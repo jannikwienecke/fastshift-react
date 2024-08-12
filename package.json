@@ -2,7 +2,9 @@
   "name": "@fast-app/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "postinstall": "nx prisma-generate nextjs"
+  },
   "private": true,
   "dependencies": {
     "@apps-next/core": "^0.0.1",
