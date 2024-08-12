@@ -1,4 +1,4 @@
-import { add } from '@fastapp/core';
+import { add } from '@apps-next/core';
 
 export function App() {
   const result = add(1, 2);

@@ -1,9 +1,9 @@
 {
-  "name": "fastapp",
+  "name": "apps-next",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/fastapp/src",
+  "sourceRoot": "apps/apps-next/src",
   "projectType": "application",
   "tags": [],
-  "// targets": "to see all targets run: nx show project fastapp --web",
+  "// targets": "to see all targets run: nx show project apps-next --web",
   "targets": {}
 }
