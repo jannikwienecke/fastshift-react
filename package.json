@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "postinstall": "nx prisma-generate nextjs"
+    "postinstall": "NX_CLOUD_DISTRIBUTED_EXECUTION=false nx prisma-generate nextjs"
   },
   "private": true,
   "dependencies": {
