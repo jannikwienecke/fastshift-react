@@ -21,17 +21,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-// const root = ReactDOM.createRoot(
-//   document.getElementById('root') as HTMLElement
-// );
-// root.render(
-//   <StrictMode>
-//     <Convex
-//     <App />
-//   </StrictMode>
-// );
-
-console.log(import.meta.env);
 const VITE_CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
 
 const convex = new ConvexReactClient(VITE_CONVEX_URL as string);
@@ -48,7 +37,9 @@ const queryClient = new QueryClient({
 
 convexQueryClient.connect(queryClient);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const root = document.getElementById('root');
+if (!root) throw new Error('root not found');
+ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <ConvexProvider client={convex}>
       <QueryClientProvider client={queryClient}>
