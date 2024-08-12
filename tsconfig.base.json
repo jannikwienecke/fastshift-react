@@ -17,7 +17,6 @@
     "paths": {
       "@apps-next/core": ["libs/core/src/index.ts"],
       "@apps-next/react": ["libs/react/src/index.ts"],
-      "@apps-next/react": ["libs/react/src/index.ts"],
       "@apps-next/react/server": ["libs/react/src/server.ts"]
     }
   },

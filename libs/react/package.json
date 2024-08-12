@@ -1,12 +1,14 @@
 {
   "name": "@apps-next/react",
-  "version": "0.0.1",
-  "main": "./index.js",
-  "types": "./index.d.ts",
+  "version": "0.0.3",
+  "main": "index.js",
+  "module": "index.mjs",
+  "types": "index.d.ts",
   "exports": {
     ".": {
       "import": "./index.mjs",
-      "require": "./index.js"
+      "require": "./index.js",
+      "types": "./index.d.ts"
     }
   }
 }
