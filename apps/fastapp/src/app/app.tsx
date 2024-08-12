@@ -1,9 +1,13 @@
-import { add } from '@apps-next/core';
+import { List } from '@apps-next/react';
 
 export function App() {
-  const result = add(1, 2);
+  return (
+    <div className="bg-red-100">
+      <div>Vite + Nx</div>
 
-  return <div className="bg-red-100">Vite + Nx {result}</div>;
+      <List />
+    </div>
+  );
 }
 
 export default App;

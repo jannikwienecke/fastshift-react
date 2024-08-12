@@ -10,6 +10,7 @@ describe('App', () => {
 
   it('should have a greeting as the title', () => {
     const { getByText } = render(<App />);
-    expect(getByText(/nx 3/i)).toBeTruthy();
+    expect(getByText(/vite/i)).toBeTruthy();
+    expect(getByText(/3/i)).toBeTruthy();
   });
 });
