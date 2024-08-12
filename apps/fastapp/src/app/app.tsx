@@ -1,7 +1,9 @@
-import NxWelcome from './nx-welcome';
+import { add } from '@fastapp/core';
 
 export function App() {
-  return <div className="bg-red-100">Vite + Nx</div>;
+  const result = add(1, 2);
+
+  return <div className="bg-red-100">Vite + Nx {result}</div>;
 }
 
 export default App;
