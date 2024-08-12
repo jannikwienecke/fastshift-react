@@ -1,8 +1,26 @@
-export default function Index() {
-  /*
-   * Replace the elements below with your own.
-   *
-   * Note: The corresponding styles are in the ./index.tailwind file.
-   */
-  return <div className="bg-blue-300">Hello Nextjs App</div>;
+// import { prisma } from '../db';
+
+import { prisma } from '../db';
+
+export default async function Index() {
+  const posts = await prisma.user.findMany({});
+
+  // await prisma.user.create({
+  //   data: {
+  //     email: 'test@test.com',
+  //     name: 'Test',
+  //   },
+  // });
+
+  return (
+    <div className="bg-blue-300">
+      <div>Hello Nextjs App !</div>
+
+      <div>
+        {posts.map((post) => (
+          <div key={post.id}>{post.email}</div>
+        ))}
+      </div>
+    </div>
+  );
 }

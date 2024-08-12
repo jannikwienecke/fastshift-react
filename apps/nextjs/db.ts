@@ -1,0 +1,30 @@
+import { createClient } from '@libsql/client';
+import { PrismaLibSQL } from '@prisma/adapter-libsql';
+import { PrismaClient } from '@prisma/client';
+
+export const singleton = <Value>(
+  name: string,
+  valueFactory: () => Value
+): Value => {
+  const g = global as any;
+  g.__singletons ??= {};
+  g.__singletons[name] ??= valueFactory();
+  return g.__singletons[name];
+};
+
+const prisma = singleton('prisma', () => {
+  if (process.env.NODE_ENV !== 'production') {
+    return new PrismaClient();
+  } else {
+    const turso = createClient({
+      url: process.env.TURSO_DATABASE_URL ?? '',
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+    const adapter = new PrismaLibSQL(turso);
+    return new PrismaClient({ adapter });
+  }
+});
+
+prisma.$connect();
+
+export { prisma };
