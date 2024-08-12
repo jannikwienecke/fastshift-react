@@ -31,6 +31,7 @@ declare module '@tanstack/react-router' {
 //   </StrictMode>
 // );
 
+console.log(import.meta.env);
 const VITE_CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
 
 const convex = new ConvexReactClient(VITE_CONVEX_URL as string);
