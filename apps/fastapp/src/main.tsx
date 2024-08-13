@@ -5,7 +5,7 @@ import * as ReactDOM from 'react-dom/client';
 
 import { api } from '@apps-next/convex';
 import { routeTree } from './routeTree.gen';
-import { ConvexQueryProvider } from '@apps-next/convex-adapter';
+import { ConvexQueryProvider } from '@apps-next/react';
 
 const router = createRouter({
   routeTree,

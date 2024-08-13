@@ -1,9 +1,9 @@
-import { useConvexQuery } from '@apps-next/convex-adapter';
 import {
   QueryProps,
   QueryReturnOrUndefined,
   RecordType,
 } from '@apps-next/core';
+import { useConvexQuery } from './convex-query-provider';
 
 const useQueryDict = {
   convex: useConvexQuery,
