@@ -2,7 +2,7 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1723476277890
+updated: 1723552744577
 created: 1723444563681
 ---
 
@@ -20,3 +20,8 @@ created: 1723444563681
 - [x] Add convex as a package
 - [x] Add Prisma to nextjs app
 - [x] use turso as a database in production and sqlite in dev
+- [ ] embed convex adapter in the vite app
+  - [ ] add query string for query
+  - [ ] clearn up
+  - [ ] write parser -> convex to zod schema
+- [ ] setup tags in nx to prevent imports

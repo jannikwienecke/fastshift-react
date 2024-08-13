@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as FastAppImport } from './routes/fastApp'
 import { Route as IndexImport } from './routes/index'
 import { Route as FastAppTasksImport } from './routes/fastApp.tasks'
+import { Route as FastAppProjectsImport } from './routes/fastApp.projects'
 
 // Create/Update Routes
 
@@ -29,6 +30,11 @@ const IndexRoute = IndexImport.update({
 
 const FastAppTasksRoute = FastAppTasksImport.update({
   path: '/tasks',
+  getParentRoute: () => FastAppRoute,
+} as any)
+
+const FastAppProjectsRoute = FastAppProjectsImport.update({
+  path: '/projects',
   getParentRoute: () => FastAppRoute,
 } as any)
 
@@ -50,6 +56,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FastAppImport
       parentRoute: typeof rootRoute
     }
+    '/fastApp/projects': {
+      id: '/fastApp/projects'
+      path: '/projects'
+      fullPath: '/fastApp/projects'
+      preLoaderRoute: typeof FastAppProjectsImport
+      parentRoute: typeof FastAppImport
+    }
     '/fastApp/tasks': {
       id: '/fastApp/tasks'
       path: '/tasks'
@@ -64,7 +77,10 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
-  FastAppRoute: FastAppRoute.addChildren({ FastAppTasksRoute }),
+  FastAppRoute: FastAppRoute.addChildren({
+    FastAppProjectsRoute,
+    FastAppTasksRoute,
+  }),
 })
 
 /* prettier-ignore-end */
@@ -85,8 +101,13 @@ export const routeTree = rootRoute.addChildren({
     "/fastApp": {
       "filePath": "fastApp.tsx",
       "children": [
+        "/fastApp/projects",
         "/fastApp/tasks"
       ]
+    },
+    "/fastApp/projects": {
+      "filePath": "fastApp.projects.tsx",
+      "parent": "/fastApp"
     },
     "/fastApp/tasks": {
       "filePath": "fastApp.tasks.tsx",

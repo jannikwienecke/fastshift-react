@@ -4,15 +4,15 @@ import React from 'react';
 // import { taskBaseView } from "src/views";
 // import schema from "src/schema";
 import { List, QueryInput } from '@apps-next/react';
-import { taskBaseView } from '../config';
+import { projectsBaseView } from '../config';
 
-export const Route = createFileRoute('/fastApp/tasks')({
-  component: () => taskBaseView.createScreen(TasksComponent),
+export const Route = createFileRoute('/fastApp/projects')({
+  component: () => projectsBaseView.createScreen(TasksComponent),
 });
 
 const TasksComponent = ({
-  data: tasks,
-}: ReturnType<typeof taskBaseView.useQuery>) => {
+  data: projects,
+}: ReturnType<typeof projectsBaseView.useQuery>) => {
   const [isAdd, setIsAdd] = React.useState(false);
 
   const ScreenControl = () => {
@@ -51,10 +51,8 @@ const TasksComponent = ({
         <QueryInput />
 
         <List />
-        {tasks?.map((task) => (
-          <div key={task.id}>
-            {task.name} + {task.id} + {task.completed ? 'true' : 'false'}
-          </div>
+        {projects?.map((project) => (
+          <div key={project.id}>{project.text}</div>
         ))}
 
         {/* <List.Default {...list.getProps({ data })} /> */}

@@ -1,0 +1,19 @@
+{
+  "name": "convex",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/convex/src",
+  "projectType": "library",
+  "tags": ["convex-adapter"],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/convex",
+        "main": "libs/convex/src/index.ts",
+        "tsConfig": "libs/convex/tsconfig.lib.json",
+        "assets": ["libs/convex/*.md"]
+      }
+    }
+  }
+}

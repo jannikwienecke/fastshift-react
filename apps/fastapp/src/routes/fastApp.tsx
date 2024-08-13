@@ -9,9 +9,9 @@ function FastAppLayoutComponent() {
     <div className="flex flex-row pt-2">
       <div className="min-w-[15rem]">
         {/* <Link to="/fastApp/projects">Projects</Link> */}
-        <div>
-          {' '}
+        <div className="flex flex-col gap-2">
           <Link to="/fastApp/tasks">Tasks</Link>
+          <Link to="/fastApp/projects">Projects</Link>
         </div>
       </div>
 

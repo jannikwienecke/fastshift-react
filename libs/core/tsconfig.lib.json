@@ -5,6 +5,12 @@
     "declaration": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "../react/src/lib/use-query.ts",
+    "../react/src/lib/config-model.tsx",
+    "../react/src/lib/useViewConfig.ts",
+    "../react/src/lib/view-context.ts"
+  ],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }
