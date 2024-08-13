@@ -5,21 +5,17 @@ const documentBaseSchema = z.object({
   id: z.string(),
 });
 
+// const documentBaseSchema2 = z.object({
+//   id: z.object({
+//     type: z.string(),
+//     // optional or required
+//     optional: z.literal('required'),
+//   }),
+// });
+
 export type FieldType = 'String' | 'Number' | 'Boolean' | 'Date';
 
-export type RecordType<T = Record<string, unknown>> = {
-  id: string;
-} & T;
-
-export type DataModel<TableNames extends string = any> = {
-  [key in TableNames]: {
-    // document: typeof documentBaseSchema;
-    schema: typeof documentBaseSchema;
-    // fields: {
-    //   type: FieldType;
-    // };
-  };
-};
+export type RecordType<T = Record<string, unknown>> = T;
 
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
@@ -27,14 +23,24 @@ export type FieldConfig = {
   type: FieldType;
 };
 
-export type GetTableName<T extends DataModel> = keyof T;
+export type GetTableName<T extends DataModel> = keyof T['tables'];
 
 export type ViewConfig<
-  TDataModel extends DataModel = any,
-  T extends keyof TDataModel = any
+  TDataModel extends Record<string, any> = any,
+  T extends keyof TDataModel['tables'] = any
 > = {
   tableName: T;
-  labelKey: keyof z.infer<TDataModel[T]['schema']>;
+  labelKey: keyof TDataModel['tables'][T]['validator']['fields'];
+  viewFields: ViewFieldConfig;
+  viewName: string;
+};
+
+export type ViewConfig2<
+  TDataModel extends Record<string, any> = any,
+  T extends keyof TDataModel['tables'] = any
+> = {
+  tableName: T;
+  labelKey: keyof z.infer<TDataModel['tables'][T]['schema']>;
   viewFields: ViewFieldConfig;
   viewName: string;
 };
@@ -45,4 +51,20 @@ export type GlobalConfig = {
   //     api?: any;
   //   };
   // };
+};
+
+type FieldSchemaType = Record<string, z.ZodTypeAny>;
+
+type TableSchemaType = {
+  schema: z.ZodTypeAny;
+};
+
+export type SchemaType = Record<string, TableSchemaType>;
+
+export type DataModel<TableNames extends string = any> = {
+  tables: {
+    [key in TableNames]: {
+      schema: typeof documentBaseSchema;
+    };
+  };
 };

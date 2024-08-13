@@ -1,5 +1,5 @@
 import { add } from '@apps-next/core';
-import { useViewConfig } from './useViewConfig';
+import { useViewConfig } from './use-view-config';
 
 export function List() {
   const { viewConfig } = useViewConfig();

@@ -49,7 +49,7 @@ const TasksComponent = ({
 
         <List />
         {projects?.map((project) => (
-          <div key={project.id}>{project.text}</div>
+          <div key={project.text}>{project.text}</div>
         ))}
 
         {/* <List.Default {...list.getProps({ data })} /> */}

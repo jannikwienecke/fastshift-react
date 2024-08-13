@@ -1,8 +1,5 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router';
-// import { List, useList } from "lib/react/ui";
 import React from 'react';
-// import { taskBaseView } from "src/views";
-// import schema from "src/schema";
 import { List, QueryInput } from '@apps-next/react';
 import { taskBaseView } from '../config';
 
@@ -53,7 +50,7 @@ const TasksComponent = ({
         <List />
         {tasks?.map((task) => (
           <div key={task.id}>
-            {task.name} + {task.id} + {task.completed ? 'true' : 'false'}
+            {task.name} - {task.completed ? '✅' : '❌'}
           </div>
         ))}
 

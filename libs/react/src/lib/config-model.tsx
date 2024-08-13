@@ -1,65 +1,67 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import {
-  DataModel,
   FieldType,
-  GetTableName,
   QueryProps,
   ViewConfig,
   ViewFieldConfig,
 } from '@apps-next/core';
+import { Infer } from 'convex/values';
 import { useAtomValue } from 'jotai';
-import { z, ZodFirstPartyTypeKind } from 'zod';
 import { ViewProvider } from './page-provider';
 import { debouncedQueryAtom } from './query-input';
 import { useQuery } from './use-query';
 
-const ZodTypeMapping: Partial<Record<ZodFirstPartyTypeKind, FieldType>> = {
-  ZodString: 'String',
-  ZodNumber: 'Number',
-  ZodBoolean: 'Boolean',
-  ZodDate: 'Date',
+const MappingConvexToFieldType: Record<string, FieldType> = {
+  string: 'String',
+  number: 'Number',
+  boolean: 'Boolean',
+  date: 'Date',
 };
 
-export class Config<TDataModel extends DataModel> {
-  dataModel: TDataModel;
-  tableNames: (keyof TDataModel)[];
-  viewFields: Record<keyof TDataModel, ViewFieldConfig>;
+type ConvexSchemaType = {
+  tables: Record<string, any>;
+};
 
-  viewConfig = new Map<keyof TDataModel, ViewConfig<TDataModel, any>>();
+export class Config<TDataModel extends ConvexSchemaType> {
+  dataModel: Record<string, any>;
+  tableNames: (keyof TDataModel)[];
+  viewFields: Record<string, ViewFieldConfig>;
 
   constructor(dataModel: TDataModel) {
     this.tableNames = Object.keys(dataModel) as (keyof TDataModel)[];
     this.dataModel = dataModel;
+
     this.viewFields = {} as any;
 
-    Object.entries(dataModel).forEach(([tableName, table]) => {
-      const shape = table.schema.shape;
-
-      this.viewFields[tableName] = Object.keys(shape).reduce((acc, key) => {
-        const type =
-          ZodTypeMapping[shape[key]._def.typeName as ZodFirstPartyTypeKind] ??
-          'String';
-
-        acc[key] = { type };
-
-        return acc;
-      }, {} as Record<string, { type: FieldType }>);
-    });
+    this.viewFields = Object.fromEntries(
+      Object.entries(dataModel.tables).map(([tableName, tableData]) => [
+        tableName,
+        Object.fromEntries(
+          Object.entries(tableData.validator.fields).map(
+            ([fieldName, fieldData]) => [
+              fieldName,
+              {
+                type: MappingConvexToFieldType[(fieldData as any).kind],
+              },
+            ]
+          )
+        ),
+      ])
+    );
   }
 
-  createBaseView<TableName extends GetTableName<TDataModel>>(
+  createBaseView<TableName extends keyof TDataModel['tables']>(
     tableName: TableName,
     config: Partial<
       Omit<ViewConfig<TDataModel, TableName>, 'viewFields' | 'tableName'>
     >
   ) {
-    const viewFields = this.viewFields;
+    const viewFields = this.viewFields[tableName as string];
 
-    type DataType = z.infer<TDataModel[TableName]['schema']>;
+    type DataType = Infer<TDataModel['tables'][TableName]['validator']>;
 
+    type DataTypeWithId = DataType & { id: string };
     const _useQuery = (props: QueryProps) => {
-      return useQuery<DataType[]>(props);
+      return useQuery<DataTypeWithId[]>(props);
     };
 
     function createScreen(
@@ -68,7 +70,7 @@ export class Config<TDataModel extends DataModel> {
       const viewConfig = {
         ...config,
         labelKey: config.labelKey as string,
-        viewFields: viewFields[tableName as string],
+        viewFields: viewFields,
         tableName,
         viewName: config.viewName ?? (tableName as string),
       };
@@ -91,8 +93,18 @@ export class Config<TDataModel extends DataModel> {
     }
 
     return {
-      createScreen,
       useQuery: _useQuery,
+      createScreen,
     };
   }
 }
+
+export const createConfigFromConvexSchema = <
+  TDataModel extends ConvexSchemaType
+>(
+  schema: TDataModel
+) => {
+  const config = new Config(schema);
+
+  return config;
+};
