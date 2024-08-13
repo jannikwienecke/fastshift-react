@@ -14,6 +14,8 @@ export default async function Index() {
   //   },
   // });
 
+  console.log({ posts });
+
   return (
     <div className="bg-blue-300">
       <div>Hello Nextjs App !</div>
