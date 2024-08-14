@@ -2,9 +2,19 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1723552744577
+updated: 1723657154741
 created: 1723444563681
 ---
+
+> Reminder: Write down the plan for the day
+> Write down thoughts and plan for the next day
+> Take time for the „little“ things
+> This is your chance
+> It’s not about how far I come but how good the things are that are created
+
+Write down how it should look in the end !!
+
+Add a small doc section to each new progress step
 
 # Pre MVP Steps
 
@@ -21,7 +31,17 @@ created: 1723444563681
 - [x] Add Prisma to nextjs app
 - [x] use turso as a database in production and sqlite in dev
 - [ ] embed convex adapter in the vite app
+
   - [ ] add query string for query
-  - [ ] clearn up
+  - [ ] Clean up !
+
+    - [x] Create internal and external for libraries
+    - [x] Add tags !
+    - [x] Check graph
+    - [ ] Great test data & Schema
+    - [ ] Wishful thinking - Desired Api Design
+    - [ ] Write tests - use for both apps
+    - [ ] Write most naive implementation to pass the tests
+    - [ ] Write abstraction
+
   - [ ] write parser -> convex to zod schema
-- [ ] setup tags in nx to prevent imports
