@@ -1,66 +1,135 @@
-import { api } from '@apps-next/convex';
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { FieldConfig } from '@apps-next/core';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { useMutation } from './use-mutation';
 import { useViewConfig } from './use-view-config';
+
+const formAtom = atom<Record<string, any>>({});
+// TODO CLEAN UP -> USE TANS STACK FORM
+const updateFormValueAtom = atom(
+  null,
+  (get, set, update: { field: string; value: any }) => {
+    const form = get(formAtom);
+
+    set(formAtom, {
+      ...form,
+      [update.field]: update.value,
+    });
+  }
+);
+
+const resetFormAtom = atom(null, (get, set) => {
+  set(formAtom, {});
+});
+
+const StringInput = ({
+  value,
+  onChange,
+  field,
+}: {
+  field: FieldConfig;
+  onChange: (e: any) => void;
+  value: any;
+}) => {
+  return (
+    <input
+      name={field.name}
+      value={value}
+      onChange={onChange}
+      className="border border-black p-1 px-4 rounded-md"
+      placeholder={'Enter ' + field.name}
+    />
+  );
+};
+
+const BooleanInput = ({
+  value,
+  onChange,
+  field,
+}: {
+  field: FieldConfig;
+  onChange: (e: any) => void;
+  value: any;
+}) => {
+  return (
+    <div className="flex flex-row items-center space-x-2">
+      <div>{field.name}</div>
+      <input
+        defaultChecked={false}
+        name={field.name}
+        value={value}
+        onChange={onChange}
+        className="border border-black p-1 px-4 rounded-md"
+        type="checkbox"
+      />
+    </div>
+  );
+};
+
+const dict = {
+  String: StringInput,
+  Number: StringInput,
+  Boolean: BooleanInput,
+  Date: StringInput,
+};
 
 export const Form = () => {
   const { viewConfig } = useViewConfig();
-  console.log({ viewConfig });
+  const { mutate } = useMutation();
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: useConvexMutation(api.query.mutation),
-  });
+  const updateFormValue = useSetAtom(updateFormValueAtom);
+  const resetForm = useSetAtom(resetFormAtom);
+  const form = useAtomValue(formAtom);
 
   return (
     <form
       onSubmit={(e) => {
+        console.log('submit');
         e.preventDefault();
 
-        const formData = new FormData(e.target as HTMLFormElement);
+        const formData = new FormData(e.target as any);
 
-        const name = formData.get('name') as string;
-        const completed = formData.get('completed');
+        const formValues: Record<string, any> = {};
 
-        mutate({ name, completed: completed === 'on' });
+        viewConfig.getViewFieldList().forEach((field) => {
+          const value = formData.get(field.name);
+          const isBoolean = field.type === 'Boolean';
+          formValues[field.name] = isBoolean && value === null ? false : value;
+        });
+
+        mutate({
+          mutation: {
+            type: 'CREATE_RECORD',
+            record: formValues,
+          },
+        });
+
+        resetForm();
       }}
     >
       <div className="pb-6 justify-end flex flex-col space-y-2 w-[20rem]">
         {viewConfig.getViewFieldList().map((field) => {
-          const StringInput = () => {
-            return (
-              <input
-                name={field.name}
-                className="border border-black p-1 px-4 rounded-md"
-                placeholder={'Enter ' + field.name}
-              />
-            );
-          };
-          const BooleanInput = () => {
-            return (
-              <div className="flex flex-row items-center space-x-2">
-                <div>{field.name}</div>
-                <input
-                  name={field.name}
-                  className="border border-black p-1 px-4 rounded-md"
-                  type="checkbox"
-                />
-              </div>
-            );
-          };
-
-          const dict = {
-            String: StringInput,
-            Number: StringInput,
-            Boolean: BooleanInput,
-            Date: StringInput,
-          };
-
           const Input = dict[field.type];
-          return <Input />;
+
+          const value = form[field.name];
+          return (
+            <div key={field.name}>
+              <Input
+                field={field}
+                value={value || ''}
+                onChange={(e) =>
+                  updateFormValue({
+                    field: field.name,
+                    value: e.target.value,
+                  })
+                }
+              />
+            </div>
+          );
         })}
 
         <button
           type="submit"
+          onClick={() => console.log('click')}
           className="border border-red-500 p-1 px-4 rounded-md"
         >
           Save

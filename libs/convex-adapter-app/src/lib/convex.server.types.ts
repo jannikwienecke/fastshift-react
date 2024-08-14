@@ -304,6 +304,38 @@ export interface GenericQueryCtx {
   runQuery?: (query: any, ...args: any) => Promise<any>;
 }
 
+export interface GenericMutationCtx {
+  /**
+   * A utility for reading and writing data in the database.
+   */
+  db: any;
+
+  /**
+   * Information about the currently authenticated user.
+   */
+  auth: any;
+
+  /**
+   * A utility for reading and writing files in storage.
+   */
+  storage: any;
+
+  /**
+   * A utility for scheduling Convex functions to run in the future.
+   */
+  scheduler: any;
+
+  /**
+   * @internal
+   */
+  runQuery: any;
+
+  /**
+   * @internal
+   */
+  runMutation: any;
+}
+
 export type DefaultFunctionArgs = Record<string, unknown>;
 
 export type FunctionType = 'query' | 'mutation' | 'action';

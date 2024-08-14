@@ -1,4 +1,5 @@
 import { RecordType } from './base.types';
+import { MutationProps } from './mutation.types';
 import { BaseViewConfigManagerInterface } from './view-config.types';
 
 export type QueryProps = {
@@ -14,3 +15,8 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
 
 export type QueryReturnOrUndefined<T extends RecordType = RecordType> =
   QueryReturnType<T>;
+
+export type MutationReturnType = {
+  mutate: (mutation: MutationProps) => void;
+  isPending: boolean;
+};

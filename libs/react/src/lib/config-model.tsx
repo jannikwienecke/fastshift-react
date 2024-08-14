@@ -1,3 +1,4 @@
+import { ConvexViewConfigManager } from '@apps-next/convex-adapter-app';
 import {
   ConvexViewConfig,
   FieldType,
@@ -8,9 +9,9 @@ import {
 import { Infer } from 'convex/values';
 import { useAtomValue } from 'jotai';
 import { debouncedQueryAtom } from './query-input';
+import { useMutation } from './use-mutation';
 import { useQuery } from './use-query';
 import { ViewProvider } from './view-provider';
-import { ConvexViewConfigManager } from '@apps-next/convex-adapter-app';
 
 const MappingConvexToFieldType: Record<string, FieldType> = {
   string: 'String',
@@ -82,10 +83,16 @@ export class Config<TDataModel extends ConvexSchemaType> {
     type DataType = Infer<TDataModel['tables'][TableName]['validator']>;
 
     type DataTypeWithId = DataType & { id: string };
+
     const _useQuery = (props: QueryProps) => {
       return useQuery<DataTypeWithId[]>(props);
     };
 
+    const _useMutation = () => {
+      return useMutation();
+    };
+
+    // TODO CLEAN UP
     function createScreen(
       Component: (props: ReturnType<typeof _useQuery>) => React.ReactNode
     ) {
@@ -124,6 +131,7 @@ export class Config<TDataModel extends ConvexSchemaType> {
 
     return {
       useQuery: _useQuery,
+      useMutation: _useMutation,
       createScreen,
     };
   }

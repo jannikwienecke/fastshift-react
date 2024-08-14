@@ -20,8 +20,16 @@ export type ViewLoader = FunctionReference<
   ConvexRecordType[] | null
 >;
 
+export type ViewMutation = FunctionReference<
+  'mutation',
+  'public',
+  DefaultFunctionArgs,
+  null
+>;
+
 export type ConvexApiType = {
   viewLoader: ViewLoader;
+  viewMutation: ViewMutation;
 };
 
 export type ConvexQueryProviderProps = React.PropsWithChildren<{

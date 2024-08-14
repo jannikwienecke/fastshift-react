@@ -33,6 +33,7 @@ ReactDOM.createRoot(root).render(
       convexUrl={VITE_CONVEX_URL}
       api={{
         viewLoader: api.query.viewLoader,
+        viewMutation: api.query.viewMutation,
       }}
     >
       <RouterProvider router={router} />

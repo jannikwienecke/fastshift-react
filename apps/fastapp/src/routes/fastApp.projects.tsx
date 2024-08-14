@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import { List, QueryInput } from '@apps-next/react';
+import { Form, List, QueryInput } from '@apps-next/react';
 import { projectsBaseView } from '../config';
 
 export const Route = createFileRoute('/fastApp/projects')({
@@ -20,17 +20,6 @@ const TasksComponent = ({
           className="border border-black p-1 px-4 rounded-md"
         >
           Add
-        </button>
-      </div>
-    );
-  };
-
-  const Form = () => {
-    return (
-      <div className="w-full pb-6 flex justify-end">
-        <input className="border border-black p-1 px-4 rounded-md" />
-        <button className="border border-red-500 p-1 px-4 rounded-md">
-          Save
         </button>
       </div>
     );
