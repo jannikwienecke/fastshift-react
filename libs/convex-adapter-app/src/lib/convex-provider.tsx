@@ -1,10 +1,13 @@
 import { ConvexQueryClient } from '@convex-dev/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConvexProvider, ConvexReactClient } from 'convex/react';
-import { ConvexApiType, ConvexQueryProviderProps } from './types.convex';
+import {
+  ConvexApiType,
+  ConvexQueryProviderProps,
+} from './_internal/types.convex';
 
 import React from 'react';
-import { ConvexContext } from './convex-context';
+import { ConvexContext } from './_internal/convex-context';
 
 export const ConvexContextProvider = (
   props: React.PropsWithChildren<{ api: ConvexApiType }>

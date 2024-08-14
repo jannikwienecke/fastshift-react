@@ -2,7 +2,7 @@ import { invarant, MutationReturnType } from '@apps-next/core';
 import { useConvexMutation as useConvexMutationConvex } from '@convex-dev/react-query';
 import { useMutation } from '@tanstack/react-query';
 
-import { useConvexApi } from './useConvexApi';
+import { useConvexApi } from './_internal/useConvexApi';
 
 export const useConvexMutation = (): MutationReturnType => {
   const api = useConvexApi();

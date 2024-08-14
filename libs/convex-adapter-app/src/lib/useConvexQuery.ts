@@ -9,8 +9,8 @@ import { convexQuery } from '@convex-dev/react-query';
 import { useQuery as useQueryTanstack } from '@tanstack/react-query';
 
 import { useRef } from 'react';
-import { parseConvexData } from './convex-utils';
-import { useConvexApi } from './useConvexApi';
+import { parseConvexData } from './_internal/convex-utils';
+import { useConvexApi } from './_internal/useConvexApi';
 
 export const useStableQuery = (fn: any, args: QueryProps) => {
   const result = useQueryTanstack(
