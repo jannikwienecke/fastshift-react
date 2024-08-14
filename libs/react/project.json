@@ -3,7 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/react/src",
   "projectType": "library",
-  "tags": ["react"],
+  "tags": ["scope:react"],
   "// targets": "to see all targets run: nx show project react --web",
   "targets": {
     "nx-release-publish": {

@@ -3,7 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/convex/src",
   "projectType": "library",
-  "tags": ["convex"],
+  "tags": ["scope:convex-app"],
   "targets": {
     "build": {
       "executor": "@nx/vite:build",

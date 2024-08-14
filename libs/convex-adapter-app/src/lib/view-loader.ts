@@ -2,6 +2,7 @@ import { invarant, MutationProps, QueryProps } from '@apps-next/core';
 import { DefaultFunctionArgs, GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
 import { ConvexViewConfigManager } from './convex-view-config';
+import { mutationHandlers } from './convex-mutation-handler';
 
 export const viewLoaderHandler = async (
   ctx: GenericQueryCtx,
@@ -32,44 +33,24 @@ export const viewLoaderHandler = async (
   return await dbQuery.collect();
 };
 
-// export const mutation = server.mutation({
-//   handler: async (ctx, _args) => {
-//     const args = _args as QueryProps;
-
-//     const { query, viewConfig, ...props }: QueryProps & Record<string, any> = {
-//       ...args,
-//       query: args.query as string,
-//       viewConfig: new ConvexViewConfigManager(args.viewConfig as any),
-//     };
-
-//     await ctx.db.insert(viewConfig.getTableName(), {
-//       completed: props['args']['completed'],
-//       name: props['args']['name'],
-//     });
-//   },
-// });
-
 export const viewMutationHandler = async (
   ctx: GenericQueryCtx,
   _args: DefaultFunctionArgs
 ): Promise<null> => {
-  console.log('HIER!!!!!');
-  console.log(_args);
   const args = _args as MutationProps;
 
-  // const { query, viewConfig, ...props }: QueryProps & Record<string, any> = {
-  //   ...args,
-  //   query: args.query as string,
-  //   viewConfig: new ConvexViewConfigManager(args.viewConfig as any),
-  // };
+  console.log(_args);
 
-  // console.log(args.viewConfig);
-  // console.log(viewConfig);
+  const { mutation, viewConfig }: MutationProps = {
+    ...args,
+    viewConfig: new ConvexViewConfigManager(args.viewConfig as any),
+  };
 
-  // await ctx.db.insert(viewConfig.getTableName(), {
-  //   completed: props['args']['completed'],
-  //   name: props['args']['name'],
-  // });
+  const handler = mutationHandlers[mutation.type];
 
+  await handler(ctx, {
+    mutation,
+    viewConfig,
+  });
   return null;
 };

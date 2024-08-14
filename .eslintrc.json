@@ -13,8 +13,24 @@
             "allow": [],
             "depConstraints": [
               {
-                "sourceTag": "*",
+                "sourceTag": "scope:shared",
+                "onlyDependOnLibsWithTags": []
+              },
+              {
+                "sourceTag": "scope:react",
+                "onlyDependOnLibsWithTags": ["scope:shared", "scope:adapter"]
+              },
+              {
+                "sourceTag": "scope:convex-app",
+                "onlyDependOnLibsWithTags": ["scope:convex-adapter"]
+              },
+              {
+                "sourceTag": "scope:application",
                 "onlyDependOnLibsWithTags": ["*"]
+              },
+              {
+                "sourceTag": "scope:convex-adapter",
+                "onlyDependOnLibsWithTags": ["scope:shared"]
               }
             ]
           }

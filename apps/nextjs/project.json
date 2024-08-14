@@ -3,7 +3,7 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "nextjs",
   "projectType": "application",
-  "tags": [],
+  "tags": ["scope:application"],
   "targets": {
     "prisma-deploy": {
       "executor": "@nx-tools/nx-prisma:deploy"

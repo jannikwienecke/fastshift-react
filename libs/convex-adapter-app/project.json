@@ -3,7 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/convex-adapter-app/src",
   "projectType": "library",
-  "tags": ["convex"],
+  "tags": ["scope:adapter", "scope:convex-adapter"],
   "// targets": "to see all targets run: nx show project convex-adapter-app --web",
   "targets": {}
 }
