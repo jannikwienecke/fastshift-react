@@ -40,3 +40,7 @@ export type ConvexQueryProviderProps = React.PropsWithChildren<{
 export type ConvexContextType = {
   api: ConvexApiType;
 };
+
+export type ConvexSchemaType = {
+  tables: Record<string, any>;
+};

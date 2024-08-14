@@ -6,6 +6,6 @@ import {
 
 export class ConvexViewConfigManager extends BaseViewConfigManager<ConvexViewConfig> {
   override getSearchableField(): SearchableField | undefined {
-    return this.viewConfig.query?.searchableField;
+    return this.viewConfig.query?.searchableFields;
   }
 }

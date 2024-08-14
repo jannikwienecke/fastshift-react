@@ -1,148 +1,79 @@
-import { ConvexViewConfigManager } from '@apps-next/convex-adapter-app';
 import {
-  ConvexViewConfig,
-  FieldType,
+  ConvexViewManager,
+  generateSearchableFieldsFromConvexSchema,
+  generateViewFieldsFromConvexSchema,
+} from '@apps-next/convex-adapter-app';
+import {
+  BaseViewConfigManager,
   QueryProps,
+  QueryReturnOrUndefined,
   SearchableField,
   ViewFieldConfig,
 } from '@apps-next/core';
-import { Infer } from 'convex/values';
 import { useAtomValue } from 'jotai';
-import { debouncedQueryAtom } from './query-input';
-import { useMutation } from './use-mutation';
+import React from 'react';
+import { debouncedQueryAtom } from './ui-components/query-input';
 import { useQuery } from './use-query';
 import { ViewProvider } from './view-provider';
 
-const MappingConvexToFieldType: Record<string, FieldType> = {
-  string: 'String',
-  number: 'Number',
-  boolean: 'Boolean',
-  date: 'Date',
-};
+type Provider = 'convex' | 'prisma';
 
 type ConvexSchemaType = {
   tables: Record<string, any>;
 };
 
-export class Config<TDataModel extends ConvexSchemaType> {
-  dataModel: Record<string, any>;
-  tableNames: (keyof TDataModel)[];
-  viewFields: Record<string, ViewFieldConfig>;
-  searchableFields: Record<string, SearchableField>;
+const ViewDataProvider = <TProps extends QueryReturnOrUndefined<any>>(props: {
+  Component: (props: TProps) => React.ReactNode;
+  viewConfig: BaseViewConfigManager;
+}) => {
+  const _useQuery = (props: QueryProps) => {
+    return useQuery<TProps['data']>(props);
+  };
 
-  constructor(dataModel: TDataModel) {
-    this.tableNames = Object.keys(dataModel) as (keyof TDataModel)[];
-    this.dataModel = dataModel;
+  const Content = () => {
+    const query = useAtomValue(debouncedQueryAtom);
+    const data = _useQuery({ query, viewConfig: props.viewConfig });
+    // eslint-disable-next-line
+    // @ts-ignore
+    return <props.Component {...data} />;
+  };
 
-    this.viewFields = {} as any;
+  const Provider = (
+    <ViewProvider viewConfig={props.viewConfig}>
+      <Content />
+    </ViewProvider>
+  );
 
-    this.viewFields = Object.fromEntries(
-      Object.entries(dataModel.tables).map(([tableName, tableData]) => [
-        tableName,
-        Object.fromEntries(
-          Object.entries(tableData.validator.fields).map(
-            ([fieldName, fieldData]) => [
-              fieldName,
-              {
-                type: MappingConvexToFieldType[(fieldData as any).kind],
-                name: fieldName,
-              },
-            ]
-          )
-        ),
-      ])
-    );
+  return Provider;
+};
 
-    this.searchableFields = Object.entries(dataModel.tables).reduce(
-      (acc, [tableName, tableData]) => {
-        const searchIndex = tableData.searchIndexes?.[0];
-
-        if (searchIndex.searchField && searchIndex.indexDescriptor) {
-          acc[tableName] = {
-            field: searchIndex.searchField,
-            name: searchIndex.indexDescriptor,
-            filterFields: searchIndex.filterFields,
-          } satisfies SearchableField;
-        }
-
-        return acc;
-      },
-      {} as Record<string, SearchableField>
-    );
-  }
-
-  createBaseView<TableName extends keyof TDataModel['tables']>(
-    tableName: TableName,
-    config: Partial<
-      Omit<ConvexViewConfig<TDataModel, TableName>, 'viewFields' | 'tableName'>
-    >
-  ) {
-    const viewFields = this.viewFields[tableName as string];
-    const searchableField = this.searchableFields[tableName as string];
-
-    type DataType = Infer<TDataModel['tables'][TableName]['validator']>;
-
-    type DataTypeWithId = DataType & { id: string };
-
-    const _useQuery = (props: QueryProps) => {
-      return useQuery<DataTypeWithId[]>(props);
-    };
-
-    const _useMutation = () => {
-      return useMutation();
-    };
-
-    // TODO CLEAN UP
-    function createScreen(
-      Component: (props: ReturnType<typeof _useQuery>) => React.ReactNode
-    ) {
-      const viewConfig: ConvexViewConfig<TDataModel, TableName> = {
-        ...config,
-        displayField: {
-          ...config.displayField,
-          field: config.displayField?.field as string,
-        },
-        viewFields: viewFields,
-        tableName,
-        viewName: config.viewName ?? (tableName as string),
-        query: {
-          searchableField,
-        },
-      };
-
-      const viewConfigManager = new ConvexViewConfigManager(viewConfig);
-
-      const Content = (props: {
-        Component: (props: ReturnType<typeof _useQuery>) => React.ReactNode;
-      }) => {
-        const query = useAtomValue(debouncedQueryAtom);
-        const data = _useQuery({ query, viewConfig: viewConfigManager });
-        return <props.Component {...data} />;
-      };
-
-      const Provider = (
-        <ViewProvider viewConfig={viewConfigManager}>
-          <Content Component={Component} />
-        </ViewProvider>
-      );
-
-      return Provider;
-    }
-
-    return {
-      useQuery: _useQuery,
-      useMutation: _useMutation,
-      createScreen,
-    };
-  }
-}
-
-export const createConfigFromConvexSchema = <
+export const generateConfigFrom = <
+  TProvider extends Provider,
   TDataModel extends ConvexSchemaType
 >(
-  schema: TDataModel
+  provider: TProvider,
+  schema: TProvider extends 'convex' ? TDataModel : never
 ) => {
-  const config = new Config(schema);
+  let searchableFields: Record<string, SearchableField> | null = null;
+  let viewFields: Record<string, ViewFieldConfig> | null = null;
 
-  return config;
+  if (provider === 'convex') {
+    searchableFields = generateSearchableFieldsFromConvexSchema(schema);
+    viewFields = generateViewFieldsFromConvexSchema(schema);
+
+    return new ConvexViewManager<TDataModel>(
+      schema,
+      viewFields,
+      searchableFields,
+      ViewDataProvider
+    );
+  } else {
+    throw new Error('Provider not supported yet');
+  }
 };
+
+export type InferViewProps<T> = T extends {
+  createScreen: (props: any) => React.ReactNode;
+}
+  ? React.ComponentProps<React.ComponentProps<T['createScreen']>>
+  : never;

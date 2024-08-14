@@ -1,9 +1,9 @@
 import { schema } from '@apps-next/convex';
-import { createConfigFromConvexSchema } from '@apps-next/react';
+import { generateConfigFrom } from '@apps-next/react';
 
-const config = createConfigFromConvexSchema(schema);
+const config = generateConfigFrom('convex', schema);
 
-export const projectsBaseView = config.createBaseView('projects', {
+export const projectsBaseView = config.createView('projects', {
   displayField: {
     field: 'text',
   },
@@ -16,7 +16,7 @@ export const projectsBaseView = config.createBaseView('projects', {
   },
 });
 
-export const taskBaseView = config.createBaseView('tasks', {
+export const taskBaseView = config.createView('tasks', {
   displayField: {
     field: 'name',
   },

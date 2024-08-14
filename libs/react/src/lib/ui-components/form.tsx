@@ -1,7 +1,7 @@
 import { FieldConfig } from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
-import { useMutation } from './use-mutation';
-import { useViewConfig } from './use-view-config';
+import { useMutation } from '../use-mutation';
+import { useViewConfig } from '../use-view-config';
 
 const formAtom = atom<Record<string, any>>({});
 // TODO CLEAN UP -> USE TANS STACK FORM

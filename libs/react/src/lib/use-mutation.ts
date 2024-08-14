@@ -1,6 +1,6 @@
 import { useConvexMutation } from '@apps-next/convex-adapter-app';
+import { Mutation } from '@apps-next/core';
 import { useViewConfig } from './use-view-config';
-import { Mutation, MutationProps } from '@apps-next/core';
 
 const useQueryDict = {
   convex: useConvexMutation,

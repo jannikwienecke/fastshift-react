@@ -23,7 +23,7 @@ export type ConvexViewConfig<
   T extends keyof TDataModel['tables'] = any
 > = {
   query?: {
-    searchableField?: SearchableField<TDataModel, T>;
+    searchableFields?: SearchableField<TDataModel, T>;
   };
 } & ViewConfig<TDataModel, T>;
 

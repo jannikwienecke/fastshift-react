@@ -24,6 +24,6 @@
     "src/**/*.jsx",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "../core/src/lib/view-config.ts"
+    "../core/src/lib/base-view-config.ts"
   ]
 }

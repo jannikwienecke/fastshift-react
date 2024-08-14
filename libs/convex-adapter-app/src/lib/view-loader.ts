@@ -21,6 +21,7 @@ export const viewLoaderHandler = async (
   invarant(Boolean(viewConfig), 'viewConfig is not defined');
 
   const searchField = viewConfig?.getSearchableField();
+  console.log({ searchField });
   const searching =
     _args['query'] === ''
       ? null

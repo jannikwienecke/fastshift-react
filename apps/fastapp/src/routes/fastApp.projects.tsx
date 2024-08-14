@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import { Form, List, QueryInput } from '@apps-next/react';
+import { Form, InferViewProps, List, QueryInput } from '@apps-next/react';
 import { projectsBaseView } from '../config';
 
 export const Route = createFileRoute('/fastApp/projects')({
@@ -9,7 +9,7 @@ export const Route = createFileRoute('/fastApp/projects')({
 
 const TasksComponent = ({
   data: projects,
-}: ReturnType<typeof projectsBaseView.useQuery>) => {
+}: InferViewProps<typeof projectsBaseView>) => {
   const [isAdd, setIsAdd] = React.useState(false);
 
   const ScreenControl = () => {
