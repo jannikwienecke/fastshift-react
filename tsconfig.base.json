@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@apps-next/convex": ["packages/convex/src/index.ts"],
-      "@apps-next/convex-adapter": ["libs/convex/src/index.ts"],
+      "@apps-next/convex-adapter-app": ["libs/convex-adapter-app/src/index.ts"],
       "@apps-next/core": ["libs/core/src/index.ts"],
       "@apps-next/react": ["libs/react/src/index.ts"]
     }

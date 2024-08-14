@@ -1,12 +1,10 @@
-import { ViewConfig } from '@apps-next/core';
+import { BaseViewConfigManagerInterface } from '@apps-next/core';
 import React from 'react';
 
-type PageContextType = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  viewConfig: ViewConfig<any>;
-  //   data: RecordType[] | undefined;
+type ViewContextType = {
+  viewConfig: BaseViewConfigManagerInterface;
 };
 
-export const ViewContext = React.createContext<PageContextType>(
-  {} as PageContextType
+export const ViewContext = React.createContext<ViewContextType>(
+  {} as ViewContextType
 );

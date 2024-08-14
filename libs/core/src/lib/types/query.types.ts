@@ -1,8 +1,9 @@
-import { RecordType, ViewConfig } from './base.types';
+import { RecordType } from './base.types';
+import { BaseViewConfigManagerInterface } from './view-config.types';
 
 export type QueryProps = {
   query?: string;
-  viewConfig?: ViewConfig;
+  viewConfig?: BaseViewConfigManagerInterface;
 };
 
 export type QueryReturnType<T extends RecordType = RecordType> = {

@@ -4,10 +4,21 @@ import { createConfigFromConvexSchema } from '@apps-next/react';
 const config = createConfigFromConvexSchema(schema);
 
 export const projectsBaseView = config.createBaseView('projects', {
-  labelKey: 'text',
+  displayField: {
+    field: 'text',
+  },
+  query: {
+    // searchablefField: {
+    //   field: 'text',
+    //   name: 'text',
+    //   filterFields: [],
+    // },
+  },
 });
 
 export const taskBaseView = config.createBaseView('tasks', {
-  labelKey: 'name',
+  displayField: {
+    field: 'name',
+  },
   viewName: 'myTasks',
 });

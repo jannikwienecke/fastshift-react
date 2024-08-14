@@ -521,3 +521,78 @@ export interface FilterBuilder<TableInfo = any> {
    */
   field: any;
 }
+
+export abstract class SearchFilter {
+  // Property for nominal type support.
+  private _isSearchFilter: undefined;
+
+  /**
+   * @internal
+   */
+  constructor() {
+    // only defining the constructor so we can mark it as internal and keep
+    // it out of the docs.
+  }
+}
+
+export interface QueryInitializer {
+  /**
+   * Query by reading all of the values out of this table.
+   *
+   * This query's cost is relative to the size of the entire table, so this
+   * should only be used on tables that will stay very small (say between a few
+   * hundred and a few thousand documents) and are updated infrequently.
+   *
+   * @returns - The {@link Query} that iterates over every document of the table.
+   */
+  fullTableScan(): any;
+
+  /**
+   * Query by reading documents from an index on this table.
+   *
+   * This query's cost is relative to the number of documents that match the
+   * index range expression.
+   *
+   * Results will be returned in index order.
+   *
+   * To learn about indexes, see [Indexes](https://docs.convex.dev/using/indexes).
+   *
+   * @param indexName - The name of the index to query.
+   * @param indexRange - An optional index range constructed with the supplied
+   *  {@link IndexRangeBuilder}. An index range is a description of which
+   * documents Convex should consider when running the query. If no index
+   * range is present, the query will consider all documents in the index.
+   * @returns - The query that yields documents in the index.
+   */
+  withIndex(indexName: string, indexRange?: any): any;
+
+  /**
+   * Query by running a full text search against a search index.
+   *
+   * Search queries must always search for some text within the index's
+   * `searchField`. This query can optionally add equality filters for any
+   * `filterFields` specified in the index.
+   *
+   * Documents will be returned in relevance order based on how well they
+   * match the search text.
+   *
+   * To learn about full text search, see [Indexes](https://docs.convex.dev/text-search).
+   *
+   * @param indexName - The name of the search index to query.
+   * @param searchFilter - A search filter expression constructed with the
+   * supplied {@link SearchFilterBuilder}. This defines the full text search to run
+   * along with equality filtering to run within the search index.
+   * @returns - A query that searches for matching documents, returning them
+   * in relevancy order.
+   */
+  withSearchIndex(
+    indexName: string,
+    searchFilter: (q: FilterBuilder) => SearchFilter
+  ): any;
+  /**
+   * The number of documents in the table.
+   *
+   * @internal
+   */
+  count(): Promise<number>;
+}

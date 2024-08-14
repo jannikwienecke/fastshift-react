@@ -1,14 +1,13 @@
-import { ViewConfig } from '@apps-next/core';
 import React from 'react';
 import { ViewContext } from './view-context';
+import { BaseViewConfigManagerInterface } from '@apps-next/core';
 
 export const ViewProvider = ({
   children,
   viewConfig,
 }: {
   children: React.ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  viewConfig: ViewConfig<any>;
+  viewConfig: BaseViewConfigManagerInterface;
 }) => {
   return (
     <ViewContext.Provider value={{ viewConfig }}>

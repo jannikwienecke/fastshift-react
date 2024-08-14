@@ -6,7 +6,10 @@ export function List() {
 
   return (
     <div>
-      Result: <span>{add(1, 2)}</span>
+      Result:{' '}
+      <span>
+        {add(1, 2)} - {viewConfig.getDisplayFieldLabel()}
+      </span>
     </div>
   );
 }

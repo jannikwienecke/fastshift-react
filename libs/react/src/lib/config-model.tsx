@@ -1,14 +1,16 @@
 import {
+  ConvexViewConfig,
   FieldType,
   QueryProps,
-  ViewConfig,
+  SearchableField,
   ViewFieldConfig,
 } from '@apps-next/core';
 import { Infer } from 'convex/values';
 import { useAtomValue } from 'jotai';
-import { ViewProvider } from './page-provider';
 import { debouncedQueryAtom } from './query-input';
 import { useQuery } from './use-query';
+import { ViewProvider } from './view-provider';
+import { ConvexViewConfigManager } from '@apps-next/convex-adapter-app';
 
 const MappingConvexToFieldType: Record<string, FieldType> = {
   string: 'String',
@@ -25,6 +27,7 @@ export class Config<TDataModel extends ConvexSchemaType> {
   dataModel: Record<string, any>;
   tableNames: (keyof TDataModel)[];
   viewFields: Record<string, ViewFieldConfig>;
+  searchableFields: Record<string, SearchableField>;
 
   constructor(dataModel: TDataModel) {
     this.tableNames = Object.keys(dataModel) as (keyof TDataModel)[];
@@ -47,15 +50,33 @@ export class Config<TDataModel extends ConvexSchemaType> {
         ),
       ])
     );
+
+    this.searchableFields = Object.entries(dataModel.tables).reduce(
+      (acc, [tableName, tableData]) => {
+        const searchIndex = tableData.searchIndexes?.[0];
+
+        if (searchIndex.searchField && searchIndex.indexDescriptor) {
+          acc[tableName] = {
+            field: searchIndex.searchField,
+            name: searchIndex.indexDescriptor,
+            filterFields: searchIndex.filterFields,
+          } satisfies SearchableField;
+        }
+
+        return acc;
+      },
+      {} as Record<string, SearchableField>
+    );
   }
 
   createBaseView<TableName extends keyof TDataModel['tables']>(
     tableName: TableName,
     config: Partial<
-      Omit<ViewConfig<TDataModel, TableName>, 'viewFields' | 'tableName'>
+      Omit<ConvexViewConfig<TDataModel, TableName>, 'viewFields' | 'tableName'>
     >
   ) {
     const viewFields = this.viewFields[tableName as string];
+    const searchableField = this.searchableFields[tableName as string];
 
     type DataType = Infer<TDataModel['tables'][TableName]['validator']>;
 
@@ -67,24 +88,32 @@ export class Config<TDataModel extends ConvexSchemaType> {
     function createScreen(
       Component: (props: ReturnType<typeof _useQuery>) => React.ReactNode
     ) {
-      const viewConfig = {
+      const viewConfig: ConvexViewConfig<TDataModel, TableName> = {
         ...config,
-        labelKey: config.labelKey as string,
+        displayField: {
+          ...config.displayField,
+          field: config.displayField?.field as string,
+        },
         viewFields: viewFields,
         tableName,
         viewName: config.viewName ?? (tableName as string),
+        query: {
+          searchableField,
+        },
       };
+
+      const viewConfigManager = new ConvexViewConfigManager(viewConfig);
 
       const Content = (props: {
         Component: (props: ReturnType<typeof _useQuery>) => React.ReactNode;
       }) => {
         const query = useAtomValue(debouncedQueryAtom);
-        const data = _useQuery({ query, viewConfig });
+        const data = _useQuery({ query, viewConfig: viewConfigManager });
         return <props.Component {...data} />;
       };
 
       const Provider = (
-        <ViewProvider viewConfig={viewConfig}>
+        <ViewProvider viewConfig={viewConfigManager}>
           <Content Component={Component} />
         </ViewProvider>
       );

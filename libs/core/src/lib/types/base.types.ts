@@ -9,40 +9,31 @@ export type FieldType = 'String' | 'Number' | 'Boolean' | 'Date';
 
 export type RecordType<T = Record<string, unknown>> = T;
 
-export type ViewFieldConfig = Record<string, FieldConfig>;
-
 export type FieldConfig = {
   type: FieldType;
 };
 
 export type GetTableName<T extends DataModel> = keyof T['tables'];
 
-export type ViewConfig<
-  TDataModel extends Record<string, any> = any,
-  T extends keyof TDataModel['tables'] = any
-> = {
-  tableName: T;
-  labelKey: keyof TDataModel['tables'][T]['validator']['fields'];
-  viewFields: ViewFieldConfig;
-  viewName: string;
-};
+type GetTableName2<TDataModel extends Record<string, any> = any> =
+  keyof TDataModel['tables'];
 
-export type ViewConfig2<
+export type GetFieldName<
   TDataModel extends Record<string, any> = any,
-  T extends keyof TDataModel['tables'] = any
+  T extends GetTableName2<TDataModel> = any
+> = keyof TDataModel['tables'][T]['validator']['fields'];
+
+export type SearchableField<
+  TDataModel extends Record<string, any> = any,
+  T extends GetTableName2<TDataModel> = any
 > = {
-  tableName: T;
-  labelKey: keyof z.infer<TDataModel['tables'][T]['schema']>;
-  viewFields: ViewFieldConfig;
-  viewName: string;
+  field: GetFieldName<TDataModel, T>;
+  name: string;
+  filterFields: GetFieldName<TDataModel, T>[];
 };
 
 export type GlobalConfig = {
-  // adapters?: {
-  //   convex?: {
-  //     api?: any;
-  //   };
-  // };
+  //
 };
 
 export type DataModel<TableNames extends string = any> = {
