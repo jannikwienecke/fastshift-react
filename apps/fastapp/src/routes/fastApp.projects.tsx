@@ -1,7 +1,8 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import { Form, InferViewProps, List, QueryInput } from '@apps-next/react';
+import { Form, List, QueryInput } from '@apps-next/react';
 import { projectsBaseView } from '../config';
+import { InferViewProps } from '@apps-next/core';
 
 export const Route = createFileRoute('/fastApp/projects')({
   component: () => projectsBaseView.createScreen(TasksComponent),

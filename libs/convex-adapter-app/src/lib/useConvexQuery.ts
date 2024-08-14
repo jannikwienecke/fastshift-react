@@ -1,6 +1,7 @@
 import {
   GlobalConfig,
   invarant,
+  QueryDto,
   QueryProps,
   QueryReturnOrUndefined,
   RecordType,
@@ -12,11 +13,11 @@ import { useRef } from 'react';
 import { parseConvexData } from './_internal/convex-utils';
 import { useConvexApi } from './_internal/useConvexApi';
 
-export const useStableQuery = (fn: any, args: QueryProps) => {
+export const useStableQuery = (fn: any, args: QueryDto) => {
   const result = useQueryTanstack(
     convexQuery(fn, {
       ...args,
-      viewConfig: args.viewConfig?.viewConfig,
+      viewConfig: args?.viewConfig,
     })
   );
 
@@ -40,7 +41,10 @@ export const useConvexQuery = <QueryReturnType extends RecordType[]>({
 
   invarant(Boolean(api), 'convex api is not defined');
 
-  const data = useStableQuery(api.viewLoader, queryProps);
+  const data = useStableQuery(api.viewLoader, {
+    ...queryProps,
+    viewConfig: queryProps.viewConfigManager?.viewConfig,
+  });
 
   const records = parseConvexData(data?.data) as QueryReturnType;
 

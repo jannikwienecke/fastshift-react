@@ -73,7 +73,7 @@ const dict = {
 };
 
 export const Form = () => {
-  const { viewConfig } = useViewConfig();
+  const { viewConfigManager } = useViewConfig();
   const { mutate } = useMutation();
 
   const updateFormValue = useSetAtom(updateFormValueAtom);
@@ -90,7 +90,7 @@ export const Form = () => {
 
         const formValues: Record<string, any> = {};
 
-        viewConfig.getViewFieldList().forEach((field) => {
+        viewConfigManager.getViewFieldList().forEach((field) => {
           const value = formData.get(field.name);
           const isBoolean = field.type === 'Boolean';
           formValues[field.name] = isBoolean && value === null ? false : value;
@@ -107,7 +107,7 @@ export const Form = () => {
       }}
     >
       <div className="pb-6 justify-end flex flex-col space-y-2 w-[20rem]">
-        {viewConfig.getViewFieldList().map((field) => {
+        {viewConfigManager.getViewFieldList().map((field) => {
           const Input = dict[field.type];
 
           const value = form[field.name];

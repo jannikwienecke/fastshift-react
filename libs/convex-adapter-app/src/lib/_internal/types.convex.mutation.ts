@@ -1,5 +1,12 @@
-import { Mutation, MutationProps } from '@apps-next/core';
+import {
+  Mutation,
+  MutationHandlerReturnType,
+  MutationPropsServer,
+} from '@apps-next/core';
 
 export type MUTATION_HANDLER_CONVEX = {
-  [key in Mutation['type']]: (ctx: any, args: MutationProps) => Promise<any>;
+  [key in Mutation['type']]: (
+    ctx: any,
+    args: MutationPropsServer
+  ) => MutationHandlerReturnType;
 };

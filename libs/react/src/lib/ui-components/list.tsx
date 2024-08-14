@@ -1,11 +1,11 @@
 import { useViewConfig } from '../use-view-config';
 
 export function List() {
-  const { viewConfig } = useViewConfig();
+  const { viewConfigManager } = useViewConfig();
 
   return (
     <div>
-      Result: <span>{viewConfig.getDisplayFieldLabel()}</span>
+      Result: <span>{viewConfigManager.getDisplayFieldLabel()}</span>
     </div>
   );
 }

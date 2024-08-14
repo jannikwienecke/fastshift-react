@@ -1,4 +1,7 @@
-import { BaseViewConfigManagerInterface } from './view-config.types';
+import {
+  BaseViewConfigManagerInterface,
+  ViewConfigType,
+} from './view-config.types';
 
 type MutationRecord = Record<string, any>;
 
@@ -21,6 +24,15 @@ type DELETE_RECORD = {
 export type Mutation = CREATE_RECORD | UPDATE_RECORD | DELETE_RECORD;
 
 export type MutationProps = {
-  viewConfig: BaseViewConfigManagerInterface;
+  viewConfig: ViewConfigType;
   mutation: Mutation;
 };
+
+export type MutationPropsServer = {
+  viewConfigManager: BaseViewConfigManagerInterface;
+  mutation: Mutation;
+};
+
+export type MutationHandlerReturnType = Promise<{
+  success: boolean;
+}>;

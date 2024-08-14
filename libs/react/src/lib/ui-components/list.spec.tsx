@@ -6,7 +6,7 @@ describe('ReactApp', () => {
   it('should render successfully', () => {
     const { baseElement } = render(
       <ViewProvider
-        viewConfig={{
+        viewConfigManager={{
           getTableName: () => 'users',
           getDisplayFieldLabel: () => 'users',
           getViewFieldList: () => [],

@@ -44,3 +44,5 @@ export type DataModel<TableNames extends string = any> = {
     };
   };
 };
+
+export type DataProvider = 'convex' | 'prisma';

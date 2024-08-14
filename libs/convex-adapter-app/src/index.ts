@@ -6,3 +6,4 @@ export * from './lib/convex-view-config';
 export * from './lib/convex-searchable-fields';
 export * from './lib/convex-view-fields';
 export * from './lib/convex-config';
+export * from './lib/_internal/types.convex';

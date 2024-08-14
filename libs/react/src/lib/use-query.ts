@@ -7,7 +7,6 @@ import {
 
 const useQueryDict = {
   convex: useConvexQuery,
-  // prisma: null,
 };
 
 export const useQuery = <QueryReturnType extends RecordType[]>(
@@ -15,7 +14,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const useQuery = useQueryDict['convex'];
 
-  // const useQuery = any
   return useQuery<QueryReturnType>({
     queryProps,
     globalConfig: {},

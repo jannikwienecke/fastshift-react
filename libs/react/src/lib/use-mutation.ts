@@ -8,15 +8,14 @@ const useQueryDict = {
 
 export const useMutation = () => {
   const _useMutation = useQueryDict['convex'];
-  const { viewConfig } = useViewConfig();
+  const { viewConfigManager } = useViewConfig();
   const mutation = _useMutation();
 
   return {
     ...mutation,
     mutate: (args: { mutation: Mutation }) => {
       return mutation.mutate({
-        // TODO CLEAN UP
-        viewConfig: viewConfig.viewConfig,
+        viewConfig: viewConfigManager.viewConfig,
         mutation: args.mutation,
       });
     },

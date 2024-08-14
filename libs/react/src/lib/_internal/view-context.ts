@@ -2,7 +2,7 @@ import { BaseViewConfigManagerInterface } from '@apps-next/core';
 import React from 'react';
 
 type ViewContextType = {
-  viewConfig: BaseViewConfigManagerInterface;
+  viewConfigManager: BaseViewConfigManagerInterface;
 };
 
 export const ViewContext = React.createContext<ViewContextType>(

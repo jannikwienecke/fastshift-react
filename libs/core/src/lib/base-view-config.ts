@@ -3,11 +3,12 @@ import {
   BaseViewConfigManagerInterface,
   FieldConfig,
   SearchableField,
-  ViewConfig,
+  ViewConfigType,
 } from './types';
 
-export class BaseViewConfigManager<TViewConfig extends ViewConfig = ViewConfig>
-  implements BaseViewConfigManagerInterface<TViewConfig>
+export class BaseViewConfigManager<
+  TViewConfig extends ViewConfigType = ViewConfigType
+> implements BaseViewConfigManagerInterface<TViewConfig>
 {
   viewConfig: TViewConfig;
 

@@ -1,4 +1,4 @@
-import { invarant, MutationProps, QueryProps } from '@apps-next/core';
+import { invarant, MutationProps, QueryDto, QueryProps } from '@apps-next/core';
 import {
   DefaultFunctionArgs,
   GenericQueryCtx,
@@ -11,26 +11,22 @@ export const viewLoaderHandler = async (
   ctx: GenericQueryCtx,
   _args: DefaultFunctionArgs
 ): Promise<ConvexRecordType[] | null> => {
-  const args = _args as QueryProps;
+  const args = _args as QueryDto;
 
-  const { query, viewConfig }: QueryProps = {
-    query: args.query as string,
-    viewConfig: new ConvexViewConfigManager(args.viewConfig as any),
-  };
+  const viewConfigManager = new ConvexViewConfigManager(args.viewConfig as any);
 
-  invarant(Boolean(viewConfig), 'viewConfig is not defined');
+  invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
 
-  const searchField = viewConfig?.getSearchableField();
-  console.log({ searchField });
+  const searchField = viewConfigManager?.getSearchableField();
   const searching =
-    _args['query'] === ''
+    args.query === ''
       ? null
       : (q: { withSearchIndex: any }) =>
           q.withSearchIndex(searchField?.name, (q: any) =>
-            q.search(searchField?.field, query as string)
+            q.search(searchField?.field, args.query)
           );
 
-  let dbQuery = ctx.db.query(viewConfig.getTableName());
+  let dbQuery = ctx.db.query(viewConfigManager.getTableName());
 
   dbQuery = searching ? searching(dbQuery) : dbQuery;
 
@@ -43,18 +39,14 @@ export const viewMutationHandler = async (
 ): Promise<null> => {
   const args = _args as MutationProps;
 
-  console.log(_args);
-
-  const { mutation, viewConfig }: MutationProps = {
-    ...args,
-    viewConfig: new ConvexViewConfigManager(args.viewConfig as any),
-  };
+  const viewConfigManager = new ConvexViewConfigManager(args.viewConfig);
+  const { mutation } = args;
 
   const handler = mutationHandlers[mutation.type];
 
   await handler(ctx, {
     mutation,
-    viewConfig,
+    viewConfigManager,
   });
   return null;
 };

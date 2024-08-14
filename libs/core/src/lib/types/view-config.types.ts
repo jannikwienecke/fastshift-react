@@ -2,7 +2,7 @@ import { FieldConfig, GetFieldName, SearchableField } from './base.types';
 
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
-export type ViewConfig<
+export type ViewConfigType<
   TDataModel extends Record<string, any> = any,
   T extends keyof TDataModel['tables'] = any
 > = {
@@ -25,10 +25,10 @@ export type ConvexViewConfig<
   query?: {
     searchableFields?: SearchableField<TDataModel, T>;
   };
-} & ViewConfig<TDataModel, T>;
+} & ViewConfigType<TDataModel, T>;
 
 export interface BaseViewConfigManagerInterface<
-  TViewConfig extends ViewConfig = ViewConfig
+  TViewConfig extends ViewConfigType = ViewConfigType
 > {
   viewConfig: TViewConfig;
   getDisplayFieldLabel(): string;
