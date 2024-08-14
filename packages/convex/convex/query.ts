@@ -1,5 +1,6 @@
 import { viewLoaderHandler } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
+import { v } from 'convex/values';
 
 export const viewLoader = server.query({
   handler: viewLoaderHandler,
@@ -25,3 +26,18 @@ export const viewLoader = server.query({
 //     // );
 //   },
 // });
+
+export const mutation = server.mutation({
+  args: {
+    name: v.string(),
+    completed: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    console.log('actionHandler', { args });
+
+    await ctx.db.insert('tasks', {
+      completed: args.completed,
+      name: args.name,
+    });
+  },
+});

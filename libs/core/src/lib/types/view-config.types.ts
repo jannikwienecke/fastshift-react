@@ -34,4 +34,5 @@ export interface BaseViewConfigManagerInterface<
   getDisplayFieldLabel(): string;
   getSearchableField(): SearchableField | undefined;
   getTableName(): string;
+  getViewFieldList(): FieldConfig[];
 }

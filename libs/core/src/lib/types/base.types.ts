@@ -11,6 +11,7 @@ export type RecordType<T = Record<string, unknown>> = T;
 
 export type FieldConfig = {
   type: FieldType;
+  name: string;
 };
 
 export type GetTableName<T extends DataModel> = keyof T['tables'];

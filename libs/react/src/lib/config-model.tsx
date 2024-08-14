@@ -44,6 +44,7 @@ export class Config<TDataModel extends ConvexSchemaType> {
               fieldName,
               {
                 type: MappingConvexToFieldType[(fieldData as any).kind],
+                name: fieldName,
               },
             ]
           )

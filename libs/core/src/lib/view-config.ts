@@ -1,6 +1,7 @@
 import { invarant } from './core-utils';
 import {
   BaseViewConfigManagerInterface,
+  FieldConfig,
   SearchableField,
   ViewConfig,
 } from './types';
@@ -25,5 +26,9 @@ export class BaseViewConfigManager<TViewConfig extends ViewConfig = ViewConfig>
 
   getSearchableField(): SearchableField | undefined {
     return undefined;
+  }
+
+  getViewFieldList(): FieldConfig[] {
+    return Object.values(this.viewConfig.viewFields);
   }
 }
