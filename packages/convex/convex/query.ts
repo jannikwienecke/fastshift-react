@@ -12,16 +12,16 @@ export const viewLoader = server.query({
   // },
 });
 
-export const testHandler = server.query({
-  handler: async (ctx, args) => {
-    console.log('testHandler', { args });
+// export const testHandler = server.query({
+//   handler: async (ctx, args) => {
+//     console.log('testHandler', { args });
 
-    // .filter((q) =>
-    //   q.or(
-    //     args.query === ''
-    //       ? q.not(q.eq(q.field('name'), ''))
-    //       : q.eq(q.field('name'), args?.query as string)
-    //   )
-    // );
-  },
-});
+//     // .filter((q) =>
+//     //   q.or(
+//     //     args.query === ''
+//     //       ? q.not(q.eq(q.field('name'), ''))
+//     //       : q.eq(q.field('name'), args?.query as string)
+//     //   )
+//     // );
+//   },
+// });

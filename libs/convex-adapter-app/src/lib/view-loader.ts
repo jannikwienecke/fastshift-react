@@ -18,7 +18,7 @@ export const viewLoaderHandler = async (
 
   const searchField = viewConfig?.getSearchableField();
   const searching =
-    _args.query === ''
+    _args['query'] === ''
       ? null
       : (q: { withSearchIndex: any }) =>
           q.withSearchIndex(searchField?.name, (q: any) =>
