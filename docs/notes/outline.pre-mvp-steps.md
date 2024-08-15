@@ -2,7 +2,7 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1723657154741
+updated: 1723699213329
 created: 1723444563681
 ---
 
@@ -38,10 +38,12 @@ Add a small doc section to each new progress step
     - [x] Create internal and external for libraries
     - [x] Add tags !
     - [x] Check graph
+    - [x] fix nextjs app deployment - use prisma workaround plugin
+    - [x] add logging library
     - [ ] Great test data & Schema
     - [ ] Wishful thinking - Desired Api Design
     - [ ] Write tests - use for both apps
-    - [ ] Write most naive implementation to pass the tests
+    - [ ] Write most naive implementation to pass the tests in nextjs app
     - [ ] Write abstraction
 
   - [ ] write parser -> convex to zod schema

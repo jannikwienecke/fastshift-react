@@ -1,10 +1,12 @@
+import { info } from '@apps-next/core';
 import { prisma } from '../db';
-
 export const dynamic = 'force-dynamic';
 
 export default async function Index() {
   const users = await prisma.user.findMany({});
   const posts = await prisma.post.findMany({});
+
+  info('Index Page', { users, posts });
 
   return (
     <div className="flex flex-col gap-2 p-4">
