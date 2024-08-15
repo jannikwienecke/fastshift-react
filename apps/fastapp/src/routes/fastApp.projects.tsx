@@ -5,10 +5,10 @@ import { projectsBaseView } from '../config';
 import { InferViewProps } from '@apps-next/core';
 
 export const Route = createFileRoute('/fastApp/projects')({
-  component: () => projectsBaseView.createScreen(TasksComponent),
+  component: () => projectsBaseView.createScreen(ProjectsComponent),
 });
 
-const TasksComponent = ({
+const ProjectsComponent = ({
   data: projects,
 }: InferViewProps<typeof projectsBaseView>) => {
   const [isAdd, setIsAdd] = React.useState(false);
@@ -38,9 +38,14 @@ const TasksComponent = ({
         <QueryInput />
 
         <List />
-        {projects?.map((project) => (
-          <div key={project.text}>{project.text}</div>
-        ))}
+        <div className="flex flex-col gap-4 p-4 w-full">
+          {projects?.map((project) => (
+            <div key={project.id} className="flex flex-col">
+              <div className="text-lg font-bold">{project.label}</div>
+              <div>{project.description}</div>
+            </div>
+          ))}
+        </div>
 
         {/* <List.Default {...list.getProps({ data })} /> */}
       </div>

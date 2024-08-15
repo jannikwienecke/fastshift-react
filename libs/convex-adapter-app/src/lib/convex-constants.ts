@@ -5,4 +5,7 @@ export const MappingConvexToFieldType: Record<string, FieldType> = {
   number: 'Number',
   boolean: 'Boolean',
   date: 'Date',
+  id: 'Reference',
+  float64: 'Number',
+  union: 'Union',
 };

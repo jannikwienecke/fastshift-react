@@ -5,14 +5,7 @@ const config = generateConfigFrom('convex', schema);
 
 export const projectsBaseView = config.createView('projects', {
   displayField: {
-    field: 'text',
-  },
-  query: {
-    // searchablefField: {
-    //   field: 'text',
-    //   name: 'text',
-    //   filterFields: [],
-    // },
+    field: 'label',
   },
 });
 

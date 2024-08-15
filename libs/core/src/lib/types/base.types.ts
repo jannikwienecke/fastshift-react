@@ -5,7 +5,13 @@ const documentBaseSchema = z.object({
   id: z.string(),
 });
 
-export type FieldType = 'String' | 'Number' | 'Boolean' | 'Date';
+export type FieldType =
+  | 'String'
+  | 'Number'
+  | 'Boolean'
+  | 'Date'
+  | 'Reference'
+  | 'Union';
 
 export type RecordType<T = Record<string, unknown>> = T;
 

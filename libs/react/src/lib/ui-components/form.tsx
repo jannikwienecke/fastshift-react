@@ -1,4 +1,4 @@
-import { FieldConfig } from '@apps-next/core';
+import { FieldConfig, FieldType } from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { useMutation } from '../use-mutation';
 import { useViewConfig } from '../use-view-config';
@@ -65,11 +65,15 @@ const BooleanInput = ({
   );
 };
 
-const dict = {
+const dict: {
+  [key in FieldType]: React.FC<any>;
+} = {
   String: StringInput,
   Number: StringInput,
   Boolean: BooleanInput,
   Date: StringInput,
+  Reference: StringInput,
+  Union: StringInput,
 };
 
 export const Form = () => {
@@ -108,7 +112,7 @@ export const Form = () => {
     >
       <div className="pb-6 justify-end flex flex-col space-y-2 w-[20rem]">
         {viewConfigManager.getViewFieldList().map((field) => {
-          const Input = dict[field.type];
+          const Input = dict[field.type] || StringInput;
 
           const value = form[field.name];
           return (

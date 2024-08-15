@@ -8,7 +8,7 @@ export const generateSearchableFieldsFromConvexSchema = (
     (acc, [tableName, tableData]) => {
       const searchIndex = tableData.searchIndexes?.[0];
 
-      if (searchIndex.searchField && searchIndex.indexDescriptor) {
+      if (searchIndex?.searchField && searchIndex?.indexDescriptor) {
         acc[tableName] = {
           field: searchIndex.searchField,
           name: searchIndex.indexDescriptor,

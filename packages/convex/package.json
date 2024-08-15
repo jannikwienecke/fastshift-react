@@ -2,6 +2,7 @@
   "name": "@apps-next/convex",
   "version": "0.0.1",
   "dependencies": {
+    "@faker-js/faker": "^8.4.1",
     "convex": "^1.14.0"
   },
   "main": "./index.js",
