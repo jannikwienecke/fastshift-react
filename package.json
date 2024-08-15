@@ -5,6 +5,9 @@
   "scripts": {
     "postinstall": "NX_CLOUD_DISTRIBUTED_EXECUTION=false nx prisma-generate nextjs"
   },
+  "prisma": {
+    "schema": "apps/nextjs/prisma/schema.prisma"
+  },
   "private": true,
   "dependencies": {
     "@convex-dev/react-query": "^0.0.0-alpha.5",
@@ -42,6 +45,7 @@
     "@nx/web": "19.5.7",
     "@nx/workspace": "19.5.7",
     "@playwright/test": "^1.36.0",
+    "@prisma/nextjs-monorepo-workaround-plugin": "^5.18.0",
     "@swc-node/register": "~1.9.1",
     "@swc/cli": "~0.3.12",
     "@swc/core": "~1.5.7",

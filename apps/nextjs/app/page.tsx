@@ -1,28 +1,26 @@
-// import { prisma } from '../db';
-
 import { prisma } from '../db';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Index() {
-  const posts = await prisma.user.findMany({});
-
-  // await prisma.user.create({
-  //   data: {
-  //     email: 'test@test.com',
-  //     name: 'Test',
-  //   },
-  // });
-
-  console.log({ posts });
+  const users = await prisma.user.findMany({});
+  const posts = await prisma.post.findMany({});
 
   return (
-    <div className="bg-blue-300">
-      <div>Hello Nextjs App !</div>
+    <div className="flex flex-col gap-2 p-4">
+      <div className="text-3xl font-bold line-clamp-2">User & Posts</div>
+
+      <div className="bg-gray-50 p-2 rounded-md">
+        <div className="text-xl font-bold">Users</div>
+        {users.map((user) => (
+          <div key={user.id}>{user.email}</div>
+        ))}
+      </div>
 
       <div>
+        <div className="text-xl font-bold">Posts</div>
         {posts.map((post) => (
-          <div key={post.id}>{post.email}</div>
+          <div key={post.id}>{post.title}</div>
         ))}
       </div>
     </div>
