@@ -31,11 +31,12 @@ export const ViewDataProvider = <
   viewConfigManager: BaseViewConfigManager;
 }) => {
   const _useQuery = (props: QueryProps) => {
-    return useQuery<TProps['data']>(props);
+    return useQuery<TProps[]>(props);
   };
 
   const Content = () => {
     const query = useAtomValue(debouncedQueryAtom);
+
     const data = _useQuery({
       query,
       viewConfigManager: props.viewConfigManager,

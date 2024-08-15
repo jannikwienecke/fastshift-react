@@ -24,7 +24,6 @@
     "src/**/*.jsx",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "../core/src/lib/base-view-config.ts",
-    "src/lib/ui-adapter.ts/list-adapter.ts"
+    "../react/src/lib/ui-adapter.ts/list-adapter.ts"
   ]
 }

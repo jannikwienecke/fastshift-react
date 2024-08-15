@@ -1,5 +1,6 @@
 import { InferViewProps } from '@apps-next/core';
-import { Form, List, QueryInput } from '@apps-next/react';
+import { Form, QueryInput } from '@apps-next/react';
+import { List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
 import { taskBaseView } from '../config';
@@ -12,6 +13,8 @@ const TasksComponent = ({
   data: tasks,
 }: InferViewProps<typeof taskBaseView>) => {
   const [isAdd, setIsAdd] = React.useState(false);
+
+  const getListProps = taskBaseView.useList();
 
   const ScreenControl = () => {
     return (
@@ -37,14 +40,7 @@ const TasksComponent = ({
 
         <QueryInput />
 
-        <List />
-        {tasks?.map((task) => (
-          <div key={task.id}>
-            {task.name} - {task.completed ? '✅' : '❌'}
-          </div>
-        ))}
-
-        {/* <List.Default {...list.getProps({ data })} /> */}
+        <List {...getListProps()} />
       </div>
       <hr />
 

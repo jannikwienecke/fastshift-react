@@ -2,7 +2,7 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1723699213329
+updated: 1723708925841
 created: 1723444563681
 ---
 
@@ -40,9 +40,10 @@ Add a small doc section to each new progress step
     - [x] Check graph
     - [x] fix nextjs app deployment - use prisma workaround plugin
     - [x] add logging library
-    - [ ] Great test data & Schema
-    - [ ] Wishful thinking - Desired Api Design
+    - [x] Great test data & Schema
+    - [ ] Extract the "components" into new package (ui)
     - [ ] Write tests - use for both apps
+    - [ ] Wishful thinking - Desired Api Design
     - [ ] Write most naive implementation to pass the tests in nextjs app
     - [ ] Write abstraction
 

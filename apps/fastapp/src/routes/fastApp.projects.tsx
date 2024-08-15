@@ -1,8 +1,9 @@
+import { InferViewProps } from '@apps-next/core';
+import { Form, QueryInput } from '@apps-next/react';
+import { List } from '@apps-next/ui';
 import { Outlet, createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import { Form, List, QueryInput } from '@apps-next/react';
 import { projectsBaseView } from '../config';
-import { InferViewProps } from '@apps-next/core';
 
 export const Route = createFileRoute('/fastApp/projects')({
   component: () => projectsBaseView.createScreen(ProjectsComponent),
@@ -12,6 +13,7 @@ const ProjectsComponent = ({
   data: projects,
 }: InferViewProps<typeof projectsBaseView>) => {
   const [isAdd, setIsAdd] = React.useState(false);
+  const getListProps = projectsBaseView.useList();
 
   const ScreenControl = () => {
     return (
@@ -39,17 +41,7 @@ const ProjectsComponent = ({
 
         <QueryInput />
 
-        <List />
-        <div className="flex flex-col gap-4 p-4 w-full">
-          {projects?.map((project) => (
-            <div key={project.id} className="flex flex-col">
-              <div className="text-lg font-bold">{project.label}</div>
-              <div>{project.description}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* <List.Default {...list.getProps({ data })} /> */}
+        <List {...getListProps({ descriptionKey: 'description' })} />
       </div>
       <hr />
 

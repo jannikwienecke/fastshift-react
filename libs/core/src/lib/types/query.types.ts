@@ -16,7 +16,7 @@ export type QueryProps = {
 };
 
 export type QueryReturnType<T extends RecordType = RecordType> = {
-  data: T[];
+  data: T[] | undefined;
   isLoading: boolean;
   isError: boolean;
 };
