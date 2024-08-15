@@ -54,7 +54,6 @@ export class ConvexViewManager<TDataModel extends ConvexSchemaType> {
     ) => {
       const viewFields = this.viewFields?.[tableName as string];
       const searchableFields = this.searchableFields?.[tableName as string];
-
       if (!viewFields) throw new Error('viewFields is not defined');
       if (!searchableFields) throw new Error('searchableField is not defined');
 
