@@ -14,6 +14,7 @@ import { generateViewFieldsFromConvexSchema } from './convex-view-fields';
 export class ConvexViewManager<TDataModel extends ConvexSchemaType> {
   viewFields: Record<string, ViewFieldConfig> | null;
   searchableFields: Record<string, SearchableField> | null;
+  viewManager: ConvexViewConfigManager | null = null;
 
   constructor(
     private convexSchema: TDataModel,
@@ -28,12 +29,18 @@ export class ConvexViewManager<TDataModel extends ConvexSchemaType> {
     this.viewFields = generateViewFieldsFromConvexSchema(convexSchema);
   }
 
+  getTableName(): string {
+    if (!this.viewManager) throw new Error('viewManager is not defined');
+    return this.viewManager?.getTableName() as string;
+  }
+
   createView<TableName extends keyof TDataModel['tables']>(
     tableName: TableName,
     config: Partial<
       Omit<ConvexViewConfig<TDataModel, TableName>, 'viewFields' | 'tableName'>
     >
   ): {
+    getViewManager: () => ConvexViewConfigManager;
     createScreen: (
       Component: (
         props: QueryReturnOrUndefined<
@@ -54,6 +61,7 @@ export class ConvexViewManager<TDataModel extends ConvexSchemaType> {
     ) => {
       const viewFields = this.viewFields?.[tableName as string];
       const searchableFields = this.searchableFields?.[tableName as string];
+
       if (!viewFields) throw new Error('viewFields is not defined');
       if (!searchableFields) throw new Error('searchableField is not defined');
 
@@ -72,6 +80,7 @@ export class ConvexViewManager<TDataModel extends ConvexSchemaType> {
       };
 
       const viewConfigManager = new ConvexViewConfigManager(viewConfig);
+      this.viewManager = viewConfigManager;
 
       return this.renderView({
         Component: Component,
@@ -80,6 +89,10 @@ export class ConvexViewManager<TDataModel extends ConvexSchemaType> {
     };
 
     return {
+      getViewManager: () => {
+        if (!this.viewManager) throw new Error('viewManager is not defined');
+        return this.viewManager;
+      },
       createScreen,
     };
   }

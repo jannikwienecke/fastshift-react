@@ -33,7 +33,9 @@ const ProjectsComponent = ({
 
         {isAdd && <Form />}
 
-        <div>tasks</div>
+        <div className="bg-red-300">
+          Table: {projectsBaseView.getViewManager().getTableName()}
+        </div>
 
         <QueryInput />
 
