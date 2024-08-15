@@ -2,10 +2,10 @@ import * as logging from 'loglevel';
 
 const log = logging;
 
-log.setDefaultLevel('warn');
+log.setDefaultLevel('info');
 
-export const error = log.error;
-export const warn = log.warn;
-export const info = log.info;
-export const debug = log.debug;
-export const trace = log.trace;
+export const llerror = log.error;
+export const llwarn = log.warn;
+export const llinfo = log.info;
+export const lldebug = log.debug;
+export const lltrace = log.trace;

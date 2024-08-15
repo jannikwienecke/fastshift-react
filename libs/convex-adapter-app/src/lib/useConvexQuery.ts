@@ -14,12 +14,7 @@ import { parseConvexData } from './_internal/convex-utils';
 import { useConvexApi } from './_internal/useConvexApi';
 
 export const useStableQuery = (fn: any, args: QueryDto) => {
-  const result = useQueryTanstack(
-    convexQuery(fn, {
-      ...args,
-      viewConfig: args?.viewConfig,
-    })
-  );
+  const result = useQueryTanstack(convexQuery(fn, args));
 
   const stored = useRef(result);
 
@@ -44,6 +39,10 @@ export const useConvexQuery = <QueryReturnType extends RecordType[]>({
   const data = useStableQuery(api.viewLoader, {
     ...queryProps,
     viewConfig: queryProps.viewConfigManager?.viewConfig,
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    viewConfigManager: undefined,
   });
 
   const records = parseConvexData(data?.data) as QueryReturnType;
