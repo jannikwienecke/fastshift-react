@@ -6,6 +6,7 @@ import * as ReactDOM from 'react-dom/client';
 import { api } from '@apps-next/convex';
 import { routeTree } from './routeTree.gen';
 import { ConvexQueryProvider } from '@apps-next/convex-adapter-app';
+import { config } from './new-config';
 
 const router = createRouter({
   routeTree,
@@ -26,6 +27,9 @@ const root = document.getElementById('root');
 if (!root) throw new Error('root not found');
 
 export const loader = api.query.viewLoader;
+
+// add global config to provider
+console.log(config.getAllTables());
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>

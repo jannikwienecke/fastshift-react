@@ -1,3 +1,7 @@
+import { PrismaQueryProvider } from '@apps-next/query-adapter';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import Link from 'next/link';
+import { viewLoader, viewMutation } from './fastapp/tasks/actions';
 import './global.css';
 
 export const metadata = {
@@ -12,7 +16,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <PrismaQueryProvider
+          api={{
+            viewLoader: viewLoader,
+            viewMutation: viewMutation,
+          }}
+        >
+          <div className="p-2">
+            <div className="flex gap-2 text-lg border-b">
+              <Link href={'/'}>Home</Link>
+            </div>
+
+            <hr />
+
+            {children}
+          </div>
+
+          <ReactQueryDevtools initialIsOpen={false} />
+        </PrismaQueryProvider>
+      </body>
     </html>
   );
 }

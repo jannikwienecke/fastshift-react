@@ -19,6 +19,10 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   isLoading: boolean;
   isError: boolean;
+  // TODO CLEAN UP
+  error: any;
+  isFetching: boolean;
+  isFetched: boolean;
 };
 
 export type QueryReturnOrUndefined<T extends RecordType = RecordType> =

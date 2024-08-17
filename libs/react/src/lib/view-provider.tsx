@@ -9,26 +9,31 @@ import {
 import { useQuery } from './use-query';
 import { useAtomValue } from 'jotai';
 import { debouncedQueryAtom } from './ui-components/query-input';
+import { useList } from './ui-adapter.ts';
+import { useViewConfig } from './use-view-config';
 
 export const ViewProvider = ({
   children,
-  viewConfigManager,
+  view,
 }: {
   children: React.ReactNode;
-  viewConfigManager: BaseViewConfigManagerInterface;
+  view: { viewConfigManager: BaseViewConfigManagerInterface };
 }) => {
   return (
-    <ViewContext.Provider value={{ viewConfigManager }}>
+    <ViewContext.Provider value={{ viewConfigManager: view.viewConfigManager }}>
       {children}
     </ViewContext.Provider>
   );
 };
 
 export const ViewDataProvider = <
-  TProps extends QueryReturnOrUndefined<any>
+  TProps extends {
+    data: QueryReturnOrUndefined<any>;
+    useList: typeof useList;
+  }
 >(props: {
   Component: (props: TProps) => React.ReactNode;
-  viewConfigManager: BaseViewConfigManager;
+  view: { viewConfigManager: BaseViewConfigManager };
 }) => {
   const _useQuery = (props: QueryProps) => {
     return useQuery<TProps[]>(props);
@@ -36,18 +41,17 @@ export const ViewDataProvider = <
 
   const Content = () => {
     const query = useAtomValue(debouncedQueryAtom);
-
     const data = _useQuery({
       query,
-      viewConfigManager: props.viewConfigManager,
     });
+
     // eslint-disable-next-line
     // @ts-ignore
-    return <props.Component {...data} />;
+    return <props.Component data={data} useList={useList} />;
   };
 
   const Provider = (
-    <ViewProvider viewConfigManager={props.viewConfigManager}>
+    <ViewProvider view={props.view}>
       <Content />
     </ViewProvider>
   );

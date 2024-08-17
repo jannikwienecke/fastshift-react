@@ -6,7 +6,8 @@
     "postinstall": "NX_CLOUD_DISTRIBUTED_EXECUTION=false nx prisma-generate nextjs"
   },
   "prisma": {
-    "schema": "apps/nextjs/prisma/schema.prisma"
+    "schema": "apps/nextjs/prisma/schema.prisma",
+    "seed": "ts-node apps/nextjs/prisma/seed.ts"
   },
   "private": true,
   "dependencies": {

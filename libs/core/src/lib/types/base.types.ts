@@ -1,9 +1,64 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
+import { BaseConfigInterface } from './config.types';
+import { ConvexSchemaType } from '@apps-next/convex-adapter-app';
+import { Prisma } from './view-config.types';
 
 const documentBaseSchema = z.object({
   id: z.string(),
 });
+
+export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
+  schema: T
+) => {
+  const config: BaseConfigInterface<T, keyof T['tables']> = {
+    searchableFields: {},
+    viewFields: {},
+    dataModel: schema,
+    tableNames: Object.keys(schema.tables) as any as keyof T['tables'],
+  };
+
+  return new ConfigWithouUi(config);
+};
+
+type RemoveDollarSign<T> = T extends `$${infer _}` ? never : T;
+
+type PrismaTableName<T> = (keyof T)[];
+
+export const createConfigFromPrismaSchema = <T extends Prisma, PrismaClient>(
+  schema: T,
+  client: PrismaClient
+) => {
+  const config: BaseConfigInterface<
+    T,
+    RemoveDollarSign<PrismaTableName<PrismaClient>[number]>[]
+  > = {
+    searchableFields: {},
+    viewFields: {},
+    dataModel: schema,
+    tableNames: Object.keys(client as any) as any as RemoveDollarSign<
+      PrismaTableName<PrismaClient>[number]
+    >[],
+  };
+
+  return new ConfigWithouUi(config);
+};
+
+export class ConfigWithouUi<T extends Record<string, any>, Tables> {
+  // config: BaseConfigInterface<T, keyof T['tables']>;
+  constructor(private config: BaseConfigInterface<T, Tables>) {}
+
+  getAllTables() {
+    return this.config.tableNames;
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Register {
+  // config: ConfigWithouUi
+}
+
+export type RegisteredRouter = Register extends { config: infer T } ? T : never;
 
 export type FieldType =
   | 'String'

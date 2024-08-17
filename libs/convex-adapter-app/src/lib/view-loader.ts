@@ -18,13 +18,12 @@ export const viewLoaderHandler = async (
   invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
 
   const searchField = viewConfigManager?.getSearchableField();
-  const searching =
-    args.query === ''
-      ? null
-      : (q: { withSearchIndex: any }) =>
-          q.withSearchIndex(searchField?.name, (q: any) =>
-            q.search(searchField?.field, args.query)
-          );
+  const searching = !args.query
+    ? null
+    : (q: { withSearchIndex: any }) =>
+        q.withSearchIndex(searchField?.name, (q: any) =>
+          q.search(searchField?.field, args.query)
+        );
 
   let dbQuery = ctx.db.query(viewConfigManager.getTableName());
 

@@ -4,3 +4,11 @@ export type InferViewProps<T> = T extends {
 }
   ? React.ComponentProps<React.ComponentProps<T['createScreen']>>
   : never;
+
+export type Merge<T, U> = {
+  [K in keyof T | keyof U]: K extends keyof U
+    ? U[K]
+    : K extends keyof T
+    ? T[K]
+    : never;
+};

@@ -1,3 +1,4 @@
+'use client';
 import {
   GlobalConfig,
   invarant,
@@ -15,11 +16,15 @@ import { useConvexApi } from './_internal/useConvexApi';
 
 export const useStableQuery = (fn: any, args: QueryDto) => {
   const result = useQueryTanstack(convexQuery(fn, args));
-
   const stored = useRef(result);
 
   if (result.data !== undefined) {
     stored.current = result;
+  } else {
+    stored.current = {
+      ...result,
+      data: stored.current?.data,
+    };
   }
 
   return stored.current;
@@ -51,5 +56,8 @@ export const useConvexQuery = <QueryReturnType extends RecordType[]>({
     isLoading: data.isLoading,
     isError: data.isError,
     data: records,
+    error: data.error,
+    isFetching: data.isFetching,
+    isFetched: data.isFetched,
   };
 };

@@ -3,10 +3,10 @@ import { ViewFieldConfig } from './view-config.types';
 
 export interface BaseConfigInterface<
   TDataModel extends Record<string, any>,
-  TableName
+  TTables
 > {
   dataModel: TDataModel;
-  tableNames: TableName[];
+  tableNames: TTables;
   viewFields: Record<string, ViewFieldConfig>;
   searchableFields: Record<string, SearchableField>;
 }

@@ -9,6 +9,7 @@ type ListGetProps<T extends RecordType> = {
   descriptionKey?: keyof T;
 };
 
+// export const _useListInternal = <T extends RecordType>() => {
 export const useList = <T extends RecordType>() => {
   const { viewConfigManager } = useViewConfig();
   const query = useAtomValue(debouncedQueryAtom);
@@ -32,3 +33,27 @@ export const useList = <T extends RecordType>() => {
     };
   };
 };
+
+// const _useList = <T extends GetTableName, TData extends GetTableDataType<T>>(
+//   tableName: T,
+//   { data, fieldLabel }: { data: TData[]; fieldLabel: keyof TData }
+// ) => {
+//   return <Props extends ListGetProps<TData>>(
+//     options?: Props
+//   ): ListProps<TData> => {
+//     const { descriptionKey } = options || {};
+//     return {
+//       items:
+//         data?.map((item) => ({
+//           ...item,
+//           name: item[fieldLabel] as string,
+//           description:
+//             descriptionKey && typeof item[descriptionKey] === 'string'
+//               ? item[descriptionKey]
+//               : undefined,
+//         })) ?? [],
+//     };
+//   };
+// };
+
+// _useList('tasks', { data: [{ id: '1' }], fieldLabel: 'name' });

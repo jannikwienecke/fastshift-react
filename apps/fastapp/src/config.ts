@@ -1,7 +1,7 @@
 import { schema } from '@apps-next/convex';
 import { generateConfigFrom } from '@apps-next/react';
 
-const config = generateConfigFrom('convex', schema);
+const config = generateConfigFrom(schema);
 
 export const projectsBaseView = config.createView('projects', {
   displayField: {
