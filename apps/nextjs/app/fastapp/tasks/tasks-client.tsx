@@ -1,18 +1,18 @@
-'use client';
+'use client'
 
-import { BaseViewConfigManager } from '@apps-next/core';
-import { useQuery, ViewProvider } from '@apps-next/react';
-import { List } from '@apps-next/ui';
-import { Post, Prisma } from '@prisma/client';
-import React, { useOptimistic } from 'react';
-import { createNewPost } from './actions';
-import { _createView } from './create-prisma-view';
+import { BaseViewConfigManager } from '@apps-next/core'
+import { useQuery, ViewProvider } from '@apps-next/react'
+import { List } from '@apps-next/ui'
+import { Post, Prisma } from '@prisma/client'
+import React, { useOptimistic } from 'react'
+import { createNewPost } from './actions'
+import { _createView } from './create-prisma-view'
 
-const data = _createView('post', {} as any);
+const data = _createView('post', {} as any)
 
 export const TasksClient = () => {
-  const getListPRops = data.useList();
-  const name = getListPRops().items?.[0].published;
+  const getListPRops = data.useList()
+  const name = getListPRops().items?.[0].published
 
   return (
     <>
@@ -24,49 +24,49 @@ export const TasksClient = () => {
             dbProvider: 'prisma',
             viewName: 'tasks',
             displayField: {
-              field: 'name',
-            },
-          }),
+              field: 'name'
+            }
+          })
         }}
       >
         <TasksClientContent />
       </ViewProvider>
     </>
-  );
-};
+  )
+}
 
 export const TasksClientContent = () => {
-  const [query, setQuery] = React.useState<{ value: string } | null>(null);
-  const [showForm, setShowForm] = React.useState(false);
+  const [query, setQuery] = React.useState<{ value: string } | null>(null)
+  const [showForm, setShowForm] = React.useState(false)
 
-  const { data, refetch } = useQuery({ query: query?.value ?? '' });
-  const tasks = (data || []) as Post[];
+  const { data, refetch } = useQuery({ query: query?.value ?? '' })
+  const tasks = (data || []) as Post[]
 
   const formAction = async (formData: FormData) => {
-    const title = formData.get('title') as string;
-    const content = formData.get('content') as string;
+    const title = formData.get('title') as string
+    const content = formData.get('content') as string
     addOptimisically({
       title: title,
-      content: content,
-    });
+      content: content
+    })
 
-    setShowForm(false);
+    setShowForm(false)
 
     await createNewPost({
       title: title,
-      content: content,
-    });
+      content: content
+    })
 
-    refetch();
-  };
+    refetch()
+  }
 
   const [optimicPosts, addOptimisically] = useOptimistic(
     tasks,
     (
       state,
       action: {
-        title: string;
-        content: string;
+        title: string
+        content: string
       }
     ) => {
       return [
@@ -75,11 +75,11 @@ export const TasksClientContent = () => {
           id: Math.random() * 10000000,
           ...action,
           published: false,
-          authorId: 1,
-        },
-      ];
+          authorId: 1
+        }
+      ]
     }
-  );
+  )
 
   return (
     <div>
@@ -134,11 +134,11 @@ export const TasksClientContent = () => {
           items={
             optimicPosts?.map((task) => ({
               name: task.title,
-              description: task.content ?? '',
+              description: task.content ?? ''
             })) ?? []
           }
         />
       </div>
     </div>
-  );
-};
+  )
+}
