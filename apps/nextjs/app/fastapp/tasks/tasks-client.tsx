@@ -86,6 +86,7 @@ export const TasksClientContent = () => {
       <div>
         <h1 className="font-bold flex flex-row gap-2 items-center ">
           <span>Tasks</span>
+
           <span>
             <button onClick={() => setShowForm(true)}>Create</button>
           </span>

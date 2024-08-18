@@ -8,6 +8,8 @@ import { routeTree } from './routeTree.gen';
 import { ConvexQueryProvider } from '@apps-next/convex-adapter-app';
 import { config } from './new-config';
 
+import '@picocss/pico/css/pico.classless.min.css';
+
 const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
