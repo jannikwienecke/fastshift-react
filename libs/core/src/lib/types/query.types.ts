@@ -23,6 +23,7 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
   error: any;
   isFetching: boolean;
   isFetched: boolean;
+  refetch: () => void;
 };
 
 export type QueryReturnOrUndefined<T extends RecordType = RecordType> =

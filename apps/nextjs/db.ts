@@ -1,5 +1,3 @@
-import { createClient } from '@libsql/client';
-import { PrismaLibSQL } from '@prisma/adapter-libsql';
 import { PrismaClient } from '@prisma/client';
 
 export const singleton = <Value>(
@@ -29,3 +27,5 @@ const prisma = singleton('prisma', () => {
 prisma.$connect();
 
 export { prisma };
+
+export type PrismaClientType = typeof prisma;

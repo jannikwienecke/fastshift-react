@@ -1,35 +1,52 @@
-import { schema } from '@apps-next/convex';
-import { createView, ConfigWithouUi, _createView } from './config-model';
+// import { createView, ConfigWithouUi, _createView } from './config-model';
+import { createConfigFromPrismaSchema, PrismaConfig } from '@apps-next/core';
+import { Prisma } from '@prisma/client';
+import { prisma, PrismaClientType } from '../db';
 
-const config = new ConfigWithouUi(schema);
+const config = createConfigFromPrismaSchema<
+  Prisma.DMMF.Datamodel,
+  PrismaClientType
+>(Prisma.dmmf.datamodel);
 
-declare global {
+const x = config.getAllTables()[0] === 'user';
+
+const prismaConfig = new PrismaConfig(prisma);
+
+declare module '@apps-next/core' {
   interface Register {
     config: typeof config;
+    prisma: typeof prismaConfig;
   }
 }
 
-const View = createView(
-  'tasks',
-  {
-    displayField: {
-      field: 'name',
-    },
-  },
-  {
-    Component: ({ data, useList }) => {
-      const list = useList();
-      console.log(list().items?.[0].id);
-      // @ts-expect-error
-      console.log(list().items?.[0].NOT_VALID_FIELD);
+// declare global {
+//   interface Register {
+//     config: typeof config;
+//     prisma: typeof prismaConfig;
+//   }
+// }
 
-      // @ts-expect-error
-      const invalid = <div>Hello: {data.data?.[0].NOT_VALID_FIELD}</div>;
+// const View = createView(
+//   'tasks',
+//   {
+//     displayField: {
+//       field: 'name',
+//     },
+//   },
+//   {
+//     Component: ({ data, useList }) => {
+//       const list = useList();
+//       console.log(list().items?.[0].id);
+//       // @ts-expect-error
+//       console.log(list().items?.[0].NOT_VALID_FIELD);
 
-      return <div>Hello: {data.data?.[0].completed}</div>;
-    },
-  }
-);
+//       // @ts-expect-error
+//       const invalid = <div>Hello: {data.data?.[0].NOT_VALID_FIELD}</div>;
+
+//       return <div>Hello: {data.data?.[0].completed}</div>;
+//     },
+//   }
+// );
 
 // schema.tables.tasks.validator
 
@@ -53,21 +70,21 @@ const View = createView(
 //   },
 // });
 
-const taskBase = _createView(
-  'projects',
-  {
-    displayField: { field: 'label' },
-  },
-  null
-);
+// const taskBase = _createView(
+//   'projects',
+//   {
+//     displayField: { field: 'label' },
+//   },
+//   null
+// );
 
-const x = _createView(
-  'projects',
-  { displayField: { field: 'label' } },
-  { Component: () => <div>Hello</div> }
-);
+// const x = _createView(
+//   'projects',
+//   { displayField: { field: 'label' } },
+//   { Component: () => <div>Hello</div> }
+// );
 
-const TasksView = () => {
-  const {} = taskBase?.useList();
-  const {} = taskBase.useQuery({ query: 'tasks' });
-};
+// const TasksView = () => {
+//   const {} = taskBase?.useList();
+//   const {} = taskBase.useQuery({ query: 'tasks' });
+// };

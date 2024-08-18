@@ -1,9 +1,9 @@
 import { schema } from '@apps-next/convex';
-import { ConfigWithouUi, createConfigFromConvexSchema } from '@apps-next/core';
+import { createConfigFromConvexSchema } from '@apps-next/core';
 // import { Register } from '@apps-next/core';
 
 // export const config = new ConfigWithouUi(schema);
-const config = createConfigFromConvexSchema(schema);
+export const config = createConfigFromConvexSchema(schema);
 
 declare module '@apps-next/core' {
   interface Register {

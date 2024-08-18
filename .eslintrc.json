@@ -39,6 +39,10 @@
               {
                 "sourceTag": "scope:ui",
                 "onlyDependOnLibsWithTags": []
+              },
+              {
+                "sourceTag": "scope:query",
+                "onlyDependOnLibsWithTags": ["scope:shared"]
               }
             ]
           }

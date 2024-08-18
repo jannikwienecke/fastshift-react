@@ -26,8 +26,7 @@ type RemoveDollarSign<T> = T extends `$${infer _}` ? never : T;
 type PrismaTableName<T> = (keyof T)[];
 
 export const createConfigFromPrismaSchema = <T extends Prisma, PrismaClient>(
-  schema: T,
-  client: PrismaClient
+  datamodel: T
 ) => {
   const config: BaseConfigInterface<
     T,
@@ -35,10 +34,10 @@ export const createConfigFromPrismaSchema = <T extends Prisma, PrismaClient>(
   > = {
     searchableFields: {},
     viewFields: {},
-    dataModel: schema,
-    tableNames: Object.keys(client as any) as any as RemoveDollarSign<
-      PrismaTableName<PrismaClient>[number]
-    >[],
+    dataModel: datamodel,
+    tableNames: Object.values(datamodel.models as any).map((m: any) =>
+      (m.name as string).toLowerCase()
+    ) as any as RemoveDollarSign<PrismaTableName<PrismaClient>[number]>[],
   };
 
   return new ConfigWithouUi(config);
@@ -53,12 +52,19 @@ export class ConfigWithouUi<T extends Record<string, any>, Tables> {
   }
 }
 
+export class PrismaConfig<T extends Record<string, any>> {
+  constructor(public prisma: T) {}
+}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Register {
   // config: ConfigWithouUi
+  // prisma: PrismaConfig<Prisma.DMMF.Datamodel>
+  //
 }
 
 export type RegisteredRouter = Register extends { config: infer T } ? T : never;
+export type RegisteredPrisma = Register extends { prisma: infer T } ? T : never;
 
 export type FieldType =
   | 'String'
@@ -68,7 +74,7 @@ export type FieldType =
   | 'Reference'
   | 'Union';
 
-export type RecordType<T = Record<string, unknown>> = T;
+export type RecordType<T = any> = T;
 
 export type FieldConfig = {
   type: FieldType;

@@ -10,7 +10,6 @@ export default async function Index() {
   const posts = await prisma.post.findMany({});
 
   llinfo('Index Page', { users, posts });
-
   return (
     <div className="p-2">
       <div className="flex gap-2 text-lg border-b">

@@ -1,5 +1,6 @@
 // import { prisma } from '../../../db';
 
+import { Prisma } from '@prisma/client';
 import { TasksClient } from './tasks-client';
 
 // import { clientConfig } from './global';
@@ -198,6 +199,10 @@ import { TasksClient } from './tasks-client';
 
 // // // generateConfigFrom('prisma', Prisma.dmmf.datamodel);
 
-export default function FastAppTasksPage() {
-  return <TasksClient />;
+type PrismaModelType = Prisma.ModelName;
+
+export default async function FastAppTasksPage() {
+  const model = 'post';
+
+  return <TasksClient datamodel={Prisma.dmmf.datamodel} />;
 }

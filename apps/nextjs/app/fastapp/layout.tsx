@@ -5,8 +5,6 @@ export default function FastAppLayoutComponent({
 }: {
   children: React.ReactNode;
 }) {
-  // if is /fastApp => route to /fastApp/tasks
-
   return (
     <div className="flex flex-row pt-2">
       <div className="min-w-[15rem]">

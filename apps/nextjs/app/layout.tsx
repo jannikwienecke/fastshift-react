@@ -3,6 +3,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Link from 'next/link';
 import { viewLoader, viewMutation } from './fastapp/tasks/actions';
 import './global.css';
+import Head from 'next/head';
+
+import '@picocss/pico/css/pico.classless.min.css';
 
 export const metadata = {
   title: 'Welcome to nextjs',
@@ -16,6 +19,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+        ></link>
+      </Head>
+
       <body>
         <PrismaQueryProvider
           api={{

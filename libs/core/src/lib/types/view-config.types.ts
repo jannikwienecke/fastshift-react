@@ -20,11 +20,7 @@ export type ViewConfigType<
 };
 
 export type Prisma = {
-  dmmf: {
-    datamodel: {
-      models: Array<unknown>;
-    };
-  };
+  models: Array<unknown>;
 };
 
 // keyof GetPersonFromType<Awaited<ReturnType<PrismaClient[TableName]['findFirst']>>>

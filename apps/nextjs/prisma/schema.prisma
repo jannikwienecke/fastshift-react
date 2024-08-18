@@ -1,14 +1,12 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters", "fullTextSearch"]
-
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      =  "postgresql://postgres:admin@localhost:5433/db"
+  url      = "postgresql://postgres:admin@localhost:5433/db"
 }
-
 
 model User {
   id    Int     @id @default(autoincrement())
@@ -19,9 +17,9 @@ model User {
 
 model Post {
   id        Int     @id @default(autoincrement())
-  title     String 
+  title     String
   content   String?
   published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
+  author    User    @relation(fields: [authorId], references: [id])
 }

@@ -67,3 +67,19 @@ export const viewLoader = async (options?: QueryDto) => {
 export const viewMutation = async (props: MutationProps) => {
   return null;
 };
+
+export const createNewPost = async (props: {
+  title: string;
+  content?: string;
+}) => {
+  const res = await prisma.post.create({
+    data: {
+      title: props.title,
+      content: props.content,
+      authorId: 1,
+    },
+  });
+
+  console.log(res);
+  return res;
+};
