@@ -177,6 +177,8 @@ export const SidebarLink = ({
 }) => {
   const { open, animate } = useSidebar();
   return (
+    // FIX ME: Must support any kind of link
+    // e.g. Next.js Link, React Router Link, etc.
     <Link
       href={link.href}
       className={cn(
