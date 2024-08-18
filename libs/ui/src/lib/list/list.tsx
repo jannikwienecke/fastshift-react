@@ -1,3 +1,5 @@
+import { AnimatedList } from '../animated-list';
+
 type ListItem = {
   name: string;
   description?: string;
@@ -9,7 +11,10 @@ export type ListProps<TItems> = {
 
 export function List<T extends Record<string, any>>(props: ListProps<T>) {
   return (
-    <ul className="flex flex-col gap-4 p-4 w-full">
+    <AnimatedList
+      animateInitial={true}
+      className="flex flex-col gap-4 p-4 w-full"
+    >
       {props.items.map((item) => (
         <li key={item.name} className="flex flex-col">
           <div className="text-base font-bold">{item.name}</div>
@@ -19,6 +24,6 @@ export function List<T extends Record<string, any>>(props: ListProps<T>) {
           ) : null}
         </li>
       ))}
-    </ul>
+    </AnimatedList>
   );
 }
