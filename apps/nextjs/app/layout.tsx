@@ -6,6 +6,7 @@ import './global.css';
 import Head from 'next/head';
 
 import '@picocss/pico/css/pico.classless.min.css';
+import React from 'react';
 
 export const metadata = {
   title: 'Welcome to nextjs',
@@ -19,33 +20,28 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-        ></link>
-      </Head>
+      <React.StrictMode>
+        <body>
+          <PrismaQueryProvider
+            api={{
+              viewLoader: viewLoader,
+              viewMutation: viewMutation,
+            }}
+          >
+            <div className="p-2">
+              <div className="flex gap-2 text-lg border-b">
+                <Link href={'/'}>Home</Link>
+              </div>
 
-      <body>
-        <PrismaQueryProvider
-          api={{
-            viewLoader: viewLoader,
-            viewMutation: viewMutation,
-          }}
-        >
-          <div className="p-2">
-            <div className="flex gap-2 text-lg border-b">
-              <Link href={'/'}>Home</Link>
+              <hr />
+
+              {children}
             </div>
 
-            <hr />
-
-            {children}
-          </div>
-
-          <ReactQueryDevtools initialIsOpen={false} />
-        </PrismaQueryProvider>
-      </body>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </PrismaQueryProvider>
+        </body>
+      </React.StrictMode>
     </html>
   );
 }

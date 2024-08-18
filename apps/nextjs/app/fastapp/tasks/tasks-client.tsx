@@ -8,13 +8,9 @@ import React, { useOptimistic } from 'react';
 import { createNewPost } from './actions';
 import { _createView } from './create-prisma-view';
 
-export const TasksClient = ({
-  datamodel,
-}: {
-  datamodel: Prisma.DMMF.Datamodel;
-}) => {
-  const data = _createView('post', {} as any);
-  console.log(data.data.authorId);
+const data = _createView('post', {} as any);
+
+export const TasksClient = () => {
   const getListPRops = data.useList();
   const name = getListPRops().items?.[0].published;
 

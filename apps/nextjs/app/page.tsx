@@ -13,7 +13,7 @@ export default async function Index() {
   return (
     <div className="p-2">
       <div className="flex gap-2 text-lg border-b">
-        <Link href={'/'}>Home123</Link>
+        <Link href={'/'}>Home</Link>
       </div>
 
       <hr />

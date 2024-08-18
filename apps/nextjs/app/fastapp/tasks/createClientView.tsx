@@ -6,7 +6,7 @@ export const createClientView = <TGlobal extends Record<string, any>>(
   globalConfig: TGlobal
 ) => {
   return (
-    <ViewProvider viewConfigManager={{} as any}>
+    <ViewProvider view={{} as any}>
       <>HELLOF FROM CLIENT</>
     </ViewProvider>
   );
