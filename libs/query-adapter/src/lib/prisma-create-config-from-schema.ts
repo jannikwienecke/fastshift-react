@@ -1,44 +1,39 @@
-import { BaseConfigInterface, BaseConfig } from '@apps-next/core';
+import { BaseConfig, BaseConfigInterface } from '@apps-next/core';
+import { generateViewFieldsFromPrismaSchema } from './_internal/prisma-generate-view-fields';
+import { getTableNamesFromPrismaSchema } from './_internal/prisma-get-tables-from-schema';
+import { GetPrismaTableName } from './_internal/prisma.type.helper';
+import { Prisma } from './prisma.types';
 
 type RemoveDollarSign<T> = T extends `$${infer _}` ? never : T;
 
 type PrismaTableName<T> = (keyof T)[];
 
-type PrismaModels = {
-  models: Array<unknown>;
-};
-
 export const createConfigFromPrismaSchema = <
-  T extends PrismaModels,
   PrismaClient extends Record<string, any>
 >(
-  datamodel: T
+  Prisma: Prisma['dmmf']['datamodel']
 ) => {
-  type TableName = RemoveDollarSign<PrismaTableName<PrismaClient>[number]>;
+  type TableName = GetPrismaTableName<PrismaClient>;
 
-  const tableNames = Object.values(datamodel.models as any).map((m: any) =>
-    (m.name as string).toLowerCase()
-  ) as any as TableName[];
+  type GetDataModelPrisma = {
+    [TKey in TableName]: Awaited<
+      ReturnType<PrismaClient[TKey]['findFirstOrThrow']>
+    >;
+  };
+
+  const tableNames = getTableNamesFromPrismaSchema(Prisma) as TableName[];
+  const viewFields = generateViewFieldsFromPrismaSchema(Prisma);
 
   const config: BaseConfigInterface<
-    T,
+    Prisma['dmmf']['datamodel'],
     RemoveDollarSign<PrismaTableName<PrismaClient>[number]>[],
-    {
-      [TKey in TableName]: Awaited<
-        ReturnType<PrismaClient[TKey]['findFirstOrThrow']>
-      >;
-    }
+    GetDataModelPrisma
   > = {
     searchableFields: {},
-    viewFields: {},
-    dataModel: datamodel,
-    testType: {} as {
-      [TKey in TableName]: Awaited<
-        ReturnType<PrismaClient[TKey]['findFirstOrThrow']>
-      >;
-    },
-
-    tableNames: tableNames,
+    viewFields,
+    dataModel: Prisma,
+    testType: {} as GetDataModelPrisma,
+    tableNames,
   };
 
   return new BaseConfig(config);

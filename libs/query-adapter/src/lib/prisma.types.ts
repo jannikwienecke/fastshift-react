@@ -11,6 +11,9 @@ export type PrismaField = {
   default?: unknown;
   isGenerated?: boolean | undefined;
   isUpdatedAt?: boolean;
+  relationName?: string;
+  relationFromFields?: string[];
+  relationToFields?: string[];
 };
 
 export type Prisma = {
@@ -18,6 +21,7 @@ export type Prisma = {
     datamodel: {
       models: Array<{
         fields: Array<PrismaField>;
+        name: string;
       }>;
     };
   };

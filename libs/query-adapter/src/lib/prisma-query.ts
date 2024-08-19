@@ -24,7 +24,7 @@ export const usePrismaQuery = <QueryReturnType extends RecordType[]>({
       prisma.viewLoader({
         ...queryProps,
         viewConfig: queryProps.viewConfigManager?.viewConfig,
-
+        modelConfig: queryProps.viewConfigManager?.modelConfig,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         viewConfigManager: undefined,

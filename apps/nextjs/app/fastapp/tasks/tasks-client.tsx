@@ -1,6 +1,6 @@
 'use client';
 
-import { createView } from '@apps-next/react';
+import { createView, QueryInput } from '@apps-next/react';
 import { List } from '@apps-next/ui';
 
 export const TasksClientContent = createView(
@@ -14,7 +14,7 @@ export const TasksClientContent = createView(
       const getListProps = useList();
       const item = getListProps().items?.[0];
 
-      const test = data.data?.[0].content;
+      const test = data.data?.[0]?.content;
 
       // @ts-expect-error INVALID FIELD
       const INVALID = data.data?.[0]?.NOT_VALID_FIELD;
@@ -30,8 +30,12 @@ export const TasksClientContent = createView(
 
 export const TasksClient = () => {
   return (
-    <>
+    <div className="flex flex-col gap-2">
+      <div>
+        <QueryInput />
+      </div>
+
       <TasksClientContent />
-    </>
+    </div>
   );
 };

@@ -24,6 +24,11 @@ export type RecordType<T = any> = T;
 export type FieldConfig = {
   type: FieldType;
   name: string;
+  isRequired?: boolean;
+  relation?: {
+    tableName: string;
+    fieldName: string;
+  };
 };
 
 export type GetTableName = RegisteredRouter['config']['tableNames'][number];
