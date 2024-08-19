@@ -5,7 +5,7 @@ export class BaseConfig<
   Tables,
   TTest extends Record<string, any>
 > {
-  constructor(private config: BaseConfigInterface<T, Tables, TTest>) {}
+  constructor(public config: BaseConfigInterface<T, Tables, TTest>) {}
 
   getAllTables() {
     return this.config.tableNames;

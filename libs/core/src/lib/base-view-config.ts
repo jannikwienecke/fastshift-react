@@ -1,5 +1,15 @@
 import { invarant } from './core-utils';
-import { FieldConfig, SearchableField, ViewConfigType } from './types';
+import {
+  FieldConfig,
+  SearchableField,
+  ViewConfigType,
+  ViewFieldConfig,
+} from './types';
+
+export type ModelConfig = {
+  searchableFields: SearchableField;
+  viewFields: ViewFieldConfig;
+};
 
 export interface BaseViewConfigManagerInterface<
   TViewConfig extends ViewConfigType = ViewConfigType
@@ -10,6 +20,7 @@ export interface BaseViewConfigManagerInterface<
   getTableName(): string;
   getViewName(): string;
   getViewFieldList(): FieldConfig[];
+  modelConfig?: ModelConfig;
 }
 
 export class BaseViewConfigManager<
@@ -18,8 +29,9 @@ export class BaseViewConfigManager<
 {
   viewConfig: TViewConfig;
 
-  constructor(viewConfig: TViewConfig) {
+  constructor(viewConfig: TViewConfig, public modelConfig?: ModelConfig) {
     this.viewConfig = viewConfig;
+    this.modelConfig = modelConfig;
   }
 
   getTableName(): string {
@@ -36,10 +48,11 @@ export class BaseViewConfigManager<
   }
 
   getSearchableField(): SearchableField | undefined {
-    return undefined;
+    console.log('GET SEARCHABLE FIELD', this.viewConfig);
+    return this.modelConfig?.searchableFields;
   }
 
   getViewFieldList(): FieldConfig[] {
-    return Object.values(this.viewConfig.viewFields);
+    return Object.values(this.modelConfig?.viewFields ?? {});
   }
 }

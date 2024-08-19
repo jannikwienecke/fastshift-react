@@ -13,11 +13,15 @@ export const viewLoaderHandler = async (
 ): Promise<ConvexRecordType[] | null> => {
   const args = _args as QueryDto;
 
-  const viewConfigManager = new ConvexViewConfigManager(args.viewConfig as any);
+  const viewConfigManager = new ConvexViewConfigManager(
+    args.viewConfig as any,
+    args.modelConfig
+  );
 
   invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
 
-  const searchField = viewConfigManager?.getSearchableField();
+  const searchField = viewConfigManager.getSearchableField();
+
   const searching = !args.query
     ? null
     : (q: { withSearchIndex: any }) =>

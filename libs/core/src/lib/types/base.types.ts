@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
+import { BaseConfigInterface } from './config.types';
 
 const documentBaseSchema = z.object({
   id: z.string(),
@@ -41,6 +42,7 @@ export type SearchableField<TDataModel extends Record<string, any> = any> = {
 
 export type GlobalConfig = {
   provider: DataProvider;
+  config: BaseConfigInterface<any, any, any>;
 };
 
 export type DataModel<TableNames extends string = any> = {

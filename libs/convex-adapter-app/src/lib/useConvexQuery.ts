@@ -44,6 +44,7 @@ export const useConvexQuery = <QueryReturnType extends RecordType[]>({
   const data = useStableQuery(api.viewLoader, {
     ...queryProps,
     viewConfig: queryProps.viewConfigManager?.viewConfig,
+    modelConfig: queryProps.viewConfigManager?.modelConfig,
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

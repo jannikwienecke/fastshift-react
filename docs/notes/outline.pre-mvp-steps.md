@@ -2,7 +2,7 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1724073724608
+updated: 1724074556474
 created: 1723444563681
 ---
 
@@ -42,9 +42,9 @@ Add a small doc section to each new progress step
     - [x] add logging library
     - [x] Great test data & Schema
     - [x] Clean Up
-    - [ ] server side nextjs react query
-    - [ ] remove any's
+    - [x] server side nextjs react query
     - [ ] create real config with fields and sserch fields for prisma and convex
+    - [ ] remove any's
     - [ ] get, post, search should work for both apps generically
     - [ ] Extract the "components" into new package (ui)
     - [ ] Write tests - use for both apps

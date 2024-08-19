@@ -1,11 +1,16 @@
 import { BaseConfigInterface, BaseConfig } from '@apps-next/core';
 import { ConvexSchemaType } from './_internal/types.convex';
 import { Infer } from 'convex/values';
+import { generateSearchableFieldsFromConvexSchema } from './convex-searchable-fields';
+import { generateViewFieldsFromConvexSchema } from './convex-view-fields';
 
 export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   schema: T
 ) => {
   type TableName = keyof T['tables'];
+
+  const searchableFields = generateSearchableFieldsFromConvexSchema(schema);
+  const viewFields = generateViewFieldsFromConvexSchema(schema);
 
   const config: BaseConfigInterface<
     T,
@@ -15,8 +20,8 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
     }
   > = {
     testType: {} as T,
-    searchableFields: {},
-    viewFields: {},
+    searchableFields,
+    viewFields,
     dataModel: schema,
     tableNames: Object.keys(schema.tables) as any as keyof T['tables'],
   };

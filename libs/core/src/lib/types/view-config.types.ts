@@ -3,7 +3,6 @@ import { FieldConfig, GetTableDataType, GetTableName } from './base.types';
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
 export type ViewConfigType<T extends GetTableName = any> = {
-  viewFields: ViewFieldConfig;
   viewName: string;
   tableName: T;
   displayField: {

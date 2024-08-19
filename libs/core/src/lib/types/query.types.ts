@@ -1,4 +1,7 @@
-import { BaseViewConfigManagerInterface } from '../base-view-config';
+import {
+  BaseViewConfigManagerInterface,
+  ModelConfig,
+} from '../base-view-config';
 import { RecordType } from './base.types';
 import { MutationProps } from './mutation.types';
 import { ViewConfigType } from './view-config.types';
@@ -6,6 +9,7 @@ import { ViewConfigType } from './view-config.types';
 export type QueryDto = {
   query?: string;
   viewConfig?: ViewConfigType;
+  modelConfig?: ModelConfig;
 };
 
 export type QueryProps = {

@@ -10,6 +10,7 @@ import { useQuery } from './use-query';
 import { useAtomValue } from 'jotai';
 import { debouncedQueryAtom } from './ui-components/query-input';
 import { useList } from './ui-adapter';
+import { useGlobalConfig } from './use-global-config';
 
 export const ViewProvider = ({
   children,
@@ -18,8 +19,23 @@ export const ViewProvider = ({
   children: React.ReactNode;
   view: { viewConfigManager: BaseViewConfigManagerInterface };
 }) => {
+  const { config } = useGlobalConfig();
+
+  const { tableName } = view.viewConfigManager.viewConfig;
+
+  const searchableFields = config.searchableFields[tableName];
+  const viewFields = config.viewFields[tableName];
+
+  const viewConfigManager = new BaseViewConfigManager(
+    view.viewConfigManager.viewConfig,
+    {
+      searchableFields,
+      viewFields,
+    }
+  );
+
   return (
-    <ViewContext.Provider value={{ viewConfigManager: view.viewConfigManager }}>
+    <ViewContext.Provider value={{ viewConfigManager }}>
       {children}
     </ViewContext.Provider>
   );
