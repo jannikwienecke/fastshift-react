@@ -8,3 +8,5 @@ export * from './lib/convex-view-fields';
 export * from './lib/convex-config';
 export * from './lib/_internal/types.convex';
 export * from './lib/_internal/convex.type.helper';
+export * from './lib/convex-create-config-from-schema';
+export * from './lib/convex-create-view-config';

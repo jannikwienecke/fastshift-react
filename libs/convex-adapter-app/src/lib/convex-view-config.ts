@@ -1,8 +1,5 @@
-import {
-  BaseViewConfigManager,
-  ConvexViewConfig,
-  SearchableField,
-} from '@apps-next/core';
+import { BaseViewConfigManager, SearchableField } from '@apps-next/core';
+import { ConvexViewConfig } from './convex-create-view-config';
 
 export class ConvexViewConfigManager extends BaseViewConfigManager<ConvexViewConfig> {
   override getSearchableField(): SearchableField | undefined {

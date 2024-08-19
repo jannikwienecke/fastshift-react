@@ -1,29 +1,22 @@
-import { FieldConfig, GetFieldName, SearchableField } from './base.types';
+import {
+  FieldConfig,
+  GetTableDataType,
+  GetTableName,
+  RegisteredRouter,
+  SearchableField,
+} from './base.types';
 
 export type ViewFieldConfig = Record<string, FieldConfig>;
-
-export type ViewConfigType<
-  TDataModel extends Record<string, any> = any,
-  T extends keyof TDataModel['tables'] = any
-> = {
-  tableName: T;
-  dbProvider: 'convex' | 'prisma';
-  viewFields: ViewFieldConfig;
-  viewName: string;
-  displayField: {
-    field: GetFieldName<TDataModel, T>;
-    cell?: (value: any) => React.ReactNode;
-  };
-  query?: {
-    //
-  };
-};
 
 export type Prisma = {
   models: Array<unknown>;
 };
 
-// keyof GetPersonFromType<Awaited<ReturnType<PrismaClient[TableName]['findFirst']>>>
+// export type GetTableName = RegisteredRouter['config']['tableNames'][number];
+// export type GetTableDataType<T extends GetTableName> =
+//   // ReturnType<RegisteredPrisma['prisma'][T]['findFirstOrThrow']>
+//   RegisteredRouter['config']['testType'][T];
+// // keyof GetPersonFromType<Awaited<ReturnType<PrismaClient[TableName]['findFirst']>>>
 
 type RemoveNull<T> = T extends null ? never : T;
 
@@ -37,16 +30,15 @@ type GetResultOfTable<
   TableName extends keyof TDataModel
 > = RemoveNull<Awaited<ReturnType<TDataModel[TableName]['findFirst']>>>;
 
-export type ViewConfigTypePrisma<
-  TDataModel extends Record<string, any>,
-  T extends keyof TDataModel
+export type ViewConfigType<
+  TDataModel extends Record<string, any> = any,
+  T extends GetTableName = never
 > = {
-  tableName: T;
-  dbProvider: 'prisma';
+  dbProvider: 'convex' | 'prisma';
   viewFields: ViewFieldConfig;
   viewName: string;
   displayField: {
-    field: GetFieldNamePrisma<TDataModel, T>;
+    field: keyof GetTableDataType<T>;
     cell?: (value: GetResultOfTable<TDataModel, T>) => React.ReactNode;
   };
   query?: {
@@ -54,15 +46,55 @@ export type ViewConfigTypePrisma<
   };
 };
 
-export type ConvexViewConfig<
+export type ViewConfig<
   TDataModel extends Record<string, any> = any,
-  T extends keyof TDataModel['tables'] = any
+  T extends keyof TDataModel = any
 > = {
-  dbProvider: 'convex';
+  tableName: T;
+  dbProvider: 'convex' | 'prisma';
+  viewFields: ViewFieldConfig;
+  displayField: {
+    field: GetFieldNamePrisma<TDataModel, T>;
+    cell?: (value: GetResultOfTable<TDataModel, T>) => React.ReactNode;
+  };
   query?: {
     searchableFields?: SearchableField<TDataModel, T>;
   };
-} & ViewConfigType<TDataModel, T>;
+} & ViewConfigType<TDataModel>;
+
+// export type ConvexViewConfig<
+//   TDataModel extends Record<string, any> = any,
+//   T extends keyof TDataModel['tables'] = any
+// > = {
+//   tableName: T;
+//   dbProvider: 'convex';
+//   viewFields: ViewFieldConfig;
+//   displayField: {
+//     field: keyof GetTableDataType<T>;
+//     cell?: (value: any) => React.ReactNode;
+//   };
+//   query?: {
+//     searchableFields?: SearchableField<TDataModel, T>;
+//   };
+// } & ViewConfigType<TDataModel>;
+
+// export type PrismaViewConfig<
+//   TDataModel extends Record<string, any> = any,
+//   T extends string = any
+// > = {
+//   // data: TDataModel;
+//   tableName: T;
+//   dbProvider: 'prisma';
+//   viewFields: ViewFieldConfig;
+//   viewName: string;
+//   displayField: {
+//     field: keyof GetTableDataType<T>;
+//     cell?: (value: GetResultOfTable<TDataModel, T>) => React.ReactNode;
+//   };
+//   query?: {
+//     //
+//   };
+// } & ViewConfigType<TDataModel>;
 
 export interface BaseViewConfigManagerInterface<
   TViewConfig extends ViewConfigType = ViewConfigType

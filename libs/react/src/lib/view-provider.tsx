@@ -9,8 +9,7 @@ import {
 import { useQuery } from './use-query';
 import { useAtomValue } from 'jotai';
 import { debouncedQueryAtom } from './ui-components/query-input';
-import { useList } from './ui-adapter.ts';
-import { useViewConfig } from './use-view-config';
+import { useList } from './ui-adapter';
 
 export const ViewProvider = ({
   children,

@@ -1,9 +1,13 @@
 import { schema } from '@apps-next/convex';
-import { createConfigFromConvexSchema } from '@apps-next/core';
+import {
+  createConfigFromConvexSchema,
+  createConvexViewConfig,
+} from '@apps-next/convex-adapter-app';
 // import { Register } from '@apps-next/core';
 
 // export const config = new ConfigWithouUi(schema);
 export const config = createConfigFromConvexSchema(schema);
+// createConvexViewConfig('dsad', {})
 
 declare module '@apps-next/core' {
   interface Register {

@@ -8,8 +8,9 @@ const config = createConfigFromPrismaSchema<
   PrismaClientType
 >(Prisma.dmmf.datamodel);
 
-const prismaConfig = new PrismaConfig(prisma);
+const co = config['config']['testType']['post'];
 
+const prismaConfig = new PrismaConfig(prisma);
 declare module '@apps-next/core' {
   interface Register {
     config: typeof config;

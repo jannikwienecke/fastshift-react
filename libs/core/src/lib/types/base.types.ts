@@ -1,51 +1,59 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
 import { BaseConfigInterface } from './config.types';
-import { ConvexSchemaType } from '@apps-next/convex-adapter-app';
 import { Prisma } from './view-config.types';
 
 const documentBaseSchema = z.object({
   id: z.string(),
 });
 
-export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
-  schema: T
-) => {
-  const config: BaseConfigInterface<T, keyof T['tables']> = {
-    searchableFields: {},
-    viewFields: {},
-    dataModel: schema,
-    tableNames: Object.keys(schema.tables) as any as keyof T['tables'],
-  };
-
-  return new ConfigWithouUi(config);
-};
-
 type RemoveDollarSign<T> = T extends `$${infer _}` ? never : T;
 
 type PrismaTableName<T> = (keyof T)[];
 
-export const createConfigFromPrismaSchema = <T extends Prisma, PrismaClient>(
+export const createConfigFromPrismaSchema = <
+  T extends Prisma,
+  PrismaClient extends Record<string, any>
+>(
   datamodel: T
 ) => {
+  type TableName = RemoveDollarSign<PrismaTableName<PrismaClient>[number]>;
+
+  const tableNames = Object.values(datamodel.models as any).map((m: any) =>
+    (m.name as string).toLowerCase()
+  ) as any as TableName[];
+
   const config: BaseConfigInterface<
     T,
-    RemoveDollarSign<PrismaTableName<PrismaClient>[number]>[]
+    RemoveDollarSign<PrismaTableName<PrismaClient>[number]>[],
+    {
+      [TKey in TableName]: Awaited<
+        ReturnType<PrismaClient[TKey]['findFirstOrThrow']>
+      >;
+    }
   > = {
     searchableFields: {},
     viewFields: {},
     dataModel: datamodel,
-    tableNames: Object.values(datamodel.models as any).map((m: any) =>
-      (m.name as string).toLowerCase()
-    ) as any as RemoveDollarSign<PrismaTableName<PrismaClient>[number]>[],
+    testType: {} as {
+      [TKey in TableName]: Awaited<
+        ReturnType<PrismaClient[TKey]['findFirstOrThrow']>
+      >;
+    },
+
+    tableNames: tableNames,
   };
 
   return new ConfigWithouUi(config);
 };
 
-export class ConfigWithouUi<T extends Record<string, any>, Tables> {
+export class ConfigWithouUi<
+  T extends Record<string, any>,
+  Tables,
+  TTest extends Record<string, any>
+> {
   // config: BaseConfigInterface<T, keyof T['tables']>;
-  constructor(private config: BaseConfigInterface<T, Tables>) {}
+  constructor(private config: BaseConfigInterface<T, Tables, TTest>) {}
 
   getAllTables() {
     return this.config.tableNames;
@@ -81,7 +89,13 @@ export type FieldConfig = {
   name: string;
 };
 
-export type GetTableName<T extends DataModel> = keyof T['tables'];
+export type GetTableName = RegisteredRouter['config']['tableNames'][number];
+
+export type GetTableDataType<T extends GetTableName> =
+  // ReturnType<RegisteredPrisma['prisma'][T]['findFirstOrThrow']>
+  RegisteredRouter['config']['testType'][T];
+
+// export type GetTableName<T extends DataModel> = keyof T['tables'];
 
 type GetTableName2<TDataModel extends Record<string, any> = any> =
   keyof TDataModel['tables'];

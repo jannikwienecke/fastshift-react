@@ -1,60 +1,28 @@
-import { Form, QueryInput, useMutation, ViewProvider } from '@apps-next/react';
+import { createConvexViewConfig } from '@apps-next/convex-adapter-app';
+import { RegisteredRouter } from '@apps-next/core';
+import {
+  createView,
+  Form,
+  QueryInput,
+  useMutation,
+  ViewProvider,
+} from '@apps-next/react';
 import { List, ShineBorder } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
-import { _createView } from '../config-model';
 
-// export const Route = createFileRoute('/fastApp/tasks')({
-//   component: () =>
-//     _createView(
-//       'projects',
-//       { displayField: { field: 'label' } },
-//       {
-//         Component: (props) => {
-//           const getListProps = props.useList();
+let test: RegisteredRouter['config']['tableNames'];
 
-//           return (
-//             <div>
-//               <>
-//                 Tasks
-//                 <List {...getListProps()} />
-//               </>
-//             </div>
-//           );
-//         },
-//       }
-//     ),
-// });
-
-const taskBase = _createView(
-  'projects',
-  {
-    displayField: { field: 'label' },
-  },
-  null
-);
-
-export const Route = createFileRoute('/fastApp/tasks')({
-  component: () => (
-    <ViewProvider view={taskBase}>
-      <TasksView />
-    </ViewProvider>
-  ),
+const _viewConfig = createConvexViewConfig('tasks', {
+  displayField: { field: 'name' },
 });
 
-// const Componen =
+const taskBase = createView(_viewConfig, null);
 
 const TasksView = () => {
   const getListProps = taskBase.useList();
-  const { data } = taskBase.useQuery({});
 
   const { mutate } = useMutation();
-
-  // @ts-expect-error - THIS IS FOR TESTING
-  const INVALID = data?.[0].INVALID_FIELD;
-
-  // @ts-expect-error - THIS IS FOR TESTING
-  const COOL = getListProps().items?.[0]?.INVALID_FIELD;
 
   const [isAdd, setIsAdd] = React.useState(false);
 
@@ -92,20 +60,12 @@ const TasksView = () => {
         {isAdd && <Form />}
 
         <ShineBorder color={['#A07CFE', '#FE8FB5', '#FFBE7B']}>
-          <button className="w-24 h-12">Test</button>
+          <button className="w-24 h-14">Test</button>
         </ShineBorder>
 
         <h1>tasks</h1>
 
         <QueryInput />
-
-        {/* <section className="">
-          <AnimatedList>
-            {data?.map((task) => (
-              <li key={task.id}>{task.label}</li>
-            ))}
-          </AnimatedList>
-        </section> */}
 
         <List {...getListProps()} />
       </div>
@@ -115,3 +75,11 @@ const TasksView = () => {
     </div>
   );
 };
+
+export const Route = createFileRoute('/fastApp/tasks')({
+  component: () => (
+    <ViewProvider view={{ viewConfigManager: taskBase.viewConfigManager }}>
+      <TasksView />
+    </ViewProvider>
+  ),
+});

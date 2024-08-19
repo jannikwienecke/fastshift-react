@@ -7,8 +7,8 @@ import {
 } from './types';
 
 export class BaseViewConfigManager<
-  TViewConfig extends ViewConfigType = ViewConfigType
-> implements BaseViewConfigManagerInterface<TViewConfig>
+  TViewConfig extends ViewConfigType = ViewConfigType<any>
+> implements BaseViewConfigManagerInterface<any>
 {
   viewConfig: TViewConfig;
 
