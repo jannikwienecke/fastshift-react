@@ -1,4 +1,4 @@
-import { BaseConfigInterface, ConfigWithouUi } from '@apps-next/core';
+import { BaseConfigInterface, BaseConfig } from '@apps-next/core';
 import { ConvexSchemaType } from './_internal/types.convex';
 import { Infer } from 'convex/values';
 
@@ -21,5 +21,5 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
     tableNames: Object.keys(schema.tables) as any as keyof T['tables'],
   };
 
-  return new ConfigWithouUi(config);
+  return new BaseConfig(config);
 };

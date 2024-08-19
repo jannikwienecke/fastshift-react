@@ -1,11 +1,11 @@
-import { invarant, MutationProps, QueryDto, QueryProps } from '@apps-next/core';
+import { invarant, MutationProps, QueryDto } from '@apps-next/core';
+import { mutationHandlers } from './_internal/convex-mutation-handler';
 import {
   DefaultFunctionArgs,
   GenericQueryCtx,
 } from './_internal/convex.server.types';
 import { ConvexRecordType } from './_internal/types.convex';
 import { ConvexViewConfigManager } from './convex-view-config';
-import { mutationHandlers } from './_internal/convex-mutation-handler';
 
 export const viewLoaderHandler = async (
   ctx: GenericQueryCtx,

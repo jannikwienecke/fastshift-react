@@ -7,3 +7,4 @@ export * from './lib/types/mutation.types';
 
 export * from './lib/logging';
 export * from './lib/create-view-config';
+export * from './lib/config';
