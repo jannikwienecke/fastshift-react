@@ -10,7 +10,6 @@ import { useQuery } from './use-query';
 import { useAtomValue } from 'jotai';
 import { debouncedQueryAtom } from './ui-components/query-input';
 import { useList } from './ui-adapter';
-import { usePrismaApi } from 'query-adapter/src/lib/use-prisma-api';
 
 export const ViewProvider = ({
   children,
