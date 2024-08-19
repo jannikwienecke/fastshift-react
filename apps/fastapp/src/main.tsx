@@ -36,6 +36,10 @@ console.log(config.getAllTables());
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <ConvexQueryProvider
+      globalConfig={{
+        ...config,
+        provider: 'convex',
+      }}
       convexUrl={VITE_CONVEX_URL}
       api={{
         viewLoader: api.query.viewLoader,

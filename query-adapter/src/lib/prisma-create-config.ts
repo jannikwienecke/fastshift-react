@@ -1,8 +1,6 @@
 import {
   BaseViewConfigManager,
-  GetTableDataType,
   GetTableName,
-  RegisteredPrisma,
   RegisteredRouter,
   ViewConfigType,
   ViewFieldConfig,
@@ -10,28 +8,28 @@ import {
 
 type RemoveNull<T> = T extends null ? never : T;
 
-type GetResultOfTable<
-  TDataModel extends Record<string, any>,
-  TableName extends keyof TDataModel
-> = RemoveNull<Awaited<ReturnType<TDataModel[TableName]['findFirst']>>>;
+// type GetResultOfTable<
+//   TDataModel extends Record<string, any>,
+//   TableName extends keyof TDataModel
+// > = RemoveNull<Awaited<ReturnType<TDataModel[TableName]['findFirst']>>>;
 
-export type PrismaViewConfig<
-  TDataModel extends Record<string, any> = any,
-  T extends GetTableName = never
-> = {
-  // data: TDataModel;
-  tableName: T;
-  dbProvider: 'prisma';
-  viewFields: ViewFieldConfig;
-  viewName: string;
-  displayField: {
-    field: keyof GetTableDataType<T>;
-    cell?: (value: GetResultOfTable<TDataModel, T>) => React.ReactNode;
-  };
-  query?: {
-    //
-  };
-} & ViewConfigType<TDataModel>;
+// export type PrismaViewConfig<
+//   TDataModel extends Record<string, any> = any,
+//   T extends GetTableName = never
+// > = {
+//   // data: TDataModel;
+//   tableName: T;
+//   dbProvider: 'prisma';
+//   viewFields: ViewFieldConfig;
+//   viewName: string;
+//   displayField: {
+//     field: keyof GetTableDataType<T>;
+//     cell?: (value: GetResultOfTable<TDataModel, T>) => React.ReactNode;
+//   };
+//   query?: {
+//     //
+//   };
+// } & ViewConfigType<TDataModel>;
 
 export function creatatePrismaViewConfig<T extends GetTableName>(
   tableName: T,
@@ -49,20 +47,20 @@ export function creatatePrismaViewConfig<T extends GetTableName>(
   const viewFields = {} as ViewFieldConfig;
   const searchableFields = {} as any;
 
-  const viewConfig: PrismaViewConfig<RegisteredPrisma['prisma'], T> = {
-    ...config,
-    dbProvider: 'prisma',
-    displayField: {
-      field: config.displayField?.field as any,
-      cell: config.displayField?.cell,
-    },
-    viewFields: viewFields,
-    tableName,
-    viewName: config.viewName ?? (tableName as string),
-    query: {
-      searchableFields: searchableFields,
-    },
-  };
+  const viewConfig: ViewConfigType<RegisteredRouter['config']['testType'], T> =
+    {
+      ...config,
+      displayField: {
+        field: config.displayField?.field as any,
+        cell: config.displayField?.cell,
+      },
+      viewFields: viewFields,
+      tableName,
+      viewName: config.viewName ?? (tableName as string),
+      query: {
+        searchableFields: searchableFields,
+      },
+    };
 
   const viewConfigManager = new BaseViewConfigManager(viewConfig);
 

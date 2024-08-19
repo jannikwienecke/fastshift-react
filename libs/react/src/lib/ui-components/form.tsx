@@ -114,13 +114,15 @@ export const Form = () => {
         {viewConfigManager.getViewFieldList().map((field) => {
           const Input = dict[field.type] || StringInput;
 
+          const value = form[field.name];
+
           return (
             <div key={field.name}>
               <Input
                 placeholder={field.name}
                 field={field}
                 value={value || ''}
-                onChange={(e) =>
+                onChange={(e: any) =>
                   updateFormValue({
                     field: field.name,
                     value: e.target.value,

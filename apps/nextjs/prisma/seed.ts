@@ -1,5 +1,6 @@
 // import { Post } from '@prisma/client';
 // import { PrismaClient } from '@prisma/client';
+// eslint-disable-next-line
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();

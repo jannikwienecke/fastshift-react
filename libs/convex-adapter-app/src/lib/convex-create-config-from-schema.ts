@@ -1,5 +1,6 @@
 import { BaseConfigInterface, ConfigWithouUi } from '@apps-next/core';
 import { ConvexSchemaType } from './_internal/types.convex';
+import { Infer } from 'convex/values';
 
 export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   schema: T
@@ -10,7 +11,7 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
     T,
     keyof T['tables'],
     {
-      [TKey in TableName]: T['tables'][TKey]['validator']['fields'];
+      [TKey in TableName]: Infer<T['tables'][TKey]['validator']>;
     }
   > = {
     testType: {} as T,

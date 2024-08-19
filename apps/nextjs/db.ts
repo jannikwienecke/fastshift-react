@@ -20,7 +20,8 @@ const prisma = singleton('prisma', () => {
     // });
     // const adapter = new PrismaLibSQL(turso);
     // return new PrismaClient({ adapter });
-    throw new Error('Not implemented');
+    // throw new Error('Not implemented');
+    return new PrismaClient();
   }
 });
 

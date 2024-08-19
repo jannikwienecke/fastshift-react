@@ -10,6 +10,7 @@ import {
   RecordType,
 } from '@apps-next/core';
 import { usePrismaQuery } from '@apps-next/query-adapter';
+import { useGlobalConfig } from './use-global-config';
 
 const useQueryDict: Record<'prisma' | 'convex', typeof useConvexQuery> = {
   convex: useConvexQuery,
@@ -21,8 +22,9 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const { viewConfigManager } = useViewConfig();
   const query = useAtomValue(debouncedQueryAtom);
+  const globalConfig = useGlobalConfig();
 
-  const _useQuery = useQueryDict[viewConfigManager.getDbProvider()];
+  const _useQuery = useQueryDict[globalConfig?.provider];
 
   const resturnData = _useQuery<QueryReturnType>({
     queryProps: {
@@ -30,7 +32,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       query: queryProps.query ?? query,
       viewConfigManager: queryProps.viewConfigManager ?? viewConfigManager,
     },
-    globalConfig: {},
+    globalConfig,
   });
 
   React.useEffect(() => {
@@ -38,7 +40,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       console.log('Use Query Error: ', resturnData.error);
       alert(String(resturnData.error));
     }
-  }, [resturnData.isError]);
+  }, [resturnData.error]);
 
   return resturnData;
 };

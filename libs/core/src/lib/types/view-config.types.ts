@@ -2,7 +2,6 @@ import {
   FieldConfig,
   GetTableDataType,
   GetTableName,
-  RegisteredRouter,
   SearchableField,
 } from './base.types';
 
@@ -27,19 +26,19 @@ type GetFieldNamePrisma<
 
 type GetResultOfTable<
   TDataModel extends Record<string, any>,
-  TableName extends keyof TDataModel
+  TableName extends keyof TDataModel = any
 > = RemoveNull<Awaited<ReturnType<TDataModel[TableName]['findFirst']>>>;
 
 export type ViewConfigType<
   TDataModel extends Record<string, any> = any,
-  T extends GetTableName = never
+  T extends GetTableName = any
 > = {
-  dbProvider: 'convex' | 'prisma';
   viewFields: ViewFieldConfig;
   viewName: string;
+  tableName: T;
   displayField: {
     field: keyof GetTableDataType<T>;
-    cell?: (value: GetResultOfTable<TDataModel, T>) => React.ReactNode;
+    cell?: (value: GetTableDataType<T>) => React.ReactNode;
   };
   query?: {
     //
@@ -58,7 +57,7 @@ export type ViewConfig<
     cell?: (value: GetResultOfTable<TDataModel, T>) => React.ReactNode;
   };
   query?: {
-    searchableFields?: SearchableField<TDataModel, T>;
+    searchableFields?: SearchableField<TDataModel>;
   };
 } & ViewConfigType<TDataModel>;
 
@@ -105,5 +104,4 @@ export interface BaseViewConfigManagerInterface<
   getTableName(): string;
   getViewName(): string;
   getViewFieldList(): FieldConfig[];
-  getDbProvider(): 'convex' | 'prisma';
 }

@@ -1,4 +1,4 @@
-export type RegisteredRouter = Register extends { config: infer T } ? T : never;
+// export type RegisteredRouter = Register extends { config: infer T } ? T : never;
 
 // export const loader = <
 //   T extends keyof RegisteredRouter['config']['dataModel']['tables']

@@ -59,5 +59,6 @@ export const useConvexQuery = <QueryReturnType extends RecordType[]>({
     error: data.error,
     isFetching: data.isFetching,
     isFetched: data.isFetched,
+    refetch: data.refetch,
   };
 };

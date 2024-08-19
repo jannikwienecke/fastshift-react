@@ -8,12 +8,16 @@ import {
 
 import React from 'react';
 import { ConvexContext } from './_internal/convex-context';
+import { GlobalConfig } from '@apps-next/core';
 
 export const ConvexContextProvider = (
-  props: React.PropsWithChildren<{ api: ConvexApiType }>
+  props: React.PropsWithChildren<{
+    api: ConvexApiType;
+    globalConfig: GlobalConfig;
+  }>
 ) => {
   return (
-    <ConvexContext.Provider value={{ api: props.api }}>
+    <ConvexContext.Provider value={{ ...props.globalConfig, api: props.api }}>
       {props.children}
     </ConvexContext.Provider>
   );
@@ -36,7 +40,13 @@ export const ConvexQueryProvider = (props: ConvexQueryProviderProps) => {
   convexQueryClient.connect(queryClient);
 
   return (
-    <ConvexContextProvider api={props.api}>
+    <ConvexContextProvider
+      api={props.api}
+      globalConfig={{
+        ...props.globalConfig,
+        provider: 'convex',
+      }}
+    >
       <ConvexProvider client={convex}>
         <QueryClientProvider client={queryClient}>
           {props.children}

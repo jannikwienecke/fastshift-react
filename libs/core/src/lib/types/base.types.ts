@@ -71,7 +71,7 @@ export interface Register {
   //
 }
 
-export type RegisteredRouter = Register extends { config: infer T } ? T : never;
+export type RegisteredRouter = Register extends { config: infer T } ? T : any;
 export type RegisteredPrisma = Register extends { prisma: infer T } ? T : never;
 
 export type FieldType =
@@ -97,25 +97,23 @@ export type GetTableDataType<T extends GetTableName> =
 
 // export type GetTableName<T extends DataModel> = keyof T['tables'];
 
-type GetTableName2<TDataModel extends Record<string, any> = any> =
-  keyof TDataModel['tables'];
+// type GetTableName2<TDataModel extends Record<string, any> = any> =
+//   keyof TDataModel['tables'];
 
-export type GetFieldName<
-  TDataModel extends Record<string, any> = any,
-  T extends GetTableName2<TDataModel> = any
-> = keyof TDataModel['tables'][T]['validator']['fields'];
+export type GetFieldName<TDataModel extends Record<string, any> = any> =
+  keyof TDataModel['tables'][GetTableName]['validator']['fields'];
 
 export type SearchableField<
   TDataModel extends Record<string, any> = any,
-  T extends GetTableName2<TDataModel> = any
+  T extends GetTableName = any
 > = {
-  field: GetFieldName<TDataModel, T>;
+  field: GetFieldName<TDataModel>;
   name: string;
-  filterFields: GetFieldName<TDataModel, T>[];
+  filterFields: GetFieldName<TDataModel>[];
 };
 
 export type GlobalConfig = {
-  //
+  provider: DataProvider;
 };
 
 export type DataModel<TableNames extends string = any> = {

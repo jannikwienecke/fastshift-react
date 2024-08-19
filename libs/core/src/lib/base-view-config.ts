@@ -7,7 +7,7 @@ import {
 } from './types';
 
 export class BaseViewConfigManager<
-  TViewConfig extends ViewConfigType = ViewConfigType<any>
+  TViewConfig extends ViewConfigType = ViewConfigType<any, any>
 > implements BaseViewConfigManagerInterface<any>
 {
   viewConfig: TViewConfig;
@@ -35,9 +35,5 @@ export class BaseViewConfigManager<
 
   getViewFieldList(): FieldConfig[] {
     return Object.values(this.viewConfig.viewFields);
-  }
-
-  getDbProvider(): 'convex' | 'prisma' {
-    return this.viewConfig.dbProvider;
   }
 }

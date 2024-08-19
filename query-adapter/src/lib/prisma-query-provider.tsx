@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { PrismaContext } from './_internal/prisma-context';
 import { PrismaClientType } from './prisma.client.types';
+import { GlobalConfig } from '@apps-next/core';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -39,9 +40,11 @@ function getQueryClient() {
 export function PrismaQueryProvider({
   children,
   api,
+  globalConfig,
 }: {
   children: React.ReactNode;
   api: PrismaClientType;
+  globalConfig: Omit<GlobalConfig, 'provider'>;
 }) {
   const queryClient = getQueryClient();
 
@@ -49,6 +52,8 @@ export function PrismaQueryProvider({
     <PrismaContext.Provider
       value={{
         prisma: api,
+        ...globalConfig,
+        provider: 'prisma',
       }}
     >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

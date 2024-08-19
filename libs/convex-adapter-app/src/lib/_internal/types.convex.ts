@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { GlobalConfig } from '@apps-next/core';
 import { DefaultFunctionArgs, FunctionReference } from './convex.server.types';
 
 export type ConvexServer = {
@@ -35,11 +36,12 @@ export type ConvexApiType = {
 export type ConvexQueryProviderProps = React.PropsWithChildren<{
   convexUrl: string;
   api: ConvexApiType;
+  globalConfig: Omit<GlobalConfig, 'provider'>;
 }>;
 
 export type ConvexContextType = {
   api: ConvexApiType;
-};
+} & GlobalConfig;
 
 export type ConvexSchemaType = {
   tables: Record<string, any>;

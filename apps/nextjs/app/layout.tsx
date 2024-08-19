@@ -3,10 +3,10 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Link from 'next/link';
 import { viewLoader, viewMutation } from './fastapp/tasks/actions';
 import './global.css';
-import Head from 'next/head';
 
 import '@picocss/pico/css/pico.classless.min.css';
 import React from 'react';
+import { config } from '.';
 
 export const metadata = {
   title: 'Welcome to nextjs',
@@ -23,6 +23,10 @@ export default function RootLayout({
       <React.StrictMode>
         <body>
           <PrismaQueryProvider
+            globalConfig={{
+              ...config,
+              provider: 'prisma',
+            }}
             api={{
               viewLoader: viewLoader,
               viewMutation: viewMutation,
