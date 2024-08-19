@@ -5,7 +5,16 @@ import React from 'react';
 
 const TasksView = createView(
   'tasks',
-  { displayField: { field: 'name', cell: (value) => <div>{value.name}</div> } },
+
+  {
+    displayField: {
+      field: 'name',
+
+      // CELL UNSUPPORTED TYPE FOR CONVEX
+      // CANNOT SEND TO THE SEVER -> NEED TO CLEAN CLIENT ONLY CONFIG
+      //  cell: (value) => <div>{value.name}</div>
+    },
+  },
   {
     Component: ({ data, useList }) => {
       const getListProps = useList();
