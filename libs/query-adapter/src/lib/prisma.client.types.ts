@@ -1,7 +1,3 @@
-// type PrismaFunctionType = {
-//   findMany: <T extends Record<string, any>>(options?: any) => Promise<T[]>;
-// };
-
 import { MutationProps, QueryDto } from '@apps-next/core';
 
 export type PrismaClientType = {

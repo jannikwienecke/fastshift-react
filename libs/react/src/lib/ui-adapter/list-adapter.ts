@@ -35,6 +35,7 @@ export const useList = <T>() => {
   };
 };
 
+// TODO Add internal and extenral useList implementations
 // const _useList = <T extends GetTableName, TData extends GetTableDataType<T>>(
 //   tableName: T,
 //   { data, fieldLabel }: { data: TData[]; fieldLabel: keyof TData }

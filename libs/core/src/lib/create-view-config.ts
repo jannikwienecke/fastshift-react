@@ -1,36 +1,5 @@
 import { BaseViewConfigManager } from './base-view-config';
-import {
-  GetTableName,
-  RegisteredRouter,
-  ViewConfigType,
-  ViewFieldConfig,
-} from './types';
-
-type PrismaField = {
-  name: string;
-  kind: string;
-  isList: boolean;
-  isRequired: boolean;
-  isUnique: boolean;
-  isId: boolean;
-  isReadOnly: boolean;
-  hasDefaultValue: boolean;
-  type: string;
-  default?: unknown;
-  isGenerated?: boolean | undefined;
-  isUpdatedAt?: boolean;
-};
-
-type Prisma = {
-  dmmf: {
-    datamodel: {
-      // PrismaField
-      models: Array<{
-        fields: Array<PrismaField>;
-      }>;
-    };
-  };
-};
+import { GetTableName, ViewConfigType, ViewFieldConfig } from './types';
 
 export function createViewConfig<T extends GetTableName>(
   tableName: T,

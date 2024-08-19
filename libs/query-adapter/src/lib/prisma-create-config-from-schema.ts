@@ -4,12 +4,12 @@ type RemoveDollarSign<T> = T extends `$${infer _}` ? never : T;
 
 type PrismaTableName<T> = (keyof T)[];
 
-export type Prisma = {
+type PrismaModels = {
   models: Array<unknown>;
 };
 
 export const createConfigFromPrismaSchema = <
-  T extends Prisma,
+  T extends PrismaModels,
   PrismaClient extends Record<string, any>
 >(
   datamodel: T
