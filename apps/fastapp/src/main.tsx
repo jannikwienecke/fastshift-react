@@ -11,6 +11,7 @@ import {
 } from '@apps-next/convex-adapter-app';
 
 import '@picocss/pico/css/pico.classless.min.css';
+import { llinfo } from '@apps-next/core';
 
 const router = createRouter({
   routeTree,
@@ -25,6 +26,7 @@ declare module '@tanstack/react-router' {
 }
 
 const config = createConfigFromConvexSchema(schema);
+llinfo('Global Config: ', config);
 
 declare module '@apps-next/core' {
   interface Register {
@@ -42,10 +44,7 @@ export const loader = api.query.viewLoader;
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <ConvexQueryProvider
-      globalConfig={{
-        ...config,
-        provider: 'convex',
-      }}
+      globalConfig={config}
       convexUrl={VITE_CONVEX_URL}
       api={{
         viewLoader: api.query.viewLoader,

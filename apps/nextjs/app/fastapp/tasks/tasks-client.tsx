@@ -7,6 +7,7 @@ export const TasksClientContent = createView(
   'post',
   {
     displayField: { field: 'title' },
+    viewName: 'post',
   },
   {
     Component: ({ useList, data }) => {
