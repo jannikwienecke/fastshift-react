@@ -1,10 +1,16 @@
 import { invarant } from './core-utils';
-import {
-  BaseViewConfigManagerInterface,
-  FieldConfig,
-  SearchableField,
-  ViewConfigType,
-} from './types';
+import { FieldConfig, SearchableField, ViewConfigType } from './types';
+
+export interface BaseViewConfigManagerInterface<
+  TViewConfig extends ViewConfigType = ViewConfigType
+> {
+  viewConfig: TViewConfig;
+  getDisplayFieldLabel(): string;
+  getSearchableField(): SearchableField | undefined;
+  getTableName(): string;
+  getViewName(): string;
+  getViewFieldList(): FieldConfig[];
+}
 
 export class BaseViewConfigManager<
   TViewConfig extends ViewConfigType = ViewConfigType<any>

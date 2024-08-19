@@ -1,9 +1,7 @@
+import { BaseViewConfigManagerInterface } from '../base-view-config';
 import { RecordType } from './base.types';
 import { MutationProps } from './mutation.types';
-import {
-  BaseViewConfigManagerInterface,
-  ViewConfigType,
-} from './view-config.types';
+import { ViewConfigType } from './view-config.types';
 
 export type QueryDto = {
   query?: string;
@@ -33,3 +31,5 @@ export type MutationReturnType = {
   mutate: (mutation: MutationProps) => void;
   isPending: boolean;
 };
+
+export const QUERY_KEY_PREFIX = 'view-loader';

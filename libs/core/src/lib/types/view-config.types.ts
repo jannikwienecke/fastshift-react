@@ -1,9 +1,4 @@
-import {
-  FieldConfig,
-  GetTableDataType,
-  GetTableName,
-  SearchableField,
-} from './base.types';
+import { FieldConfig, GetTableDataType, GetTableName } from './base.types';
 
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
@@ -19,14 +14,3 @@ export type ViewConfigType<T extends GetTableName = any> = {
     //
   };
 };
-
-export interface BaseViewConfigManagerInterface<
-  TViewConfig extends ViewConfigType = ViewConfigType
-> {
-  viewConfig: TViewConfig;
-  getDisplayFieldLabel(): string;
-  getSearchableField(): SearchableField | undefined;
-  getTableName(): string;
-  getViewName(): string;
-  getViewFieldList(): FieldConfig[];
-}

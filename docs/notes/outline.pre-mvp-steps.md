@@ -2,7 +2,7 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1724073128789
+updated: 1724073724608
 created: 1723444563681
 ---
 
@@ -41,7 +41,7 @@ Add a small doc section to each new progress step
     - [x] fix nextjs app deployment - use prisma workaround plugin
     - [x] add logging library
     - [x] Great test data & Schema
-    - [ ] Clean Up
+    - [x] Clean Up
     - [ ] server side nextjs react query
     - [ ] remove any's
     - [ ] create real config with fields and sserch fields for prisma and convex

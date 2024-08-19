@@ -1,23 +1,6 @@
-// import { prisma } from '../../../db';
-
+import { QueryPrefetchProvider } from '@apps-next/query-adapter';
+import { viewLoader } from './actions';
 import { TasksClient } from './tasks-client';
-
-// import {
-//   dehydrate,
-//   HydrationBoundary,
-//   QueryClient,
-// } from '@tanstack/react-query';
-
-// export type Prisma = {
-//   dmmf: {
-//     datamodel: {
-//       // PrismaField
-//       models: Array<{
-//         fields: Array<PrismaField>;
-//       }>;
-//     };
-//   };
-// };
 
 //   type PrismaFieldTypeMapping = {
 //     [key in PrismaField['kind']]: FieldType;
@@ -41,44 +24,10 @@ import { TasksClient } from './tasks-client';
 //     }, acc);
 //   }, {} as ViewFieldConfig);
 
-// export default async function FastAppTasksPage() {
-//   const queryClient = new QueryClient();
-
-//   generateFromPrismaSchema<typeof Prisma, typeof prisma>(Prisma);
-
-//   await queryClient.prefetchQuery({
-//     queryKey: ['posts', ''],
-//     queryFn: (context) => getTasks(),
-//   });
-
-//   return (
-//     <HydrationBoundary state={dehydrate(queryClient)}>
-//       <TasksClient />
-//     </HydrationBoundary>
-//   );
-// }
-
-// // const DataModel = {
-// //   name: 'Post',
-// //   dbName: null,
-// //   fields: [
-// //     {
-// //       name: 'id',
-// //       kind: 'scalar',
-// //       isList: false,
-// //       isRequired: true,
-// //       isUnique: false,
-// //       isId: true,
-// //       isReadOnly: false,
-// //       hasDefaultValue: true,
-// //       type: 'Int',
-// //       default: [Object],
-// //       isGenerated: false,
-// //       isUpdatedAt: false,
-// //     } as const,
-// //   ],
-// // } as const;
-
 export default async function FastAppTasksPage() {
-  return <TasksClient />;
+  return (
+    <QueryPrefetchProvider viewLoader={viewLoader} viewName={'post'}>
+      <TasksClient />
+    </QueryPrefetchProvider>
+  );
 }
