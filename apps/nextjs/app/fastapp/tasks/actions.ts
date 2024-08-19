@@ -42,6 +42,7 @@ export const viewLoader = async (options?: QueryDto) => {
   console.log('getTasks, options', options);
   const { query } = options || {};
 
+  // TODO FIX THIS -> MUST BE GENERIC
   if (!query) return await prisma.post.findMany();
 
   return await prisma.post.findMany({
