@@ -1,7 +1,7 @@
 'use client';
 
 import { ViewConfigType } from '@apps-next/core';
-import { QueryInput, makeHooks } from '@apps-next/react';
+import { Form, QueryInput, makeHooks } from '@apps-next/react';
 import { List } from '@apps-next/ui';
 
 export const TasksClient = ({
@@ -27,9 +27,9 @@ export const TasksClient = ({
       </div>
 
       <div>
-        {/* <Form */}
+        <Form />
 
-        <List {...getListProps()} />
+        <List {...getListProps({ descriptionKey: 'content' })} />
       </div>
     </div>
   );

@@ -22,6 +22,8 @@ export type FieldType =
 export type RecordType = Record<any, any>;
 
 export type FieldConfig = {
+  isId?: boolean;
+  isRelationalIdField?: boolean;
   type: FieldType;
   name: string;
   isRequired?: boolean;

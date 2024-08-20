@@ -8,7 +8,7 @@ export type PrismaField = {
   isReadOnly: boolean;
   hasDefaultValue: boolean;
   type: string;
-  default?: unknown;
+  default?: { name?: string; args: unknown[] };
   isGenerated?: boolean | undefined;
   isUpdatedAt?: boolean;
   relationName?: string;

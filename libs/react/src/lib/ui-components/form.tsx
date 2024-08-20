@@ -97,7 +97,17 @@ export const Form = () => {
         viewConfigManager.getViewFieldList().forEach((field) => {
           const value = formData.get(field.name);
           const isBoolean = field.type === 'Boolean';
-          formValues[field.name] = isBoolean && value === null ? false : value;
+          const isIdField = field.isId;
+
+          if (isIdField) return;
+          if (field.isRelationalIdField) {
+            formValues[field.name] = 1;
+          } else if (field.relation) {
+            //
+          } else {
+            formValues[field.name] =
+              isBoolean && typeof value !== 'boolean' ? false : value;
+          }
         });
 
         mutate({
@@ -115,6 +125,9 @@ export const Form = () => {
           const Input = dict[field.type] || StringInput;
 
           const value = form[field.name];
+
+          if (field.isId) return null;
+          if (field.isRelationalIdField) return null;
 
           return (
             <div key={field.name}>

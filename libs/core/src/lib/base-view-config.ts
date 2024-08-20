@@ -52,6 +52,7 @@ export class BaseViewConfigManager<
   }
 
   getViewFieldList(): FieldConfig[] {
-    return Object.values(this.modelConfig?.viewFields ?? {});
+    // return Object.values(this.modelConfig?.viewFields ?? {});
+    return Object.values(this.viewConfig?.viewFields ?? {});
   }
 }

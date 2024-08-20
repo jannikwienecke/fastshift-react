@@ -24,15 +24,25 @@ export const generateViewFieldsFromPrismaSchema = (
               relationName,
               relationFromFields,
               name: fieldName,
+              type: fieldType,
             } = fieldData;
 
+            const isRelationalIdField = tableData.fields.find(
+              (f) => f.relationFromFields?.[0] === fieldName
+            );
+
+            const isIdField =
+              fieldData.isId && fieldData.default?.name === 'autoincrement';
             const isRelationalField = relationName && relationFromFields;
 
-            let type = fieldTypeMapping[fieldData.kind] ?? 'String';
-            type = isRelationalField ? 'Reference' : 'String';
+            let type = fieldTypeMapping[fieldType] ?? 'String';
+            type = isRelationalField ? 'Reference' : type;
+
             return [
               fieldName,
               {
+                isId: isIdField,
+                isRelationalIdField,
                 type,
                 name: fieldData.name,
                 isRequired: fieldData.isRequired,

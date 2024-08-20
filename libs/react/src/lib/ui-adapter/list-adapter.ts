@@ -1,4 +1,4 @@
-import { ListProps } from '@apps-next/ui';
+import { ListItem, ListProps } from '@apps-next/ui';
 import { useQuery } from '../use-query';
 import { useView } from '../use-view';
 import { useMutation } from '../use-mutation';
@@ -12,12 +12,14 @@ type ListGetProps<T> = {
 export const useList = <T extends RecordType>() => {
   const { viewConfigManager } = useView();
 
-  const { data } = useQuery();
+  const { data } = useQuery<T[]>();
   const { mutate } = useMutation();
 
   const fieldLabel = viewConfigManager.getDisplayFieldLabel();
 
-  return <Props extends ListGetProps<T>>(options?: Props): ListProps<T> => {
+  return <Props extends ListGetProps<T>>(
+    options?: Props
+  ): ListProps<T & ListItem> => {
     const { descriptionKey } = options || {};
     return {
       onDelete: (item) => {

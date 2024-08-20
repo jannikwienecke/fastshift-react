@@ -1,20 +1,18 @@
-import { AnimatedList } from '../animated-list';
-
-type ListItem = {
+export type ListItem = {
   id: string;
   name: string;
   description?: string;
 };
 
-export type ListProps<TItem> = {
-  items: ((TItem & ListItem) | ListItem)[];
-  onDelete?: (item: (TItem & ListItem) | ListItem) => void;
+export type ListProps<TItem extends ListItem> = {
+  items: TItem[];
+  onDelete?: (item: TItem) => void;
 };
 
-export function List<T>(props: ListProps<T>) {
+export function List<T extends ListItem>(props: ListProps<T>) {
   return (
-    <AnimatedList
-      animateInitial={true}
+    <div
+      // animateInitial={true}
       className="flex flex-col gap-4 p-4 w-full"
     >
       {props.items.map((item) => (
@@ -37,6 +35,6 @@ export function List<T>(props: ListProps<T>) {
           </div>
         </li>
       ))}
-    </AnimatedList>
+    </div>
   );
 }
