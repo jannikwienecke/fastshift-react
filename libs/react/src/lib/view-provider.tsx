@@ -27,7 +27,11 @@ export const ViewProvider = ({
   const viewFields = config.viewFields[tableName];
 
   const viewConfigManager = new BaseViewConfigManager(
-    view.viewConfigManager.viewConfig,
+    {
+      ...view.viewConfigManager.viewConfig,
+      viewFields,
+      searchableFields,
+    },
     {
       searchableFields,
       viewFields,

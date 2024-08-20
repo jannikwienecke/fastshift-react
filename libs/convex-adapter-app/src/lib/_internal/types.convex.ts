@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { GlobalConfig } from '@apps-next/core';
+import { GlobalConfig, MutationReturnDto } from '@apps-next/core';
 import { DefaultFunctionArgs, FunctionReference } from './convex.server.types';
 
 export type ConvexServer = {
@@ -25,7 +25,7 @@ export type ViewMutation = FunctionReference<
   'mutation',
   'public',
   DefaultFunctionArgs,
-  null
+  MutationReturnDto
 >;
 
 export type ConvexApiType = {

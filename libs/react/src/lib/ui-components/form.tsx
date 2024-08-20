@@ -24,11 +24,13 @@ const resetFormAtom = atom(null, (get, set) => {
 const StringInput = ({
   value,
   onChange,
+  placeholder,
   field,
 }: {
   field: FieldConfig;
   onChange: (e: any) => void;
   value: any;
+  placeholder?: string;
 }) => {
   return (
     <input
@@ -36,7 +38,7 @@ const StringInput = ({
       value={value}
       onChange={onChange}
       className="border border-black p-1 px-4 rounded-md"
-      placeholder={'Enter ' + field.name}
+      placeholder={placeholder ?? 'Enter ' + field.name}
     />
   );
 };
@@ -101,7 +103,9 @@ export const Form = () => {
 
           if (isIdField) return;
           if (field.isRelationalIdField) {
-            formValues[field.name] = 1;
+            // FIX: Hardcoded for now -> later have select value
+            formValues[field.name] = 'j97axm7vxkhy23tad71gdtq5b96z3ysq';
+            // formValues[field.name] = 1;
           } else if (field.relation) {
             //
           } else {
@@ -125,14 +129,17 @@ export const Form = () => {
           const Input = dict[field.type] || StringInput;
 
           const value = form[field.name];
+          const { relation } = field;
+
+          const name = relation ? relation.tableName : field.name;
 
           if (field.isId) return null;
-          if (field.isRelationalIdField) return null;
+          if (field.isRelationalIdField && !field.relation) return null;
 
           return (
             <div key={field.name}>
               <Input
-                placeholder={field.name}
+                placeholder={name}
                 field={field}
                 value={value || ''}
                 onChange={(e: any) =>

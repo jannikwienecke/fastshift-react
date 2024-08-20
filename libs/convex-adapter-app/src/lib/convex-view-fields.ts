@@ -1,3 +1,4 @@
+import { FieldConfig } from '@apps-next/core';
 import { ConvexSchemaType } from './_internal/types.convex';
 import { MappingConvexToFieldType } from './convex-constants';
 
@@ -9,13 +10,23 @@ export const generateViewFieldsFromConvexSchema = (
       tableName,
       Object.fromEntries(
         Object.entries(tableData.validator.fields).map(
-          ([fieldName, fieldData]) => [
-            fieldName,
-            {
+          ([fieldName, fieldData]) => {
+            const relation = (fieldData as any).tableName
+              ? {
+                  fieldName: fieldName,
+                  tableName: (fieldData as any).tableName,
+                }
+              : undefined;
+
+            const field: FieldConfig = {
+              // FIX THIS -> USE CONVEX FIELD TYPE
+              relation,
+              isRelationalIdField: relation ? true : false,
               type: MappingConvexToFieldType[(fieldData as any).kind],
-              name: fieldName,
-            },
-          ]
+              name: relation ? relation.fieldName : fieldName,
+            };
+            return [fieldName, field];
+          }
         )
       ),
     ])

@@ -9,6 +9,8 @@ export const createMutation = async (
   if (mutation.type !== 'CREATE_RECORD') throw new Error('Not supported yet');
 
   const { record } = mutation;
+  console.warn('createMutation', { record });
+
   await ctx.db.insert(viewConfigManager.getTableName(), record);
 
   return {
@@ -20,7 +22,12 @@ export const deleteMutation = async (
   ctx: any,
   { mutation, viewConfigManager }: MutationPropsServer
 ) => {
-  throw new Error('Not supported yet');
+  if (mutation.type !== 'DELETE_RECORD') throw new Error('Not supported yet');
+
+  const { id } = mutation;
+
+  console.warn('deleteMutation', { id });
+  await ctx.db.delete(id);
 
   return {
     success: true,

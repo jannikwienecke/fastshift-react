@@ -11,3 +11,10 @@ export const viewLoader = server.query({
 export const viewMutation = server.mutation({
   handler: viewMutationHandler,
 });
+
+// export const deleteMutation = server.mutation({
+//   handler: (ctx, args) => {
+//     console.log('deleteMutation');
+//     // ctx.db.delete();
+//   },
+// });

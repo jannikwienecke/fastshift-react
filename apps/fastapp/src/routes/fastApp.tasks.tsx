@@ -17,7 +17,6 @@ export const Route = createFileRoute('/fastApp/tasks')({
       },
     },
     ({ data, useList }) => {
-      console.log('RUN TASKS');
       const getListProps = useList();
       const { mutate } = useMutation();
       const [isAdd, setIsAdd] = React.useState(false);
@@ -58,6 +57,8 @@ export const Route = createFileRoute('/fastApp/tasks')({
             </ShineBorder>
             <h1>tasks</h1>
             <QueryInput />
+
+            <Form />
 
             <List {...getListProps()} />
           </div>
