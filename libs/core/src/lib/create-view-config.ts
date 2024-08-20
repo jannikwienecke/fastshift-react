@@ -1,13 +1,16 @@
-import { BaseViewConfigManager } from './base-view-config';
-import { GetTableName, ViewConfigType, ViewFieldConfig } from './types';
+import {
+  FieldConfig,
+  GetTableName,
+  SearchableField,
+  ViewConfigType,
+} from './types';
 
 export function createViewConfig<T extends GetTableName>(
   tableName: T,
   config: Partial<Omit<ViewConfigType<T>, 'viewFields' | 'tableName'>>
 ) {
-  // TODO USE REAL IMPLEMENTATIONS FOR PRISMA AND CONVEX
-  const viewFields = {} as ViewFieldConfig;
-  const searchableFields = {} as any;
+  const viewFields = {} as FieldConfig[];
+  const searchableFields = {} as SearchableField;
 
   // TODO RENAME testType
   const viewConfig: ViewConfigType<T> = {
@@ -24,7 +27,7 @@ export function createViewConfig<T extends GetTableName>(
     },
   };
 
-  const viewConfigManager = new BaseViewConfigManager<any>(viewConfig);
+  // const viewConfigManager = new BaseViewConfigManager(viewConfig);
 
-  return viewConfigManager;
+  return viewConfig;
 }

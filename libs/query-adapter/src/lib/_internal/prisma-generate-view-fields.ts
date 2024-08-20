@@ -17,7 +17,7 @@ export const generateViewFieldsFromPrismaSchema = (
   const viewFields = Object.fromEntries(
     Object.entries(Prisma.models).map(([index, tableData]) => {
       return [
-        Prisma.models[+index].name,
+        Prisma.models[+index].name.toLowerCase(),
         Object.fromEntries(
           Object.entries(tableData.fields).map(([index, fieldData]) => {
             const {

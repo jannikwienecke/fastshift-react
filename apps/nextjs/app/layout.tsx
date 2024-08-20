@@ -35,29 +35,29 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <React.StrictMode>
-        <body>
-          <PrismaQueryProvider
-            config={config.config}
-            api={{
-              viewLoader: viewLoader,
-              viewMutation: viewMutation,
-            }}
-          >
-            <div className="p-2">
-              <div className="flex gap-2 text-lg border-b">
-                <Link href={'/'}>Home</Link>
-              </div>
-
-              <hr />
-
-              {children}
+      {/* <React.StrictMode> */}
+      <body>
+        <PrismaQueryProvider
+          config={config.config}
+          api={{
+            viewLoader: viewLoader,
+            viewMutation: viewMutation,
+          }}
+        >
+          <div className="p-2">
+            <div className="flex gap-2 text-lg border-b">
+              <Link href={'/'}>Home</Link>
             </div>
 
-            <ReactQueryDevtools initialIsOpen={false} />
-          </PrismaQueryProvider>
-        </body>
-      </React.StrictMode>
+            <hr />
+
+            {children}
+          </div>
+
+          <ReactQueryDevtools initialIsOpen={false} />
+        </PrismaQueryProvider>
+      </body>
+      {/* </React.StrictMode> */}
     </html>
   );
 }

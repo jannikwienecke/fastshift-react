@@ -25,6 +25,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "../core/src/lib/base-view-config.ts",
-    "src/lib/ui-adapter/list-adapter.ts"
+    "src/lib/ui-adapter/list-adapter.ts",
+    "../query-adapter/src/lib/Provider.tsx"
   ]
 }

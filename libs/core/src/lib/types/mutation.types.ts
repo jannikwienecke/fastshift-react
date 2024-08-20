@@ -1,7 +1,5 @@
-import {
-  BaseViewConfigManagerInterface,
-  ViewConfigType,
-} from './view-config.types';
+import { BaseViewConfigManagerInterface } from '../base-view-config';
+import { ViewConfigType } from './view-config.types';
 
 type MutationRecord = Record<string, any>;
 

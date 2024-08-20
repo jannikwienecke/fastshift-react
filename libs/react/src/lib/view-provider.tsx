@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { ViewContext } from './_internal/view-context';
 import {
