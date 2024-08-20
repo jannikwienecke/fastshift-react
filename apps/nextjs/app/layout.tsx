@@ -1,10 +1,11 @@
 import {
   createConfigFromPrismaSchema,
   PrismaQueryProvider,
+  prismaViewLoader,
+  prismaViewMutation,
 } from '@apps-next/query-adapter';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Link from 'next/link';
-import { viewLoader, viewMutation } from './fastapp/tasks/actions';
 import './global.css';
 
 import '@picocss/pico/css/pico.classless.min.css';
@@ -16,7 +17,7 @@ export const metadata = {
 };
 
 import { Prisma } from '@prisma/client';
-import { PrismaClientType } from '../db';
+import { prisma, PrismaClientType } from '../db';
 
 export const config = createConfigFromPrismaSchema<PrismaClientType>(
   Prisma.dmmf.datamodel
@@ -40,8 +41,14 @@ export default function RootLayout({
         <PrismaQueryProvider
           config={config.config}
           api={{
-            viewLoader: viewLoader,
-            viewMutation: viewMutation,
+            viewLoader: async (dto) => {
+              'use server';
+              return prismaViewLoader(prisma, dto);
+            },
+            viewMutation: async (props) => {
+              'use server';
+              return prismaViewMutation(prisma, props);
+            },
           }}
         >
           <div className="p-2">

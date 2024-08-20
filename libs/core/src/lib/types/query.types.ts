@@ -17,6 +17,11 @@ export type QueryDto = {
   viewConfig?: ViewConfigType;
 } & Omit<QueryProps, 'viewConfigManager'>;
 
+export type QueryReturnDto<T extends RecordType = RecordType> = {
+  data: T[] | undefined;
+  error?: any;
+};
+
 export type QueryReturnType<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   isLoading: boolean;

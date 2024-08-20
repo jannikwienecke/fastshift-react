@@ -37,8 +37,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     globalConfig,
   });
 
-  console.log('REGISTRED_VIEWS:::', registeredViews);
-
   React.useEffect(() => {
     if (resturnData.error) {
       console.log('Use Query Error: ', resturnData.error);

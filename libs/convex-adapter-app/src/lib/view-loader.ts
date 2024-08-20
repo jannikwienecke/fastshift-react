@@ -35,21 +35,3 @@ export const viewLoaderHandler = async (
 
   return await dbQuery.collect();
 };
-
-export const viewMutationHandler = async (
-  ctx: GenericQueryCtx,
-  _args: DefaultFunctionArgs
-): Promise<null> => {
-  const args = _args as MutationProps;
-
-  const viewConfigManager = new ConvexViewConfigManager(args.viewConfig);
-  const { mutation } = args;
-
-  const handler = mutationHandlers[mutation.type];
-
-  await handler(ctx, {
-    mutation,
-    viewConfigManager,
-  });
-  return null;
-};

@@ -1,8 +1,11 @@
 import { createServerViewConfig } from '@apps-next/core';
-import { QueryPrefetchProvider } from '@apps-next/query-adapter';
+import {
+  prismaViewLoader,
+  QueryPrefetchProvider,
+} from '@apps-next/query-adapter';
 import { config } from '../../layout';
-import { viewLoader } from './actions';
 import { TasksClient } from './tasks-client';
+import { prisma } from '../../../db';
 
 const viewConfig = createServerViewConfig(
   'post',
@@ -14,7 +17,10 @@ const viewConfig = createServerViewConfig(
 
 export default async function FastAppTasksPage() {
   return (
-    <QueryPrefetchProvider viewConfig={viewConfig} viewLoader={viewLoader}>
+    <QueryPrefetchProvider
+      viewConfig={viewConfig}
+      viewLoader={(props) => prismaViewLoader(prisma, props)}
+    >
       <TasksClient viewConfig={viewConfig} />
     </QueryPrefetchProvider>
   );

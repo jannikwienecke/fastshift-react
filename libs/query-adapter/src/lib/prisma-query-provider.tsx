@@ -6,6 +6,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import React from 'react';
 import { PrismaContext } from './_internal/prisma-context';
 import { PrismaClientType } from './prisma.client.types';
 
@@ -51,7 +52,9 @@ export function PrismaQueryProvider({
   return (
     <PrismaContext.Provider
       value={{
-        prisma: api,
+        prisma: {
+          ...api,
+        },
         config: config,
         provider: 'prisma',
       }}

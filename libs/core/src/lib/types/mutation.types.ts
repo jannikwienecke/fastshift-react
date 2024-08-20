@@ -34,3 +34,8 @@ export type MutationPropsServer = {
 export type MutationHandlerReturnType = Promise<{
   success: boolean;
 }>;
+
+export type MutationReturnDto = {
+  error?: any;
+  succes: boolean;
+};

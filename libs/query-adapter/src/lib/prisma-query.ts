@@ -1,5 +1,6 @@
 import {
   GlobalConfig,
+  QUERY_KEY_PREFIX,
   QueryProps,
   QueryReturnOrUndefined,
   RecordType,
@@ -18,11 +19,12 @@ export const usePrismaQuery = <QueryReturnType extends RecordType[]>({
 
   const viewName = queryProps.viewConfigManager?.getViewName();
 
-  const data = useQuery({
-    queryKey: [`view-loader`, viewName, queryProps.query ?? ''],
+  const queryReturn = useQuery({
+    queryKey: [QUERY_KEY_PREFIX, viewName, queryProps.query ?? ''],
     queryFn: async () =>
       prisma.viewLoader({
         ...queryProps,
+
         viewConfig: queryProps.viewConfigManager?.viewConfig,
         modelConfig: queryProps.viewConfigManager?.modelConfig,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -31,5 +33,8 @@ export const usePrismaQuery = <QueryReturnType extends RecordType[]>({
       }),
   });
 
-  return data;
+  return {
+    ...queryReturn,
+    data: queryReturn.data?.data,
+  };
 };

@@ -5,3 +5,4 @@ export * from './lib/prisma-create-config-from-schema';
 export * from './lib/prisma.types';
 export * from './lib/query-prefetch-provider';
 export * from './lib/server-side-config-context';
+export * from './lib/prisma-view-loader';
