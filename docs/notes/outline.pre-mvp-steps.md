@@ -2,7 +2,7 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1724074556474
+updated: 1724170123788
 created: 1723444563681
 ---
 
@@ -43,7 +43,14 @@ Add a small doc section to each new progress step
     - [x] Great test data & Schema
     - [x] Clean Up
     - [x] server side nextjs react query
-    - [ ] create real config with fields and sserch fields for prisma and convex
+    - [x] create real config with fields and sserch fields for prisma and convex
+    - [x] create view loadeer and mutation handler for convex and prisma
+    - [ ] create a delete|create|update mutation for convex
+    - [ ] create a delete|create|update mutation for prisma
+    - [ ] add relational fields
+    - [ ] test how a reusable component would look like (use list as example)
+    - [ ] test how a reusable component would look like (use query as example)
+      - list item can delete, can open a record, can update and can be customized
     - [ ] remove any's
     - [ ] get, post, search should work for both apps generically
     - [ ] Extract the "components" into new package (ui)

@@ -1,14 +1,20 @@
 import { useConvexMutation } from '@apps-next/convex-adapter-app';
-import { llinfo, Mutation } from '@apps-next/core';
+import { DataProvider, llinfo, Mutation } from '@apps-next/core';
+import { usePrismaMutation } from '@apps-next/query-adapter';
+import { useGlobalConfig } from './use-global-config';
 import { useView } from './use-view';
 
-const useQueryDict = {
+const useQueryDict: {
+  [key in DataProvider]: typeof useConvexMutation;
+} = {
   convex: useConvexMutation,
+  prisma: usePrismaMutation,
 };
 
 export const useMutation = () => {
-  const _useMutation = useQueryDict['convex'];
   const { viewConfigManager } = useView();
+  const globalConfig = useGlobalConfig();
+  const _useMutation = useQueryDict[globalConfig?.provider];
   const mutation = _useMutation();
 
   return {

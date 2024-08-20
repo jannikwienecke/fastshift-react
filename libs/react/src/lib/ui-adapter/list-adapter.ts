@@ -1,27 +1,38 @@
 import { ListProps } from '@apps-next/ui';
 import { useQuery } from '../use-query';
 import { useView } from '../use-view';
+import { useMutation } from '../use-mutation';
+import { RecordType } from '@apps-next/core';
 
 type ListGetProps<T> = {
   descriptionKey?: keyof T;
 };
 
 // export const _useListInternal = <T extends RecordType>() => {
-export const useList = <T>() => {
+export const useList = <T extends RecordType>() => {
   const { viewConfigManager } = useView();
 
   const { data } = useQuery();
+  const { mutate } = useMutation();
 
   const fieldLabel = viewConfigManager.getDisplayFieldLabel();
 
   return <Props extends ListGetProps<T>>(options?: Props): ListProps<T> => {
     const { descriptionKey } = options || {};
     return {
+      onDelete: (item) => {
+        mutate({
+          mutation: {
+            type: 'DELETE_RECORD',
+            id: item.id,
+          },
+        });
+      },
       items:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data?.map((item: any) => ({
+        data?.map((item) => ({
           ...item,
-          name: item[fieldLabel] as string,
+          id: item.id,
+          name: item[fieldLabel],
           description:
             descriptionKey &&
             typeof item[descriptionKey as keyof T] === 'string'

@@ -19,7 +19,7 @@ export type FieldType =
   | 'Reference'
   | 'Union';
 
-export type RecordType<T = any> = T;
+export type RecordType = Record<any, any>;
 
 export type FieldConfig = {
   type: FieldType;

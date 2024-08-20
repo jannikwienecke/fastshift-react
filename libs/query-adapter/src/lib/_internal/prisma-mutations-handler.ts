@@ -24,7 +24,15 @@ export const deleteMutation = async (
   dbMutation: DbMutation,
   { mutation, viewConfigManager }: MutationPropsServer
 ) => {
-  throw new Error('Not supported yet');
+  if (mutation.type !== 'DELETE_RECORD') throw new Error('Not supported yet');
+
+  const { id } = mutation;
+
+  await dbMutation.delete({
+    where: {
+      id,
+    },
+  });
 
   return {
     success: true,

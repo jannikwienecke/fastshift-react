@@ -38,6 +38,8 @@ function getQueryClient() {
   }
 }
 
+export const queryClient = getQueryClient();
+
 export function PrismaQueryProvider({
   children,
   api,
@@ -47,8 +49,6 @@ export function PrismaQueryProvider({
   api: PrismaClientType;
   config: BaseConfigInterface<any, any, any>;
 }) {
-  const queryClient = getQueryClient();
-
   return (
     <PrismaContext.Provider
       value={{
