@@ -1,11 +1,16 @@
-import { createViewConfig } from '@apps-next/core';
+import { createServerViewConfig } from '@apps-next/core';
 import { QueryPrefetchProvider } from '@apps-next/query-adapter';
+import { config } from '../../layout';
 import { viewLoader } from './actions';
 import { TasksClient } from './tasks-client';
 
-const viewConfig = createViewConfig('post', {
-  displayField: { field: 'title' },
-});
+const viewConfig = createServerViewConfig(
+  'post',
+  {
+    displayField: { field: 'title' },
+  },
+  config.config
+);
 
 export default async function FastAppTasksPage() {
   return (

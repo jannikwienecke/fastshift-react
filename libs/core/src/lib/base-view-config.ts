@@ -7,7 +7,7 @@ import {
 } from './types';
 
 export type ModelConfig = {
-  searchableFields: SearchableField;
+  searchableFields?: SearchableField;
   viewFields: ViewFieldConfig;
 };
 
@@ -48,7 +48,6 @@ export class BaseViewConfigManager<
   }
 
   getSearchableField(): SearchableField | undefined {
-    console.log('GET SEARCHABLE FIELD', this.viewConfig);
     return this.modelConfig?.searchableFields;
   }
 

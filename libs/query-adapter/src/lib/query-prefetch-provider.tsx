@@ -24,32 +24,29 @@ export async function QueryPrefetchProvider({
 
   const viewConfigManager = new BaseViewConfigManager(viewConfig);
   const searchableFields = viewConfigManager.getSearchableField();
-  const viewFields = viewConfigManager.getViewFieldList();
+  const viewFields = viewConfigManager.viewConfig.viewFields;
   const viewName = viewConfigManager.getViewName();
 
   await queryClient.prefetchQuery({
     queryKey: [QUERY_KEY_PREFIX, viewName, ''],
-    queryFn: (context) =>
-      viewLoader({
-        viewConfig: {
-          viewName,
+    queryFn: async (context) =>
+      await viewLoader({
+        modelConfig: {
           viewFields: viewFields,
-          tableName: viewName,
-          displayField: {
-            field: viewFields[0].name,
-          },
-          query: {
-            searchableFields,
-          },
+          searchableFields: searchableFields,
+        },
+        viewConfig: {
+          ...viewConfigManager.viewConfig,
+          viewFields: viewFields,
         },
       }),
   });
 
   return (
-    <ServerSideConfigProvider viewConfig={viewConfigManager.viewConfig}>
-      <HydrationBoundary state={dehydrate(queryClient)}>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ServerSideConfigProvider viewConfig={viewConfigManager.viewConfig}>
         {children}
-      </HydrationBoundary>
-    </ServerSideConfigProvider>
+      </ServerSideConfigProvider>
+    </HydrationBoundary>
   );
 }
