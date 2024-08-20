@@ -1,3 +1,4 @@
+import { BaseViewConfigManagerInterface } from '../base-view-config';
 import { FieldConfig, GetTableDataType, GetTableName } from './base.types';
 
 export type ViewFieldConfig = Record<string, FieldConfig>;
@@ -13,4 +14,13 @@ export type ViewConfigType<T extends GetTableName = any> = {
   query?: {
     //
   };
+};
+
+export type RegisteredViews = Partial<{
+  [key in GetTableName]: ViewConfigType;
+}>;
+
+export type ViewContextType = {
+  viewConfigManager: BaseViewConfigManagerInterface;
+  registeredViews: RegisteredViews;
 };

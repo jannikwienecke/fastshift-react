@@ -1,6 +1,6 @@
 import { useConvexMutation } from '@apps-next/convex-adapter-app';
 import { llinfo, Mutation } from '@apps-next/core';
-import { useViewConfig } from './use-view-config';
+import { useView } from './use-view';
 
 const useQueryDict = {
   convex: useConvexMutation,
@@ -8,7 +8,7 @@ const useQueryDict = {
 
 export const useMutation = () => {
   const _useMutation = useQueryDict['convex'];
-  const { viewConfigManager } = useViewConfig();
+  const { viewConfigManager } = useView();
   const mutation = _useMutation();
 
   return {

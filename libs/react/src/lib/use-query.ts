@@ -2,7 +2,7 @@ import { useConvexQuery } from '@apps-next/convex-adapter-app';
 import { useAtomValue } from 'jotai';
 import React from 'react';
 import { debouncedQueryAtom } from './ui-components/query-input';
-import { useViewConfig } from './use-view-config';
+import { useView } from './use-view';
 
 import {
   QueryProps,
@@ -18,9 +18,9 @@ const useQueryDict: Record<'prisma' | 'convex', typeof useConvexQuery> = {
 };
 
 export const useQuery = <QueryReturnType extends RecordType[]>(
-  queryProps: QueryProps
+  queryProps?: QueryProps
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
-  const { viewConfigManager } = useViewConfig();
+  const { viewConfigManager, registeredViews } = useView();
   const query = useAtomValue(debouncedQueryAtom);
   const globalConfig = useGlobalConfig();
 
@@ -29,11 +29,15 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const resturnData = _useQuery<QueryReturnType>({
     queryProps: {
       ...queryProps,
-      query: queryProps.query ?? query,
-      viewConfigManager: queryProps.viewConfigManager ?? viewConfigManager,
+      registeredViews,
+      modelConfig: viewConfigManager.modelConfig,
+      query: queryProps?.query ?? query,
+      viewConfigManager: queryProps?.viewConfigManager ?? viewConfigManager,
     },
     globalConfig,
   });
+
+  console.log('REGISTRED_VIEWS:::', registeredViews);
 
   React.useEffect(() => {
     if (resturnData.error) {

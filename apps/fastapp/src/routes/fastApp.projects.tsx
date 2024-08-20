@@ -1,4 +1,4 @@
-import { createView, QueryInput, useViewConfig } from '@apps-next/react';
+import { createView, QueryInput, useView } from '@apps-next/react';
 import { List } from '@apps-next/ui';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -7,8 +7,9 @@ export const Route = createFileRoute('/fastApp/projects')({
     'projects',
     { displayField: { field: 'label' } },
     ({ useList }) => {
+      console.log('RUN PROJECTS');
       const getListProps = useList();
-      const { viewConfigManager } = useViewConfig();
+      const { viewConfigManager } = useView();
 
       return (
         <div className="p-16">

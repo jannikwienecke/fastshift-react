@@ -1,10 +1,15 @@
 import {
   GetTableName,
   GlobalConfig,
+  RegisteredViews,
   SearchableField,
   ViewConfigType,
   ViewFieldConfig,
 } from './types';
+import { registerViewHandler } from './register-view-handler';
+
+// TODO WRITE CLASS THAT MANAGES THIS DATA STRUCTURE
+export const REGISTRED_VIEWS: RegisteredViews = {};
 
 export function createViewConfig<T extends GetTableName>(
   tableName: T,
@@ -14,6 +19,7 @@ export function createViewConfig<T extends GetTableName>(
   // in the ViewProvider -> we do not want the user to have to pass the viewFields and searchableFields
   const viewFields = {} as ViewFieldConfig;
   const searchableFields = {} as SearchableField;
+  const viewName = config.viewName ?? (tableName as string);
 
   // TODO RENAME testType
   const viewConfig: ViewConfigType<T> = {
@@ -24,13 +30,13 @@ export function createViewConfig<T extends GetTableName>(
     },
     viewFields: viewFields,
     tableName,
-    viewName: config.viewName ?? (tableName as string),
+    viewName,
     query: {
       searchableFields: searchableFields,
     },
   };
 
-  // const viewConfigManager = new BaseViewConfigManager(viewConfig);
+  registerViewHandler.register(viewName, viewConfig);
 
   return viewConfig;
 }
@@ -43,6 +49,7 @@ export function createServerViewConfig<T extends GetTableName>(
   // Clean Up -> Duplicate code in ViewProvider
   const searchableFields = globalConfig.searchableFields[tableName as string];
   const viewFields = globalConfig.viewFields[tableName as string];
+  const viewName = config.viewName ?? (tableName as string);
 
   // TODO RENAME testType
   const viewConfig: ViewConfigType<T> = {
@@ -53,11 +60,13 @@ export function createServerViewConfig<T extends GetTableName>(
     },
     viewFields: viewFields,
     tableName,
-    viewName: config.viewName ?? (tableName as string),
+    viewName,
     query: {
       searchableFields: searchableFields,
     },
   };
+
+  registerViewHandler.register(viewName, viewConfig);
 
   return viewConfig;
 }

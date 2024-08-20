@@ -12,7 +12,7 @@ export const TasksClient = ({
   const { useList, useQuery } = makeHooks(viewConfig);
 
   const getListProps = useList();
-  const { data } = useQuery({});
+  const { data } = useQuery();
   const item = getListProps().items?.[0];
 
   const content = data?.[0].content;

@@ -3,15 +3,13 @@
 import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  RegisteredViews,
+  ViewContextType,
 } from '@apps-next/core';
 import React from 'react';
 
-type ProviderProps = {
-  viewConfigManager: BaseViewConfigManagerInterface;
-};
-
-export const ProviderContext = React.createContext<ProviderProps>(
-  {} as ProviderProps
+export const ServerSideConfigContext = React.createContext<ViewContextType>(
+  {} as ViewContextType
 );
 
 // used in apps like nextjs when prefetching data and creating
@@ -20,12 +18,15 @@ export const ProviderContext = React.createContext<ProviderProps>(
 export const ServerSideConfigProvider = (
   props: {
     viewConfig: BaseViewConfigManagerInterface['viewConfig'];
+    registeredViews: RegisteredViews;
   } & { children: React.ReactNode }
 ) => {
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
   return (
-    <ProviderContext.Provider value={{ viewConfigManager }}>
+    <ServerSideConfigContext.Provider
+      value={{ viewConfigManager, registeredViews: props.registeredViews }}
+    >
       {props.children}
-    </ProviderContext.Provider>
+    </ServerSideConfigContext.Provider>
   );
 };

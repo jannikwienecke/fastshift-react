@@ -2,6 +2,7 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   QUERY_KEY_PREFIX,
+  REGISTRED_VIEWS,
 } from '@apps-next/core';
 import {
   dehydrate,
@@ -10,7 +11,7 @@ import {
 } from '@tanstack/react-query';
 import React from 'react';
 import { PrismaClientType } from './prisma.client.types';
-import { ServerSideConfigProvider } from './Provider';
+import { ServerSideConfigProvider } from './server-side-config-context';
 
 export async function QueryPrefetchProvider({
   children,
@@ -26,11 +27,13 @@ export async function QueryPrefetchProvider({
   const searchableFields = viewConfigManager.getSearchableField();
   const viewFields = viewConfigManager.viewConfig.viewFields;
   const viewName = viewConfigManager.getViewName();
+  const registeredViews = REGISTRED_VIEWS;
 
   await queryClient.prefetchQuery({
     queryKey: [QUERY_KEY_PREFIX, viewName, ''],
     queryFn: async (context) =>
       await viewLoader({
+        registeredViews,
         modelConfig: {
           viewFields: viewFields,
           searchableFields: searchableFields,
@@ -44,7 +47,10 @@ export async function QueryPrefetchProvider({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ServerSideConfigProvider viewConfig={viewConfigManager.viewConfig}>
+      <ServerSideConfigProvider
+        registeredViews={registeredViews}
+        viewConfig={viewConfigManager.viewConfig}
+      >
         {children}
       </ServerSideConfigProvider>
     </HydrationBoundary>

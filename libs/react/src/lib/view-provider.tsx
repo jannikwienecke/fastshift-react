@@ -1,18 +1,16 @@
 'use client';
 
-import React from 'react';
-import { ViewContext } from './_internal/view-context';
 import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
-  QueryProps,
   QueryReturnOrUndefined,
+  REGISTRED_VIEWS,
 } from '@apps-next/core';
-import { useQuery } from './use-query';
-import { useAtomValue } from 'jotai';
-import { debouncedQueryAtom } from './ui-components/query-input';
+import React from 'react';
+import { ViewContext } from './_internal/view-context';
 import { useList } from './ui-adapter';
 import { useGlobalConfig } from './use-global-config';
+import { useQuery } from './use-query';
 
 export const ViewProvider = ({
   children,
@@ -37,7 +35,9 @@ export const ViewProvider = ({
   );
 
   return (
-    <ViewContext.Provider value={{ viewConfigManager }}>
+    <ViewContext.Provider
+      value={{ viewConfigManager, registeredViews: REGISTRED_VIEWS }}
+    >
       {children}
     </ViewContext.Provider>
   );
@@ -52,15 +52,8 @@ export const ViewDataProvider = <
   Component: (props: TProps) => React.ReactNode;
   view: { viewConfigManager: BaseViewConfigManager };
 }) => {
-  const _useQuery = (props: QueryProps) => {
-    return useQuery<TProps[]>(props);
-  };
-
   const Content = () => {
-    const query = useAtomValue(debouncedQueryAtom);
-    const data = _useQuery({
-      query,
-    });
+    const data = useQuery<TProps[]>();
 
     // eslint-disable-next-line
     // @ts-ignore

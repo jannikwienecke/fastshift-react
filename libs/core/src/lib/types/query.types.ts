@@ -4,18 +4,18 @@ import {
 } from '../base-view-config';
 import { RecordType } from './base.types';
 import { MutationProps } from './mutation.types';
-import { ViewConfigType } from './view-config.types';
-
-export type QueryDto = {
-  query?: string;
-  viewConfig?: ViewConfigType;
-  modelConfig?: ModelConfig;
-};
+import { RegisteredViews, ViewConfigType } from './view-config.types';
 
 export type QueryProps = {
   query?: string;
   viewConfigManager?: BaseViewConfigManagerInterface;
+  registeredViews: RegisteredViews;
+  modelConfig?: ModelConfig;
 };
+
+export type QueryDto = {
+  viewConfig?: ViewConfigType;
+} & Omit<QueryProps, 'viewConfigManager'>;
 
 export type QueryReturnType<T extends RecordType = RecordType> = {
   data: T[] | undefined;

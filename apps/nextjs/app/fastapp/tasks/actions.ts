@@ -3,7 +3,7 @@
 import { Post } from '@prisma/client';
 import { prisma } from '../../../db';
 import { revalidatePath } from 'next/cache';
-import { MutationProps, QueryDto } from '@apps-next/core';
+import { MutationProps, QueryDto, REGISTRED_VIEWS } from '@apps-next/core';
 
 export const filterTasks = async (query: string) => {
   return await prisma.post.findMany({
@@ -42,6 +42,8 @@ export const createTask = async (tasks: Pick<Post, 'title' | 'content'>) => {
 export const viewLoader = async (options?: QueryDto) => {
   // console.log('getTasks, options', options);
   const { query, viewConfig, modelConfig } = options || {};
+
+  console.log('VIEWLOADER: VIEW_DICT::: ', REGISTRED_VIEWS);
 
   // generate query based on the model and view config
   // in prisma we should the user user select all fields

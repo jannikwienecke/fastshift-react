@@ -1,8 +1,6 @@
 import { ListProps } from '@apps-next/ui';
-import { useAtomValue } from 'jotai';
-import { debouncedQueryAtom } from '../ui-components/query-input';
 import { useQuery } from '../use-query';
-import { useViewConfig } from '../use-view-config';
+import { useView } from '../use-view';
 
 type ListGetProps<T> = {
   descriptionKey?: keyof T;
@@ -10,10 +8,9 @@ type ListGetProps<T> = {
 
 // export const _useListInternal = <T extends RecordType>() => {
 export const useList = <T>() => {
-  const { viewConfigManager } = useViewConfig();
-  const query = useAtomValue(debouncedQueryAtom);
+  const { viewConfigManager } = useView();
 
-  const { data } = useQuery({ viewConfigManager, query });
+  const { data } = useQuery();
 
   const fieldLabel = viewConfigManager.getDisplayFieldLabel();
 
