@@ -27,8 +27,21 @@ export const useConvexMutation = (): MutationReturnType => {
     [mutateAsync]
   );
 
+  const mutateHandlerSync = React.useCallback(
+    (props: MutationProps) => {
+      return mutate({
+        ...props,
+        mutation: {
+          ...props.mutation,
+          handler: undefined,
+        },
+      });
+    },
+    [mutate]
+  );
+
   return {
-    mutate,
+    mutate: mutateHandlerSync,
     mutateAsync: mutateHandler,
     isPending,
   };

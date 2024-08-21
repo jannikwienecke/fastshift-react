@@ -27,7 +27,7 @@ export const useMutation = () => {
 
   const runMutateAsync = React.useCallback(
     async (args: { mutation: Mutation }): Promise<MutationReturnDto> => {
-      llinfo('DISPATCH MUTATION', args.mutation);
+      llinfo('DISPATCH MUTATION2', args.mutation);
       try {
         return await mutateAsync({
           viewConfig: viewConfigManager.viewConfig,
@@ -43,7 +43,7 @@ export const useMutation = () => {
 
   const runMutate = React.useCallback(
     (args: { mutation: Mutation }) => {
-      llinfo('DISPATCH MUTATION', args.mutation);
+      llinfo('DISPATCH MUTATION: ', args.mutation);
       return mutate({
         viewConfig: viewConfigManager.viewConfig,
         mutation: args.mutation,
