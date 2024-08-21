@@ -43,6 +43,8 @@ export const formAtom = atom(
 
         const defaultValue = isRequired
           ? FORM_DEFAULT_VALUE_DICT[field.type]
+          : field.type === 'String'
+          ? ''
           : undefined;
 
         const Component = FORM_INPUT_DICT[field.type] || StringInput;
@@ -52,7 +54,7 @@ export const formAtom = atom(
           required: field.isRequired || false,
           type: field.type,
           placeholder: `Enter ${name}`,
-          value: editState.record?.[name] || defaultValue || undefined,
+          value: editState.record?.[name] || defaultValue,
           Component: Component,
           relation: field.relation,
           isRelationalIdField,
@@ -98,8 +100,6 @@ export const formAtom = atom(
       ready: true,
       isSubmitting: false,
       onSubmit: async () => {
-        if (!editState.record) return;
-
         const formState = get(initialFormAtom);
         const record = formState.fields.reduce((acc, field) => {
           acc[field.relation?.fieldName || (field.name as keyof RecordType)] =
@@ -122,19 +122,31 @@ export const formAtom = atom(
           isSubmitting: true,
         });
 
-        const res = await update.onSubmit({
-          type: 'UPDATE_RECORD',
-          record: record,
-          id: editState.record.id,
-          handler: (items) => {
-            return items.map((item) => {
-              if (item.id === editState.record?.id) {
-                return record;
-              }
-              return item;
-            });
-          },
-        });
+        let res: MutationReturnDto;
+
+        if (editState.record) {
+          res = await update.onSubmit({
+            type: 'UPDATE_RECORD',
+            record: record,
+            id: editState.record.id,
+            handler: (items) => {
+              return items.map((item) => {
+                if (item.id === editState.record?.id) {
+                  return record;
+                }
+                return item;
+              });
+            },
+          });
+        } else {
+          res = await update.onSubmit({
+            type: 'CREATE_RECORD',
+            record: record,
+            handler: (items) => {
+              return [...items, record];
+            },
+          });
+        }
 
         if (res.succes) {
           set(initialFormAtom, {

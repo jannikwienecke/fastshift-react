@@ -7,6 +7,7 @@ type MutationRecord = Record<string, any>;
 type CREATE_RECORD = {
   type: 'CREATE_RECORD';
   record: MutationRecord;
+  handler?: (items: MutationRecord[]) => MutationRecord[];
 };
 
 type UPDATE_RECORD = {

@@ -8,4 +8,7 @@ export type StoreAction =
   | {
       type: 'SAVE_UPDATED_RECORD';
       record: RecordType;
+    }
+  | {
+      type: 'ADD_NEW_RECORD';
     };

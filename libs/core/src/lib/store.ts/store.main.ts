@@ -24,5 +24,15 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
         record: null,
       },
     };
+
+  if (action.type === 'ADD_NEW_RECORD')
+    return {
+      ...prev,
+      edit: {
+        isEditing: true,
+        record: null,
+      },
+    };
+
   throw new Error('unknown action type');
 };
