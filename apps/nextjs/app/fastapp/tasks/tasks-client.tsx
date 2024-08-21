@@ -1,6 +1,10 @@
 'use client';
 
-import { useStoreValue, ViewConfigType } from '@apps-next/core';
+import {
+  useStoreDispatch,
+  useStoreValue,
+  ViewConfigType,
+} from '@apps-next/core';
 import { makeHooks, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 
@@ -23,8 +27,14 @@ export const TasksClient = ({
 
   const getFormProps = useForm();
 
+  const dispatch = useStoreDispatch();
+
   return (
     <div className="p-4 flex flex-col gap-2 w-full">
+      <button onClick={() => dispatch({ type: 'ADD_NEW_RECORD' })}>
+        Add New
+      </button>
+
       <div>
         <QueryInput />
       </div>
