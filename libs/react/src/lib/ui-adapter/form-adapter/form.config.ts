@@ -20,6 +20,6 @@ export const FORM_DEFAULT_VALUE_DICT: {
   Boolean: false,
   Date: new Date(),
   // FIX THIS
-  Reference: 1,
+  Reference: 'j974cpqvkwtw1rxpm6pk99kb516z38ed',
   Union: '',
 };
