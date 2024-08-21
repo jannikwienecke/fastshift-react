@@ -55,11 +55,11 @@ export function PrismaQueryProvider({
         prisma: {
           ...api,
           viewMutation(props) {
-            console.log('viewMutation', props);
             return api.viewMutation({
               ...props,
               mutation: {
                 ...props.mutation,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 handler: undefined,
               },
