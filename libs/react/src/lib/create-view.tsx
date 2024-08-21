@@ -8,7 +8,7 @@ import {
 } from '@apps-next/core';
 
 import React from 'react';
-import { useList } from './ui-adapter';
+import { useForm, useList } from './ui-adapter';
 import { ViewDataProvider } from './view-provider';
 import { useQuery } from './use-query';
 
@@ -19,6 +19,7 @@ export function createView<
   config: Partial<Omit<ViewConfigType<T>, 'viewFields' | 'tableName'>>,
   Component: (props: {
     useList: typeof useList<GetTableDataType<T>>;
+    useForm: typeof useForm<GetTableDataType<T>>;
     data: QueryReturnOrUndefined<GetTableDataType<T>>;
   }) => React.ReactNode
 ): () => React.ReactNode {
@@ -41,6 +42,7 @@ export const makeHooks = <
 ) => {
   return {
     useList: useList<GetTableDataType<T>>,
+    useForm: useForm<GetTableDataType<T>>,
     useQuery: useQuery<GetTableDataType<T>[]>,
   };
 };

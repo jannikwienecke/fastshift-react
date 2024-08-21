@@ -19,13 +19,13 @@ export const metadata = {
 import { Prisma } from '@prisma/client';
 import { prisma, PrismaClientType } from '../db';
 
-export const config = createConfigFromPrismaSchema<PrismaClientType>(
+export const globalConfig = createConfigFromPrismaSchema<PrismaClientType>(
   Prisma.dmmf.datamodel
 );
 
 declare module '@apps-next/core' {
   interface Register {
-    config: typeof config;
+    config: typeof globalConfig;
   }
 }
 
@@ -39,7 +39,7 @@ export default function RootLayout({
       {/* <React.StrictMode> */}
       <body>
         <PrismaQueryProvider
-          config={config.config}
+          config={globalConfig.config}
           api={{
             viewLoader: async (dto) => {
               'use server';

@@ -1,15 +1,15 @@
 'use client';
 
 import { ViewConfigType } from '@apps-next/core';
-import { Form, QueryInput, makeHooks } from '@apps-next/react';
-import { List } from '@apps-next/ui';
+import { QueryInput, makeHooks } from '@apps-next/react';
+import { Form, List } from '@apps-next/ui';
 
 export const TasksClient = ({
   viewConfig,
 }: {
   viewConfig: ViewConfigType<'post'>;
 }) => {
-  const { useList, useQuery } = makeHooks(viewConfig);
+  const { useList, useQuery, useForm } = makeHooks(viewConfig);
 
   const getListProps = useList();
   const { data } = useQuery();
@@ -20,6 +20,8 @@ export const TasksClient = ({
   // @ts-expect-error INVALID FIELD
   const INVALID = data?.[0]?.NOT_VALID_FIELD;
 
+  const getFormProps = useForm();
+
   return (
     <div className="p-4 flex flex-col gap-2 w-full">
       <div>
@@ -27,7 +29,7 @@ export const TasksClient = ({
       </div>
 
       <div>
-        <Form />
+        <Form {...getFormProps()} />
 
         <List {...getListProps({ descriptionKey: 'content' })} />
       </div>

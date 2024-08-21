@@ -3,7 +3,7 @@ import {
   prismaViewLoader,
   QueryPrefetchProvider,
 } from '@apps-next/query-adapter';
-import { config } from '../../layout';
+import { globalConfig } from '../../layout';
 import { TasksClient } from './tasks-client';
 import { prisma } from '../../../db';
 
@@ -12,7 +12,7 @@ const viewConfig = createServerViewConfig(
   {
     displayField: { field: 'title' },
   },
-  config.config
+  globalConfig.config
 );
 
 export default async function FastAppTasksPage() {

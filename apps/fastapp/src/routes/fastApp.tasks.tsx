@@ -1,5 +1,6 @@
-import { createView, Form, QueryInput, useMutation } from '@apps-next/react';
-import { List, ShineBorder } from '@apps-next/ui';
+import { useStoreValue } from '@apps-next/core';
+import { createView, QueryInput, useMutation } from '@apps-next/react';
+import { Form, List, ShineBorder } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
 
@@ -16,10 +17,14 @@ export const Route = createFileRoute('/fastApp/tasks')({
         //  cell: (value) => <div>{value.name}</div>
       },
     },
-    ({ data, useList }) => {
+    ({ data, useList, useForm }) => {
       const getListProps = useList();
+      const getFormProps = useForm();
+
       const { mutate } = useMutation();
       const [isAdd, setIsAdd] = React.useState(false);
+
+      const { edit } = useStoreValue();
 
       const ScreenControl = () => {
         return (
@@ -51,14 +56,13 @@ export const Route = createFileRoute('/fastApp/tasks')({
         <div className="p-2 flex gap-2 grow overflow-scroll">
           <div className="flex flex-col w-full ">
             <ScreenControl />
-            {isAdd && <Form />}
             <ShineBorder color={['#A07CFE', '#FE8FB5', '#FFBE7B']}>
               <button className="w-24 h-14">Test</button>
             </ShineBorder>
             <h1>tasks</h1>
             <QueryInput />
 
-            <Form />
+            {edit.isEditing ? <Form {...getFormProps()} /> : null}
 
             <List {...getListProps()} />
           </div>

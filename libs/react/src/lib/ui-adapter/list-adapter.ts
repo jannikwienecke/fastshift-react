@@ -1,8 +1,8 @@
+import { RecordType, useStoreDispatch } from '@apps-next/core';
 import { ListItem, ListProps } from '@apps-next/ui';
+import { useMutation } from '../use-mutation';
 import { useQuery } from '../use-query';
 import { useView } from '../use-view';
-import { useMutation } from '../use-mutation';
-import { RecordType } from '@apps-next/core';
 
 type ListGetProps<T> = {
   descriptionKey?: keyof T;
@@ -11,6 +11,7 @@ type ListGetProps<T> = {
 // export const _useListInternal = <T extends RecordType>() => {
 export const useList = <T extends RecordType>() => {
   const { viewConfigManager } = useView();
+  const dispatch = useStoreDispatch();
 
   const { data } = useQuery<T[]>();
   const { mutate } = useMutation();
@@ -22,6 +23,8 @@ export const useList = <T extends RecordType>() => {
   ): ListProps<T & ListItem> => {
     const { descriptionKey } = options || {};
     return {
+      onEdit: (item) => dispatch({ type: 'EDIT_RECORD', record: item }),
+
       onDelete: (item) => {
         mutate({
           mutation: {

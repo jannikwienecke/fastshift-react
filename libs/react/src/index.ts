@@ -1,6 +1,5 @@
 export * from './lib/ui-components';
 export * from './lib/use-query';
-export * from './lib/ui-components/query-input';
 export * from './lib/use-view';
 export * from './lib/ui-adapter';
 export * from './lib/view-provider';

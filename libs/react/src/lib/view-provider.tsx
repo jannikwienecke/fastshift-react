@@ -8,7 +8,7 @@ import {
 } from '@apps-next/core';
 import React from 'react';
 import { ViewContext } from './_internal/view-context';
-import { useList } from './ui-adapter';
+import { useForm, useList } from './ui-adapter';
 import { useGlobalConfig } from './use-global-config';
 import { useQuery } from './use-query';
 
@@ -61,7 +61,7 @@ export const ViewDataProvider = <
 
     // eslint-disable-next-line
     // @ts-ignore
-    return <props.Component data={data} useList={useList} />;
+    return <props.Component data={data} useList={useList} useForm={useForm} />;
   };
 
   const Provider = (

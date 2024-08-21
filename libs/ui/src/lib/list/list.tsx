@@ -7,6 +7,7 @@ export type ListItem = {
 export type ListProps<TItem extends ListItem> = {
   items: TItem[];
   onDelete?: (item: TItem) => void;
+  onEdit?: (item: TItem) => void;
 };
 
 export function List<T extends ListItem>(props: ListProps<T>) {
@@ -25,10 +26,17 @@ export function List<T extends ListItem>(props: ListProps<T>) {
             ) : null}
           </div>
 
-          <div>
+          <div className="flex flex-row gap-2">
+            <button
+              onClick={() => props.onEdit?.(item)}
+              className="btn bg-orange-400"
+            >
+              Edit
+            </button>
+
             <button
               onClick={() => props.onDelete?.(item)}
-              className="btn btn-primary"
+              className="btn btn-primary bg-red-500"
             >
               Delete
             </button>
