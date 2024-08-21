@@ -7,6 +7,7 @@ import {
 import {
   dehydrate,
   HydrationBoundary,
+  QueryCache,
   QueryClient,
 } from '@tanstack/react-query';
 import React from 'react';
@@ -31,8 +32,9 @@ export async function QueryPrefetchProvider({
 
   await queryClient.prefetchQuery({
     queryKey: [QUERY_KEY_PREFIX, viewName, ''],
-    queryFn: async (context) =>
-      await viewLoader({
+
+    queryFn: async (context) => {
+      const res = await viewLoader({
         registeredViews,
         modelConfig: {
           viewFields: viewFields,
@@ -42,17 +44,20 @@ export async function QueryPrefetchProvider({
           ...viewConfigManager.viewConfig,
           viewFields: viewFields,
         },
-      }),
+      });
+
+      return res;
+    },
   });
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ServerSideConfigProvider
-        registeredViews={registeredViews}
-        viewConfig={viewConfigManager.viewConfig}
-      >
+    <ServerSideConfigProvider
+      registeredViews={registeredViews}
+      viewConfig={viewConfigManager.viewConfig}
+    >
+      <HydrationBoundary state={dehydrate(queryClient)}>
         {children}
-      </ServerSideConfigProvider>
-    </HydrationBoundary>
+      </HydrationBoundary>
+    </ServerSideConfigProvider>
   );
 }

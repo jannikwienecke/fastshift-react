@@ -21,8 +21,8 @@ export const usePrismaQuery = <QueryReturnType extends RecordType[]>({
 
   const queryReturn = useQuery({
     queryKey: [QUERY_KEY_PREFIX, viewName, queryProps.query ?? ''],
-    queryFn: async () =>
-      prisma.viewLoader({
+    queryFn: async () => {
+      const res = await prisma.viewLoader({
         ...queryProps,
 
         viewConfig: queryProps.viewConfigManager?.viewConfig,
@@ -30,7 +30,10 @@ export const usePrismaQuery = <QueryReturnType extends RecordType[]>({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         viewConfigManager: undefined,
-      }),
+      });
+
+      return res;
+    },
   });
 
   return {

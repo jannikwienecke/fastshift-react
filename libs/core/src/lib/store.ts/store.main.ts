@@ -15,5 +15,14 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
         record: action.record,
       },
     };
+
+  if (action.type === 'SAVE_UPDATED_RECORD')
+    return {
+      ...prev,
+      edit: {
+        isEditing: false,
+        record: null,
+      },
+    };
   throw new Error('unknown action type');
 };

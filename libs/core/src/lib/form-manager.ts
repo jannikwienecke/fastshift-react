@@ -8,12 +8,18 @@ export type FormManagerInterface = {
 export class FormManager implements FormManagerInterface {
   constructor(private base: BaseViewConfigManagerInterface) {}
   getFormFieldList(): FieldConfig[] {
+    // console.log(this.base.viewConfig);
+
     // console.log(
-    //   this.base.getViewFieldList().filter((field) => !field.isId)
-    //   // .filter((field) => !field.relation && field.isRelationalIdField)
+    //   this.base
+    //     .getViewFieldList()
+    //     .filter((field) => !field.isId)
+    //     .filter((field) => !(!field.relation && field.isRelationalIdField))
     // );
 
-    return this.base.getViewFieldList().filter((field) => !field.isId);
-    //   .filter((field) => !field.relation && field.isRelationalIdField);
+    return this.base
+      .getViewFieldList()
+      .filter((field) => !field.isId)
+      .filter((field) => !(!field.relation && field.isRelationalIdField));
   }
 }

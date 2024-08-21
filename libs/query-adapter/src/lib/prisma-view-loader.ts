@@ -45,9 +45,16 @@ export const prismaViewLoader = async (
           },
         ],
       },
+      orderBy: {
+        id: 'asc',
+      },
     });
   } else {
-    result = await dbQuery.findMany({});
+    result = await dbQuery.findMany({
+      orderBy: {
+        id: 'asc',
+      },
+    });
   }
 
   return {

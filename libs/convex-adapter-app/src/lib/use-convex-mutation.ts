@@ -9,12 +9,13 @@ export const useConvexMutation = (): MutationReturnType => {
 
   invarant(Boolean(api), 'convex api is not defined');
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, mutateAsync } = useMutation({
     mutationFn: useConvexMutationConvex(api.viewMutation),
   });
 
   return {
     mutate,
+    mutateAsync,
     isPending,
   };
 };

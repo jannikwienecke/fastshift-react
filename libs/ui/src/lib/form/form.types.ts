@@ -12,6 +12,10 @@ export type FormField<T extends FormRecord> = {
   error?: {
     message: string;
   };
+  relation?: {
+    tableName: string;
+    fieldName: string;
+  };
 };
 
 export type FormProps<T extends FormRecord> = {
@@ -20,6 +24,8 @@ export type FormProps<T extends FormRecord> = {
   record: T | null;
   dirty: boolean;
   ready: boolean;
+  onSubmit: (formData: FormData) => void;
+  isSubmitting: boolean;
 };
 
 export type FormFieldProps<T extends FormRecord> = Omit<

@@ -61,3 +61,5 @@ export type DataModel<TableNames extends string = any> = {
 };
 
 export type DataProvider = 'convex' | 'prisma';
+
+export type ID = string | number;

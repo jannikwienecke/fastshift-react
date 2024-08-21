@@ -5,7 +5,8 @@ export const BooleanInput = (props: FormField<FormRecord>) => {
     <div className="flex flex-row items-center space-x-2">
       <div>{props.placeholder}</div>
       <input
-        {...props}
+        value={props.value}
+        placeholder={props.placeholder}
         defaultChecked={props.value}
         className="border border-black p-1 px-4 rounded-md"
         type="checkbox"

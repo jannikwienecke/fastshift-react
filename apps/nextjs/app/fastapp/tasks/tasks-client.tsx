@@ -1,7 +1,7 @@
 'use client';
 
-import { ViewConfigType } from '@apps-next/core';
-import { QueryInput, makeHooks } from '@apps-next/react';
+import { useStoreValue, ViewConfigType } from '@apps-next/core';
+import { makeHooks, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 
 export const TasksClient = ({
@@ -12,8 +12,9 @@ export const TasksClient = ({
   const { useList, useQuery, useForm } = makeHooks(viewConfig);
 
   const getListProps = useList();
+  const { edit } = useStoreValue();
+
   const { data } = useQuery();
-  const item = getListProps().items?.[0];
 
   const content = data?.[0]?.content;
 
@@ -29,10 +30,24 @@ export const TasksClient = ({
       </div>
 
       <div>
-        <Form {...getFormProps()} />
+        {edit.isEditing ? <Form {...getFormProps()} /> : null}
 
         <List {...getListProps({ descriptionKey: 'content' })} />
       </div>
     </div>
   );
 };
+
+// export const TasksClient = ({
+//   viewConfig,
+// }: {
+//   viewConfig: ViewConfigType<'post'>;
+// }) => {
+//   return (
+//     <ViewProvider
+//       view={{ viewConfigManager: new BaseViewConfigManager(viewConfig) }}
+//     >
+//       <TasksClientContent viewConfig={viewConfig} />
+//     </ViewProvider>
+//   );
+// };

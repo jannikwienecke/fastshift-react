@@ -4,7 +4,10 @@ export const StringInput = (props: FormField<FormRecord>) => {
   return (
     <>
       <input
-        {...props}
+        name={props.name}
+        placeholder={props.placeholder}
+        value={props.value}
+        required={props.required}
         onChange={(e) => {
           props.onChange(e.target.value);
         }}

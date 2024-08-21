@@ -3,7 +3,7 @@ import {
   ModelConfig,
 } from '../base-view-config';
 import { RecordType } from './base.types';
-import { MutationProps } from './mutation.types';
+import { MutationProps, MutationReturnDto } from './mutation.types';
 import { RegisteredViews, ViewConfigType } from './view-config.types';
 
 export type QueryProps = {
@@ -39,6 +39,7 @@ export type QueryReturnOrUndefined<T extends RecordType = RecordType> =
 export type MutationReturnType = {
   mutate: (mutation: MutationProps) => void;
   isPending: boolean;
+  mutateAsync: (mutation: MutationProps) => Promise<MutationReturnDto>;
 };
 
 export const QUERY_KEY_PREFIX = 'view-loader';

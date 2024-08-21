@@ -49,7 +49,7 @@ export const generateViewFieldsFromPrismaSchema = (
               fieldName,
               {
                 isId: isIdField,
-                isRelationalIdField: isRelationalField ? true : false,
+                isRelationalIdField: isRelationalIdField ? true : false,
                 type,
                 name: fieldData.name,
                 isRequired: fieldData.isRequired,

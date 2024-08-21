@@ -1,4 +1,5 @@
 import { useReducerAtom } from '../jotai-utils/use-reducer-atom';
+import { RecordType } from '../types';
 import { StoreAction } from './store.actions.types';
 import { storeAtom, storeReducer } from './store.main';
 import { Store } from './store.type';

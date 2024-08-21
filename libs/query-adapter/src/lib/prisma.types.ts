@@ -1,3 +1,5 @@
+import { ID } from '@apps-next/core';
+
 export type PrismaField = {
   name: string;
   kind: string;
@@ -27,25 +29,6 @@ export type Prisma = {
   };
 };
 
-// return await prisma.post.findMany({
-//   where: {
-//     OR: [
-//       {
-//         title: {
-//           contains: query,
-//           mode: 'insensitive',
-//         },
-//       },
-//       {
-//         content: {
-//           contains: query,
-//           mode: 'insensitive',
-//         },
-//       },
-//     ],
-//   },
-// });
-
 export type PrismaRecord = Record<string, any> & { id?: number | string };
 
 export type PrismaWhere = {
@@ -57,11 +40,19 @@ export type PrismaWhere = {
   }>;
 };
 
+export type PrismaOrderBy = {
+  id?: 'asc' | 'desc';
+} & Record<string, 'asc' | 'desc'>;
+
 export type PrismaClient = {
   [key in string]: {
-    findMany: (args: { where?: PrismaWhere }) => Promise<PrismaRecord[]>;
+    findMany: (args: {
+      where?: PrismaWhere;
+      orderBy?: PrismaOrderBy;
+    }) => Promise<PrismaRecord[]>;
     create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
-    delete: (args: { where: { id: string } }) => Promise<void>;
+    delete: (args: { where: { id: ID } }) => Promise<void>;
+    update: (args: { where: { id: ID }; data: PrismaRecord }) => Promise<void>;
   };
 };
 

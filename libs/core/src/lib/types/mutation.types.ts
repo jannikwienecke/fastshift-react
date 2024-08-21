@@ -1,4 +1,5 @@
 import { BaseViewConfigManagerInterface } from '../base-view-config';
+import { ID } from './base.types';
 import { ViewConfigType } from './view-config.types';
 
 type MutationRecord = Record<string, any>;
@@ -10,13 +11,14 @@ type CREATE_RECORD = {
 
 type UPDATE_RECORD = {
   type: 'UPDATE_RECORD';
-  id: string;
+  id: ID;
   record: MutationRecord;
+  handler?: (items: MutationRecord[]) => MutationRecord[];
 };
 
 type DELETE_RECORD = {
   type: 'DELETE_RECORD';
-  id: string;
+  id: ID;
 };
 
 export type Mutation = CREATE_RECORD | UPDATE_RECORD | DELETE_RECORD;

@@ -3,9 +3,11 @@ import {
   prismaViewLoader,
   QueryPrefetchProvider,
 } from '@apps-next/query-adapter';
+import { prisma } from '../../../db';
 import { globalConfig } from '../../layout';
 import { TasksClient } from './tasks-client';
-import { prisma } from '../../../db';
+
+export const dynamic = 'force-dynamic';
 
 const viewConfig = createServerViewConfig(
   'post',
@@ -15,7 +17,7 @@ const viewConfig = createServerViewConfig(
   globalConfig.config
 );
 
-export default async function FastAppTasksPage() {
+export default function FastAppTasksPage() {
   return (
     <QueryPrefetchProvider
       viewConfig={viewConfig}

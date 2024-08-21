@@ -54,6 +54,17 @@ export function PrismaQueryProvider({
       value={{
         prisma: {
           ...api,
+          viewMutation(props) {
+            console.log('viewMutation', props);
+            return api.viewMutation({
+              ...props,
+              mutation: {
+                ...props.mutation,
+                // @ts-ignore
+                handler: undefined,
+              },
+            });
+          },
         },
         config: config,
         provider: 'prisma',

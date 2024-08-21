@@ -39,8 +39,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   React.useEffect(() => {
     if (resturnData.error) {
-      console.log('Use Query Error: ', resturnData.error);
-      alert(String(resturnData.error));
+      console.error('Use Query Error: ', resturnData.error);
     }
   }, [resturnData.error]);
 
