@@ -25,7 +25,7 @@ export const useForm = <T extends RecordType>(): (() => FormProps<T>) => {
           }),
       });
     }
-  }, [edit.isEditing, mutateAsync, set]);
+  }, [edit, mutateAsync, set]);
 
   return getFormProps;
 };

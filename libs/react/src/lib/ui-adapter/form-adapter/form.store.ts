@@ -182,3 +182,6 @@ export const formAtom = atom(
     });
   }
 );
+
+formAtom.debugLabel = 'Form Atom';
+initialFormAtom.debugLabel = 'Form Record Atom';

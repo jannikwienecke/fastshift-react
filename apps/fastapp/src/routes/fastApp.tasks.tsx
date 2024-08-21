@@ -2,6 +2,7 @@ import { useStoreDispatch, useStoreValue } from '@apps-next/core';
 import { createView, GetViewProps, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { useAtomsDevtools } from 'jotai-devtools';
 
 export const TasksView = createView(
   'tasks',
@@ -16,6 +17,11 @@ export const TasksView = createView(
     },
   },
   (props) => {
+    const DebugAtoms = () => {
+      useAtomsDevtools('Store');
+      return null;
+    };
+
     const getListProps = props.useList();
 
     const dispatch = useStoreDispatch();
@@ -39,6 +45,8 @@ export const TasksView = createView(
           <ScreenControl />
 
           <h1>tasks</h1>
+
+          <DebugAtoms />
 
           <QueryInput />
 

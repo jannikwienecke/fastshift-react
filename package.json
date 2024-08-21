@@ -26,6 +26,7 @@
     "convex": "^1.14.0",
     "framer-motion": "^11.3.28",
     "jotai": "^2.9.3",
+    "jotai-devtools": "^0.10.1",
     "libsql": "^0.2.0-pre.7",
     "loglevel": "^1.9.1",
     "next": "^15.0.0-rc.0",
