@@ -15,6 +15,5 @@ export const viewMutation = server.mutation({
 // export const deleteMutation = server.mutation({
 //   handler: (ctx, args) => {
 //     console.log('deleteMutation');
-//     // ctx.db.patch({})
 //   },
 // });

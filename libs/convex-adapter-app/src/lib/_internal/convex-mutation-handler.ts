@@ -1,15 +1,15 @@
 import { MutationPropsServer } from '@apps-next/core';
 import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
+import { ConvexContext } from './convex.db.type';
 
 // TODO CLEAN UP
 export const createMutation = async (
-  ctx: any,
+  ctx: ConvexContext,
   { mutation, viewConfigManager }: MutationPropsServer
 ) => {
   if (mutation.type !== 'CREATE_RECORD') throw new Error('INVALID MUTATION-1');
 
   const { record } = mutation;
-  console.warn('createMutation', { record });
 
   await ctx.db.insert(viewConfigManager.getTableName(), record);
 
@@ -19,14 +19,13 @@ export const createMutation = async (
 };
 
 export const deleteMutation = async (
-  ctx: any,
-  { mutation, viewConfigManager }: MutationPropsServer
+  ctx: ConvexContext,
+  { mutation }: MutationPropsServer
 ) => {
   if (mutation.type !== 'DELETE_RECORD') throw new Error('INVALID MUTATION-2');
 
   const { id } = mutation;
 
-  console.warn('deleteMutation', { id });
   await ctx.db.delete(id);
 
   return {
@@ -35,8 +34,8 @@ export const deleteMutation = async (
 };
 
 export const updateMutation = async (
-  ctx: any,
-  { mutation, viewConfigManager }: MutationPropsServer
+  ctx: ConvexContext,
+  { mutation }: MutationPropsServer
 ) => {
   if (mutation.type !== 'UPDATE_RECORD') throw new Error('INVALID MUTATION-3');
 

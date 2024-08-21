@@ -10,9 +10,10 @@ export type ConvexServer = {
   }) => any;
 };
 
+export type RecordType = Record<string, unknown>;
 export type ConvexRecordType = {
   _id: string;
-} & Record<string, unknown>;
+} & RecordType;
 
 export type ViewLoader = FunctionReference<
   'query',
