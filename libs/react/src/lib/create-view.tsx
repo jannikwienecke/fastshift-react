@@ -46,3 +46,7 @@ export const makeHooks = <
     useQuery: useQuery<GetTableDataType<T>[]>,
   };
 };
+
+export type GetViewProps<
+  T extends keyof RegisteredRouter['config']['testType']
+> = Parameters<Parameters<typeof createView<T>>[2]>[0];

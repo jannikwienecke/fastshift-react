@@ -5,7 +5,7 @@ import { StoreAction } from './store.actions.types';
 export const storeAtom = atom<Store>(DEFAULT_STORE);
 
 export const storeReducer = (prev: Store, action: StoreAction): Store => {
-  console.warn('storeReducer', prev, action);
+  console.info('storeReducer', prev, action);
 
   if (action.type === 'EDIT_RECORD')
     return {

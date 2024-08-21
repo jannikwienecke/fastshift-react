@@ -1,14 +1,13 @@
 import {
-  ID,
   MutationProps,
   MutationReturnDto,
   RecordType,
   storeAtom,
 } from '@apps-next/core';
+import { FormField, FormProps, StringInput } from '@apps-next/ui';
 import { atom } from 'jotai';
 import { viewConfigManagerAtom } from '../../use-view';
 import { FORM_DEFAULT_VALUE_DICT, FORM_INPUT_DICT } from './form.config';
-import { FormField, FormProps, StringInput } from '@apps-next/ui';
 
 const INITIAL: FormProps<any> = {
   fields: [],

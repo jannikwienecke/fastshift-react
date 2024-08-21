@@ -1,8 +1,7 @@
 import { useStoreDispatch, useStoreValue } from '@apps-next/core';
-import { createView, QueryInput, useMutation } from '@apps-next/react';
+import { createView, GetViewProps, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import React from 'react';
 
 export const TasksView = createView(
   'tasks',
@@ -16,11 +15,8 @@ export const TasksView = createView(
       //  cell: (value) => <div>{value.name}</div>
     },
   },
-  ({ data, useList, useForm }) => {
-    const getListProps = useList();
-    const getFormProps = useForm();
-
-    const { edit } = useStoreValue();
+  (props) => {
+    const getListProps = props.useList();
 
     const dispatch = useStoreDispatch();
 
@@ -43,9 +39,10 @@ export const TasksView = createView(
           <ScreenControl />
 
           <h1>tasks</h1>
+
           <QueryInput />
 
-          {edit.isEditing ? <Form {...getFormProps()} /> : null}
+          <FormRender {...props} />
 
           <List {...getListProps()} />
         </div>
@@ -56,6 +53,14 @@ export const TasksView = createView(
     );
   }
 );
+
+const FormRender = ({ useForm }: GetViewProps<'tasks'>) => {
+  const getFormProps = useForm();
+
+  const { edit } = useStoreValue();
+
+  return <span>{edit.isEditing ? <Form {...getFormProps()} /> : null}</span>;
+};
 
 export const Route = createFileRoute('/fastApp/tasks')({
   component: () => <TasksView />,
