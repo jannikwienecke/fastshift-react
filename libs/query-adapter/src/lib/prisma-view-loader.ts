@@ -4,6 +4,7 @@ import {
   BaseViewConfigManager,
   QueryDto,
   QueryReturnDto,
+  waitFor,
 } from '@apps-next/core';
 import { PrismaClient, PrismaRecord } from './prisma.types';
 
@@ -84,6 +85,8 @@ export const prismaViewMutation = async (
     mutation,
     viewConfigManager,
   });
+
+  await waitFor(1500);
 
   return {
     succes: true,

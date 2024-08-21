@@ -26,9 +26,13 @@ export const usePrismaMutation = (): MutationReturnType => {
       ]);
 
       if ('handler' in vars.mutation) {
+        console.log('handler', vars.mutation.handler);
+
         const newTodos = vars.mutation.handler?.(
           (previousTodos as any).data || []
         );
+
+        console.log('newTodos', newTodos);
 
         queryClient.setQueryData(
           [QUERY_KEY_PREFIX, vars.viewConfig.viewName, ''],
@@ -40,12 +44,9 @@ export const usePrismaMutation = (): MutationReturnType => {
         return {
           data: newTodos,
         };
+      } else {
+        return { previousTodos };
       }
-
-      // Optimistically update to the new value
-
-      // Return a context object with the snapshotted value
-      return { previousTodos };
     },
   });
 

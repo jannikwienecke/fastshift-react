@@ -50,9 +50,6 @@ export const updateMutation = async (
 
   console.warn('updateMutation', { id, data });
 
-  const waitFor1 = () => new Promise((resolve) => setTimeout(resolve, 1000));
-  await waitFor1();
-
   await dbMutation.update({
     where: {
       id,

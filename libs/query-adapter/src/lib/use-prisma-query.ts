@@ -1,18 +1,25 @@
 import {
   GlobalConfig,
   QUERY_KEY_PREFIX,
-  QueryDto,
   QueryProps,
+  QueryReturnDto,
   QueryReturnOrUndefined,
   RecordType,
 } from '@apps-next/core';
 import { useQuery } from '@tanstack/react-query';
-import { usePrismaApi } from './use-prisma-api';
 import React from 'react';
+import { usePrismaApi } from './use-prisma-api';
 
-export const useStableQuery = (fn: any, args: QueryDto) => {
+export const useStableQuery = (
+  fn: () => Promise<QueryReturnDto>,
+  args: QueryProps
+) => {
   const result = useQuery({
-    queryKey: [QUERY_KEY_PREFIX, args.viewConfig?.viewName, args.query ?? ''],
+    queryKey: [
+      QUERY_KEY_PREFIX,
+      args.viewConfigManager?.getViewName(),
+      args.query ?? '',
+    ],
     queryFn: fn,
   });
 

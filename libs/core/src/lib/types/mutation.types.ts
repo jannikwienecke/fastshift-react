@@ -20,6 +20,7 @@ type UPDATE_RECORD = {
 type DELETE_RECORD = {
   type: 'DELETE_RECORD';
   id: ID;
+  handler?: (items: MutationRecord[]) => MutationRecord[];
 };
 
 export type Mutation = CREATE_RECORD | UPDATE_RECORD | DELETE_RECORD;
