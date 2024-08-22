@@ -10,6 +10,7 @@ export default function FastAppLayoutComponent({
       <div className="min-w-[15rem]">
         <div className="flex flex-col gap-2">
           <Link href="/fastapp/tasks">Tasks</Link>
+          <Link href="/fastapp/projects">Projects</Link>
         </div>
       </div>
       {children}

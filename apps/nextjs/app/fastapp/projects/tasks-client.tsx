@@ -8,10 +8,10 @@ import {
 import { makeHooks, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 
-export const TasksClient = ({
+export const ProjectsClient = ({
   viewConfig,
 }: {
-  viewConfig: ViewConfigType<'task'>;
+  viewConfig: ViewConfigType<'project'>;
 }) => {
   const { useList, useQuery, useForm } = makeHooks(viewConfig);
 
@@ -40,7 +40,7 @@ export const TasksClient = ({
       <div>
         {edit.isEditing ? <Form {...getFormProps()} /> : null}
 
-        <List {...getListProps({ descriptionKey: 'priority' })} />
+        <List {...getListProps({ descriptionKey: 'description' })} />
       </div>
     </div>
   );

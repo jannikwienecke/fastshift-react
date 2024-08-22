@@ -5,14 +5,14 @@ import {
 } from '@apps-next/query-adapter';
 import { prisma } from '../../../db';
 import { globalConfig } from '../../layout';
-import { TasksClient } from './tasks-client';
+import { ProjectsClient } from './tasks-client';
 
 export const dynamic = 'force-dynamic';
 
 const viewConfig = createServerViewConfig(
-  'task',
+  'project',
   {
-    displayField: { field: 'name' },
+    displayField: { field: 'label' },
   },
   globalConfig.config
 );
@@ -23,7 +23,7 @@ export default function FastAppTasksPage() {
       viewConfig={viewConfig}
       viewLoader={(props) => prismaViewLoader(prisma, props)}
     >
-      <TasksClient viewConfig={viewConfig} />
+      <ProjectsClient viewConfig={viewConfig} />
     </QueryPrefetchProvider>
   );
 }

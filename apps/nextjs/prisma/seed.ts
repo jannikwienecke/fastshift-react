@@ -1,54 +1,121 @@
-// import { Post } from '@prisma/client';
-// import { PrismaClient } from '@prisma/client';
 // eslint-disable-next-line
 const { PrismaClient } = require('@prisma/client');
+// eslint-disable-next-line
+const { faker } = require('@faker-js/faker');
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.$executeRaw`delete from "Post"`;
-  await prisma.$executeRaw`delete from "User"`;
+  console.log('🌱 Seeding Prisma database...');
 
-  await prisma.user.create({
+  // Clear existing data
+  //   await prisma.$executeRaw`delete from "Post"`;
+  // await prisma.$executeRaw`delete from "User"`;
+
+  await prisma.taskTag.deleteMany({});
+  await prisma.task.deleteMany({});
+  await prisma.project.deleteMany({});
+  await prisma.tag.deleteMany({});
+  await prisma.owner.deleteMany({});
+  await prisma.category.deleteMany({});
+  await prisma.user.deleteMany({});
+
+  // Create a user
+  const user = await prisma.user.create({
     data: {
-      id: 1,
-      email: 'jannik@gmail.com',
-      name: 'Jannik Wiencek',
+      email: 'wienecke.jannik@gmail.com',
+      password: 'admin',
     },
   });
 
-  const posts = [
-    {
-      id: 1,
-      title: 'Incredible Metal Towels',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      published: true,
-      authorId: 1,
+  // Create an owner
+  const owner = await prisma.owner.create({
+    data: {
+      userId: user.id,
+      firstname: 'Jannik',
+      lastname: 'Wiencek',
+      age: 32,
+      user: {
+        connect: {
+          id: user.id,
+        },
+      },
     },
-    {
-      id: 2,
-      title: 'The Football Is Good For Training And Recreational Purposes',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      published: true,
-      authorId: 1,
-    },
-  ];
+  });
 
-  Promise.all(
-    posts.map(async (post) => {
-      return await prisma.post.create({
-        data: post,
-      });
-    })
-  );
+  // Create categories
+  const categories = [];
+  for (let i = 0; i < 10; i++) {
+    const category = await prisma.category.create({
+      data: {
+        label: faker.vehicle.manufacturer(),
+        color: faker.color.human(),
+      },
+    });
+    categories.push(category);
+  }
+
+  // Create tags
+  const tags = [];
+  for (let i = 0; i < 10; i++) {
+    const tag = await prisma.tag.create({
+      data: {
+        name: faker.hacker.verb(),
+        color: faker.color.human(),
+      },
+    });
+    tags.push(tag);
+  }
+
+  // Create projects
+  const projects = [];
+  for (let i = 0; i < 10; i++) {
+    const project = await prisma.project.create({
+      data: {
+        label: faker.commerce.productName(),
+        description: faker.commerce.productDescription(),
+        categoryId: categories[0].id,
+        ownerId: owner.id,
+        dueDate: faker.date.future().getTime(),
+      },
+    });
+    projects.push(project);
+  }
+
+  // Create tasks
+  const tasks = [];
+  for (let i = 0; i < 50; i++) {
+    const randomProject = projects[Math.floor(Math.random() * projects.length)];
+    const task = await prisma.task.create({
+      data: {
+        name: faker.person.fullName(),
+        completed: faker.datatype.boolean(),
+        projectId: randomProject.id,
+        priority: 'low',
+      },
+    });
+    tasks.push(task);
+  }
+
+  // Create task-tag associations
+  for (let i = 0; i < 10; i++) {
+    const randomTag = tags[Math.floor(Math.random() * tags.length)];
+    const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
+    await prisma.taskTag.create({
+      data: {
+        tagId: randomTag.id,
+        taskId: randomTask.id,
+      },
+    });
+  }
 }
 
 main()
+  .then(() => {
+    console.log('Seed data created successfully');
+  })
   .catch((e) => {
     console.error(e);
-    process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
