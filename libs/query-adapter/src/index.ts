@@ -7,3 +7,4 @@ export * from './lib/query-prefetch-provider';
 export * from './lib/server-side-config-context';
 export * from './lib/prisma-view-loader';
 export * from './lib/use-prisma-mutation';
+export * from './lib/use-prisma-query-relational';

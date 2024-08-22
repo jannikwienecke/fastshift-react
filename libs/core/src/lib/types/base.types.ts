@@ -17,10 +17,16 @@ export type FieldType =
   | 'Boolean'
   | 'Date'
   | 'Reference'
+  | 'OneToOneReference'
   | 'Union'
   | 'Enum';
 
 export type RecordType = Record<any, any>;
+
+export type RecordRelationType = {
+  id: ID;
+  label: string;
+};
 
 export type Enum = { name: string };
 

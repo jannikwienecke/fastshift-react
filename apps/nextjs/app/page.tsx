@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { prisma } from '../db';
 export const dynamic = 'force-dynamic';
 
 export default async function Index() {
@@ -12,3 +13,7 @@ export default async function Index() {
     </div>
   );
 }
+
+// prisma.project.findMany({
+//   take: 5,
+// })

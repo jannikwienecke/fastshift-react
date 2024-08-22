@@ -1,4 +1,5 @@
 import React from 'react';
+import { ComboboxProps } from '../combobox';
 
 export type FormRecord = Record<any, any>;
 
@@ -15,6 +16,10 @@ export type FormField<T extends FormRecord> = {
   relation?: {
     tableName: string;
     fieldName: string;
+    useCombobox?: (props: {
+      tableName: string;
+      query?: string;
+    }) => () => ComboboxProps;
   };
   enum?: {
     fieldName: string;

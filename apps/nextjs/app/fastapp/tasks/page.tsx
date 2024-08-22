@@ -10,7 +10,7 @@ import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
-const viewConfig = createServerViewConfig(
+export const viewConfig = createServerViewConfig(
   'task',
   {
     displayField: { field: 'name' },
@@ -18,7 +18,7 @@ const viewConfig = createServerViewConfig(
   globalConfig.config
 );
 
-// const Tasks = Prisma.dmmf.datamodel.models.find((m) => m.name === 'Task');
+const Tasks = Prisma.dmmf.datamodel.models.find((m) => m.name === 'Task');
 // console.log(Tasks?.fields);
 export default function FastAppTasksPage() {
   return (

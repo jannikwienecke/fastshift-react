@@ -11,6 +11,9 @@ export type QueryProps = {
   viewConfigManager?: BaseViewConfigManagerInterface;
   registeredViews: RegisteredViews;
   modelConfig?: ModelConfig;
+  relationQuery?: {
+    tableName: string;
+  };
 };
 
 export type QueryDto = {
@@ -43,3 +46,4 @@ export type MutationReturnType = {
 };
 
 export const QUERY_KEY_PREFIX = 'view-loader';
+export const RELATIONAL_QUERY_KEY_PREFIX = 'relational-view-loader';

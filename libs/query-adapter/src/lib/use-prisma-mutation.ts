@@ -19,33 +19,31 @@ export const usePrismaMutation = (): MutationReturnType => {
       });
 
       // Snapshot the previous value
-      const previousTodos = queryClient.getQueryData([
+      const previousState = queryClient.getQueryData([
         QUERY_KEY_PREFIX,
         vars.viewConfig.viewName,
         '',
       ]);
 
       if ('handler' in vars.mutation) {
-        console.log('handler', vars.mutation.handler);
-
-        const newTodos = vars.mutation.handler?.(
-          (previousTodos as any).data || []
+        const newState = vars.mutation.handler?.(
+          (previousState as any).data || []
         );
 
-        console.log('newTodos', newTodos);
+        console.debug('newState', newState);
 
         queryClient.setQueryData(
           [QUERY_KEY_PREFIX, vars.viewConfig.viewName, ''],
           {
-            data: newTodos,
+            data: newState,
           }
         );
 
         return {
-          data: newTodos,
+          data: newState,
         };
       } else {
-        return { previousTodos };
+        return { previousTodos: previousState };
       }
     },
   });

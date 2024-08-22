@@ -29,14 +29,14 @@ export function List<T extends ListItem>(props: ListProps<T>) {
           <div className="flex flex-row gap-2">
             <button
               onClick={() => props.onEdit?.(item)}
-              className="btn bg-orange-400"
+              className="btn bg-orange-300 p-2 px-3 rounded-md"
             >
               Edit
             </button>
 
             <button
               onClick={() => props.onDelete?.(item)}
-              className="btn btn-primary bg-red-500"
+              className="btn btn-primary bg-red-300 p-2 rounded-md"
             >
               Delete
             </button>

@@ -1,4 +1,12 @@
 import Link from 'next/link';
+import { viewConfig as ProjectsViewConfig } from './projects/page';
+import { viewConfig as TasksViewConfig } from './tasks/page';
+
+console.debug('Registered Views');
+console.debug(TasksViewConfig.viewName);
+console.debug(ProjectsViewConfig.viewName);
+console.debug('==');
+console.debug(' ');
 
 export default function FastAppLayoutComponent({
   children,

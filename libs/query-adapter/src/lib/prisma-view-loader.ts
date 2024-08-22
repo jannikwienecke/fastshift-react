@@ -34,6 +34,55 @@ export const prismaViewLoader = async (
 
   let result: PrismaRecord[] | undefined;
 
+  if (args.relationQuery) {
+    const tableNameRelation = args.relationQuery.tableName;
+    const dbQuery = (prismaClient as PrismaClient)[tableNameRelation];
+
+    const configOfRelationTable =
+      args.registeredViews[args.relationQuery.tableName];
+
+    console.log('configOfRelationTable', configOfRelationTable?.tableName);
+    let displayField = 'id';
+    if (configOfRelationTable?.tableName) {
+      const viewConfigManager = new BaseViewConfigManager(
+        configOfRelationTable
+      );
+      displayField = viewConfigManager.getDisplayFieldLabel();
+    }
+
+    let result: PrismaRecord[] | undefined;
+    if (args.query) {
+      result = await dbQuery.findMany({
+        take: 5,
+        where: {
+          OR: [
+            {
+              [displayField]: {
+                contains: args.query,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        },
+        orderBy: {
+          id: 'asc',
+        },
+      });
+    } else {
+      result = await dbQuery.findMany({
+        take: 5,
+      });
+    }
+
+    console.log(result);
+    return {
+      data: result.map((data) => ({
+        id: data.id,
+        name: data[displayField],
+      })),
+    };
+  }
+
   if (args.query) {
     result = await dbQuery.findMany({
       where: {

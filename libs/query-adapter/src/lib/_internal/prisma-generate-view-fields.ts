@@ -48,12 +48,22 @@ export const generateViewFieldsFromPrismaSchema = (
               relationFromFields?.length === 0 &&
               relationToFields?.length === 0;
 
+            const isOneToOneRelation =
+              relationName &&
+              relationFromFields?.length &&
+              relationToFields?.length &&
+              !fieldData.isList &&
+              !fieldData.isUnique;
+
             if (isManyToManyRelation) {
               relationType = 'manyToMany';
+            } else if (isOneToOneRelation) {
+              relationType = 'oneToOne';
             }
 
             let type = fieldTypeMapping[fieldType] ?? 'String';
             type = isRelationalField ? 'Reference' : type;
+            type = isOneToOneRelation ? 'OneToOneReference' : type;
 
             const enumType =
               fieldData.kind === 'enum' ? fieldData.type : undefined;

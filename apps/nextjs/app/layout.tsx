@@ -8,7 +8,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Link from 'next/link';
 import './global.css';
 
-import '@picocss/pico/css/pico.classless.min.css';
+// import '@picocss/pico/css/pico.classless.min.css';
 import React from 'react';
 
 export const metadata = {

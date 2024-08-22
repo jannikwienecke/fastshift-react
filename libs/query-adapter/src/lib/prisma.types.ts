@@ -56,6 +56,7 @@ export type PrismaClient = {
   [key in string]: {
     findMany: (args: {
       where?: PrismaWhere;
+      take?: number;
       orderBy?: PrismaOrderBy;
     }) => Promise<PrismaRecord[]>;
     create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;

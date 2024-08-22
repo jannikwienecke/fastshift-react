@@ -8,6 +8,7 @@ import { FormField, FormProps, StringInput } from '@apps-next/ui';
 import { atom } from 'jotai';
 import { viewConfigManagerAtom } from '../../use-view';
 import { FORM_DEFAULT_VALUE_DICT, FORM_INPUT_DICT } from './form.config';
+import { useCombobox } from '../combox-adapter';
 
 const INITIAL: FormProps<any> = {
   fields: [],
@@ -59,7 +60,12 @@ export const formAtom = atom(
           placeholder: `Enter ${name}`,
           value: editState.record?.[name] || defaultValue,
           Component: Component,
-          relation: field.relation,
+          relation: field.relation
+            ? {
+                ...field.relation,
+                useCombobox,
+              }
+            : undefined,
           isRelationalIdField,
           enum: field.enum
             ? {

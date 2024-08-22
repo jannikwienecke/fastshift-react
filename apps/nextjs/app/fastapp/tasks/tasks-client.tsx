@@ -7,6 +7,7 @@ import {
 } from '@apps-next/core';
 import { makeHooks, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
+import { Example as ComboboxExample } from './combobox';
 
 export const TasksClient = ({
   viewConfig,
@@ -44,6 +45,8 @@ export const TasksClient = ({
       </div>
     </div>
   );
+
+  // return <ComboboxExample />;
 };
 
 // export const TasksClient = ({

@@ -17,4 +17,8 @@ export const registerViewHandler = {
 
     return view;
   },
+
+  _getAll() {
+    return REGISTRED_VIEWS;
+  },
 };

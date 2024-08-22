@@ -5,11 +5,11 @@ import {
 } from '@apps-next/query-adapter';
 import { prisma } from '../../../db';
 import { globalConfig } from '../../layout';
-import { ProjectsClient } from './tasks-client';
+import { ProjectsClient } from './projects-client';
 
 export const dynamic = 'force-dynamic';
 
-const viewConfig = createServerViewConfig(
+export const viewConfig = createServerViewConfig(
   'project',
   {
     displayField: { field: 'label' },
