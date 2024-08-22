@@ -3,7 +3,7 @@ import { ComboboxProps } from '../combobox';
 
 export type FormRecord = Record<any, any>;
 
-export type FormField<T extends FormRecord> = {
+export type FormField<T extends FormRecord = FormRecord> = {
   name: keyof T;
   required: boolean;
   placeholder: string;
@@ -16,10 +16,7 @@ export type FormField<T extends FormRecord> = {
   relation?: {
     tableName: string;
     fieldName: string;
-    useCombobox?: (props: {
-      tableName: string;
-      query?: string;
-    }) => () => ComboboxProps;
+    useCombobox?: (props: FormField<T>) => () => ComboboxProps;
   };
   enum?: {
     fieldName: string;

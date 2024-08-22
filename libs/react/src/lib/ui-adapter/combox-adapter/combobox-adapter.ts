@@ -1,4 +1,4 @@
-import { ComboboxProps } from '@apps-next/ui';
+import { ComboboxProps, FormField } from '@apps-next/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { useRelationalQuery } from '../../use-query-relational';
@@ -8,15 +8,13 @@ import {
   updateValuesAtom,
 } from './combobox.store';
 
-export const useCombobox = (props: {
-  tableName: string;
-}): (() => ComboboxProps) => {
+export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
   const state = useAtomValue(comboboxStateAtom);
   const updateValues = useSetAtom(updateValuesAtom);
   const setDebouncedValue = useSetAtom(debouncedQueryAtom);
 
   const { data } = useRelationalQuery({
-    tableName: props.tableName,
+    tableName: props.relation?.tableName ?? '',
     query: state.debouncedQuery || '',
   });
 
@@ -51,9 +49,11 @@ export const useCombobox = (props: {
     } satisfies ComboboxProps;
   };
 
+  const propsRef = React.useRef(props);
   React.useEffect(() => {
     updateValues({
       values: data || [],
+      formField: propsRef.current,
     });
   }, [data, updateValues]);
 
