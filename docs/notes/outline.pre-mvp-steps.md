@@ -2,7 +2,7 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1724233962237
+updated: 1724306476227
 created: 1723444563681
 ---
 
@@ -45,9 +45,9 @@ Add a small doc section to each new progress step
     - [x] server side nextjs react query
     - [x] create real config with fields and sserch fields for prisma and convex
     - [x] create view loadeer and mutation handler for convex and prisma
-    - [ ] create a delete|create|update mutation for prisma
-    - [ ] add test data / schema and seed for nextjs app
-    - [ ] create a delete|create|update mutation for convex
+    - [x] create a delete|create|update mutation for prisma
+    - [x] add test data / schema and seed for nextjs app
+    - [x] create a delete|create|update mutation for convex
     - [ ] add relational fields
     - [ ] test how a reusable component would look like (use list as example)
     - [ ] test how a reusable component would look like (use query as example)

@@ -17,6 +17,8 @@ export class FormManager implements FormManagerInterface {
     //     .filter((field) => !(!field.relation && field.isRelationalIdField))
     // );
 
+    console.log(this.base.getViewFieldList());
+
     return this.base
       .getViewFieldList()
       .filter((field) => !field.isId)

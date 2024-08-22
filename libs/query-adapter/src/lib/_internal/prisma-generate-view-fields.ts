@@ -30,14 +30,9 @@ export const generateViewFieldsFromPrismaSchema = (
             const isRelationalIdField = tableData.fields.find(
               (f) => f.relationFromFields?.[0] === fieldName
             );
+            console.log({ fieldData });
 
-            const isIdField =
-              fieldData.isId &&
-              fieldData.default &&
-              typeof fieldData.default === 'object' &&
-              'name' in fieldData.default
-                ? fieldData.default?.name === 'autoincrement'
-                : false;
+            const isIdField = fieldData.isId && fieldData.default;
 
             const isRelationalField =
               relationName && relationFromFields ? true : false;
