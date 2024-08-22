@@ -40,13 +40,17 @@ export const formAtom = atom(
         const { relation, isRequired, isRelationalIdField } = field;
         const name = relation ? relation.tableName : field.name;
 
-        const defaultValue = isRequired
+        let defaultValue = isRequired
           ? FORM_DEFAULT_VALUE_DICT[field.type]
           : field.type === 'String'
           ? ''
           : undefined;
 
         const Component = FORM_INPUT_DICT[field.type] || StringInput;
+
+        if (field.enum && !defaultValue) {
+          defaultValue = field.enum.values?.[0]?.name;
+        }
 
         return {
           name,
@@ -57,6 +61,12 @@ export const formAtom = atom(
           Component: Component,
           relation: field.relation,
           isRelationalIdField,
+          enum: field.enum
+            ? {
+                fieldName: field.name,
+                values: field.enum?.values ?? [],
+              }
+            : undefined,
           onChange: (value: unknown) => {
             const formState = get(initialFormAtom);
             const noValue =

@@ -9,9 +9,10 @@ type RemoveDollarSign<T> = T extends `$${infer _}` ? never : T;
 type PrismaTableName<T> = (keyof T)[];
 
 export const createConfigFromPrismaSchema = <
-  PrismaClient extends Record<string, any>
+  PrismaClient extends Record<string, any>,
+  TDataModel extends Record<string, any> = any
 >(
-  Prisma: Prisma['dmmf']['datamodel']
+  Prisma: TDataModel
 ) => {
   type TableName = GetPrismaTableName<PrismaClient>;
 
@@ -31,7 +32,8 @@ export const createConfigFromPrismaSchema = <
   > = {
     searchableFields: {},
     viewFields,
-    dataModel: Prisma,
+    // TODO FIX THIS -> Move to a type helper : GetPRismaDataModel
+    dataModel: Prisma as any as Prisma['dmmf']['datamodel'],
     testType: {} as GetDataModelPrisma,
     tableNames,
   };

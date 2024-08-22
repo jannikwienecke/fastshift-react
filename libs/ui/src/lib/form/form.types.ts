@@ -16,6 +16,12 @@ export type FormField<T extends FormRecord> = {
     tableName: string;
     fieldName: string;
   };
+  enum?: {
+    fieldName: string;
+    values: {
+      name: string;
+    }[];
+  };
 };
 
 export type FormProps<T extends FormRecord> = {

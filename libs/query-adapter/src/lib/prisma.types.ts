@@ -18,6 +18,12 @@ export type PrismaField = {
   relationToFields?: string[];
 };
 
+export type PrismaEnum = {
+  name: string;
+  values: Array<{ name: string; dbName: string | null }>;
+  dbName: string | null;
+};
+
 export type Prisma = {
   dmmf: {
     datamodel: {
@@ -25,6 +31,8 @@ export type Prisma = {
         fields: Array<PrismaField>;
         name: string;
       }>;
+      enums: Array<PrismaEnum>;
+      types: unknown;
     };
   };
 };

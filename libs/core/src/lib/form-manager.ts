@@ -22,6 +22,7 @@ export class FormManager implements FormManagerInterface {
     return this.base
       .getViewFieldList()
       .filter((field) => !field.isId)
-      .filter((field) => !(!field.relation && field.isRelationalIdField));
+      .filter((field) => !(!field.relation && field.isRelationalIdField))
+      .filter((field) => field.relation?.type !== 'manyToMany');
   }
 }

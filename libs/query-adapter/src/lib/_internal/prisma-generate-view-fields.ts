@@ -1,4 +1,4 @@
-import { FieldType } from '@apps-next/core';
+import { FieldConfig, FieldType, TableRelationType } from '@apps-next/core';
 import { Prisma, PrismaField } from '../prisma.types';
 
 type PrismaFieldTypeMapping = {
@@ -9,11 +9,14 @@ const fieldTypeMapping: PrismaFieldTypeMapping = {
   String: 'String',
   Boolean: 'Boolean',
   Int: 'Number',
+  Enum: 'Enum',
 };
 
 export const generateViewFieldsFromPrismaSchema = (
-  Prisma: Prisma['dmmf']['datamodel']
+  _prisma: Record<string, any>
 ) => {
+  const Prisma = _prisma as any as Prisma['dmmf']['datamodel'];
+
   const viewFields = Object.fromEntries(
     Object.entries(Prisma.models).map(([index, tableData]) => {
       return [
@@ -23,6 +26,7 @@ export const generateViewFieldsFromPrismaSchema = (
             const {
               relationName,
               relationFromFields,
+              relationToFields,
               name: fieldName,
               type: fieldType,
             } = fieldData;
@@ -30,15 +34,34 @@ export const generateViewFieldsFromPrismaSchema = (
             const isRelationalIdField = tableData.fields.find(
               (f) => f.relationFromFields?.[0] === fieldName
             );
-            console.log({ fieldData });
 
-            const isIdField = fieldData.isId && fieldData.default;
+            const isIdField =
+              fieldData.isId && fieldData.default ? true : false;
 
             const isRelationalField =
               relationName && relationFromFields ? true : false;
 
+            let relationType: TableRelationType = 'oneToMany';
+
+            const isManyToManyRelation =
+              relationName &&
+              relationFromFields?.length === 0 &&
+              relationToFields?.length === 0;
+
+            if (isManyToManyRelation) {
+              relationType = 'manyToMany';
+            }
+
             let type = fieldTypeMapping[fieldType] ?? 'String';
             type = isRelationalField ? 'Reference' : type;
+
+            const enumType =
+              fieldData.kind === 'enum' ? fieldData.type : undefined;
+            const enumValues = enumType
+              ? Prisma.enums.find((e) => e.name === enumType)?.values
+              : undefined;
+
+            type = enumType ? 'Enum' : type;
 
             return [
               fieldName,
@@ -48,13 +71,21 @@ export const generateViewFieldsFromPrismaSchema = (
                 type,
                 name: fieldData.name,
                 isRequired: fieldData.isRequired,
+                enum:
+                  enumType && enumValues
+                    ? {
+                        name: enumType,
+                        values: enumValues,
+                      }
+                    : undefined,
                 relation: isRelationalField
                   ? {
                       tableName: fieldData.name,
                       fieldName: relationFromFields?.[0] ?? '',
+                      type: relationType,
                     }
                   : undefined,
-              },
+              } satisfies FieldConfig,
             ];
           })
         ),

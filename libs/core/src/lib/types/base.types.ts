@@ -17,10 +17,14 @@ export type FieldType =
   | 'Boolean'
   | 'Date'
   | 'Reference'
-  | 'Union';
+  | 'Union'
+  | 'Enum';
 
 export type RecordType = Record<any, any>;
 
+export type Enum = { name: string };
+
+export type TableRelationType = 'oneToOne' | 'oneToMany' | 'manyToMany';
 export type FieldConfig = {
   isId?: boolean;
   isRelationalIdField?: boolean;
@@ -30,6 +34,11 @@ export type FieldConfig = {
   relation?: {
     tableName: string;
     fieldName: string;
+    type: TableRelationType;
+  };
+  enum?: {
+    name: string;
+    values: Enum[];
   };
 };
 

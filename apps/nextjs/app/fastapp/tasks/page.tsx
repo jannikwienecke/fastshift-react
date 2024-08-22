@@ -6,6 +6,7 @@ import {
 import { prisma } from '../../../db';
 import { globalConfig } from '../../layout';
 import { TasksClient } from './tasks-client';
+import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,8 @@ const viewConfig = createServerViewConfig(
   globalConfig.config
 );
 
+// const Tasks = Prisma.dmmf.datamodel.models.find((m) => m.name === 'Task');
+// console.log(Tasks?.fields);
 export default function FastAppTasksPage() {
   return (
     <QueryPrefetchProvider
