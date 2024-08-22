@@ -2,9 +2,9 @@ import { SearchableField } from './base.types';
 import { ViewFieldConfig } from './view-config.types';
 
 export interface BaseConfigInterface<
-  TDataModel extends Record<string, any>,
-  TTables,
-  TTest extends Record<string, any>
+  TDataModel extends Record<string, any> = any,
+  TTables = any,
+  TTest extends Record<string, any> = any
 > {
   dataModel: TDataModel;
   tableNames: TTables;

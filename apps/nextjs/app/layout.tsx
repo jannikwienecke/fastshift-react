@@ -20,7 +20,13 @@ import { Prisma } from '@prisma/client';
 import { prisma, PrismaClientType } from '../db';
 
 export const globalConfig = createConfigFromPrismaSchema<PrismaClientType>(
-  Prisma.dmmf.datamodel
+  Prisma.dmmf.datamodel,
+  {
+    // option to provide displayField for each table
+    smart: {
+      guessDisplayFieldIfNotProvided: true,
+    },
+  }
 );
 
 declare module '@apps-next/core' {

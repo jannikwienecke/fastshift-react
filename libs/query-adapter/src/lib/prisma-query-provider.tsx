@@ -47,7 +47,7 @@ export function PrismaQueryProvider({
 }: {
   children: React.ReactNode;
   api: PrismaClientType;
-  config: BaseConfigInterface<any, any, any>;
+  config: BaseConfigInterface;
 }) {
   return (
     <PrismaContext.Provider

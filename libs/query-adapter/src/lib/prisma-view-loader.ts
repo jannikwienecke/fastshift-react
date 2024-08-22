@@ -41,14 +41,11 @@ export const prismaViewLoader = async (
     const configOfRelationTable =
       args.registeredViews[args.relationQuery.tableName];
 
-    console.log('configOfRelationTable', configOfRelationTable?.tableName);
-    let displayField = 'id';
-    if (configOfRelationTable?.tableName) {
-      const viewConfigManager = new BaseViewConfigManager(
-        configOfRelationTable
-      );
-      displayField = viewConfigManager.getDisplayFieldLabel();
-    }
+    if (!configOfRelationTable)
+      throw new Error('configOfRelationTable is undefined');
+
+    const viewConfigManager = new BaseViewConfigManager(configOfRelationTable);
+    const displayField = viewConfigManager.getDisplayFieldLabel();
 
     let result: PrismaRecord[] | undefined;
     if (args.query) {

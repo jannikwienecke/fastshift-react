@@ -1,16 +1,6 @@
-import { FieldConfig, FieldType, TableRelationType } from '@apps-next/core';
-import { Prisma, PrismaField } from '../prisma.types';
-
-type PrismaFieldTypeMapping = {
-  [key in PrismaField['kind']]: FieldType;
-};
-
-const fieldTypeMapping: PrismaFieldTypeMapping = {
-  String: 'String',
-  Boolean: 'Boolean',
-  Int: 'Number',
-  Enum: 'Enum',
-};
+import { FieldConfig } from '@apps-next/core';
+import { Prisma } from '../prisma.types';
+import { prismaViewFieldsHelper } from './prisma-view-fields-helper';
 
 export const generateViewFieldsFromPrismaSchema = (
   _prisma: Record<string, any>
@@ -24,77 +14,24 @@ export const generateViewFieldsFromPrismaSchema = (
         Object.fromEntries(
           Object.entries(tableData.fields).map(([index, fieldData]) => {
             const {
-              relationName,
-              relationFromFields,
-              relationToFields,
-              name: fieldName,
-              type: fieldType,
-            } = fieldData;
-
-            const isRelationalIdField = tableData.fields.find(
-              (f) => f.relationFromFields?.[0] === fieldName
-            );
-
-            const isIdField =
-              fieldData.isId && fieldData.default ? true : false;
-
-            const isRelationalField =
-              relationName && relationFromFields ? true : false;
-
-            let relationType: TableRelationType = 'oneToMany';
-
-            const isManyToManyRelation =
-              relationName &&
-              relationFromFields?.length === 0 &&
-              relationToFields?.length === 0;
-
-            const isOneToOneRelation =
-              relationName &&
-              relationFromFields?.length &&
-              relationToFields?.length &&
-              !fieldData.isList &&
-              !fieldData.isUnique;
-
-            if (isManyToManyRelation) {
-              relationType = 'manyToMany';
-            } else if (isOneToOneRelation) {
-              relationType = 'oneToOne';
-            }
-
-            let type = fieldTypeMapping[fieldType] ?? 'String';
-            type = isRelationalField ? 'Reference' : type;
-            type = isOneToOneRelation ? 'OneToOneReference' : type;
-
-            const enumType =
-              fieldData.kind === 'enum' ? fieldData.type : undefined;
-            const enumValues = enumType
-              ? Prisma.enums.find((e) => e.name === enumType)?.values
-              : undefined;
-
-            type = enumType ? 'Enum' : type;
+              type,
+              isIdField,
+              isRelationalIdField,
+              enumValue,
+              relation,
+              fieldName,
+            } = prismaViewFieldsHelper(fieldData, tableData, Prisma);
 
             return [
               fieldName,
               {
                 isId: isIdField,
-                isRelationalIdField: isRelationalIdField ? true : false,
+                isRelationalIdField,
                 type,
                 name: fieldData.name,
                 isRequired: fieldData.isRequired,
-                enum:
-                  enumType && enumValues
-                    ? {
-                        name: enumType,
-                        values: enumValues,
-                      }
-                    : undefined,
-                relation: isRelationalField
-                  ? {
-                      tableName: fieldData.name,
-                      fieldName: relationFromFields?.[0] ?? '',
-                      type: relationType,
-                    }
-                  : undefined,
+                enum: enumValue,
+                relation,
               } satisfies FieldConfig,
             ];
           })

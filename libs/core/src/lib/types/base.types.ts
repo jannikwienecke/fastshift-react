@@ -64,7 +64,7 @@ export type SearchableField<TDataModel extends Record<string, any> = any> = {
 
 export type GlobalConfig = {
   provider: DataProvider;
-  config: BaseConfigInterface<any, any, any>;
+  config: BaseConfigInterface;
 };
 
 export type DataModel<TableNames extends string = any> = {

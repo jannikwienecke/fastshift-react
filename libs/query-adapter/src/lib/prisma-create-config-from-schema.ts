@@ -1,4 +1,5 @@
 import { BaseConfig, BaseConfigInterface } from '@apps-next/core';
+import { generateDefaultViewConfigs } from './_internal/prisma-generate-default-view-configs';
 import { generateViewFieldsFromPrismaSchema } from './_internal/prisma-generate-view-fields';
 import { getTableNamesFromPrismaSchema } from './_internal/prisma-get-tables-from-schema';
 import { GetPrismaTableName } from './_internal/prisma.type.helper';
@@ -12,7 +13,12 @@ export const createConfigFromPrismaSchema = <
   PrismaClient extends Record<string, any>,
   TDataModel extends Record<string, any> = any
 >(
-  Prisma: TDataModel
+  Prisma: TDataModel,
+  options?: {
+    smart?: {
+      guessDisplayFieldIfNotProvided?: boolean;
+    };
+  }
 ) => {
   type TableName = GetPrismaTableName<PrismaClient>;
 
@@ -38,5 +44,19 @@ export const createConfigFromPrismaSchema = <
     tableNames,
   };
 
+  generateDefaultViewConfigs({
+    tableNames: tableNames as string[],
+    dataModel: Prisma as any as Prisma['dmmf']['datamodel'],
+    config,
+    guessDisplayFieldIfNotProvided:
+      options?.smart?.guessDisplayFieldIfNotProvided,
+  });
+
   return new BaseConfig(config);
+};
+
+// eslint-disable-next-line
+(BigInt.prototype as any).toJSON = function () {
+  const int = Number.parseInt(this.toString());
+  return int ?? this.toString();
 };
