@@ -56,14 +56,16 @@ export type PrismaInclude = {
   [key in string]: boolean | PrismaInclude;
 };
 
+export type PrismaFindManyArgs = {
+  take?: number;
+  where?: PrismaWhere;
+  orderBy?: PrismaOrderBy;
+  include?: PrismaInclude;
+};
+
 export type PrismaClient = {
   [key in string]: {
-    findMany: (args: {
-      where?: PrismaWhere;
-      take?: number;
-      orderBy?: PrismaOrderBy;
-      include?: PrismaInclude;
-    }) => Promise<PrismaRecord[]>;
+    findMany: (args: PrismaFindManyArgs) => Promise<PrismaRecord[]>;
     create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
     delete: (args: { where: { id: ID } }) => Promise<void>;
     update: (args: { where: { id: ID }; data: PrismaRecord }) => Promise<void>;

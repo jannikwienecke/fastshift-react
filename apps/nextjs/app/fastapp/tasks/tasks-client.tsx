@@ -7,14 +7,21 @@ import {
 } from '@apps-next/core';
 import { makeHooks, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
-import { Example as ComboboxExample } from './combobox';
+import { Tag } from '@prisma/client';
 
 export const TasksClient = ({
   viewConfig,
 }: {
   viewConfig: ViewConfigType<'task'>;
 }) => {
-  const { useList, useQuery, useForm } = makeHooks(viewConfig);
+  const { useList, useQuery, useForm } = makeHooks<
+    'task',
+    {
+      tags: {
+        tag: Tag;
+      }[];
+    }
+  >(viewConfig);
 
   const getListProps = useList();
   const { edit } = useStoreValue();
@@ -24,6 +31,7 @@ export const TasksClient = ({
   // @ts-expect-error INVALID FIELD
   const INVALID = data?.[0]?.NOT_VALID_FIELD;
 
+  console.log(data?.[0].tags?.[0].tag.name);
   const getFormProps = useForm();
 
   const dispatch = useStoreDispatch();
@@ -45,20 +53,4 @@ export const TasksClient = ({
       </div>
     </div>
   );
-
-  // return <ComboboxExample />;
 };
-
-// export const TasksClient = ({
-//   viewConfig,
-// }: {
-//   viewConfig: ViewConfigType<'post'>;
-// }) => {
-//   return (
-//     <ViewProvider
-//       view={{ viewConfigManager: new BaseViewConfigManager(viewConfig) }}
-//     >
-//       <TasksClientContent viewConfig={viewConfig} />
-//     </ViewProvider>
-//   );
-// };

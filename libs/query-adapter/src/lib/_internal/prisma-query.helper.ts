@@ -1,16 +1,24 @@
 import { IncludeConfig } from '@apps-next/core';
-import { PrismaInclude, PrismaOrderBy, PrismaWhere } from '../prisma.types';
+import {
+  PrismaFindManyArgs,
+  PrismaInclude,
+  PrismaOrderBy,
+  PrismaWhere,
+} from '../prisma.types';
 
 export const queryHelper = ({
   displayField,
   query,
+  override,
 }: {
   displayField: string;
   query?: string;
+  override?: PrismaFindManyArgs;
 }) => {
   const getOrderBy = (direction?: 'asc' | 'desc'): PrismaOrderBy => {
     return {
       [displayField]: direction ?? 'asc',
+      ...(override?.orderBy ?? {}),
     };
   };
 
@@ -24,17 +32,21 @@ export const queryHelper = ({
           },
         },
       ],
+      ...(override?.where ?? {}),
     };
   };
 
   const getInclude = (includeFields: IncludeConfig[string]): PrismaInclude => {
-    return includeFields.reduce(
-      (acc, f) => ({
-        ...acc,
-        [f]: true,
-      }),
-      {}
-    );
+    return {
+      ...includeFields.reduce(
+        (acc, f) => ({
+          ...acc,
+          [f]: true,
+        }),
+        {}
+      ),
+      ...(override?.include ?? {}),
+    };
   };
 
   return {

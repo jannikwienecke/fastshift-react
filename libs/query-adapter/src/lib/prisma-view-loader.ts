@@ -8,7 +8,7 @@ import {
   QueryReturnDto,
   waitFor,
 } from '@apps-next/core';
-import { PrismaClient, PrismaRecord } from './prisma.types';
+import { PrismaClient, PrismaFindManyArgs, PrismaRecord } from './prisma.types';
 
 import { MutationProps, MutationReturnDto } from '@apps-next/core';
 import { relationalViewHelper } from 'libs/core/src/lib/relational-view.helper';
@@ -67,7 +67,14 @@ export const prismaViewLoader = async (
 
     return relationQueryHelper.relationQueryData;
   } else {
-    const helper = queryHelper({ displayField, query: args.query });
+    const _prismaLoaderExtension: PrismaFindManyArgs =
+      args.viewConfig?.loader?._prismaLoaderExtension ?? {};
+
+    const helper = queryHelper({
+      displayField,
+      query: args.query,
+      override: _prismaLoaderExtension,
+    });
 
     const include = helper.getInclude(viewConfigManager.getIncludeFields());
 

@@ -36,14 +36,19 @@ export function createView<
 }
 
 export const makeHooks = <
-  T extends keyof RegisteredRouter['config']['testType']
+  T extends keyof RegisteredRouter['config']['testType'],
+  TCustomDataType extends Record<string, any> | undefined = undefined
 >(
   config: ViewConfigType<T>
 ) => {
+  type DataType = TCustomDataType extends undefined
+    ? GetTableDataType<T>
+    : TCustomDataType & GetTableDataType<T>;
+
   return {
-    useList: useList<GetTableDataType<T>>,
-    useForm: useForm<GetTableDataType<T>>,
-    useQuery: useQuery<GetTableDataType<T>[]>,
+    useList: useList<DataType>,
+    useForm: useForm<DataType>,
+    useQuery: useQuery<DataType[]>,
   };
 };
 

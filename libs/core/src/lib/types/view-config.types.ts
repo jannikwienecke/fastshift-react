@@ -16,6 +16,9 @@ export type ViewConfigType<T extends GetTableName = any> = {
   query?: {
     //
   };
+  loader?: {
+    _prismaLoaderExtension?: Record<string, unknown>;
+  };
 };
 
 export type RegisteredViews = Partial<{
