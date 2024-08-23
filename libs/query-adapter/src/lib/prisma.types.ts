@@ -52,12 +52,17 @@ export type PrismaOrderBy = {
   id?: 'asc' | 'desc';
 } & Record<string, 'asc' | 'desc'>;
 
+export type PrismaInclude = {
+  [key in string]: boolean | PrismaInclude;
+};
+
 export type PrismaClient = {
   [key in string]: {
     findMany: (args: {
       where?: PrismaWhere;
       take?: number;
       orderBy?: PrismaOrderBy;
+      include?: PrismaInclude;
     }) => Promise<PrismaRecord[]>;
     create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
     delete: (args: { where: { id: ID } }) => Promise<void>;

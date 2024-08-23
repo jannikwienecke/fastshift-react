@@ -16,4 +16,7 @@ export default async function Index() {
 
 // prisma.project.findMany({
 //   take: 5,
-// })
+//   include: {
+//     category: true,
+//   },
+// });

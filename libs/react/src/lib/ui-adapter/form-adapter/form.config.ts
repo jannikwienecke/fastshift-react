@@ -4,6 +4,7 @@ import {
   BooleanInput,
   EnumInput,
   OneToOneSelectInput,
+  ComboxboxItem,
 } from '@apps-next/ui';
 
 export const FORM_INPUT_DICT: {
@@ -20,7 +21,13 @@ export const FORM_INPUT_DICT: {
 };
 
 export const FORM_DEFAULT_VALUE_DICT: {
-  [key in FieldType]: string | number | boolean | Date | undefined;
+  [key in FieldType]:
+    | string
+    | number
+    | boolean
+    | Date
+    | undefined
+    | ComboxboxItem;
 } = {
   String: '',
   Number: 0,

@@ -1,82 +1,104 @@
 import { atomWithDebounce } from '@apps-next/core';
-import { FormField } from '@apps-next/ui';
+import { ComboxboxItem, FormField } from '@apps-next/ui';
 import { atom } from 'jotai';
 import { initialFormAtom } from '../form-adapter/form.store';
+import { formHelper } from '../form-adapter/form-helper';
 
-type ComboboxState<
-  T extends { id: string; label: string } = {
-    id: string;
-    label: string;
-  }
-> = {
-  values: T[];
-  selected: null | T;
+type State = {
+  values: ComboxboxItem[];
+  selected: null | ComboxboxItem;
   query: string;
   debouncedQuery: string;
   formField?: FormField;
+  initialized: boolean;
 };
 
-const comboboxAtom = atom<ComboboxState>({
-  values: [],
-  selected: null,
-  query: '',
-  debouncedQuery: '',
-  formField: undefined,
-});
+// each combobox input field has its own state: {task : {....}, project: {...}}
+type ComboboxState<> = {
+  [key in string]: State;
+};
+
+const comboboxAtom = atom<ComboboxState>({});
 
 export const {
   isDebouncingAtom,
   debouncedValueAtom: debouncedQueryAtom,
   clearTimeoutAtom,
   currentValueAtom,
-} = atomWithDebounce('');
+} = atomWithDebounce({
+  query: '',
+  fieldName: '',
+});
 
-export const comboboxStateAtom = atom(
-  (get) => {
-    const debouncedQuery = get(debouncedQueryAtom);
-    const query = get(currentValueAtom);
+export const comboboxStateAtom = atom((get) => {
+  const debouncedQuery = get(debouncedQueryAtom);
+  const query = get(currentValueAtom);
 
-    return {
-      values: get(comboboxAtom).values,
-      selected: get(comboboxAtom).selected,
-      query: query,
-      debouncedQuery: debouncedQuery,
-    };
-  },
-  (get, set, update: Partial<ComboboxState>) => {
+  return {
+    query: query,
+    debouncedQuery: debouncedQuery,
+    state: get(comboboxAtom),
+  };
+});
+
+export const updateValuesAtom = atom(
+  null,
+  (
+    get,
+    set,
+    update: {
+      fieldName: string;
+      state: Partial<State>;
+    }
+  ) => {
+    const formData = get(initialFormAtom);
+    const state = get(comboboxAtom);
+
+    const fieldName = update.fieldName;
+    const newState = update.state;
+
+    if (!state[fieldName]?.initialized) return;
+
+    const fields = formHelper(formData).updateFields(
+      fieldName,
+      update.state.selected
+    );
+
+    set(initialFormAtom, {
+      ...formData,
+      fields,
+    });
+
     set(comboboxAtom, {
-      ...get(comboboxAtom),
-      ...update,
+      ...state,
+      [fieldName]: {
+        ...state[fieldName],
+        ...newState,
+        selected: newState.selected?.id
+          ? newState.selected
+          : state[fieldName]?.selected,
+      },
     });
   }
 );
 
-export const testAtom = atom((get) => get(debouncedQueryAtom).length);
-
-export const updateValuesAtom = atom(
+export const initComboboxAtom = atom(
   null,
-  (get, set, update: Partial<ComboboxState<any>>) => {
-    const { formField } = get(comboboxAtom);
-
-    const formData = get(initialFormAtom);
-
-    set(initialFormAtom, {
-      ...formData,
-      fields: formData.fields.map((field) => {
-        if (field.name === formField?.relation?.tableName) {
-          return {
-            ...field,
-            value: update.selected?.id,
-          };
-        }
-
-        return field;
-      }),
-    });
+  (
+    get,
+    set,
+    update: { fieldName: string; initialSelected: State['selected'] }
+  ) => {
+    const { fieldName, initialSelected } = update;
+    const state = get(comboboxAtom);
 
     set(comboboxAtom, {
-      ...get(comboboxAtom),
-      ...update,
+      ...state,
+      [fieldName]: {
+        ...state[fieldName],
+        selected: initialSelected,
+        initialized: true,
+      },
     });
   }
 );

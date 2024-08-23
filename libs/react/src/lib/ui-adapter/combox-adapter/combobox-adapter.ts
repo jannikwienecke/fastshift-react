@@ -5,17 +5,24 @@ import { useRelationalQuery } from '../../use-query-relational';
 import {
   comboboxStateAtom,
   debouncedQueryAtom,
+  initComboboxAtom,
   updateValuesAtom,
 } from './combobox.store';
 
 export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
-  const state = useAtomValue(comboboxStateAtom);
+  const _state = useAtomValue(comboboxStateAtom);
   const updateValues = useSetAtom(updateValuesAtom);
+  const initializeCombobox = useSetAtom(initComboboxAtom);
   const setDebouncedValue = useSetAtom(debouncedQueryAtom);
+
+  const state = _state.state[props.name as string];
 
   const { data } = useRelationalQuery({
     tableName: props.relation?.tableName ?? '',
-    query: state.debouncedQuery || '',
+    query:
+      _state.query.fieldName === props.name
+        ? _state.debouncedQuery.query || ''
+        : '',
   });
 
   const getComboboxProps = () => {
@@ -24,7 +31,10 @@ export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
         values: data || [],
         onSelectedChange: (value) => {
           updateValues({
-            selected: value,
+            fieldName: props.name as string,
+            state: {
+              selected: value,
+            },
           });
         },
       },
@@ -32,30 +42,52 @@ export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
         label: 'Assigned to',
         onChange: (value) => {
           updateValues({
-            selected: value,
+            fieldName: props.name as string,
+            state: {
+              selected: value,
+            },
           });
         },
-        selected: state.selected,
+        selected: state?.selected,
       },
       inputProps: {
-        query: state.query ?? '',
+        placeholder: props.placeholder,
+        query: _state.query.query ?? '',
         onChange(query) {
-          setDebouncedValue(query);
+          setDebouncedValue({
+            query,
+            fieldName: props.name as string,
+          });
         },
         onBlur: () => {
-          setDebouncedValue('');
+          setDebouncedValue({
+            query: '',
+            fieldName: props.name as string,
+          });
         },
       },
     } satisfies ComboboxProps;
   };
 
   const propsRef = React.useRef(props);
+
   React.useEffect(() => {
+    if (!data) return;
+
     updateValues({
-      values: data || [],
-      formField: propsRef.current,
+      fieldName: propsRef.current.name as string,
+      state: { values: data || [] },
     });
   }, [data, updateValues]);
+
+  React.useEffect(() => {
+    if (propsRef.current.value) {
+      initializeCombobox({
+        fieldName: props.name as string,
+        initialSelected: propsRef.current.value,
+      });
+    }
+  }, [initializeCombobox, props.name]);
 
   return getComboboxProps;
 };

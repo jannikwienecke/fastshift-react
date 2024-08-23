@@ -1,11 +1,8 @@
+import { ServerSideConfigContext } from '@apps-next/query-adapter';
+import { useSetAtom } from 'jotai';
 import React from 'react';
 import { ViewContext } from './_internal/view-context';
-import { ServerSideConfigContext } from '@apps-next/query-adapter';
-import { atom, useSetAtom } from 'jotai';
-import { BaseViewConfigManagerInterface } from '@apps-next/core';
-
-export const viewConfigManagerAtom =
-  atom<BaseViewConfigManagerInterface | null>(null);
+import { registeredViewsAtom, viewConfigManagerAtom } from '@apps-next/core';
 
 export const useView = () => {
   const context = React.useContext(ViewContext);
@@ -14,6 +11,7 @@ export const useView = () => {
   const _context = context.viewConfigManager ? context : queryPrefetchProvider;
 
   const setViewConfigManager = useSetAtom(viewConfigManagerAtom);
+  const setRegisteredViews = useSetAtom(registeredViewsAtom);
 
   if (!_context.viewConfigManager) {
     throw new Error('useView must be used within a ViewProvider');
@@ -22,6 +20,10 @@ export const useView = () => {
   React.useEffect(() => {
     setViewConfigManager(_context.viewConfigManager);
   }, [_context.viewConfigManager, setViewConfigManager]);
+
+  React.useEffect(() => {
+    setRegisteredViews(_context.registeredViews);
+  }, [_context.registeredViews, setRegisteredViews]);
 
   return _context;
 };

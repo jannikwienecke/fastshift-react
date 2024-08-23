@@ -6,6 +6,7 @@ export type ComboxboxItem = {
 export type ComboboxProps = {
   inputProps: {
     query: string;
+    placeholder: string;
     onChange: (query: string) => void;
     onBlur?: () => void;
   };

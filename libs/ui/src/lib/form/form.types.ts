@@ -1,6 +1,7 @@
 import React from 'react';
 import { ComboboxProps } from '../combobox';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FormRecord = Record<any, any>;
 
 export type FormField<T extends FormRecord = FormRecord> = {
@@ -26,7 +27,7 @@ export type FormField<T extends FormRecord = FormRecord> = {
   };
 };
 
-export type FormProps<T extends FormRecord> = {
+export type FormProps<T extends FormRecord = any> = {
   fields: FormField<T>[];
   show: boolean;
   record: T | null;

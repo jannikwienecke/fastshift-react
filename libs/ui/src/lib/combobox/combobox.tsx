@@ -11,7 +11,11 @@ import { ComboboxProps } from './combobox.types';
 
 export function Combobox(props: ComboboxProps) {
   return (
-    <ComboboxHeadlessUi as="div" {...props.comboboxProps}>
+    <ComboboxHeadlessUi
+      as="div"
+      {...props.comboboxProps}
+      value={props.comboboxProps.selected ?? null}
+    >
       <Label className="block text-sm font-medium leading-6 text-gray-900">
         {props.comboboxProps.label}
       </Label>
@@ -19,11 +23,9 @@ export function Combobox(props: ComboboxProps) {
       <div className="relative mt-2">
         <ComboboxInput
           className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          //   onChange={(event) => setQuery(event.target.value)}
-          //   onBlur={() => setQuery('')}
           {...props.inputProps}
           onChange={(event) => props.inputProps.onChange(event.target.value)}
-          displayValue={(value: any) => value?.label}
+          displayValue={(value: any) => value?.label ?? ''}
         />
         <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
           <ChevronUpDownIcon

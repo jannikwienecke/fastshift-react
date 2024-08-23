@@ -3,14 +3,16 @@ import {
   MutationReturnDto,
   RecordType,
   storeAtom,
+  viewConfigManagerAtom,
+  viewsHelperAtom,
 } from '@apps-next/core';
 import { FormField, FormProps, StringInput } from '@apps-next/ui';
 import { atom } from 'jotai';
-import { viewConfigManagerAtom } from '../../use-view';
-import { FORM_DEFAULT_VALUE_DICT, FORM_INPUT_DICT } from './form.config';
 import { useCombobox } from '../combox-adapter';
+import { formFieldHelper } from './form-helper';
+import { FORM_DEFAULT_VALUE_DICT, FORM_INPUT_DICT } from './form.config';
 
-const INITIAL: FormProps<any> = {
+const INITIAL: FormProps = {
   fields: [],
   show: false,
   record: {},
@@ -20,7 +22,7 @@ const INITIAL: FormProps<any> = {
   onSubmit: () => null,
 };
 
-export const initialFormAtom = atom<FormProps<any>>(INITIAL);
+export const initialFormAtom = atom<FormProps>(INITIAL);
 
 export const formAtom = atom(
   INITIAL,
@@ -41,6 +43,8 @@ export const formAtom = atom(
         const { relation, isRequired, isRelationalIdField } = field;
         const name = relation ? relation.tableName : field.name;
 
+        let value = editState.record?.[name];
+
         let defaultValue = isRequired
           ? FORM_DEFAULT_VALUE_DICT[field.type]
           : field.type === 'String'
@@ -53,12 +57,24 @@ export const formAtom = atom(
           defaultValue = field.enum.values?.[0]?.name;
         }
 
+        if (relation) {
+          const relationDisplayField = get(viewsHelperAtom).getDisplayField(
+            relation.tableName
+          );
+
+          value = {
+            id: editState.record?.[relation.tableName]?.id,
+            label:
+              editState.record?.[relation.tableName]?.[relationDisplayField],
+          };
+        }
+
         return {
           name,
           required: field.isRequired || false,
           type: field.type,
           placeholder: `Enter ${name}`,
-          value: editState.record?.[name] || defaultValue,
+          value: value || defaultValue,
           Component: Component,
           relation: field.relation
             ? {
@@ -116,16 +132,17 @@ export const formAtom = atom(
       isSubmitting: false,
       onSubmit: async () => {
         const formState = get(initialFormAtom);
-        const record = formState.fields.reduce((acc, field) => {
-          acc[field.relation?.fieldName || (field.name as keyof RecordType)] =
-            field.value;
-          return acc;
-        }, {} as RecordType);
 
+        const record = formState.fields.reduce(
+          (acc, field) => formFieldHelper(field).updateRecord(acc),
+          {} as RecordType
+        );
+
+        const store = get(storeAtom);
         set(storeAtom, {
-          ...get(storeAtom),
+          ...store,
           edit: {
-            ...get(storeAtom).edit,
+            ...store.edit,
             isEditing: false,
             record: null,
           },
@@ -169,15 +186,6 @@ export const formAtom = atom(
             ready: true,
             isSubmitting: false,
           });
-
-          set(storeAtom, {
-            ...get(storeAtom),
-            edit: {
-              ...get(storeAtom).edit,
-              isEditing: false,
-              record: null,
-            },
-          });
         } else {
           set(initialFormAtom, {
             ...formState,
@@ -186,9 +194,9 @@ export const formAtom = atom(
           });
 
           set(storeAtom, {
-            ...get(storeAtom),
+            ...store,
             edit: {
-              ...get(storeAtom).edit,
+              ...store.edit,
               isEditing: true,
               record: editState.record,
             },

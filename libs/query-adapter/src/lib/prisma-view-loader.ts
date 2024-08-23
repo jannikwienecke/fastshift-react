@@ -71,7 +71,6 @@ export const prismaViewLoader = async (
       });
     }
 
-    console.log(result);
     return {
       data: result.map((data) => ({
         id: data.id,
@@ -92,12 +91,21 @@ export const prismaViewLoader = async (
           },
         ],
       },
+      include: {
+        category: true,
+        owner: true,
+      },
       orderBy: {
         id: 'asc',
       },
     });
   } else {
     result = await dbQuery.findMany({
+      include: {
+        // FIX THIS -> GENERIC
+        category: true,
+        owner: true,
+      },
       orderBy: {
         id: 'asc',
       },
