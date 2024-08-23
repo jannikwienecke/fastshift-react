@@ -21,7 +21,6 @@ export function createViewConfig<T extends GetTableName>(
   const searchableFields = {} as SearchableField;
   const viewName = config.viewName ?? (tableName as string);
 
-  // TODO RENAME testType
   const viewConfig: ViewConfigType<T> = {
     ...config,
     displayField: {
@@ -54,7 +53,6 @@ export function createServerViewConfig<T extends GetTableName>(
 
   const viewName = config.viewName ?? (tableName as string);
 
-  // TODO RENAME testType
   const viewConfig: ViewConfigType<T> = {
     ...config,
     displayField: {

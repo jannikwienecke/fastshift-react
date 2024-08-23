@@ -13,7 +13,7 @@ import { ViewDataProvider } from './view-provider';
 import { useQuery } from './use-query';
 
 export function createView<
-  T extends keyof RegisteredRouter['config']['testType']
+  T extends keyof RegisteredRouter['config']['_datamodel']
 >(
   tableName: T,
   config: Partial<Omit<ViewConfigType<T>, 'viewFields' | 'tableName'>>,
@@ -36,7 +36,7 @@ export function createView<
 }
 
 export const makeHooks = <
-  T extends keyof RegisteredRouter['config']['testType'],
+  T extends keyof RegisteredRouter['config']['_datamodel'],
   TCustomDataType extends Record<string, any> | undefined = undefined
 >(
   config: ViewConfigType<T>
@@ -53,5 +53,5 @@ export const makeHooks = <
 };
 
 export type GetViewProps<
-  T extends keyof RegisteredRouter['config']['testType']
+  T extends keyof RegisteredRouter['config']['_datamodel']
 > = Parameters<Parameters<typeof createView<T>>[2]>[0];

@@ -43,7 +43,7 @@ export const createConfigFromPrismaSchema = <
     // TODO FIX THIS -> Move to a type helper : GetPRismaDataModel
     dataModel: Prisma as any as Prisma['dmmf']['datamodel'],
     includeFields,
-    testType: {} as GetDataModelPrisma,
+    _datamodel: {} as GetDataModelPrisma,
     tableNames,
   };
 

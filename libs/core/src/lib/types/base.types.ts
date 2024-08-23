@@ -51,7 +51,7 @@ export type FieldConfig = {
 export type GetTableName = RegisteredRouter['config']['tableNames'][number];
 
 export type GetTableDataType<T extends GetTableName> =
-  RegisteredRouter['config']['testType'][T];
+  RegisteredRouter['config']['_datamodel'][T];
 
 export type GetFieldName<TDataModel extends Record<string, any> = any> =
   keyof TDataModel['tables'][GetTableName]['validator']['fields'];

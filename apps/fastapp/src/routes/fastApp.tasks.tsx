@@ -44,7 +44,7 @@ export const TasksView = createView(
         <div className="flex flex-col w-full ">
           <ScreenControl />
 
-          <h1>tasks</h1>
+          <h1>Tasks Page</h1>
 
           <DebugAtoms />
 

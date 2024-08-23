@@ -21,7 +21,7 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
       [TKey in TableName]: Infer<T['tables'][TKey]['validator']>;
     }
   > = {
-    testType: {} as T,
+    _datamodel: {} as T,
     includeFields: {},
     searchableFields,
     viewFields,
