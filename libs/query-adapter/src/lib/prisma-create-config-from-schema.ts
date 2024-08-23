@@ -4,6 +4,7 @@ import { generateViewFieldsFromPrismaSchema } from './_internal/prisma-generate-
 import { getTableNamesFromPrismaSchema } from './_internal/prisma-get-tables-from-schema';
 import { GetPrismaTableName } from './_internal/prisma.type.helper';
 import { Prisma } from './prisma.types';
+import { generateIncludeFields } from './_internal/prisma-generate-include-fields';
 
 type RemoveDollarSign<T> = T extends `$${infer _}` ? never : T;
 
@@ -30,6 +31,7 @@ export const createConfigFromPrismaSchema = <
 
   const tableNames = getTableNamesFromPrismaSchema(Prisma) as TableName[];
   const viewFields = generateViewFieldsFromPrismaSchema(Prisma);
+  const includeFields = generateIncludeFields(Prisma);
 
   const config: BaseConfigInterface<
     Prisma['dmmf']['datamodel'],
@@ -40,6 +42,7 @@ export const createConfigFromPrismaSchema = <
     viewFields,
     // TODO FIX THIS -> Move to a type helper : GetPRismaDataModel
     dataModel: Prisma as any as Prisma['dmmf']['datamodel'],
+    includeFields,
     testType: {} as GetDataModelPrisma,
     tableNames,
   };

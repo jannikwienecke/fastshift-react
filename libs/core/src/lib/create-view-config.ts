@@ -29,6 +29,7 @@ export function createViewConfig<T extends GetTableName>(
       cell: config.displayField?.cell,
     },
     viewFields: viewFields,
+    includeFields: [],
     tableName,
     viewName,
     query: {
@@ -49,6 +50,8 @@ export function createServerViewConfig<T extends GetTableName>(
   // Clean Up -> Duplicate code in ViewProvider
   const searchableFields = globalConfig.searchableFields[tableName as string];
   const viewFields = globalConfig.viewFields[tableName as string];
+  const includeFields = globalConfig.includeFields[tableName as string];
+
   const viewName = config.viewName ?? (tableName as string);
 
   // TODO RENAME testType
@@ -59,6 +62,7 @@ export function createServerViewConfig<T extends GetTableName>(
       cell: config.displayField?.cell,
     },
     viewFields: viewFields,
+    includeFields,
     tableName,
     viewName,
     query: {

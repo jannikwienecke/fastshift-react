@@ -2,6 +2,8 @@
 
 import {
   BaseViewConfigManager,
+  DEFAULT_FETCH_LIMIT_QUERY,
+  DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   QueryDto,
   QueryReturnDto,
   waitFor,
@@ -9,13 +11,17 @@ import {
 import { PrismaClient, PrismaRecord } from './prisma.types';
 
 import { MutationProps, MutationReturnDto } from '@apps-next/core';
+import { relationalViewHelper } from 'libs/core/src/lib/relational-view.helper';
+import { client } from './_internal/prisma-get-client';
 import { mutationHandlers } from './_internal/prisma-mutations-handler';
+import { queryHelper } from './_internal/prisma-query.helper';
+import { relationalQueryHelper } from './_internal/prisma-relational-query.helper';
 
 export const prismaViewLoader = async (
   prismaClient: unknown,
   args: QueryDto
 ): Promise<QueryReturnDto> => {
-  console.log('prismaViewLoader');
+  console.debug('prismaViewLoader');
 
   if (args.viewConfig === undefined) {
     throw new Error('viewLoaderHandler: viewConfig is required');
@@ -30,98 +36,69 @@ export const prismaViewLoader = async (
 
   const tableName = viewConfigManager.getTableName();
 
-  const dbQuery = (prismaClient as PrismaClient)[tableName];
+  const { registeredViews, relationQuery } = args;
+
+  const dbQuery = client(prismaClient).dbQuery(tableName);
 
   let result: PrismaRecord[] | undefined;
 
-  if (args.relationQuery) {
-    const tableNameRelation = args.relationQuery.tableName;
-    const dbQuery = (prismaClient as PrismaClient)[tableNameRelation];
+  if (relationQuery) {
+    const tableNameRelation = relationQuery.tableName;
 
-    const configOfRelationTable =
-      args.registeredViews[args.relationQuery.tableName];
+    const dbQuery = client(prismaClient).dbQuery(tableNameRelation);
 
-    if (!configOfRelationTable)
-      throw new Error('configOfRelationTable is undefined');
+    const { displayField } = relationalViewHelper(
+      relationQuery.tableName,
+      registeredViews
+    );
 
-    const viewConfigManager = new BaseViewConfigManager(configOfRelationTable);
-    const displayField = viewConfigManager.getDisplayFieldLabel();
+    const helper = queryHelper({ displayField, query: args.query });
 
-    let result: PrismaRecord[] | undefined;
+    const result = await dbQuery.findMany({
+      take: DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
+      where: args.query ? helper.where : undefined,
+      orderBy: helper.orderBy,
+    });
+
+    const relationQueryHelper = relationalQueryHelper({
+      displayField,
+      result,
+    });
+
+    return relationQueryHelper.relationQueryData;
+  } else {
+    const helper = queryHelper({ displayField, query: args.query });
+
+    const include = helper.getInclude(viewConfigManager.getIncludeFields());
+
     if (args.query) {
       result = await dbQuery.findMany({
-        take: 5,
-        where: {
-          OR: [
-            {
-              [displayField]: {
-                contains: args.query,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-        orderBy: {
-          id: 'asc',
-        },
+        take: DEFAULT_FETCH_LIMIT_QUERY,
+        where: helper.where,
+        include,
+        orderBy: helper.orderBy,
       });
     } else {
       result = await dbQuery.findMany({
-        take: 5,
+        take: DEFAULT_FETCH_LIMIT_QUERY,
+        include,
+        orderBy: helper.orderBy,
       });
     }
 
+    await waitFor(300);
+
     return {
-      data: result.map((data) => ({
-        id: data.id,
-        name: data[displayField],
-      })),
+      data: result,
     };
   }
-
-  if (args.query) {
-    result = await dbQuery.findMany({
-      where: {
-        OR: [
-          {
-            [displayField]: {
-              contains: args.query,
-              mode: 'insensitive',
-            },
-          },
-        ],
-      },
-      include: {
-        category: true,
-        owner: true,
-      },
-      orderBy: {
-        id: 'asc',
-      },
-    });
-  } else {
-    result = await dbQuery.findMany({
-      include: {
-        // FIX THIS -> GENERIC
-        category: true,
-        owner: true,
-      },
-      orderBy: {
-        id: 'asc',
-      },
-    });
-  }
-
-  return {
-    data: result,
-  };
 };
 
 export const prismaViewMutation = async (
   prismaClient: unknown,
   args: MutationProps
 ): Promise<MutationReturnDto> => {
-  console.log('prismaViewMutation');
+  console.debug('prismaViewMutation');
 
   if (args.viewConfig === undefined) {
     throw new Error('viewLoaderHandler: viewConfig is required');
@@ -140,7 +117,7 @@ export const prismaViewMutation = async (
     viewConfigManager,
   });
 
-  await waitFor(1500);
+  await waitFor(1000);
 
   return {
     succes: true,

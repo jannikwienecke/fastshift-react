@@ -3,6 +3,7 @@
 import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  IncludeConfig,
   RegisteredViews,
   ViewContextType,
 } from '@apps-next/core';
@@ -19,12 +20,16 @@ export const ServerSideConfigProvider = (
   props: {
     viewConfig: BaseViewConfigManagerInterface['viewConfig'];
     registeredViews: RegisteredViews;
+    includeConfig: IncludeConfig;
   } & { children: React.ReactNode }
 ) => {
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
   return (
     <ServerSideConfigContext.Provider
-      value={{ viewConfigManager, registeredViews: props.registeredViews }}
+      value={{
+        viewConfigManager,
+        registeredViews: props.registeredViews,
+      }}
     >
       {props.children}
     </ServerSideConfigContext.Provider>

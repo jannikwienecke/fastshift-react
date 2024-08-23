@@ -1,7 +1,7 @@
 import { invarant } from './core-utils';
 import {
   FieldConfig,
-  FieldType,
+  IncludeConfig,
   SearchableField,
   ViewConfigType,
   ViewFieldConfig,
@@ -63,5 +63,9 @@ export class BaseViewConfigManager<
   getViewFieldList(): FieldConfig[] {
     // return Object.values(this.modelConfig?.viewFields ?? {});
     return Object.values(this.viewConfig?.viewFields ?? {});
+  }
+
+  getIncludeFields(): IncludeConfig[string] {
+    return this.viewConfig.includeFields;
   }
 }

@@ -1,3 +1,4 @@
+import { BaseViewConfigManager } from './base-view-config';
 import { RegisteredViews } from './types';
 
 export const relationalViewHelper = (
@@ -16,7 +17,11 @@ export const relationalViewHelper = (
     return relationalView;
   };
 
+  const relationalView = getRelationalView(relationalTableName);
+  const baseViewConfigManger = new BaseViewConfigManager(relationalView);
   return {
-    relationalView: getRelationalView(relationalTableName),
+    relationalView,
+    baseViewConfigManger,
+    displayField: baseViewConfigManger.getDisplayFieldLabel(),
   };
 };

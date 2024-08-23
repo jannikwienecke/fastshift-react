@@ -25,12 +25,14 @@ export const ViewProvider = ({
 
   const searchableFields = config.searchableFields[tableName];
   const viewFields = config.viewFields[tableName];
+  const includeFields = config.includeFields[tableName];
 
   const viewConfigManager = new BaseViewConfigManager(
     {
       ...view.viewConfigManager.viewConfig,
       viewFields,
       searchableFields,
+      includeFields,
     },
     {
       searchableFields,
@@ -49,7 +51,7 @@ export const ViewProvider = ({
 
 export const ViewDataProvider = <
   TProps extends {
-    data: QueryReturnOrUndefined<any>;
+    data: QueryReturnOrUndefined;
     useList: typeof useList;
   }
 >(props: {

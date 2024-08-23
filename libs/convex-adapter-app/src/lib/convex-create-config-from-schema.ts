@@ -12,6 +12,8 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   const searchableFields = generateSearchableFieldsFromConvexSchema(schema);
   const viewFields = generateViewFieldsFromConvexSchema(schema);
 
+  // TODO CONVEX: ADD INCLUDE FIELDS
+
   const config: BaseConfigInterface<
     T,
     keyof T['tables'],
@@ -20,6 +22,7 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
     }
   > = {
     testType: {} as T,
+    includeFields: {},
     searchableFields,
     viewFields,
     dataModel: schema,

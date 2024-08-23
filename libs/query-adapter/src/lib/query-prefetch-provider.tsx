@@ -29,6 +29,7 @@ export async function QueryPrefetchProvider({
   const viewFields = viewConfigManager.viewConfig.viewFields;
   const viewName = viewConfigManager.getViewName();
   const registeredViews = REGISTRED_VIEWS;
+  // const includeConfig = INCLUDE_CONFIG;
 
   await queryClient.prefetchQuery({
     queryKey: [QUERY_KEY_PREFIX, viewName, ''],
@@ -54,6 +55,7 @@ export async function QueryPrefetchProvider({
     <ServerSideConfigProvider
       registeredViews={registeredViews}
       viewConfig={viewConfigManager.viewConfig}
+      includeConfig={{}}
     >
       <HydrationBoundary state={dehydrate(queryClient)}>
         {children}

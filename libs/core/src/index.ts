@@ -11,3 +11,5 @@ export * from './lib/config';
 export * from './lib/store.ts';
 export * from './lib/view-config.store';
 export * from './lib/registered-view.store';
+export * from './lib/core.constants';
+export * from './lib/include-config.store';
