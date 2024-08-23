@@ -19,6 +19,8 @@ export const metadata = {
 import { Prisma } from '@prisma/client';
 import { prisma, PrismaClientType } from '../db';
 
+export const dynamic = 'force-dynamic';
+
 export const globalConfig = createConfigFromPrismaSchema<PrismaClientType>(
   Prisma.dmmf.datamodel,
   {

@@ -46,16 +46,16 @@ export const ProjectsClient = ({
   );
 };
 
-// export const TasksClient = ({
+// export const ProjectsClient = ({
 //   viewConfig,
 // }: {
-//   viewConfig: ViewConfigType<'post'>;
+//   viewConfig: ViewConfigType<'project'>;
 // }) => {
 //   return (
 //     <ViewProvider
 //       view={{ viewConfigManager: new BaseViewConfigManager(viewConfig) }}
 //     >
-//       <TasksClientContent viewConfig={viewConfig} />
+//       <ProjectsClient_ viewConfig={viewConfig} />
 //     </ViewProvider>
 //   );
 // };

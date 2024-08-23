@@ -7,7 +7,6 @@ import {
 import {
   dehydrate,
   HydrationBoundary,
-  QueryCache,
   QueryClient,
 } from '@tanstack/react-query';
 import React from 'react';
@@ -22,34 +21,37 @@ export async function QueryPrefetchProvider({
   viewLoader: PrismaClientType['viewLoader'];
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
 }>) {
-  const queryClient = new QueryClient();
-
   const viewConfigManager = new BaseViewConfigManager(viewConfig);
   const searchableFields = viewConfigManager.getSearchableField();
   const viewFields = viewConfigManager.viewConfig.viewFields;
   const viewName = viewConfigManager.getViewName();
   const registeredViews = REGISTRED_VIEWS;
-  // const includeConfig = INCLUDE_CONFIG;
 
-  await queryClient.prefetchQuery({
-    queryKey: [QUERY_KEY_PREFIX, viewName, ''],
+  const queryClient = new QueryClient();
 
-    queryFn: async (context) => {
-      const res = await viewLoader({
-        registeredViews,
-        modelConfig: {
-          viewFields: viewFields,
-          searchableFields: searchableFields,
-        },
-        viewConfig: {
-          ...viewConfigManager.viewConfig,
-          viewFields: viewFields,
-        },
-      });
+  const queryData = queryClient.getQueryData([QUERY_KEY_PREFIX, viewName, '']);
 
-      return res;
-    },
-  });
+  if (!queryData) {
+    await queryClient.prefetchQuery({
+      queryKey: [QUERY_KEY_PREFIX, viewName, ''],
+
+      queryFn: async (context) => {
+        const res = await viewLoader({
+          registeredViews,
+          modelConfig: {
+            viewFields: viewFields,
+            searchableFields: searchableFields,
+          },
+          viewConfig: {
+            ...viewConfigManager.viewConfig,
+            viewFields: viewFields,
+          },
+        });
+
+        return res;
+      },
+    });
+  }
 
   return (
     <ServerSideConfigProvider

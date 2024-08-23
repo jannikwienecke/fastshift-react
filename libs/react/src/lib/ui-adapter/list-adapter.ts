@@ -30,12 +30,7 @@ export const useList = <T extends RecordType>() => {
           mutation: {
             type: 'DELETE_RECORD',
             id: item.id,
-            handler: (items) =>
-              items.filter((i) => {
-                console.log('onDelete', i.id, item.id);
-
-                return i.id !== item.id;
-              }),
+            handler: (items) => items.filter((i) => i.id !== item.id),
           },
         });
       },

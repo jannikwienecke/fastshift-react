@@ -2,7 +2,7 @@
 id: 61256rqi3pi0n6ny0pivu3c
 title: Pre Mvp Steps
 desc: ''
-updated: 1724306476227
+updated: 1724430626973
 created: 1723444563681
 ---
 
@@ -49,6 +49,7 @@ Add a small doc section to each new progress step
     - [x] add test data / schema and seed for nextjs app
     - [x] create a delete|create|update mutation for convex
     - [ ] add relational fields
+    - [ ] Required relational fields
     - [ ] test how a reusable component would look like (use list as example)
     - [ ] test how a reusable component would look like (use query as example)
       - list item can delete, can open a record, can update and can be customized

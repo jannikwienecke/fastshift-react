@@ -93,7 +93,7 @@ export const prismaViewLoader = async (
       });
     }
 
-    await waitFor(300);
+    await waitFor(250);
 
     return {
       data: result,

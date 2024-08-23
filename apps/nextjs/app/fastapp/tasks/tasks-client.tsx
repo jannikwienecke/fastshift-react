@@ -31,7 +31,7 @@ export const TasksClient = ({
   // @ts-expect-error INVALID FIELD
   const INVALID = data?.[0]?.NOT_VALID_FIELD;
 
-  console.log(data?.[0].tags?.[0].tag.name);
+  // console.log(data?.[0].tags?.[0].tag.name);
   const getFormProps = useForm();
 
   const dispatch = useStoreDispatch();
@@ -54,3 +54,17 @@ export const TasksClient = ({
     </div>
   );
 };
+
+// export const TasksClient = ({
+//   viewConfig,
+// }: {
+//   viewConfig: ViewConfigType<'task'>;
+// }) => {
+//   return (
+//     <ViewProvider
+//       view={{ viewConfigManager: new BaseViewConfigManager(viewConfig) }}
+//     >
+//       <TasksClient_ viewConfig={viewConfig} />
+//     </ViewProvider>
+//   );
+// };

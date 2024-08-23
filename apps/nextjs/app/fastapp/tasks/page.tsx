@@ -28,20 +28,6 @@ const configWithCustomLoader = configurePrismaLoader(
   },
 });
 
-// type ReturnTypeOf = Awaited<
-//   ReturnType<
-//     typeof prisma.task.findFirstOrThrow<{
-//       include: {
-//         project: true;
-//         tags: {
-//           include: { tag: true };
-//         };
-//       };
-//     }>
-//   >
-// >;
-
-// const Tasks = Prisma.dmmf.datamodel.models.find((m) => m.name === 'Task');
 export default function FastAppTasksPage() {
   return (
     <QueryPrefetchProvider
@@ -52,39 +38,3 @@ export default function FastAppTasksPage() {
     </QueryPrefetchProvider>
   );
 }
-
-// const getWhereType = <
-//   PrismaClient extends Record<string, any>,
-//   TableName extends GetPrismaTableName<PrismaClient>
-// >(
-//   prisma: PrismaClient,
-//   tableName: TableName,
-//   where: GetFindManyWhere<PrismaClient, TableName>
-// ): GetFindManyWhere<PrismaClient, TableName> => {
-//   return prisma[tableName].findMany;
-// };
-
-// type x = GetFindManyWhere<PrismaClient, T>;
-// const X: x = {'dsa': 1}
-
-const test = async () => {
-  const include = {
-    project: true,
-  };
-
-  const x = await prisma.task.findMany<{
-    include: { project: boolean };
-    take: number;
-  }>({
-    take: 10,
-    include,
-  });
-
-  type ReturnTypeOf = Awaited<
-    ReturnType<
-      typeof prisma.task.findFirstOrThrow<{
-        include: typeof include;
-      }>
-    >
-  >;
-};
