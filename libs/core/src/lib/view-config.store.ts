@@ -10,3 +10,11 @@ export const setViewConfigAtom = atom(
     set(viewConfigManagerAtom, update);
   }
 );
+
+export const getViewConfigAtom = atom((get) => {
+  const viewConfigManager = get(viewConfigManagerAtom);
+  if (!viewConfigManager) {
+    throw new Error('View config manager not found');
+  }
+  return viewConfigManager;
+});

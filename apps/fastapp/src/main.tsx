@@ -1,18 +1,18 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { createRouter, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import * as ReactDOM from 'react-dom/client';
 
 import { api, schema } from '@apps-next/convex';
-import { routeTree } from './routeTree.gen';
 import {
   ConvexQueryProvider,
   createConfigFromConvexSchema,
 } from '@apps-next/convex-adapter-app';
+import { routeTree } from './routeTree.gen';
 
-import '@picocss/pico/css/pico.classless.min.css';
 import { llinfo } from '@apps-next/core';
-
+import '@picocss/pico/css/pico.classless.min.css';
+// import {api} from '@apps-next/convex'
 const router = createRouter({
   routeTree,
   defaultPreload: 'intent',

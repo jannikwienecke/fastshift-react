@@ -30,7 +30,7 @@ export const useRelationalQuery = ({
       query: query,
 
       registeredViews: registeredViews,
-      modelConfig: viewConfigManager.modelConfig,
+      modelConfig: viewConfigManager?.modelConfig,
       relationQuery: {
         tableName: tableName,
       },

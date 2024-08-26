@@ -2,6 +2,7 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   QUERY_KEY_PREFIX,
+  QueryReturnDto,
   REGISTRED_VIEWS,
 } from '@apps-next/core';
 import {
@@ -58,6 +59,15 @@ export async function QueryPrefetchProvider({
       registeredViews={registeredViews}
       viewConfig={viewConfigManager.viewConfig}
       includeConfig={{}}
+      data={
+        (
+          queryClient.getQueryData([
+            QUERY_KEY_PREFIX,
+            viewName,
+            '',
+          ]) as QueryReturnDto
+        )?.data
+      }
     >
       <HydrationBoundary state={dehydrate(queryClient)}>
         {children}

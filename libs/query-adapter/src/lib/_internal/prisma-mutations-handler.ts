@@ -1,32 +1,38 @@
 import { MutationPropsServer } from '@apps-next/core';
 import { DbMutation } from '../prisma.types';
-import { MUTATION_HANDLER_PRISMA } from './prisma-mutation.types';
+import {
+  createSuccessResponse,
+  isCreateRecord,
+  isDeleteRecord,
+  isUpdateRecord,
+  throwInvalidMutationTypeError,
+} from './prisma-mutations-helper';
 
-// TODO CLEAN UP
 export const createMutation = async (
   dbMutation: DbMutation,
-  { mutation, viewConfigManager }: MutationPropsServer
+  { mutation }: MutationPropsServer
 ) => {
-  if (mutation.type !== 'CREATE_RECORD') throw new Error('Not supported yet');
+  if (!isCreateRecord(mutation)) throwInvalidMutationTypeError(mutation);
 
-  const { record } = mutation;
+  const { record } = mutation.payload;
 
-  await dbMutation.create({
+  const result = await dbMutation.create({
     data: record,
   });
 
-  return {
-    success: true,
-  };
+  return createSuccessResponse(
+    `Record ${result?.id} created successfully`,
+    'CREATED'
+  );
 };
 
 export const deleteMutation = async (
   dbMutation: DbMutation,
   { mutation }: MutationPropsServer
 ) => {
-  if (mutation.type !== 'DELETE_RECORD') throw new Error('Not supported yet');
+  if (!isDeleteRecord(mutation)) throwInvalidMutationTypeError(mutation);
 
-  const { id } = mutation;
+  const { id } = mutation.payload;
 
   await dbMutation.delete({
     where: {
@@ -34,21 +40,17 @@ export const deleteMutation = async (
     },
   });
 
-  return {
-    success: true,
-  };
+  return createSuccessResponse(`Record ${id} deleted successfully`, 'DELETED');
 };
 
 export const updateMutation = async (
   dbMutation: DbMutation,
   { mutation, viewConfigManager }: MutationPropsServer
 ) => {
-  if (mutation.type !== 'UPDATE_RECORD') throw new Error('Not supported yet');
+  if (!isUpdateRecord(mutation)) throwInvalidMutationTypeError(mutation);
 
-  const { id } = mutation;
-  const { id: _, ...data } = mutation.record;
-
-  console.warn('updateMutation', { id, data });
+  const { id } = mutation.payload;
+  const { id: _, ...data } = mutation.payload.record;
 
   await dbMutation.update({
     where: {
@@ -57,13 +59,5 @@ export const updateMutation = async (
     data: data,
   });
 
-  return {
-    success: true,
-  };
-};
-
-export const mutationHandlers: MUTATION_HANDLER_PRISMA = {
-  CREATE_RECORD: createMutation,
-  DELETE_RECORD: deleteMutation,
-  UPDATE_RECORD: updateMutation,
+  return createSuccessResponse(`Record ${id} updated successfully`, 'UPDATED');
 };

@@ -54,10 +54,12 @@ export const useConvexQuery = <QueryReturnType extends RecordType[]>({
   const records = parseConvexData(data?.data) as QueryReturnType;
 
   return {
+    ...data,
     isLoading: data.isLoading,
     isError: data.isError,
     data: records,
-    error: data.error,
+    // TODO: FIX THIS typing
+    error: data.error as any,
     isFetching: data.isFetching,
     isFetched: data.isFetched,
     refetch: data.refetch,

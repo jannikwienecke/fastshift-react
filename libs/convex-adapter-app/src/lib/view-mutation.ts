@@ -24,5 +24,10 @@ export const viewMutationHandler = async (
     viewConfigManager,
   });
 
-  return { succes: true };
+  return {
+    success: {
+      message: '200',
+      status: 200 as const,
+    },
+  };
 };

@@ -35,10 +35,10 @@ export const useMutation = () => {
         });
       } catch (error) {
         console.error('Error in runMutateAsync: ', error);
-        return { error: (error as any)?.message, succes: false };
+        return { error: (error as any)?.message };
       }
     },
-    [mutateAsync, viewConfigManager.viewConfig]
+    [mutateAsync, viewConfigManager]
   );
 
   const runMutate = React.useCallback(
@@ -49,7 +49,7 @@ export const useMutation = () => {
         mutation: args.mutation,
       });
     },
-    [mutate, viewConfigManager.viewConfig]
+    [mutate, viewConfigManager]
   );
 
   return {

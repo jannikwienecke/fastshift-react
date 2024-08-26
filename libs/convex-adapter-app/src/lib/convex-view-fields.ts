@@ -1,4 +1,4 @@
-import { FieldConfig } from '@apps-next/core';
+import { FieldConfig, TableRelationType } from '@apps-next/core';
 import { ConvexSchemaType } from './_internal/types.convex';
 import { MappingConvexToFieldType } from './convex-constants';
 
@@ -17,6 +17,8 @@ export const generateViewFieldsFromConvexSchema = (
               ? {
                   fieldName: fieldName,
                   tableName: (fieldData as any).tableName,
+                  // TODO: FIX THIS
+                  type: 'oneToMany' as const,
                 }
               : undefined;
 

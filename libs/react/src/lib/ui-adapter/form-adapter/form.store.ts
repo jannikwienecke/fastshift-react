@@ -159,8 +159,11 @@ export const formAtom = atom(
         if (editState.record) {
           res = await update.onSubmit({
             type: 'UPDATE_RECORD',
-            record: record,
-            id: editState.record.id,
+            payload: {
+              record: record,
+              id: editState.record.id,
+            },
+
             handler: (items) => {
               return items.map((item) => {
                 if (item.id === editState.record?.id) {
@@ -173,14 +176,17 @@ export const formAtom = atom(
         } else {
           res = await update.onSubmit({
             type: 'CREATE_RECORD',
-            record: record,
+            payload: {
+              id: record.id,
+              record: record,
+            },
             handler: (items) => {
               return [...items, record];
             },
           });
         }
 
-        if (res.succes) {
+        if (res.success?.message) {
           set(initialFormAtom, {
             ...formState,
             ready: true,

@@ -30,11 +30,9 @@ Add a small doc section to each new progress step
 - [x] Add convex as a package
 - [x] Add Prisma to nextjs app
 - [x] use turso as a database in production and sqlite in dev
-- [ ] embed convex adapter in the vite app
-
-  - [ ] add query string for query
-  - [ ] Clean up !
-
+- [x] embed convex adapter in the vite app
+  - [x] add query string for query
+  - [x] Clean up !
     - [x] Create internal and external for libraries
     - [x] Add tags !
     - [x] Check graph
@@ -48,17 +46,15 @@ Add a small doc section to each new progress step
     - [x] create a delete|create|update mutation for prisma
     - [x] add test data / schema and seed for nextjs app
     - [x] create a delete|create|update mutation for convex
-    - [ ] add relational fields
-    - [ ] Required relational fields
-    - [ ] test how a reusable component would look like (use list as example)
+    - [x] add relational fields
+    - [x] Extract the "components" into new package (ui)
+    - [ ] End of day goal: Have a working list component (reusable, extensible, configurable, with relations)
+    - [ ] Display relation fields in the list -> task: show the project
+    - [ ] test how a reusable component would look like (use list as example) - see Linear for insparation
+    - [ ] Required relational field?
+    - [ ] Allow to create a pattern to create custom ids PROJECT-12
     - [ ] test how a reusable component would look like (use query as example)
       - list item can delete, can open a record, can update and can be customized
     - [ ] remove any's
-    - [ ] get, post, search should work for both apps generically
-    - [ ] Extract the "components" into new package (ui)
     - [ ] Write tests - use for both apps
     - [ ] Wishful thinking - Desired Api Design
-    - [ ] Write most naive implementation to pass the tests in nextjs app
-    - [ ] Write abstraction
-
-  - [ ] write parser -> convex to zod schema

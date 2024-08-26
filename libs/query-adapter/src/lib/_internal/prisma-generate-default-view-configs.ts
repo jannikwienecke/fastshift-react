@@ -1,4 +1,8 @@
-import { BaseConfigInterface, createServerViewConfig } from '@apps-next/core';
+import {
+  BaseConfigInterface,
+  createServerViewConfig,
+  GetTableName,
+} from '@apps-next/core';
 import { Prisma, PrismaField } from '../prisma.types';
 import {
   getPrefferedDisplayField,
@@ -42,7 +46,7 @@ export const generateDefaultViewConfigs = ({
     const displayField = getPrefferedDisplayField(options.map((f) => f.name));
 
     createServerViewConfig(
-      tableName,
+      tableName as GetTableName,
       {
         query: {},
         viewName: tableName as string,

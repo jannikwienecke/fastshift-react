@@ -25,12 +25,15 @@ export type QueryReturnDto<T extends RecordType = RecordType> = {
   error?: any;
 };
 
+export type QueryError = {
+  message: string;
+};
+
 export type QueryReturnType<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   isLoading: boolean;
   isError: boolean;
-  // TODO CLEAN UP
-  error: any;
+  error: QueryError | undefined;
   isFetching: boolean;
   isFetched: boolean;
   refetch: () => void;

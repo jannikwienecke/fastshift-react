@@ -11,7 +11,7 @@ export default defineConfig({
 
   plugins: [
     react(),
-    nxViteTsPaths(),
+    nxViteTsPaths(), // Removed unsupported tsConfigPath option
     dts({
       entryRoot: 'src',
       tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),

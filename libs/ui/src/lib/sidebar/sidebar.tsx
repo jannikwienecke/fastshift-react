@@ -3,7 +3,7 @@ import { IconMenu2, IconX } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { createContext, useContext, useState } from 'react';
-import { cn } from '../list/utils';
+import { cn } from '../utils';
 
 interface Links {
   label: string;

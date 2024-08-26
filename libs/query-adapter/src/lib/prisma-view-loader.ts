@@ -4,16 +4,27 @@ import {
   BaseViewConfigManager,
   DEFAULT_FETCH_LIMIT_QUERY,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
+  ERROR_STATUS,
+  lldebug,
+  llerror,
+  MutationContext,
+  MutationPropsServer,
   QueryDto,
   QueryReturnDto,
+  relationalViewHelper,
   waitFor,
 } from '@apps-next/core';
-import { PrismaClient, PrismaFindManyArgs, PrismaRecord } from './prisma.types';
+import {
+  DbMutation,
+  PrismaClient,
+  PrismaFindManyArgs,
+  PrismaRecord,
+} from './prisma.types';
 
 import { MutationProps, MutationReturnDto } from '@apps-next/core';
-import { relationalViewHelper } from 'libs/core/src/lib/relational-view.helper';
 import { client } from './_internal/prisma-get-client';
-import { mutationHandlers } from './_internal/prisma-mutations-handler';
+import { MUTATION_HANDLER_PRISMA } from './_internal/prisma-mutation.types';
+import { mutationHandlers } from './_internal/prisma-mutations-helper';
 import { queryHelper } from './_internal/prisma-query.helper';
 import { relationalQueryHelper } from './_internal/prisma-relational-query.helper';
 
@@ -21,7 +32,12 @@ export const prismaViewLoader = async (
   prismaClient: unknown,
   args: QueryDto
 ): Promise<QueryReturnDto> => {
-  console.debug('prismaViewLoader');
+  lldebug('prismaViewLoader: ', {
+    table: args.viewConfig?.tableName,
+    view: args.viewConfig?.viewName,
+    query: args.query,
+    relationQuery: args.relationQuery,
+  });
 
   if (args.viewConfig === undefined) {
     throw new Error('viewLoaderHandler: viewConfig is required');
@@ -93,7 +109,7 @@ export const prismaViewLoader = async (
       });
     }
 
-    await waitFor(250);
+    await waitFor(100);
 
     return {
       data: result,
@@ -105,11 +121,7 @@ export const prismaViewMutation = async (
   prismaClient: unknown,
   args: MutationProps
 ): Promise<MutationReturnDto> => {
-  console.debug('prismaViewMutation');
-
-  if (args.viewConfig === undefined) {
-    throw new Error('viewLoaderHandler: viewConfig is required');
-  }
+  lldebug('prismaViewMutation: ', args.mutation.type);
 
   const { mutation } = args;
 
@@ -119,14 +131,42 @@ export const prismaViewMutation = async (
 
   const handler = mutationHandlers[mutation.type];
 
-  await handler(dbMutation, {
+  return runMutation(handler, dbMutation, {
     mutation,
     viewConfigManager,
   });
+};
 
-  await waitFor(1000);
-
-  return {
-    succes: true,
+const runMutation = async (
+  handler: MUTATION_HANDLER_PRISMA[MutationProps['mutation']['type']],
+  dbMutation: DbMutation,
+  mutation: MutationPropsServer
+): Promise<MutationReturnDto> => {
+  const mutationContext: MutationContext = {
+    table: mutation.viewConfigManager.getTableName(),
+    view: mutation.viewConfigManager.getViewName(),
+    displayField: mutation.viewConfigManager.getDisplayFieldLabel(),
+    payload: mutation.mutation.payload,
+    type: mutation.mutation.type,
   };
+
+  try {
+    lldebug('Run Mutation: ', mutationContext);
+
+    await waitFor(150);
+    return await handler(dbMutation, mutation);
+  } catch (error) {
+    llerror(
+      `Error running mutation: ${mutation.mutation.type}. Check Context: ${mutationContext}`
+    );
+
+    return {
+      error: {
+        message: `Error running mutation: ${mutation.mutation.type}`,
+        error: String(error),
+        status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+        context: mutationContext,
+      },
+    };
+  }
 };

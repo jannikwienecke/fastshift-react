@@ -9,8 +9,9 @@ import {
 
 import React from 'react';
 import { useForm, useList } from './ui-adapter';
-import { ViewDataProvider } from './view-provider';
 import { useQuery } from './use-query';
+import { useQueryData } from './use-query-data';
+import { ViewDataProvider } from './view-provider';
 
 export function createView<
   T extends keyof RegisteredRouter['config']['_datamodel']
@@ -49,6 +50,7 @@ export const makeHooks = <
     useList: useList<DataType>,
     useForm: useForm<DataType>,
     useQuery: useQuery<DataType[]>,
+    useQueryData: useQueryData<DataType[]>,
   };
 };
 

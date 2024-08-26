@@ -8,7 +8,6 @@ import {
 } from './types';
 import { registerViewHandler } from './register-view-handler';
 
-// TODO WRITE CLASS THAT MANAGES THIS DATA STRUCTURE
 export const REGISTRED_VIEWS: RegisteredViews = {};
 
 export function createViewConfig<T extends GetTableName>(

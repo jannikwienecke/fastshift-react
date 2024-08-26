@@ -5,8 +5,9 @@ import {
   prismaViewMutation,
 } from '@apps-next/query-adapter';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import Link from 'next/link';
 import './global.css';
+
+import { GeistSans } from 'geist/font/sans';
 
 // import '@picocss/pico/css/pico.classless.min.css';
 import React from 'react';
@@ -45,7 +46,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       {/* <React.StrictMode> */}
-      <body>
+
+      <body className={GeistSans.className}>
         <PrismaQueryProvider
           config={globalConfig.config}
           api={{
@@ -59,15 +61,7 @@ export default function RootLayout({
             },
           }}
         >
-          <div className="p-2">
-            <div className="flex gap-2 text-lg border-b">
-              <Link href={'/'}>Home</Link>
-            </div>
-
-            <hr />
-
-            {children}
-          </div>
+          {children}
 
           <ReactQueryDevtools initialIsOpen={false} />
         </PrismaQueryProvider>

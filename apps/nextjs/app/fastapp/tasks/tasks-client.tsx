@@ -1,22 +1,58 @@
 'use client';
 
 import {
+  clientViewConfigAtom,
+  setClientViewConfig,
   useStoreDispatch,
   useStoreValue,
   ViewConfigType,
 } from '@apps-next/core';
 import { makeHooks, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
-import { Tag } from '@prisma/client';
+import { Project, Tag } from '@prisma/client';
+import { useAtomValue } from 'jotai';
+
+setClientViewConfig('task', {
+  fields: {
+    completed: {
+      component: ({ data }) => (
+        <div>{data.getItemValue('completed') ? '✅' : '❌'}</div>
+      ),
+    },
+
+    priority: {
+      component: (props) => {
+        const PRIORITY_COLORS = {
+          low: '🟢',
+          medium: '🟡',
+          high: '🔴',
+        };
+
+        const priority = props.data.getItemValue('priority');
+
+        return <div>{PRIORITY_COLORS[priority]}</div>;
+      },
+    },
+
+    // TODO: Clean up types here
+    // @ts-expect-error INVALID FIELD
+    tags: {
+      component: ({ data }: any) => {
+        return <div>Tags...</div>;
+      },
+    },
+  },
+});
 
 export const TasksClient = ({
   viewConfig,
 }: {
   viewConfig: ViewConfigType<'task'>;
 }) => {
-  const { useList, useQuery, useForm } = makeHooks<
+  const { useList, useQuery, useForm, useQueryData } = makeHooks<
     'task',
     {
+      project: Project;
       tags: {
         tag: Tag;
       }[];
@@ -36,35 +72,27 @@ export const TasksClient = ({
 
   const dispatch = useStoreDispatch();
 
+  const queryData = useQueryData();
+
   return (
-    <div className="p-4 flex flex-col gap-2 w-full">
-      <button onClick={() => dispatch({ type: 'ADD_NEW_RECORD' })}>
-        Add New
-      </button>
+    <div className="p-4 flex flex-col gap-2 w-full overflow-scroll h-screen">
+      <div className="py-1 border-b border-gray-200">
+        <button onClick={() => dispatch({ type: 'ADD_NEW_RECORD' })}>
+          Add New
+        </button>
 
-      <div>
-        <QueryInput />
-      </div>
-
-      <div>
+        <div>
+          <QueryInput />
+        </div>
         {edit.isEditing ? <Form {...getFormProps()} /> : null}
-
-        <List {...getListProps({ descriptionKey: 'priority' })} />
       </div>
+
+      <List.Default
+        {...getListProps({
+          fieldsLeft: ['name', 'priority'],
+          fieldsRight: ['project', 'tags'],
+        })}
+      />
     </div>
   );
 };
-
-// export const TasksClient = ({
-//   viewConfig,
-// }: {
-//   viewConfig: ViewConfigType<'task'>;
-// }) => {
-//   return (
-//     <ViewProvider
-//       view={{ viewConfigManager: new BaseViewConfigManager(viewConfig) }}
-//     >
-//       <TasksClient_ viewConfig={viewConfig} />
-//     </ViewProvider>
-//   );
-// };

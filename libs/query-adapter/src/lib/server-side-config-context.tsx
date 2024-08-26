@@ -3,11 +3,29 @@
 import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  clientConfigStore,
+  GlobalConfig,
   IncludeConfig,
+  Model,
+  QueryReturnDto,
+  QueryStore,
+  queryStoreAtom,
+  RecordType,
   RegisteredViews,
+  registeredViewsAtom,
+  setGlobalConfigAtom,
+  viewConfigManagerAtom,
   ViewContextType,
 } from '@apps-next/core';
+import { Provider } from 'jotai';
+import { useHydrateAtoms } from 'jotai/utils';
+
 import React from 'react';
+
+const HydrateAtoms = ({ initialValues, children }: any) => {
+  useHydrateAtoms(initialValues, { dangerouslyForceHydrate: true });
+  return children;
+};
 
 export const ServerSideConfigContext = React.createContext<ViewContextType>(
   {} as ViewContextType
@@ -21,17 +39,50 @@ export const ServerSideConfigProvider = (
     viewConfig: BaseViewConfigManagerInterface['viewConfig'];
     registeredViews: RegisteredViews;
     includeConfig: IncludeConfig;
+    data: QueryReturnDto['data'];
   } & { children: React.ReactNode }
 ) => {
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
+
+  const model = Model.create(
+    props.data ?? [],
+    viewConfigManager,
+    props.registeredViews
+  );
+
+  const queryStore: QueryStore<RecordType> = {
+    dataRaw: props.data || [],
+    dataModel: model,
+    loading: false,
+    error: null,
+    page: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+    isInitialized: true,
+  };
+
+  const initialValues = [
+    [viewConfigManagerAtom, viewConfigManager],
+    [registeredViewsAtom, props.registeredViews],
+    [setGlobalConfigAtom, {} as GlobalConfig],
+    [queryStoreAtom, queryStore],
+  ];
+
   return (
-    <ServerSideConfigContext.Provider
-      value={{
-        viewConfigManager,
-        registeredViews: props.registeredViews,
-      }}
-    >
-      {props.children}
-    </ServerSideConfigContext.Provider>
+    <Provider store={clientConfigStore}>
+      <HydrateAtoms
+        key={viewConfigManager.getViewName()}
+        initialValues={initialValues}
+      >
+        <ServerSideConfigContext.Provider
+          value={{
+            viewConfigManager,
+            registeredViews: props.registeredViews,
+          }}
+        >
+          {props.children}
+        </ServerSideConfigContext.Provider>
+      </HydrateAtoms>
+    </Provider>
   );
 };
