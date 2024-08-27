@@ -1,18 +1,17 @@
-import { IconDots } from '@tabler/icons-react';
 import React from 'react';
+import { Checkbox } from '../components/checkbox';
+import { cn } from '../utils';
+
+export type ListValueProps = {
+  id: string | number;
+  name: string;
+  render: () => React.ReactNode;
+};
 
 export type ListItem = {
   id: string | number;
-  valuesLeft: {
-    id: string | number;
-    name: string;
-    render: () => React.ReactNode;
-  }[];
-  valuesRight: {
-    id: string | number;
-    name: string;
-    render: () => React.ReactNode;
-  }[];
+  valuesLeft: ListValueProps[];
+  valuesRight: ListValueProps[];
 };
 
 export type ListProps<TItem extends ListItem = ListItem> = {
@@ -27,19 +26,23 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     <List>
       {items.map((item) => {
         return (
-          <List.Item key={item.id}>
+          <List.Item key={item.id} className="">
             <List.Control />
 
             <List.Values>
               <div className="flex flex-row gap-2 items-center">
                 {item.valuesLeft.map((value) => (
-                  <List.Value key={value.id}>{value.render()}</List.Value>
+                  <List.Value key={value.id}>
+                    {value.render ? value.render() : value.name}
+                  </List.Value>
                 ))}
               </div>
 
               <div className="flex flex-row gap-2 items-center">
                 {item.valuesRight.map((value) => (
-                  <List.Value key={value.id}>{value.render()}</List.Value>
+                  <List.Value key={value.id}>
+                    {value.render ? value.render() : value.name}
+                  </List.Value>
                 ))}
               </div>
             </List.Values>
@@ -52,21 +55,32 @@ export function ListDefault<TItem extends ListItem = ListItem>({
 
 export function List({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col w-full border-collapse overflow-scroll grow ">
+    <div className="flex flex-col w-full border-collapse overflow-scroll ">
       {children}
     </div>
   );
 }
 
 export function ListControl() {
+  // CONTINUE HERE:
+  // add icons to views/tables and show in the list
+  // handle check state of all items in list store
+  // handle when clicking on a relational field like user etc...
+  // handle actions like delete, edit, etc...
+  const [selected, setSelected] = React.useState(false);
   return (
-    <div className="flex flex-row gap-1 items-center group">
-      <div>
-        <input className="invisible group-hover:visible" type="checkbox" />
-      </div>
-      <div>
-        <IconDots className="h-4 w-4 text-gray-500" />
-      </div>
+    <div
+      className={cn(
+        'invisible group-hover:visible transition-all grid place-items-center',
+        selected ? 'visible' : 'invisible'
+      )}
+    >
+      <Checkbox
+        checked={selected}
+        onCheckedChange={(checked: boolean) => {
+          setSelected(checked);
+        }}
+      />
     </div>
   );
 }
@@ -74,10 +88,13 @@ export function ListControl() {
 function Item(
   props: React.ComponentPropsWithoutRef<'li'> & { children: React.ReactNode }
 ) {
-  const { children, ...restProps } = props;
+  const { children, className, ...restProps } = props;
   return (
     <li
-      className="flex flex-row py-3 px-4 w-full gap-3 grow border-b border-collapse border-gray-200 hover:bg-slate-50"
+      className={cn(
+        'flex flex-row py-3 px-4 w-full gap-3 grow border-b border-collapse border-gray-200 hover:bg-slate-50',
+        className
+      )}
       {...restProps}
     >
       {children}
@@ -85,25 +102,32 @@ function Item(
   );
 }
 
-function ValuesWrapper(
-  props: React.ComponentPropsWithoutRef<'div'> & { children: React.ReactNode }
-) {
+function ValuesWrapper({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'> & { children: React.ReactNode }) {
   return (
     <div
-      className="flex flex-row items-center gap-2 grow justify-between"
+      className={cn(
+        'flex flex-row items-center gap-2 grow justify-between',
+        className
+      )}
       {...props}
     >
-      {props.children}
+      {children}
     </div>
   );
 }
 
-function Value(
-  props: React.ComponentPropsWithoutRef<'div'> & { children: React.ReactNode }
-) {
+function Value({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'> & { children: React.ReactNode }) {
   return (
-    <div className="text-sm" {...props}>
-      {props.children}
+    <div className={cn('text-sm', className)} {...props}>
+      {children}
     </div>
   );
 }

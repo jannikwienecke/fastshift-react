@@ -1,5 +1,7 @@
 import {
   clientConfigAtom,
+  DataRow,
+  getViewConfigAtom,
   RecordType,
   useStoreDispatch,
 } from '@apps-next/core';
@@ -19,51 +21,53 @@ export const useList = <T extends RecordType>() => {
   const { dataModel } = useQueryData<T[]>();
   const { mutate } = useMutation();
 
+  // TODO: FIX NAMING -> OR MERGE THEM clientConfigAtom and getViewConfigAtom
   const config = useAtomValue(clientConfigAtom);
+  const viewConfig = useAtomValue(getViewConfigAtom);
 
   return <Props extends ListGetProps<T>>(
     options?: Props
   ): ListProps<T & ListItem> => {
+    const { list } = viewConfig.viewConfig.ui || {};
+    const fieldsLeft = options?.fieldsLeft ?? list?.fieldsLeft ?? [];
+    const fieldsRight = options?.fieldsRight ?? list?.fieldsRight ?? [];
+    const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
+
+    const renderFields = (item: DataRow<T>, fields: (keyof T)[]) => {
+      return (
+        fields?.map((field) => ({
+          id: item.getItemName(field),
+          name: item.getItemLabel(field),
+          render: () => {
+            const fieldConfig = config?.fields[field];
+            if (!fieldConfig) return item.getItemLabel(field);
+            return <fieldConfig.component data={item} />;
+          },
+        })) ?? []
+      );
+    };
+
+    const renderLabel = (item: DataRow<T>) => {
+      return [
+        {
+          id: item.id,
+          name: item.label,
+          render: () => <span>{item.label}</span>,
+        },
+      ];
+    };
+
     return {
       onEdit: (item) => dispatch({ type: 'EDIT_RECORD', record: item }),
 
-      // onDelete: (item) => {
-      //   mutate({
-      //     mutation: {
-      //       type: 'DELETE_RECORD',
-      //       payload: {
-      //         id: item.id,
-      //       },
-      //       handler: (items) => items.filter((i) => i.id !== item.id),
-      //     },
-      //   });
-      // },
       items:
         dataModel.getRows()?.map((item) => ({
           ...item.getRow(),
           id: item.id,
-          valuesLeft: [
-            ...(options?.fieldsLeft?.map((field) => ({
-              id: item.getItemName(field),
-              name: item.getItemLabel(field),
-              render: () => {
-                const fieldConfig = config.fields[field];
-                if (!fieldConfig) return item.getItemLabel(field);
-                return <fieldConfig.component data={item} />;
-              },
-            })) ?? []),
-          ] satisfies ListProps['items'][0]['valuesLeft'],
-          valuesRight: [
-            ...(options?.fieldsRight?.map((field) => ({
-              id: item.getItemName(field),
-              name: item.getItemLabel(field),
-              render: () => {
-                const fieldConfig = config.fields[field];
-                if (!fieldConfig) return item.getItemLabel(field);
-                return <fieldConfig.component data={item} />;
-              },
-            })) ?? []),
-          ] satisfies ListProps['items'][0]['valuesRight'],
+          valuesLeft: _renderLabel
+            ? renderLabel(item)
+            : renderFields(item, fieldsLeft),
+          valuesRight: renderFields(item, fieldsRight),
         })) ?? [],
     };
   };

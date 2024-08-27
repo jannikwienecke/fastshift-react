@@ -6,7 +6,7 @@ import {
   useStoreValue,
   ViewConfigType,
 } from '@apps-next/core';
-import { makeHooks } from '@apps-next/react';
+import { DataType, makeHooks } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 import { Owner } from '@prisma/client';
 import { AvatarIcon } from '@radix-ui/react-icons';
@@ -18,10 +18,10 @@ import { IconAdjustmentsHorizontal, IconListSearch } from '@tabler/icons-react';
 // use default list -> render yourself and adjust sorting
 // use default list -> pass props to list
 
-setClientViewConfig('project', {
+type ProjectViewDataType = DataType<'project', { owner: Owner }>;
+
+setClientViewConfig<ProjectViewDataType>('project', {
   fields: {
-    // TODO: Clean up types here
-    // @ts-expect-error INVALID FIELD
     owner: {
       component: ({ data }: any) => {
         const owner = data;
@@ -40,12 +40,7 @@ export const ProjectsClient = ({
 }: {
   viewConfig: ViewConfigType<'project'>;
 }) => {
-  const { useList, useQuery, useForm } = makeHooks<
-    'project',
-    {
-      owner: Owner;
-    }
-  >(viewConfig);
+  const { useList, useQuery, useForm } = makeHooks<ProjectViewDataType>();
 
   const getListProps = useList();
   const { edit } = useStoreValue();

@@ -1,45 +1,42 @@
 'use client';
 
 import {
-  clientViewConfigAtom,
   setClientViewConfig,
   useStoreDispatch,
   useStoreValue,
   ViewConfigType,
 } from '@apps-next/core';
-import { makeHooks, QueryInput } from '@apps-next/react';
+import { DataType, makeHooks, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 import { Project, Tag } from '@prisma/client';
-import { useAtomValue } from 'jotai';
+import {
+  CompletedComponent,
+  PriorityComponent,
+  TagsComponent,
+} from './components';
 
-setClientViewConfig('task', {
+type TaskViewDataType = DataType<
+  'task',
+  {
+    project: Project;
+    tags: {
+      tag: Tag;
+    }[];
+  }
+>;
+
+setClientViewConfig<TaskViewDataType>('task', {
   fields: {
     completed: {
-      component: ({ data }) => (
-        <div>{data.getItemValue('completed') ? '✅' : '❌'}</div>
-      ),
+      component: CompletedComponent,
     },
 
     priority: {
-      component: (props) => {
-        const PRIORITY_COLORS = {
-          low: '🟢',
-          medium: '🟡',
-          high: '🔴',
-        };
-
-        const priority = props.data.getItemValue('priority');
-
-        return <div>{PRIORITY_COLORS[priority]}</div>;
-      },
+      component: PriorityComponent,
     },
 
-    // TODO: Clean up types here
-    // @ts-expect-error INVALID FIELD
     tags: {
-      component: ({ data }: any) => {
-        return <div>Tags...</div>;
-      },
+      component: TagsComponent,
     },
   },
 });
@@ -49,15 +46,8 @@ export const TasksClient = ({
 }: {
   viewConfig: ViewConfigType<'task'>;
 }) => {
-  const { useList, useQuery, useForm, useQueryData } = makeHooks<
-    'task',
-    {
-      project: Project;
-      tags: {
-        tag: Tag;
-      }[];
-    }
-  >(viewConfig);
+  const { useList, useQuery, useForm, useQueryData } =
+    makeHooks<TaskViewDataType>();
 
   const getListProps = useList();
   const { edit } = useStoreValue();

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
 import { BaseConfigInterface } from './config.types';
+import { DataRow } from '../query-store';
 
 const documentBaseSchema = z.object({
   id: z.string(),
@@ -52,6 +53,8 @@ export type GetTableName = RegisteredRouter['config']['tableNames'][number];
 
 export type GetTableDataType<T extends GetTableName> =
   RegisteredRouter['config']['_datamodel'][T];
+
+export type GetRowType<T extends GetTableName> = DataRow<GetTableDataType<T>>;
 
 export type GetFieldName<TDataModel extends Record<string, any> = any> =
   keyof TDataModel['tables'][GetTableName]['validator']['fields'];

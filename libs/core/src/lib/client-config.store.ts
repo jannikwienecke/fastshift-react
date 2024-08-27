@@ -3,12 +3,15 @@ import { DataRow } from './query-store';
 import { GetTableName, GetTableDataType, RegisteredRouter } from './types';
 import { viewConfigManagerAtom } from './view-config.store';
 
-type ClientViewConfig<T extends GetTableName> = {
+type ClientViewConfig<
+  T extends GetTableName,
+  U extends GetTableDataType<any>
+> = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   [key in T]: {
     fields: Partial<{
-      [key in keyof GetTableDataType<T>]: {
+      [key in keyof U]: {
         component: (props: {
           data: DataRow<GetTableDataType<T>>;
         }) => React.ReactNode;
@@ -17,15 +20,17 @@ type ClientViewConfig<T extends GetTableName> = {
   };
 };
 
-export const clientViewConfigAtom = atom({} as ClientViewConfig<any>);
+export const clientViewConfigAtom = atom({} as ClientViewConfig<any, any>);
 
 export const clientConfigStore = createStore();
 
-export const setClientViewConfig = <
-  T extends keyof RegisteredRouter['config']['_datamodel']
->(
-  table: T,
-  data: ClientViewConfig<T>[T]
+// TODO: Clean up -> refacotr this function -> Naming etc.
+export const setClientViewConfig = <T extends GetTableDataType<any>>(
+  table: keyof RegisteredRouter['config']['_datamodel'],
+  data: ClientViewConfig<
+    keyof RegisteredRouter['config']['_datamodel'],
+    T
+  >[keyof RegisteredRouter['config']['_datamodel']]
 ) => {
   clientConfigStore.set(clientViewConfigAtom, (prev) => ({
     ...prev,

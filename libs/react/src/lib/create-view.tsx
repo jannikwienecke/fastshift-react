@@ -2,6 +2,7 @@ import {
   BaseViewConfigManager,
   createViewConfig,
   GetTableDataType,
+  GetTableName,
   QueryReturnOrUndefined,
   RegisteredRouter,
   ViewConfigType,
@@ -36,21 +37,32 @@ export function createView<
   );
 }
 
-export const makeHooks = <
-  T extends keyof RegisteredRouter['config']['_datamodel'],
+// export type DataType<
+//   TConfig extends ViewConfigType,
+//   TCustomDataType extends Record<string, any> | undefined = undefined
+// > = TCustomDataType extends undefined
+//   ? GetTableDataType<TConfig['tableName']>
+//   : TCustomDataType & GetTableDataType<TConfig['tableName']>;
+
+export type DataType<
+  T extends GetTableName,
   TCustomDataType extends Record<string, any> | undefined = undefined
->(
-  config: ViewConfigType<T>
+> = TCustomDataType extends undefined
+  ? GetTableDataType<T>
+  : TCustomDataType & GetTableDataType<T>;
+
+export const makeHooks = <T extends DataType<any, any> | ViewConfigType>(
+  viewConfig?: T
 ) => {
-  type DataType = TCustomDataType extends undefined
-    ? GetTableDataType<T>
-    : TCustomDataType & GetTableDataType<T>;
+  type DataTypeToUse = T extends ViewConfigType
+    ? GetTableDataType<T['tableName']>
+    : T;
 
   return {
-    useList: useList<DataType>,
-    useForm: useForm<DataType>,
-    useQuery: useQuery<DataType[]>,
-    useQueryData: useQueryData<DataType[]>,
+    useList: useList<DataTypeToUse>,
+    useForm: useForm<DataTypeToUse>,
+    useQuery: useQuery<DataTypeToUse[]>,
+    useQueryData: useQueryData<DataTypeToUse[]>,
   };
 };
 

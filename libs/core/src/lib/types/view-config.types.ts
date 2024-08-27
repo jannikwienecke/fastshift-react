@@ -19,6 +19,13 @@ export type ViewConfigType<T extends GetTableName = any> = {
   loader?: {
     _prismaLoaderExtension?: Record<string, unknown>;
   };
+  ui?: {
+    list?: {
+      useLabel?: boolean;
+      fieldsLeft: (keyof GetTableDataType<T>)[];
+      fieldsRight: (keyof GetTableDataType<T>)[];
+    };
+  };
 };
 
 export type RegisteredViews = Partial<{
