@@ -40,6 +40,14 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
         },
       };
 
+    if (action.type === 'SELECT_RECORD')
+      return {
+        ...prev,
+        selected: prev.selected.includes(action.record)
+          ? prev.selected.filter((r) => r['id'] !== action.record['id'])
+          : [...prev.selected, action.record],
+      };
+
     throw new Error('unknown action type');
   };
 

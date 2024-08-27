@@ -11,4 +11,8 @@ export type StoreAction =
     }
   | {
       type: 'ADD_NEW_RECORD';
+    }
+  | {
+      type: 'SELECT_RECORD';
+      record: RecordType;
     };

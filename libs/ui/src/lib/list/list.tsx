@@ -17,17 +17,20 @@ export type ListItem = {
 
 export type ListProps<TItem extends ListItem = ListItem> = {
   items: TItem[];
-  onEdit?: (item: TItem) => void;
+  onSelect: (item: TItem) => void;
+  selected: Record<string, any>[];
 };
 
 export function ListDefault<TItem extends ListItem = ListItem>({
   items,
+  onSelect,
+  selected,
 }: ListProps<TItem>) {
   return (
-    <List>
+    <List onSelect={onSelect} selected={selected}>
       {items.map((item) => {
         return (
-          <List.Item key={item.id} className="">
+          <List.Item key={item.id} className="" item={item}>
             <List.Control />
 
             <List.Icon icon={item?.icon} />
@@ -56,18 +59,32 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   );
 }
 
-export function List({ children }: { children: React.ReactNode }) {
+const ListContext = React.createContext<
+  Pick<ListProps<any>, 'onSelect' | 'selected'>
+>({} as Pick<ListProps<any>, 'onSelect' | 'selected'>);
+const ListProvider = ListContext.Provider;
+
+export function List<TItem extends ListItem = ListItem>({
+  children,
+  onSelect,
+  selected,
+}: { children: React.ReactNode } & {
+  onSelect: ListProps<TItem>['onSelect'];
+  selected: ListProps<TItem>['selected'];
+}) {
   return (
-    <div className="flex flex-col w-full border-collapse overflow-scroll ">
-      {children}
-    </div>
+    <ListProvider value={{ onSelect, selected }}>
+      <div className="flex flex-col w-full border-collapse overflow-scroll ">
+        {children}
+      </div>
+    </ListProvider>
   );
 }
 
 export function ListControl() {
   // CONTINUE HERE:
   // add icons to views/tables and show in the list - check!
-  // handle check state of all items in list store
+  // handle check state of all items in list store - check!
   // handle when clicking on a relational field like user etc...
   // handle actions like delete, edit, etc...
   // - [ ] Add commandbar
@@ -75,44 +92,68 @@ export function ListControl() {
   // - [ ] Add filter component
   // - [ ] Can be filter
   // - [ ] Can do pagination
-  const [selected, setSelected] = React.useState(false);
+  const { selected, onSelect } = React.useContext(ListContext);
+  const { item } = React.useContext(ItemContext);
+
+  const isSelected = selected?.map((i) => i.id).includes(item.id);
   return (
     <div
       className={cn(
-        'invisible group-hover:visible transition-all grid place-items-center',
-        selected ? 'visible' : 'invisible'
+        'px-1 opacity-0 hover:opacity-100 transition-all grid place-items-center',
+        isSelected ? 'opacity-100' : ''
       )}
     >
       <Checkbox
-        checked={selected}
+        checked={isSelected}
         onCheckedChange={(checked: boolean) => {
-          setSelected(checked);
+          onSelect?.(item);
         }}
       />
     </div>
   );
 }
 
+const ItemContext = React.createContext<{ item: ListItem }>(
+  {} as { item: ListItem }
+);
+const ItemProvider = ItemContext.Provider;
+
 function Item(
-  props: React.ComponentPropsWithoutRef<'li'> & { children: React.ReactNode }
+  props: React.ComponentPropsWithoutRef<'li'> & {
+    children: React.ReactNode;
+    item: ListItem;
+  }
 ) {
-  const { children, className, ...restProps } = props;
+  const { children, className, item, ...restProps } = props;
+  const { selected } = React.useContext(ListContext);
+
+  const isSelected = selected?.map((i) => i.id).includes(item.id);
+
   return (
-    <li
-      className={cn(
-        'flex flex-row py-3 px-4 w-full gap-3 grow border-b border-collapse border-gray-200 hover:bg-slate-50',
-        className
-      )}
-      {...restProps}
-    >
-      {children}
-    </li>
+    <ItemProvider value={{ item }}>
+      <li
+        className={cn(
+          'flex flex-row py-3 px-4 w-full gap-3 grow border-b border-collapse border-gray-200',
+          isSelected
+            ? 'bg-card-foreground/90  text-background'
+            : 'hover:bg-slate-50',
+          className
+        )}
+        {...restProps}
+      >
+        {children}
+      </li>
+    </ItemProvider>
   );
 }
 
 function ListIcon(props: { icon?: React.FC }) {
   if (!props.icon) return null;
-  return <div>{props.icon && <props.icon />}</div>;
+  return (
+    <div className="grid place-items-center">
+      {props.icon && <props.icon />}
+    </div>
+  );
 }
 
 function ValuesWrapper({

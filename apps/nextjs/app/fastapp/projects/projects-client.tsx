@@ -71,13 +71,13 @@ export const ProjectsClient = ({
           </div>
         </div>
 
-        <List>
+        <List {...getListProps()}>
           {getListProps({
             fieldsLeft: ['label'],
             fieldsRight: ['owner'],
           }).items.map((item) => {
             return (
-              <List.Item key={item.id}>
+              <List.Item key={item.id} item={item}>
                 <List.Control />
 
                 <List.Icon icon={item.icon} />

@@ -3,13 +3,15 @@ import {
   DataRow,
   getViewConfigAtom,
   RecordType,
+  useStore,
   useStoreDispatch,
+  useStoreValue,
 } from '@apps-next/core';
 import { ListItem, ListProps } from '@apps-next/ui';
 import { useAtomValue } from 'jotai';
-import { useMutation } from '../use-mutation';
-import { useQueryData } from '../use-query-data';
-import { Icon } from '../ui-components/render-icon';
+import { useMutation } from '../../use-mutation';
+import { useQueryData } from '../../use-query-data';
+import { Icon } from '../../ui-components/render-icon';
 
 type ListGetProps<T> = {
   fieldsLeft: (keyof T)[];
@@ -21,6 +23,7 @@ export const useList = <T extends RecordType>() => {
 
   const { dataModel } = useQueryData<T[]>();
   const { mutate } = useMutation();
+  const { selected } = useStoreValue();
 
   // TODO: FIX NAMING -> OR MERGE THEM clientConfigAtom and getViewConfigAtom
   const config = useAtomValue(clientConfigAtom);
@@ -62,8 +65,8 @@ export const useList = <T extends RecordType>() => {
     };
 
     return {
-      onEdit: (item) => dispatch({ type: 'EDIT_RECORD', record: item }),
-
+      onSelect: (item) => dispatch({ type: 'SELECT_RECORD', record: item }),
+      selected,
       items:
         dataModel.getRows()?.map((item) => ({
           ...item.getRow(),
