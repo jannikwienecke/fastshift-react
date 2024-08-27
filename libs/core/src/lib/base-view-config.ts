@@ -23,6 +23,7 @@ export interface BaseViewConfigManagerInterface<
   getTableName(): string;
   getViewName(): string;
   getViewFieldList(): FieldConfig[];
+  getFieldBy(fieldName: string): FieldConfig;
   modelConfig?: ModelConfig;
   form: FormManagerInterface;
 }
@@ -63,6 +64,10 @@ export class BaseViewConfigManager<
   getViewFieldList(): FieldConfig[] {
     // return Object.values(this.modelConfig?.viewFields ?? {});
     return Object.values(this.viewConfig?.viewFields ?? {});
+  }
+
+  getFieldBy(fieldName: string): FieldConfig {
+    return this.viewConfig.viewFields[fieldName];
   }
 
   getIncludeFields(): IncludeConfig[string] {

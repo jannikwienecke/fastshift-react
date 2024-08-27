@@ -25,6 +25,7 @@ import { MutationProps, MutationReturnDto } from '@apps-next/core';
 import { client } from './_internal/prisma-get-client';
 import { MUTATION_HANDLER_PRISMA } from './_internal/prisma-mutation.types';
 import { mutationHandlers } from './_internal/prisma-mutations-helper';
+import { parsePrismaResult } from './_internal/prisma-parse-result';
 import { queryHelper } from './_internal/prisma-query.helper';
 import { relationalQueryHelper } from './_internal/prisma-relational-query.helper';
 
@@ -111,8 +112,13 @@ export const prismaViewLoader = async (
 
     await waitFor(100);
 
+    const parsedResult = parsePrismaResult({
+      include,
+      viewConfigManager,
+    }).parseResult(result);
+
     return {
-      data: result,
+      data: parsedResult,
     };
   }
 };

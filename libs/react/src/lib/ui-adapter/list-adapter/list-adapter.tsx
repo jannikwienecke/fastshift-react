@@ -3,15 +3,15 @@ import {
   DataRow,
   getViewConfigAtom,
   RecordType,
-  useStore,
   useStoreDispatch,
   useStoreValue,
 } from '@apps-next/core';
 import { ListItem, ListProps } from '@apps-next/ui';
 import { useAtomValue } from 'jotai';
+import { Icon } from '../../ui-components/render-icon';
 import { useMutation } from '../../use-mutation';
 import { useQueryData } from '../../use-query-data';
-import { Icon } from '../../ui-components/render-icon';
+import { useCombobox } from '../combox-adapter';
 
 type ListGetProps<T> = {
   fieldsLeft: (keyof T)[];
@@ -38,19 +38,48 @@ export const useList = <T extends RecordType>() => {
     const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
 
     const renderFields = (
-      item: DataRow<T>,
+      row: DataRow<T>,
       fields: (keyof T)[]
     ): ListProps['items'][0]['valuesLeft'] => {
       return (
-        fields?.map((field) => ({
-          id: item.getItemName(field),
-          name: item.getItemLabel(field),
-          render: () => {
-            const fieldConfig = config?.fields[field];
-            if (!fieldConfig) return item.getItemLabel(field);
-            return <fieldConfig.component data={item} />;
-          },
-        })) ?? []
+        fields?.map((fieldName) => {
+          const field = row.getItem(fieldName)?.field;
+
+          return {
+            id: row.getItemName(fieldName),
+            name: row.getItemLabel(fieldName),
+            relation: field?.relation
+              ? {
+                  ...field.relation,
+                  useCombobox: useCombobox,
+                }
+              : undefined,
+            render: () => {
+              const fieldConfig = config?.fields[fieldName];
+
+              return (
+                <span
+                  role="button"
+                  onClick={() => {
+                    if (!field) return;
+                    if (!field.relation) return;
+
+                    dispatch({
+                      type: 'SELECT_RELATIONAL_FIELD',
+                      field,
+                    });
+                  }}
+                >
+                  {fieldConfig?.component ? (
+                    <fieldConfig.component data={row} />
+                  ) : (
+                    <>{row.getItemLabel(fieldName)}</>
+                  )}
+                </span>
+              );
+            },
+          };
+        }) ?? []
       );
     };
 
@@ -80,28 +109,3 @@ export const useList = <T extends RecordType>() => {
     };
   };
 };
-
-// TODO Add internal and extenral useList implementations
-// const _useList = <T extends GetTableName, TData extends GetTableDataType<T>>(
-//   tableName: T,
-//   { data, fieldLabel }: { data: TData[]; fieldLabel: keyof TData }
-// ) => {
-//   return <Props extends ListGetProps<TData>>(
-//     options?: Props
-//   ): ListProps<TData> => {
-//     const { descriptionKey } = options || {};
-//     return {
-//       items:
-//         data?.map((item) => ({
-//           ...item,
-//           name: item[fieldLabel] as string,
-//           description:
-//             descriptionKey && typeof item[descriptionKey] === 'string'
-//               ? item[descriptionKey]
-//               : undefined,
-//         })) ?? [],
-//     };
-//   };
-// };
-
-// _useList('tasks', { data: [{ id: '1' }], fieldLabel: 'name' });

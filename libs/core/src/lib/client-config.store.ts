@@ -3,18 +3,16 @@ import { DataRow } from './query-store';
 import { GetTableName, GetTableDataType, RegisteredRouter } from './types';
 import { viewConfigManagerAtom } from './view-config.store';
 
-type ClientViewConfig<
+export type ClientViewConfig<
   T extends GetTableName,
-  U extends GetTableDataType<any>
+  U extends GetTableDataType<T>
 > = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   [key in T]: {
     fields: Partial<{
       [key in keyof U]: {
-        component: (props: {
-          data: DataRow<GetTableDataType<T>>;
-        }) => React.ReactNode;
+        component: (props: { data: DataRow<U> }) => React.ReactNode;
       };
     }>;
   };

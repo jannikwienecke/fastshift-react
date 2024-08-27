@@ -23,13 +23,31 @@ export const prismaViewFieldsHelper = (
     relationToFields,
     name: fieldName,
     type: fieldType,
+    isList,
   } = fieldData;
+
+  const getManyToManyModel = () => {
+    const includes = fieldData.type
+      .toLowerCase()
+      .includes(tableData.name.toLowerCase());
+
+    const modelOfRelationType =
+      includes &&
+      fieldData.type.toLowerCase().replace(tableData.name.toLowerCase(), '');
+
+    const model = Prisma.models.find(
+      (m) => m.name.toLowerCase() === modelOfRelationType
+    );
+    return model;
+  };
 
   const isManyToManyRelation = () => {
     return (
       relationName &&
       relationFromFields?.length === 0 &&
-      relationToFields?.length === 0
+      relationToFields?.length === 0 &&
+      isList &&
+      getManyToManyModel()
     );
   };
 
@@ -104,6 +122,16 @@ export const prismaViewFieldsHelper = (
   const getRelation = () => {
     const isRelationalField = getIsRelationalField();
     const relationType = getRelationType();
+    const model = getManyToManyModel();
+
+    if (isManyToManyRelation() && model) {
+      return {
+        type: relationType,
+        tableName: model.name.toLowerCase(),
+        fieldName: model?.name,
+        manyToManyRelation: fieldData.name,
+      };
+    }
 
     return isRelationalField
       ? {
@@ -139,7 +167,7 @@ export const prismaViewFieldsHelper = (
     isIdField: getIsIdField(),
     enumValue: getEnum(),
     relation: getRelation(),
-    fieldName: fieldName,
+    fieldName: getManyToManyModel()?.name.toLowerCase() ?? fieldName,
     isOptionForDisplayField: isOptionForDisplayField(),
   };
 };

@@ -28,7 +28,7 @@ export const generateViewFieldsFromPrismaSchema = (
                 isId: isIdField,
                 isRelationalIdField,
                 type,
-                name: fieldData.name,
+                name: fieldName,
                 isRequired: fieldData.isRequired,
                 enum: enumValue,
                 relation,

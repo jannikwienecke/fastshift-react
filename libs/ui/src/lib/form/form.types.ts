@@ -17,7 +17,11 @@ export type FormField<T extends FormRecord = FormRecord> = {
   relation?: {
     tableName: string;
     fieldName: string;
-    useCombobox?: (props: FormField<T>) => () => ComboboxProps;
+    useCombobox?: (props: {
+      fieldName: string;
+      placeholder: string;
+      value: T[keyof T];
+    }) => () => ComboboxProps;
   };
   enum?: {
     fieldName: string;

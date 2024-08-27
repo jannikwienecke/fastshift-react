@@ -3,11 +3,17 @@ import {
   BaseViewConfigManagerInterface,
 } from '../base-view-config';
 import { relationalViewHelper } from '../relational-view.helper';
-import { FieldType, ID, RecordType, RegisteredViews } from '../types';
+import {
+  FieldConfig,
+  FieldType,
+  ID,
+  RecordType,
+  RegisteredViews,
+} from '../types';
 
 type DataItemProps<T extends RecordType> = {
   value: T | DataItem<T>;
-  type: FieldType;
+  field: FieldConfig;
   name: keyof T;
   label: string;
 };
@@ -27,7 +33,11 @@ export class DataItem<T extends RecordType> {
   }
 
   get type() {
-    return this.props.type;
+    return this.props.field.type;
+  }
+
+  get field() {
+    return this.props.field;
   }
 
   get label() {
@@ -48,36 +58,23 @@ export class DataRow<TProps extends RecordType = RecordType> {
     registeredViews: RegisteredViews
   ) {
     const items = viewConfigManager.getViewFieldList().map((field) => {
-      let value = props?.[field.name];
+      const value = props?.[field.name];
       let label = value;
 
       const { fieldName, tableName } = field.relation || {};
 
       if (fieldName && tableName) {
-        const { getDisplayFieldValue, relationalView } = relationalViewHelper(
+        const { getDisplayFieldValue } = relationalViewHelper(
           tableName,
           registeredViews
         );
 
         label = getDisplayFieldValue(props);
 
-        value = value
-          ? DataRow.create(
-              value,
-              new BaseViewConfigManager(relationalView),
-              registeredViews
-            )
-          : DataItem.create({
-              value: props?.[fieldName],
-              type: field.type,
-              name: field.name,
-              label: getDisplayFieldValue(props) ?? props?.[fieldName],
-            });
-
         return DataItem.create({
           value,
           label,
-          type: field.type,
+          field,
           name: field.name,
         });
       }
@@ -85,7 +82,7 @@ export class DataRow<TProps extends RecordType = RecordType> {
       return DataItem.create({
         value,
         label,
-        type: field.type,
+        field,
         name: field.name,
       });
     });
@@ -110,24 +107,19 @@ export class DataRow<TProps extends RecordType = RecordType> {
   }
 
   getItemValue<TKey extends keyof TProps>(name: TKey): TProps[TKey] {
-    const value = this.items.find((item) => item.name === name)?.value;
-    if (typeof value === 'string') {
-      return value;
-    }
+    const item = this.items.find((item) => item.name === name);
+    if (!item)
+      throw new Error(`getItemValue: Item with name ${String(name)} not found`);
 
-    if (value instanceof DataRow) {
-      return value.label as TProps[TKey];
-    }
-
-    return '' as TProps[TKey];
+    return item.value as TProps[TKey];
   }
 
   getItemLabel(name: keyof TProps) {
     const item = this.items.find((item) => item.name === name);
-    if (item) {
+    if (item && item.label) {
       return item.label.toString();
     }
-    throw new Error(`Item with name ${String(name)} not found`);
+    throw new Error(`getItemLabel: Item with name ${String(name)} not found`);
   }
 
   getItemName(name: keyof TProps) {
@@ -135,9 +127,12 @@ export class DataRow<TProps extends RecordType = RecordType> {
     if (item) {
       return item.name.toString();
     }
-    console.log({ name });
 
-    throw new Error(`Item with name ${String(name)} not found`);
+    throw new Error(`getItemName: Item with name ${String(name)} not found`);
+  }
+
+  getItem(name: keyof TProps) {
+    return this.items.find((item) => item.name === name);
   }
 }
 

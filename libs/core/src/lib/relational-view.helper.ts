@@ -32,7 +32,13 @@ export const relationalViewHelper = (
       const relationalValue =
         value?.[baseViewConfigManger.getDisplayFieldLabel()];
 
-      if (!relationalValue && value) {
+      if (Array.isArray(value)) {
+        return value
+          .map((item) => item[baseViewConfigManger.getDisplayFieldLabel()])
+          .join(', ');
+      }
+
+      if (!relationalValue && value && !(value && Array.isArray(value))) {
         throw new Error(
           `relationalViewHelper: display field value not found for ${relationalTableName}`
         );

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
-import { BaseConfigInterface } from './config.types';
 import { DataRow } from '../query-store';
+import { BaseConfigInterface } from './config.types';
 
 const documentBaseSchema = z.object({
   id: z.string(),
@@ -42,6 +42,7 @@ export type FieldConfig = {
     tableName: string;
     fieldName: string;
     type: TableRelationType;
+    manyToManyRelation?: string;
   };
   enum?: {
     name: string;

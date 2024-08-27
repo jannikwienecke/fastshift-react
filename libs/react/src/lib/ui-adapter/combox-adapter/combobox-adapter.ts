@@ -1,7 +1,8 @@
-import { ComboboxProps, FormField } from '@apps-next/ui';
+import { ComboboxProps } from '@apps-next/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { useRelationalQuery } from '../../use-query-relational';
+import { useView } from '../../use-view';
 import {
   comboboxStateAtom,
   debouncedQueryAtom,
@@ -9,18 +10,26 @@ import {
   updateValuesAtom,
 } from './combobox.store';
 
-export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
+export const useCombobox = (props: {
+  fieldName: string;
+  placeholder: string;
+  // TODO check type here
+  value: any;
+}): (() => ComboboxProps) => {
   const _state = useAtomValue(comboboxStateAtom);
   const updateValues = useSetAtom(updateValuesAtom);
   const initializeCombobox = useSetAtom(initComboboxAtom);
   const setDebouncedValue = useSetAtom(debouncedQueryAtom);
 
-  const state = _state.state[props.name as string];
+  const { viewConfigManager } = useView();
+  const field = viewConfigManager.getFieldBy(props.fieldName);
+
+  const state = _state.state[field.name as string];
 
   const { data } = useRelationalQuery({
-    tableName: props.relation?.tableName ?? '',
+    tableName: field.relation?.tableName ?? '',
     query:
-      _state.query.fieldName === props.name
+      _state.query.fieldName === field.name
         ? _state.debouncedQuery.query || ''
         : '',
   });
@@ -31,7 +40,7 @@ export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
         values: data || [],
         onSelectedChange: (value) => {
           updateValues({
-            fieldName: props.name as string,
+            fieldName: field.name as string,
             state: {
               selected: value,
             },
@@ -42,7 +51,7 @@ export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
         label: 'Assigned to',
         onChange: (value) => {
           updateValues({
-            fieldName: props.name as string,
+            fieldName: field.name as string,
             state: {
               selected: value,
             },
@@ -56,13 +65,13 @@ export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
         onChange(query) {
           setDebouncedValue({
             query,
-            fieldName: props.name as string,
+            fieldName: field.name as string,
           });
         },
         onBlur: () => {
           setDebouncedValue({
             query: '',
-            fieldName: props.name as string,
+            fieldName: field.name as string,
           });
         },
       },
@@ -75,7 +84,7 @@ export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
     if (!data) return;
 
     updateValues({
-      fieldName: propsRef.current.name as string,
+      fieldName: propsRef.current.fieldName as string,
       state: { values: data || [] },
     });
   }, [data, updateValues]);
@@ -83,11 +92,11 @@ export const useCombobox = (props: FormField<any>): (() => ComboboxProps) => {
   React.useEffect(() => {
     if (propsRef.current.value) {
       initializeCombobox({
-        fieldName: props.name as string,
+        fieldName: field.name as string,
         initialSelected: propsRef.current.value,
       });
     }
-  }, [initializeCombobox, props.name]);
+  }, [initializeCombobox, field.name]);
 
   return getComboboxProps;
 };

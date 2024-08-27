@@ -1,4 +1,4 @@
-import { RecordType } from '../types';
+import { FieldConfig, RecordType } from '../types';
 
 export type StoreAction =
   | {
@@ -15,4 +15,8 @@ export type StoreAction =
   | {
       type: 'SELECT_RECORD';
       record: RecordType;
+    }
+  | {
+      type: 'SELECT_RELATIONAL_FIELD';
+      field: FieldConfig;
     };

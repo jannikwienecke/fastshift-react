@@ -6,24 +6,15 @@ import {
   useStoreValue,
   ViewConfigType,
 } from '@apps-next/core';
-import { DataType, makeHooks, QueryInput } from '@apps-next/react';
+import { makeHooks, QueryInput } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
-import { Project, Tag } from '@prisma/client';
 import {
   CompletedComponent,
   PriorityComponent,
+  ProjectComponent,
   TagsComponent,
 } from './components';
-
-type TaskViewDataType = DataType<
-  'task',
-  {
-    project: Project;
-    tags: {
-      tag: Tag;
-    }[];
-  }
->;
+import { TaskViewDataType } from './tasks.types';
 
 setClientViewConfig<TaskViewDataType>('task', {
   fields: {
@@ -35,8 +26,11 @@ setClientViewConfig<TaskViewDataType>('task', {
       component: PriorityComponent,
     },
 
-    tags: {
+    tag: {
       component: TagsComponent,
+    },
+    project: {
+      component: ProjectComponent,
     },
   },
 });
@@ -65,8 +59,8 @@ export const TasksClient = ({
   const queryData = useQueryData();
 
   return (
-    <div className="p-4 flex flex-col gap-2 w-full overflow-scroll h-screen">
-      <div className="py-1 border-b border-gray-200">
+    <div className="p-4 pb-0 flex flex-col w-full overflow-scroll h-screen">
+      <div className="pt-1 border-b border-gray-200">
         <button onClick={() => dispatch({ type: 'ADD_NEW_RECORD' })}>
           Add New
         </button>
@@ -80,7 +74,7 @@ export const TasksClient = ({
       <List.Default
         {...getListProps({
           fieldsLeft: ['name', 'priority'],
-          fieldsRight: ['project', 'tags'],
+          fieldsRight: ['project', 'tag'],
         })}
       />
     </div>

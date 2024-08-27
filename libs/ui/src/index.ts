@@ -8,3 +8,5 @@ export * from './lib/combobox';
 export * from './lib/animated-tab/AnimatedTab';
 export * from './lib/filter/filter';
 export * from './lib/components/checkbox';
+export * from './lib/icon';
+export * from './lib/bubble';
