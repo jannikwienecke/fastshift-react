@@ -3,6 +3,7 @@ import {
   GlobalConfig,
   RegisteredViews,
   SearchableField,
+  ViewConfigBaseInfo,
   ViewConfigType,
   ViewFieldConfig,
 } from './types';
@@ -20,8 +21,13 @@ export function createViewConfig<T extends GetTableName>(
   const searchableFields = {} as SearchableField;
   const viewName = config.viewName ?? (tableName as string);
 
+  if (!config.icon) {
+    throw new Error('icon is required');
+  }
+
   const viewConfig: ViewConfigType<T> = {
     ...config,
+    icon: config.icon,
     displayField: {
       field: config.displayField?.field as any,
       cell: config.displayField?.cell,
@@ -42,7 +48,8 @@ export function createViewConfig<T extends GetTableName>(
 
 export function createServerViewConfig<T extends GetTableName>(
   tableName: T,
-  config: Partial<Omit<ViewConfigType<T>, 'viewFields' | 'tableName'>>,
+  config: Partial<Omit<ViewConfigType<T>, 'viewFields' | 'tableName'>> &
+    Pick<ViewConfigBaseInfo<T>, 'icon'>,
   globalConfig: GlobalConfig['config']
 ) {
   // Clean Up -> Duplicate code in ViewProvider

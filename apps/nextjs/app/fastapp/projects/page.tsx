@@ -13,6 +13,7 @@ export const viewConfig = createServerViewConfig(
   'project',
   {
     displayField: { field: 'label' },
+    icon: 'FaProjectDiagram',
   },
   globalConfig.config
 );

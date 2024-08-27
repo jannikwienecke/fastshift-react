@@ -9,6 +9,7 @@ import { ListItem, ListProps } from '@apps-next/ui';
 import { useAtomValue } from 'jotai';
 import { useMutation } from '../use-mutation';
 import { useQueryData } from '../use-query-data';
+import { Icon } from '../ui-components/render-icon';
 
 type ListGetProps<T> = {
   fieldsLeft: (keyof T)[];
@@ -33,7 +34,10 @@ export const useList = <T extends RecordType>() => {
     const fieldsRight = options?.fieldsRight ?? list?.fieldsRight ?? [];
     const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
 
-    const renderFields = (item: DataRow<T>, fields: (keyof T)[]) => {
+    const renderFields = (
+      item: DataRow<T>,
+      fields: (keyof T)[]
+    ): ListProps['items'][0]['valuesLeft'] => {
       return (
         fields?.map((field) => ({
           id: item.getItemName(field),
@@ -64,6 +68,7 @@ export const useList = <T extends RecordType>() => {
         dataModel.getRows()?.map((item) => ({
           ...item.getRow(),
           id: item.id,
+          icon: Icon,
           valuesLeft: _renderLabel
             ? renderLabel(item)
             : renderFields(item, fieldsLeft),

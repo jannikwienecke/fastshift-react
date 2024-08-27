@@ -10,6 +10,7 @@ export type ListValueProps = {
 
 export type ListItem = {
   id: string | number;
+  icon?: () => React.ReactNode;
   valuesLeft: ListValueProps[];
   valuesRight: ListValueProps[];
 };
@@ -28,6 +29,8 @@ export function ListDefault<TItem extends ListItem = ListItem>({
         return (
           <List.Item key={item.id} className="">
             <List.Control />
+
+            <List.Icon icon={item?.icon} />
 
             <List.Values>
               <div className="flex flex-row gap-2 items-center">
@@ -63,7 +66,7 @@ export function List({ children }: { children: React.ReactNode }) {
 
 export function ListControl() {
   // CONTINUE HERE:
-  // add icons to views/tables and show in the list
+  // add icons to views/tables and show in the list - check!
   // handle check state of all items in list store
   // handle when clicking on a relational field like user etc...
   // handle actions like delete, edit, etc...
@@ -107,6 +110,11 @@ function Item(
   );
 }
 
+function ListIcon(props: { icon?: React.FC }) {
+  if (!props.icon) return null;
+  return <div>{props.icon && <props.icon />}</div>;
+}
+
 function ValuesWrapper({
   className,
   children,
@@ -141,4 +149,5 @@ List.Item = Item;
 List.Control = ListControl;
 List.Values = ValuesWrapper;
 List.Value = Value;
+List.Icon = ListIcon;
 List.Default = ListDefault;

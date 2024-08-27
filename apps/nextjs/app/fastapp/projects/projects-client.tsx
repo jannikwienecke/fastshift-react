@@ -80,6 +80,8 @@ export const ProjectsClient = ({
               <List.Item key={item.id}>
                 <List.Control />
 
+                <List.Icon icon={item.icon} />
+
                 <List.Values>
                   <div className="flex flex-row gap-2">
                     {item.valuesLeft.map((value) => (

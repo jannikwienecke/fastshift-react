@@ -14,6 +14,7 @@ export const viewConfig = createServerViewConfig(
   'task',
   {
     displayField: { field: 'name' },
+    icon: 'FaTasks',
   },
   globalConfig.config
 );
