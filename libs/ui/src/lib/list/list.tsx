@@ -67,6 +67,11 @@ export function ListControl() {
   // handle check state of all items in list store
   // handle when clicking on a relational field like user etc...
   // handle actions like delete, edit, etc...
+  // - [ ] Add commandbar
+  // - [ ] Click list edit field
+  // - [ ] Add filter component
+  // - [ ] Can be filter
+  // - [ ] Can do pagination
   const [selected, setSelected] = React.useState(false);
   return (
     <div
