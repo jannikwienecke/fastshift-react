@@ -8,9 +8,12 @@ import {
 } from '@apps-next/core';
 import { FormField, FormProps, StringInput } from '@apps-next/ui';
 import { atom } from 'jotai';
-import { useCombobox } from '../combox-adapter';
 import { formFieldHelper } from './form-helper';
 import { FORM_DEFAULT_VALUE_DICT, FORM_INPUT_DICT } from './form.config';
+import {
+  UseComboboAdaper,
+  useCombobox as useComboboxAdapter,
+} from '../combox-adapter';
 
 const INITIAL: FormProps = {
   fields: [],
@@ -30,11 +33,15 @@ export const formAtom = atom(
     get,
     set,
     update: {
+      useCombobox?: UseComboboAdaper;
       onSubmit: (
         props: MutationProps['mutation']
       ) => Promise<MutationReturnDto>;
     }
   ) => {
+    const { useCombobox: useComboboxProps } = update ?? {};
+    const useCombobox = useComboboxProps ?? useComboboxAdapter;
+
     const editState = get(storeAtom).edit;
     const viewConfigManager = get(viewConfigManagerAtom);
 
@@ -72,17 +79,17 @@ export const formAtom = atom(
         return {
           name,
           required: field.isRequired || false,
-          type: field.type,
           placeholder: `Enter ${name}`,
           value: value || defaultValue,
+
           Component: Component,
           relation: field.relation
             ? {
                 ...field.relation,
+
                 useCombobox,
               }
             : undefined,
-          isRelationalIdField,
           enum: field.enum
             ? {
                 fieldName: field.name,
@@ -120,7 +127,7 @@ export const formAtom = atom(
               }),
             });
           },
-        };
+        } satisfies FormField<RecordType>;
       }) || [];
 
     set(initialFormAtom, {

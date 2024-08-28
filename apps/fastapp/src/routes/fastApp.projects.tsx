@@ -20,7 +20,7 @@ export const Route = createFileRoute('/fastApp/projects')({
 
           <Form {...getFormProps()} />
 
-          <List {...getListProps()} />
+          <List.Default {...getListProps()} />
         </div>
       );
     }

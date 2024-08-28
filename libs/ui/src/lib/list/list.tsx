@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComboxboxItem } from '../combobox';
 import {
+  ComboboxGetPropsOptions,
   ComboboxPopover,
-  ComboboAdapterProps,
 } from '../combobox-popover/combobox-popover';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
@@ -78,7 +78,7 @@ export function List<TItem extends ListItem = ListItem>({
 }: { children: React.ReactNode } & {
   onSelect: ListProps<TItem>['onSelect'];
   selected: ListProps<TItem>['selected'];
-  comboboxOptions?: ComboboAdapterProps;
+  comboboxOptions?: ComboboxGetPropsOptions;
 }) {
   return (
     <ListProvider value={{ onSelect, selected, comboboxOptions }}>

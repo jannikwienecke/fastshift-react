@@ -52,7 +52,7 @@ export const TasksView = createView(
 
           <FormRender {...props} />
 
-          <List {...getListProps()} />
+          <List.Default {...getListProps()} />
         </div>
         <hr />
 

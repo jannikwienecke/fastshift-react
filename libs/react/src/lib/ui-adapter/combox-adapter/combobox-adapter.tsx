@@ -36,8 +36,6 @@ export const useCombobox = (props: {
   const field = viewConfigManager.getFieldBy(props.fieldName);
 
   const identifier = props.connectedRecordId + props.fieldName;
-  console.log('IDENTIFIER: ', identifier);
-  // + props.selectedValue.id;
 
   const state = comboboxStateDict.state?.[identifier as string] as
     | State

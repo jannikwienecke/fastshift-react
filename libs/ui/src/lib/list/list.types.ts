@@ -12,7 +12,7 @@ export type ListValueProps = {
     fieldName: string;
     useCombobox: (
       props: ComboboAdapterProps
-    ) => (options?: ComboboAdapterProps) => ComboboxPopoverProps;
+    ) => (options?: ComboboxGetPropsOptions) => ComboboxPopoverProps;
   };
   render: () => React.ReactNode;
 };
