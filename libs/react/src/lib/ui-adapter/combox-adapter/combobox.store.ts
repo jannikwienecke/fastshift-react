@@ -42,6 +42,14 @@ export const comboboxStateAtom = atom((get) => {
   };
 });
 
+export const getStateByAtom = atom(
+  null,
+  (get, _, props: { fieldName: string; rowId: string | number }) => {
+    const state = get(comboboxAtom);
+    return state[props.rowId + props.fieldName] as State | undefined;
+  }
+);
+
 export const updateValuesAtom = atom(
   null,
   (
@@ -107,6 +115,11 @@ export const initComboboxAtom = atom(
 export const toggleOpenAtom = atom(
   null,
   (get, set, props: { fieldName: string }) => {
+    set(debouncedQueryAtom, {
+      query: '',
+      fieldName: props.fieldName,
+    });
+
     const state = get(comboboxAtom);
     set(comboboxAtom, {
       ...state,

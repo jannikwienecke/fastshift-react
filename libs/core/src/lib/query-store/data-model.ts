@@ -88,7 +88,7 @@ export class DataRow<TProps extends RecordType = RecordType> {
     return this.props[this.viewConfigManager.getDisplayFieldLabel()];
   }
 
-  getRow() {
+  getRawData() {
     return this.props;
   }
 
@@ -163,8 +163,12 @@ export class Model<T extends RecordType> {
     return new Model(data, viewConfigManager, registeredViews);
   }
 
-  getRowById(id: ID) {
-    return this.rows.find((row) => row.id === id);
+  getRowById(id: ID, throwError = true): DataRow<T> {
+    const row = this.rows.find((row) => row.id === id);
+    if (!row && throwError) {
+      throw new Error(`getRowById: Row with id ${id} not found`);
+    }
+    return row as DataRow<T>;
   }
 
   getRows() {

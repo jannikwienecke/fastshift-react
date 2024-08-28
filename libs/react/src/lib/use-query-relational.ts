@@ -24,7 +24,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>({
 
   const useQueryRelational = useQueryRelationalDict[globalConfig?.provider];
 
-  return useQueryRelational({
+  const result = useQueryRelational({
     globalConfig,
     queryProps: {
       query: query,
@@ -37,4 +37,6 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>({
       viewConfigManager: viewConfigManager,
     },
   });
+
+  return result;
 };

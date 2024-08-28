@@ -33,6 +33,14 @@ export type ComboboxPopoverProps = {
   render: (value: ComboxboxItem) => React.ReactNode;
 };
 
+export type ComboboxGetPropsOptions = {
+  onSelect: (props: {
+    value: ComboxboxItem;
+    rowId: string | number;
+    fieldName: string;
+  }) => void;
+};
+
 export type ComboboAdapterProps = {
   name: string;
   fieldName: string;

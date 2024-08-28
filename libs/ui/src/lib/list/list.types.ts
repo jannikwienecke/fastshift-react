@@ -1,5 +1,6 @@
 import {
   ComboboAdapterProps,
+  ComboboxGetPropsOptions,
   ComboboxPopoverProps,
 } from '../combobox-popover/combobox-popover';
 
@@ -9,7 +10,9 @@ export type ListValueProps = {
   relation?: {
     tableName: string;
     fieldName: string;
-    useCombobox: (props: ComboboAdapterProps) => () => ComboboxPopoverProps;
+    useCombobox: (
+      props: ComboboAdapterProps
+    ) => (options?: ComboboAdapterProps) => ComboboxPopoverProps;
   };
   render: () => React.ReactNode;
 };
@@ -26,4 +29,5 @@ export type ListProps<TItem extends ListItem = ListItem> = {
   items: TItem[];
   onSelect: (item: TItem) => void;
   selected: Record<string, any>[];
+  comboboxOptions?: ComboboxGetPropsOptions;
 };

@@ -1,6 +1,5 @@
-import { clientConfigAtom, DataRow, RecordType } from '@apps-next/core';
+import { clientConfigAtom, ComponentType, DataRow } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
-import { ComponentType } from '@apps-next/core';
 
 export const FieldValue = ({
   fieldName,

@@ -6,7 +6,11 @@ import {
   useStoreValue,
   ViewConfigType,
 } from '@apps-next/core';
-import { makeHooks, QueryInput } from '@apps-next/react';
+import {
+  makeHooks,
+  QueryInput,
+  useHandleSelectCombobox,
+} from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 import {
   CompletedComponent,
@@ -56,7 +60,13 @@ export const TasksClient = ({
   const { useList, useQuery, useForm, useQueryData } =
     makeHooks<TaskViewDataType>();
 
-  const getListProps = useList();
+  const handleSelect = useHandleSelectCombobox();
+
+  const getListProps = useList({
+    comboboxOptions: {
+      onSelect: handleSelect,
+    },
+  });
   const { edit } = useStoreValue();
 
   const { data } = useQuery();
