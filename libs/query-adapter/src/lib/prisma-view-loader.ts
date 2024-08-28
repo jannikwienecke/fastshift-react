@@ -71,18 +71,30 @@ export const prismaViewLoader = async (
 
     const helper = queryHelper({ displayField, query: args.query });
 
+    const include = helper.getInclude(
+      viewConfigManager.getIncludeFieldsForRelation(
+        tableNameRelation,
+        registeredViews
+      ) ?? []
+    );
+
+    console.log('include', include);
+
     const result = await dbQuery.findMany({
       take: DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
       where: args.query ? helper.where : undefined,
+      include,
       orderBy: helper.orderBy,
     });
 
-    const relationQueryHelper = relationalQueryHelper({
-      displayField,
-      result,
-    });
+    const parsedResult = parsePrismaResult({
+      include,
+      viewConfigManager,
+    }).parseResult(result);
 
-    return relationQueryHelper.relationQueryData;
+    return {
+      data: parsedResult,
+    };
   } else {
     const _prismaLoaderExtension: PrismaFindManyArgs =
       args.viewConfig?.loader?._prismaLoaderExtension ?? {};

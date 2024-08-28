@@ -1,16 +1,36 @@
 import React from 'react';
+import {
+  ComboboxPopover,
+  ComboboxPopoverProps,
+} from '../combobox-popover/combobox-popover';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
 
 export type ListValueProps = {
   id: string | number;
   name: string;
+  relation?: {
+    tableName: string;
+    fieldName: string;
+    useCombobox: (props: {
+      name: string;
+      fieldName: string;
+      placeholder: string;
+      uniqueId: string;
+      connectedRecordId: string | number;
+      value: {
+        id: string | number;
+        label: string;
+      };
+    }) => () => ComboboxPopoverProps;
+  };
   render: () => React.ReactNode;
 };
 
 export type ListItem = {
   id: string | number;
-  icon?: () => React.ReactNode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon?: (props: any) => React.ReactNode;
   valuesLeft: ListValueProps[];
   valuesRight: ListValueProps[];
 };
@@ -45,11 +65,30 @@ export function ListDefault<TItem extends ListItem = ListItem>({
               </div>
 
               <div className="flex flex-row gap-2 items-center">
-                {item.valuesRight.map((value) => (
-                  <List.Value key={value.id}>
-                    {value.render ? value.render() : value.name}
-                  </List.Value>
-                ))}
+                {item.valuesRight.map((value) => {
+                  if (value.relation) {
+                    return (
+                      <ListCombobox
+                        key={value.id}
+                        id={item.id}
+                        relation={value.relation}
+                        placeholder={value.name}
+                        value={{
+                          id: value.name,
+                          label: value.name,
+                        }}
+                      >
+                        {value.render ? value.render() : value.name}
+                      </ListCombobox>
+                    );
+                  }
+
+                  return (
+                    <List.Value key={value.id}>
+                      {value.render ? value.render() : value.name}
+                    </List.Value>
+                  );
+                })}
               </div>
             </List.Values>
           </List.Item>
@@ -58,6 +97,36 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     </List>
   );
 }
+
+const ListCombobox = ({
+  relation,
+  value,
+  placeholder,
+  id,
+  children,
+}: {
+  id: string | number;
+  relation: ListValueProps['relation'];
+  value: {
+    id: string | number;
+    label: string;
+  };
+  placeholder: string;
+  children: React.ReactNode;
+}) => {
+  if (!relation) throw new Error('Relation not found');
+
+  const getProps = relation.useCombobox?.({
+    fieldName: relation.tableName,
+    value,
+    placeholder,
+    connectedRecordId: id,
+    uniqueId: `item-${id}-relation-${relation.tableName}`,
+    name: relation.fieldName,
+  });
+
+  return <ComboboxPopover {...getProps()}>{children}</ComboboxPopover>;
+};
 
 const ListContext = React.createContext<
   Pick<ListProps<any>, 'onSelect' | 'selected'>
@@ -74,7 +143,7 @@ export function List<TItem extends ListItem = ListItem>({
 }) {
   return (
     <ListProvider value={{ onSelect, selected }}>
-      <div className="flex flex-col w-full border-collapse overflow-scroll ">
+      <div className="flex flex-col w-full border-collapse overflow-scroll grow">
         {children}
       </div>
     </ListProvider>
@@ -92,6 +161,9 @@ export function ListControl() {
   // - [ ] Add filter component
   // - [ ] Can be filter
   // - [ ] Can do pagination
+  // two ways when clicking on a field
+  // 1. open a dropdown to update that field value -> DEFAULT
+  // 2. open the record behind that field -> CAN BE SELECTED IN THE CONFIG
   const { selected, onSelect } = React.useContext(ListContext);
   const { item } = React.useContext(ItemContext);
 
@@ -105,7 +177,7 @@ export function ListControl() {
     >
       <Checkbox
         checked={isSelected}
-        onCheckedChange={(checked: boolean) => {
+        onCheckedChange={() => {
           onSelect?.(item);
         }}
       />
@@ -133,7 +205,7 @@ function Item(
     <ItemProvider value={{ item }}>
       <li
         className={cn(
-          'flex flex-row py-3 px-4 w-full gap-3 grow border-b border-collapse border-gray-200',
+          'flex flex-row py-2 px-4 w-full gap-3 border-b border-collapse border-gray-200',
           isSelected
             ? 'bg-card-foreground/90  text-background'
             : 'hover:bg-slate-50',
@@ -179,8 +251,20 @@ function Value({
   children,
   ...props
 }: React.ComponentPropsWithoutRef<'div'> & { children: React.ReactNode }) {
+  const { item } = React.useContext(ItemContext);
+  const { selected } = React.useContext(ListContext);
+
+  const isSelected = selected?.map((i) => i.id).includes(item.id);
+
   return (
-    <div className={cn('text-sm', className)} {...props}>
+    <div
+      className={cn(
+        'text-sm text-foreground/80 ',
+        isSelected ? 'text-background' : 'hover:bg-slate-50',
+        className
+      )}
+      {...props}
+    >
       {children}
     </div>
   );

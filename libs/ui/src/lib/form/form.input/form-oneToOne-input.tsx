@@ -1,4 +1,3 @@
-import { Combobox } from '../../combobox';
 import { FormField, FormRecord } from '../form.types';
 
 export const OneToOneSelectInput = (props: FormField<FormRecord>) => {
@@ -6,9 +5,13 @@ export const OneToOneSelectInput = (props: FormField<FormRecord>) => {
     fieldName: props.name,
     placeholder: props.placeholder,
     value: props.value,
+    connectedRecordId: '',
+    name: props.name,
+    uniqueId: props.name,
   });
 
   if (!getProps) return null;
 
-  return <Combobox {...getProps()} />;
+  // TODO: implement
+  return null;
 };

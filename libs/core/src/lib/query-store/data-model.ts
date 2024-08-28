@@ -47,7 +47,7 @@ export class DataItem<T extends RecordType> {
 
 export class DataRow<TProps extends RecordType = RecordType> {
   private constructor(
-    private props: TProps,
+    public props: TProps,
     private viewConfigManager: BaseViewConfigManagerInterface,
     private items: DataItem<TProps>[]
   ) {}
@@ -70,13 +70,6 @@ export class DataRow<TProps extends RecordType = RecordType> {
         );
 
         label = getDisplayFieldValue(props);
-
-        return DataItem.create({
-          value,
-          label,
-          field,
-          name: field.name,
-        });
       }
 
       return DataItem.create({
@@ -108,15 +101,18 @@ export class DataRow<TProps extends RecordType = RecordType> {
 
   getItemValue<TKey extends keyof TProps>(name: TKey): TProps[TKey] {
     const item = this.items.find((item) => item.name === name);
-    if (!item)
+    if (!item) {
+      console.trace();
+      console.log({ name, items: this.items });
       throw new Error(`getItemValue: Item with name ${String(name)} not found`);
+    }
 
     return item.value as TProps[TKey];
   }
 
   getItemLabel(name: keyof TProps) {
     const item = this.items.find((item) => item.name === name);
-    if (item && item.label) {
+    if (item && item.label !== undefined) {
       return item.label.toString();
     }
     throw new Error(`getItemLabel: Item with name ${String(name)} not found`);
@@ -133,6 +129,15 @@ export class DataRow<TProps extends RecordType = RecordType> {
 
   getItem(name: keyof TProps) {
     return this.items.find((item) => item.name === name);
+  }
+
+  updateItem<TKey extends keyof TProps>(name: TKey, value: DataItem<TProps>) {
+    this.items = this.items.map((item) => {
+      if (item.name === name) {
+        return value;
+      }
+      return item;
+    });
   }
 }
 
@@ -155,6 +160,10 @@ export class Model<T extends RecordType> {
     registeredViews: RegisteredViews
   ) {
     return new Model(data, viewConfigManager, registeredViews);
+  }
+
+  getRowById(id: ID) {
+    return this.rows.find((row) => row.id === id);
   }
 
   getRows() {

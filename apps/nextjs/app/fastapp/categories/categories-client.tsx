@@ -10,7 +10,9 @@ type CategoryViewDataType = DataType<'category'>;
 setClientViewConfig<CategoryViewDataType>('category', {
   fields: {
     color: {
-      component: ColorComponent,
+      component: {
+        list: ColorComponent,
+      },
     },
   },
 });

@@ -1,23 +1,13 @@
-import { createServerViewConfig } from '@apps-next/core';
 import {
   configurePrismaLoader,
   prismaViewLoader,
   QueryPrefetchProvider,
 } from '@apps-next/query-adapter';
 import { prisma, PrismaClientType } from '../../../db';
-import { globalConfig } from '../../layout';
 import { TasksClient } from './tasks-client';
+import { viewConfig } from './tasks.config';
 
 export const dynamic = 'force-dynamic';
-
-export const viewConfig = createServerViewConfig(
-  'task',
-  {
-    displayField: { field: 'name' },
-    icon: 'FaTasks',
-  },
-  globalConfig.config
-);
 
 const configWithCustomLoader = configurePrismaLoader(
   viewConfig

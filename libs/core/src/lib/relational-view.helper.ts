@@ -23,6 +23,7 @@ export const relationalViewHelper = (
 
   const baseViewConfigManger = new BaseViewConfigManager(relationalView);
   return {
+    all: views,
     relationalView,
     baseViewConfigManger,
     displayField: baseViewConfigManger.getDisplayFieldLabel(),

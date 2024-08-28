@@ -2,8 +2,6 @@ import { atom } from 'jotai';
 import { RegisteredViews } from './types';
 import { relationalViewHelper } from './relational-view.helper';
 
-export const registeredViewsAtom = atom<RegisteredViews>({});
-
 export const viewsHelperAtom = atom((get) => {
   return {
     get: (tableName: string) =>
@@ -16,3 +14,5 @@ export const viewsHelperAtom = atom((get) => {
     },
   };
 });
+
+export const registeredViewsAtom = atom<RegisteredViews>({});

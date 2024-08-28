@@ -37,6 +37,7 @@ export type FieldConfig = {
   isRelationalIdField?: boolean;
   type: FieldType;
   name: string;
+  isList: boolean;
   isRequired?: boolean;
   relation?: {
     tableName: string;

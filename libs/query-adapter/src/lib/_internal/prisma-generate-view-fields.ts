@@ -20,6 +20,7 @@ export const generateViewFieldsFromPrismaSchema = (
               enumValue,
               relation,
               fieldName,
+              isList,
             } = prismaViewFieldsHelper(fieldData, tableData, Prisma);
 
             return [
@@ -32,6 +33,7 @@ export const generateViewFieldsFromPrismaSchema = (
                 isRequired: fieldData.isRequired,
                 enum: enumValue,
                 relation,
+                isList,
               } satisfies FieldConfig,
             ];
           })

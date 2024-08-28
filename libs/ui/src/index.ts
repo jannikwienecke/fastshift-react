@@ -10,3 +10,5 @@ export * from './lib/filter/filter';
 export * from './lib/components/checkbox';
 export * from './lib/icon';
 export * from './lib/bubble';
+export * from './lib/combobox-popover/combobox-popover';
+export * from './lib/components';

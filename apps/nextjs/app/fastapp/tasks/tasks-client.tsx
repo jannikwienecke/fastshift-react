@@ -12,6 +12,7 @@ import {
   CompletedComponent,
   PriorityComponent,
   ProjectComponent,
+  TagsCombobox,
   TagsComponent,
 } from './components';
 import { TaskViewDataType } from './tasks.types';
@@ -19,18 +20,30 @@ import { TaskViewDataType } from './tasks.types';
 setClientViewConfig<TaskViewDataType>('task', {
   fields: {
     completed: {
-      component: CompletedComponent,
+      component: {
+        list: CompletedComponent,
+        combobox: CompletedComponent,
+      },
     },
 
     priority: {
-      component: PriorityComponent,
+      component: {
+        list: PriorityComponent,
+        combobox: PriorityComponent,
+      },
     },
 
     tag: {
-      component: TagsComponent,
+      component: {
+        list: TagsComponent,
+        combobox: TagsCombobox,
+      },
     },
     project: {
-      component: ProjectComponent,
+      component: {
+        list: ProjectComponent,
+        // combobox: ProjectComponent,
+      },
     },
   },
 });
@@ -59,7 +72,7 @@ export const TasksClient = ({
   const queryData = useQueryData();
 
   return (
-    <div className="p-4 pb-0 flex flex-col w-full overflow-scroll h-screen">
+    <div className="p-4 pb-0 flex flex-col w-full overflow-scroll h-[calc(100vh-16px)]">
       <div className="pt-1 border-b border-gray-200">
         <button onClick={() => dispatch({ type: 'ADD_NEW_RECORD' })}>
           Add New

@@ -169,6 +169,7 @@ export const prismaViewFieldsHelper = (
     relation: getRelation(),
     fieldName: getManyToManyModel()?.name.toLowerCase() ?? fieldName,
     isOptionForDisplayField: isOptionForDisplayField(),
+    isList: isList,
   };
 };
 

@@ -1,22 +1,12 @@
-import { createServerViewConfig } from '@apps-next/core';
 import {
   prismaViewLoader,
   QueryPrefetchProvider,
 } from '@apps-next/query-adapter';
 import { prisma } from '../../../db';
-import { globalConfig } from '../../layout';
 import { ProjectsClient } from './projects-client';
+import { viewConfig } from './projects.config';
 
 export const dynamic = 'force-dynamic';
-
-export const viewConfig = createServerViewConfig(
-  'project',
-  {
-    displayField: { field: 'label' },
-    icon: 'FaProjectDiagram',
-  },
-  globalConfig.config
-);
 
 export default function FastAppTasksPage() {
   return (

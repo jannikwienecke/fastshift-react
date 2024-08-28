@@ -48,6 +48,7 @@ export const useList = <T extends RecordType>() => {
           return {
             id: row.getItemName(fieldName),
             name: row.getItemLabel(fieldName),
+
             relation: field?.relation
               ? {
                   ...field.relation,
@@ -55,7 +56,7 @@ export const useList = <T extends RecordType>() => {
                 }
               : undefined,
             render: () => {
-              const fieldConfig = config?.fields[fieldName];
+              const ListComponent = config?.fields[fieldName]?.component?.list;
 
               return (
                 <span
@@ -70,10 +71,12 @@ export const useList = <T extends RecordType>() => {
                     });
                   }}
                 >
-                  {fieldConfig?.component ? (
-                    <fieldConfig.component data={row} />
+                  {ListComponent ? (
+                    <>
+                      <ListComponent data={row} />
+                    </>
                   ) : (
-                    <>{row.getItemLabel(fieldName)}</>
+                    <>{row.getItemLabel(fieldName)}12</>
                   )}
                 </span>
               );

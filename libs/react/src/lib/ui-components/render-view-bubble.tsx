@@ -8,7 +8,7 @@ export const ViewBubble = (props: {
   value: string;
   color?: string;
 }) => {
-  const view = useViewOf(props.tableName);
+  const view = useViewOf(props.tableName as string);
   return (
     <Bubble
       label={props.value}

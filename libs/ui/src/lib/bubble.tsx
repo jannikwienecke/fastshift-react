@@ -8,7 +8,7 @@ export const Bubble = ({
   color?: string;
 }) => {
   return (
-    <div className="border-[1px] border-gray-300 rounded-lg text-xs px-2 py-1 flex items-center gap-2 bg-opacity-45">
+    <div className="border-[1px] bg-background border-gray-300 rounded-lg text-xs px-2 py-1 flex items-center gap-2 bg-opacity-45">
       {color ? (
         <div
           style={{ backgroundColor: color }}

@@ -2,6 +2,7 @@ import { invarant } from './core-utils';
 import {
   FieldConfig,
   IncludeConfig,
+  RegisteredViews,
   SearchableField,
   ViewConfigType,
   ViewFieldConfig,
@@ -67,10 +68,38 @@ export class BaseViewConfigManager<
   }
 
   getFieldBy(fieldName: string): FieldConfig {
-    return this.viewConfig.viewFields[fieldName];
+    const field = Object.values(this.viewConfig.viewFields).find(
+      (field) => field.name.toLowerCase() === fieldName.toLowerCase()
+    );
+
+    invarant(!!field, `Field ${fieldName} not found`);
+
+    return field as FieldConfig;
   }
 
   getIncludeFields(): IncludeConfig[string] {
     return this.viewConfig.includeFields;
+  }
+
+  getIncludeFieldsForRelation(
+    tableName: string,
+    registeredViews: RegisteredViews
+  ): IncludeConfig[string] {
+    const view = Object.values(registeredViews).find(
+      (view) => view?.tableName === tableName
+    );
+
+    if (!view) {
+      return [];
+    }
+
+    return view.includeFields.filter((field) => {
+      const isList = view.viewFields[field].isList;
+      if (isList) {
+        return false;
+      }
+
+      return true;
+    });
   }
 }

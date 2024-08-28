@@ -1,16 +1,19 @@
-import { atomWithDebounce } from '@apps-next/core';
+import { atomWithDebounce, Model, RecordType } from '@apps-next/core';
 import { ComboxboxItem, FormField } from '@apps-next/ui';
 import { atom } from 'jotai';
 import { initialFormAtom } from '../form-adapter/form.store';
 import { formHelper } from '../form-adapter/form-helper';
 
-type State = {
+export type State = {
+  dataRaw: RecordType[];
+  data: Model<RecordType>;
   values: ComboxboxItem[];
   selected: null | ComboxboxItem;
   query: string;
   debouncedQuery: string;
   formField?: FormField;
   initialized: boolean;
+  open: boolean;
 };
 
 // each combobox input field has its own state: {task : {....}, project: {...}}
@@ -98,6 +101,20 @@ export const initComboboxAtom = atom(
         ...state[fieldName],
         selected: initialSelected,
         initialized: true,
+      },
+    });
+  }
+);
+
+export const toggleOpenAtom = atom(
+  null,
+  (get, set, props: { fieldName: string }) => {
+    const state = get(comboboxAtom);
+    set(comboboxAtom, {
+      ...state,
+      [props.fieldName]: {
+        ...state[props.fieldName],
+        open: !state[props.fieldName]?.open,
       },
     });
   }

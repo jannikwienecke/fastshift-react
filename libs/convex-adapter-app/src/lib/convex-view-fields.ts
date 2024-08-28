@@ -29,6 +29,8 @@ export const generateViewFieldsFromConvexSchema = (
               isRelationalIdField: relation ? true : false,
               type: MappingConvexToFieldType[(fieldData as any).kind],
               name: relation ? relation.fieldName : fieldName,
+              // TODO: FIX THIS - HARDCODED
+              isList: false,
             };
             return [fieldName, field];
           }

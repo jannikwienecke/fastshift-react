@@ -23,13 +23,15 @@ type ProjectViewDataType = DataType<'project', { owner: Owner }>;
 setClientViewConfig<ProjectViewDataType>('project', {
   fields: {
     owner: {
-      component: ({ data }: any) => {
-        const owner = data;
-        return (
-          <>
-            <AvatarIcon className="w-5 h-5" />
-          </>
-        );
+      component: {
+        list: ({ data }: any) => {
+          const owner = data;
+          return (
+            <>
+              <AvatarIcon className="w-5 h-5" />
+            </>
+          );
+        },
       },
     },
   },

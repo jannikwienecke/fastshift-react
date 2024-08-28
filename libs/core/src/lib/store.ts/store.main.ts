@@ -51,6 +51,12 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
       };
     }
 
+    if (action.type === 'SELECT_RELATIONAL_FIELD') {
+      return {
+        ...prev,
+      };
+    }
+
     throw new Error('unknown action type');
   };
 

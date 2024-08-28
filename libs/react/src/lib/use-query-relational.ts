@@ -1,6 +1,6 @@
 import { useView } from './use-view';
 
-import { QueryReturnOrUndefined, RecordRelationType } from '@apps-next/core';
+import { QueryReturnOrUndefined, RecordType } from '@apps-next/core';
 import { usePrismaQueryRelational } from '@apps-next/query-adapter';
 import { useGlobalConfig } from './use-global-config';
 
@@ -12,13 +12,13 @@ const useQueryRelationalDict: Record<
   prisma: usePrismaQueryRelational,
 };
 
-export const useRelationalQuery = ({
+export const useRelationalQuery = <QueryReturnType extends RecordType[]>({
   tableName,
   query,
 }: {
   tableName: string;
   query?: string;
-}): QueryReturnOrUndefined<RecordRelationType> => {
+}): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const { viewConfigManager, registeredViews } = useView();
   const globalConfig = useGlobalConfig();
 

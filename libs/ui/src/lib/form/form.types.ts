@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComboboxProps } from '../combobox';
+import { ComboboxPopoverProps } from '../combobox-popover/combobox-popover';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FormRecord = Record<any, any>;
@@ -17,11 +17,17 @@ export type FormField<T extends FormRecord = FormRecord> = {
   relation?: {
     tableName: string;
     fieldName: string;
-    useCombobox?: (props: {
+    useCombobox: (props: {
+      name: string;
       fieldName: string;
       placeholder: string;
-      value: T[keyof T];
-    }) => () => ComboboxProps;
+      uniqueId: string;
+      connectedRecordId: string | number;
+      value: {
+        id: string | number;
+        label: string;
+      };
+    }) => () => ComboboxPopoverProps;
   };
   enum?: {
     fieldName: string;

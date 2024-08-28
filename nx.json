@@ -88,6 +88,12 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
+    },
+    "@nx/next:dev": {
+      "cache": true,
+      "options": {
+        "turbo": true
+      }
     }
   },
   "release": {

@@ -53,6 +53,7 @@ export const generateDefaultViewConfigs = ({
         displayField: {
           field: guessDisplayFieldIfNotProvided ? displayField ?? 'id' : 'id',
         },
+        icon: 'FaDotCircle',
       },
       config
     );

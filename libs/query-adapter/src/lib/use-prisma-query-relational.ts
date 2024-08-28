@@ -65,15 +65,7 @@ export const usePrismaQueryRelational = <
       viewConfigManager: undefined,
     });
 
-    return {
-      data: res.data?.map(
-        (item) =>
-          ({
-            id: item.id,
-            label: item.name,
-          } as any)
-      ),
-    };
+    return res;
   }, queryProps);
 
   return {
