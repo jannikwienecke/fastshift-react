@@ -9,8 +9,6 @@ export type State = {
   data: Model<RecordType>;
   values: ComboxboxItem[];
   selected: null | ComboxboxItem;
-  query: string;
-  debouncedQuery: string;
   formField?: FormField;
   initialized: boolean;
   open: boolean;

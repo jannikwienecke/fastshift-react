@@ -174,9 +174,9 @@ const runMutation = async (
     await waitFor(150);
     return await handler(dbMutation, mutation);
   } catch (error) {
-    llerror(
-      `Error running mutation: ${mutation.mutation.type}. Check Context: ${mutationContext}`
-    );
+    llerror(`Error running mutation: ${mutation.mutation.type}. Check Context`);
+    llerror(mutationContext);
+    llerror(error);
 
     return {
       error: {

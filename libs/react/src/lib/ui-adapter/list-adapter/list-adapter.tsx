@@ -1,5 +1,4 @@
 import {
-  clientConfigAtom,
   DataRow,
   getViewConfigAtom,
   RecordType,
@@ -9,24 +8,29 @@ import {
 import { ListItem, ListProps } from '@apps-next/ui';
 import { useAtomValue } from 'jotai';
 import { Icon } from '../../ui-components/render-icon';
-import { useMutation } from '../../use-mutation';
+import { ListFieldValue } from '../../ui-components/render-list-field-value';
 import { useQueryData } from '../../use-query-data';
-import { useCombobox } from '../combox-adapter';
+import {
+  UseComboboAdaper,
+  useCombobox as useComboboxAdapter,
+} from '../combox-adapter';
 
 type ListGetProps<T> = {
   fieldsLeft: (keyof T)[];
   fieldsRight: (keyof T)[];
 };
 
-export const useList = <T extends RecordType>() => {
+export const useList = <T extends RecordType>(props?: {
+  useCombobox?: UseComboboAdaper;
+}) => {
+  const { useCombobox: useComboboxProps } = props ?? {};
+  const useCombobox = useComboboxProps ?? useComboboxAdapter;
+
   const dispatch = useStoreDispatch();
 
   const { dataModel } = useQueryData<T[]>();
-  const { mutate } = useMutation();
   const { selected } = useStoreValue();
 
-  // TODO: FIX NAMING -> OR MERGE THEM clientConfigAtom and getViewConfigAtom
-  const config = useAtomValue(clientConfigAtom);
   const viewConfig = useAtomValue(getViewConfigAtom);
 
   return <Props extends ListGetProps<T>>(
@@ -43,44 +47,16 @@ export const useList = <T extends RecordType>() => {
     ): ListProps['items'][0]['valuesLeft'] => {
       return (
         fields?.map((fieldName) => {
-          const field = row.getItem(fieldName)?.field;
+          const { label, id, field } = row.getItem(fieldName);
 
           return {
-            id: row.getItemName(fieldName),
-            name: row.getItemLabel(fieldName),
-
-            relation: field?.relation
-              ? {
-                  ...field.relation,
-                  useCombobox: useCombobox,
-                }
-              : undefined,
-            render: () => {
-              const ListComponent = config?.fields[fieldName]?.component?.list;
-
-              return (
-                <span
-                  role="button"
-                  onClick={() => {
-                    if (!field) return;
-                    if (!field.relation) return;
-
-                    dispatch({
-                      type: 'SELECT_RELATIONAL_FIELD',
-                      field,
-                    });
-                  }}
-                >
-                  {ListComponent ? (
-                    <>
-                      <ListComponent data={row} />
-                    </>
-                  ) : (
-                    <>{row.getItemLabel(fieldName)}12</>
-                  )}
-                </span>
-              );
+            id,
+            label,
+            relation: field.relation && {
+              ...field.relation,
+              useCombobox,
             },
+            render: () => <ListFieldValue field={field} row={row} />,
           };
         }) ?? []
       );
@@ -90,8 +66,8 @@ export const useList = <T extends RecordType>() => {
       return [
         {
           id: item.id,
-          name: item.label,
-          render: () => <span>{item.label}</span>,
+          label: item.label,
+          render: () => <>{item.label}</>,
         },
       ];
     };

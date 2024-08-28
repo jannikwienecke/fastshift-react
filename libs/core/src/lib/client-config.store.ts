@@ -1,12 +1,9 @@
 import { atom, createStore } from 'jotai';
 import { DataRow } from './query-store';
-import {
-  GetTableName,
-  GetTableDataType,
-  RegisteredRouter,
-  RecordType,
-} from './types';
+import { GetTableName, RecordType, RegisteredRouter } from './types';
 import { viewConfigManagerAtom } from './view-config.store';
+
+export type ComponentType = 'list' | 'combobox';
 
 export type ClientViewConfig<T extends GetTableName, U extends RecordType> = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -14,10 +11,11 @@ export type ClientViewConfig<T extends GetTableName, U extends RecordType> = {
   [key in T]: {
     fields: Partial<{
       [key in keyof U]: {
-        component?: {
-          list?: (props: { data: DataRow<U> }) => React.ReactNode;
-          combobox?: (props: { data: DataRow<U> }) => React.ReactNode;
-        };
+        component?: Partial<{
+          [key in ComponentType]: (props: {
+            data: DataRow<U>;
+          }) => React.ReactNode;
+        }>;
       };
     }>;
   };

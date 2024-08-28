@@ -8,7 +8,7 @@ import {
 } from '@apps-next/core';
 import { DataType, makeHooks } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
-import { Owner } from '@prisma/client';
+import { Category, Owner } from '@prisma/client';
 import { AvatarIcon } from '@radix-ui/react-icons';
 import { IconAdjustmentsHorizontal, IconListSearch } from '@tabler/icons-react';
 
@@ -18,7 +18,10 @@ import { IconAdjustmentsHorizontal, IconListSearch } from '@tabler/icons-react';
 // use default list -> render yourself and adjust sorting
 // use default list -> pass props to list
 
-type ProjectViewDataType = DataType<'project', { owner: Owner }>;
+type ProjectViewDataType = DataType<
+  'project',
+  { owner: Owner; category: Category }
+>;
 
 setClientViewConfig<ProjectViewDataType>('project', {
   fields: {
@@ -76,7 +79,7 @@ export const ProjectsClient = ({
         <List {...getListProps()}>
           {getListProps({
             fieldsLeft: ['label'],
-            fieldsRight: ['owner'],
+            fieldsRight: ['owner', 'category'],
           }).items.map((item) => {
             return (
               <List.Item key={item.id} item={item}>
@@ -91,11 +94,7 @@ export const ProjectsClient = ({
                     ))}
                   </div>
 
-                  <div>
-                    {item.valuesRight.map((value) => (
-                      <List.Value key={value.id}>{value.render()}</List.Value>
-                    ))}
-                  </div>
+                  <List.ValuesRight values={item.valuesRight} />
                 </List.Values>
               </List.Item>
             );

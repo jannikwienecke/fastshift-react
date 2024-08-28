@@ -1,21 +1,13 @@
-import {
-  BaseViewConfigManager,
-  BaseViewConfigManagerInterface,
-} from '../base-view-config';
+import { BaseViewConfigManagerInterface } from '../base-view-config';
 import { relationalViewHelper } from '../relational-view.helper';
-import {
-  FieldConfig,
-  FieldType,
-  ID,
-  RecordType,
-  RegisteredViews,
-} from '../types';
+import { FieldConfig, ID, RecordType, RegisteredViews } from '../types';
 
 type DataItemProps<T extends RecordType> = {
-  value: T | DataItem<T>;
+  value: T;
   field: FieldConfig;
   name: keyof T;
   label: string;
+  id: string;
 };
 export class DataItem<T extends RecordType> {
   private constructor(private props: DataItemProps<T>) {}
@@ -42,6 +34,10 @@ export class DataItem<T extends RecordType> {
 
   get label() {
     return this.props.label;
+  }
+
+  get id(): string {
+    return this.props.value?.id ?? this.value ?? '';
   }
 }
 
@@ -73,6 +69,7 @@ export class DataRow<TProps extends RecordType = RecordType> {
       }
 
       return DataItem.create({
+        id: value?.id ?? value ?? '',
         value,
         label,
         field,
@@ -128,7 +125,11 @@ export class DataRow<TProps extends RecordType = RecordType> {
   }
 
   getItem(name: keyof TProps) {
-    return this.items.find((item) => item.name === name);
+    const item = this.items.find((item) => item.name === name);
+    if (!item) {
+      throw new Error(`getItem: Item with name ${String(name)} not found`);
+    }
+    return item;
   }
 
   updateItem<TKey extends keyof TProps>(name: TKey, value: DataItem<TProps>) {
