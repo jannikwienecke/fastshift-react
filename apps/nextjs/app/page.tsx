@@ -13,10 +13,3 @@ export default async function Index() {
     </div>
   );
 }
-
-// prisma.project.findMany({
-//   take: 5,
-//   include: {
-//     category: true,
-//   },
-// });

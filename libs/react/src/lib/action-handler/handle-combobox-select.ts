@@ -7,6 +7,7 @@ import {
 } from '../ui-adapter/combox-adapter/combobox.store';
 import { useView } from '../use-view';
 import { useMutation } from '../use-mutation';
+import { RecordType } from '@apps-next/core';
 
 export const useHandleSelectCombobox = () => {
   const { mutate } = useMutation();
@@ -29,6 +30,7 @@ export const useHandleSelectCombobox = () => {
     if (!field.relation || !state) return;
 
     const relationalRow = state.data.getRowById(value.id);
+    const isManyToManyRelation = field.relation.manyToManyRelation;
 
     setTimeout(() => {
       // prevent seeing the flash of disappearing input text
@@ -54,7 +56,12 @@ export const useHandleSelectCombobox = () => {
             if (item.id === rowId) {
               return {
                 ...item,
-                [fieldName]: relationalRow.getRawData(),
+                [fieldName]: isManyToManyRelation
+                  ? updateManyToManyRelation(
+                      item[fieldName],
+                      relationalRow.getRawData()
+                    )
+                  : relationalRow.getRawData(),
               };
             }
             return item;
@@ -72,3 +79,15 @@ export const useHandleSelectCombobox = () => {
 
   return handleSelect;
 };
+
+function updateManyToManyRelation(
+  currentValues: RecordType[],
+  newValue: RecordType
+) {
+  const existingIndex = currentValues.findIndex(
+    (value) => value.id === newValue.id
+  );
+  return existingIndex !== -1
+    ? currentValues.filter((_, index) => index !== existingIndex)
+    : [...currentValues, newValue];
+}

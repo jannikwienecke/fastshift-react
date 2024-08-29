@@ -2,7 +2,7 @@ import {
   ComboboAdapterProps,
   ComboboxGetPropsOptions,
   ComboboxPopoverProps,
-} from '../combobox-popover/combobox-popover';
+} from '../combobox-popover';
 
 export type ListValueProps = {
   id: string | number;

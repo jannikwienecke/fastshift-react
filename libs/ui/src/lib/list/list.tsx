@@ -1,9 +1,6 @@
 import React from 'react';
 import { ComboxboxItem } from '../combobox';
-import {
-  ComboboxGetPropsOptions,
-  ComboboxPopover,
-} from '../combobox-popover/combobox-popover';
+import { ComboboxGetPropsOptions, ComboboxPopover } from '../combobox-popover';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
 import { ListItem, ListProps, ListValueProps } from './list.types';
@@ -23,9 +20,10 @@ export function ListDefault<TItem extends ListItem = ListItem>({
       {items.map((item) => {
         return (
           <List.Item key={item.id} className="" item={item}>
-            <List.Control />
-
-            <List.Icon icon={item?.icon} />
+            <div className="flex gap-1 pr-2">
+              <List.Control />
+              <List.Icon icon={item?.icon} />
+            </div>
 
             <List.Values>
               <ListValues values={item.valuesLeft} />
@@ -131,7 +129,7 @@ function Item(
     <ItemProvider value={{ item }}>
       <li
         className={cn(
-          'flex flex-row py-2 px-4 w-full gap-3 border-b border-collapse border-gray-200',
+          'flex flex-row py-[10px] pl-2 pr-4 w-full gap-2 border-b border-collapse border-[#f7f7f7]',
           isSelected ? 'bg-foreground/5  text-foreground' : 'hover:bg-slate-50',
           className
         )}
@@ -143,11 +141,16 @@ function Item(
   );
 }
 
-function ListIcon(props: { icon?: React.FC }) {
-  if (!props.icon) return null;
+function ListIcon({
+  icon: Icon,
+  ...props
+}: {
+  icon?: React.FC<React.ComponentProps<'div'>>;
+} & React.ComponentPropsWithoutRef<'div'>) {
+  if (!Icon) return null;
   return (
-    <div className="grid place-items-center">
-      {props.icon && <props.icon />}
+    <div className="grid place-items-center text-muted-foreground">
+      {Icon && <Icon {...props} />}
     </div>
   );
 }
@@ -183,7 +186,7 @@ function Value({
   return (
     <div
       className={cn(
-        'text-sm text-foreground/80 ',
+        'text-sm text-foreground/90 ',
         isSelected ? '' : 'hover:bg-slate-50',
         className
       )}
@@ -206,11 +209,14 @@ function ListValues({
   return (
     <>
       <div
-        className={cn('flex flex-row gap-2 items-center', className)}
+        className={cn(
+          'flex flex-row gap-2 items-center text-foreground/80',
+          className
+        )}
         {...props}
       >
         {values.map((value, index) => {
-          if (value.relation && value.relation.tableName !== 'tag') {
+          if (value.relation && value.relation.tableName !== 'project') {
             return (
               <ListCombobox
                 key={value.id}
@@ -247,13 +253,21 @@ List.Combobox = ListCombobox;
 // CONTINUE HERE:
 // add icons to views/tables and show in the list - check!
 // handle check state of all items in list store - check!
-// handle when clicking on a relational field like user etc...
-// handle actions like delete, edit, etc...
+// handle when clicking on a relational field like user etc... -> check!
+// change the combobox placeholder text -> NEXT TO DOa -> Check!
+// change icon color to more grayish and the relational field labels as well -> Check!
+// make icons a bit smaller -> Check!
+// left padding bit less in list item, padding top/bottom bit more in list item -> Check!
+
+// make combobox work for
+// - [ ] Add many to many fields
+// - [ ] enum fields
+// handle actions like delete, edit, etc... (... icon next to list show on hover -see linear)
 // - [ ] Add commandbar
-// - [ ] Click list edit field
+// - [ ] Click list edit field -> check!
 // - [ ] Add filter component
 // - [ ] Can be filter
 // - [ ] Can do pagination
 // two ways when clicking on a field
-// 1. open a dropdown to update that field value -> DEFAULT
+// 1. open a dropdown to update that field value -> DEFAULT -> check!
 // 2. open the record behind that field -> CAN BE SELECTED IN THE CONFIG

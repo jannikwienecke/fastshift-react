@@ -68,7 +68,9 @@ export type PrismaClient = {
     findMany: (args: PrismaFindManyArgs) => Promise<PrismaRecord[]>;
     create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
     delete: (args: { where: { id: ID } }) => Promise<void>;
+    deleteMany: (args: { where: Record<string, unknown> }) => Promise<void>;
     update: (args: { where: { id: ID }; data: PrismaRecord }) => Promise<void>;
+    findUnique: (args: { where: { id: ID } }) => Promise<PrismaRecord>;
   };
 };
 

@@ -7,12 +7,13 @@ export const ViewBubble = (props: {
   tableName: GetTableName;
   value: string;
   color?: string;
+  showIcon?: boolean;
 }) => {
   const view = useViewOf(props.tableName as string);
   return (
     <Bubble
       label={props.value}
-      icon={<Icon icon={view.icon || null} />}
+      icon={props.showIcon === false ? null : <Icon icon={view.icon || null} />}
       color={props.color}
     />
   );

@@ -1,4 +1,4 @@
-import { FieldConfig } from '@apps-next/core';
+import { FieldConfig, FieldRelationType } from '@apps-next/core';
 import { Prisma } from '../prisma.types';
 import { prismaViewFieldsHelper } from './prisma-view-fields-helper';
 
@@ -11,36 +11,61 @@ export const generateViewFieldsFromPrismaSchema = (
     Object.entries(Prisma.models).map(([index, tableData]) => {
       return [
         Prisma.models[+index].name.toLowerCase(),
-        Object.fromEntries(
-          Object.entries(tableData.fields).map(([index, fieldData]) => {
-            const {
-              type,
-              isIdField,
-              isRelationalIdField,
-              enumValue,
-              relation,
-              fieldName,
-              isList,
-            } = prismaViewFieldsHelper(fieldData, tableData, Prisma);
-
-            return [
-              fieldName,
-              {
-                isId: isIdField,
-                isRelationalIdField,
-                type,
-                name: fieldName,
-                isRequired: fieldData.isRequired,
-                enum: enumValue,
-                relation,
-                isList,
-              } satisfies FieldConfig,
-            ];
-          })
-        ),
+        Object.fromEntries(parseFields(tableData, Prisma)),
       ];
     })
   );
 
   return viewFields;
+};
+
+const parseFields = (
+  tableData: Prisma['dmmf']['datamodel']['models'][0],
+  Prisma: Prisma['dmmf']['datamodel']
+) => {
+  return Object.entries(tableData.fields).map(([index, fieldData]) => {
+    const {
+      type,
+      isIdField,
+      isRelationalIdField,
+      enumValue,
+      relation,
+      fieldName,
+      isList,
+    } = prismaViewFieldsHelper(fieldData, tableData, Prisma);
+
+    let manyToManyModelFields: FieldRelationType['manyToManyModelFields'] = [];
+
+    if (relation?.manyToManyTable) {
+      // if this is a many to many relation, we need to get the fields of the many to many table
+      const model = Prisma.models.find(
+        (m) => m.name === relation?.manyToManyTable
+      );
+
+      const parsed = model ? parseFields(model, Prisma) : undefined;
+
+      const fields = parsed?.map((value) => value[1]) as FieldConfig[];
+
+      manyToManyModelFields = fields;
+    }
+
+    return [
+      fieldName,
+      {
+        isId: isIdField,
+        isRelationalIdField,
+        type,
+        name: fieldName,
+        isRequired: fieldData.isRequired,
+        enum: enumValue,
+        relation: relation
+          ? {
+              ...relation,
+              manyToManyModelFields,
+            }
+          : undefined,
+        isList,
+      } satisfies FieldConfig,
+    ];
+  });
 };

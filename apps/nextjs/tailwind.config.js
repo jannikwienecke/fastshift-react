@@ -79,6 +79,10 @@ module.exports = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      fontSize: {
+        base: '15px',
+        sm: '13px', // Add this line to set text-sm to 13px
+      },
     },
   },
   plugins: [require('tailwindcss-animate'), '@tailwindcss/forms'],

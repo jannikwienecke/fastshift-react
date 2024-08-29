@@ -32,6 +32,16 @@ export type RecordRelationType = {
 export type Enum = { name: string };
 
 export type TableRelationType = 'oneToOne' | 'oneToMany' | 'manyToMany';
+
+export type FieldRelationType = {
+  tableName: string;
+  fieldName: string;
+  type: TableRelationType;
+  manyToManyRelation?: string;
+  // e.g. type: 'TaskTag',
+  manyToManyTable?: string;
+  manyToManyModelFields?: FieldConfig[];
+};
 export type FieldConfig = {
   isId?: boolean;
   isRelationalIdField?: boolean;
@@ -39,12 +49,7 @@ export type FieldConfig = {
   name: string;
   isList: boolean;
   isRequired?: boolean;
-  relation?: {
-    tableName: string;
-    fieldName: string;
-    type: TableRelationType;
-    manyToManyRelation?: string;
-  };
+  relation?: FieldRelationType;
   enum?: {
     name: string;
     values: Enum[];

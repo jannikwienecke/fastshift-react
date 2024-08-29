@@ -6,7 +6,7 @@ import {
   useStoreValue,
   ViewConfigType,
 } from '@apps-next/core';
-import { DataType, makeHooks } from '@apps-next/react';
+import { DataType, makeHooks, useHandleSelectCombobox } from '@apps-next/react';
 import { Form, List } from '@apps-next/ui';
 import { Category, Owner } from '@prisma/client';
 import { AvatarIcon } from '@radix-ui/react-icons';
@@ -47,7 +47,14 @@ export const ProjectsClient = ({
 }) => {
   const { useList, useQuery, useForm } = makeHooks<ProjectViewDataType>();
 
-  const getListProps = useList();
+  const handleSelect = useHandleSelectCombobox();
+
+  const getListProps = useList({
+    comboboxOptions: {
+      onSelect: handleSelect,
+    },
+  });
+
   const { edit } = useStoreValue();
 
   const { data } = useQuery();
@@ -60,7 +67,7 @@ export const ProjectsClient = ({
   const dispatch = useStoreDispatch();
 
   return (
-    <div className="flex grow mx-2 flex-col gap-2 h-[calc(100vh-1rem)] border-[1px] border-gray-200">
+    <div className="flex grow mx-2 flex-col gap-2 h-[calc(100vh-1rem)] border-[1px] border-gray-100">
       <div className="">
         {edit.isEditing ? <Form {...getFormProps()} /> : null}
 
@@ -70,7 +77,7 @@ export const ProjectsClient = ({
             <div className="text-xs">Filter</div>
           </div>
 
-          <div className="flex flex-row space-y-1 items-center space-x-2 border border-gray-200 hover:bg-gray-100 rounded-md p-1 px-2">
+          <div className="flex flex-row space-y-1 items-center space-x-2 border border-gray-100 hover:bg-gray-100 rounded-md p-1 px-2">
             <IconAdjustmentsHorizontal className="w-4 h-4" />
             <div className="text-xs">Sort</div>
           </div>

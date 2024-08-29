@@ -85,6 +85,7 @@ export const useCombobox = (props: {
           });
         },
       },
+      multiple: Boolean(field.relation?.manyToManyRelation),
     } satisfies ComboboxPopoverProps;
   };
 

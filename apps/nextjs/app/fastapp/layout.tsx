@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { viewConfig as ProjectsViewConfig } from './projects/projects.config';
-import { viewConfig as TasksViewConfig } from './tasks/tasks.config';
-import { viewConfig as CategoriesViewConfig } from './categories/categories.config';
+// import { viewConfig as ProjectsViewConfig } from './projects/projects.config';
+// import { viewConfig as TasksViewConfig } from './tasks/tasks.config';
+// import { viewConfig as CategoriesViewConfig } from './categories/categories.config';
 
 // console.debug('Registered Views');
 // console.debug(TasksViewConfig.viewName);
-console.debug(ProjectsViewConfig.viewName);
+// console.debug(ProjectsViewConfig.viewName);
 // console.debug(CategoriesViewConfig.viewName);
 // console.debug('==');
 // console.debug(' ');

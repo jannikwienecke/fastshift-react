@@ -1,7 +1,7 @@
 'use client';
 
 import { setClientViewConfig, ViewConfigType } from '@apps-next/core';
-import { DataType, makeHooks } from '@apps-next/react';
+import { DataType, makeHooks, useHandleSelectCombobox } from '@apps-next/react';
 import { List } from '@apps-next/ui';
 import { ColorComponent } from './categories.components';
 
@@ -24,10 +24,15 @@ export const CategoriesClient = ({
 }) => {
   const { useList } = makeHooks(viewConfig);
 
-  const getListProps = useList();
+  const handleSelect = useHandleSelectCombobox();
 
+  const getListProps = useList({
+    comboboxOptions: {
+      onSelect: handleSelect,
+    },
+  });
   return (
-    <div className="flex grow mx-2 flex-col gap-2 h-[calc(100vh-10rem)] border-[1px] border-gray-200">
+    <div className="flex grow mx-2 flex-col gap-2 h-[calc(100vh-10rem)] border-[1px] border-gray-100">
       <List.Default {...getListProps()} />
     </div>
   );

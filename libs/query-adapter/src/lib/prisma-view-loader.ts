@@ -55,15 +55,14 @@ export const prismaViewLoader = async (
 
   const { registeredViews, relationQuery } = args;
 
-  const dbQuery = client(prismaClient).dbQuery(tableName);
+  const dbQuery = client(prismaClient).tableClient(tableName);
 
   let result: PrismaRecord[] | undefined;
 
   if (relationQuery) {
     const tableNameRelation = relationQuery.tableName;
 
-    const dbQuery = client(prismaClient).dbQuery(tableNameRelation);
-
+    const dbQuery = client(prismaClient).tableClient(tableNameRelation);
     const { displayField } = relationalViewHelper(
       relationQuery.tableName,
       registeredViews
@@ -136,7 +135,7 @@ export const prismaViewLoader = async (
 };
 
 export const prismaViewMutation = async (
-  prismaClient: unknown,
+  prismaClient: Record<string, PrismaClient>,
   args: MutationProps
 ): Promise<MutationReturnDto> => {
   lldebug('prismaViewMutation: ', args.mutation.type);
@@ -145,11 +144,9 @@ export const prismaViewMutation = async (
 
   const viewConfigManager = new BaseViewConfigManager(args.viewConfig);
 
-  const dbMutation = (prismaClient as PrismaClient)[args.viewConfig.tableName];
-
   const handler = mutationHandlers[mutation.type];
 
-  return runMutation(handler, dbMutation, {
+  return runMutation(handler, prismaClient, {
     mutation,
     viewConfigManager,
   });
@@ -157,7 +154,7 @@ export const prismaViewMutation = async (
 
 const runMutation = async (
   handler: MUTATION_HANDLER_PRISMA[MutationProps['mutation']['type']],
-  dbMutation: DbMutation,
+  prismaClient: Record<string, PrismaClient>,
   mutation: MutationPropsServer
 ): Promise<MutationReturnDto> => {
   const mutationContext: MutationContext = {
@@ -172,7 +169,7 @@ const runMutation = async (
     lldebug('Run Mutation: ', mutationContext);
 
     await waitFor(150);
-    return await handler(dbMutation, mutation);
+    return await handler(prismaClient, mutation);
   } catch (error) {
     llerror(`Error running mutation: ${mutation.mutation.type}. Check Context`);
     llerror(mutationContext);

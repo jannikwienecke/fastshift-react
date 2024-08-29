@@ -1,5 +1,5 @@
 import { BaseViewConfigManagerInterface } from '../base-view-config';
-import { ID } from './base.types';
+import { FieldConfig, ID } from './base.types';
 import { ViewConfigType } from './view-config.types';
 
 type MutationRecord = Record<string, any>;
@@ -107,3 +107,11 @@ export type MutationReturnDtoError = {
 export type MutationReturnDto =
   | MutationReturnDtoSuccess
   | MutationReturnDtoError;
+
+export type ManyToManyMutationProps = {
+  fieldName: string;
+  table: string;
+  values: ID[];
+  manyToManyTable: string;
+  manyToManyModelFields: FieldConfig[];
+};

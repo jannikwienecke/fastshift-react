@@ -10,46 +10,8 @@ import {
 } from '../components/command';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/popover';
 import { cn } from '../utils';
-
-type ComboxboxItem = {
-  id: string | number;
-  label: string;
-};
-
-export type ComboboxPopoverProps = {
-  input: {
-    query: string;
-    placeholder: string;
-    onChange: (query: string) => void;
-    onBlur?: () => void;
-  };
-
-  values: ComboxboxItem[];
-  onChange: (value: ComboxboxItem) => void;
-  selected: ComboxboxItem | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  tableName: string;
-  render: (value: ComboxboxItem) => React.ReactNode;
-};
-
-export type ComboboxGetPropsOptions = {
-  onSelect: (props: {
-    value: ComboxboxItem;
-    rowId: string | number;
-    fieldName: string;
-  }) => void;
-};
-
-export type ComboboAdapterProps = {
-  name: string;
-  fieldName: string;
-  connectedRecordId: string | number;
-  selectedValue: {
-    id: string | number;
-    label: string;
-  };
-};
+import { ComboboxPopoverProps } from './combobox-popver.types';
+import { Checkbox } from '../components/checkbox';
 
 export function ComboboxPopover({
   input,
@@ -70,12 +32,14 @@ export function ComboboxPopover({
         <PopoverContent className="p-0" side="right" align="start">
           <Command>
             <div
-              className="flex items-center justify-between border-b px-3"
+              className="flex items-center justify-between border-b pr-2"
               cmdk-input-wrapper=""
             >
               <Input
                 value={input.query}
-                placeholder="Change status..."
+                placeholder={
+                  input.placeholder || `Change ${comboboxProps.tableName}...`
+                }
                 onChange={(event) => input.onChange(event.target.value)}
                 className={cn(
                   'flex h-10 w-full rounded-md shadow-none bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-none focus-visible:ring-0'
@@ -89,20 +53,29 @@ export function ComboboxPopover({
 
             <CommandList>
               <CommandGroup>
-                {comboboxProps.values.map((value) => {
+                {comboboxProps.values.map((value, index) => {
                   return (
                     <CommandItem
-                      className="flex items-center justify-between whitespace-nowrap gap-3"
+                      className="flex items-center justify-between whitespace-nowrap gap-3 text-[13px]"
                       key={value.id}
                       value={value.id.toString()}
                       onSelect={() => {
                         comboboxProps.onChange(value);
                       }}
                     >
-                      {comboboxProps.render(value)}
-                      {comboboxProps.selected?.id === value.id ? (
-                        <CheckIcon className="w-5 h-5 font-bold" />
-                      ) : null}
+                      <div className="flex items-center gap-4">
+                        {comboboxProps.multiple ? <Checkbox /> : null}
+
+                        <div>{comboboxProps.render(value)}</div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {comboboxProps.selected?.id === value.id ? (
+                          <CheckIcon className="w-5 h-5 font-bold" />
+                        ) : null}
+
+                        <span className="text-[11px]">{index}</span>
+                      </div>
                     </CommandItem>
                   );
                 })}

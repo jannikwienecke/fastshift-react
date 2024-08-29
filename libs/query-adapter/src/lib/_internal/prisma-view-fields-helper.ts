@@ -1,4 +1,8 @@
-import { FieldType, TableRelationType } from '@apps-next/core';
+import {
+  FieldRelationType,
+  FieldType,
+  TableRelationType,
+} from '@apps-next/core';
 import { Prisma, PrismaField } from '../prisma.types';
 
 type PrismaFieldTypeMapping = {
@@ -130,7 +134,9 @@ export const prismaViewFieldsHelper = (
         tableName: model.name.toLowerCase(),
         fieldName: model?.name,
         manyToManyRelation: fieldData.name,
-      };
+        manyToManyTable: fieldData.type,
+        manyToManyModelFields: [],
+      } satisfies FieldRelationType;
     }
 
     return isRelationalField

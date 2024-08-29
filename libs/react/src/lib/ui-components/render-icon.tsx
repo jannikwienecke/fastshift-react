@@ -11,7 +11,7 @@ export function Icon(props: { icon?: keyof typeof icons | null }) {
   return (
     <Icon
       style={{ color: viewConfig.viewConfig.iconColor }}
-      className="w-4 h-4"
+      className="w-3 h-3"
     />
   );
 }

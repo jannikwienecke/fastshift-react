@@ -3,7 +3,7 @@ import {
   ComboboAdapterProps,
   ComboboxGetPropsOptions,
   ComboboxPopoverProps,
-} from '../combobox-popover/combobox-popover';
+} from '../combobox-popover';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FormRecord = Record<any, any>;

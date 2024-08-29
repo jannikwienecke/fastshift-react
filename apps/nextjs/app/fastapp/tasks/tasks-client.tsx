@@ -16,9 +16,10 @@ import {
   CompletedComponent,
   PriorityComponent,
   ProjectComponent,
+  ProjectComponentCombobox,
   TagsCombobox,
   TagsComponent,
-} from './components';
+} from './tasks.components';
 import { TaskViewDataType } from './tasks.types';
 
 setClientViewConfig<TaskViewDataType>('task', {
@@ -46,7 +47,7 @@ setClientViewConfig<TaskViewDataType>('task', {
     project: {
       component: {
         list: ProjectComponent,
-        // combobox: ProjectComponent,
+        combobox: ProjectComponentCombobox,
       },
     },
   },
@@ -83,11 +84,7 @@ export const TasksClient = ({
 
   return (
     <div className="p-4 pb-0 flex flex-col w-full overflow-scroll h-[calc(100vh-16px)]">
-      <div className="pt-1 border-b border-gray-200">
-        <button onClick={() => dispatch({ type: 'ADD_NEW_RECORD' })}>
-          Add New
-        </button>
-
+      <div className="pt-1 border-b border-gray-100">
         <div>
           <QueryInput />
         </div>

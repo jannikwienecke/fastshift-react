@@ -7,7 +7,7 @@ import { PrismaClient } from '../prisma.types';
 
 export type MUTATION_HANDLER_PRISMA = {
   [key in Mutation['type']]: (
-    dbMutation: PrismaClient[string],
+    prismaClient: Record<string, PrismaClient>,
     args: MutationPropsServer
   ) => Promise<MutationReturnDtoSuccess>;
 };

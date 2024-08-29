@@ -1,7 +1,8 @@
 import { DataRow } from '@apps-next/core';
-import { ViewBubble } from '@apps-next/react';
+import { useViewOf, ViewBubble } from '@apps-next/react';
 import { TaskViewDataType } from './tasks.types';
 import React from 'react';
+import { Icon } from '@apps-next/ui';
 
 // TODO: Have a default component library export for fields
 // like: CheckboxField, TextField, Completed, Priority, Tags...
@@ -76,15 +77,21 @@ export const TagsComponent = (props: { data: DataRow<TaskViewDataType> }) => {
 
   return (
     <div ref={containerRef} className="flex items-center">
-      {visibleTags.map((tag, index) => (
+      {visibleTags?.map((tag, index) => (
         <div key={tag.id} className={index !== 0 ? '-ml-2' : ''}>
-          <ViewBubble tableName="tag" value={tag.name} color={tag.color} />
+          <ViewBubble
+            tableName="tag"
+            value={tag.name}
+            color={tag.color}
+            showIcon={false}
+          />
         </div>
       ))}
 
       {visibleTags.length < tags.length && (
         <div className={'-ml-2'}>
           <ViewBubble
+            showIcon={false}
             tableName="tag"
             value={`+${tags.length - visibleTags.length} more`}
           />
@@ -99,13 +106,14 @@ export const TagsCombobox = (props: { data: DataRow<TaskViewDataType> }) => {
 
   if (!tags) return null;
   return (
-    <div className="flex gap-[2px] text-sm text-muted-foreground">
+    <div className="flex gap-[2px] text-sm">
       {tags.map((tag) => (
-        <div key={tag.id} className="flex items-center gap-4">
+        <div key={tag.id} className="flex items-center">
           <div
             style={{ backgroundColor: tag.color }}
-            className="w-[10px] h-[10px] rounded-full"
+            className="w-[10px] h-[10px] rounded-full mr-3"
           />
+
           <div>{tag.name}</div>
         </div>
       ))}
@@ -119,4 +127,18 @@ export const ProjectComponent = (props: {
   const project = props.data.getItemValue('project');
 
   return <ViewBubble tableName="project" value={String(project.label)} />;
+};
+
+export const ProjectComponentCombobox = (props: {
+  data: DataRow<TaskViewDataType>;
+}) => {
+  const project = props.data.getItemValue('project');
+  const view = useViewOf('project');
+
+  return (
+    <div className="flex gap-2 items-center w-full">
+      <Icon icon={view.icon} />
+      <div>{project.label}</div>
+    </div>
+  );
 };
