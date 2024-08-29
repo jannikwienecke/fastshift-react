@@ -1,14 +1,14 @@
+import { RecordType, useStoreDispatch } from '@apps-next/core';
 import { ComboboxAdapterOptions } from '@apps-next/ui';
 import { useSetAtom } from 'jotai';
 import {
-  updateValuesAtom,
-  getStateByAtom,
   debouncedQueryAtom,
+  getStateByAtom,
+  updateValuesAtom,
 } from '../ui-adapter/combox-adapter/combobox.store';
-import { useView } from '../use-view';
 import { useMutation } from '../use-mutation';
-import { RecordType, useStoreDispatch } from '@apps-next/core';
 import { useQueryData } from '../use-query-data';
+import { useView } from '../use-view';
 
 export const useHandleSelectCombobox = () => {
   const { mutate } = useMutation();
@@ -48,7 +48,9 @@ export const useHandleSelectCombobox = () => {
 
     row.updateItemId(fieldName, selected as any);
 
-    dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
+    if (!isManyToManyRelation) {
+      dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
+    }
 
     setTimeout(() => {
       // prevent seeing the flash of disappearing input text
@@ -69,7 +71,6 @@ export const useHandleSelectCombobox = () => {
             },
           }
         : {
-            open: false,
             selected: null,
           },
     });
