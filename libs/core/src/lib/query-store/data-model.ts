@@ -37,7 +37,7 @@ export class DataItem<T extends RecordType> {
   }
 
   get id(): string {
-    return this.props.value?.id ?? this.value ?? '';
+    return this.props.id;
   }
 }
 
@@ -55,7 +55,7 @@ export class DataRow<TProps extends RecordType = RecordType> {
   ) {
     const items = viewConfigManager.getViewFieldList().map((field) => {
       const value = props?.[field.name];
-      let label = value;
+      let label = value ?? '';
 
       const { fieldName, tableName } = field.relation || {};
 
@@ -68,8 +68,9 @@ export class DataRow<TProps extends RecordType = RecordType> {
         label = getDisplayFieldValue(props);
       }
 
+      const ids = Array.isArray(value) ? value.map((v) => v.id) : undefined;
       return DataItem.create({
-        id: value?.id ?? value ?? '',
+        id: ids ?? value?.id ?? value,
         value,
         label,
         field,
@@ -99,8 +100,6 @@ export class DataRow<TProps extends RecordType = RecordType> {
   getItemValue<TKey extends keyof TProps>(name: TKey): TProps[TKey] {
     const item = this.items.find((item) => item.name === name);
     if (!item) {
-      console.trace();
-      console.log({ name, items: this.items });
       throw new Error(`getItemValue: Item with name ${String(name)} not found`);
     }
 
@@ -126,6 +125,7 @@ export class DataRow<TProps extends RecordType = RecordType> {
 
   getItem(name: keyof TProps) {
     const item = this.items.find((item) => item.name === name);
+
     if (!item) {
       throw new Error(`getItem: Item with name ${String(name)} not found`);
     }
@@ -136,6 +136,21 @@ export class DataRow<TProps extends RecordType = RecordType> {
     this.items = this.items.map((item) => {
       if (item.name === name) {
         return value;
+      }
+      return item;
+    });
+  }
+
+  updateItemId<TKey extends keyof TProps>(name: TKey, value: string) {
+    this.items = this.items.map((item) => {
+      if (item.name === name) {
+        return DataItem.create({
+          label: item.label,
+          name: item.name,
+          value: item.value,
+          field: item.field,
+          id: value,
+        });
       }
       return item;
     });

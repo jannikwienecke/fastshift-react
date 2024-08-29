@@ -1,3 +1,4 @@
+import { DataRow, DataItem } from '../query-store';
 import { FieldConfig, RecordType } from '../types';
 
 export type StoreAction =
@@ -19,4 +20,10 @@ export type StoreAction =
   | {
       type: 'SELECT_RELATIONAL_FIELD';
       field: FieldConfig;
+      row: DataRow;
+      value: DataItem<RecordType>;
+      rect: DOMRect;
+    }
+  | {
+      type: 'DESELECT_RELATIONAL_FIELD';
     };

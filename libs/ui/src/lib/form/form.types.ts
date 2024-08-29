@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   ComboboAdapterProps,
-  ComboboxGetPropsOptions,
+  ComboboxAdapterOptions,
   ComboboxPopoverProps,
 } from '../combobox-popover';
 
@@ -23,7 +23,7 @@ export type FormField<T extends FormRecord = FormRecord> = {
     fieldName: string;
     useCombobox: (
       props: ComboboAdapterProps
-    ) => (options?: ComboboxGetPropsOptions) => ComboboxPopoverProps;
+    ) => (options?: ComboboxAdapterOptions) => ComboboxPopoverProps;
   };
   enum?: {
     fieldName: string;

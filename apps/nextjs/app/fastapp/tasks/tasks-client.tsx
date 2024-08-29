@@ -4,14 +4,14 @@ import {
   setClientViewConfig,
   useStoreDispatch,
   useStoreValue,
-  ViewConfigType,
 } from '@apps-next/core';
 import {
   makeHooks,
   QueryInput,
+  useCombobox,
   useHandleSelectCombobox,
 } from '@apps-next/react';
-import { Form, List } from '@apps-next/ui';
+import { ComboboxPopover, Form, List } from '@apps-next/ui';
 import {
   CompletedComponent,
   PriorityComponent,
@@ -53,21 +53,14 @@ setClientViewConfig<TaskViewDataType>('task', {
   },
 });
 
-export const TasksClient = ({
-  viewConfig,
-}: {
-  viewConfig: ViewConfigType<'task'>;
-}) => {
+export const TasksClient = () => {
   const { useList, useQuery, useForm, useQueryData } =
     makeHooks<TaskViewDataType>();
 
-  const handleSelect = useHandleSelectCombobox();
+  const { handleSelect, handleClose } = useHandleSelectCombobox();
 
-  const getListProps = useList({
-    comboboxOptions: {
-      onSelect: handleSelect,
-    },
-  });
+  const getListProps = useList();
+
   const { edit } = useStoreValue();
 
   const { data } = useQuery();
@@ -82,6 +75,11 @@ export const TasksClient = ({
 
   const queryData = useQueryData();
 
+  const getComboboxProps = useCombobox({
+    onSelect: handleSelect,
+    onClose: handleClose,
+  });
+
   return (
     <div className="p-4 pb-0 flex flex-col w-full overflow-scroll h-[calc(100vh-16px)]">
       <div className="pt-1 border-b border-gray-100">
@@ -90,6 +88,8 @@ export const TasksClient = ({
         </div>
         {edit.isEditing ? <Form {...getFormProps()} /> : null}
       </div>
+
+      <ComboboxPopover {...getComboboxProps()} />
 
       <List.Default
         {...getListProps({

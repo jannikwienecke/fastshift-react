@@ -8,6 +8,7 @@ import { atom, useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { useRelationalQuery } from './use-query-relational';
 import { updateValuesAtom } from './ui-adapter/combox-adapter/combobox.store';
+import { usePrevious } from '@uidotdev/usehooks';
 
 type RelationalQueryStore<T extends RecordType> = {
   [key: string]: {
@@ -73,16 +74,31 @@ export const useRelationalQueryData = <
   const queryStore = useAtomValue(relationalQueryStoreAtom);
   const updateQueryData = useSetAtom(updateRelationalQueryDataAtom);
 
-  const { data } = useRelationalQuery(props);
+  const { data, isFetching } = useRelationalQuery(props);
 
-  const propsRef = React.useRef(props);
+  const prevIsFetching = usePrevious(isFetching);
+
+  const wasUpdatedRef = React.useRef(false);
+
   React.useEffect(() => {
+    if (isFetching) {
+      wasUpdatedRef.current = false;
+    }
+  }, [isFetching]);
+
+  React.useEffect(() => {
+    if (prevIsFetching === isFetching) return;
+    if (isFetching) return;
+    if (wasUpdatedRef.current) return;
+
+    wasUpdatedRef.current = true;
+
     updateQueryData({
       dataRaw: data || [],
-      tableName: propsRef.current.tableName,
-      identifier: propsRef.current.identifier,
+      tableName: props.tableName,
+      identifier: props.identifier,
     });
-  }, [data, updateQueryData]);
+  }, [data, isFetching, prevIsFetching, props, updateQueryData]);
 
   return queryStore[props.tableName];
 };

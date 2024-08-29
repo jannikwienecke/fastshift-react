@@ -1,5 +1,5 @@
 export type ComboxboxItem = {
-  id: string | number;
+  id: string | number | (string | number)[];
   label: string;
 };
 

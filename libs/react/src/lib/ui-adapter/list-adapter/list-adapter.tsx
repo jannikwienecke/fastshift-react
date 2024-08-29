@@ -5,28 +5,18 @@ import {
   useStoreDispatch,
   useStoreValue,
 } from '@apps-next/core';
-import { ComboboxGetPropsOptions, ListItem, ListProps } from '@apps-next/ui';
+import { ListItem, ListProps } from '@apps-next/ui';
 import { useAtomValue } from 'jotai';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
 import { useQueryData } from '../../use-query-data';
-import {
-  UseComboboAdaper,
-  useCombobox as useComboboxAdapter,
-} from '../combox-adapter';
 
 type ListGetProps<T> = {
   fieldsLeft: (keyof T)[];
   fieldsRight: (keyof T)[];
 };
 
-export const useList = <T extends RecordType>(props?: {
-  useCombobox?: UseComboboAdaper;
-  comboboxOptions?: ComboboxGetPropsOptions;
-}) => {
-  const { useCombobox: useComboboxProps } = props ?? {};
-  const useCombobox = useComboboxProps ?? useComboboxAdapter;
-
+export const useList = <T extends RecordType>() => {
   const dispatch = useStoreDispatch();
 
   const { dataModel } = useQueryData<T[]>();
@@ -48,16 +38,18 @@ export const useList = <T extends RecordType>(props?: {
     ): ListProps['items'][0]['valuesLeft'] => {
       return (
         fields?.map((fieldName) => {
-          const { label, id, field } = row.getItem(fieldName);
+          const item = row.getItem(fieldName);
+          const { label, id, field } = item;
 
           return {
             id,
             label,
             relation: field.relation && {
               ...field.relation,
-              useCombobox,
             },
-            render: () => <ListFieldValue field={field} row={row} />,
+            render: () => (
+              <ListFieldValue value={item} field={field} row={row} />
+            ),
           };
         }) ?? []
       );
@@ -76,7 +68,6 @@ export const useList = <T extends RecordType>(props?: {
     return {
       onSelect: (item) => dispatch({ type: 'SELECT_RECORD', record: item }),
       selected,
-      comboboxOptions: props?.comboboxOptions,
       items:
         dataModel.getRows()?.map((item) => ({
           ...item.getRawData(),

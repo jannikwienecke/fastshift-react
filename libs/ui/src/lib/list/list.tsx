@@ -1,6 +1,4 @@
 import React from 'react';
-import { ComboxboxItem } from '../combobox';
-import { ComboboxGetPropsOptions, ComboboxPopover } from '../combobox-popover';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
 import { ListItem, ListProps, ListValueProps } from './list.types';
@@ -9,14 +7,9 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   items,
   onSelect,
   selected,
-  comboboxOptions,
 }: ListProps<TItem>) {
   return (
-    <List
-      onSelect={onSelect}
-      selected={selected}
-      comboboxOptions={comboboxOptions}
-    >
+    <List onSelect={onSelect} selected={selected}>
       {items.map((item) => {
         return (
           <List.Item key={item.id} className="" item={item}>
@@ -36,50 +29,21 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   );
 }
 
-const ListCombobox = ({
-  relation,
-  value,
-  id,
-  children,
-}: {
-  id: string | number;
-  relation: ListValueProps['relation'];
-  value: ComboxboxItem;
-  children: React.ReactNode;
-}) => {
-  const { comboboxOptions } = React.useContext(ListContext);
-
-  if (!relation) throw new Error('Relation not found');
-
-  const getProps = relation.useCombobox?.({
-    fieldName: relation.tableName,
-    selectedValue: value,
-    connectedRecordId: id,
-    name: relation.fieldName,
-  });
-
-  return (
-    <ComboboxPopover {...getProps(comboboxOptions)}>{children}</ComboboxPopover>
-  );
-};
-
 const ListContext = React.createContext<
-  Pick<ListProps<any>, 'onSelect' | 'selected' | 'comboboxOptions'>
->({} as Pick<ListProps<any>, 'onSelect' | 'selected' | 'comboboxOptions'>);
+  Pick<ListProps<any>, 'onSelect' | 'selected'>
+>({} as Pick<ListProps<any>, 'onSelect' | 'selected'>);
 const ListProvider = ListContext.Provider;
 
 export function List<TItem extends ListItem = ListItem>({
   children,
   onSelect,
   selected,
-  comboboxOptions,
 }: { children: React.ReactNode } & {
   onSelect: ListProps<TItem>['onSelect'];
   selected: ListProps<TItem>['selected'];
-  comboboxOptions?: ComboboxGetPropsOptions;
 }) {
   return (
-    <ListProvider value={{ onSelect, selected, comboboxOptions }}>
+    <ListProvider value={{ onSelect, selected }}>
       <div className="flex flex-col w-full border-collapse overflow-scroll grow">
         {children}
       </div>
@@ -204,8 +168,6 @@ function ListValues({
 }: React.ComponentPropsWithoutRef<'div'> & {
   values: ListValueProps[];
 }) {
-  const { item } = React.useContext(ItemContext);
-
   return (
     <>
       <div
@@ -215,20 +177,7 @@ function ListValues({
         )}
         {...props}
       >
-        {values.map((value, index) => {
-          if (value.relation && value.relation.tableName !== 'project') {
-            return (
-              <ListCombobox
-                key={value.id}
-                id={item.id}
-                relation={value.relation}
-                value={value}
-              >
-                {value.render ? value.render() : value.label}
-              </ListCombobox>
-            );
-          }
-
+        {values.map((value) => {
           return (
             <List.Value key={value.id}>
               {value.render ? value.render() : value.label}
@@ -248,7 +197,6 @@ List.ValuesRight = ListValues;
 List.Value = Value;
 List.Icon = ListIcon;
 List.Default = ListDefault;
-List.Combobox = ListCombobox;
 
 // CONTINUE HERE:
 // add icons to views/tables and show in the list - check!

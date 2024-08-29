@@ -54,9 +54,22 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
     if (action.type === 'SELECT_RELATIONAL_FIELD') {
       return {
         ...prev,
+        list: {
+          ...prev.list,
+          focusedRelationField: action,
+        },
       };
     }
 
+    if (action.type === 'DESELECT_RELATIONAL_FIELD') {
+      return {
+        ...prev,
+        list: {
+          ...prev.list,
+          focusedRelationField: undefined,
+        },
+      };
+    }
     throw new Error('unknown action type');
   };
 

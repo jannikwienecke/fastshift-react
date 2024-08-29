@@ -11,7 +11,6 @@ export type State = {
   selected: null | ComboxboxItem;
   formField?: FormField;
   initialized: boolean;
-  open: boolean;
 };
 
 // each combobox input field has its own state: {task : {....}, project: {...}}
@@ -107,25 +106,6 @@ export const initComboboxAtom = atom(
         ...state[fieldName],
         selected: initialSelected,
         initialized: true,
-      },
-    });
-  }
-);
-
-export const toggleOpenAtom = atom(
-  null,
-  (get, set, props: { fieldName: string }) => {
-    set(debouncedQueryAtom, {
-      query: '',
-      fieldName: props.fieldName,
-    });
-
-    const state = get(comboboxAtom);
-    set(comboboxAtom, {
-      ...state,
-      [props.fieldName]: {
-        ...state[props.fieldName],
-        open: !state[props.fieldName]?.open,
       },
     });
   }

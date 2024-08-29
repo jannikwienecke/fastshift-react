@@ -1,3 +1,4 @@
+import { DataItem, DataRow } from '../query-store';
 import { FieldConfig, RecordType } from '../types';
 
 export type Store = {
@@ -10,6 +11,15 @@ export type Store = {
   edit: {
     isEditing: boolean;
     record: RecordType | null;
+  };
+  // TODO: Think about this approach. is it best to differentiate if its on the list or somewhere else?
+  list?: {
+    focusedRelationField?: {
+      row: DataRow;
+      field: FieldConfig | null;
+      value: DataItem<RecordType>;
+      rect: DOMRect;
+    };
   };
 };
 

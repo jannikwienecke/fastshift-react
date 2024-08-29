@@ -1,7 +1,4 @@
-type ComboxboxItem = {
-  id: string | number;
-  label: string;
-};
+import { ComboxboxItem } from '../combobox/combobox.types';
 
 export type ComboboxPopoverProps = {
   input: {
@@ -19,9 +16,11 @@ export type ComboboxPopoverProps = {
   tableName: string;
   render: (value: ComboxboxItem) => React.ReactNode;
   multiple: boolean;
+  rect: DOMRect | null;
 };
 
-export type ComboboxGetPropsOptions = {
+export type ComboboxAdapterOptions = {
+  onClose: () => void;
   onSelect: (props: {
     value: ComboxboxItem;
     rowId: string | number;
@@ -34,7 +33,7 @@ export type ComboboAdapterProps = {
   fieldName: string;
   connectedRecordId: string | number;
   selectedValue: {
-    id: string | number;
+    id: string | number | (string | number)[];
     label: string;
   };
 };

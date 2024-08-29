@@ -1,7 +1,8 @@
+import { useStoreValue } from '@apps-next/core';
 import {
-  ComboboxGetPropsOptions,
+  ComboboAdapterProps,
+  ComboboxAdapterOptions,
   ComboboxPopoverProps,
-  ComboxboxItem,
 } from '@apps-next/ui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
@@ -13,27 +14,41 @@ import {
   debouncedQueryAtom,
   initComboboxAtom,
   State,
-  toggleOpenAtom,
 } from './combobox.store';
 
 export type UseComboboAdaper = typeof useCombobox;
 
-export const useCombobox = (props: {
-  name: string;
-  placeholder?: string;
-  fieldName: string;
-  connectedRecordId: string | number;
-  selectedValue: ComboxboxItem;
-}): (() => ComboboxPopoverProps) => {
+export const useCombobox = (
+  options?: ComboboxAdapterOptions
+): (() => ComboboxPopoverProps) => {
+  const { list } = useStoreValue();
+
+  const props = React.useMemo(() => {
+    return {
+      name:
+        list?.focusedRelationField?.field?.relation?.fieldName ?? 'projectId',
+      fieldName:
+        list?.focusedRelationField?.field?.relation?.tableName ?? 'project',
+      connectedRecordId:
+        list?.focusedRelationField?.row.id ?? 'cm04vi2ff001uenx68cp65f3t',
+      selectedValue: {
+        id: list?.focusedRelationField?.value.id ?? 'cm04vi2f4000wenx63rae4exv',
+        label:
+          list?.focusedRelationField?.value.label ?? 'Fantastic Plastic Soap',
+      },
+    } satisfies ComboboAdapterProps;
+  }, [list]);
+
   const initializeCombobox = useSetAtom(initComboboxAtom);
   const setDebouncedValue = useSetAtom(debouncedQueryAtom);
-  const toggleOpen = useSetAtom(toggleOpenAtom);
 
   const { debouncedQuery, ...comboboxStateDict } =
     useAtomValue(comboboxStateAtom);
 
   const { viewConfigManager } = useView();
-  const field = viewConfigManager.getFieldBy(props.fieldName);
+  const field = props.fieldName
+    ? viewConfigManager.getFieldBy(props.fieldName)
+    : null;
 
   const identifier = props.connectedRecordId + props.fieldName;
 
@@ -43,17 +58,18 @@ export const useCombobox = (props: {
 
   useRelationalQueryData({
     identifier,
-    tableName: field.relation?.tableName ?? '',
+    tableName: field?.relation?.tableName ?? '',
     query: identifier === debouncedQuery.fieldName ? debouncedQuery.query : '',
   });
 
-  const getComboboxProps = (options?: ComboboxGetPropsOptions) => {
+  const getComboboxProps = () => {
     return {
-      tableName: field.relation?.tableName ?? '',
-      open: state?.open ?? false,
+      rect: list?.focusedRelationField?.rect ?? null,
+      tableName: field?.relation?.tableName ?? '',
+      open: list?.focusedRelationField ? true : false,
       selected: state?.selected ?? null,
       values: state?.values ?? [],
-      onOpenChange: () => toggleOpen({ fieldName: identifier }),
+      onOpenChange: () => options?.onClose?.(),
       onChange: (value) => {
         options?.onSelect?.({
           value,
@@ -70,7 +86,7 @@ export const useCombobox = (props: {
         />
       ),
       input: {
-        placeholder: props.placeholder ?? '',
+        placeholder: '',
         query: comboboxStateDict.query.query ?? '',
         onChange(query) {
           setDebouncedValue({
@@ -85,20 +101,18 @@ export const useCombobox = (props: {
           });
         },
       },
-      multiple: Boolean(field.relation?.manyToManyRelation),
+      multiple: Boolean(field?.relation?.manyToManyRelation),
     } satisfies ComboboxPopoverProps;
   };
 
-  const propsRef = React.useRef(props);
-
   React.useEffect(() => {
-    if (propsRef.current.selectedValue) {
+    if (props.selectedValue && identifier) {
       initializeCombobox({
         fieldName: identifier,
-        initialSelected: propsRef.current.selectedValue,
+        initialSelected: props.selectedValue,
       });
     }
-  }, [field, identifier, initializeCombobox, props.name]);
+  }, [identifier, initializeCombobox, props]);
 
   return getComboboxProps;
 };
