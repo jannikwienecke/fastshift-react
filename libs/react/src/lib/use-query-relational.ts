@@ -14,9 +14,11 @@ const useQueryRelationalDict: Record<
 
 export const useRelationalQuery = <QueryReturnType extends RecordType[]>({
   tableName,
+  recordId,
   query,
 }: {
   tableName: string;
+  recordId?: string;
   query?: string;
 }): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const { viewConfigManager, registeredViews } = useView();
@@ -33,6 +35,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>({
       modelConfig: viewConfigManager?.modelConfig,
       relationQuery: {
         tableName: tableName,
+        recordId,
       },
       viewConfigManager: viewConfigManager,
     },

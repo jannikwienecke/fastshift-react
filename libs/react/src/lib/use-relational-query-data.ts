@@ -18,7 +18,7 @@ type RelationalQueryStore<T extends RecordType> = {
 
 const relationalQueryStoreAtom = atom<RelationalQueryStore<RecordType>>({});
 
-const updateRelationalQueryDataAtom = atom(
+export const updateRelationalQueryDataAtom = atom(
   null,
   (
     get,
@@ -64,6 +64,7 @@ export const useRelationalQueryData = <
   QueryReturnType extends RecordType[]
 >(props: {
   tableName: string;
+  recordId?: string;
   query?: string;
   identifier: string;
 }): {

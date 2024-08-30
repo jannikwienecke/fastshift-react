@@ -12,7 +12,7 @@ export const Bubble = ({
       {color ? (
         <div
           style={{ backgroundColor: color }}
-          className="w-2 h-2 rounded-full"
+          className="w-2 h-2 rounded-full border-[1px] border-gray-200"
         />
       ) : null}
 
