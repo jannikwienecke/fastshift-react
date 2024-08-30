@@ -1,4 +1,4 @@
-import { useStoreValue } from '@apps-next/core';
+import { RELATIONAL_QUERY_KEY_PREFIX, useStoreValue } from '@apps-next/core';
 import {
   ComboboAdapterProps,
   ComboboxAdapterOptions,
@@ -8,7 +8,10 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { ComboboxFieldValue } from '../../ui-components/render-combobox-field-value';
 import { useRelationalQuery } from '../../use-query-relational';
-import { useRelationalQueryData } from '../../use-relational-query-data';
+import {
+  updateRelationalQueryDataAtom,
+  useRelationalQueryData,
+} from '../../use-relational-query-data';
 import { useView } from '../../use-view';
 import {
   comboboxStateAtom,
@@ -16,6 +19,7 @@ import {
   initComboboxAtom,
   State,
 } from './combobox.store';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type UseComboboAdaper = typeof useCombobox;
 
@@ -23,7 +27,7 @@ export const useCombobox = (
   options?: ComboboxAdapterOptions
 ): (() => ComboboxPopoverProps) => {
   const { list } = useStoreValue();
-  const { viewConfigManager, registeredViews } = useView();
+  const { viewConfigManager } = useView();
 
   const relationalFields = viewConfigManager.getRelationalFieldList();
   const fieldDefault = relationalFields?.[0];
@@ -32,23 +36,8 @@ export const useCombobox = (
     tableName: fieldDefault.name,
   });
   const prefetchedRef = React.useRef(false);
-  React.useEffect(() => {
-    if (prefetchedRef.current) return;
 
-    prefetchedRef.current = true;
-
-    relationalFields.forEach((field, index) => {
-      if (index === 0) return;
-
-      prefetchQuery?.({ tableName: field.name });
-    });
-  }, [
-    fieldDefault.name,
-    prefetchQuery,
-    registeredViews,
-    relationalFields,
-    viewConfigManager,
-  ]);
+  const queryClient = useQueryClient();
 
   const props = React.useMemo(() => {
     return {
@@ -84,9 +73,46 @@ export const useCombobox = (
     | State
     | undefined;
 
+  const updateQueryData = useSetAtom(updateRelationalQueryDataAtom);
+
+  React.useEffect(() => {
+    if (prefetchedRef.current) return;
+
+    prefetchedRef.current = true;
+
+    relationalFields.forEach((field, index) => {
+      if (index === 0) return;
+
+      prefetchQuery?.({ tableName: field.name });
+
+      const interval = setInterval(() => {
+        const data = queryClient.getQueryData([
+          RELATIONAL_QUERY_KEY_PREFIX,
+          field.name,
+          '',
+        ]);
+
+        if (data) {
+          clearInterval(interval);
+
+          updateQueryData({
+            dataRaw: (data as any).data || [],
+            tableName: field.name,
+            identifier: field.name,
+          });
+        }
+      }, 100);
+
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 1000);
+    });
+  }, [prefetchQuery, updateQueryData, relationalFields, queryClient]);
+
   useRelationalQueryData({
     identifier,
     tableName: field?.relation?.tableName ?? '',
+    recordId: props.connectedRecordId.toString(),
     query: identifier === debouncedQuery.fieldName ? debouncedQuery.query : '',
   });
 
@@ -134,7 +160,7 @@ export const useCombobox = (
   };
 
   React.useEffect(() => {
-    if (props.selectedValue && identifier) {
+    if (props.selectedValue.id && identifier) {
       initializeCombobox({
         fieldName: identifier,
         initialSelected: props.selectedValue,

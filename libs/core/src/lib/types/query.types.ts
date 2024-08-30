@@ -13,6 +13,7 @@ export type QueryProps = {
   modelConfig?: ModelConfig;
   relationQuery?: {
     tableName: string;
+    recordId?: string;
   };
 };
 

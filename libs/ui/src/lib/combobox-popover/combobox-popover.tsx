@@ -68,7 +68,7 @@ export function ComboboxPopover({
             <CommandGroup>
               {comboboxProps.values.map((value, index) => {
                 const isSelected = comboboxProps.multiple
-                  ? (comboboxProps.selected?.id as string[]).some(
+                  ? (comboboxProps.selected?.id as string[] | undefined)?.some(
                       (selected) => selected === value.id
                     )
                   : false;

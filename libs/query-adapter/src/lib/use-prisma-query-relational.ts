@@ -17,7 +17,7 @@ const useStableQuery = (
   const result = useQuery({
     queryKey: [
       RELATIONAL_QUERY_KEY_PREFIX,
-      args.relationQuery?.tableName,
+      `${args.relationQuery?.tableName}${args.relationQuery?.recordId ?? ''}`,
       args.query ?? '',
     ],
     queryFn: fn,
