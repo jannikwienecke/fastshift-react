@@ -38,7 +38,7 @@ export const TagsComponent = (props: { data: DataRow<TaskViewDataType> }) => {
     const updateVisibleTags = () => {
       if (!containerRef.current) return;
 
-      const maxWidth = 100; // Adjust this value as needed
+      const maxWidth = 200; // Adjust this value as needed
       let totalWidth = 0;
       let visibleCount = 0;
 
@@ -77,26 +77,30 @@ export const TagsComponent = (props: { data: DataRow<TaskViewDataType> }) => {
 
   return (
     <div ref={containerRef} className="flex items-center">
-      {visibleTags?.map((tag, index) => (
-        <div key={tag.id} className={index !== 0 ? '-ml-2' : ''}>
-          <ViewBubble
-            tableName="tag"
-            value={tag.name}
-            color={tag.color}
-            showIcon={false}
-          />
-        </div>
-      ))}
+      {containerRef.current ? (
+        <>
+          {visibleTags?.map((tag, index) => (
+            <div key={tag.id} className={index !== 0 ? '-ml-2' : ''}>
+              <ViewBubble
+                tableName="tag"
+                value={tag.name}
+                color={tag.color}
+                showIcon={false}
+              />
+            </div>
+          ))}
 
-      {visibleTags.length < tags.length && (
-        <div className={'-ml-2'}>
-          <ViewBubble
-            showIcon={false}
-            tableName="tag"
-            value={`+${tags.length - visibleTags.length} more`}
-          />
-        </div>
-      )}
+          {visibleTags.length < tags.length && (
+            <div className={'-ml-2'}>
+              <ViewBubble
+                showIcon={false}
+                tableName="tag"
+                value={`+${tags.length - visibleTags.length} more`}
+              />
+            </div>
+          )}
+        </>
+      ) : null}
     </div>
   );
 };

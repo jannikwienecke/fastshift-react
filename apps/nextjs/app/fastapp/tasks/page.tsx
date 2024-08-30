@@ -25,7 +25,7 @@ export default function FastAppTasksPage() {
       viewConfig={configWithCustomLoader}
       viewLoader={(props) => prismaViewLoader(prisma, props)}
     >
-      <TasksClient viewConfig={configWithCustomLoader} />
+      <TasksClient />
     </QueryPrefetchProvider>
   );
 }

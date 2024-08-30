@@ -49,20 +49,18 @@ export const useHandleSelectCombobox = () => {
     row.updateItemId(fieldName, selected as any);
 
     if (!isManyToManyRelation) {
-      dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
+      setTimeout(() => {
+        dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
+        setDebouncedValue({
+          query: '',
+          fieldName,
+        });
+      }, 100);
     }
-
-    setTimeout(() => {
-      // prevent seeing the flash of disappearing input text
-      setDebouncedValue({
-        query: '',
-        fieldName: rowId + fieldName,
-      });
-    }, 100);
 
     // TODO: FIX TYPe here
     updateValues({
-      fieldName: rowId + fieldName,
+      fieldName,
       state: isManyToManyRelation
         ? {
             selected: {
@@ -105,7 +103,9 @@ export const useHandleSelectCombobox = () => {
   };
 
   const handleClose = () => {
-    dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
+    setTimeout(() => {
+      dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
+    }, 100);
   };
 
   return { handleSelect, handleClose };

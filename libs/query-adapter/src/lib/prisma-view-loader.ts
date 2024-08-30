@@ -14,12 +14,7 @@ import {
   relationalViewHelper,
   waitFor,
 } from '@apps-next/core';
-import {
-  DbMutation,
-  PrismaClient,
-  PrismaFindManyArgs,
-  PrismaRecord,
-} from './prisma.types';
+import { PrismaClient, PrismaFindManyArgs, PrismaRecord } from './prisma.types';
 
 import { MutationProps, MutationReturnDto } from '@apps-next/core';
 import { client } from './_internal/prisma-get-client';
@@ -27,7 +22,6 @@ import { MUTATION_HANDLER_PRISMA } from './_internal/prisma-mutation.types';
 import { mutationHandlers } from './_internal/prisma-mutations-helper';
 import { parsePrismaResult } from './_internal/prisma-parse-result';
 import { queryHelper } from './_internal/prisma-query.helper';
-import { relationalQueryHelper } from './_internal/prisma-relational-query.helper';
 
 export const prismaViewLoader = async (
   prismaClient: unknown,
@@ -135,7 +129,7 @@ export const prismaViewLoader = async (
 };
 
 export const prismaViewMutation = async (
-  prismaClient: Record<string, PrismaClient>,
+  prismaClient: unknown,
   args: MutationProps
 ): Promise<MutationReturnDto> => {
   lldebug('prismaViewMutation: ', args.mutation.type);
@@ -146,7 +140,7 @@ export const prismaViewMutation = async (
 
   const handler = mutationHandlers[mutation.type];
 
-  return runMutation(handler, prismaClient, {
+  return runMutation(handler, prismaClient as Record<string, PrismaClient>, {
     mutation,
     viewConfigManager,
   });

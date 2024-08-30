@@ -17,13 +17,15 @@ export const ListFieldValue = ({
   value: DataItem<RecordType>;
 }) => {
   const dispatch = useStoreDispatch();
-
   return (
     <span
-      role="button"
+      style={{
+        cursor: 'default',
+      }}
       onClick={(e) => {
         if (!field) return;
         if (!field.relation) return;
+
         const rect = e.currentTarget.getBoundingClientRect();
 
         dispatch({

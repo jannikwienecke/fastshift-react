@@ -1,9 +1,4 @@
 import React from 'react';
-import {
-  ComboboAdapterProps,
-  ComboboxAdapterOptions,
-  ComboboxPopoverProps,
-} from '../combobox-popover';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FormRecord = Record<any, any>;
@@ -21,9 +16,6 @@ export type FormField<T extends FormRecord = FormRecord> = {
   relation?: {
     tableName: string;
     fieldName: string;
-    useCombobox: (
-      props: ComboboAdapterProps
-    ) => (options?: ComboboxAdapterOptions) => ComboboxPopoverProps;
   };
   enum?: {
     fieldName: string;

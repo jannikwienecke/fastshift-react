@@ -26,11 +26,7 @@ export const CategoriesClient = ({
 
   const handleSelect = useHandleSelectCombobox();
 
-  const getListProps = useList({
-    comboboxOptions: {
-      onSelect: handleSelect,
-    },
-  });
+  const getListProps = useList();
   return (
     <div className="flex grow mx-2 flex-col gap-2 h-[calc(100vh-10rem)] border-[1px] border-gray-100">
       <List.Default {...getListProps()} />

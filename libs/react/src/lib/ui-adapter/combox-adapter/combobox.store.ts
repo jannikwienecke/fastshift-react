@@ -1,8 +1,6 @@
 import { atomWithDebounce, Model, RecordType } from '@apps-next/core';
 import { ComboxboxItem, FormField } from '@apps-next/ui';
 import { atom } from 'jotai';
-import { initialFormAtom } from '../form-adapter/form.store';
-import { formHelper } from '../form-adapter/form-helper';
 
 export type State = {
   dataRaw: RecordType[];
@@ -45,7 +43,7 @@ export const getStateByAtom = atom(
   null,
   (get, _, props: { fieldName: string; rowId: string | number }) => {
     const state = get(comboboxAtom);
-    return state[props.rowId + props.fieldName] as State | undefined;
+    return state[props.fieldName] as State | undefined;
   }
 );
 
@@ -59,23 +57,10 @@ export const updateValuesAtom = atom(
       state: Partial<State>;
     }
   ) => {
-    const formData = get(initialFormAtom);
     const state = get(comboboxAtom);
 
     const fieldName = update.fieldName;
     const newState = update.state;
-
-    if (!state[fieldName]?.initialized) return;
-
-    const fields = formHelper(formData).updateFields(
-      fieldName,
-      update.state.selected
-    );
-
-    set(initialFormAtom, {
-      ...formData,
-      fields,
-    });
 
     set(comboboxAtom, {
       ...state,

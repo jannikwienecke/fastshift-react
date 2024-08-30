@@ -40,7 +40,9 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
 };
 
 export type QueryReturnOrUndefined<T extends RecordType = RecordType> =
-  QueryReturnType<T>;
+  QueryReturnType<T> & {
+    prefetchRelatioanlQuery?: (queryProps: QueryProps['relationQuery']) => void;
+  };
 
 export type MutationReturnType = {
   mutate: (mutation: MutationProps) => void;

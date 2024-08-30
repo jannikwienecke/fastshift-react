@@ -7,6 +7,7 @@ import {
 import { useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { ComboboxFieldValue } from '../../ui-components/render-combobox-field-value';
+import { useRelationalQuery } from '../../use-query-relational';
 import { useRelationalQueryData } from '../../use-relational-query-data';
 import { useView } from '../../use-view';
 import {
@@ -22,22 +23,54 @@ export const useCombobox = (
   options?: ComboboxAdapterOptions
 ): (() => ComboboxPopoverProps) => {
   const { list } = useStoreValue();
+  const { viewConfigManager, registeredViews } = useView();
+
+  const relationalFields = viewConfigManager.getRelationalFieldList();
+  const fieldDefault = relationalFields?.[0];
+
+  const { prefetchRelatioanlQuery: prefetchQuery } = useRelationalQuery({
+    tableName: fieldDefault.name,
+  });
+  const prefetchedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (prefetchedRef.current) return;
+
+    prefetchedRef.current = true;
+
+    relationalFields.forEach((field, index) => {
+      if (index === 0) return;
+
+      prefetchQuery?.({ tableName: field.name });
+    });
+  }, [
+    fieldDefault.name,
+    prefetchQuery,
+    registeredViews,
+    relationalFields,
+    viewConfigManager,
+  ]);
 
   const props = React.useMemo(() => {
     return {
       name:
-        list?.focusedRelationField?.field?.relation?.fieldName ?? 'projectId',
+        list?.focusedRelationField?.field?.relation?.fieldName ??
+        fieldDefault.relation?.fieldName ??
+        '',
       fieldName:
-        list?.focusedRelationField?.field?.relation?.tableName ?? 'project',
-      connectedRecordId:
-        list?.focusedRelationField?.row.id ?? 'cm04vi2ff001uenx68cp65f3t',
+        list?.focusedRelationField?.field?.relation?.tableName ??
+        fieldDefault.name ??
+        '',
+      connectedRecordId: list?.focusedRelationField?.row.id ?? '',
       selectedValue: {
-        id: list?.focusedRelationField?.value.id ?? 'cm04vi2f4000wenx63rae4exv',
-        label:
-          list?.focusedRelationField?.value.label ?? 'Fantastic Plastic Soap',
+        id: list?.focusedRelationField?.value.id ?? '',
+        label: list?.focusedRelationField?.value.label ?? '',
       },
     } satisfies ComboboAdapterProps;
-  }, [list]);
+  }, [list, fieldDefault]);
+
+  const field = props.fieldName
+    ? viewConfigManager.getFieldBy(props.fieldName)
+    : fieldDefault;
 
   const initializeCombobox = useSetAtom(initComboboxAtom);
   const setDebouncedValue = useSetAtom(debouncedQueryAtom);
@@ -45,12 +78,7 @@ export const useCombobox = (
   const { debouncedQuery, ...comboboxStateDict } =
     useAtomValue(comboboxStateAtom);
 
-  const { viewConfigManager } = useView();
-  const field = props.fieldName
-    ? viewConfigManager.getFieldBy(props.fieldName)
-    : null;
-
-  const identifier = props.connectedRecordId + props.fieldName;
+  const identifier = props.fieldName;
 
   const state = comboboxStateDict.state?.[identifier as string] as
     | State
@@ -69,7 +97,13 @@ export const useCombobox = (
       open: list?.focusedRelationField ? true : false,
       selected: state?.selected ?? null,
       values: state?.values ?? [],
-      onOpenChange: () => options?.onClose?.(),
+      onOpenChange: () => {
+        options?.onClose?.();
+        setDebouncedValue({
+          query: '',
+          fieldName: identifier as string,
+        });
+      },
       onChange: (value) => {
         options?.onSelect?.({
           value,
@@ -91,12 +125,6 @@ export const useCombobox = (
         onChange(query) {
           setDebouncedValue({
             query,
-            fieldName: identifier as string,
-          });
-        },
-        onBlur: () => {
-          setDebouncedValue({
-            query: '',
             fieldName: identifier as string,
           });
         },

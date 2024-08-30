@@ -24,6 +24,7 @@ export interface BaseViewConfigManagerInterface<
   getTableName(): string;
   getViewName(): string;
   getViewFieldList(): FieldConfig[];
+  getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
   modelConfig?: ModelConfig;
   form: FormManagerInterface;
@@ -65,6 +66,12 @@ export class BaseViewConfigManager<
   getViewFieldList(): FieldConfig[] {
     // return Object.values(this.modelConfig?.viewFields ?? {});
     return Object.values(this.viewConfig?.viewFields ?? {});
+  }
+
+  getRelationalFieldList(): FieldConfig[] {
+    return Object.values(this.viewConfig.viewFields ?? {}).filter(
+      (f) => f.relation
+    );
   }
 
   getFieldBy(fieldName: string): FieldConfig {

@@ -52,6 +52,8 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
     }
 
     if (action.type === 'SELECT_RELATIONAL_FIELD') {
+      if (prev.list?.focusedRelationField) return prev;
+
       return {
         ...prev,
         list: {

@@ -5,7 +5,6 @@ export type ComboboxPopoverProps = {
     query: string;
     placeholder: string;
     onChange: (query: string) => void;
-    onBlur?: () => void;
   };
 
   values: ComboxboxItem[];

@@ -86,8 +86,6 @@ export const formAtom = atom(
           relation: field.relation
             ? {
                 ...field.relation,
-
-                useCombobox,
               }
             : undefined,
           enum: field.enum

@@ -208,7 +208,11 @@ List.Default = ListDefault;
 // left padding bit less in list item, padding top/bottom bit more in list item -> Check!
 
 // make combobox work for
-// - [ ] Add many to many fields
+// - [x] Add many to many fields -> Check
+// - [x] combobox when removing query -> "" it should show the default ones -> Check!
+// - [ ] For many to many fiels, load all items that are selected + other items that are not selected
+// - -  [ ] same for non relational fields: Always load the selected one + other items that are not selected
+// - [ ] positioning of the combobox dropdown
 // - [ ] enum fields
 // handle actions like delete, edit, etc... (... icon next to list show on hover -see linear)
 // - [ ] Add commandbar
