@@ -14,13 +14,14 @@ export const useQueryData = <
   const queryStore = useAtomValue(queryStoreAtom);
   const updateQueryData = useSetAtom(updateQueryDataAtom);
 
-  const { data } = useQuery();
+  const { data, relationalData } = useQuery();
 
   React.useEffect(() => {
     updateQueryData({
       dataRaw: data || [],
+      relationalDataRaw: relationalData || {},
     });
-  }, [data, updateQueryData]);
+  }, [data, relationalData, updateQueryData]);
 
   return queryStore;
 };

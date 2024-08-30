@@ -40,6 +40,7 @@ export type Prisma = {
 export type PrismaRecord = Record<string, any> & { id?: number | string };
 
 export type PrismaWhere = {
+  id?: ID;
   OR?: Array<{
     [key in string]: {
       contains?: string;

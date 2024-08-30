@@ -63,5 +63,6 @@ export const usePrismaQuery = <QueryReturnType extends RecordType[]>({
   return {
     ...queryReturn,
     data: queryReturn.data?.data,
+    relationalData: queryReturn.data?.relationalData,
   };
 };

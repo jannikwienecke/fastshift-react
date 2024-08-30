@@ -9,6 +9,7 @@ export type State = {
   selected: null | ComboxboxItem;
   formField?: FormField;
   initialized: boolean;
+  isFetching: boolean;
 };
 
 // each combobox input field has its own state: {task : {....}, project: {...}}
@@ -16,7 +17,7 @@ type ComboboxState<> = {
   [key in string]: State;
 };
 
-const comboboxAtom = atom<ComboboxState>({});
+export const comboboxAtom = atom<ComboboxState>({});
 
 export const {
   isDebouncingAtom,

@@ -21,6 +21,7 @@ const useStableQuery = (
       args.query ?? '',
     ],
     queryFn: fn,
+    enabled: !!args.relationQuery?.recordId && !!args.query,
   });
 
   const stored = React.useRef(result as any);

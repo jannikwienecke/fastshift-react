@@ -21,8 +21,13 @@ export type QueryDto = {
   viewConfig?: ViewConfigType;
 } & Omit<QueryProps, 'viewConfigManager'>;
 
+export type QueryRelationalData = {
+  [key: string]: RecordType[];
+};
+
 export type QueryReturnDto<T extends RecordType = RecordType> = {
   data: T[] | undefined;
+  relationalData?: QueryRelationalData;
   error?: any;
 };
 
@@ -32,6 +37,7 @@ export type QueryError = {
 
 export type QueryReturnType<T extends RecordType = RecordType> = {
   data: T[] | undefined;
+  relationalData?: QueryRelationalData;
   isLoading: boolean;
   isError: boolean;
   error: QueryError | undefined;

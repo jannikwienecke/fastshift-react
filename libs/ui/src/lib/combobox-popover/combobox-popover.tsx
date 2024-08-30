@@ -74,30 +74,31 @@ export function ComboboxPopover({
                   : false;
 
                 return (
-                  <CommandItem
-                    className="flex items-center justify-between whitespace-nowrap gap-3 text-[13px]"
-                    key={value.id.toString()}
-                    value={value.id.toString()}
-                    onSelect={() => {
-                      comboboxProps.onChange(value);
-                    }}
-                  >
-                    <div className="flex items-center gap-4">
-                      {comboboxProps.multiple ? (
-                        <Checkbox checked={isSelected} />
-                      ) : null}
+                  <div key={value.id.toString()} className="">
+                    <CommandItem
+                      className="flex items-center justify-between whitespace-nowrap gap-3 text-[13px]"
+                      value={value.id.toString()}
+                      onSelect={() => {
+                        comboboxProps.onChange(value);
+                      }}
+                    >
+                      <div className="flex items-center gap-4">
+                        {comboboxProps.multiple ? (
+                          <Checkbox checked={isSelected} />
+                        ) : null}
 
-                      <div>{comboboxProps.render(value)}</div>
-                    </div>
+                        <div>{comboboxProps.render(value)}</div>
+                      </div>
 
-                    <div className="flex items-center gap-2">
-                      {comboboxProps.selected?.id === value.id ? (
-                        <CheckIcon className="w-5 h-5 font-bold" />
-                      ) : null}
+                      <div className="flex items-center gap-2">
+                        {comboboxProps.selected?.id === value.id ? (
+                          <CheckIcon className="w-5 h-5 font-bold" />
+                        ) : null}
 
-                      <span className="text-[11px]">{index}</span>
-                    </div>
-                  </CommandItem>
+                        <span className="text-[11px]">{index}</span>
+                      </div>
+                    </CommandItem>
+                  </div>
                 );
               })}
             </CommandGroup>

@@ -10,6 +10,7 @@ import {
   MutationContext,
   MutationPropsServer,
   QueryDto,
+  QueryRelationalData,
   QueryReturnDto,
   relationalViewHelper,
   waitFor,
@@ -53,10 +54,10 @@ export const prismaViewLoader = async (
 
   let result: PrismaRecord[] | undefined;
 
-  if (relationQuery) {
+  if (relationQuery?.tableName) {
     const tableNameRelation = relationQuery.tableName;
 
-    const dbQuery = client(prismaClient).tableClient(tableNameRelation);
+    let dbQuery = client(prismaClient).tableClient(tableNameRelation);
     const { displayField } = relationalViewHelper(
       relationQuery.tableName,
       registeredViews
@@ -71,23 +72,75 @@ export const prismaViewLoader = async (
       ) ?? []
     );
 
-    console.log('include', include);
+    const field = viewConfigManager.getFieldBy(relationQuery.tableName);
+    if (field.relation?.manyToManyTable && relationQuery.recordId) {
+      const firstLetterLowerCase = (str: string) =>
+        str.charAt(0).toLowerCase() + str.slice(1);
+      dbQuery = client(prismaClient).tableClient(
+        firstLetterLowerCase(field.relation.manyToManyTable)
+      );
 
-    const result = await dbQuery.findMany({
-      take: DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
-      where: args.query ? helper.where : undefined,
-      include,
-      orderBy: helper.orderBy,
-    });
+      const fieldNameTable = field.relation?.manyToManyModelFields?.find(
+        (f) =>
+          f.name.toLowerCase() ===
+          viewConfigManager.getTableName().toLowerCase()
+      )?.relation?.fieldName;
 
-    const parsedResult = parsePrismaResult({
-      include,
-      viewConfigManager,
-    }).parseResult(result);
+      const result = await dbQuery.findMany({
+        take: DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
+        include: {
+          [relationQuery.tableName]: true,
+        },
+        where: relationQuery.recordId
+          ? {
+              [fieldNameTable ?? '']: relationQuery.recordId,
+            }
+          : undefined,
+      });
 
-    return {
-      data: parsedResult,
-    };
+      const parsedResult = result.map((r) => r[relationQuery.tableName]);
+
+      return {
+        data: parsedResult,
+      };
+    } else if (relationQuery.recordId) {
+      dbQuery = client(prismaClient).tableClient(
+        viewConfigManager.getTableName()
+      );
+
+      // Implement the missing functionality
+      const result = await dbQuery.findMany({
+        take: DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
+        where: {
+          id: relationQuery.recordId,
+        },
+        include: {
+          [relationQuery.tableName]: true,
+        },
+      });
+
+      const parsedResult = result?.map((r) => r[relationQuery.tableName]);
+
+      return {
+        data: parsedResult,
+      };
+    } else {
+      const result = await dbQuery.findMany({
+        take: DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
+        where: args.query ? helper.where : undefined,
+        include,
+        orderBy: helper.orderBy,
+      });
+
+      const parsedResult = parsePrismaResult({
+        include,
+        viewConfigManager,
+      }).parseResult(result);
+
+      return {
+        data: parsedResult,
+      };
+    }
   } else {
     const _prismaLoaderExtension: PrismaFindManyArgs =
       args.viewConfig?.loader?._prismaLoaderExtension ?? {};
@@ -99,6 +152,36 @@ export const prismaViewLoader = async (
     });
 
     const include = helper.getInclude(viewConfigManager.getIncludeFields());
+
+    const getManyToManyField = (key: string) => {
+      return viewConfigManager
+        .getViewFieldList()
+        .find((f) => f.relation?.manyToManyRelation === key);
+    };
+
+    const relationalDataPromises = Object.keys(include).map((key) => {
+      const field = getManyToManyField(key);
+
+      let dbQuery = client(prismaClient).tableClient(key);
+
+      if (field?.relation?.type === 'manyToMany') {
+        dbQuery = client(prismaClient).tableClient(field.relation.tableName);
+      }
+
+      return dbQuery.findMany({
+        take: DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
+      });
+    });
+
+    const resultList = await Promise.all(relationalDataPromises);
+
+    const relationalData = Object.keys(include).reduce((acc, key, index) => {
+      const field = getManyToManyField(key);
+      const _key = field?.relation?.tableName ?? key;
+
+      acc[_key] = resultList[index];
+      return acc;
+    }, {} as QueryRelationalData);
 
     if (args.query) {
       result = await dbQuery.findMany({
@@ -124,8 +207,14 @@ export const prismaViewLoader = async (
 
     return {
       data: parsedResult,
+      relationalData,
     };
   }
+
+  // Add a default return statement to satisfy the linter
+  return {
+    data: [],
+  };
 };
 
 export const prismaViewMutation = async (
@@ -179,3 +268,8 @@ const runMutation = async (
     };
   }
 };
+
+// for all include fields, (tag, project etc)
+// some data will be loaded with the view
+// when opening the combobo
+// we show this loaded that with the data that is loaded with the record (due to the include)

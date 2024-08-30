@@ -210,6 +210,7 @@ List.Default = ListDefault;
 // make combobox work for
 // - [x] Add many to many fields -> Check
 // - [x] combobox when removing query -> "" it should show the default ones -> Check!
+// - [ ] insteed of preloading the relational quries in useeffect -> do it in the initial query
 // - [ ] For many to many fiels, load all items that are selected + other items that are not selected
 // - -  [ ] same for non relational fields: Always load the selected one + other items that are not selected
 // - [ ] positioning of the combobox dropdown
