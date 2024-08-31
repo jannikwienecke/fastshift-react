@@ -40,6 +40,7 @@ export const ServerSideConfigProvider = (
     registeredViews: RegisteredViews;
     includeConfig: IncludeConfig;
     data: QueryReturnDto['data'];
+    relationalDataRaw: QueryReturnDto['relationalData'];
   } & { children: React.ReactNode }
 ) => {
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
@@ -50,9 +51,18 @@ export const ServerSideConfigProvider = (
     props.registeredViews
   );
 
+  const relationalDataModel = Object.entries(
+    props.relationalDataRaw ?? {}
+  ).reduce((acc, [key, data]) => {
+    acc[key] = Model.create(data, viewConfigManager, props.registeredViews);
+    return acc;
+  }, {} as { [key: string]: Model<RecordType> });
+
   const queryStore: QueryStore<RecordType> = {
     dataRaw: props.data || [],
     dataModel: model,
+    relationalDataRaw: props.relationalDataRaw ?? {},
+    relationalDataModel,
     loading: false,
     error: null,
     page: 1,

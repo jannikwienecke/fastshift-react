@@ -16,11 +16,16 @@ export const useQueryData = <
 
   const { data, relationalData } = useQuery();
 
+  const updatedRef = React.useRef(false);
   React.useEffect(() => {
-    updateQueryData({
-      dataRaw: data || [],
-      relationalDataRaw: relationalData || {},
-    });
+    if (data && relationalData) {
+      updatedRef.current = true;
+
+      updateQueryData({
+        dataRaw: data || [],
+        relationalDataRaw: relationalData || {},
+      });
+    }
   }, [data, relationalData, updateQueryData]);
 
   return queryStore;

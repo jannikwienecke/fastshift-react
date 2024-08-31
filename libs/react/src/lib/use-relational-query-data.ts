@@ -92,85 +92,136 @@ export const useRelationalQueryData = <
 } => {
   const queryStore = useAtomValue(relationalQueryStoreAtom);
   const updateQueryData = useSetAtom(updateRelationalQueryDataAtom);
-  const setFetching = useSetAtom(isFetchingRelationalQueryAtom);
 
   const { data, isFetching } = useRelationalQuery(props);
-  const { relationalDataModel } = useQueryData();
+  const { relationalDataModel, dataModel } = useQueryData();
   const { list } = useStoreValue();
 
   const wasUpdatedRef = React.useRef(false);
 
   const defaultRelationalData = relationalDataModel?.[props.tableName];
 
+  const currentValue: RecordType | RecordType[] | undefined =
+    list?.focusedRelationField
+      ? dataModel
+          .getRowById(list?.focusedRelationField?.row.id)
+          .getItemValue(props.tableName)
+      : undefined;
+
+  const _currentValue = React.useMemo(() => {
+    return Array.isArray(currentValue) ? currentValue : [currentValue];
+  }, [currentValue]);
+
+  const defaultValues = React.useMemo(() => {
+    return defaultRelationalData?.getRows().map((i) => i.getRawData());
+  }, [defaultRelationalData]);
+
   React.useEffect(() => {
-    if (isFetching) {
-      setFetching({ identifier: props.identifier });
+    wasUpdatedRef.current = false;
+  }, [props.tableName, isFetching]);
+
+  const defaultValuesRef = React.useRef(defaultValues);
+  const propsRef = React.useRef(props);
+  const _currentValueRef = React.useRef(_currentValue);
+  const isFetchingRef = React.useRef(isFetching);
+  const dataRef = React.useRef(data);
+
+  React.useEffect(() => {
+    dataRef.current = data;
+    _currentValueRef.current = _currentValue;
+    isFetchingRef.current = isFetching;
+    propsRef.current = props;
+    defaultValuesRef.current = defaultValues;
+  }, [data, _currentValue, isFetching, props, defaultValues]);
+
+  React.useEffect(() => {
+    if (list?.focusedRelationField?.row.id) {
       wasUpdatedRef.current = false;
+
+      updateQueryData({
+        dataRaw: setAndSortData(
+          defaultValuesRef.current,
+          _currentValueRef.current
+        ),
+        tableName: propsRef.current.tableName,
+        identifier: propsRef.current.identifier,
+      });
     }
-  }, [isFetching, props.identifier, setFetching]);
+  }, [list?.focusedRelationField, updateQueryData]);
 
   React.useEffect(() => {
-    wasUpdatedRef.current = false;
-  }, [props.tableName]);
+    if (props.query === '') {
+      if (dataRef.current !== undefined && !isFetchingRef.current) {
+        console.log('UPDATE Data 2 ');
 
-  React.useEffect(() => {
-    wasUpdatedRef.current = false;
-  }, [list?.focusedRelationField]);
+        updateQueryData({
+          dataRaw: setAndSortData(
+            defaultValuesRef.current,
+            _currentValueRef.current
+          ),
+          tableName: propsRef.current.tableName,
+          identifier: propsRef.current.identifier,
+        });
+      }
+    }
+  }, [props.query, updateQueryData]);
 
   React.useEffect(() => {
     if (isFetching) return;
     if (wasUpdatedRef.current) return;
     if (!defaultRelationalData) return;
+    if (!list?.focusedRelationField) return;
 
     wasUpdatedRef.current = true;
 
-    const defaultValues = defaultRelationalData
-      .getRows()
-      .map((i) => i.getRawData());
-
-    const currentValue = list?.focusedRelationField?.row.getItemValue(
-      props.tableName
-    );
-
-    const _currentValue = Array.isArray(currentValue)
-      ? currentValue
-      : [currentValue];
-
-    const all = [
-      ..._currentValue.filter(Boolean),
-      ...(data ?? []),
-      ...defaultValues,
-    ];
-    const allIds = Array.from(new Set(all.map((item) => item.id)));
-
-    const unique = allIds
-      .map((id) => all.find((item) => item.id === id))
-      .filter(Boolean) as RecordType[];
-
-    unique.sort((a, b) => {
-      const aInData = data?.find((item) => item.id === a.id);
-      const bInData = data?.find((item) => item.id === b.id);
-
-      if (aInData && !bInData) return -1;
-      if (!aInData && bInData) return 1;
-      return 0;
-    });
-
+    const dataToShow = data && props.query ? data : defaultValues;
+    const showCurrentValue = data && props.query ? false : true;
     updateQueryData({
-      dataRaw: unique,
+      dataRaw: setAndSortData(
+        dataToShow,
+        showCurrentValue ? _currentValue : []
+      ),
       tableName: props.tableName,
       identifier: props.identifier,
     });
   }, [
+    _currentValue,
     data,
     defaultRelationalData,
+    defaultValues,
     isFetching,
-    list?.focusedRelationField?.row,
+    list?.focusedRelationField,
     props.identifier,
+    props.query,
     props.tableName,
-    relationalDataModel,
     updateQueryData,
   ]);
 
   return queryStore[props.tableName];
+};
+
+const setAndSortData = (
+  dataToShow: RecordType[],
+  currentValue: RecordType[]
+) => {
+  const all = [...currentValue.filter(Boolean), ...(dataToShow ?? [])];
+  const allIds = Array.from(new Set(all.map((item) => item.id)));
+
+  const unique = allIds
+    .map((id) => all.find((item) => item.id === id))
+    .filter(Boolean) as RecordType[];
+
+  // console.log(unique);
+  // unique
+  //   .sort((a, b) => {
+  //     const aInData = dataToShow?.find((item) => item.id === a.id);
+  //     const bInData = dataToShow?.find((item) => item.id === b.id);
+
+  //     if (aInData && !bInData) return -1;
+  //     if (!aInData && bInData) return 1;
+  //     return 0;
+  //   })
+  //   .reverse();
+
+  return unique;
 };
