@@ -1,69 +1,29 @@
-import {
-  DataItem,
-  DataRow,
-  getViewConfigAtom,
-  queryStoreAtom,
-  viewsHelperAtom,
-} from '@apps-next/core';
+import { clientConfigAtom, Row } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
-import { FieldValue } from './render-field-value';
-import {
-  comboboxStateAtom,
-  State,
-} from '../ui-adapter/combox-adapter/combobox.store';
-import { ComboxboxItem } from '@apps-next/ui';
 
 export const ComboboxFieldValue = ({
-  fieldName,
   value,
-  identifier,
-  connectedRecordId,
+  tableName,
 }: {
-  fieldName: string;
-  value: ComboxboxItem;
-  identifier: string;
-  connectedRecordId: string;
+  tableName: string;
+  value: Row;
 }) => {
-  const relationalViewHelper = useAtomValue(viewsHelperAtom);
-  const viewConfigManager = useAtomValue(getViewConfigAtom);
-  const { dataModel } = useAtomValue(queryStoreAtom);
+  // TODO: FIX NAMING -> OR MERGE THEM clientConfigAtom and getViewConfigAtom
+  const injectedViewConfig = useAtomValue(clientConfigAtom);
+  const componentType = 'combobox';
 
-  const { debouncedQuery, ...comboboxStateDict } =
-    useAtomValue(comboboxStateAtom);
-
-  const field = viewConfigManager.getFieldBy(fieldName);
-
-  const state = comboboxStateDict.state?.[identifier as string] as
-    | State
-    | undefined;
-
-  const row = state?.data?.getRows()?.find((item) => item.id === value.id);
-
-  if (!row) return null;
-  if (!state?.data) return null;
-
-  const connectedRow = dataModel?.getRowById(connectedRecordId);
-  if (!connectedRow) return null;
-
-  const item = DataItem.create({
-    id: row.id.toString(),
-    field: field,
-    label: row.label,
-    name: fieldName,
-    value: field.relation?.manyToManyRelation
-      ? [row.getRawData()]
-      : row.getRawData(),
-  });
-
-  const _row = DataRow.create(
-    connectedRow.props,
-    viewConfigManager,
-    relationalViewHelper.get(fieldName).all
-  );
-
-  _row.updateItem(fieldName, item);
+  const ComponentToRender =
+    injectedViewConfig?.fields[tableName]?.component?.[componentType];
 
   return (
-    <FieldValue fieldName={fieldName} componentType={'combobox'} row={_row} />
+    <>
+      {ComponentToRender ? (
+        <>
+          <ComponentToRender data={value} />
+        </>
+      ) : (
+        <>{value.label}</>
+      )}
+    </>
   );
 };

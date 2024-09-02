@@ -1,6 +1,6 @@
 import {
   GlobalConfig,
-  QUERY_KEY_PREFIX,
+  makeQueryKey,
   QueryProps,
   QueryReturnDto,
   QueryReturnOrUndefined,
@@ -15,12 +15,13 @@ export const useStableQuery = (
   args: QueryProps
 ) => {
   const result = useQuery({
-    queryKey: [
-      QUERY_KEY_PREFIX,
-      args.viewConfigManager?.getViewName(),
-      args.query ?? '',
-    ],
+    queryKey: makeQueryKey({
+      viewName: args.viewConfigManager?.getViewName(),
+      query: args.query,
+      relation: args.relationQuery?.tableName,
+    }),
     queryFn: fn,
+    enabled: args.disabled === true ? false : true,
   });
 
   const stored = React.useRef(result as any);

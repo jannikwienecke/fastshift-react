@@ -1,156 +1,105 @@
-import { useStoreValue } from '@apps-next/core';
-import {
-  ComboboAdapterProps,
-  ComboboxAdapterOptions,
-  ComboboxPopoverProps,
-} from '@apps-next/ui';
-import { useAtomValue, useSetAtom } from 'jotai';
-import React from 'react';
-import { ComboboxFieldValue } from '../../ui-components/render-combobox-field-value';
-import { useRelationalQueryData } from '../../use-relational-query-data';
+import { makeData, Row } from '@apps-next/core';
+import { ComboboxPopoverProps } from '@apps-next/ui';
+import { useDebounce } from '@uidotdev/usehooks';
+import React, { useRef } from 'react';
+import { useQuery } from '../../use-query';
+import { useQueryDataOf } from '../../use-query-data-relational';
 import { useView } from '../../use-view';
-import {
-  comboboxStateAtom,
-  debouncedQueryAtom,
-  initComboboxAtom,
-  State,
-} from './combobox.store';
+import { ComboboxInitPayload } from './_combobox.store/store.ts';
+import { useComboboxStore } from './_combobox.store/store.ts/store-adapter';
 
 export type UseComboboAdaper = typeof useCombobox;
 
-export const useCombobox = (
-  options?: ComboboxAdapterOptions
-): (() => ComboboxPopoverProps) => {
-  const { list } = useStoreValue();
-  const { viewConfigManager } = useView();
+export const useCombobox = ({
+  state: initialState,
+  onClose,
+  onSelect,
+  renderValue,
+}: {
+  state: Omit<ComboboxInitPayload, 'defaultData' | 'registeredViews'> | null;
+  onClose: () => void;
+  onSelect: (value: Row) => void;
+  renderValue: (value: Row) => React.ReactNode;
+}) => {
+  const [store, dispatch] = useComboboxStore();
+  const { registeredViews } = useView();
+  const query = useDebounce(store.query, 300);
 
-  const relationalFields = viewConfigManager.getRelationalFieldList();
-  const fieldDefault = relationalFields?.[0];
+  const defaultData = useQueryDataOf(initialState?.field?.relation?.tableName);
 
-  const props = React.useMemo(() => {
-    return {
-      name:
-        list?.focusedRelationField?.field?.relation?.fieldName ??
-        fieldDefault.relation?.fieldName ??
-        '',
-      fieldName:
-        list?.focusedRelationField?.field?.relation?.tableName ??
-        fieldDefault.name ??
-        '',
-      connectedRecordId: list?.focusedRelationField?.row.id ?? '',
-      selectedValue: {
-        id: list?.focusedRelationField?.value.id ?? '',
-        label: list?.focusedRelationField?.value.label ?? '',
-      },
-    } satisfies ComboboAdapterProps;
-  }, [list, fieldDefault]);
-
-  const field = props.fieldName
-    ? viewConfigManager.getFieldBy(props.fieldName)
-    : fieldDefault;
-
-  const initializeCombobox = useSetAtom(initComboboxAtom);
-  const setDebouncedValue = useSetAtom(debouncedQueryAtom);
-
-  const { debouncedQuery, ...comboboxStateDict } =
-    useAtomValue(comboboxStateAtom);
-
-  const identifier = props.fieldName;
-
-  const state = comboboxStateDict.state?.[identifier as string] as
-    | State
-    | undefined;
-
-  // React.useEffect(() => {
-  //   if (prefetchedRef.current) return;
-
-  //   prefetchedRef.current = true;
-
-  //   relationalFields.forEach((field, index) => {
-  //     prefetchQuery?.({ tableName: field.name });
-
-  //     const interval = setInterval(() => {
-  //       const data = queryClient.getQueryData([
-  //         RELATIONAL_QUERY_KEY_PREFIX,
-  //         field.name,
-  //         '',
-  //       ]);
-
-  //       if (data) {
-  //         clearInterval(interval);
-
-  //         updateQueryData({
-  //           dataRaw: (data as any).data || [],
-  //           tableName: field.name,
-  //           identifier: field.name,
-  //         });
-  //       }
-  //     }, 100);
-
-  //     setTimeout(() => {
-  //       clearInterval(interval);
-  //     }, 1000);
-  //   });
-  // }, [prefetchQuery, updateQueryData, relationalFields, queryClient]);
-
-  useRelationalQueryData({
-    identifier,
-    tableName: field?.relation?.tableName ?? '',
-    recordId: props.connectedRecordId.toString(),
-    query: identifier === debouncedQuery.fieldName ? debouncedQuery.query : '',
+  const { data, isFetching, isFetched } = useQuery({
+    query: query,
+    relationQuery: {
+      tableName: store.tableName ?? '',
+    },
+    disabled: !store.field || !query,
   });
+
+  React.useEffect(() => {
+    if (isFetched && !isFetching && initialState?.field?.relation?.tableName) {
+      dispatch({
+        type: 'HANDLE_QUERY_DATA',
+        data: makeData(
+          registeredViews,
+          initialState?.field?.relation?.tableName
+        )(data ?? []).rows,
+      });
+    }
+  }, [
+    data,
+    dispatch,
+    initialState?.field?.relation?.tableName,
+    isFetched,
+    isFetching,
+    registeredViews,
+  ]);
+
+  const lastInitialState = useRef(initialState);
+  React.useEffect(() => {
+    if (lastInitialState.current?.row === initialState?.row) return;
+
+    lastInitialState.current = initialState;
+
+    if (!initialState?.field) {
+      dispatch({ type: 'CLOSE' });
+    } else {
+      dispatch({
+        type: 'INITIALIZE',
+        payload: {
+          ...initialState,
+          defaultData,
+          registeredViews,
+        },
+      });
+    }
+  }, [dispatch, initialState, defaultData, registeredViews]);
 
   const getComboboxProps = () => {
     return {
-      rect: list?.focusedRelationField?.rect ?? null,
-      tableName: field?.relation?.tableName ?? '',
-      open: !state?.isFetching && list?.focusedRelationField ? true : false,
-      selected: state?.selected ?? null,
-      values: state?.values ?? [],
+      ...store,
+
       onOpenChange: () => {
-        options?.onClose?.();
-        setDebouncedValue({
-          query: '',
-          fieldName: identifier as string,
-        });
+        onClose?.();
       },
       onChange: (value) => {
-        options?.onSelect?.({
-          value,
-          rowId: props.connectedRecordId,
-          fieldName: props.fieldName,
-        });
+        dispatch({ type: 'SELECT_VALUE', payload: value });
+        onSelect?.(value);
       },
-      render: (value) => (
-        <ComboboxFieldValue
-          fieldName={props.fieldName}
-          value={value}
-          identifier={identifier}
-          connectedRecordId={props.connectedRecordId.toString()}
-        />
-      ),
+
+      render: (value) => {
+        return renderValue(value);
+      },
+
       input: {
         placeholder: '',
-        query: comboboxStateDict.query.query ?? '',
+        query: store.query,
         onChange(query) {
-          setDebouncedValue({
-            query,
-            fieldName: identifier as string,
-          });
+          dispatch({ type: 'UPDATE_QUERY', payload: query });
         },
       },
-      multiple: Boolean(field?.relation?.manyToManyRelation),
-    } satisfies ComboboxPopoverProps;
+      multiple: store.multiple,
+    } satisfies ComboboxPopoverProps<Row>;
   };
-
-  React.useEffect(() => {
-    if (props.selectedValue.id && identifier) {
-      initializeCombobox({
-        fieldName: identifier,
-        initialSelected: props.selectedValue,
-      });
-    }
-  }, [identifier, initializeCombobox, props]);
 
   return getComboboxProps;
 };

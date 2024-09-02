@@ -16,3 +16,4 @@ export * from './lib/include-config.store';
 export * from './lib/query-store';
 export * from './lib/relational-view.helper';
 export * from './lib/client-config.store';
+export * from './lib/query-store/data-model-new';

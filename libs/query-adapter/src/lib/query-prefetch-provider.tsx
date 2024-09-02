@@ -1,7 +1,7 @@
 import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
-  QUERY_KEY_PREFIX,
+  makeQueryKey,
   QueryReturnDto,
   REGISTRED_VIEWS,
 } from '@apps-next/core';
@@ -30,11 +30,14 @@ export async function QueryPrefetchProvider({
 
   const queryClient = new QueryClient();
 
-  const queryData = queryClient.getQueryData([QUERY_KEY_PREFIX, viewName, '']);
+  const queryKey = makeQueryKey({
+    viewName,
+  });
+  const queryData = queryClient.getQueryData(queryKey);
 
   if (!queryData) {
     await queryClient.prefetchQuery({
-      queryKey: [QUERY_KEY_PREFIX, viewName, ''],
+      queryKey,
 
       queryFn: async (context) => {
         const res = await viewLoader({
@@ -59,15 +62,7 @@ export async function QueryPrefetchProvider({
       registeredViews={registeredViews}
       viewConfig={viewConfigManager.viewConfig}
       includeConfig={{}}
-      data={
-        (
-          queryClient.getQueryData([
-            QUERY_KEY_PREFIX,
-            viewName,
-            '',
-          ]) as QueryReturnDto
-        )?.data
-      }
+      {...(queryClient.getQueryData(queryKey) as QueryReturnDto)}
     >
       <HydrationBoundary state={dehydrate(queryClient)}>
         {children}

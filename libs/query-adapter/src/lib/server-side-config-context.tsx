@@ -4,8 +4,10 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   clientConfigStore,
+  DataModelNew,
   GlobalConfig,
   IncludeConfig,
+  makeData,
   Model,
   QueryReturnDto,
   QueryStore,
@@ -40,28 +42,25 @@ export const ServerSideConfigProvider = (
     registeredViews: RegisteredViews;
     includeConfig: IncludeConfig;
     data: QueryReturnDto['data'];
-    relationalDataRaw: QueryReturnDto['relationalData'];
+    relationalData?: QueryReturnDto['relationalData'];
   } & { children: React.ReactNode }
 ) => {
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
 
-  const model = Model.create(
-    props.data ?? [],
-    viewConfigManager,
-    props.registeredViews
-  );
+  const dataModel = makeData(
+    props.registeredViews,
+    viewConfigManager.getViewName()
+  )(props.data ?? []);
 
   const relationalDataModel = Object.entries(
-    props.relationalDataRaw ?? {}
+    props?.relationalData ?? {}
   ).reduce((acc, [key, data]) => {
-    acc[key] = Model.create(data, viewConfigManager, props.registeredViews);
+    acc[key] = makeData(props.registeredViews, key)(data);
     return acc;
-  }, {} as { [key: string]: Model<RecordType> });
+  }, {} as { [key: string]: DataModelNew<RecordType> });
 
   const queryStore: QueryStore<RecordType> = {
-    dataRaw: props.data || [],
-    dataModel: model,
-    relationalDataRaw: props.relationalDataRaw ?? {},
+    dataModel,
     relationalDataModel,
     loading: false,
     error: null,

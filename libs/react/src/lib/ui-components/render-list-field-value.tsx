@@ -1,20 +1,12 @@
-import {
-  DataItem,
-  DataRow,
-  FieldConfig,
-  RecordType,
-  useStoreDispatch,
-} from '@apps-next/core';
+import { FieldConfig, Row, useStoreDispatch } from '@apps-next/core';
 import { FieldValue } from './render-field-value';
 
 export const ListFieldValue = ({
   row,
   field,
-  value,
 }: {
-  row: DataRow;
+  row: Row;
   field: FieldConfig;
-  value: DataItem<RecordType>;
 }) => {
   const dispatch = useStoreDispatch();
   return (
@@ -32,7 +24,7 @@ export const ListFieldValue = ({
           type: 'SELECT_RELATIONAL_FIELD',
           field,
           row,
-          value: row.getItem(field.name),
+          selected: row.getValue(field.name),
           rect,
         });
       }}

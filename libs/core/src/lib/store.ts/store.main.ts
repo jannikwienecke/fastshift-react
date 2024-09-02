@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
-import { DEFAULT_STORE, Store } from './store.type';
 import { StoreAction } from './store.actions.types';
+import { DEFAULT_STORE, Store } from './store.type';
 
 export const storeAtom = atom<Store>(DEFAULT_STORE);
 storeAtom.debugLabel = 'Global Store';
@@ -59,6 +59,42 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
         list: {
           ...prev.list,
           focusedRelationField: action,
+        },
+      };
+    }
+
+    if (action.type === 'UPDATE_SELECTED_RELATIONAL_FIELD') {
+      const selectedField = prev.list?.focusedRelationField;
+      if (!selectedField) {
+        return prev;
+      }
+
+      if (Array.isArray(selectedField.selected)) {
+        const ids = selectedField.selected.map((r) => r.id);
+        const newSelected = ids.includes(action.selected.id)
+          ? selectedField.selected.filter((s) => s.id !== action.selected.id)
+          : [...selectedField.selected, action.selected];
+
+        return {
+          ...prev,
+          list: {
+            ...prev.list,
+            focusedRelationField: {
+              ...selectedField,
+              selected: newSelected,
+            },
+          },
+        };
+      }
+
+      return {
+        ...prev,
+        list: {
+          ...prev.list,
+          focusedRelationField: {
+            ...selectedField,
+            selected: action.selected,
+          },
         },
       };
     }

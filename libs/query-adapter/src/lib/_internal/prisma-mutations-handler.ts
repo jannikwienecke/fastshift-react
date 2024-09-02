@@ -124,25 +124,49 @@ export const updateManyToManyMutation = async (
 ) => {
   const { id } = mutation.payload;
 
-  // Handle many-to-many relations
+  // // Handle many-to-many relations
   for (const relation of manyToManyRelations) {
+    const relationTableClient = client(prismaClient).tableClient(
+      relation.manyToManyTable
+    );
+
+    const fieldNameTable = relation.manyToManyModelFields.find(
+      (f) =>
+        f.name.toLowerCase() === viewConfigManager.getTableName().toLowerCase()
+    )?.relation?.fieldName;
+
+    const fieldNameRelationTable = relation.manyToManyModelFields.find(
+      (f) => f.name.toLowerCase() === relation.fieldName.toLowerCase()
+    )?.relation?.fieldName;
+
+    if (!fieldNameTable) return;
+    if (!fieldNameRelationTable) return;
+
+    const allExisting = await relationTableClient.findMany({
+      where: {
+        // the table where we are currently on. Tasks -> has tags (we update a tag) -> taskId
+        [fieldNameTable]: id,
+        // the relation table field -> tagId
+      },
+      select: {
+        [fieldNameRelationTable]: true,
+      },
+    });
+
+    const toDelete = allExisting
+      .map((v) => v?.[fieldNameRelationTable])
+      .filter((v) => !relation.values.includes(v));
+
+    console.log('=toDelete', toDelete);
+    await relationTableClient.deleteMany({
+      where: {
+        [fieldNameRelationTable]: {
+          in: toDelete,
+        },
+      },
+    });
+
     for (const value of relation.values) {
-      const relationTableClient = client(prismaClient).tableClient(
-        relation.manyToManyTable
-      );
-
-      const fieldNameTable = relation.manyToManyModelFields.find(
-        (f) =>
-          f.name.toLowerCase() ===
-          viewConfigManager.getTableName().toLowerCase()
-      )?.relation?.fieldName;
-
-      const fieldNameRelationTable = relation.manyToManyModelFields.find(
-        (f) => f.name.toLowerCase() === relation.fieldName.toLowerCase()
-      )?.relation?.fieldName;
-
-      if (!fieldNameTable || !fieldNameRelationTable) return;
-
       const hasRecord = await relationTableClient.findMany({
         where: {
           // the table where we are currently on. Tasks -> has tags (we update a tag) -> taskId
@@ -153,12 +177,8 @@ export const updateManyToManyMutation = async (
       });
 
       if (hasRecord.length > 0) {
-        await relationTableClient.deleteMany({
-          where: {
-            [fieldNameTable]: id,
-            [fieldNameRelationTable]: value,
-          },
-        });
+        console.log('DO NOTHING');
+        // do nothing
       } else {
         await relationTableClient.create({
           data: {

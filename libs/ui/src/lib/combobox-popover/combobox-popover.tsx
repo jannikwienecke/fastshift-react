@@ -12,13 +12,16 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '../components/popover';
 import { cn } from '../utils';
 import { ComboboxPopoverProps } from './combobox-popver.types';
+import { ComboxboxItem } from '../combobox/combobox.types';
 
-export function ComboboxPopover({
-  input,
-  rect,
-  ...comboboxProps
-}: ComboboxPopoverProps) {
-  if (!rect) return null;
+export function ComboboxPopover<T extends ComboxboxItem>(
+  props: ComboboxPopoverProps<T>
+) {
+  if (!props) return null;
+
+  const { input, rect, ...comboboxProps } = props || {};
+
+  if (!rect || !input) return null;
 
   return (
     <Popover
@@ -67,11 +70,9 @@ export function ComboboxPopover({
           <CommandList>
             <CommandGroup>
               {comboboxProps.values.map((value, index) => {
-                const isSelected = comboboxProps.multiple
-                  ? (comboboxProps.selected?.id as string[] | undefined)?.some(
-                      (selected) => selected === value.id
-                    )
-                  : false;
+                const isSelected = comboboxProps.selected?.find(
+                  (s) => s.id === value.id
+                );
 
                 return (
                   <div key={value.id.toString()} className="">
@@ -84,16 +85,19 @@ export function ComboboxPopover({
                     >
                       <div className="flex items-center gap-4">
                         {comboboxProps.multiple ? (
-                          <Checkbox checked={isSelected} />
+                          <Checkbox checked={isSelected ? true : false} />
                         ) : null}
 
                         <div>{comboboxProps.render(value)}</div>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {comboboxProps.selected?.id === value.id ? (
-                          <CheckIcon className="w-5 h-5 font-bold" />
-                        ) : null}
+                        <CheckIcon
+                          className={cn(
+                            'w-5 h-5 font-bold invisible',
+                            isSelected ? 'visible' : ''
+                          )}
+                        />
 
                         <span className="text-[11px]">{index}</span>
                       </div>

@@ -251,7 +251,7 @@ const runMutation = async (
   try {
     lldebug('Run Mutation: ', mutationContext);
 
-    await waitFor(150);
+    await waitFor(500);
     return await handler(prismaClient, mutation);
   } catch (error) {
     llerror(`Error running mutation: ${mutation.mutation.type}. Check Context`);

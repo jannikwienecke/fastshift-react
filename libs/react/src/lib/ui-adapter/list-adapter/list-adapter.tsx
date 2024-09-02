@@ -1,7 +1,7 @@
 import {
-  DataRow,
   getViewConfigAtom,
   RecordType,
+  Row,
   useStoreDispatch,
   useStoreValue,
 } from '@apps-next/core';
@@ -33,12 +33,12 @@ export const useList = <T extends RecordType>() => {
     const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
 
     const renderFields = (
-      row: DataRow<T>,
+      row: Row<T>,
       fields: (keyof T)[]
     ): ListProps['items'][0]['valuesLeft'] => {
       return (
         fields?.map((fieldName) => {
-          const item = row.getItem(fieldName);
+          const item = row.getField(fieldName);
           const { label, id, field } = item;
 
           return {
@@ -47,15 +47,13 @@ export const useList = <T extends RecordType>() => {
             relation: field.relation && {
               ...field.relation,
             },
-            render: () => (
-              <ListFieldValue value={item} field={field} row={row} />
-            ),
+            render: () => <ListFieldValue field={field} row={row} />,
           };
         }) ?? []
       );
     };
 
-    const renderLabel = (item: DataRow<T>) => {
+    const renderLabel = (item: Row<T>) => {
       return [
         {
           id: item.id,
@@ -69,8 +67,8 @@ export const useList = <T extends RecordType>() => {
       onSelect: (item) => dispatch({ type: 'SELECT_RECORD', record: item }),
       selected,
       items:
-        dataModel.getRows()?.map((item) => ({
-          ...item.getRawData(),
+        dataModel.rows?.map((item) => ({
+          ...item.raw,
           id: item.id,
           icon: Icon,
           valuesLeft: _renderLabel

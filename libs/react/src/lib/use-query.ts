@@ -18,7 +18,7 @@ const useQueryDict: Record<'prisma' | 'convex', typeof useConvexQuery> = {
 };
 
 export const useQuery = <QueryReturnType extends RecordType[]>(
-  queryProps?: QueryProps
+  queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const { viewConfigManager, registeredViews } = useView();
   const query = useAtomValue(debouncedQueryAtom);

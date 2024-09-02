@@ -1,7 +1,7 @@
 import { atom, createStore } from 'jotai';
-import { DataRow } from './query-store';
 import { GetTableName, RecordType, RegisteredRouter } from './types';
 import { viewConfigManagerAtom } from './view-config.store';
+import { Row } from './query-store/data-model-new';
 
 export type ComponentType = 'list' | 'combobox';
 
@@ -12,8 +12,12 @@ export type ClientViewConfig<T extends GetTableName, U extends RecordType> = {
     fields: Partial<{
       [key in keyof U]: {
         component?: Partial<{
-          [key in ComponentType]: (props: {
-            data: DataRow<U>;
+          // [key in ComponentType]: (props: { data: Row<U> }) => React.ReactNode;
+          list: (props: { data: Row<U> }) => React.ReactNode;
+          combobox: (props: {
+            data: Row<U[key]>['raw'] extends Array<any>
+              ? Row<U[key][0]>
+              : Row<U[key]>;
           }) => React.ReactNode;
         }>;
       };

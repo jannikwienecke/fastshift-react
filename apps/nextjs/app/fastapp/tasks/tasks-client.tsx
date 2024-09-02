@@ -12,6 +12,7 @@ import {
   useHandleSelectCombobox,
 } from '@apps-next/react';
 import { ComboboxPopover, Form, List } from '@apps-next/ui';
+import { ComboboxFieldValue } from 'libs/react/src/lib/ui-components/render-combobox-field-value';
 import {
   CompletedComponent,
   PriorityComponent,
@@ -26,15 +27,15 @@ setClientViewConfig<TaskViewDataType>('task', {
   fields: {
     completed: {
       component: {
-        list: CompletedComponent,
-        combobox: CompletedComponent,
+        // list: CompletedComponent,
+        // combobox: CompletedComponent,
       },
     },
 
     priority: {
       component: {
-        list: PriorityComponent,
-        combobox: PriorityComponent,
+        // list: PriorityComponent,
+        // combobox: PriorityComponent,
       },
     },
 
@@ -64,6 +65,7 @@ export const TasksClient = () => {
   const { edit } = useStoreValue();
 
   const { data } = useQuery();
+  const { dataModel } = useQueryData();
 
   // @ts-expect-error INVALID FIELD
   const INVALID = data?.[0]?.NOT_VALID_FIELD;
@@ -73,12 +75,26 @@ export const TasksClient = () => {
 
   const dispatch = useStoreDispatch();
 
-  const queryData = useQueryData();
+  const { list } = useStoreValue();
+
+  const table = list?.focusedRelationField?.field?.relation?.tableName;
 
   const getComboboxProps = useCombobox({
-    onSelect: handleSelect,
+    state: list?.focusedRelationField ? list.focusedRelationField : null,
+    onSelect: (row) => {
+      handleSelect({
+        value: row,
+      });
+    },
+
     onClose: handleClose,
+    renderValue: (value) => {
+      if (!list?.focusedRelationField?.field || !table) return null;
+      return <ComboboxFieldValue tableName={table} value={value} />;
+    },
   });
+
+  const props = getComboboxProps();
 
   return (
     <div className="p-4 pb-0 flex flex-col w-full overflow-scroll h-[calc(100vh-16px)]">
@@ -89,11 +105,11 @@ export const TasksClient = () => {
         {edit.isEditing ? <Form {...getFormProps()} /> : null}
       </div>
 
-      <ComboboxPopover {...getComboboxProps()} />
+      <ComboboxPopover {...props} />
 
       <List.Default
         {...getListProps({
-          fieldsLeft: ['name', 'priority'],
+          fieldsLeft: ['name'],
           fieldsRight: ['project', 'tag'],
         })}
       />

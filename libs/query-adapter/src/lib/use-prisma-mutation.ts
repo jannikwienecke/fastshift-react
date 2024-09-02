@@ -1,7 +1,7 @@
-import { MutationReturnType, QUERY_KEY_PREFIX } from '@apps-next/core';
+import { makeQueryKey, MutationReturnType } from '@apps-next/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { usePrismaApi } from './use-prisma-api';
 import React from 'react';
+import { usePrismaApi } from './use-prisma-api';
 
 export const usePrismaMutation = (): MutationReturnType => {
   const prisma = usePrismaApi();
@@ -15,41 +15,61 @@ export const usePrismaMutation = (): MutationReturnType => {
       queryClient.invalidateQueries();
     },
     onError: (error, variables, context) => {
-      queryClient.setQueryData(
-        [QUERY_KEY_PREFIX, lastViewName.current, ''],
-        context
-      );
-    },
-    onMutate: async (vars) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
+      const { previousState, previousStateAll } = (context as any) || {};
 
-      lastViewName.current = vars.viewConfig.viewName;
-
-      await queryClient.cancelQueries({
-        queryKey: [QUERY_KEY_PREFIX, vars.viewConfig.viewName, ''],
+      const queryKey = makeQueryKey({
+        viewName: lastViewName.current,
+        query: variables.query,
       });
 
-      // Snapshot the previous value
-      const previousState = queryClient.getQueryData([
-        QUERY_KEY_PREFIX,
-        vars.viewConfig.viewName,
-        '',
-      ]);
+      const queryKeyAll = makeQueryKey({
+        viewName: lastViewName.current,
+        query: variables.query,
+      });
+
+      queryClient.setQueryData(queryKey, previousState);
+      queryClient.setQueryData(queryKeyAll, previousStateAll);
+    },
+    onMutate: async (vars) => {
+      lastViewName.current = vars.viewConfig.viewName;
+
+      const queryKey = makeQueryKey({
+        viewName: vars.viewConfig.viewName,
+        query: vars.query,
+      });
+
+      const queryKeyAll = makeQueryKey({
+        viewName: vars.viewConfig.viewName,
+      });
+
+      await queryClient.cancelQueries({
+        queryKey: queryKey,
+      });
+
+      await queryClient.cancelQueries({
+        queryKey: queryKeyAll,
+      });
+
+      const previousState = queryClient.getQueryData(queryKey);
+      const previousStateAll = queryClient.getQueryData(queryKeyAll);
 
       if ('handler' in vars.mutation) {
         const newState = vars.mutation.handler?.(
           (previousState as any).data || []
         );
 
-        queryClient.setQueryData(
-          [QUERY_KEY_PREFIX, vars.viewConfig.viewName, ''],
-          {
-            data: newState,
-          }
-        );
+        queryClient.setQueryData(queryKey, {
+          data: newState,
+        });
 
-        return previousState;
+        queryClient.setQueryData(queryKeyAll, {
+          data: newState,
+        });
+
+        return {
+          previousState,
+          previousStateAll,
+        };
       } else {
         return previousState;
       }

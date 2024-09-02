@@ -1,4 +1,5 @@
 import { DataRow, DataItem } from '../query-store';
+import { Row } from '../query-store/data-model-new';
 import { FieldConfig, RecordType } from '../types';
 
 export type StoreAction =
@@ -20,10 +21,14 @@ export type StoreAction =
   | {
       type: 'SELECT_RELATIONAL_FIELD';
       field: FieldConfig;
-      row: DataRow;
-      value: DataItem<RecordType>;
+      row: Row;
+      selected: Row | Row[];
       rect: DOMRect;
     }
   | {
       type: 'DESELECT_RELATIONAL_FIELD';
+    }
+  | {
+      type: 'UPDATE_SELECTED_RELATIONAL_FIELD';
+      selected: Row;
     };

@@ -40,6 +40,7 @@ export type Mutation = CREATE_RECORD | UPDATE_RECORD | DELETE_RECORD;
 export type MutationProps = {
   viewConfig: ViewConfigType;
   mutation: Mutation;
+  query: string;
 };
 
 export type MutationPropsServer = {

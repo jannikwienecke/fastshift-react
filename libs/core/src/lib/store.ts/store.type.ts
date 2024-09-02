@@ -1,4 +1,4 @@
-import { DataItem, DataRow } from '../query-store';
+import { Row } from '../query-store/data-model-new';
 import { FieldConfig, RecordType } from '../types';
 
 export type Store = {
@@ -15,9 +15,9 @@ export type Store = {
   // TODO: Think about this approach. is it best to differentiate if its on the list or somewhere else?
   list?: {
     focusedRelationField?: {
-      row: DataRow;
+      row: Row;
       field: FieldConfig | null;
-      value: DataItem<RecordType>;
+      selected: Row | Row[];
       rect: DOMRect;
     };
   };

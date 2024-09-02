@@ -3,15 +3,14 @@ import {
   QueryRelationalData,
   QueryReturnDto,
   RecordType,
+  DataModelNew,
 } from '@apps-next/core';
 
 export type QueryStore<T extends RecordType> = {
-  dataModel: Model<T>;
-  dataRaw: T[];
+  dataModel: DataModelNew<T>;
 
-  relationalDataRaw: QueryRelationalData;
   relationalDataModel: {
-    [key: string]: Model<RecordType>;
+    [key: string]: DataModelNew<T>;
   };
 
   loading: boolean;

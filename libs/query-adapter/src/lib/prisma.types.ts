@@ -62,6 +62,7 @@ export type PrismaFindManyArgs = {
   where?: PrismaWhere;
   orderBy?: PrismaOrderBy;
   include?: PrismaInclude;
+  select?: PrismaInclude;
 };
 
 export type PrismaClient = {

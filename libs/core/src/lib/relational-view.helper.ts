@@ -9,7 +9,6 @@ export const relationalViewHelper = (
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const relationalView = views[relationalTableName];
-
     if (!relationalView) {
       throw new Error(
         `relationalViewHelper: view not found for ${relationalTableName}`
@@ -20,11 +19,12 @@ export const relationalViewHelper = (
   };
 
   const relationalView = getRelationalView(relationalTableName);
-
+  const relationalViewManager = new BaseViewConfigManager(relationalView);
   const baseViewConfigManger = new BaseViewConfigManager(relationalView);
   return {
     all: views,
     relationalView,
+    relationalViewManager,
     baseViewConfigManger,
     displayField: baseViewConfigManger.getDisplayFieldLabel(),
     getDisplayFieldValue: (row: RecordType) => {

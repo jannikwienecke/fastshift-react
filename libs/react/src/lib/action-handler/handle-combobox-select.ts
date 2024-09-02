@@ -1,105 +1,98 @@
-import { RecordType, useStoreDispatch } from '@apps-next/core';
-import { ComboboxAdapterOptions } from '@apps-next/ui';
-import { useSetAtom } from 'jotai';
 import {
-  debouncedQueryAtom,
-  getStateByAtom,
-  updateValuesAtom,
-} from '../ui-adapter/combox-adapter/combobox.store';
+  RecordType,
+  Row,
+  useStoreDispatch,
+  useStoreValue,
+} from '@apps-next/core';
+import { ComboboxAdapterOptions } from '@apps-next/ui';
 import { useMutation } from '../use-mutation';
-import { useQueryData } from '../use-query-data';
-import { useView } from '../use-view';
-
+import React from 'react';
 export const useHandleSelectCombobox = () => {
   const { mutate } = useMutation();
 
-  const updateValues = useSetAtom(updateValuesAtom);
+  const { list } = useStoreValue();
 
   const dispatch = useStoreDispatch();
 
-  const setDebouncedValue = useSetAtom(debouncedQueryAtom);
-  const { dataModel } = useQueryData();
-  const getStateBy = useSetAtom(getStateByAtom);
-
-  const { viewConfigManager } = useView();
+  const startSelectedRef = React.useRef<string | string[]>();
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleSelect = ({
     value,
-    fieldName,
-    rowId,
-  }: Parameters<ComboboxAdapterOptions['onSelect']>[0]) => {
-    const field = viewConfigManager.getFieldBy(fieldName);
-    const state = getStateBy({ fieldName, rowId });
+  }: Parameters<ComboboxAdapterOptions<Row>['onSelect']>[0]) => {
+    const { row, field } = list?.focusedRelationField || {};
 
-    if (!field.relation || !state) return;
-
-    const relationalRow = state.data.getRowById(value.id.toString());
-    const row = dataModel.getRowById(rowId);
-    const currentId = row.getItem(fieldName).id;
+    if (!field?.relation) throw new Error('no relation field');
+    if (!row) throw new Error('no row');
 
     const isManyToManyRelation = field.relation.manyToManyRelation;
-    const ids = isManyToManyRelation ? (currentId as any as string[]) : [];
-
-    const selected = isManyToManyRelation
-      ? ids.includes(value.id.toString())
-        ? ids.filter((id) => id !== value.id.toString())
-        : [...currentId, value.id]
-      : value;
-
-    row.updateItemId(fieldName, selected as any);
 
     if (!isManyToManyRelation) {
       setTimeout(() => {
         dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
-        setDebouncedValue({
-          query: '',
-          fieldName,
-        });
       }, 100);
     }
 
-    // TODO: FIX TYPe here
-    updateValues({
-      fieldName,
-      state: isManyToManyRelation
-        ? {
-            selected: {
-              id: selected as string[],
-              label: '',
-            },
-          }
-        : {
-            selected: null,
-          },
-    });
+    if (!startSelectedRef.current && list?.focusedRelationField?.selected) {
+      startSelectedRef.current = Array.isArray(
+        list.focusedRelationField.selected
+      )
+        ? list.focusedRelationField.selected.map((v) => v.id)
+        : list.focusedRelationField.selected.id;
+    }
 
-    mutate({
-      mutation: {
-        type: 'UPDATE_RECORD',
-        handler: (items) => {
-          return items.map((item) => {
-            if (item.id === rowId) {
-              return {
-                ...item,
-                [fieldName]: isManyToManyRelation
-                  ? updateManyToManyRelation(
-                      item[fieldName],
-                      relationalRow.getRawData()
-                    )
-                  : relationalRow.getRawData(),
-              };
-            }
-            return item;
-          });
-        },
-        payload: {
-          id: rowId,
-          record: {
-            [field.relation.fieldName]: value.id,
+    dispatch({ type: 'UPDATE_SELECTED_RELATIONAL_FIELD', selected: value });
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(
+      () => {
+        timeoutRef.current = null;
+
+        if (!field.relation) return;
+        const newSelected = Array.isArray(list?.focusedRelationField?.selected)
+          ? updateManyToManyRelation(
+              list.focusedRelationField.selected ?? [],
+              value
+            ).map((v) => v.id)
+          : list?.focusedRelationField?.selected.id;
+
+        startSelectedRef.current = newSelected;
+
+        mutate({
+          mutation: {
+            type: 'UPDATE_RECORD',
+            handler: (items) => {
+              if (isManyToManyRelation) return items;
+
+              return items.map((item) => {
+                if (item.id === row.id) {
+                  const newValue = {
+                    ...item,
+                    [field.name]: isManyToManyRelation
+                      ? updateManyToManyRelation(item[field.name], value.raw)
+                      : value.raw,
+                  };
+                  return newValue;
+                }
+                return item;
+              });
+            },
+            payload: {
+              id: row.id,
+              record: {
+                [field.relation.fieldName]: isManyToManyRelation
+                  ? newSelected
+                  : value.id,
+              },
+            },
           },
-        },
+        });
       },
-    });
+      isManyToManyRelation ? 500 : 0
+    );
   };
 
   const handleClose = () => {

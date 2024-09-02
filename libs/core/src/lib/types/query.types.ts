@@ -15,6 +15,7 @@ export type QueryProps = {
     tableName: string;
     recordId?: string;
   };
+  disabled?: boolean;
 };
 
 export type QueryDto = {

@@ -1,23 +1,21 @@
 'use client';
 
-import { atom } from 'jotai';
-import { QueryStore } from './query.types';
 import {
-  DataModel,
+  DataModelNew,
   getViewConfigAtom,
-  Model,
+  makeData,
   QueryRelationalData,
   RecordType,
   registeredViewsAtom,
-  viewConfigManagerAtom,
+  viewsHelperAtom,
 } from '@apps-next/core';
+import { atom } from 'jotai';
+import { QueryStore } from './query.types';
 
 export const queryStoreAtom = atom<QueryStore<RecordType>>({
-  dataRaw: [] as RecordType[],
-  dataModel: {} as Model<RecordType>,
-  relationalDataRaw: {} as QueryRelationalData,
+  dataModel: {} as DataModelNew<RecordType>,
   relationalDataModel: {} as {
-    [key: string]: Model<RecordType>;
+    [key: string]: DataModelNew<RecordType>;
   },
   loading: false,
   error: null,
@@ -29,30 +27,36 @@ export const queryStoreAtom = atom<QueryStore<RecordType>>({
 
 export const updateQueryDataAtom = atom<
   null,
-  [Pick<QueryStore<RecordType>, 'dataRaw' | 'relationalDataRaw'>],
+  [
+    {
+      dataRaw: RecordType[];
+      relationalDataRaw: QueryRelationalData;
+    }
+  ],
   void
->(null, (get, set, queryStore) => {
+>(null, (get, set, { dataRaw, relationalDataRaw }) => {
   const registeredViews = get(registeredViewsAtom);
   const viewConfigManager = get(getViewConfigAtom);
 
-  const dataModel = Model.create(
-    queryStore.dataRaw,
-    viewConfigManager,
-    registeredViews
-  );
+  const dataModel = makeData(
+    registeredViews,
+    viewConfigManager.getViewName()
+  )(dataRaw);
 
-  const relationalDataModel = Object.entries(
-    queryStore.relationalDataRaw
-  ).reduce((acc, [key, data]) => {
-    acc[key] = Model.create(data, viewConfigManager, registeredViews);
-    return acc;
-  }, {} as { [key: string]: Model<RecordType> });
+  const relationalDataModel = Object.entries(relationalDataRaw).reduce(
+    (acc, [key, data]) => {
+      acc[key] = makeData(registeredViews, key)(data);
+      return acc;
+    },
+    {} as { [key: string]: DataModelNew }
+  );
 
   set(queryStoreAtom, {
     ...get(queryStoreAtom),
-    dataRaw: queryStore.dataRaw,
     dataModel,
-    relationalDataRaw: queryStore.relationalDataRaw,
-    relationalDataModel,
+    relationalDataModel: {
+      ...get(queryStoreAtom).relationalDataModel,
+      ...relationalDataModel,
+    },
   });
 });
