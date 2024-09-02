@@ -1,10 +1,4 @@
-import {
-  Model,
-  QueryRelationalData,
-  QueryReturnDto,
-  RecordType,
-  DataModelNew,
-} from '@apps-next/core';
+import { DataModelNew, QueryReturnDto, RecordType } from '@apps-next/core';
 
 export type QueryStore<T extends RecordType> = {
   dataModel: DataModelNew<T>;

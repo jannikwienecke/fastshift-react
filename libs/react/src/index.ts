@@ -7,4 +7,4 @@ export * from './lib/use-mutation';
 export * from './lib/create-view';
 export * from './lib/ui-components/render-view-bubble';
 export * from './lib/action-handler';
-export * from './lib/data-adapter';
+export * from './lib/ui-components/render-combobox-field-value';

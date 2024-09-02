@@ -1,7 +1,7 @@
 'use client';
 
 import { setClientViewConfig, ViewConfigType } from '@apps-next/core';
-import { DataType, makeHooks, useHandleSelectCombobox } from '@apps-next/react';
+import { DataType, makeHooks } from '@apps-next/react';
 import { List } from '@apps-next/ui';
 import { ColorComponent } from './categories.components';
 
@@ -23,8 +23,6 @@ export const CategoriesClient = ({
   viewConfig: ViewConfigType<'category'>;
 }) => {
   const { useList } = makeHooks(viewConfig);
-
-  const handleSelect = useHandleSelectCombobox();
 
   const getListProps = useList();
   return (

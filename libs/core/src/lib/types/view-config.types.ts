@@ -37,7 +37,7 @@ export type ViewConfigType<T extends GetTableName = any> =
   };
 
 export type RegisteredViews = Partial<{
-  [key in GetTableName]: ViewConfigType;
+  [key: string]: ViewConfigType;
 }>;
 
 export type ViewContextType = {

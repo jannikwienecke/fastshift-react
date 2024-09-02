@@ -6,13 +6,13 @@ import {
   useStoreValue,
 } from '@apps-next/core';
 import {
+  ComboboxFieldValue,
   makeHooks,
   QueryInput,
   useCombobox,
   useHandleSelectCombobox,
 } from '@apps-next/react';
 import { ComboboxPopover, Form, List } from '@apps-next/ui';
-import { ComboboxFieldValue } from 'libs/react/src/lib/ui-components/render-combobox-field-value';
 import {
   CompletedComponent,
   PriorityComponent,
@@ -27,14 +27,14 @@ setClientViewConfig<TaskViewDataType>('task', {
   fields: {
     completed: {
       component: {
-        // list: CompletedComponent,
+        list: CompletedComponent,
         // combobox: CompletedComponent,
       },
     },
 
     priority: {
       component: {
-        // list: PriorityComponent,
+        list: PriorityComponent,
         // combobox: PriorityComponent,
       },
     },
@@ -70,7 +70,6 @@ export const TasksClient = () => {
   // @ts-expect-error INVALID FIELD
   const INVALID = data?.[0]?.NOT_VALID_FIELD;
 
-  // console.log(data?.[0].tags?.[0].tag.name);
   const getFormProps = useForm();
 
   const dispatch = useStoreDispatch();
@@ -81,12 +80,7 @@ export const TasksClient = () => {
 
   const getComboboxProps = useCombobox({
     state: list?.focusedRelationField ? list.focusedRelationField : null,
-    onSelect: (row) => {
-      handleSelect({
-        value: row,
-      });
-    },
-
+    onSelect: handleSelect,
     onClose: handleClose,
     renderValue: (value) => {
       if (!list?.focusedRelationField?.field || !table) return null;
@@ -110,7 +104,7 @@ export const TasksClient = () => {
       <List.Default
         {...getListProps({
           fieldsLeft: ['name'],
-          fieldsRight: ['project', 'tag'],
+          fieldsRight: ['project', 'tag', 'priority', 'completed'],
         })}
       />
     </div>

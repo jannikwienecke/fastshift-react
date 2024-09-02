@@ -7,6 +7,7 @@ import {
 import { ComboboxAdapterOptions } from '@apps-next/ui';
 import { useMutation } from '../use-mutation';
 import React from 'react';
+
 export const useHandleSelectCombobox = () => {
   const { mutate } = useMutation();
 
@@ -17,9 +18,7 @@ export const useHandleSelectCombobox = () => {
   const startSelectedRef = React.useRef<string | string[]>();
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  const handleSelect = ({
-    value,
-  }: Parameters<ComboboxAdapterOptions<Row>['onSelect']>[0]) => {
+  const handleSelect = (value: Row) => {
     const { row, field } = list?.focusedRelationField || {};
 
     if (!field?.relation) throw new Error('no relation field');

@@ -1,7 +1,6 @@
 import { atom } from 'jotai';
 import { ComboboxStore, DEFAULT_STORE } from './store.type';
 import { ComboboxStoreAction } from './store.actions.types';
-import { _ } from '../../../../data-adapter';
 
 export const storeAtom = atom<ComboboxStore>(DEFAULT_STORE);
 storeAtom.debugLabel = 'Global Store';
@@ -29,7 +28,6 @@ export const storeReducer = (
 
     if (action.type === 'INITIALIZE') {
       const { row, field, defaultData, selected } = action.payload;
-      console.log({ row, field, defaultData, selected });
       if (!row || !field) return prev;
 
       const id = row.id + field.name;

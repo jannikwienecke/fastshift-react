@@ -7,6 +7,7 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import {
+  ComboboxFieldValue,
   DataType,
   makeHooks,
   useCombobox,
@@ -56,9 +57,18 @@ export const ProjectsClient = ({
 
   const getListProps = useList();
 
+  const { list } = useStoreValue();
+
+  const table = list?.focusedRelationField?.field?.relation?.tableName;
+
   const getComboboxProps = useCombobox({
-    onClose: handleClose,
+    state: list?.focusedRelationField ? list.focusedRelationField : null,
     onSelect: handleSelect,
+    onClose: handleClose,
+    renderValue: (value) => {
+      if (!list?.focusedRelationField?.field || !table) return null;
+      return <ComboboxFieldValue tableName={table} value={value} />;
+    },
   });
 
   const { edit } = useStoreValue();

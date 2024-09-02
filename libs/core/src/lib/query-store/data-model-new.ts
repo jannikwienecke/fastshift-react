@@ -32,7 +32,7 @@ export const makeData = (
   viewName: string
 ) => {
   return <T extends RecordType = RecordType>(data: T[]): DataModelNew<T> => {
-    const viewConfig = registeredViews[viewName];
+    const viewConfig = registeredViews[viewName as string];
     if (!viewConfig) {
       throw new Error(`View ${viewName} not found`);
     }
@@ -48,7 +48,7 @@ export const makeData = (
           id: item['id'] as string,
           label: item[label],
           getValue: <K extends keyof T>(key: K) => {
-            const viewConfig = registeredViews[key];
+            const viewConfig = registeredViews[key as string];
             if (viewConfig) {
               const value = item[key];
               const isArray = Array.isArray(value);
@@ -59,7 +59,7 @@ export const makeData = (
 
               const r = isArray ? data.rows : data.rows?.[0];
 
-              return r;
+              return r as T[K];
             } else {
               return item[key];
             }

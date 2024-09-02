@@ -8,7 +8,6 @@ import {
   GlobalConfig,
   IncludeConfig,
   makeData,
-  Model,
   QueryReturnDto,
   QueryStore,
   queryStoreAtom,

@@ -1,4 +1,3 @@
-import { DataRow, DataItem } from '../query-store';
 import { Row } from '../query-store/data-model-new';
 import { FieldConfig, RecordType } from '../types';
 

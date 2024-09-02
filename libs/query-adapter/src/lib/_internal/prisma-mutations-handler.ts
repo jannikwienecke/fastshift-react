@@ -157,7 +157,6 @@ export const updateManyToManyMutation = async (
       .map((v) => v?.[fieldNameRelationTable])
       .filter((v) => !relation.values.includes(v));
 
-    console.log('=toDelete', toDelete);
     await relationTableClient.deleteMany({
       where: {
         [fieldNameRelationTable]: {
@@ -176,10 +175,7 @@ export const updateManyToManyMutation = async (
         },
       });
 
-      if (hasRecord.length > 0) {
-        console.log('DO NOTHING');
-        // do nothing
-      } else {
+      if (!(hasRecord.length > 0)) {
         await relationTableClient.create({
           data: {
             [fieldNameTable]: id,

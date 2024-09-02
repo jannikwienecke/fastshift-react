@@ -1,12 +1,5 @@
-import {
-  clientConfigAtom,
-  ComponentType,
-  DataRow,
-  Row,
-  useStoreValue,
-} from '@apps-next/core';
+import { clientConfigAtom, ComponentType, Row } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
-import { useQueryData } from '../use-query-data';
 
 export const FieldValue = ({
   fieldName,
@@ -17,14 +10,6 @@ export const FieldValue = ({
   componentType: ComponentType;
   row: Row | undefined;
 }) => {
-  const queryData = useQueryData();
-
-  const { list } = useStoreValue();
-
-  const table = list?.focusedRelationField?.field?.relation?.tableName;
-
-  const queryDataTable = queryData.relationalDataModel?.[table as string];
-
   // TODO: FIX NAMING -> OR MERGE THEM clientConfigAtom and getViewConfigAtom
   const injectedViewConfig = useAtomValue(clientConfigAtom);
 

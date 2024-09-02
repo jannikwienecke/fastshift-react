@@ -6,7 +6,7 @@ export const ColorComponent = (props: { data: GetRowType<'category'> }) => {
     <div
       className="w-5 h-5 rounded-full"
       style={{
-        backgroundColor: props.data.getItemValue('color'),
+        backgroundColor: props.data.raw.color,
       }}
     />
   );
