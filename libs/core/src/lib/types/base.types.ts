@@ -61,7 +61,7 @@ export type GetTableName = RegisteredRouter['config']['tableNames'][number];
 export type GetTableDataType<T extends GetTableName> =
   RegisteredRouter['config']['_datamodel'][T];
 
-export type GetRowType<T extends GetTableName> = Row<GetTableDataType<T>>;
+export type GetRowType<T extends GetTableName> = GetTableDataType<T>;
 
 export type GetFieldName<TDataModel extends Record<string, any> = any> =
   keyof TDataModel['tables'][GetTableName]['validator']['fields'];

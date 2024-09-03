@@ -16,7 +16,7 @@ export const ListFieldValue = ({
       }}
       onClick={(e) => {
         if (!field) return;
-        if (!field.relation) return;
+        if (!field.relation && !field.enum) return;
 
         const rect = e.currentTarget.getBoundingClientRect();
 

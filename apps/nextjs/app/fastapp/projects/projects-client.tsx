@@ -38,14 +38,14 @@ setClientViewConfig<ProjectViewDataType>('project', {
     category: {
       component: {
         list: ({ data }) => {
-          return <>{data.getValue('category').label}</>;
+          return <>{data.category.label}</>;
         },
       },
     },
     tasks: {
       component: {
         list: ({ data }) => {
-          const tasks = data.getValue('tasks').length;
+          const tasks = data.tasks.length;
           return (
             <div className="flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
               {tasks}
@@ -58,7 +58,7 @@ setClientViewConfig<ProjectViewDataType>('project', {
     owner: {
       component: {
         list: ({ data }) => {
-          const { firstname, lastname } = data.getValue('owner').raw;
+          const { firstname, lastname } = data.owner;
           return (
             <div className="flex space-x-1 items-center pr-2">
               <div>

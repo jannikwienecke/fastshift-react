@@ -17,7 +17,7 @@ export type Store = {
     focusedRelationField?: {
       row: Row;
       field: FieldConfig | null;
-      selected: Row | Row[];
+      selected: string | Row | Row[];
       rect: DOMRect;
     };
   };

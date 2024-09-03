@@ -177,18 +177,16 @@ function ListValues({
         )}
         {...props}
       >
-        {values.map((value) => {
+        {values.map((value, index) => {
           return (
-            <div>
-              <List.Value
-                key={
-                  value.id ??
-                  'NO_VALUE' + (value.relation?.fieldName.toString() ?? '')
-                }
-              >
-                <>{value.render ? value.render() : value.label}</>
-              </List.Value>
-            </div>
+            <List.Value
+              key={
+                value.id + '_fieldName_' + value.relation?.fieldName ??
+                'NO_VALUE' + (value.relation?.fieldName.toString() ?? '')
+              }
+            >
+              <>{value.render ? value.render() : value.label}</>
+            </List.Value>
           );
         })}
       </div>

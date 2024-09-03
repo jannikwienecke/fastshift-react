@@ -1,31 +1,43 @@
-import { Row } from '@apps-next/core';
 import { useViewOf, ViewBubble } from '@apps-next/react';
 import { Icon } from '@apps-next/ui';
 import { TaskViewDataType } from './tasks.types';
 
 // TODO: Have a default component library export for fields
 // like: CheckboxField, TextField, Completed, Priority, Tags...
-export const PriorityComponent = (props: { data: Row<TaskViewDataType> }) => {
-  const PRIORITY_COLORS = {
-    low: '🟢',
-    medium: '🟡',
-    high: '🔴',
-  };
+const PRIORITY_COLORS = {
+  low: '🟢',
+  medium: '🟡',
+  high: '🔴',
+};
 
-  const priority = props.data.getValue('priority');
+export const PriorityComponent = (props: { data: TaskViewDataType }) => {
+  const priority = props.data.priority;
 
   return <div>{PRIORITY_COLORS[priority]}</div>;
 };
 
+export const PriorityComponentCombobox = (props: {
+  data: TaskViewDataType['priority'];
+}) => {
+  const priority = props.data;
+
+  return (
+    <div className="flex items-center gap-2">
+      <div>{PRIORITY_COLORS[priority]}</div>
+      <div>{priority}</div>
+    </div>
+  );
+};
+
 // Todo: Check typings of these components GetRowType<'category'>
-export const CompletedComponent = (props: { data: Row<TaskViewDataType> }) => {
-  const completed = props.data.getValue('completed');
+export const CompletedComponent = (props: { data: TaskViewDataType }) => {
+  const completed = props.data.completed;
 
   return <div>{completed ? '✅' : '❌'}</div>;
 };
 
-export const TagsComponent = (props: { data: Row<TaskViewDataType> }) => {
-  const tags = props.data.getValue('tag');
+export const TagsComponent = (props: { data: TaskViewDataType }) => {
+  const tags = props.data.tag;
 
   if (!tags) return null;
 
@@ -38,8 +50,8 @@ export const TagsComponent = (props: { data: Row<TaskViewDataType> }) => {
           <div key={tag.id} className={index !== 0 ? '-ml-2' : ''}>
             <ViewBubble
               tableName="tag"
-              value={tag.label}
-              color={tag.raw.color}
+              value={tag.name}
+              color={tag.color}
               showIcon={false}
             />
           </div>
@@ -59,9 +71,7 @@ export const TagsComponent = (props: { data: Row<TaskViewDataType> }) => {
   );
 };
 
-export const TagsCombobox = (props: {
-  data: Row<TaskViewDataType['tag'][0]>;
-}) => {
+export const TagsCombobox = (props: { data: TaskViewDataType['tag'][0] }) => {
   const tag = props.data;
 
   if (!tag) return null;
@@ -69,28 +79,28 @@ export const TagsCombobox = (props: {
     <div className="flex gap-[2px] text-sm">
       <div key={tag.id} className="flex items-center">
         <div
-          style={{ backgroundColor: tag.raw.color }}
+          style={{ backgroundColor: tag.color }}
           className="w-[10px] h-[10px] rounded-full mr-3"
         />
 
-        <div>{tag.label}</div>
+        <div>{tag.name}</div>
       </div>
     </div>
   );
 };
 
-export const ProjectComponent = (props: { data: Row<TaskViewDataType> }) => {
-  const project = props.data.getValue('project');
+export const ProjectComponent = (props: { data: TaskViewDataType }) => {
+  const project = props.data.project;
 
-  if (!project.raw?.label) {
+  if (!project?.label) {
     return <>Set Project</>;
   }
 
-  return <ViewBubble tableName="project" value={String(project.raw.label)} />;
+  return <ViewBubble tableName="project" value={String(project.label)} />;
 };
 
 export const ProjectComponentCombobox = (props: {
-  data: Row<TaskViewDataType['project']>;
+  data: TaskViewDataType['project'];
 }) => {
   const project = props.data;
   const view = useViewOf('project');
@@ -98,7 +108,7 @@ export const ProjectComponentCombobox = (props: {
   return (
     <div className="flex gap-2 items-center w-full">
       <Icon icon={view.icon} />
-      <div>{project.raw?.label}</div>
+      <div>{project?.label}</div>
     </div>
   );
 };

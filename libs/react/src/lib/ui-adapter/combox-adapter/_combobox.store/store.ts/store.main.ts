@@ -1,6 +1,7 @@
+import { makeRow } from '@apps-next/core';
 import { atom } from 'jotai';
-import { ComboboxStore, DEFAULT_STORE } from './store.type';
 import { ComboboxStoreAction } from './store.actions.types';
+import { ComboboxStore, DEFAULT_STORE } from './store.type';
 
 export const storeAtom = atom<ComboboxStore>(DEFAULT_STORE);
 storeAtom.debugLabel = 'Global Store';
@@ -29,10 +30,38 @@ export const storeReducer = (
     if (action.type === 'INITIALIZE') {
       const { row, field, defaultData, selected } = action.payload;
       if (!row || !field) return prev;
-
       const id = row.id + field.name;
 
       if (prev.id === id) return prev;
+
+      if (field.enum) {
+        const values = field.enum.values.map((v) => {
+          return makeRow(v.name, v.name, v.name, field);
+        });
+
+        return {
+          ...DEFAULT_STORE,
+          ...action.payload,
+          id,
+          open: true,
+          values,
+          fallbackData: values,
+
+          multiple: false,
+          selected: [
+            makeRow(
+              selected.toString(),
+              selected.toString(),
+              selected.toString(),
+              field
+            ),
+          ],
+        };
+      }
+
+      if (!Array.isArray(selected) && typeof selected !== 'object') {
+        return prev;
+      }
 
       const table = action.payload.field?.relation?.tableName ?? '';
       const defaultValues = defaultData?.rows ?? [];
@@ -71,6 +100,14 @@ export const storeReducer = (
           ...prev,
           values: prev.fallbackData,
           query: '',
+        };
+      } else if (prev.field?.enum) {
+        return {
+          ...prev,
+          query,
+          values: prev.values.filter((v) =>
+            v.label.toLowerCase().includes(query.toLowerCase())
+          ),
         };
       }
 

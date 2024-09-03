@@ -71,7 +71,7 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
 
       if (Array.isArray(selectedField.selected)) {
         const ids = selectedField.selected.map((r) => r.id);
-        const newSelected = ids.includes(action.selected.id)
+        const newSelected = ids.includes(action.selected.id.toString())
           ? selectedField.selected.filter((s) => s.id !== action.selected.id)
           : [...selectedField.selected, action.selected];
 

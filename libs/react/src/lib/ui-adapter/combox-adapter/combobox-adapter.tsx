@@ -32,7 +32,7 @@ export const useCombobox = ({
     relationQuery: {
       tableName: store.tableName ?? '',
     },
-    disabled: !store.field || !query,
+    disabled: !store.field || !query || !!store.field.enum,
   });
 
   React.useEffect(() => {
@@ -59,7 +59,6 @@ export const useCombobox = ({
     if (lastInitialState.current?.row === initialState?.row) return;
 
     lastInitialState.current = initialState;
-
     if (!initialState?.field) {
       dispatch({ type: 'CLOSE' });
     } else {
@@ -77,7 +76,6 @@ export const useCombobox = ({
   const getComboboxProps = () => {
     return {
       ...store,
-
       onOpenChange: () => {
         onClose?.();
       },

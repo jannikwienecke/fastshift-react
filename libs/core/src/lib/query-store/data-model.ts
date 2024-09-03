@@ -1,7 +1,7 @@
 import { BaseViewConfigManager } from '../base-view-config';
-import { FieldConfig, RecordType, RegisteredViews } from '../types';
+import { FieldConfig, ID, RecordType, RegisteredViews } from '../types';
 
-export type Row<T extends RecordType | undefined = RecordType> = {
+export type Row<T extends RecordType | string | number | undefined = any> = {
   raw: T;
   label: string;
   id: string;
@@ -12,6 +12,7 @@ export type Row<T extends RecordType | undefined = RecordType> = {
     : T[K] extends RecordType | undefined
     ? Row<T[K]>
     : T[K];
+
   getValueLabel(key: keyof T): string;
   getField(key: keyof T): {
     id: string;
@@ -79,5 +80,25 @@ export const makeData = (
         };
       }),
     };
+  };
+};
+
+export const makeRow = (
+  id: ID,
+  label: string,
+  raw: any,
+  field: FieldConfig
+): Row => {
+  return {
+    id: id.toString(),
+    label,
+    raw,
+    getValue: (key: keyof any) => raw[key],
+    getValueLabel: (key: keyof any) => raw[key],
+    getField: (key: keyof any) => ({
+      id: raw[key].id,
+      label: raw[key].label,
+      field,
+    }),
   };
 };

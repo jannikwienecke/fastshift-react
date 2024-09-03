@@ -4,9 +4,8 @@ import {
   useStoreDispatch,
   useStoreValue,
 } from '@apps-next/core';
-import { ComboboxAdapterOptions } from '@apps-next/ui';
-import { useMutation } from '../use-mutation';
 import React from 'react';
+import { useMutation } from '../use-mutation';
 
 export const useHandleSelectCombobox = () => {
   const { mutate } = useMutation();
@@ -21,10 +20,10 @@ export const useHandleSelectCombobox = () => {
   const handleSelect = (value: Row) => {
     const { row, field } = list?.focusedRelationField || {};
 
-    if (!field?.relation) throw new Error('no relation field');
     if (!row) throw new Error('no row');
+    if (!field) throw new Error('no field');
 
-    const isManyToManyRelation = field.relation.manyToManyRelation;
+    const isManyToManyRelation = field?.relation?.manyToManyRelation;
 
     if (!isManyToManyRelation) {
       setTimeout(() => {
@@ -32,12 +31,18 @@ export const useHandleSelectCombobox = () => {
       }, 100);
     }
 
-    if (!startSelectedRef.current && list?.focusedRelationField?.selected) {
-      startSelectedRef.current = Array.isArray(
-        list.focusedRelationField.selected
-      )
-        ? list.focusedRelationField.selected.map((v) => v.id)
-        : list.focusedRelationField.selected.id;
+    const selected = list?.focusedRelationField?.selected;
+    const selectedId =
+      typeof selected === 'string'
+        ? selected
+        : Array.isArray(selected)
+        ? selected.map((v) => v.id)
+        : selected?.id;
+
+    if (!startSelectedRef.current && selected) {
+      startSelectedRef.current = Array.isArray(selected)
+        ? selected.map((v) => v.id)
+        : selectedId;
     }
 
     dispatch({ type: 'UPDATE_SELECTED_RELATIONAL_FIELD', selected: value });
@@ -50,13 +55,11 @@ export const useHandleSelectCombobox = () => {
       () => {
         timeoutRef.current = null;
 
-        if (!field.relation) return;
-        const newSelected = Array.isArray(list?.focusedRelationField?.selected)
-          ? updateManyToManyRelation(
-              list.focusedRelationField.selected ?? [],
-              value
-            ).map((v) => v.id)
-          : list?.focusedRelationField?.selected.id;
+        if (!field) return;
+
+        const newSelected = Array.isArray(selected)
+          ? updateManyToManyRelation(selected ?? [], value).map((v) => v.id)
+          : selectedId;
 
         startSelectedRef.current = newSelected;
 
@@ -71,7 +74,7 @@ export const useHandleSelectCombobox = () => {
                   const newValue = {
                     ...item,
                     [field.name]: isManyToManyRelation
-                      ? updateManyToManyRelation(item[field.name], value.raw)
+                      ? updateManyToManyRelation(item[field.name], value)
                       : value.raw,
                   };
                   return newValue;
@@ -82,7 +85,7 @@ export const useHandleSelectCombobox = () => {
             payload: {
               id: row.id,
               record: {
-                [field.relation.fieldName]: isManyToManyRelation
+                [field.relation?.fieldName ?? field.name]: isManyToManyRelation
                   ? newSelected
                   : value.id,
               },

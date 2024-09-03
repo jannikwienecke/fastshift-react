@@ -19,7 +19,7 @@ export const ComboboxFieldValue = ({
     <>
       {ComponentToRender ? (
         <>
-          <ComponentToRender data={value} />
+          <ComponentToRender data={value.raw} />
         </>
       ) : (
         <>{value.label}</>

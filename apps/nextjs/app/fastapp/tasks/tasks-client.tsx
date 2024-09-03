@@ -16,6 +16,7 @@ import { ComboboxPopover, Form, List } from '@apps-next/ui';
 import {
   CompletedComponent,
   PriorityComponent,
+  PriorityComponentCombobox,
   ProjectComponent,
   ProjectComponentCombobox,
   TagsCombobox,
@@ -35,7 +36,7 @@ setClientViewConfig<TaskViewDataType>('task', {
     priority: {
       component: {
         list: PriorityComponent,
-        // combobox: PriorityComponent,
+        combobox: PriorityComponentCombobox,
       },
     },
 
@@ -83,8 +84,12 @@ export const TasksClient = () => {
     onSelect: handleSelect,
     onClose: handleClose,
     renderValue: (value) => {
-      if (!list?.focusedRelationField?.field || !table) return null;
-      return <ComboboxFieldValue tableName={table} value={value} />;
+      return (
+        <ComboboxFieldValue
+          tableName={table ?? list?.focusedRelationField?.field?.name ?? ''}
+          value={value}
+        />
+      );
     },
   });
 

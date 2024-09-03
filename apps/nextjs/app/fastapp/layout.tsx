@@ -17,8 +17,8 @@ export default function FastAppLayoutComponent({
 }) {
   return (
     <div className="flex flex-row pt-2">
-      <div className="min-w-[15rem]">
-        <div className="flex flex-col gap-2 p-4">
+      <div className="min-w-[12rem]">
+        <div className="flex flex-col gap-2 p-4 text-[14px]">
           <Link href="/fastapp/tasks">Tasks</Link>
           <Link href="/fastapp/projects">Projects</Link>
           <Link href="/fastapp/categories">Categories</Link>

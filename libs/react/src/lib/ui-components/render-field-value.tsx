@@ -20,7 +20,7 @@ export const FieldValue = ({
   return (
     <>
       {ComponentToRender ? (
-        <ComponentToRender data={row} />
+        <ComponentToRender data={row.raw} />
       ) : (
         <>{row?.getValueLabel(fieldName)}</>
       )}

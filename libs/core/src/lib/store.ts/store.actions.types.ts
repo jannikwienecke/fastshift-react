@@ -1,5 +1,5 @@
 import { Row } from '../query-store/data-model';
-import { FieldConfig, RecordType } from '../types';
+import { ComboxboxItem, FieldConfig, RecordType } from '../types';
 
 export type StoreAction =
   | {
