@@ -1,6 +1,23 @@
-import { useViewOf, ViewBubble } from '@apps-next/react';
-import { Icon } from '@apps-next/ui';
+import { useViewOf } from '@apps-next/react';
+import { Bubble, Icon } from '@apps-next/ui';
 import { TaskViewDataType } from './tasks.types';
+import { GetTableName } from '@apps-next/core';
+
+export const ViewBubble = (props: {
+  tableName: GetTableName;
+  value: string;
+  color?: string;
+  showIcon?: boolean;
+}) => {
+  const view = useViewOf(props.tableName as string);
+  return (
+    <Bubble
+      label={props.value}
+      icon={props.showIcon === false ? null : <Icon icon={view.icon || null} />}
+      color={props.color}
+    />
+  );
+};
 
 // TODO: Have a default component library export for fields
 // like: CheckboxField, TextField, Completed, Priority, Tags...

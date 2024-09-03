@@ -19,11 +19,7 @@
               },
               {
                 "sourceTag": "scope:react",
-                "onlyDependOnLibsWithTags": [
-                  "scope:shared",
-                  "scope:adapter",
-                  "scope:ui"
-                ]
+                "onlyDependOnLibsWithTags": ["scope:shared", "scope:ui"]
               },
               {
                 "sourceTag": "scope:convex-app",
@@ -43,7 +39,7 @@
               },
               {
                 "sourceTag": "scope:query",
-                "onlyDependOnLibsWithTags": ["scope:shared"]
+                "onlyDependOnLibsWithTags": ["scope:shared", "scope:react"]
               }
             ]
           }

@@ -84,6 +84,18 @@ export class BaseViewConfigManager<
     return field as FieldConfig;
   }
 
+  getRelationFieldByTableName(tableName: string): FieldConfig {
+    const field = this.getViewFieldList().find(
+      (f) => f.relation?.tableName === tableName
+    );
+
+    if (!field) {
+      throw new Error(`Field ${tableName} not found`);
+    }
+
+    return field as FieldConfig;
+  }
+
   getIncludeFields(): IncludeConfig[string] {
     return this.viewConfig.includeFields;
   }

@@ -12,7 +12,7 @@ import {
   useCombobox,
   useHandleSelectCombobox,
 } from '@apps-next/react';
-import { ComboboxPopover, Form, List } from '@apps-next/ui';
+import { ComboboxPopover, List } from '@apps-next/ui';
 import {
   CompletedComponent,
   PriorityComponent,
@@ -101,7 +101,7 @@ export const TasksClient = () => {
         <div>
           <QueryInput />
         </div>
-        {edit.isEditing ? <Form {...getFormProps()} /> : null}
+        {/* {edit.isEditing ? <Form {...getFormProps()} /> : null} */}
       </div>
 
       <ComboboxPopover {...props} />

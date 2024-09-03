@@ -1,19 +1,17 @@
 import {
   MutationProps,
   MutationReturnDto,
-  RecordType,
   storeAtom,
   viewConfigManagerAtom,
   viewsHelperAtom,
 } from '@apps-next/core';
-import { FormField, FormProps, StringInput } from '@apps-next/ui';
 import { atom } from 'jotai';
-import { formFieldHelper } from './form-helper';
-import { FORM_DEFAULT_VALUE_DICT, FORM_INPUT_DICT } from './form.config';
 import {
   UseComboboAdaper,
   useCombobox as useComboboxAdapter,
 } from '../combox-adapter';
+import { FormProps } from './form-adapter';
+import { FORM_DEFAULT_VALUE_DICT, FORM_INPUT_DICT } from './form.config';
 
 const INITIAL: FormProps = {
   fields: [],
@@ -45,7 +43,7 @@ export const formAtom = atom(
     const editState = get(storeAtom).edit;
     const viewConfigManager = get(viewConfigManagerAtom);
 
-    const fields: FormField<RecordType>[] =
+    const fields: any[] =
       viewConfigManager?.form.getFormFieldList().map((field) => {
         const { relation, isRequired, isRelationalIdField } = field;
         const name = relation ? relation.tableName : field.name;
@@ -58,7 +56,7 @@ export const formAtom = atom(
           ? ''
           : undefined;
 
-        const Component = FORM_INPUT_DICT[field.type] || StringInput;
+        const Component = FORM_INPUT_DICT[field.type] || (() => null);
 
         if (field.enum && !defaultValue) {
           defaultValue = field.enum.values?.[0]?.name;
@@ -102,12 +100,12 @@ export const formAtom = atom(
             const isRequiredError = field.isRequired && noValue;
             formState.ready = isRequiredError ? false : true;
 
-            const error: FormField<RecordType>['error'] | undefined =
-              formState.ready
-                ? undefined
-                : {
-                    message: isRequiredError ? `Field ${name} is required` : '',
-                  };
+            // const error: FieldConfig['error'] | undefined =
+            //   formState.ready
+            //     ? undefined
+            //     : {
+            //         message: isRequiredError ? `Field ${name} is required` : '',
+            //       };
 
             set(initialFormAtom, {
               ...formState,
@@ -118,14 +116,14 @@ export const formAtom = atom(
                   return {
                     ...field,
                     value,
-                    error,
+                    error: '',
                   };
                 }
                 return field;
               }),
             });
           },
-        } satisfies FormField<RecordType>;
+        };
       }) || [];
 
     set(initialFormAtom, {
@@ -138,81 +136,81 @@ export const formAtom = atom(
       onSubmit: async () => {
         const formState = get(initialFormAtom);
 
-        const record = formState.fields.reduce(
-          (acc, field) => formFieldHelper(field).updateRecord(acc),
-          {} as RecordType
-        );
+        // const record = formState.fields.reduce(
+        //   (acc, field) => formFieldHelper(field).updateRecord(acc),
+        //   {} as RecordType
+        // );
 
-        const store = get(storeAtom);
-        set(storeAtom, {
-          ...store,
-          edit: {
-            ...store.edit,
-            isEditing: false,
-            record: null,
-          },
-        });
+        // const store = get(storeAtom);
+        // set(storeAtom, {
+        //   ...store,
+        //   edit: {
+        //     ...store.edit,
+        //     isEditing: false,
+        //     record: null,
+        //   },
+        // });
 
-        set(initialFormAtom, {
-          ...formState,
-          ready: false,
-          isSubmitting: true,
-        });
+        // set(initialFormAtom, {
+        //   ...formState,
+        //   ready: false,
+        //   isSubmitting: true,
+        // });
 
-        let res: MutationReturnDto;
+        // let res: MutationReturnDto;
 
-        if (editState.record) {
-          res = await update.onSubmit({
-            type: 'UPDATE_RECORD',
-            payload: {
-              record: record,
-              id: editState.record.id,
-            },
+        // if (editState.record) {
+        //   res = await update.onSubmit({
+        //     type: 'UPDATE_RECORD',
+        //     payload: {
+        //       record: record,
+        //       id: editState.record.id,
+        //     },
 
-            handler: (items) => {
-              return items.map((item) => {
-                if (item.id === editState.record?.id) {
-                  return record;
-                }
-                return item;
-              });
-            },
-          });
-        } else {
-          res = await update.onSubmit({
-            type: 'CREATE_RECORD',
-            payload: {
-              id: record.id,
-              record: record,
-            },
-            handler: (items) => {
-              return [...items, record];
-            },
-          });
-        }
+        //     handler: (items) => {
+        //       return items.map((item) => {
+        //         if (item.id === editState.record?.id) {
+        //           return record;
+        //         }
+        //         return item;
+        //       });
+        //     },
+        //   });
+        // } else {
+        //   res = await update.onSubmit({
+        //     type: 'CREATE_RECORD',
+        //     payload: {
+        //       id: record.id,
+        //       record: record,
+        //     },
+        //     handler: (items) => {
+        //       return [...items, record];
+        //     },
+        //   });
+        // }
 
-        if (res.success?.message) {
-          set(initialFormAtom, {
-            ...formState,
-            ready: true,
-            isSubmitting: false,
-          });
-        } else {
-          set(initialFormAtom, {
-            ...formState,
-            ready: false,
-            isSubmitting: false,
-          });
+        // if (res.success?.message) {
+        //   set(initialFormAtom, {
+        //     ...formState,
+        //     ready: true,
+        //     isSubmitting: false,
+        //   });
+        // } else {
+        //   set(initialFormAtom, {
+        //     ...formState,
+        //     ready: false,
+        //     isSubmitting: false,
+        //   });
 
-          set(storeAtom, {
-            ...store,
-            edit: {
-              ...store.edit,
-              isEditing: true,
-              record: editState.record,
-            },
-          });
-        }
+        //   set(storeAtom, {
+        //     ...store,
+        //     edit: {
+        //       ...store.edit,
+        //       isEditing: true,
+        //       record: editState.record,
+        //     },
+        //   });
+        // }
       },
     });
   }

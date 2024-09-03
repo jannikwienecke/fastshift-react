@@ -1,40 +1,46 @@
-import { useConvexQuery } from '@apps-next/convex-adapter-app';
-import { useAtomValue } from 'jotai';
-import React from 'react';
-import { debouncedQueryAtom } from './ui-components/query-input';
-import { useView } from './use-view';
+'use client';
 
 import {
   QueryProps,
   QueryReturnOrUndefined,
   RecordType,
 } from '@apps-next/core';
-import { usePrismaQuery } from '@apps-next/query-adapter';
-import { useGlobalConfig } from './use-global-config';
+import { atom, useAtomValue } from 'jotai';
+import React from 'react';
+import { debouncedQueryAtom } from './ui-components';
+import { useView } from './use-view';
 
-const useQueryDict: Record<'prisma' | 'convex', typeof useConvexQuery> = {
-  convex: useConvexQuery,
-  prisma: usePrismaQuery,
-};
+export const queryDataAtom = atom<QueryReturnOrUndefined<RecordType>>({
+  data: [],
+  relationalData: {},
+  isLoading: false,
+  isError: false,
+  error: undefined,
+  isFetching: false,
+  isFetched: false,
+  refetch: () => null,
+} as QueryReturnOrUndefined<RecordType>);
+
+export const queryPropsAtom = atom<{
+  [queryKey: string]: Partial<QueryProps>;
+}>({});
+
+export const useQueryAtom = atom<typeof useQuery>();
 
 export const useQuery = <QueryReturnType extends RecordType[]>(
   queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
+  const useQueryAdapter = useAtomValue(useQueryAtom) as typeof useQuery;
+
   const { viewConfigManager, registeredViews } = useView();
   const query = useAtomValue(debouncedQueryAtom);
-  const globalConfig = useGlobalConfig();
 
-  const _useQuery = useQueryDict[globalConfig?.provider];
-
-  const resturnData = _useQuery<QueryReturnType>({
-    queryProps: {
-      ...queryProps,
-      registeredViews,
-      modelConfig: viewConfigManager.modelConfig,
-      query: queryProps?.query ?? query,
-      viewConfigManager: queryProps?.viewConfigManager ?? viewConfigManager,
-    },
-    globalConfig,
+  const resturnData = useQueryAdapter<QueryReturnType>({
+    ...queryProps,
+    registeredViews,
+    modelConfig: viewConfigManager.modelConfig,
+    query: queryProps?.query || query,
+    viewConfigManager: queryProps?.viewConfigManager ?? viewConfigManager,
   });
 
   React.useEffect(() => {

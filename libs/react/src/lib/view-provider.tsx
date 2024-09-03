@@ -3,13 +3,14 @@
 import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  globalConfigAtom,
   QueryReturnOrUndefined,
   REGISTRED_VIEWS,
 } from '@apps-next/core';
+import { useAtomValue } from 'jotai';
 import React from 'react';
 import { ViewContext } from './_internal/view-context';
 import { useForm, useList } from './ui-adapter';
-import { useGlobalConfig } from './use-global-config';
 import { useQuery } from './use-query';
 
 export const ViewProvider = ({
@@ -19,9 +20,8 @@ export const ViewProvider = ({
   children: React.ReactNode;
   view: { viewConfigManager: BaseViewConfigManagerInterface };
 }) => {
-  const { config } = useGlobalConfig();
-
   const { tableName } = view.viewConfigManager.viewConfig;
+  const config = useAtomValue(globalConfigAtom);
 
   const searchableFields = config.searchableFields[tableName];
   const viewFields = config.viewFields[tableName];

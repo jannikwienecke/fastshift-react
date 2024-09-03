@@ -1,4 +1,8 @@
-import { BaseViewConfigManager, RecordType } from '@apps-next/core';
+import {
+  BaseViewConfigManager,
+  FieldConfig,
+  RecordType,
+} from '@apps-next/core';
 import { PrismaInclude } from '../prisma.types';
 
 export const parsePrismaResult = ({
@@ -20,8 +24,13 @@ export const parsePrismaResult = ({
         if (include[key]) {
           const items = r[key] as RecordType[];
 
-          const field =
-            getManyToManyField(key) ?? viewConfigManager.getFieldBy(key);
+          let field: FieldConfig | undefined;
+          try {
+            field =
+              getManyToManyField(key) ?? viewConfigManager.getFieldBy(key);
+          } catch (error) {
+            //
+          }
 
           //   example:
           // Task -> Many To Many Relationship with Model "Tag"

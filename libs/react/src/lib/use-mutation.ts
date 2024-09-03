@@ -1,30 +1,28 @@
-import { useConvexMutation } from '@apps-next/convex-adapter-app';
 import {
-  DataProvider,
   llinfo,
   Mutation,
   MutationReturnDto,
+  MutationReturnType,
 } from '@apps-next/core';
-import { usePrismaMutation } from '@apps-next/query-adapter';
-import { useGlobalConfig } from './use-global-config';
-import { useView } from './use-view';
+import { atom, useAtomValue } from 'jotai';
 import React from 'react';
-import { useAtomValue } from 'jotai';
 import { debouncedQueryAtom } from './ui-components';
+import { useView } from './use-view';
 
-const useQueryDict: {
-  [key in DataProvider]: typeof useConvexMutation;
-} = {
-  convex: useConvexMutation,
-  prisma: usePrismaMutation,
-};
+type UseMutationAdapter = () => MutationReturnType;
+
+export const useMutationAtom = atom<UseMutationAdapter>(
+  {} as UseMutationAdapter
+);
 
 export const useMutation = () => {
   const { viewConfigManager } = useView();
-  const globalConfig = useGlobalConfig();
-  const _useMutation = useQueryDict[globalConfig?.provider];
-  const mutation = _useMutation();
   const query = useAtomValue(debouncedQueryAtom);
+
+  const useMutationAdapter = useAtomValue(
+    useMutationAtom
+  ) as UseMutationAdapter;
+  const mutation = useMutationAdapter();
 
   const { mutate, mutateAsync } = mutation;
 
@@ -37,6 +35,7 @@ export const useMutation = () => {
           mutation: args.mutation,
           query,
         });
+        return Promise.resolve({} as any);
       } catch (error) {
         console.error('Error in runMutateAsync: ', error);
         return { error: (error as any)?.message };
@@ -58,7 +57,7 @@ export const useMutation = () => {
   );
 
   return {
-    ...mutation,
+    ...{},
     mutateAsync: runMutateAsync,
     mutate: runMutate,
   };

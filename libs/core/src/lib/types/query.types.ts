@@ -29,7 +29,7 @@ export type QueryRelationalData = {
 export type QueryReturnDto<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   relationalData?: QueryRelationalData;
-  error?: any;
+  error?: unknown;
 };
 
 export type QueryError = {

@@ -5,7 +5,7 @@ import {
   BaseViewConfigManagerInterface,
   clientConfigStore,
   DataModelNew,
-  GlobalConfig,
+  globalConfigAtom,
   IncludeConfig,
   makeData,
   QueryReturnDto,
@@ -14,14 +14,16 @@ import {
   RecordType,
   RegisteredViews,
   registeredViewsAtom,
-  setGlobalConfigAtom,
   viewConfigManagerAtom,
   ViewContextType,
 } from '@apps-next/core';
-import { Provider } from 'jotai';
+import { Provider, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 
+import { queryDataAtom, useMutationAtom, useQueryAtom } from '@apps-next/react';
 import React from 'react';
+import { usePrismaQuery } from './use-prisma-query';
+import { usePrismaMutation } from './use-prisma-mutation';
 
 const HydrateAtoms = ({ initialValues, children }: any) => {
   useHydrateAtoms(initialValues, { dangerouslyForceHydrate: true });
@@ -45,6 +47,8 @@ export const ServerSideConfigProvider = (
   } & { children: React.ReactNode }
 ) => {
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
+
+  const globalConfig = useAtomValue(globalConfigAtom);
 
   const dataModel = makeData(
     props.registeredViews,
@@ -76,8 +80,17 @@ export const ServerSideConfigProvider = (
   const initialValues = [
     [viewConfigManagerAtom, viewConfigManager],
     [registeredViewsAtom, props.registeredViews],
-    [setGlobalConfigAtom, {} as GlobalConfig],
+    [globalConfigAtom, globalConfig],
     [queryStoreAtom, queryStore],
+    [useQueryAtom, () => usePrismaQuery],
+    [useMutationAtom, () => usePrismaMutation],
+    [
+      queryDataAtom,
+      {
+        data: props.data,
+        relationalData: props.relationalData,
+      },
+    ],
   ];
 
   return (

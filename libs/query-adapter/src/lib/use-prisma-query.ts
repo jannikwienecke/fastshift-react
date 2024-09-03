@@ -1,5 +1,4 @@
 import {
-  GlobalConfig,
   makeQueryKey,
   QueryProps,
   QueryReturnDto,
@@ -38,28 +37,27 @@ export const useStableQuery = (
   return stored.current;
 };
 
-export const usePrismaQuery = <QueryReturnType extends RecordType[]>({
-  queryProps,
-  globalConfig,
-}: {
-  queryProps: QueryProps;
-  globalConfig: GlobalConfig;
-}): QueryReturnOrUndefined<QueryReturnType[0]> => {
+export const usePrismaQuery = <QueryReturnType extends RecordType[]>(
+  queryProps?: Partial<QueryProps>
+): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const prisma = usePrismaApi();
 
   const queryReturn = useStableQuery(async () => {
     const res = await prisma.viewLoader({
       ...queryProps,
+      registeredViews: queryProps?.registeredViews ?? {},
+      modelConfig: queryProps?.viewConfigManager?.modelConfig,
+      query: queryProps?.query,
 
-      viewConfig: queryProps.viewConfigManager?.viewConfig,
-      modelConfig: queryProps.viewConfigManager?.modelConfig,
+      viewConfig: queryProps?.viewConfigManager?.viewConfig,
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       viewConfigManager: undefined,
     });
 
     return res;
-  }, queryProps);
+  }, (queryProps ?? {}) as QueryProps);
 
   return {
     ...queryReturn,

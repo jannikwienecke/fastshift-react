@@ -1,23 +1,18 @@
-import { FieldType } from '@apps-next/core';
-import {
-  StringInput,
-  BooleanInput,
-  EnumInput,
-  OneToOneSelectInput,
-  ComboxboxItem,
-} from '@apps-next/ui';
+import { ComboxboxItem, FieldType } from '@apps-next/core';
+
+const StringInput = () => null;
 
 export const FORM_INPUT_DICT: {
   [key in FieldType]: React.FC<any>;
 } = {
   String: StringInput,
   Number: StringInput,
-  Boolean: BooleanInput,
+  Boolean: StringInput,
   Date: StringInput,
   Reference: StringInput,
-  OneToOneReference: OneToOneSelectInput,
+  OneToOneReference: StringInput,
   Union: StringInput,
-  Enum: EnumInput,
+  Enum: StringInput,
 };
 
 export const FORM_DEFAULT_VALUE_DICT: {

@@ -1,11 +1,12 @@
 'use client';
 
-import { BaseConfigInterface } from '@apps-next/core';
+import { BaseConfigInterface, globalConfigAtom } from '@apps-next/core';
 import {
   isServer,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import { useHydrateAtoms } from 'jotai/utils';
 import React from 'react';
 import { PrismaContext } from './_internal/prisma-context';
 import { PrismaClientType } from './prisma.client.types';
@@ -50,27 +51,39 @@ export function PrismaQueryProvider({
   config: BaseConfigInterface;
 }) {
   return (
-    <PrismaContext.Provider
-      value={{
-        prisma: {
-          ...api,
-          viewMutation(props) {
-            return api.viewMutation({
-              ...props,
-              mutation: {
-                ...props.mutation,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                handler: undefined,
-              },
-            });
-          },
-        },
-        config: config,
-        provider: 'prisma',
-      }}
+    <HydrateAtoms
+      key={'global-config'}
+      initialValues={[[globalConfigAtom, config]]}
     >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </PrismaContext.Provider>
+      <PrismaContext.Provider
+        value={{
+          prisma: {
+            ...api,
+            viewMutation(props) {
+              return api.viewMutation({
+                ...props,
+                mutation: {
+                  ...props.mutation,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  handler: undefined,
+                },
+              });
+            },
+          },
+          config: config,
+          provider: 'prisma',
+        }}
+      >
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </PrismaContext.Provider>
+    </HydrateAtoms>
   );
 }
+
+const HydrateAtoms = ({ initialValues, children }: any) => {
+  useHydrateAtoms(initialValues, { dangerouslyForceHydrate: true });
+  return children;
+};

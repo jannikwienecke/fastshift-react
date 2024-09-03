@@ -72,8 +72,11 @@ export const prismaViewLoader = async (
       ) ?? []
     );
 
-    const field = viewConfigManager.getFieldBy(relationQuery.tableName);
-    if (field.relation?.manyToManyTable && relationQuery.recordId) {
+    const field = viewConfigManager.getRelationFieldByTableName(
+      relationQuery.tableName
+    );
+
+    if (field?.relation?.manyToManyTable && relationQuery.recordId) {
       const firstLetterLowerCase = (str: string) =>
         str.charAt(0).toLowerCase() + str.slice(1);
       dbQuery = client(prismaClient).tableClient(
