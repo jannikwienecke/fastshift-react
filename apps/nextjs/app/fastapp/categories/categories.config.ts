@@ -1,5 +1,5 @@
 import { createServerViewConfig } from '@apps-next/core';
-import { globalConfig } from '../../layout';
+import { globalConfig } from '../../global-config';
 
 export const viewConfig = createServerViewConfig(
   'category',
@@ -16,5 +16,6 @@ export const viewConfig = createServerViewConfig(
       },
     },
   },
+  //TODO CHECK: DO I NEED TO PASS THIS IN??
   globalConfig.config
 );

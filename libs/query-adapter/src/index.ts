@@ -8,3 +8,4 @@ export * from './lib/server-side-config-context';
 export * from './lib/prisma-view-loader';
 export * from './lib/use-prisma-mutation';
 export * from './lib/prisma-configure-loader';
+export * from './lib/prisma-query-provider-server';

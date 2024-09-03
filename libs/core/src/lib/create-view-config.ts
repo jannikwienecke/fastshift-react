@@ -7,7 +7,7 @@ import {
   ViewConfigType,
   ViewFieldConfig,
 } from './types';
-import { registerViewHandler } from './register-view-handler';
+import { registerView } from './client-config.store';
 
 export const REGISTRED_VIEWS: RegisteredViews = {};
 
@@ -41,8 +41,7 @@ export function createViewConfig<T extends GetTableName>(
     },
   };
 
-  registerViewHandler.register(viewName, viewConfig);
-
+  registerView(viewName, viewConfig);
   return viewConfig;
 }
 
@@ -74,7 +73,7 @@ export function createServerViewConfig<T extends GetTableName>(
     },
   };
 
-  registerViewHandler.register(viewName, viewConfig);
+  registerView(viewName, viewConfig);
 
   return viewConfig;
 }

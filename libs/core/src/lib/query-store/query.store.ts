@@ -23,6 +23,7 @@ export const queryStoreAtom = atom<QueryStore<RecordType>>({
   hasNextPage: false,
   hasPreviousPage: false,
   isInitialized: false,
+  viewName: '',
 });
 
 export const updateQueryDataAtom = atom<
@@ -55,6 +56,7 @@ export const updateQueryDataAtom = atom<
 
   set(queryStoreAtom, {
     ...get(queryStoreAtom),
+    viewName: viewConfigManager.getViewName(),
     dataModel,
     relationalDataModel: {
       ...get(queryStoreAtom).relationalDataModel,

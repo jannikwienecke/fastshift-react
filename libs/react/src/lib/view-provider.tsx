@@ -6,12 +6,16 @@ import {
   globalConfigAtom,
   QueryReturnOrUndefined,
   REGISTRED_VIEWS,
+  viewConfigManagerAtom,
+  ViewConfigType,
 } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
+import { useHydrateAtoms } from 'jotai/utils';
 import React from 'react';
 import { ViewContext } from './_internal/view-context';
 import { useForm, useList } from './ui-adapter';
-import { useQuery } from './use-query';
+import { useMutationAtom } from './use-mutation';
+import { useQuery, useQueryAtom } from './use-query';
 
 export const ViewProvider = ({
   children,
@@ -27,25 +31,34 @@ export const ViewProvider = ({
   const viewFields = config.viewFields[tableName];
   const includeFields = config.includeFields[tableName];
 
-  const viewConfigManager = new BaseViewConfigManager(
-    {
-      ...view.viewConfigManager.viewConfig,
-      viewFields,
+  const viewConfig: ViewConfigType = {
+    ...view.viewConfigManager.viewConfig,
+    viewFields,
+    includeFields,
+    query: {
       searchableFields,
-      includeFields,
     },
-    {
-      searchableFields,
-      viewFields,
-    }
-  );
+  };
+
+  const queryAdapter = useAtomValue(useQueryAtom);
+  const mutationAdapter = useAtomValue(useMutationAtom);
+
+  const viewConfigManager = new BaseViewConfigManager(viewConfig);
 
   return (
-    <ViewContext.Provider
-      value={{ viewConfigManager, registeredViews: REGISTRED_VIEWS }}
+    <HydrateAtoms
+      initialValues={[
+        [viewConfigManagerAtom, viewConfigManager],
+        [useQueryAtom, () => queryAdapter],
+        [useMutationAtom, () => mutationAdapter],
+      ]}
     >
-      {children}
-    </ViewContext.Provider>
+      <ViewContext.Provider
+        value={{ viewConfigManager, registeredViews: REGISTRED_VIEWS }}
+      >
+        {children}
+      </ViewContext.Provider>
+    </HydrateAtoms>
   );
 };
 
@@ -73,4 +86,9 @@ export const ViewDataProvider = <
   );
 
   return Provider;
+};
+
+const HydrateAtoms = ({ initialValues, children }: any) => {
+  useHydrateAtoms(initialValues, { dangerouslyForceHydrate: true });
+  return children;
 };

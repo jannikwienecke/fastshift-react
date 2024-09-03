@@ -116,8 +116,6 @@ export const ProjectsClient = ({
 
       <div className="flex grow mx-2 flex-col gap-2 h-[calc(100vh-1rem)] border-[1px] border-gray-100">
         <div className="">
-          {edit.isEditing ? <Form {...getFormProps()} /> : null}
-
           <div className="flex flex-row border-b border-gray-200 pl-8 pr-4 items-center py-1 justify-between">
             <div className="flex flex-row space-y-1 items-center space-x-2 hover:bg-gray-100 rounded-md p-1 px-2">
               <IconListSearch className="w-4 h-4" />

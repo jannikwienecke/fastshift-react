@@ -32,7 +32,6 @@ export const makeData = (
   return <T extends RecordType = RecordType>(data: T[]): DataModelNew<T> => {
     const viewConfig = registeredViews[viewName as string];
     if (!viewConfig) {
-      console.trace();
       throw new Error(`View ${viewName} not found`);
     }
 
@@ -66,7 +65,9 @@ export const makeData = (
               return item[key];
             }
           },
-          getValueLabel: (key: keyof T) => item[key].toString(),
+          getValueLabel: (key: keyof T) => {
+            return item[key] ? item[key].toString() : '';
+          },
           getField: (key: keyof T) => {
             const field = viewConfigManager.getFieldBy(key.toString());
             const value = item[key];

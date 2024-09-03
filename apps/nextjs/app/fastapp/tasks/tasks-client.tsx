@@ -1,9 +1,11 @@
 'use client';
 
 import {
+  BaseViewConfigManager,
   setClientViewConfig,
   useStoreDispatch,
   useStoreValue,
+  ViewConfigType,
 } from '@apps-next/core';
 import {
   ComboboxFieldValue,
@@ -11,6 +13,7 @@ import {
   QueryInput,
   useCombobox,
   useHandleSelectCombobox,
+  ViewProvider,
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
 import {
@@ -55,7 +58,17 @@ setClientViewConfig<TaskViewDataType>('task', {
   },
 });
 
-export const TasksClient = () => {
+export const TasksClient = (props: { config: ViewConfigType<'task'> }) => {
+  return (
+    <ViewProvider
+      view={{ viewConfigManager: new BaseViewConfigManager(props.config) }}
+    >
+      <TaskContent />
+    </ViewProvider>
+  );
+};
+
+const TaskContent = () => {
   const { useList, useQuery, useForm, useQueryData } =
     makeHooks<TaskViewDataType>();
 
@@ -66,6 +79,7 @@ export const TasksClient = () => {
   const { edit } = useStoreValue();
 
   const { data } = useQuery();
+
   const { dataModel } = useQueryData();
 
   // @ts-expect-error INVALID FIELD
@@ -93,7 +107,7 @@ export const TasksClient = () => {
     },
   });
 
-  const props = getComboboxProps();
+  const comboboxProps = getComboboxProps();
 
   return (
     <div className="p-4 pb-0 flex flex-col w-full overflow-scroll h-[calc(100vh-16px)]">
@@ -101,10 +115,9 @@ export const TasksClient = () => {
         <div>
           <QueryInput />
         </div>
-        {/* {edit.isEditing ? <Form {...getFormProps()} /> : null} */}
       </div>
 
-      <ComboboxPopover {...props} />
+      <ComboboxPopover {...comboboxProps} />
 
       <List.Default
         {...getListProps({

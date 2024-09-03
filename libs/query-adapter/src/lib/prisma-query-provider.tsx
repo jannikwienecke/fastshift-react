@@ -1,15 +1,27 @@
 'use client';
 
-import { BaseConfigInterface, globalConfigAtom } from '@apps-next/core';
+import {
+  BaseConfigInterface,
+  clientConfigStore,
+  clientViewConfigAtom,
+  globalConfigAtom,
+  RegisteredViews,
+  registeredViewsAtom,
+  registeredViewsStore,
+} from '@apps-next/core';
+import { useMutationAtom, useQueryAtom } from '@apps-next/react';
 import {
   isServer,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import { Provider } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import React from 'react';
 import { PrismaContext } from './_internal/prisma-context';
 import { PrismaClientType } from './prisma.client.types';
+import { usePrismaMutation } from './use-prisma-mutation';
+import { usePrismaQuery } from './use-prisma-query';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -45,41 +57,50 @@ export function PrismaQueryProvider({
   children,
   api,
   config,
+  registeredViews,
 }: {
   children: React.ReactNode;
   api: PrismaClientType;
   config: BaseConfigInterface;
+  registeredViews: RegisteredViews;
 }) {
   return (
-    <HydrateAtoms
-      key={'global-config'}
-      initialValues={[[globalConfigAtom, config]]}
-    >
-      <PrismaContext.Provider
-        value={{
-          prisma: {
-            ...api,
-            viewMutation(props) {
-              return api.viewMutation({
-                ...props,
-                mutation: {
-                  ...props.mutation,
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  handler: undefined,
-                },
-              });
-            },
-          },
-          config: config,
-          provider: 'prisma',
-        }}
+    <Provider store={clientConfigStore}>
+      <HydrateAtoms
+        key={'global-config'}
+        initialValues={[
+          [globalConfigAtom, config],
+          [useQueryAtom, () => usePrismaQuery],
+          [useMutationAtom, () => usePrismaMutation],
+          [registeredViewsAtom, registeredViews],
+        ]}
       >
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </PrismaContext.Provider>
-    </HydrateAtoms>
+        <PrismaContext.Provider
+          value={{
+            prisma: {
+              ...api,
+              viewMutation(props) {
+                return api.viewMutation({
+                  ...props,
+                  mutation: {
+                    ...props.mutation,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    handler: undefined,
+                  },
+                });
+              },
+            },
+            config: config,
+            provider: 'prisma',
+          }}
+        >
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        </PrismaContext.Provider>
+      </HydrateAtoms>
+    </Provider>
   );
 }
 

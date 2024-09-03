@@ -67,7 +67,8 @@ const FormRender = ({ useForm }: GetViewProps<'tasks'>) => {
 
   const { edit } = useStoreValue();
 
-  return <span>{edit.isEditing ? <Form {...getFormProps()} /> : null}</span>;
+  return null;
+  // return <span>{edit.isEditing ? <Form {...getFormProps()} /> : null}</span>;
 };
 
 export const Route = createFileRoute('/fastApp/tasks')({

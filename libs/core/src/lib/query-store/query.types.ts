@@ -13,4 +13,5 @@ export type QueryStore<T extends RecordType> = {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
   isInitialized: boolean;
+  viewName: string;
 };

@@ -38,8 +38,20 @@ export const useList = <T extends RecordType>() => {
     ): ListProps['items'][0]['valuesLeft'] => {
       return (
         fields?.map((fieldName) => {
-          const item = row.getField(fieldName);
-          const { label, id, field } = item;
+          let item;
+          let label;
+          let id;
+          let field;
+
+          try {
+            item = row.getField(fieldName);
+            label = item.label;
+            id = item.id;
+            field = item.field;
+            field = item.field;
+          } catch (error) {
+            throw new Error(`Field ${fieldName.toLocaleString()} not found`);
+          }
 
           return {
             id,

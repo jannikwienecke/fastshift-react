@@ -1,7 +1,7 @@
 import { createServerViewConfig } from '@apps-next/core';
-import { globalConfig } from '../../layout';
 import { configurePrismaLoader } from '@apps-next/query-adapter';
 import { PrismaClientType } from '../../../db';
+import { globalConfig } from '../../global-config';
 
 const _viewConfig = createServerViewConfig(
   'project',

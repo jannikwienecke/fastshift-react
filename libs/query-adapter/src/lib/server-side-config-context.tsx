@@ -75,6 +75,7 @@ export const ServerSideConfigProvider = (
     hasNextPage: false,
     hasPreviousPage: false,
     isInitialized: true,
+    viewName: viewConfigManager.getViewName(),
   };
 
   const initialValues = [

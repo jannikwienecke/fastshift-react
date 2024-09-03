@@ -2,7 +2,9 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   makeQueryKey,
+  registeredViewsAtom,
   QueryReturnDto,
+  registeredViewsStore,
   REGISTRED_VIEWS,
 } from '@apps-next/core';
 import {
@@ -26,7 +28,7 @@ export async function QueryPrefetchProvider({
   const searchableFields = viewConfigManager.getSearchableField();
   const viewFields = viewConfigManager.viewConfig.viewFields;
   const viewName = viewConfigManager.getViewName();
-  const registeredViews = REGISTRED_VIEWS;
+  const registeredViews = registeredViewsStore.get(registeredViewsAtom);
 
   const queryClient = new QueryClient();
 

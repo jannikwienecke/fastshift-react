@@ -1,6 +1,12 @@
 import { atom, createStore } from 'jotai';
-import { GetTableName, RecordType, RegisteredRouter } from './types';
+import {
+  GetTableName,
+  RecordType,
+  RegisteredRouter,
+  ViewConfigType,
+} from './types';
 import { viewConfigManagerAtom } from './view-config.store';
+import { registeredViewsAtom } from './registered-view.store';
 
 export type ComponentType = 'list' | 'combobox';
 
@@ -46,3 +52,12 @@ export const clientConfigAtom = atom((get) => {
 
   return clientConfigView[viewConfig?.getViewName() ?? ''];
 });
+
+export const registeredViewsStore = createStore();
+
+export const registerView = (viewName: string, viewConfig: ViewConfigType) => {
+  registeredViewsStore.set(registeredViewsAtom, (prev) => ({
+    ...prev,
+    [viewName]: viewConfig,
+  }));
+};
