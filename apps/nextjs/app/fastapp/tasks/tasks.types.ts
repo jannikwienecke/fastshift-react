@@ -4,7 +4,7 @@ import { Project, Tag } from '@prisma/client';
 export type TaskViewDataType = DataType<
   'task',
   {
-    project: Project;
+    project?: Project;
     tag: Tag[];
   }
 >;

@@ -81,6 +81,11 @@ export const TagsCombobox = (props: {
 
 export const ProjectComponent = (props: { data: Row<TaskViewDataType> }) => {
   const project = props.data.getValue('project');
+
+  if (!project.raw?.label) {
+    return <>Set Project</>;
+  }
+
   return <ViewBubble tableName="project" value={String(project.raw.label)} />;
 };
 
@@ -93,7 +98,7 @@ export const ProjectComponentCombobox = (props: {
   return (
     <div className="flex gap-2 items-center w-full">
       <Icon icon={view.icon} />
-      <div>{project.label}</div>
+      <div>{project.raw?.label}</div>
     </div>
   );
 };

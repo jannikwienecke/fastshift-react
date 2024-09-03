@@ -65,13 +65,21 @@ export const prismaViewFieldsHelper = (
     );
   };
 
+  const getIsOneToManyRelation = () => {
+    return relationName && fieldData.isList;
+  };
+
   const getRelationType = () => {
-    let relationType: TableRelationType = 'oneToMany';
+    let relationType: TableRelationType = '';
 
     if (isManyToManyRelation()) {
       relationType = 'manyToMany';
     } else if (getIsOneToOneRelation()) {
       relationType = 'oneToOne';
+    } else if (getIsOneToManyRelation()) {
+      relationType = 'oneToMany';
+    } else {
+      relationType = '';
     }
 
     return relationType;
@@ -124,7 +132,6 @@ export const prismaViewFieldsHelper = (
   };
 
   const getRelation = () => {
-    const isRelationalField = getIsRelationalField();
     const relationType = getRelationType();
     const model = getManyToManyModel();
 
@@ -137,15 +144,24 @@ export const prismaViewFieldsHelper = (
         manyToManyTable: fieldData.type,
         manyToManyModelFields: [],
       } satisfies FieldRelationType;
-    }
+    } else if (relationType === 'oneToMany') {
+      return {
+        type: relationType,
+        tableName: fieldData.type.toLowerCase(),
+        fieldName: fieldData.name,
+        manyToManyRelation: fieldData.name,
+        manyToManyTable: fieldData.type,
+        manyToManyModelFields: [],
+      } satisfies FieldRelationType;
+    } else if (relationType === 'oneToOne') {
+      const rel = {
+        type: relationType,
+        tableName: fieldData.type.toLowerCase(),
+        fieldName: fieldData.relationFromFields?.[0] ?? fieldData.name,
+      } satisfies FieldRelationType;
 
-    return isRelationalField
-      ? {
-          tableName: fieldData.name,
-          fieldName: relationFromFields?.[0] ?? '',
-          type: relationType,
-        }
-      : undefined;
+      return rel;
+    }
   };
 
   const isOptionForDisplayField = () => {

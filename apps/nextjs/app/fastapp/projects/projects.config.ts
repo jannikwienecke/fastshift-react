@@ -1,7 +1,9 @@
 import { createServerViewConfig } from '@apps-next/core';
 import { globalConfig } from '../../layout';
+import { configurePrismaLoader } from '@apps-next/query-adapter';
+import { PrismaClientType } from '../../../db';
 
-export const viewConfig = createServerViewConfig(
+const _viewConfig = createServerViewConfig(
   'project',
   {
     displayField: { field: 'label' },
@@ -9,3 +11,9 @@ export const viewConfig = createServerViewConfig(
   },
   globalConfig.config
 );
+
+export const viewConfig = configurePrismaLoader(_viewConfig)<PrismaClientType>({
+  include: {
+    tasks: true,
+  },
+});

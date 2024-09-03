@@ -1,10 +1,7 @@
-import {
-  BaseViewConfigManager,
-  BaseViewConfigManagerInterface,
-} from '../base-view-config';
+import { BaseViewConfigManager } from '../base-view-config';
 import { FieldConfig, RecordType, RegisteredViews } from '../types';
 
-export type Row<T extends RecordType = RecordType> = {
+export type Row<T extends RecordType | undefined = RecordType> = {
   raw: T;
   label: string;
   id: string;
@@ -12,7 +9,7 @@ export type Row<T extends RecordType = RecordType> = {
     key: K
   ): T[K] extends Array<any>
     ? Row<T[K][0]>[]
-    : T[K] extends RecordType
+    : T[K] extends RecordType | undefined
     ? Row<T[K]>
     : T[K];
   getValueLabel(key: keyof T): string;
@@ -34,6 +31,7 @@ export const makeData = (
   return <T extends RecordType = RecordType>(data: T[]): DataModelNew<T> => {
     const viewConfig = registeredViews[viewName as string];
     if (!viewConfig) {
+      console.trace();
       throw new Error(`View ${viewName} not found`);
     }
 
@@ -45,16 +43,19 @@ export const makeData = (
       rows: data.map((item) => {
         return {
           raw: item,
-          id: item['id'] as string,
-          label: item[label],
+          id: item ? (item['id'] as string) : '',
+          label: item ? item[label] : '',
           getValue: <K extends keyof T>(key: K) => {
-            const viewConfig = registeredViews[key as string];
+            const field = viewConfigManager.getFieldBy(key.toString());
+            const viewConfig = registeredViews[field.relation?.tableName ?? ''];
+
             if (viewConfig) {
               const value = item[key];
               const isArray = Array.isArray(value);
+
               const data = makeData(
                 registeredViews,
-                key.toString()
+                field.relation?.tableName ?? ''
               )(isArray ? value : [value]);
 
               const r = isArray ? data.rows : data.rows?.[0];

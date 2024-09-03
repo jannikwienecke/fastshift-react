@@ -14,9 +14,13 @@ import {
   useHandleSelectCombobox,
 } from '@apps-next/react';
 import { ComboboxPopover, Form, List } from '@apps-next/ui';
-import { Category, Owner } from '@prisma/client';
+import { Category, Owner, Task } from '@prisma/client';
 import { AvatarIcon } from '@radix-ui/react-icons';
-import { IconAdjustmentsHorizontal, IconListSearch } from '@tabler/icons-react';
+import {
+  IconAdjustmentsHorizontal,
+  IconListSearch,
+  IconSubtask,
+} from '@tabler/icons-react';
 
 // use Default list but adjut each item [x]
 // use default list but have border bottom
@@ -26,19 +30,43 @@ import { IconAdjustmentsHorizontal, IconListSearch } from '@tabler/icons-react';
 
 type ProjectViewDataType = DataType<
   'project',
-  { owner: Owner; category: Category }
+  { owner: Owner; category: Category; tasks: Task[] }
 >;
 
 setClientViewConfig<ProjectViewDataType>('project', {
   fields: {
+    category: {
+      component: {
+        list: ({ data }) => {
+          return <>{data.getValue('category').label}</>;
+        },
+      },
+    },
+    tasks: {
+      component: {
+        list: ({ data }) => {
+          const tasks = data.getValue('tasks').length;
+          return (
+            <div className="flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
+              {tasks}
+              <IconSubtask className="w-4 h-4" />
+            </div>
+          );
+        },
+      },
+    },
     owner: {
       component: {
-        list: ({ data }: any) => {
-          const owner = data;
+        list: ({ data }) => {
+          const { firstname, lastname } = data.getValue('owner').raw;
           return (
-            <>
+            <div className="flex space-x-1 items-center pr-2">
+              <div>
+                {`${firstname.slice(0, 1).toUpperCase()}`}
+                {`${lastname.slice(0, 1).toUpperCase()}`}
+              </div>
               <AvatarIcon className="w-5 h-5" />
-            </>
+            </div>
           );
         },
       },
@@ -105,7 +133,7 @@ export const ProjectsClient = ({
           <List {...getListProps()}>
             {getListProps({
               fieldsLeft: ['label'],
-              fieldsRight: ['owner', 'category'],
+              fieldsRight: ['owner', 'category', 'tasks'],
             }).items.map((item) => {
               return (
                 <List.Item key={item.id} item={item}>

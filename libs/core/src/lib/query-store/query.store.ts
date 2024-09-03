@@ -44,8 +44,10 @@ export const updateQueryDataAtom = atom<
   )(dataRaw);
 
   const relationalDataModel = Object.entries(relationalDataRaw).reduce(
-    (acc, [key, data]) => {
-      acc[key] = makeData(registeredViews, key)(data);
+    (acc, [tableName, data]) => {
+      const viewConfig = registeredViews[tableName];
+
+      acc[tableName] = makeData(registeredViews, viewConfig?.tableName)(data);
       return acc;
     },
     {} as { [key: string]: DataModelNew }

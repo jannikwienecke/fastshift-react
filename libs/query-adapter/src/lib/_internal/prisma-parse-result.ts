@@ -20,7 +20,8 @@ export const parsePrismaResult = ({
         if (include[key]) {
           const items = r[key] as RecordType[];
 
-          const field = getManyToManyField(key);
+          const field =
+            getManyToManyField(key) ?? viewConfigManager.getFieldBy(key);
 
           //   example:
           // Task -> Many To Many Relationship with Model "Tag"
@@ -43,7 +44,10 @@ export const parsePrismaResult = ({
           //   and add it to the task data
           //   relation.tableName === tag
           // manyToManyFIeld === tags
-          if (field?.relation?.manyToManyRelation) {
+          if (
+            field?.relation?.manyToManyRelation &&
+            field.relation.type === 'manyToMany'
+          ) {
             const relation = field.relation;
 
             return {

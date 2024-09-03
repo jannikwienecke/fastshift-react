@@ -19,7 +19,7 @@ const configWithCustomLoader = configurePrismaLoader(
   },
 });
 
-export default function FastAppTasksPage() {
+export default async function FastAppTasksPage() {
   return (
     <QueryPrefetchProvider
       viewConfig={configWithCustomLoader}

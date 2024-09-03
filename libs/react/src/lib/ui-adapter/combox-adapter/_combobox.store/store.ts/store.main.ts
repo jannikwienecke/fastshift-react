@@ -36,7 +36,12 @@ export const storeReducer = (
 
       const table = action.payload.field?.relation?.tableName ?? '';
       const defaultValues = defaultData?.rows ?? [];
-      const selectedValues = Array.isArray(selected) ? selected : [selected];
+
+      const selectedValues = Array.isArray(selected)
+        ? selected
+        : selected.id
+        ? [selected]
+        : [];
 
       const values = [...selectedValues, ...defaultValues];
       const uniqueIds = Array.from(new Set(values.map((v) => v.id)));

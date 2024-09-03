@@ -1,4 +1,4 @@
-import { Row } from '../query-store/data-model-new';
+import { Row } from '../query-store/data-model';
 import { FieldConfig, RecordType } from '../types';
 
 export type Store = {

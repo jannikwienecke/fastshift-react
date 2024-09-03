@@ -36,7 +36,10 @@ const parseFields = (
 
     let manyToManyModelFields: FieldRelationType['manyToManyModelFields'] = [];
 
-    if (relation?.manyToManyTable) {
+    if (
+      (relation?.type === 'manyToMany' || relation?.type === 'oneToMany') &&
+      relation?.manyToManyTable
+    ) {
       // if this is a many to many relation, we need to get the fields of the many to many table
       const model = Prisma.models.find(
         (m) => m.name === relation?.manyToManyTable

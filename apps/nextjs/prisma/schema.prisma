@@ -9,33 +9,34 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
+  id       String @id @default(cuid())
   email    String
   password String
-  owner  Owner?
+  owner    Owner?
 
   @@unique([email])
 }
 
 model Owner {
-  id        String  @id @default(cuid())
+  id        String    @id @default(cuid())
   firstname String
   lastname  String
   age       Int
-  userId    String  @unique
-  user      User    @relation(fields: [id], references: [id])
+  userId    String    @unique
+  user      User      @relation(fields: [id], references: [id])
   projects  Project[]
 
   @@unique([firstname, lastname])
 }
+
 model Task {
-  id         String    @id @default(cuid())
-  name       String
-  completed  Boolean
-  projectId  String
-  project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  priority   Priority
-  tags       TaskTag[]
+  id        String    @id @default(cuid())
+  name      String
+  completed Boolean
+  projectId String?
+  project   Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  priority  Priority
+  tags      TaskTag[]
 }
 
 model Tag {
@@ -50,27 +51,27 @@ model TaskTag {
   tagId  String
   task   Task   @relation(fields: [taskId], references: [id])
   tag    Tag    @relation(fields: [tagId], references: [id])
+
   @@id([taskId, tagId])
 }
 
 model Project {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   label       String
   ownerId     String
-  owner       Owner     @relation(fields: [ownerId], references: [id])
+  owner       Owner    @relation(fields: [ownerId], references: [id])
   dueDate     BigInt
   description String
   categoryId  String
-  category    Category  @relation(fields: [categoryId], references: [id])
-  tasks       Task[]  
+  category    Category @relation(fields: [categoryId], references: [id])
+  tasks       Task[]
   // 
-
 }
 
 model Category {
-  id    String    @id @default(cuid())
-  label String
-  color String
+  id       String    @id @default(cuid())
+  label    String
+  color    String
   projects Project[]
 }
 

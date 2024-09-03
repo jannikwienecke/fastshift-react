@@ -159,12 +159,16 @@ export const prismaViewLoader = async (
         .find((f) => f.relation?.manyToManyRelation === key);
     };
 
-    const relationalDataPromises = Object.keys(include).map((key) => {
-      const field = getManyToManyField(key);
+    const relationalDataPromises = Object.keys({
+      ...include,
+    }).map((key) => {
+      const manyToManyField = getManyToManyField(key);
+
+      const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
 
       let dbQuery = client(prismaClient).tableClient(key);
 
-      if (field?.relation?.type === 'manyToMany') {
+      if (field.relation) {
         dbQuery = client(prismaClient).tableClient(field.relation.tableName);
       }
 

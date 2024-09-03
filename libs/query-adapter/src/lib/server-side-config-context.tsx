@@ -53,8 +53,12 @@ export const ServerSideConfigProvider = (
 
   const relationalDataModel = Object.entries(
     props?.relationalData ?? {}
-  ).reduce((acc, [key, data]) => {
-    acc[key] = makeData(props.registeredViews, key)(data);
+  ).reduce((acc, [tableName, data]) => {
+    const viewConfig = props.registeredViews[tableName];
+    acc[tableName] = makeData(
+      props.registeredViews,
+      viewConfig?.tableName
+    )(data);
     return acc;
   }, {} as { [key: string]: DataModelNew<RecordType> });
 

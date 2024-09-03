@@ -7,10 +7,11 @@ export const generateIncludeFields = (_prisma: Record<string, any>) => {
   const includeDict = Prisma.models.reduce((acc, model) => {
     const includeFieldsModel = model?.fields
       .map((fieldData) => {
-        const { isIdField, relation, fieldName, isManyToManyRelation } =
+        const { isIdField, relation, fieldName, isManyToManyRelation, isList } =
           prismaViewFieldsHelper(fieldData, model, Prisma);
 
-        if (isIdField || !relation || isManyToManyRelation) return null;
+        if (isIdField || !relation || isManyToManyRelation || isList)
+          return null;
 
         return fieldName;
       })

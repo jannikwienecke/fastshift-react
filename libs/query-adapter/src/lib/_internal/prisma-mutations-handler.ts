@@ -82,7 +82,10 @@ export const updateMutation = async (
 
         return {
           fieldName: key,
-          table: field.relation.manyToManyRelation,
+          table:
+            field.relation.type === 'manyToMany'
+              ? field.relation.manyToManyRelation
+              : field.relation.tableName,
           manyToManyTable: field.relation.manyToManyTable,
           values: typeof value === 'string' ? [value] : value,
           manyToManyModelFields: field.relation.manyToManyModelFields,
@@ -111,6 +114,7 @@ export const updateMutation = async (
   return createSuccessResponse(`Record ${id} updated successfully`, 'UPDATED');
 };
 
+// TODO refactor this whole function -> split into oneToMany and manyToMany
 export const updateManyToManyMutation = async (
   prismaClient: Record<string, PrismaClient>,
   { viewConfigManager, mutation }: MutationPropsServer,
@@ -140,48 +144,119 @@ export const updateManyToManyMutation = async (
     )?.relation?.fieldName;
 
     if (!fieldNameTable) return;
-    if (!fieldNameRelationTable) return;
 
-    const allExisting = await relationTableClient.findMany({
-      where: {
-        // the table where we are currently on. Tasks -> has tags (we update a tag) -> taskId
-        [fieldNameTable]: id,
-        // the relation table field -> tagId
-      },
-      select: {
-        [fieldNameRelationTable]: true,
-      },
-    });
-
-    const toDelete = allExisting
-      .map((v) => v?.[fieldNameRelationTable])
-      .filter((v) => !relation.values.includes(v));
-
-    await relationTableClient.deleteMany({
-      where: {
-        [fieldNameRelationTable]: {
-          in: toDelete,
-        },
-      },
-    });
-
-    for (const value of relation.values) {
-      const hasRecord = await relationTableClient.findMany({
+    const exisitingValues: string[] = [];
+    if (fieldNameRelationTable) {
+      const allExisting = await relationTableClient.findMany({
         where: {
           // the table where we are currently on. Tasks -> has tags (we update a tag) -> taskId
           [fieldNameTable]: id,
           // the relation table field -> tagId
-          [fieldNameRelationTable]: value,
+        },
+        select: {
+          [fieldNameRelationTable]: true,
         },
       });
 
-      if (!(hasRecord.length > 0)) {
-        await relationTableClient.create({
+      const toDelete = allExisting
+        .map((v) => v?.[fieldNameRelationTable])
+        .filter((v) => !relation.values.includes(v));
+
+      await relationTableClient.deleteMany({
+        where: {
+          [fieldNameRelationTable]: {
+            in: toDelete,
+          },
+        },
+      });
+    } else {
+      const relationTableClient = client(prismaClient).tableClient(
+        viewConfigManager.getTableName()
+      );
+
+      const projectWithTasks = await relationTableClient.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          [relation.fieldName]: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      const allExistingIds: string[] = projectWithTasks?.[
+        relation.fieldName
+      ].map((v: { id: string }) => v.id);
+
+      const toDelete = allExistingIds.filter(
+        (v) => !relation.values.includes(v)
+      );
+
+      exisitingValues.push(...allExistingIds);
+
+      for (const value of toDelete) {
+        const relationTableClient = client(prismaClient).tableClient(
+          relation.table
+        );
+
+        const fieldNameTable = relation.manyToManyModelFields.find(
+          (f) => f.name === viewConfigManager.getTableName()
+        )?.relation?.fieldName;
+
+        await relationTableClient.update({
+          where: {
+            id: value,
+          },
           data: {
+            [fieldNameTable as string]: null,
+          },
+        });
+      }
+    }
+
+    for (const value of relation.values) {
+      if (exisitingValues.includes(value.toString())) {
+        continue;
+      }
+
+      if (!fieldNameRelationTable) {
+        const relationTableClient = client(prismaClient).tableClient(
+          relation.table
+        );
+
+        const fieldNameTable = relation.manyToManyModelFields.find(
+          (f) => f.name === viewConfigManager.getTableName()
+        )?.relation?.fieldName;
+
+        await relationTableClient.update({
+          where: {
+            id: value,
+          },
+          data: {
+            [fieldNameTable as string]: id,
+          },
+        });
+      } else {
+        const hasRecord = await relationTableClient.findMany({
+          where: {
+            // the table where we are currently on. Tasks -> has tags (we update a tag) -> taskId
             [fieldNameTable]: id,
+            // the relation table field -> tagId
             [fieldNameRelationTable]: value,
           },
         });
+
+        if (!(hasRecord.length > 0)) {
+          await relationTableClient.create({
+            data: {
+              [fieldNameTable]: id,
+              [fieldNameRelationTable]: value,
+            },
+          });
+        }
       }
     }
   }

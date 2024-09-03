@@ -1,7 +1,7 @@
 import { atom, createStore } from 'jotai';
 import { GetTableName, RecordType, RegisteredRouter } from './types';
 import { viewConfigManagerAtom } from './view-config.store';
-import { Row } from './query-store/data-model-new';
+import { Row } from './query-store/data-model';
 
 export type ComponentType = 'list' | 'combobox';
 

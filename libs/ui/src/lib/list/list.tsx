@@ -179,9 +179,16 @@ function ListValues({
       >
         {values.map((value) => {
           return (
-            <List.Value key={value.id}>
-              {value.render ? value.render() : value.label}
-            </List.Value>
+            <div>
+              <List.Value
+                key={
+                  value.id ??
+                  'NO_VALUE' + (value.relation?.fieldName.toString() ?? '')
+                }
+              >
+                <>{value.render ? value.render() : value.label}</>
+              </List.Value>
+            </div>
           );
         })}
       </div>
