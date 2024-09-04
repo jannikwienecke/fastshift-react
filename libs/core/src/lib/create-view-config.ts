@@ -74,6 +74,7 @@ export function createServerViewConfig<T extends GetTableName>(
     },
   };
 
+  registerView(viewName, viewConfig);
   registerViewServer(viewName, viewConfig);
 
   return viewConfig;

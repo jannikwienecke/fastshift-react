@@ -4,17 +4,17 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   globalConfigAtom,
+  mergeRegisteredViews,
   QueryReturnOrUndefined,
   registeredViewsAtom,
   registeredViewsServerAtom,
-  registeredViewsStore,
   viewConfigManagerAtom,
   ViewConfigType,
 } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
-import { useHydrateAtoms } from 'jotai/utils';
 import React from 'react';
 import { useForm, useList } from './ui-adapter';
+import { HydrateAtoms } from './ui-components';
 import { useMutationAtom } from './use-mutation';
 import { useQuery, useQueryAtom } from './use-query';
 
@@ -32,9 +32,8 @@ export const ViewProvider = ({
   const viewFields = config.viewFields[tableName];
   const includeFields = config.includeFields[tableName];
 
+  const registeredViewsClient = useAtomValue(registeredViewsAtom);
   const registeredViews = useAtomValue(registeredViewsServerAtom);
-
-  const registeredViewsClient = registeredViewsStore.get(registeredViewsAtom);
 
   const viewConfig: ViewConfigType = React.useMemo(() => {
     return {
@@ -50,8 +49,7 @@ export const ViewProvider = ({
 
   const patchedRegisteredViews = React.useMemo(() => {
     return {
-      ...registeredViews,
-      ...registeredViewsClient,
+      ...mergeRegisteredViews(registeredViews, registeredViewsClient),
       [viewConfig.viewName || '']: viewConfig,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,9 +98,4 @@ export const ViewDataProvider = <
   );
 
   return Provider;
-};
-
-const HydrateAtoms = ({ initialValues, children }: any) => {
-  useHydrateAtoms(initialValues, { dangerouslyForceHydrate: true });
-  return children;
 };
