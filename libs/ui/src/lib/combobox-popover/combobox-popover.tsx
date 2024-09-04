@@ -27,6 +27,7 @@ export function ComboboxPopover<T extends ComboxboxItem>(
     <Popover
       open={comboboxProps.open}
       onOpenChange={comboboxProps.onOpenChange}
+      data-testid="combobox-popover"
     >
       <PopoverTrigger asChild>
         <div

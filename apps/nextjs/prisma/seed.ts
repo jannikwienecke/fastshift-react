@@ -1,122 +1,171 @@
+import { waitFor } from '@apps-next/core';
+
 // eslint-disable-next-line
 const { PrismaClient } = require('@prisma/client');
-// eslint-disable-next-line
-const { faker } = require('@faker-js/faker');
 
 const prisma = new PrismaClient();
 
-async function main() {
+export async function main() {
   console.log('🌱 Seeding Prisma database...');
 
   // Clear existing data
-  //   await prisma.$executeRaw`delete from "Post"`;
-  // await prisma.$executeRaw`delete from "User"`;
-
+  await waitFor(500);
   await prisma.taskTag.deleteMany({});
   await prisma.task.deleteMany({});
   await prisma.project.deleteMany({});
   await prisma.tag.deleteMany({});
   await prisma.owner.deleteMany({});
-  await prisma.category.deleteMany({});
   await prisma.user.deleteMany({});
+  await prisma.category.deleteMany({});
 
-  // Create a user
-  const user = await prisma.user.create({
+  // Create users
+  const user1 = await prisma.user.create({
     data: {
-      email: 'wienecke.jannik@gmail.com',
-      password: 'admin',
+      email: 'john.doe@example.com',
+      password: 'password123',
     },
   });
 
-  // Create an owner
-  const owner = await prisma.owner.create({
+  const user2 = await prisma.user.create({
     data: {
-      userId: user.id,
-      firstname: 'Jannik',
-      lastname: 'Wiencek',
-      age: 32,
-      user: {
-        connect: {
-          id: user.id,
-        },
-      },
+      email: 'jane.smith@example.com',
+      password: 'securepass',
+    },
+  });
+
+  // Create owners
+  const owner1 = await prisma.owner.create({
+    data: {
+      userId: user1.id,
+      firstname: 'John',
+      lastname: 'Doe',
+      age: 35,
+      user: { connect: { id: user1.id } },
+    },
+  });
+
+  const owner2 = await prisma.owner.create({
+    data: {
+      userId: user2.id,
+      firstname: 'Jane',
+      lastname: 'Smith',
+      age: 28,
+      user: { connect: { id: user2.id } },
     },
   });
 
   // Create categories
-  const categories = [];
-  for (let i = 0; i < 10; i++) {
-    const category = await prisma.category.create({
-      data: {
-        label: faker.vehicle.manufacturer(),
-        color: faker.color.human(),
-      },
-    });
-    categories.push(category);
-  }
+  const categories = [
+    { label: 'Work', color: 'blue' },
+    { label: 'Personal', color: 'green' },
+    { label: 'Health', color: 'red' },
+    { label: 'Finance', color: 'yellow' },
+    { label: 'Education', color: 'purple' },
+  ];
+
+  const createdCategories = await Promise.all(
+    categories.map((category) => prisma.category.create({ data: category }))
+  );
 
   // Create tags
-  const tags = [];
-  for (let i = 0; i < 10; i++) {
-    const tag = await prisma.tag.create({
-      data: {
-        name: faker.hacker.verb(),
-        color: faker.color.human(),
-      },
-    });
-    tags.push(tag);
-  }
+  const tags = [
+    { name: 'Urgent', color: 'red' },
+    { name: 'Important', color: 'orange' },
+    { name: 'Long-term', color: 'blue' },
+    { name: 'Quick', color: 'green' },
+    { name: 'Collaborative', color: 'purple' },
+  ];
+
+  const createdTags = await Promise.all(
+    tags.map((tag) => prisma.tag.create({ data: tag }))
+  );
 
   // Create projects
-  const projects = [];
-  for (let i = 0; i < 10; i++) {
-    const project = await prisma.project.create({
-      data: {
-        label: faker.commerce.productName(),
-        description: faker.commerce.productDescription(),
-        categoryId: categories[0].id,
-        ownerId: owner.id,
-        dueDate: faker.date.future().getTime(),
-      },
-    });
-    projects.push(project);
-  }
+  const projects = [
+    {
+      label: 'Website Redesign',
+      description: 'Redesign company website',
+      categoryId: createdCategories[0].id,
+      ownerId: owner1.id,
+      dueDate: new Date('2023-12-31').getTime(),
+    },
+    {
+      label: 'Fitness Plan',
+      description: 'Create a personal fitness plan',
+      categoryId: createdCategories[2].id,
+      ownerId: owner2.id,
+      dueDate: new Date('2023-09-30').getTime(),
+    },
+    {
+      label: 'Budget Analysis',
+      description: 'Analyze monthly budget',
+      categoryId: createdCategories[3].id,
+      ownerId: owner1.id,
+      dueDate: new Date('2023-10-15').getTime(),
+    },
+  ];
+
+  const createdProjects = await Promise.all(
+    projects.map((project) => prisma.project.create({ data: project }))
+  );
 
   // Create tasks
-  const tasks = [];
-  for (let i = 0; i < 50; i++) {
-    const randomProject = projects[Math.floor(Math.random() * projects.length)];
-    const task = await prisma.task.create({
-      data: {
-        name: faker.person.fullName(),
-        completed: faker.datatype.boolean(),
-        projectId: randomProject.id,
-        priority: 'low',
-      },
-    });
-    tasks.push(task);
-  }
+  const tasks = [
+    {
+      name: 'Design mockups',
+      completed: false,
+      projectId: createdProjects[0].id,
+      priority: 'high',
+    },
+    {
+      name: 'Develop frontend',
+      completed: false,
+      projectId: createdProjects[0].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Create workout schedule',
+      completed: true,
+      projectId: createdProjects[1].id,
+      priority: 'low',
+    },
+    {
+      name: 'Track expenses',
+      completed: false,
+      projectId: createdProjects[2].id,
+      priority: 'high',
+    },
+  ];
 
-  // Create task-tag associations
-  for (let i = 0; i < 10; i++) {
-    const randomTag = tags[Math.floor(Math.random() * tags.length)];
-    const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
-    await prisma.taskTag.create({
-      data: {
-        tagId: randomTag.id,
-        taskId: randomTask.id,
-      },
-    });
-  }
+  const createdTasks = await Promise.all(
+    tasks.map((task) => prisma.task.create({ data: task }))
+  );
+
+  // Create task tags
+  await prisma.taskTag.create({
+    data: {
+      tagId: createdTags[0].id,
+      taskId: createdTasks[0].id,
+    },
+  });
+
+  await prisma.taskTag.create({
+    data: {
+      tagId: createdTags[1].id,
+      taskId: createdTasks[0].id,
+    },
+  });
+
+  console.log('Seed data created successfully');
 }
 
-main()
-  .then(() => {
-    console.log('Seed data created successfully');
-  })
-  .catch((e) => {
-    console.error(e);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// Keep the original execution for when the script is run directly
+if (require.main === module) {
+  main()
+    .catch((e) => {
+      console.error(e);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

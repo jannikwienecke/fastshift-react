@@ -18,12 +18,12 @@ export const FieldValue = ({
 
   if (!row) return null;
   return (
-    <>
+    <div data-testid={`field-value-${fieldName}`}>
       {ComponentToRender ? (
         <ComponentToRender data={row.raw} />
       ) : (
         <>{row?.getValueLabel(fieldName)}</>
       )}
-    </>
+    </div>
   );
 };

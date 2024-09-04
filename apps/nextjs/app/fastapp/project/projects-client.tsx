@@ -69,6 +69,20 @@ setClientViewConfig<ProjectViewDataType>('project', {
             </div>
           );
         },
+
+        combobox: ({ data }) => {
+          const { firstname, lastname } = data;
+          return (
+            <div className="flex space-x-1 items-center pr-2 gap-2">
+              <AvatarIcon className="w-5 h-5" />
+
+              <div>
+                {`${firstname} `}
+                {`${lastname}`}
+              </div>
+            </div>
+          );
+        },
       },
     },
   },

@@ -66,7 +66,7 @@
     "@nx/vite": "19.5.7",
     "@nx/web": "19.5.7",
     "@nx/workspace": "19.5.7",
-    "@playwright/test": "^1.36.0",
+    "@playwright/test": "^1.46.1",
     "@prisma/nextjs-monorepo-workaround-plugin": "^5.18.0",
     "@swc-node/register": "~1.9.1",
     "@swc/cli": "~0.3.12",
