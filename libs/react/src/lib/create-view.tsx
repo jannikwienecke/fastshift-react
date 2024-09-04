@@ -37,13 +37,6 @@ export function createView<
   );
 }
 
-// export type DataType<
-//   TConfig extends ViewConfigType,
-//   TCustomDataType extends Record<string, any> | undefined = undefined
-// > = TCustomDataType extends undefined
-//   ? GetTableDataType<TConfig['tableName']>
-//   : TCustomDataType & GetTableDataType<TConfig['tableName']>;
-
 export type DataType<
   T extends GetTableName,
   TCustomDataType extends Record<string, any> | undefined = undefined

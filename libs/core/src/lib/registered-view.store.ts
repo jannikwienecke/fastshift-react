@@ -16,3 +16,4 @@ export const viewsHelperAtom = atom((get) => {
 });
 
 export const registeredViewsAtom = atom<RegisteredViews>({});
+export const registeredViewsServerAtom = atom<RegisteredViews>({});

@@ -6,7 +6,10 @@ import {
   ViewConfigType,
 } from './types';
 import { viewConfigManagerAtom } from './view-config.store';
-import { registeredViewsAtom } from './registered-view.store';
+import {
+  registeredViewsAtom,
+  registeredViewsServerAtom,
+} from './registered-view.store';
 
 export type ComponentType = 'list' | 'combobox';
 
@@ -54,9 +57,20 @@ export const clientConfigAtom = atom((get) => {
 });
 
 export const registeredViewsStore = createStore();
+export const registeredViewsServerStore = createStore();
 
 export const registerView = (viewName: string, viewConfig: ViewConfigType) => {
   registeredViewsStore.set(registeredViewsAtom, (prev) => ({
+    ...prev,
+    [viewName]: viewConfig,
+  }));
+};
+
+export const registerViewServer = (
+  viewName: string,
+  viewConfig: ViewConfigType
+) => {
+  registeredViewsServerStore.set(registeredViewsServerAtom, (prev) => ({
     ...prev,
     [viewName]: viewConfig,
   }));

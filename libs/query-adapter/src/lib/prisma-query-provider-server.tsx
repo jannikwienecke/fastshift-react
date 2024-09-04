@@ -1,7 +1,7 @@
 import {
   BaseConfigInterface,
-  registeredViewsAtom,
-  registeredViewsStore,
+  registeredViewsServerAtom,
+  registeredViewsServerStore,
 } from '@apps-next/core';
 import { PrismaQueryProvider } from './prisma-query-provider';
 import { PrismaClientType } from './prisma.client.types';
@@ -14,12 +14,8 @@ export const PrismaQueryProviderServer = ({
   api: PrismaClientType;
   config: BaseConfigInterface;
 }) => {
-  // TODO: Currently these are just the server side rendered views
-  // we need to collect the one from the client as well
-  // and other way around with the client configs
-  const registered = registeredViewsStore.get(registeredViewsAtom);
+  const registered = registeredViewsServerStore.get(registeredViewsServerAtom);
 
-  console.log('==registered', registered);
   return (
     <PrismaQueryProvider {...props} registeredViews={registered}>
       {children}

@@ -10,6 +10,7 @@ export type ViewConfigBaseInfo<T extends GetTableName> = {
   tableName: T;
   icon: keyof typeof icons;
   iconColor?: string;
+  relativePath?: string;
 };
 
 export type ViewConfigType<T extends GetTableName = any> =

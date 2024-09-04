@@ -5,14 +5,15 @@ import {
   BaseViewConfigManagerInterface,
   globalConfigAtom,
   QueryReturnOrUndefined,
-  REGISTRED_VIEWS,
+  registeredViewsAtom,
+  registeredViewsServerAtom,
+  registeredViewsStore,
   viewConfigManagerAtom,
   ViewConfigType,
 } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import React from 'react';
-import { ViewContext } from './_internal/view-context';
 import { useForm, useList } from './ui-adapter';
 import { useMutationAtom } from './use-mutation';
 import { useQuery, useQueryAtom } from './use-query';
@@ -31,14 +32,30 @@ export const ViewProvider = ({
   const viewFields = config.viewFields[tableName];
   const includeFields = config.includeFields[tableName];
 
-  const viewConfig: ViewConfigType = {
-    ...view.viewConfigManager.viewConfig,
-    viewFields,
-    includeFields,
-    query: {
-      searchableFields,
-    },
-  };
+  const registeredViews = useAtomValue(registeredViewsServerAtom);
+
+  const registeredViewsClient = registeredViewsStore.get(registeredViewsAtom);
+
+  const viewConfig: ViewConfigType = React.useMemo(() => {
+    return {
+      ...view.viewConfigManager.viewConfig,
+      viewFields,
+      includeFields,
+      query: {
+        searchableFields,
+      },
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const patchedRegisteredViews = React.useMemo(() => {
+    return {
+      ...registeredViews,
+      ...registeredViewsClient,
+      [viewConfig.viewName || '']: viewConfig,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const queryAdapter = useAtomValue(useQueryAtom);
   const mutationAdapter = useAtomValue(useMutationAtom);
@@ -51,13 +68,10 @@ export const ViewProvider = ({
         [viewConfigManagerAtom, viewConfigManager],
         [useQueryAtom, () => queryAdapter],
         [useMutationAtom, () => mutationAdapter],
+        [registeredViewsAtom, patchedRegisteredViews],
       ]}
     >
-      <ViewContext.Provider
-        value={{ viewConfigManager, registeredViews: REGISTRED_VIEWS }}
-      >
-        {children}
-      </ViewContext.Provider>
+      {children}
     </HydrateAtoms>
   );
 };

@@ -49,6 +49,7 @@ export const generateDefaultViewConfigs = ({
       tableName as GetTableName,
       {
         query: {},
+        relativePath: tableName,
         viewName: tableName as string,
         displayField: {
           field: guessDisplayFieldIfNotProvided ? displayField ?? 'id' : 'id',

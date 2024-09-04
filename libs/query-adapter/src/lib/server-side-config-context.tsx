@@ -14,6 +14,7 @@ import {
   RecordType,
   RegisteredViews,
   registeredViewsAtom,
+  registeredViewsStore,
   viewConfigManagerAtom,
   ViewContextType,
 } from '@apps-next/core';
@@ -49,6 +50,7 @@ export const ServerSideConfigProvider = (
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
 
   const globalConfig = useAtomValue(globalConfigAtom);
+  const registeredViewsClient = registeredViewsStore.get(registeredViewsAtom);
 
   const dataModel = makeData(
     props.registeredViews,
@@ -78,9 +80,17 @@ export const ServerSideConfigProvider = (
     viewName: viewConfigManager.getViewName(),
   };
 
+  const combinedRegisteredViews = React.useMemo(() => {
+    return {
+      ...props.registeredViews,
+      ...registeredViewsClient,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.registeredViews]);
+
   const initialValues = [
     [viewConfigManagerAtom, viewConfigManager],
-    [registeredViewsAtom, props.registeredViews],
+    [registeredViewsAtom, combinedRegisteredViews],
     [globalConfigAtom, globalConfig],
     [queryStoreAtom, queryStore],
     [useQueryAtom, () => usePrismaQuery],

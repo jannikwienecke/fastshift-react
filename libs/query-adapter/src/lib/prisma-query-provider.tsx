@@ -3,11 +3,9 @@
 import {
   BaseConfigInterface,
   clientConfigStore,
-  clientViewConfigAtom,
   globalConfigAtom,
   RegisteredViews,
-  registeredViewsAtom,
-  registeredViewsStore,
+  registeredViewsServerAtom,
 } from '@apps-next/core';
 import { useMutationAtom, useQueryAtom } from '@apps-next/react';
 import {
@@ -72,7 +70,7 @@ export function PrismaQueryProvider({
           [globalConfigAtom, config],
           [useQueryAtom, () => usePrismaQuery],
           [useMutationAtom, () => usePrismaMutation],
-          [registeredViewsAtom, registeredViews],
+          [registeredViewsServerAtom, registeredViews],
         ]}
       >
         <PrismaContext.Provider

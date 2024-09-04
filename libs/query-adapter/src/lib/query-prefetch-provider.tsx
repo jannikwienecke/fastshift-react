@@ -2,10 +2,9 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   makeQueryKey,
-  registeredViewsAtom,
   QueryReturnDto,
-  registeredViewsStore,
-  REGISTRED_VIEWS,
+  registeredViewsServerAtom,
+  registeredViewsServerStore,
 } from '@apps-next/core';
 import {
   dehydrate,
@@ -28,7 +27,10 @@ export async function QueryPrefetchProvider({
   const searchableFields = viewConfigManager.getSearchableField();
   const viewFields = viewConfigManager.viewConfig.viewFields;
   const viewName = viewConfigManager.getViewName();
-  const registeredViews = registeredViewsStore.get(registeredViewsAtom);
+
+  const registeredViewsServer = registeredViewsServerStore.get(
+    registeredViewsServerAtom
+  );
 
   const queryClient = new QueryClient();
 
@@ -43,7 +45,7 @@ export async function QueryPrefetchProvider({
 
       queryFn: async (context) => {
         const res = await viewLoader({
-          registeredViews,
+          registeredViews: registeredViewsServer,
           modelConfig: {
             viewFields: viewFields,
             searchableFields: searchableFields,
@@ -61,7 +63,7 @@ export async function QueryPrefetchProvider({
 
   return (
     <ServerSideConfigProvider
-      registeredViews={registeredViews}
+      registeredViews={registeredViewsServer}
       viewConfig={viewConfigManager.viewConfig}
       includeConfig={{}}
       {...(queryClient.getQueryData(queryKey) as QueryReturnDto)}
