@@ -15,6 +15,7 @@ export type ViewConfigBaseInfo<T extends GetTableName> = {
 
 export type ViewConfigType<T extends GetTableName = any> =
   ViewConfigBaseInfo<T> & {
+    _generated?: boolean;
     viewFields: ViewFieldConfig;
     includeFields: IncludeConfig[string];
     displayField: {
