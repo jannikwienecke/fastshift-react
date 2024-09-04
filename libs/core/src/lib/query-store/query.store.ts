@@ -7,7 +7,6 @@ import {
   QueryRelationalData,
   RecordType,
   registeredViewsAtom,
-  viewsHelperAtom,
 } from '@apps-next/core';
 import { atom } from 'jotai';
 import { QueryStore } from './query.types';

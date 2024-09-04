@@ -49,6 +49,7 @@ export const generateDefaultViewConfigs = ({
       tableName as GetTableName,
       {
         query: {},
+        _generated: true,
         relativePath: tableName,
         viewName: tableName as string,
         displayField: {

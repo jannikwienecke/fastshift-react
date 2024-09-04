@@ -50,7 +50,11 @@ export const useList = <T extends RecordType>() => {
             field = item.field;
             field = item.field;
           } catch (error) {
-            throw new Error(`Field ${fieldName.toLocaleString()} not found`);
+            throw new Error(
+              `Field ${field?.name} not found in row ${
+                row.id
+              } of view ${viewConfig.getViewName()}`
+            );
           }
 
           return {

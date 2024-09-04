@@ -19,17 +19,16 @@ import {
   ViewContextType,
 } from '@apps-next/core';
 import { Provider, useAtomValue } from 'jotai';
-import { useHydrateAtoms } from 'jotai/utils';
 
-import { queryDataAtom, useMutationAtom, useQueryAtom } from '@apps-next/react';
+import {
+  HydrateAtoms,
+  queryDataAtom,
+  useMutationAtom,
+  useQueryAtom,
+} from '@apps-next/react';
 import React from 'react';
 import { usePrismaQuery } from './use-prisma-query';
 import { usePrismaMutation } from './use-prisma-mutation';
-
-const HydrateAtoms = ({ initialValues, children }: any) => {
-  useHydrateAtoms(initialValues, { dangerouslyForceHydrate: true });
-  return children;
-};
 
 export const ServerSideConfigContext = React.createContext<ViewContextType>(
   {} as ViewContextType
