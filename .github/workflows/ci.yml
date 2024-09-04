@@ -13,6 +13,21 @@ permissions:
 jobs:
   main:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: admin
+          POSTGRES_USER: postgres
+          POSTGRES_DB: db
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,4 +52,13 @@ jobs:
       # - run: npx nx-cloud record -- echo Hello World
       # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
       - run: npx nx affected -t lint test build
-      - run: npx nx affected --parallel 1 -t e2e-ci
+
+      - name: Run e2e tests
+        run: npx nx affected --parallel 1 -t e2e-ci
+        env:
+          DATABASE_URL: postgresql://postgres:admin@localhost:5433/db
+
+      - name: Run Playwright tests
+        run: npx nx run nextjs-e2e:e2e
+        env:
+          DATABASE_URL: postgresql://postgres:admin@localhost:5433/db
