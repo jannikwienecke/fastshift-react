@@ -19,13 +19,5 @@
     "**/*.spec.jsx",
     "**/*.test.jsx"
   ],
-  "include": [
-    "src/**/*.js",
-    "src/**/*.jsx",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "../core/src/lib/base-view-config.ts",
-    "src/lib/ui-adapter/list-adapter.ts",
-    "../query-adapter/src/lib/server-side-config-context.tsx"
-  ]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
 }

@@ -16,7 +16,7 @@ export const ListFieldValue = ({
       }}
       onClick={(e) => {
         if (!field) return;
-        if (!field.relation && !field.enum) return;
+        if (!field.relation && !field.enum && field.type !== 'Boolean') return;
 
         const rect = e.currentTarget.getBoundingClientRect();
 
@@ -29,11 +29,7 @@ export const ListFieldValue = ({
         });
       }}
     >
-      <FieldValue
-        fieldName={field.name as string}
-        componentType="list"
-        row={row}
-      />
+      <FieldValue field={field} componentType="list" row={row} />
     </span>
   );
 };

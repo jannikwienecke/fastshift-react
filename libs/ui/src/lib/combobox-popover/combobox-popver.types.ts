@@ -17,6 +17,7 @@ export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> =
       render: (value: T) => React.ReactNode;
       multiple: boolean;
       rect: DOMRect | null;
+      searchable: boolean;
     }
   | undefined
   | null;

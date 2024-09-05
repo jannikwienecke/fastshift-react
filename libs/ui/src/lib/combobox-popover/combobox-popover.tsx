@@ -52,16 +52,18 @@ export function ComboboxPopover<T extends ComboxboxItem>(
             className="flex items-center justify-between border-b pr-2"
             cmdk-input-wrapper=""
           >
-            <Input
-              value={input.query}
-              placeholder={
-                input.placeholder || `Change ${comboboxProps.tableName}...`
-              }
-              onChange={(event) => input.onChange(event.target.value)}
-              className={cn(
-                'flex h-10 w-full rounded-md shadow-none bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-none focus-visible:ring-0'
-              )}
-            />
+            {comboboxProps.searchable ? (
+              <Input
+                value={input.query}
+                placeholder={
+                  input.placeholder || `Change ${comboboxProps.tableName}...`
+                }
+                onChange={(event) => input.onChange(event.target.value)}
+                className={cn(
+                  'flex h-10 w-full rounded-md shadow-none bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-none focus-visible:ring-0'
+                )}
+              />
+            ) : null}
 
             <div className="text-foreground text-xs px-1 py-[1px] rounded-sm border-[1px]">
               {comboboxProps.tableName.slice(0, 1).toUpperCase()}

@@ -1,12 +1,12 @@
-import { makeData, Row } from '@apps-next/core';
+import { FieldConfig, makeData, Row } from '@apps-next/core';
 import { ComboboxPopoverProps } from '@apps-next/ui';
 import { useDebounce } from '@uidotdev/usehooks';
 import React, { useRef } from 'react';
 import { useQuery } from '../../use-query';
 import { useQueryDataOf } from '../../use-query-data-relational';
 import { useView } from '../../use-view';
-import { ComboboxInitPayload } from './_combobox.store/store.ts';
-import { useComboboxStore } from './_combobox.store/store.ts/store-adapter';
+import { ComboboxFieldValue } from '../../ui-components/render-combobox-field-value';
+import { ComboboxInitPayload, useComboboxStore } from './_combobox.store/store';
 
 export type UseComboboAdaper = typeof useCombobox;
 
@@ -14,18 +14,22 @@ export const useCombobox = ({
   state: initialState,
   onClose,
   onSelect,
-  renderValue,
+  ...props
 }: {
   state: Omit<ComboboxInitPayload, 'defaultData' | 'registeredViews'> | null;
   onClose: () => void;
   onSelect: (value: Row) => void;
-  renderValue: (value: Row) => React.ReactNode;
+  renderValue?: (props: { value: Row; field: FieldConfig }) => React.ReactNode;
 }) => {
   const [store, dispatch] = useComboboxStore();
   const { registeredViews } = useView();
   const query = useDebounce(store.query, 300);
 
   const defaultData = useQueryDataOf(initialState?.field?.relation?.tableName);
+
+  const renderValue = (props: { value: Row; field: FieldConfig }) => (
+    <ComboboxFieldValue {...props} />
+  );
 
   const { data, isFetching, isFetched } = useQuery({
     query: query,
@@ -85,7 +89,12 @@ export const useCombobox = ({
       },
 
       render: (value) => {
-        return renderValue(value);
+        if (!store.field) return null;
+        const fn = props.renderValue ?? renderValue;
+        return fn({
+          field: store.field,
+          value,
+        });
       },
 
       input: {

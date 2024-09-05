@@ -22,6 +22,8 @@ export type ComboboxStore = {
   registeredViews: RegisteredViews;
 
   multiple: boolean;
+
+  searchable: boolean;
 };
 
 export type ComboboxInitPayload = Pick<
@@ -45,4 +47,5 @@ export const DEFAULT_STORE: ComboboxStore = {
   defaultData: null,
   registeredViews: {},
   multiple: false,
+  searchable: true,
 };
