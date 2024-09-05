@@ -18,7 +18,7 @@ export const test = base.extend<Fixtures>({
       // This will run before each test that uses this fixture
       console.log('Run: Seeding the database...');
       try {
-        // await main();
+        await main();
         // hier
         console.log('Database seeded successfully');
       } catch (error) {

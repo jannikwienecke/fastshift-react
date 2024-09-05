@@ -30,7 +30,7 @@ const PRIORITY_COLORS = {
 export const PriorityComponent = (props: { data: TaskViewDataType }) => {
   const priority = props.data.priority;
 
-  return <div>{PRIORITY_COLORS[priority]}</div>;
+  return <div data-testid="priority">{PRIORITY_COLORS[priority]}</div>;
 };
 
 export const PriorityComponentCombobox = (props: {

@@ -16,13 +16,15 @@ const baseURL = process.env['BASE_URL'] || 'http://127.0.0.1:3000';
  */
 export default defineConfig({
   ...nxE2EPreset(__filename, { testDir: './src' }),
-  globalSetup: require.resolve('./src/global-setup'),
+  //
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     baseURL,
+    //
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
+  workers: 1,
   /* Run your local dev server before starting the tests */
   webServer: {
     command: 'npx nx start nextjs',

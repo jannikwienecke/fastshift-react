@@ -1,12 +1,12 @@
 import { expect, test } from './fixtures';
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, seedDatabase }) => {
+  await seedDatabase();
+
   await page.goto('/fastapp/task', { timeout: 5000 });
 });
 
 test.describe('Task management', () => {
-  test.describe.configure({ mode: 'serial' });
-
   test('can change the project of a task.', async ({ page }) => {
     // Click on the first project (Website Redesign)
     await page.getByText('product launch').first().click({ force: true });
@@ -64,5 +64,27 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText('important')).toBeVisible();
     await expect(firstListItem.getByText('Planning')).toBeHidden();
     await expect(firstListItem.getByText('Bug')).toBeHidden();
+  });
+
+  test('can chaange the priority of a task', async ({ page }) => {
+    const firstListItem = page.getByTestId('list-item').first();
+
+    // get by test id priority
+    // const priority = firstListItem.getByTestId('priority');
+    await firstListItem.getByText('🟢').click();
+
+    const popover = page.getByTestId('combobox-popover');
+    await expect(popover.getByText('🟡')).toBeVisible();
+
+    await popover.getByText('🟡').click();
+
+    // close popover by clicking /assign launch/i
+    await page
+      .getByText(/assign launch/i)
+      .first()
+      .click();
+
+    await expect(firstListItem.getByText('🟡')).toBeVisible();
+    await expect(firstListItem.getByText('🟢')).toBeHidden();
   });
 });

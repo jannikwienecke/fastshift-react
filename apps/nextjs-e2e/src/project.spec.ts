@@ -1,7 +1,9 @@
 import {} from '@playwright/test';
 import { expect, test } from './fixtures';
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, seedDatabase }) => {
+  await seedDatabase();
+
   await page.goto('/fastapp/project', { timeout: 5000 });
 });
 
