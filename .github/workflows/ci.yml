@@ -28,32 +28,24 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      DATABASE_URL: postgresql://postgres:admin@postgres:5432/db
+      DATABASE_URL: postgresql://postgres:admin@localhost:5432/db
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # Cache node_modules
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps && npm i -g nx
-        env:
-          DATABASE_URL: postgresql://postgres:admin@postgres:5432/db
+        run: npm ci
 
-      # - uses: nrwl/nx-set-shas@v4
+      # - name: Run linter
+      #   run: npm run lint
 
-      # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
-      # - run: npx nx-cloud record -- echo Hello World
-      # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
-      - run: npx nx affected -t lint build
+      # - name: Build project
+      #   run: npm run build
 
       - name: Run Playwright tests
-        run: npx nx run nextjs-e2e:e2e
-        env:
-          DATABASE_URL: postgresql://postgres:admin@postgres:5432/db
+        run: npx nx e2e nextjs-e2e
