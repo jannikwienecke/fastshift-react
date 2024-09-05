@@ -1,15 +1,22 @@
-import { clientConfigAtom, ComponentType, Row } from '@apps-next/core';
+import {
+  clientConfigAtom,
+  ComponentType,
+  FieldConfig,
+  Row,
+} from '@apps-next/core';
 import { useAtomValue } from 'jotai';
 
 export const FieldValue = ({
-  fieldName,
+  field,
   componentType,
   row,
 }: {
-  fieldName: string;
+  field: FieldConfig;
   componentType: ComponentType;
   row: Row | undefined;
 }) => {
+  const fieldName = field.name;
+  const fieldType = field.type;
   // TODO: FIX NAMING -> OR MERGE THEM clientConfigAtom and getViewConfigAtom
   const injectedViewConfig = useAtomValue(clientConfigAtom);
 
@@ -21,6 +28,15 @@ export const FieldValue = ({
     <div data-testid={`field-value-${fieldName}`}>
       {ComponentToRender ? (
         <ComponentToRender data={row.raw} />
+      ) : // TODO BOOLEAN
+      fieldType === 'Boolean' ? (
+        <>
+          <input
+            type="checkbox"
+            checked={row?.getValue(fieldName)}
+            onChange={() => null}
+          />
+        </>
       ) : (
         <>{row?.getValueLabel(fieldName)}</>
       )}

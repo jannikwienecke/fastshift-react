@@ -6,6 +6,7 @@ import {
 } from '@apps-next/core';
 import React from 'react';
 import { useMutation } from '../use-mutation';
+import { handleSelectUpdate } from '../field-features/update-record-mutation';
 
 export const useHandleSelectCombobox = () => {
   const { mutate } = useMutation();
@@ -25,76 +26,91 @@ export const useHandleSelectCombobox = () => {
 
     const isManyToManyRelation = field?.relation?.manyToManyRelation;
 
+    if (field.type === 'Boolean') {
+      const mutation = handleSelectUpdate({
+        field,
+        row,
+        value,
+        selected: list?.focusedRelationField?.selected ?? [],
+      });
+
+      mutate({
+        mutation: mutation,
+      });
+    } else {
+      const selected = list?.focusedRelationField?.selected;
+      const selectedId =
+        typeof selected === 'string'
+          ? selected
+          : Array.isArray(selected)
+          ? selected.map((v) => v.id)
+          : selected?.id;
+
+      if (!startSelectedRef.current && selected) {
+        startSelectedRef.current = Array.isArray(selected)
+          ? selected.map((v) => v.id)
+          : selectedId;
+      }
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(
+        () => {
+          timeoutRef.current = null;
+
+          if (!field) return;
+
+          const newSelected = Array.isArray(selected)
+            ? updateManyToManyRelation(selected ?? [], value).map((v) => v.id)
+            : selectedId;
+
+          startSelectedRef.current = newSelected;
+
+          const valueToUpdate =
+            !field.relation && !field.enum ? value.raw : value.id;
+          mutate({
+            mutation: {
+              type: 'UPDATE_RECORD',
+              handler: (items) => {
+                if (isManyToManyRelation) return items;
+
+                return items.map((item) => {
+                  if (item.id === row.id) {
+                    const newValue = {
+                      ...item,
+                      [field.name]: isManyToManyRelation
+                        ? updateManyToManyRelation(item[field.name], value)
+                        : value.raw,
+                    };
+                    return newValue;
+                  }
+                  return item;
+                });
+              },
+              payload: {
+                id: row.id,
+                record: {
+                  [field.relation?.fieldName ?? field.name]:
+                    isManyToManyRelation ? newSelected : valueToUpdate,
+                },
+              },
+            },
+          });
+        },
+        isManyToManyRelation ? 500 : 0
+      );
+    }
+
+    // behavour for the combobox
     if (!isManyToManyRelation) {
       setTimeout(() => {
         dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
       }, 100);
     }
 
-    const selected = list?.focusedRelationField?.selected;
-    const selectedId =
-      typeof selected === 'string'
-        ? selected
-        : Array.isArray(selected)
-        ? selected.map((v) => v.id)
-        : selected?.id;
-
-    if (!startSelectedRef.current && selected) {
-      startSelectedRef.current = Array.isArray(selected)
-        ? selected.map((v) => v.id)
-        : selectedId;
-    }
-
     dispatch({ type: 'UPDATE_SELECTED_RELATIONAL_FIELD', selected: value });
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(
-      () => {
-        timeoutRef.current = null;
-
-        if (!field) return;
-
-        const newSelected = Array.isArray(selected)
-          ? updateManyToManyRelation(selected ?? [], value).map((v) => v.id)
-          : selectedId;
-
-        startSelectedRef.current = newSelected;
-
-        mutate({
-          mutation: {
-            type: 'UPDATE_RECORD',
-            handler: (items) => {
-              if (isManyToManyRelation) return items;
-
-              return items.map((item) => {
-                if (item.id === row.id) {
-                  const newValue = {
-                    ...item,
-                    [field.name]: isManyToManyRelation
-                      ? updateManyToManyRelation(item[field.name], value)
-                      : value.raw,
-                  };
-                  return newValue;
-                }
-                return item;
-              });
-            },
-            payload: {
-              id: row.id,
-              record: {
-                [field.relation?.fieldName ?? field.name]: isManyToManyRelation
-                  ? newSelected
-                  : value.id,
-              },
-            },
-          },
-        });
-      },
-      isManyToManyRelation ? 500 : 0
-    );
   };
 
   const handleClose = () => {
