@@ -41,6 +41,9 @@ jobs:
       - name: Install dependencies
         run: npm ci --force
 
+      - name: Install Playwright Browser
+        run: npx playwright install
+
       - name: Push Prisma schema to database
         run: npx prisma db push
 
