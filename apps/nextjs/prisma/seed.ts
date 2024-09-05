@@ -18,41 +18,65 @@ export async function main() {
   await prisma.user.deleteMany({});
   await prisma.category.deleteMany({});
 
-  // Create users
-  const user1 = await prisma.user.create({
-    data: {
+  // Create users and owners
+  const userData = [
+    {
       email: 'john.doe@example.com',
       password: 'password123',
-    },
-  });
-
-  const user2 = await prisma.user.create({
-    data: {
-      email: 'jane.smith@example.com',
-      password: 'securepass',
-    },
-  });
-
-  // Create owners
-  const owner1 = await prisma.owner.create({
-    data: {
-      userId: user1.id,
       firstname: 'John',
       lastname: 'Doe',
       age: 35,
-      user: { connect: { id: user1.id } },
     },
-  });
-
-  const owner2 = await prisma.owner.create({
-    data: {
-      userId: user2.id,
+    {
+      email: 'jane.smith@example.com',
+      password: 'securepass',
       firstname: 'Jane',
       lastname: 'Smith',
       age: 28,
-      user: { connect: { id: user2.id } },
     },
-  });
+    {
+      email: 'mike.johnson@example.com',
+      password: 'mikepass',
+      firstname: 'Mike',
+      lastname: 'Johnson',
+      age: 42,
+    },
+    {
+      email: 'emily.brown@example.com',
+      password: 'emilypass',
+      firstname: 'Emily',
+      lastname: 'Brown',
+      age: 31,
+    },
+    {
+      email: 'david.wilson@example.com',
+      password: 'davidpass',
+      firstname: 'David',
+      lastname: 'Wilson',
+      age: 39,
+    },
+  ];
+
+  const owners = [];
+  for (const data of userData) {
+    const user = await prisma.user.create({
+      data: {
+        email: data.email,
+        password: data.password,
+      },
+    });
+
+    const owner = await prisma.owner.create({
+      data: {
+        userId: user.id,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        age: data.age,
+        user: { connect: { id: user.id } },
+      },
+    });
+    owners.push(owner);
+  }
 
   // Create categories
   const categories = [
@@ -74,6 +98,11 @@ export async function main() {
     { name: 'Long-term', color: 'blue' },
     { name: 'Quick', color: 'green' },
     { name: 'Collaborative', color: 'purple' },
+    { name: 'Creative', color: 'pink' },
+    { name: 'Technical', color: 'cyan' },
+    { name: 'Research', color: 'indigo' },
+    { name: 'Planning', color: 'teal' },
+    { name: 'Review', color: 'gray' },
   ];
 
   const createdTags = await Promise.all(
@@ -81,80 +110,550 @@ export async function main() {
   );
 
   // Create projects
-  const projects = [
+  const projectData = [
     {
       label: 'Website Redesign',
-      description: 'Redesign company website',
+      description: 'Redesign company website for better user experience',
       categoryId: createdCategories[0].id,
-      ownerId: owner1.id,
+      ownerId: owners[0].id,
       dueDate: new Date('2023-12-31').getTime(),
     },
     {
       label: 'Fitness Plan',
-      description: 'Create a personal fitness plan',
+      description: 'Create a personal fitness plan for weight loss',
       categoryId: createdCategories[2].id,
-      ownerId: owner2.id,
+      ownerId: owners[1].id,
       dueDate: new Date('2023-09-30').getTime(),
     },
     {
       label: 'Budget Analysis',
-      description: 'Analyze monthly budget',
+      description: 'Analyze monthly budget to reduce expenses',
       categoryId: createdCategories[3].id,
-      ownerId: owner1.id,
+      ownerId: owners[2].id,
       dueDate: new Date('2023-10-15').getTime(),
+    },
+    {
+      label: 'Learn Spanish',
+      description: 'Complete Spanish language course for business',
+      categoryId: createdCategories[4].id,
+      ownerId: owners[3].id,
+      dueDate: new Date('2023-11-30').getTime(),
+    },
+    {
+      label: 'Home Renovation',
+      description: 'Renovate kitchen and bathroom for modern look',
+      categoryId: createdCategories[1].id,
+      ownerId: owners[4].id,
+      dueDate: new Date('2023-12-15').getTime(),
+    },
+    {
+      label: 'Product Launch',
+      description: 'Plan and execute new product launch campaign',
+      categoryId: createdCategories[0].id,
+      ownerId: owners[0].id,
+      dueDate: new Date('2023-08-15').getTime(),
+    },
+    {
+      label: 'Garden Makeover',
+      description: 'Redesign backyard garden with native plants',
+      categoryId: createdCategories[1].id,
+      ownerId: owners[1].id,
+      dueDate: new Date('2023-07-20').getTime(),
+    },
+    {
+      label: 'Marathon Training',
+      description: 'Prepare for upcoming city marathon',
+      categoryId: createdCategories[2].id,
+      ownerId: owners[2].id,
+      dueDate: new Date('2023-10-25').getTime(),
+    },
+    {
+      label: 'Mobile App Development',
+      description: 'Develop a new mobile app for task management',
+      categoryId: createdCategories[0].id,
+      ownerId: owners[3].id,
+      dueDate: new Date('2023-11-30').getTime(),
+    },
+    {
+      label: 'Investment Portfolio',
+      description: 'Diversify and optimize investment portfolio',
+      categoryId: createdCategories[3].id,
+      ownerId: owners[4].id,
+      dueDate: new Date('2023-09-10').getTime(),
+    },
+    {
+      label: 'Charity Fundraiser',
+      description: 'Organize annual charity fundraising event',
+      categoryId: createdCategories[1].id,
+      ownerId: owners[0].id,
+      dueDate: new Date('2023-12-05').getTime(),
+    },
+    {
+      label: 'Write Novel',
+      description: 'Complete first draft of mystery novel',
+      categoryId: createdCategories[4].id,
+      ownerId: owners[1].id,
+      dueDate: new Date('2024-03-20').getTime(),
+    },
+    {
+      label: 'Eco-Friendly Home',
+      description: 'Implement sustainable practices at home',
+      categoryId: createdCategories[1].id,
+      ownerId: owners[2].id,
+      dueDate: new Date('2023-11-25').getTime(),
+    },
+    {
+      label: 'European Vacation',
+      description: 'Plan and book European family vacation',
+      categoryId: createdCategories[1].id,
+      ownerId: owners[3].id,
+      dueDate: new Date('2023-08-30').getTime(),
+    },
+    {
+      label: 'Retirement Planning',
+      description: 'Create comprehensive retirement savings plan',
+      categoryId: createdCategories[3].id,
+      ownerId: owners[4].id,
+      dueDate: new Date('2023-10-10').getTime(),
+    },
+    {
+      label: 'Career Development',
+      description: 'Enhance skills for career advancement',
+      categoryId: createdCategories[4].id,
+      ownerId: owners[0].id,
+      dueDate: new Date('2023-12-15').getTime(),
+    },
+    {
+      label: 'Healthy Cooking',
+      description: 'Learn and implement healthy cooking techniques',
+      categoryId: createdCategories[2].id,
+      ownerId: owners[1].id,
+      dueDate: new Date('2023-09-20').getTime(),
+    },
+    {
+      label: 'Home Office Setup',
+      description: 'Create ergonomic and productive home office',
+      categoryId: createdCategories[1].id,
+      ownerId: owners[2].id,
+      dueDate: new Date('2023-07-25').getTime(),
+    },
+    {
+      label: 'Digital Declutter',
+      description: 'Organize and streamline digital files and accounts',
+      categoryId: createdCategories[1].id,
+      ownerId: owners[3].id,
+      dueDate: new Date('2023-08-30').getTime(),
+    },
+    {
+      label: 'Learn Photography',
+      description: 'Master DSLR camera and photo editing techniques',
+      categoryId: createdCategories[4].id,
+      ownerId: owners[4].id,
+      dueDate: new Date('2023-11-10').getTime(),
     },
   ];
 
-  const createdProjects = await Promise.all(
-    projects.map((project) => prisma.project.create({ data: project }))
+  const projects = await Promise.all(
+    projectData.map((project) => prisma.project.create({ data: project }))
   );
 
   // Create tasks
-  const tasks = [
+  const taskData = [
     {
       name: 'Design mockups',
       completed: false,
-      projectId: createdProjects[0].id,
+      projectId: projects[0].id,
       priority: 'high',
     },
     {
       name: 'Develop frontend',
       completed: false,
-      projectId: createdProjects[0].id,
+      projectId: projects[0].id,
       priority: 'medium',
     },
     {
+      name: 'Implement responsive design',
+      completed: false,
+      projectId: projects[0].id,
+      priority: 'high',
+    },
+
+    {
       name: 'Create workout schedule',
       completed: true,
-      projectId: createdProjects[1].id,
-      priority: 'low',
+      projectId: projects[1].id,
+      priority: 'high',
     },
     {
-      name: 'Track expenses',
+      name: 'Research healthy recipes',
       completed: false,
-      projectId: createdProjects[2].id,
+      projectId: projects[1].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Buy workout equipment',
+      completed: false,
+      projectId: projects[1].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Track monthly expenses',
+      completed: false,
+      projectId: projects[2].id,
       priority: 'high',
+    },
+    {
+      name: 'Create savings plan',
+      completed: false,
+      projectId: projects[2].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Review investment options',
+      completed: false,
+      projectId: projects[2].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Study Spanish vocabulary',
+      completed: false,
+      projectId: projects[3].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Practice speaking Spanish',
+      completed: false,
+      projectId: projects[3].id,
+      priority: 'high',
+    },
+    {
+      name: 'Watch Spanish movies',
+      completed: false,
+      projectId: projects[3].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Choose kitchen cabinets',
+      completed: false,
+      projectId: projects[4].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Hire renovation contractor',
+      completed: false,
+      projectId: projects[4].id,
+      priority: 'high',
+    },
+    {
+      name: 'Select bathroom tiles',
+      completed: false,
+      projectId: projects[4].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Define product features',
+      completed: false,
+      projectId: projects[5].id,
+      priority: 'high',
+    },
+    {
+      name: 'Create marketing timeline',
+      completed: false,
+      projectId: projects[5].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Assign launch team roles',
+      completed: false,
+      projectId: projects[5].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Research native plants',
+      completed: false,
+      projectId: projects[6].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Create garden layout',
+      completed: false,
+      projectId: projects[6].id,
+      priority: 'high',
+    },
+    {
+      name: 'Purchase gardening supplies',
+      completed: false,
+      projectId: projects[6].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Create training schedule',
+      completed: false,
+      projectId: projects[7].id,
+      priority: 'high',
+    },
+    {
+      name: 'Buy running shoes',
+      completed: false,
+      projectId: projects[7].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Plan nutrition strategy',
+      completed: false,
+      projectId: projects[7].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Design app wireframes',
+      completed: false,
+      projectId: projects[8].id,
+      priority: 'high',
+    },
+    {
+      name: 'Develop app prototype',
+      completed: false,
+      projectId: projects[8].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Conduct user testing',
+      completed: false,
+      projectId: projects[8].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Research market trends',
+      completed: false,
+      projectId: projects[9].id,
+      priority: 'high',
+    },
+    {
+      name: 'Consult financial advisor',
+      completed: false,
+      projectId: projects[9].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Rebalance portfolio',
+      completed: false,
+      projectId: projects[9].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Set fundraising goal',
+      completed: false,
+      projectId: projects[10].id,
+      priority: 'high',
+    },
+    {
+      name: 'Contact potential sponsors',
+      completed: false,
+      projectId: projects[10].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Plan event logistics',
+      completed: false,
+      projectId: projects[10].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Outline novel chapters',
+      completed: false,
+      projectId: projects[11].id,
+      priority: 'high',
+    },
+    {
+      name: 'Develop character profiles',
+      completed: false,
+      projectId: projects[11].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Research mystery elements',
+      completed: false,
+      projectId: projects[11].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Install solar panels',
+      completed: false,
+      projectId: projects[12].id,
+      priority: 'high',
+    },
+    {
+      name: 'Set up composting system',
+      completed: false,
+      projectId: projects[12].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Replace with energy-efficient appliances',
+      completed: false,
+      projectId: projects[12].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Book flights',
+      completed: false,
+      projectId: projects[13].id,
+      priority: 'high',
+    },
+    {
+      name: 'Reserve accommodations',
+      completed: false,
+      projectId: projects[13].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Plan daily itineraries',
+      completed: false,
+      projectId: projects[13].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Calculate retirement needs',
+      completed: false,
+      projectId: projects[14].id,
+      priority: 'high',
+    },
+    {
+      name: 'Open retirement accounts',
+      completed: false,
+      projectId: projects[14].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Set up automatic contributions',
+      completed: false,
+      projectId: projects[14].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Take online courses',
+      completed: false,
+      projectId: projects[15].id,
+      priority: 'high',
+    },
+    {
+      name: 'Attend industry conferences',
+      completed: false,
+      projectId: projects[15].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Find a mentor',
+      completed: false,
+      projectId: projects[15].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Learn new recipes',
+      completed: false,
+      projectId: projects[16].id,
+      priority: 'high',
+    },
+    {
+      name: 'Buy kitchen equipment',
+      completed: false,
+      projectId: projects[16].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Meal prep for the week',
+      completed: false,
+      projectId: projects[16].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Choose ergonomic chair',
+      completed: false,
+      projectId: projects[17].id,
+      priority: 'high',
+    },
+    {
+      name: 'Set up proper lighting',
+      completed: false,
+      projectId: projects[17].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Organize desk space',
+      completed: false,
+      projectId: projects[17].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Unsubscribe from newsletters',
+      completed: false,
+      projectId: projects[18].id,
+      priority: 'high',
+    },
+    {
+      name: 'Organize digital photos',
+      completed: false,
+      projectId: projects[18].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Clean up computer desktop',
+      completed: false,
+      projectId: projects[18].id,
+      priority: 'low',
+    },
+
+    {
+      name: 'Research camera models',
+      completed: false,
+      projectId: projects[19].id,
+      priority: 'high',
+    },
+    {
+      name: 'Take online photography course',
+      completed: false,
+      projectId: projects[19].id,
+      priority: 'medium',
+    },
+    {
+      name: 'Practice editing techniques',
+      completed: false,
+      projectId: projects[19].id,
+      priority: 'low',
     },
   ];
 
-  const createdTasks = await Promise.all(
-    tasks.map((task) => prisma.task.create({ data: task }))
-  );
+  for (let i = 0; i < taskData.length; i++) {
+    const task = await prisma.task.create({ data: taskData[i] });
 
-  // Create task tags
-  await prisma.taskTag.create({
-    data: {
-      tagId: createdTags[0].id,
-      taskId: createdTasks[0].id,
-    },
-  });
-
-  await prisma.taskTag.create({
-    data: {
-      tagId: createdTags[1].id,
-      taskId: createdTasks[0].id,
-    },
-  });
+    // Add tags to each task (0 to 4 tags)
+    const numTags = i % 5;
+    for (let j = 0; j < numTags; j++) {
+      await prisma.taskTag.create({
+        data: {
+          tagId: createdTags[(i + j) % 10].id,
+          taskId: task.id,
+        },
+      });
+    }
+  }
 
   console.log('Seed data created successfully');
 }

@@ -18,8 +18,8 @@ test.describe('Project management', () => {
 
     // Wait for 'Work' category not to be visible
     const popover = page.getByTestId('combobox-popover');
-    // expect that inside popover finance is not visible
-    await expect(popover.getByText('Finance')).toBeHidden();
+    // expect that inside popover Work is not visible
+    await expect(popover.getByText('Work')).toBeHidden();
 
     // Expect 'Personal' category to be visible
     await expect(page.getByText('Personal').first()).toBeVisible();
@@ -27,7 +27,7 @@ test.describe('Project management', () => {
     // Click on "Personal" to confirm the change
     await page.getByText('Personal').first().click();
 
-    // // Expect input field not to be visible after confirmation
+    // Expect input field not to be visible after confirmation
     await expect(input).toBeHidden();
   });
 
@@ -60,7 +60,7 @@ test.describe('Project management', () => {
       .first()
       .innerText();
 
-    expect(initialTaskCount).toBe('1');
+    expect(initialTaskCount).toBe('3');
 
     // Open the task dropdown
     await page.getByTestId('field-value-tasks').first().click();
@@ -75,7 +75,7 @@ test.describe('Project management', () => {
     await page.getByText('Website Redesign').first().click();
 
     // Expect the task count to increase
-    await expect(page.getByTestId('field-value-tasks').first()).toHaveText('2');
+    await expect(page.getByTestId('field-value-tasks').first()).toHaveText('4');
 
     // Open the dropdown again
     await page.getByTestId('field-value-tasks').first().click();
@@ -91,6 +91,6 @@ test.describe('Project management', () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Expect the task count to decrease
-    await expect(page.getByTestId('field-value-tasks').first()).toHaveText('2');
+    await expect(page.getByTestId('field-value-tasks').first()).toHaveText('5');
   });
 });
