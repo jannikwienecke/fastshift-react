@@ -43,17 +43,13 @@ jobs:
 
       - name: Build project
         run: npx nx build nextjs
-
-      - name: Start NextJS app
-        run: npx nx start nextjs && npx nx
-
       # - name: Run linter
       #   run: npm run lint
 
       # - name: Build project
       #   run: npm run build
       - name: Wait for Next.js to be ready
-        run: npx wait-on http://localhost:3000
+        run: npx wait-on http://127.0.0.1:3000
 
       - name: Run Playwright tests
         run: npx nx e2e nextjs-e2e
