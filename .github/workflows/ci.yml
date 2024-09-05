@@ -56,4 +56,4 @@ jobs:
       - name: Run Playwright tests
         run: npx nx run nextjs-e2e:e2e
         env:
-          DATABASE_URL: postgresql://postgres:admin@localhost:5432/db
+          DATABASE_URL: postgresql://postgres:admin@postgres:5432/db
