@@ -7,13 +7,12 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import {
-  ComboboxFieldValue,
   DataType,
   makeHooks,
   useCombobox,
   useHandleSelectCombobox,
 } from '@apps-next/react';
-import { ComboboxPopover, Form, List } from '@apps-next/ui';
+import { ComboboxPopover, List } from '@apps-next/ui';
 import { Category, Owner, Task } from '@prisma/client';
 import { AvatarIcon } from '@radix-ui/react-icons';
 import {
@@ -52,6 +51,30 @@ setClientViewConfig<ProjectViewDataType>('project', {
               <IconSubtask className="w-4 h-4" />
             </div>
           );
+        },
+      },
+    },
+    // due date is a number field that represents a date(show as Aug 15, 2024)
+    dueDate: {
+      component: {
+        list: ({ data }) => {
+          const dueDate = new Date(Number(data.dueDate)).toLocaleDateString(
+            'en-US',
+            {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            }
+          );
+          // make the font light and smaller
+          return <div className="text-gray-500 text-[12px]">{dueDate}</div>;
+        },
+      },
+    },
+    active: {
+      component: {
+        combobox: ({ data }) => {
+          return <div>{data ? 'Active' : 'Inactive'}</div>;
         },
       },
     },
@@ -101,16 +124,10 @@ export const ProjectsClient = ({
 
   const { list } = useStoreValue();
 
-  const table = list?.focusedRelationField?.field?.relation?.tableName;
-
   const getComboboxProps = useCombobox({
     state: list?.focusedRelationField ? list.focusedRelationField : null,
     onSelect: handleSelect,
     onClose: handleClose,
-    renderValue: (value) => {
-      if (!list?.focusedRelationField?.field || !table) return null;
-      return <ComboboxFieldValue tableName={table} value={value} />;
-    },
   });
 
   const { edit } = useStoreValue();
@@ -144,7 +161,7 @@ export const ProjectsClient = ({
 
           <List {...getListProps()}>
             {getListProps({
-              fieldsLeft: ['label'],
+              fieldsLeft: ['label', 'dueDate', 'active'],
               fieldsRight: ['owner', 'category', 'tasks'],
             }).items.map((item) => {
               return (

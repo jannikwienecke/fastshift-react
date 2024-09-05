@@ -65,6 +65,7 @@ model Project {
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
   tasks       Task[]
+  active      Boolean  @default(true)
   // 
 }
 

@@ -18,6 +18,7 @@ export default defineConfig({
   ...nxE2EPreset(__filename, { testDir: './src' }),
   //
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  //
   use: {
     baseURL,
     //
@@ -29,6 +30,7 @@ export default defineConfig({
   webServer: {
     command: 'npx nx start nextjs',
     url: 'http://127.0.0.1:3000',
+
     reuseExistingServer: !process.env.CI,
     cwd: workspaceRoot,
   },

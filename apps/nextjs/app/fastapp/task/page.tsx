@@ -54,20 +54,10 @@ const TaskContent = () => {
 
   const { list } = useStoreValue();
 
-  const table = list?.focusedRelationField?.field?.relation?.tableName;
-
   const getComboboxProps = useCombobox({
     state: list?.focusedRelationField ? list.focusedRelationField : null,
     onSelect: handleSelect,
     onClose: handleClose,
-    renderValue: (value) => {
-      return (
-        <ComboboxFieldValue
-          tableName={table ?? list?.focusedRelationField?.field?.name ?? ''}
-          value={value}
-        />
-      );
-    },
   });
 
   const comboboxProps = getComboboxProps();
