@@ -30,6 +30,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     cwd: workspaceRoot,
   },
+  fullyParallel: false,
+  //
   timeout: 15000,
   projects: [
     {

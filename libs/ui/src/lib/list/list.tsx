@@ -92,6 +92,7 @@ function Item(
   return (
     <ItemProvider value={{ item }}>
       <li
+        data-testid="list-item"
         className={cn(
           'flex flex-row py-[10px] pl-2 pr-4 w-full gap-2 border-b border-collapse border-[#f7f7f7]',
           isSelected ? 'bg-foreground/5  text-foreground' : 'hover:bg-slate-50',

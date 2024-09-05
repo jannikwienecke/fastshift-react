@@ -54,7 +54,8 @@ export const clientConfigAtom = atom((get) => {
   const viewConfig = get(viewConfigManagerAtom);
   const clientConfigView = get(clientViewConfigAtom);
 
-  return clientConfigView[viewConfig?.getViewName() ?? ''];
+  // TODO: This must have the option to get it by the viewName as well
+  return clientConfigView[viewConfig?.getTableName() ?? ''];
 });
 
 export const clientConfigStore: AtomStore = createStore();
