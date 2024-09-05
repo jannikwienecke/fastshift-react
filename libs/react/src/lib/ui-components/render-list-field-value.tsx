@@ -29,6 +29,8 @@ export const ListFieldValue = ({
         });
       }}
     >
+      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+      {/* @ts-ignore */}
       <FieldValue field={field} componentType="list" row={row} />
     </span>
   );
