@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 // Import the main function from your existing seed script
+// eslint-disable-next-line
 import { main as seedMain } from '../../../nextjs/prisma/seed';
 
 const prisma = new PrismaClient();

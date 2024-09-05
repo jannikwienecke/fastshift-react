@@ -1,15 +1,15 @@
 import { atom, createStore } from 'jotai';
 import {
+  registeredViewsAtom,
+  registeredViewsServerAtom,
+} from './registered-view.store';
+import {
   GetTableName,
   RecordType,
   RegisteredRouter,
   ViewConfigType,
 } from './types';
 import { viewConfigManagerAtom } from './view-config.store';
-import {
-  registeredViewsAtom,
-  registeredViewsServerAtom,
-} from './registered-view.store';
 
 export type ComponentType = 'list' | 'combobox';
 
@@ -33,7 +33,8 @@ export type ClientViewConfig<T extends GetTableName, U extends RecordType> = {
 
 export const clientViewConfigAtom = atom({} as ClientViewConfig<any, any>);
 
-export const clientConfigStore = createStore();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AtomStore = any;
 
 // TODO: Clean up -> refacotr this function -> Naming etc.
 export const setClientViewConfig = <T extends RecordType>(
@@ -43,7 +44,7 @@ export const setClientViewConfig = <T extends RecordType>(
     T
   >[keyof RegisteredRouter['config']['_datamodel']]
 ) => {
-  clientConfigStore.set(clientViewConfigAtom, (prev) => ({
+  clientConfigStore.set(clientViewConfigAtom, (prev: any) => ({
     ...prev,
     [table]: data,
   }));
@@ -56,11 +57,12 @@ export const clientConfigAtom = atom((get) => {
   return clientConfigView[viewConfig?.getViewName() ?? ''];
 });
 
-export const registeredViewsStore = createStore();
-export const registeredViewsServerStore = createStore();
+export const clientConfigStore: AtomStore = createStore();
+export const registeredViewsStore: AtomStore = createStore();
+export const registeredViewsServerStore: AtomStore = createStore();
 
 export const registerView = (viewName: string, viewConfig: ViewConfigType) => {
-  registeredViewsStore.set(registeredViewsAtom, (prev) => ({
+  registeredViewsStore.set(registeredViewsAtom, (prev: any) => ({
     ...prev,
     [viewName]: viewConfig,
   }));
@@ -70,7 +72,7 @@ export const registerViewServer = (
   viewName: string,
   viewConfig: ViewConfigType
 ) => {
-  registeredViewsServerStore.set(registeredViewsServerAtom, (prev) => ({
+  registeredViewsServerStore.set(registeredViewsServerAtom, (prev: any) => ({
     ...prev,
     [viewName]: viewConfig,
   }));

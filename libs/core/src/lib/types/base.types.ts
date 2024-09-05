@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
-import { Row } from '../query-store/data-model';
 import { BaseConfigInterface } from './config.types';
 
 const documentBaseSchema = z.object({

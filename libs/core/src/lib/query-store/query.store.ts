@@ -1,15 +1,10 @@
-'use client';
-
-import {
-  DataModelNew,
-  getViewConfigAtom,
-  makeData,
-  QueryRelationalData,
-  RecordType,
-  registeredViewsAtom,
-} from '@apps-next/core';
 import { atom } from 'jotai';
+
 import { QueryStore } from './query.types';
+import { registeredViewsAtom } from '../registered-view.store';
+import { RecordType, QueryRelationalData } from '../types';
+import { getViewConfigAtom } from '../view-config.store';
+import { DataModelNew, makeData } from './data-model';
 
 export const queryStoreAtom = atom<QueryStore<RecordType>>({
   dataModel: {} as DataModelNew<RecordType>,
