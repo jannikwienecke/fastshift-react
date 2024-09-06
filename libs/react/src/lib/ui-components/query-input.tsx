@@ -1,5 +1,5 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
-import { atomWithDebounce } from '@apps-next/core';
+import { atomWithDebounce } from '../jotai-utils';
 
 export const queryAtom = atom('');
 

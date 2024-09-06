@@ -60,3 +60,8 @@ export type MutationReturnType = {
 
 export const QUERY_KEY_PREFIX = 'view-loader';
 export const RELATIONAL_QUERY_KEY_PREFIX = 'relational-view-loader';
+
+export type ApiClientType = {
+  viewLoader: (dto: QueryDto) => Promise<QueryReturnDto>;
+  viewMutation: (props: MutationProps) => Promise<MutationReturnDto>;
+};

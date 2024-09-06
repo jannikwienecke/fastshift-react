@@ -1,6 +1,6 @@
 {
   "name": "@apps-next/ui",
-  "version": "0.0.1",
+  "version": "0.0.16",
   "main": "./index.js",
   "types": "./index.d.ts",
   "exports": {
@@ -8,5 +8,18 @@
       "import": "./index.mjs",
       "require": "./index.js"
     }
+  },
+  "dependencies": {
+    "@apps-next/core": "^0.0.16"
+  },
+  "devDependencies": {
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc",
+    "@vitejs/plugin-react": "^4.3.1",
+    "react": "19.0.0-rc-4c2e457c7c-20240522",
+    "react-dom": "19.0.0-rc-4c2e457c7c-20240522"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
   }
 }

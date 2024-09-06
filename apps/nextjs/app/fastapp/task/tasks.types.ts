@@ -1,4 +1,4 @@
-import { DataType } from '@apps-next/react';
+import { DataType } from '@apps-next/core';
 import { Project, Tag } from '@prisma/client';
 
 export type TaskViewDataType = DataType<

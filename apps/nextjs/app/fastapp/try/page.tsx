@@ -1,6 +1,6 @@
 'use client';
 
-import { ComboxboxItem } from '@apps-next/ui';
+import { ComboxboxItem } from '@apps-next/core';
 import React from 'react';
 
 type Status = {

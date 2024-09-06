@@ -1,7 +1,7 @@
-import { useReducerAtom } from '@apps-next/core';
 import { ComboboxStoreAction } from './store.actions.types';
 import { storeAtom, storeReducer } from './store.main';
 import { ComboboxStore } from './store.type';
+import { useReducerAtom } from '../../../../jotai-utils/use-reducer-atom';
 
 export const useComboboxStore = () => {
   const [store, dispatch] = useReducerAtom<ComboboxStore, ComboboxStoreAction>(

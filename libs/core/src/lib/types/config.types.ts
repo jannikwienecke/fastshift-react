@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { SearchableField } from './base.types';
-import { ViewFieldConfig } from './view-config.types';
+import { ViewConfigType, ViewFieldConfig } from './view-config.types';
 
 export type IncludeConfig = Record<string, string[]>;
 
@@ -16,4 +16,5 @@ export interface BaseConfigInterface<
   searchableFields: Record<string, SearchableField>;
   includeFields: IncludeConfig;
   _datamodel: DataModelType;
+  defaultViewConfigs: Partial<Record<string, ViewConfigType<any>>>;
 }

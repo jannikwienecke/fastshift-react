@@ -9,8 +9,6 @@ import {
   IncludeConfig,
   makeData,
   QueryReturnDto,
-  QueryStore,
-  queryStoreAtom,
   RecordType,
   RegisteredViews,
   registeredViewsAtom,
@@ -19,10 +17,11 @@ import {
   ViewContextType,
 } from '@apps-next/core';
 import { Provider, useAtomValue } from 'jotai';
-
 import {
   HydrateAtoms,
   queryDataAtom,
+  QueryStore,
+  queryStoreAtom,
   useMutationAtom,
   useQueryAtom,
 } from '@apps-next/react';

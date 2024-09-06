@@ -35,11 +35,15 @@
               },
               {
                 "sourceTag": "scope:ui",
-                "onlyDependOnLibsWithTags": []
+                "onlyDependOnLibsWithTags": ["scope:shared"]
               },
               {
                 "sourceTag": "scope:query",
                 "onlyDependOnLibsWithTags": ["scope:shared", "scope:react"]
+              },
+              {
+                "sourceTag": "scope:server-adapter",
+                "onlyDependOnLibsWithTags": ["scope:shared"]
               }
             ]
           }

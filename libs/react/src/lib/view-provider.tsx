@@ -5,7 +5,6 @@ import {
   BaseViewConfigManagerInterface,
   globalConfigAtom,
   mergeRegisteredViews,
-  QueryReturnOrUndefined,
   registeredViewsAtom,
   registeredViewsServerAtom,
   viewConfigManagerAtom,
@@ -13,10 +12,9 @@ import {
 } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
 import React from 'react';
-import { useForm, useList } from './ui-adapter';
 import { HydrateAtoms } from './ui-components';
 import { useMutationAtom } from './use-mutation';
-import { useQuery, useQueryAtom } from './use-query';
+import { useQueryAtom } from './use-query';
 
 export const ViewProvider = ({
   children,
@@ -74,28 +72,28 @@ export const ViewProvider = ({
   );
 };
 
-export const ViewDataProvider = <
-  TProps extends {
-    data: QueryReturnOrUndefined;
-    useList: typeof useList;
-  }
->(props: {
-  Component: (props: TProps) => React.ReactNode;
-  view: { viewConfigManager: BaseViewConfigManager };
-}) => {
-  const Content = () => {
-    const data = useQuery<TProps[]>();
+// export const ViewDataProvider = <
+//   TProps extends {
+//     data: QueryReturnOrUndefined;
+//     useList: typeof useList;
+//   }
+// >(props: {
+//   Component: (props: TProps) => React.ReactNode;
+//   view: { viewConfigManager: BaseViewConfigManager };
+// }) => {
+//   const Content = () => {
+//     const data = useQuery<TProps[]>();
 
-    // eslint-disable-next-line
-    // @ts-ignore
-    return <props.Component data={data} useList={useList} useForm={useForm} />;
-  };
+//     // eslint-disable-next-line
+//     // @ts-ignore
+//     return <props.Component data={data} useList={useList} useForm={useForm} />;
+//   };
 
-  const Provider = (
-    <ViewProvider view={props.view}>
-      <Content />
-    </ViewProvider>
-  );
+//   const Provider = (
+//     <ViewProvider view={props.view}>
+//       <Content />
+//     </ViewProvider>
+//   );
 
-  return Provider;
-};
+//   return Provider;
+// };

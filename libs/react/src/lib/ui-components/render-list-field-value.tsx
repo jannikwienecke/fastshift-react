@@ -1,5 +1,6 @@
-import { FieldConfig, Row, useStoreDispatch } from '@apps-next/core';
+import { FieldConfig, Row } from '@apps-next/core';
 import { FieldValue } from './render-field-value';
+import { useStoreDispatch } from '../store.ts';
 
 export const ListFieldValue = ({
   row,

@@ -1,12 +1,8 @@
-import {
-  RecordType,
-  Row,
-  useStoreDispatch,
-  useStoreValue,
-} from '@apps-next/core';
+import { RecordType, Row } from '@apps-next/core';
 import React from 'react';
 import { useMutation } from '../use-mutation';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
+import { useStoreValue, useStoreDispatch } from '../store.ts';
 
 export const useHandleSelectCombobox = () => {
   const { mutate } = useMutation();

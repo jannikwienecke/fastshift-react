@@ -1,7 +1,7 @@
 import React from 'react';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
-import { ListItem, ListProps, ListValueProps } from './list.types';
+import { ListItem, ListProps, ListValueProps } from '@apps-next/core';
 
 export function ListDefault<TItem extends ListItem = ListItem>({
   items,

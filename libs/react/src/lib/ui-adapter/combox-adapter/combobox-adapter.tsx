@@ -1,5 +1,9 @@
-import { FieldConfig, makeData, Row } from '@apps-next/core';
-import { ComboboxPopoverProps } from '@apps-next/ui';
+import {
+  ComboboxPopoverProps,
+  FieldConfig,
+  makeData,
+  Row,
+} from '@apps-next/core';
 import { useDebounce } from '@uidotdev/usehooks';
 import React, { useRef } from 'react';
 import { useQuery } from '../../use-query';

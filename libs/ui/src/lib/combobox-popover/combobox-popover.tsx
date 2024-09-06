@@ -11,8 +11,7 @@ import {
 } from '../components/command';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/popover';
 import { cn } from '../utils';
-import { ComboboxPopoverProps } from './combobox-popver.types';
-import { ComboxboxItem } from '../combobox/combobox.types';
+import { ComboxboxItem, ComboboxPopoverProps } from '@apps-next/core';
 
 export function ComboboxPopover<T extends ComboxboxItem>(
   props: ComboboxPopoverProps<T>

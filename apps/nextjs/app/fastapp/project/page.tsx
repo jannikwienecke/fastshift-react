@@ -1,10 +1,8 @@
-import {
-  prismaViewLoader,
-  QueryPrefetchProvider,
-} from '@apps-next/query-adapter';
+import { QueryPrefetchProvider } from '@apps-next/query-adapter';
 import { prisma } from '../../../db';
 import { ProjectsClient } from './projects-client';
 import { viewConfig } from './projects.config';
+import { prismaViewLoader } from '@apps-next/prisma-adapter';
 
 export const dynamic = 'force-dynamic';
 

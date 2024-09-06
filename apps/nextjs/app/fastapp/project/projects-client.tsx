@@ -1,16 +1,12 @@
 'use client';
 
+import { DataType, setClientViewConfig, ViewConfigType } from '@apps-next/core';
 import {
-  setClientViewConfig,
-  useStoreDispatch,
-  useStoreValue,
-  ViewConfigType,
-} from '@apps-next/core';
-import {
-  DataType,
   makeHooks,
   useCombobox,
   useHandleSelectCombobox,
+  useStoreDispatch,
+  useStoreValue,
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
 import { Category, Owner, Task } from '@prisma/client';
@@ -116,7 +112,7 @@ export const ProjectsClient = ({
 }: {
   viewConfig: ViewConfigType<'project'>;
 }) => {
-  const { useList, useQuery, useForm } = makeHooks<ProjectViewDataType>();
+  const { useList, useQuery } = makeHooks<ProjectViewDataType>();
 
   const { handleClose, handleSelect } = useHandleSelectCombobox();
 
@@ -136,8 +132,6 @@ export const ProjectsClient = ({
 
   // @ts-expect-error INVALID FIELD
   const INVALID = data?.[0]?.NOT_VALID_FIELD;
-
-  const getFormProps = useForm();
 
   const dispatch = useStoreDispatch();
 

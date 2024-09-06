@@ -11,8 +11,8 @@ import {
   TagsComponent,
 } from './tasks.components';
 import { TaskViewDataType } from './tasks.types';
-import { configurePrismaLoader } from '@apps-next/query-adapter';
 import type { PrismaClientType } from '../../../db';
+import { configurePrismaLoader } from '@apps-next/prisma-adapter';
 
 export const viewConfig = configurePrismaLoader(
   createViewConfig('task', {

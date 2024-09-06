@@ -1,20 +1,16 @@
 import {
   getViewConfigAtom,
+  ListGetProps,
+  ListItem,
+  ListProps,
   RecordType,
   Row,
-  useStoreDispatch,
-  useStoreValue,
 } from '@apps-next/core';
-import { ListItem, ListProps } from '@apps-next/ui';
 import { useAtomValue } from 'jotai';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
 import { useQueryData } from '../../use-query-data';
-
-type ListGetProps<T> = {
-  fieldsLeft: (keyof T)[];
-  fieldsRight: (keyof T)[];
-};
+import { useStoreDispatch, useStoreValue } from '../../store.ts';
 
 export const useList = <T extends RecordType>() => {
   const dispatch = useStoreDispatch();

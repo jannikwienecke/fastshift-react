@@ -1,6 +1,6 @@
-import { createConfigFromPrismaSchema } from '@apps-next/query-adapter';
 import { Prisma } from '@prisma/client';
 import { PrismaClientType } from '../db';
+import { createConfigFromPrismaSchema } from '@apps-next/prisma-adapter';
 
 export const globalConfig = createConfigFromPrismaSchema<PrismaClientType>(
   Prisma.dmmf.datamodel,

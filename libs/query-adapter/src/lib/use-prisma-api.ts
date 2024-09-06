@@ -1,8 +1,8 @@
 import React from 'react';
-import { PrismaContext } from './_internal/prisma-context';
+import { QueryContext } from './query-context';
 
 export const usePrismaApi = () => {
-  const prismaContext = React.useContext(PrismaContext);
+  const prismaContext = React.useContext(QueryContext);
 
   if (!prismaContext.provider) {
     throw new Error('ConvexContext not found');

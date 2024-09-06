@@ -1,0 +1,124 @@
+'use client';
+
+import {
+  ApiClientType,
+  BaseConfigInterface,
+  clientConfigStore,
+  globalConfigAtom,
+  RegisteredViews,
+  registeredViewsAtom,
+  registeredViewsServerAtom,
+  registeredViewsServerStore,
+  registeredViewsStore,
+} from '@apps-next/core';
+import { useMutationAtom, useQueryAtom } from '@apps-next/react';
+import {
+  isServer,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+import { Provider } from 'jotai';
+import { useHydrateAtoms } from 'jotai/utils';
+import React from 'react';
+import { usePrismaMutation } from './use-prisma-mutation';
+import { usePrismaQuery } from './use-prisma-query';
+import { QueryContext } from './query-context';
+
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        // With SSR, we usually want to set some default staleTime
+        // above 0 to avoid refetching immediately on the client
+        staleTime: 60 * 1000,
+      },
+    },
+  });
+}
+
+let browserQueryClient: QueryClient | undefined = undefined;
+
+function getQueryClient() {
+  if (isServer) {
+    // Server: always make a new query client
+    return makeQueryClient();
+  } else {
+    // Browser: make a new query client if we don't already have one
+    // This is very important, so we don't re-make a new client if React
+    // suspends during the initial render. This may not be needed if we
+    // have a suspense boundary BELOW the creation of the query client
+    if (!browserQueryClient) browserQueryClient = makeQueryClient();
+    return browserQueryClient;
+  }
+}
+
+export const queryClient = getQueryClient();
+
+export function QueryProvider({
+  children,
+  api,
+  config,
+  registeredViews,
+}: {
+  children: React.ReactNode;
+  api: ApiClientType;
+  config: BaseConfigInterface;
+  registeredViews?: RegisteredViews;
+}) {
+  const registeredServer = registeredViewsServerStore.get(
+    registeredViewsServerAtom
+  );
+  const registeredClient = registeredViewsStore.get(registeredViewsAtom);
+
+  const registered = registeredServer ?? registeredViews ?? registeredClient;
+
+  return (
+    <Provider store={clientConfigStore}>
+      <HydrateAtoms
+        key={'global-config'}
+        initialValues={[
+          [globalConfigAtom, config],
+          [useQueryAtom, () => usePrismaQuery],
+          [useMutationAtom, () => usePrismaMutation],
+          [
+            registeredViewsServerAtom,
+            {
+              ...config.defaultViewConfigs,
+              ...registered,
+            },
+          ],
+        ]}
+      >
+        <QueryContext.Provider
+          value={{
+            prisma: {
+              ...api,
+              viewMutation(props) {
+                return api.viewMutation({
+                  ...props,
+                  mutation: {
+                    ...props.mutation,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    handler: undefined,
+                  },
+                });
+              },
+            },
+            config: config,
+            provider: 'prisma',
+          }}
+        >
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        </QueryContext.Provider>
+      </HydrateAtoms>
+    </Provider>
+  );
+}
+
+const HydrateAtoms = ({ initialValues, children }: any) => {
+  useHydrateAtoms(initialValues, { dangerouslyForceHydrate: true });
+  return children;
+};

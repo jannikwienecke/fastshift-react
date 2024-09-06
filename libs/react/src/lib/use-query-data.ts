@@ -1,13 +1,8 @@
-import {
-  QueryStore,
-  queryStoreAtom,
-  RecordType,
-  updateQueryDataAtom,
-  viewConfigManagerAtom,
-} from '@apps-next/core';
+import { RecordType, viewConfigManagerAtom } from '@apps-next/core';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { useQuery } from './use-query';
+import { QueryStore, queryStoreAtom, updateQueryDataAtom } from './query-store';
 
 export const useQueryData = <
   QueryReturnType extends RecordType[]

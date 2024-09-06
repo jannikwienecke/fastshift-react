@@ -1,17 +1,14 @@
 'use client';
 import { viewConfig } from './tasks.config';
 
+import { BaseViewConfigManager } from '@apps-next/core';
 import {
-  BaseViewConfigManager,
-  useStoreDispatch,
-  useStoreValue,
-} from '@apps-next/core';
-import {
-  ComboboxFieldValue,
   makeHooks,
   QueryInput,
   useCombobox,
   useHandleSelectCombobox,
+  useStoreDispatch,
+  useStoreValue,
   ViewProvider,
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
@@ -32,8 +29,7 @@ export default function FastAppTasksPage() {
 }
 
 const TaskContent = () => {
-  const { useList, useQuery, useForm, useQueryData } =
-    makeHooks<TaskViewDataType>();
+  const { useList, useQuery, useQueryData, xx } = makeHooks<TaskViewDataType>();
 
   const { handleSelect, handleClose } = useHandleSelectCombobox();
 
@@ -47,8 +43,6 @@ const TaskContent = () => {
 
   // @ts-expect-error INVALID FIELD
   const INVALID = data?.[0]?.NOT_VALID_FIELD;
-
-  const getFormProps = useForm();
 
   const dispatch = useStoreDispatch();
 
