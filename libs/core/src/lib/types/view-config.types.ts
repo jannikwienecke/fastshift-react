@@ -41,8 +41,3 @@ export type ViewConfigType<T extends GetTableName = any> =
 export type RegisteredViews = Partial<{
   [key: string]: ViewConfigType;
 }>;
-
-export type ViewContextType = {
-  viewConfigManager: BaseViewConfigManagerInterface;
-  registeredViews: RegisteredViews;
-};

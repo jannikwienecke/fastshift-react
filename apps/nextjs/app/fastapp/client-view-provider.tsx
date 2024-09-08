@@ -1,23 +1,19 @@
 'use client';
 
-import { ViewConfigType } from '@apps-next/core';
-import { QueryProviderAnother } from '@apps-next/react';
-import { DehydratedState, HydrationBoundary } from '@tanstack/react-query';
+import {
+  ApiClientType,
+  BaseConfigInterface,
+  RegisteredViews,
+  ViewConfigType,
+} from '@apps-next/core';
+import { QueryProvider } from '@apps-next/react';
 
-export const ClientViewProvider = ({
-  viewConfig,
-  queryClientState,
-  children,
-}: {
+export const ClientViewProvider = (props: {
   viewConfig: ViewConfigType;
   children: React.ReactNode;
-  queryClientState: DehydratedState;
+  api: ApiClientType;
+  globalConfig: BaseConfigInterface;
+  views: RegisteredViews;
 }) => {
-  return (
-    <HydrationBoundary state={queryClientState}>
-      <QueryProviderAnother viewConfig={viewConfig} includeConfig={{}}>
-        {children}
-      </QueryProviderAnother>
-    </HydrationBoundary>
-  );
+  return <QueryProvider {...props} includeConfig={{}} />;
 };

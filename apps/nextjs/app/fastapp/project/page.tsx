@@ -1,21 +1,14 @@
-import { dehydrate } from '@tanstack/react-query';
-import { ClientViewProvider } from '../client-view-provider';
-import { prefetchView } from '../prefetch';
+import { ServerViewProvider } from '../server-view-provider';
 import { ProjectsClient } from './projects-client';
 import { viewConfig } from './projects.config';
 
 export const dynamic = 'force-dynamic';
 
-export default async function FastAppTasksPage() {
-  const queryClient = await prefetchView(viewConfig);
-
+export default async function FastAppProjectPage() {
   return (
-    <ClientViewProvider
-      queryClientState={dehydrate(queryClient)}
-      viewConfig={viewConfig}
-    >
+    <ServerViewProvider viewConfig={viewConfig}>
       <ProjectsClient />
-    </ClientViewProvider>
+    </ServerViewProvider>
   );
 }
 

@@ -53,6 +53,7 @@ export const createConfigFromPrismaSchema = <
     defaultViewConfigs: {},
   };
 
+  console.log('GENERATE DEFAULT CONFIGS');
   const defaultViewConfigs = generateDefaultViewConfigs({
     tableNames: tableNames as string[],
     dataModel: Prisma as any as Prisma['dmmf']['datamodel'],

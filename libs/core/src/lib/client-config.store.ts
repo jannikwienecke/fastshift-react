@@ -7,6 +7,7 @@ import {
   GetTableName,
   RecordType,
   RegisteredRouter,
+  RegisteredViews,
   ViewConfigType,
 } from './types';
 import { viewConfigManagerAtom } from './view-config.store';
@@ -59,15 +60,7 @@ export const clientConfigAtom = atom((get) => {
 });
 
 export const clientConfigStore: AtomStore = createStore();
-export const registeredViewsStore: AtomStore = createStore();
 export const registeredViewsServerStore: AtomStore = createStore();
-
-export const registerView = (viewName: string, viewConfig: ViewConfigType) => {
-  registeredViewsStore.set(registeredViewsAtom, (prev: any) => ({
-    ...prev,
-    [viewName]: viewConfig,
-  }));
-};
 
 export const registerViewServer = (
   viewName: string,
@@ -77,4 +70,12 @@ export const registerViewServer = (
     ...prev,
     [viewName]: viewConfig,
   }));
+};
+
+export const getViews = (): RegisteredViews => {
+  const registeredViews = registeredViewsServerStore.get(
+    registeredViewsServerAtom
+  );
+
+  return registeredViews;
 };

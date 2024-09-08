@@ -3,103 +3,120 @@
 import {
   ApiClientType,
   BaseConfigInterface,
+  BaseViewConfigManager,
+  BaseViewConfigManagerInterface,
   clientConfigStore,
+  DataModelNew,
   globalConfigAtom,
-  registeredViewsServerAtom,
+  IncludeConfig,
+  makeData,
+  makeQueryKey,
+  QueryReturnOrUndefined,
+  RecordType,
+  RegisteredViews,
+  registeredViewsAtom,
+  viewConfigManagerAtom,
 } from '@apps-next/core';
-import {
-  isServer,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+
+import { useQueryClient } from '@tanstack/react-query';
 import { Provider } from 'jotai';
-import { useHydrateAtoms } from 'jotai/utils';
 import React from 'react';
 import { QueryContext } from './query-context';
+import { QueryStore, queryStoreAtom } from './query-store';
+import { HydrateAtoms } from './ui-components';
 
-function makeQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        // With SSR, we usually want to set some default staleTime
-        // above 0 to avoid refetching immediately on the client
-        staleTime: 60 * 1000,
-      },
+// used in apps like nextjs when prefetching data and creating
+// the view config in the server.
+// Used together with QueryPrefetchProvider
+export const QueryProvider = (
+  props: {
+    viewConfig: BaseViewConfigManagerInterface['viewConfig'];
+    api: ApiClientType;
+    includeConfig: IncludeConfig;
+    globalConfig: BaseConfigInterface;
+    views: RegisteredViews;
+  } & { children: React.ReactNode }
+) => {
+  const api = props.api;
+
+  const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
+
+  const registeredViews = props.globalConfig.defaultViewConfigs;
+  const queryClient = useQueryClient();
+  const data = queryClient.getQueryData(
+    makeQueryKey({
+      viewName: viewConfigManager.getViewName(),
+    })
+  ) as QueryReturnOrUndefined;
+
+  const dataModel = makeData(
+    registeredViews,
+    viewConfigManager.getViewName()
+  )(data?.data ?? []);
+
+  const relationalDataModel = Object.entries(data?.relationalData ?? {}).reduce(
+    (acc, [tableName, data]) => {
+      const viewConfig = registeredViews[tableName];
+      acc[tableName] = makeData(registeredViews, viewConfig?.tableName)(data);
+      return acc;
     },
-  });
-}
+    {} as { [key: string]: DataModelNew<RecordType> }
+  );
 
-let browserQueryClient: QueryClient | undefined = undefined;
+  const queryStore: QueryStore<RecordType> = {
+    dataModel,
+    relationalDataModel,
+    loading: false,
+    error: null,
+    page: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+    isInitialized: true,
+    viewName: viewConfigManager.getViewName(),
+  };
 
-function getQueryClient() {
-  if (isServer) {
-    // Server: always make a new query client
-    return makeQueryClient();
-  } else {
-    // Browser: make a new query client if we don't already have one
-    // This is very important, so we don't re-make a new client if React
-    // suspends during the initial render. This may not be needed if we
-    // have a suspense boundary BELOW the creation of the query client
-    if (!browserQueryClient) browserQueryClient = makeQueryClient();
-    return browserQueryClient;
-  }
-}
+  const initialValues = [
+    [viewConfigManagerAtom, viewConfigManager],
+    [
+      registeredViewsAtom,
+      {
+        ...props.globalConfig.defaultViewConfigs,
+        ...props.views,
+      },
+    ],
+    [globalConfigAtom, props.globalConfig],
+    [queryStoreAtom, queryStore],
+  ];
 
-export const queryClient = getQueryClient();
-
-export function QueryProvider({
-  children,
-  api,
-  config,
-}: {
-  children: React.ReactNode;
-  api: ApiClientType;
-  config: BaseConfigInterface;
-}) {
   return (
     <Provider store={clientConfigStore}>
-      <HydrateAtoms
-        key={'global-config'}
-        initialValues={[
-          [globalConfigAtom, config],
-          [
-            registeredViewsServerAtom,
-            {
-              ...config.defaultViewConfigs,
+      <QueryContext.Provider
+        value={{
+          prisma: {
+            ...props.api,
+            viewMutation(props) {
+              return api.viewMutation({
+                ...props,
+                mutation: {
+                  ...props.mutation,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  handler: undefined,
+                },
+              });
             },
-          ],
-        ]}
+          },
+          config: props.globalConfig,
+          provider: 'default',
+        }}
       >
-        <QueryContext.Provider
-          value={{
-            prisma: {
-              ...api,
-              viewMutation(props) {
-                return api.viewMutation({
-                  ...props,
-                  mutation: {
-                    ...props.mutation,
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    handler: undefined,
-                  },
-                });
-              },
-            },
-            config: config,
-            provider: 'prisma',
-          }}
+        <HydrateAtoms
+          key={viewConfigManager.getViewName()}
+          initialValues={initialValues}
         >
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
-        </QueryContext.Provider>
-      </HydrateAtoms>
+          {props.children}
+        </HydrateAtoms>
+      </QueryContext.Provider>
     </Provider>
   );
-}
-
-const HydrateAtoms = ({ initialValues, children }: any) => {
-  useHydrateAtoms(initialValues, { dangerouslyForceHydrate: true });
-  return children;
 };

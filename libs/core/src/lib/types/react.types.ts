@@ -1,5 +1,4 @@
-import { createView } from '../create-view';
-import { GetTableDataType, GetTableName, RegisteredRouter } from './base.types';
+import { GetTableDataType, GetTableName } from './base.types';
 import { ViewConfigType } from './view-config.types';
 
 export type DataType<
@@ -9,9 +8,9 @@ export type DataType<
   ? GetTableDataType<T>
   : TCustomDataType & GetTableDataType<T>;
 
-export type GetViewProps<
-  T extends keyof RegisteredRouter['config']['_datamodel']
-> = Parameters<Parameters<typeof createView<T>>[2]>[0];
+// export type GetViewProps<
+//   T extends keyof RegisteredRouter['config']['_datamodel']
+// > = Parameters<Parameters<typeof createView<T>>[2]>[0];
 
 export type DataTypeToUse<T extends DataType<any, any>> =
   T extends ViewConfigType ? GetTableDataType<T['tableName']> : T;

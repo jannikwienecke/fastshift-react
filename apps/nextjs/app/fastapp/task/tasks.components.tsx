@@ -1,3 +1,5 @@
+'use client';
+
 import { useViewOf } from '@apps-next/react';
 import { Bubble, Icon } from '@apps-next/ui';
 import { TaskViewDataType } from './tasks.types';
