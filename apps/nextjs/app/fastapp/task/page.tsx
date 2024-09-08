@@ -29,7 +29,7 @@ export default function FastAppTasksPage() {
 }
 
 const TaskContent = () => {
-  const { useList, useQuery, useQueryData, xx } = makeHooks<TaskViewDataType>();
+  const { useList, useQuery, useQueryData } = makeHooks<TaskViewDataType>();
 
   const { handleSelect, handleClose } = useHandleSelectCombobox();
 

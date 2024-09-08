@@ -1,34 +1,97 @@
 import {
+  lldebug,
   llinfo,
+  makeQueryKey,
   Mutation,
   MutationReturnDto,
-  MutationReturnType,
 } from '@apps-next/core';
-import { atom, useAtomValue } from 'jotai';
+import {
+  useMutation as useMutationTanstack,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import React from 'react';
-import { debouncedQueryAtom } from './ui-components';
-import { useView } from './use-view';
-
-type UseMutationAdapter = () => MutationReturnType;
-
-export const useMutationAtom = atom<UseMutationAdapter>(
-  {} as UseMutationAdapter
-);
+import { debouncedQueryAtom, useView } from '..';
+import { useApi } from './use-api';
 
 export const useMutation = () => {
   const { viewConfigManager } = useView();
   const query = useAtomValue(debouncedQueryAtom);
+  const api = useApi();
+  const queryClient = useQueryClient();
 
-  const useMutationAdapter = useAtomValue(
-    useMutationAtom
-  ) as UseMutationAdapter;
-  const mutation = useMutationAdapter();
+  const lastViewName = React.useRef('');
 
-  const { mutate, mutateAsync } = mutation;
+  const { mutate, isPending, mutateAsync } = useMutationTanstack({
+    mutationFn: api.viewMutation,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+    onError: (error, variables, context) => {
+      const { previousState, previousStateAll } = (context as any) || {};
+
+      const queryKey = makeQueryKey({
+        viewName: lastViewName.current,
+        query: variables.query,
+      });
+
+      const queryKeyAll = makeQueryKey({
+        viewName: lastViewName.current,
+        query: variables.query,
+      });
+
+      queryClient.setQueryData(queryKey, previousState);
+      queryClient.setQueryData(queryKeyAll, previousStateAll);
+    },
+    onMutate: async (vars) => {
+      lastViewName.current = vars.viewConfig.viewName;
+
+      const queryKey = makeQueryKey({
+        viewName: vars.viewConfig.viewName,
+        query: vars.query,
+      });
+
+      const queryKeyAll = makeQueryKey({
+        viewName: vars.viewConfig.viewName,
+      });
+
+      await queryClient.cancelQueries({
+        queryKey: queryKey,
+      });
+
+      await queryClient.cancelQueries({
+        queryKey: queryKeyAll,
+      });
+
+      const previousState = queryClient.getQueryData(queryKey);
+      const previousStateAll = queryClient.getQueryData(queryKeyAll);
+
+      if ('handler' in vars.mutation) {
+        const newState = vars.mutation.handler?.(
+          (previousState as any).data || []
+        );
+
+        queryClient.setQueryData(queryKey, {
+          data: newState,
+        });
+
+        queryClient.setQueryData(queryKeyAll, {
+          data: newState,
+        });
+
+        return {
+          previousState,
+          previousStateAll,
+        };
+      } else {
+        return previousState;
+      }
+    },
+  });
 
   const runMutateAsync = React.useCallback(
     async (args: { mutation: Mutation }): Promise<MutationReturnDto> => {
-      llinfo('DISPATCH MUTATION2', args.mutation);
+      lldebug('DISPATCH MUTATION2', args.mutation);
       try {
         return await mutateAsync({
           viewConfig: viewConfigManager.viewConfig,
@@ -46,7 +109,7 @@ export const useMutation = () => {
 
   const runMutate = React.useCallback(
     (args: { mutation: Mutation }) => {
-      llinfo('DISPATCH MUTATION: ', args.mutation);
+      lldebug('DISPATCH MUTATION: ', args.mutation);
       return mutate({
         viewConfig: viewConfigManager.viewConfig,
         mutation: args.mutation,
@@ -57,8 +120,10 @@ export const useMutation = () => {
   );
 
   return {
-    ...{},
-    mutateAsync: runMutateAsync,
-    mutate: runMutate,
+    mutateAsync,
+    mutate,
+    isPending,
+    runMutateAsync,
+    runMutate,
   };
 };

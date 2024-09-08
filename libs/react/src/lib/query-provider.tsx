@@ -5,13 +5,8 @@ import {
   BaseConfigInterface,
   clientConfigStore,
   globalConfigAtom,
-  RegisteredViews,
-  registeredViewsAtom,
   registeredViewsServerAtom,
-  registeredViewsServerStore,
-  registeredViewsStore,
 } from '@apps-next/core';
-import { useMutationAtom, useQueryAtom } from '@apps-next/react';
 import {
   isServer,
   QueryClient,
@@ -20,8 +15,6 @@ import {
 import { Provider } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import React from 'react';
-import { usePrismaMutation } from './use-prisma-mutation';
-import { usePrismaQuery } from './use-prisma-query';
 import { QueryContext } from './query-context';
 
 function makeQueryClient() {
@@ -58,33 +51,21 @@ export function QueryProvider({
   children,
   api,
   config,
-  registeredViews,
 }: {
   children: React.ReactNode;
   api: ApiClientType;
   config: BaseConfigInterface;
-  registeredViews?: RegisteredViews;
 }) {
-  const registeredServer = registeredViewsServerStore.get(
-    registeredViewsServerAtom
-  );
-  const registeredClient = registeredViewsStore.get(registeredViewsAtom);
-
-  const registered = registeredServer ?? registeredViews ?? registeredClient;
-
   return (
     <Provider store={clientConfigStore}>
       <HydrateAtoms
         key={'global-config'}
         initialValues={[
           [globalConfigAtom, config],
-          [useQueryAtom, () => usePrismaQuery],
-          [useMutationAtom, () => usePrismaMutation],
           [
             registeredViewsServerAtom,
             {
               ...config.defaultViewConfigs,
-              ...registered,
             },
           ],
         ]}

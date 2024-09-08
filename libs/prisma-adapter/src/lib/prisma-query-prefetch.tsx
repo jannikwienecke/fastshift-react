@@ -6,12 +6,11 @@ import {
   registeredViewsServerAtom,
   registeredViewsServerStore,
 } from '@apps-next/core';
+
 import { QueryClient } from '@tanstack/react-query';
-
 import React from 'react';
-// import { ClientProvider } from './client-provider';
 
-export async function QueryPrefetchProvider({
+export async function prefetchViewQuery({
   children,
   viewLoader,
   viewConfig,
@@ -33,13 +32,14 @@ export async function QueryPrefetchProvider({
   const queryKey = makeQueryKey({
     viewName,
   });
+
   const queryData = queryClient.getQueryData(queryKey);
 
   if (!queryData) {
     await queryClient.prefetchQuery({
       queryKey,
 
-      queryFn: async (context) => {
+      queryFn: async (context: any) => {
         const res = await viewLoader({
           registeredViews: registeredViewsServer,
           modelConfig: {
@@ -57,18 +57,5 @@ export async function QueryPrefetchProvider({
     });
   }
 
-  return (
-    // <ServerSideConfigProvider
-    //   registeredViews={registeredViewsServer}
-    //   viewConfig={viewConfigManager.viewConfig}
-    //   includeConfig={{}}
-    //   {...(queryClient.getQueryData(queryKey) as QueryReturnDto)}
-    // >
-    //   <HydrationBoundary state={dehydrate(queryClient)}>
-    //     {children}
-    //   </HydrationBoundary>
-    // </ServerSideConfigProvider>
-    // <ClientProvider queryClient={queryClient}>{children}</ClientProvider>
-    <>{children}</>
-  );
+  return queryClient;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { QueryContext } from './query-context';
 
-export const usePrismaApi = () => {
+export const useApi = () => {
   const prismaContext = React.useContext(QueryContext);
 
   if (!prismaContext.provider) {

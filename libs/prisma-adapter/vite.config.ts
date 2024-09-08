@@ -40,17 +40,18 @@ export default defineConfig({
       transformMixedEsModules: true,
     },
     lib: {
-      // Could also be a dictionary or array of multiple entry points.
-      entry: 'src/index.ts',
-      name: 'prisma-adapter',
-      fileName: 'index',
-      // Change this to the formats you want to support.
-      // Don't forget to update your package.json as well.
+      entry: {
+        index: 'src/index.ts',
+      },
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      // External packages that should not be bundled into your library.
       external: ['react', 'react-dom', 'react/jsx-runtime'],
+      output: {
+        entryFileNames: (chunkInfo) => {
+          return `${chunkInfo.name}/index.[format].js`;
+        },
+      },
     },
   },
 

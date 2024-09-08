@@ -26,6 +26,7 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
     searchableFields,
     viewFields,
     dataModel: schema,
+    defaultViewConfigs: {},
     tableNames: Object.keys(schema.tables) as any as keyof T['tables'],
   };
 

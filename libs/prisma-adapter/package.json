@@ -1,13 +1,24 @@
 {
   "name": "@apps-next/prisma-adapter",
-  "version": "0.0.25",
-  "main": "./index.js",
+  "version": "0.0.34",
+  "main": "./index.cjs.js",
+  "module": "./index.es.js",
   "types": "./index.d.ts",
   "exports": {
     ".": {
-      "import": "./index.mjs",
-      "require": "./index.js",
+      "import": "./index.es.js",
+      "require": "./index.cjs.js",
       "types": "./index.d.ts"
+    },
+    "./client": {
+      "import": "./client/index.es.js",
+      "require": "./client/index.cjs.js",
+      "types": "./client/index.d.ts"
+    },
+    "./server": {
+      "import": "./server/index.es.js",
+      "require": "./server/index.cjs.js",
+      "types": "./server/index.d.ts"
     }
   },
   "dependencies": {

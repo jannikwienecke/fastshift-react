@@ -8,26 +8,19 @@ import {
   globalConfigAtom,
   IncludeConfig,
   makeData,
-  QueryReturnDto,
+  makeQueryKey,
+  QueryReturnOrUndefined,
   RecordType,
-  RegisteredViews,
   registeredViewsAtom,
-  registeredViewsStore,
   viewConfigManagerAtom,
   ViewContextType,
 } from '@apps-next/core';
+
 import { Provider, useAtomValue } from 'jotai';
-import {
-  HydrateAtoms,
-  queryDataAtom,
-  QueryStore,
-  queryStoreAtom,
-  useMutationAtom,
-  useQueryAtom,
-} from '@apps-next/react';
 import React from 'react';
-import { usePrismaQuery } from './use-prisma-query';
-import { usePrismaMutation } from './use-prisma-mutation';
+import { useQueryClient } from '@tanstack/react-query';
+import { QueryStore, queryStoreAtom } from './query-store';
+import { HydrateAtoms } from './ui-components';
 
 export const ServerSideConfigContext = React.createContext<ViewContextType>(
   {} as ViewContextType
@@ -36,35 +29,38 @@ export const ServerSideConfigContext = React.createContext<ViewContextType>(
 // used in apps like nextjs when prefetching data and creating
 // the view config in the server.
 // Used together with QueryPrefetchProvider
-export const ServerSideConfigProvider = (
+export const QueryProviderAnother = (
   props: {
     viewConfig: BaseViewConfigManagerInterface['viewConfig'];
-    registeredViews: RegisteredViews;
     includeConfig: IncludeConfig;
-    data: QueryReturnDto['data'];
-    relationalData?: QueryReturnDto['relationalData'];
   } & { children: React.ReactNode }
 ) => {
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
 
   const globalConfig = useAtomValue(globalConfigAtom);
-  const registeredViewsClient = registeredViewsStore.get(registeredViewsAtom);
+  const registeredViews = globalConfig.defaultViewConfigs;
+
+  const queryClient = useQueryClient();
+
+  const data = queryClient.getQueryData(
+    makeQueryKey({
+      viewName: viewConfigManager.getViewName(),
+    })
+  ) as QueryReturnOrUndefined;
 
   const dataModel = makeData(
-    props.registeredViews,
+    registeredViews,
     viewConfigManager.getViewName()
-  )(props.data ?? []);
+  )(data?.data ?? []);
 
-  const relationalDataModel = Object.entries(
-    props?.relationalData ?? {}
-  ).reduce((acc, [tableName, data]) => {
-    const viewConfig = props.registeredViews[tableName];
-    acc[tableName] = makeData(
-      props.registeredViews,
-      viewConfig?.tableName
-    )(data);
-    return acc;
-  }, {} as { [key: string]: DataModelNew<RecordType> });
+  const relationalDataModel = Object.entries(data?.relationalData ?? {}).reduce(
+    (acc, [tableName, data]) => {
+      const viewConfig = registeredViews[tableName];
+      acc[tableName] = makeData(registeredViews, viewConfig?.tableName)(data);
+      return acc;
+    },
+    {} as { [key: string]: DataModelNew<RecordType> }
+  );
 
   const queryStore: QueryStore<RecordType> = {
     dataModel,
@@ -78,28 +74,11 @@ export const ServerSideConfigProvider = (
     viewName: viewConfigManager.getViewName(),
   };
 
-  const combinedRegisteredViews = React.useMemo(() => {
-    return {
-      ...props.registeredViews,
-      ...registeredViewsClient,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.registeredViews]);
-
   const initialValues = [
     [viewConfigManagerAtom, viewConfigManager],
-    [registeredViewsAtom, combinedRegisteredViews],
+    [registeredViewsAtom, globalConfig.defaultViewConfigs],
     [globalConfigAtom, globalConfig],
     [queryStoreAtom, queryStore],
-    [useQueryAtom, () => usePrismaQuery],
-    [useMutationAtom, () => usePrismaMutation],
-    [
-      queryDataAtom,
-      {
-        data: props.data,
-        relationalData: props.relationalData,
-      },
-    ],
   ];
 
   return (
@@ -111,7 +90,7 @@ export const ServerSideConfigProvider = (
         <ServerSideConfigContext.Provider
           value={{
             viewConfigManager,
-            registeredViews: props.registeredViews,
+            registeredViews,
           }}
         >
           {props.children}

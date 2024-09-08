@@ -1,18 +1,20 @@
-import { QueryPrefetchProvider } from '@apps-next/query-adapter';
-import { prisma } from '../../../db';
+import { dehydrate } from '@tanstack/react-query';
+import { ClientViewProvider } from '../client-view-provider';
+import { prefetchView } from '../prefetch';
 import { CategoriesClient } from './categories-client';
 import { viewConfig } from './categories.config';
-import { prismaViewLoader } from '@apps-next/prisma-adapter';
 
 export const dynamic = 'force-dynamic';
 
-export default function FastAppCategoriesPage() {
+export default async function FastAppCategoriesPage() {
+  const queryClient = await prefetchView(viewConfig);
+
   return (
-    <QueryPrefetchProvider
+    <ClientViewProvider
+      queryClientState={dehydrate(queryClient)}
       viewConfig={viewConfig}
-      viewLoader={(props) => prismaViewLoader(prisma, props)}
     >
-      <CategoriesClient viewConfig={viewConfig} />
-    </QueryPrefetchProvider>
+      <CategoriesClient />
+    </ClientViewProvider>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { DataType, setClientViewConfig, ViewConfigType } from '@apps-next/core';
+import { DataType, setClientViewConfig } from '@apps-next/core';
 import {
   makeHooks,
   useCombobox,
@@ -107,11 +107,7 @@ setClientViewConfig<ProjectViewDataType>('project', {
   },
 });
 
-export const ProjectsClient = ({
-  viewConfig,
-}: {
-  viewConfig: ViewConfigType<'project'>;
-}) => {
+export const ProjectsClient = () => {
   const { useList, useQuery } = makeHooks<ProjectViewDataType>();
 
   const { handleClose, handleSelect } = useHandleSelectCombobox();

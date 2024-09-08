@@ -11,8 +11,13 @@ export const invarant = (condition: boolean, message: string) => {
   throw new Error(label);
 };
 
-export const waitFor = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+export const waitFor = (ms: number) => {
+  if (process.env.NODE_ENV === 'development') {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  return Promise.resolve();
+};
 
 export const makeQueryKey = ({
   viewName,

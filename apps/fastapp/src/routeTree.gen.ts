@@ -11,31 +11,13 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as FastAppImport } from './routes/fastApp'
 import { Route as IndexImport } from './routes/index'
-import { Route as FastAppTasksImport } from './routes/fastApp.tasks'
-import { Route as FastAppProjectsImport } from './routes/fastApp.projects'
 
 // Create/Update Routes
-
-const FastAppRoute = FastAppImport.update({
-  path: '/fastApp',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
-} as any)
-
-const FastAppTasksRoute = FastAppTasksImport.update({
-  path: '/tasks',
-  getParentRoute: () => FastAppRoute,
-} as any)
-
-const FastAppProjectsRoute = FastAppProjectsImport.update({
-  path: '/projects',
-  getParentRoute: () => FastAppRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -49,39 +31,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/fastApp': {
-      id: '/fastApp'
-      path: '/fastApp'
-      fullPath: '/fastApp'
-      preLoaderRoute: typeof FastAppImport
-      parentRoute: typeof rootRoute
-    }
-    '/fastApp/projects': {
-      id: '/fastApp/projects'
-      path: '/projects'
-      fullPath: '/fastApp/projects'
-      preLoaderRoute: typeof FastAppProjectsImport
-      parentRoute: typeof FastAppImport
-    }
-    '/fastApp/tasks': {
-      id: '/fastApp/tasks'
-      path: '/tasks'
-      fullPath: '/fastApp/tasks'
-      preLoaderRoute: typeof FastAppTasksImport
-      parentRoute: typeof FastAppImport
-    }
   }
 }
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({
-  IndexRoute,
-  FastAppRoute: FastAppRoute.addChildren({
-    FastAppProjectsRoute,
-    FastAppTasksRoute,
-  }),
-})
+export const routeTree = rootRoute.addChildren({ IndexRoute })
 
 /* prettier-ignore-end */
 
@@ -91,27 +46,11 @@ export const routeTree = rootRoute.addChildren({
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/fastApp"
+        "/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/fastApp": {
-      "filePath": "fastApp.tsx",
-      "children": [
-        "/fastApp/projects",
-        "/fastApp/tasks"
-      ]
-    },
-    "/fastApp/projects": {
-      "filePath": "fastApp.projects.tsx",
-      "parent": "/fastApp"
-    },
-    "/fastApp/tasks": {
-      "filePath": "fastApp.tasks.tsx",
-      "parent": "/fastApp"
     }
   }
 }

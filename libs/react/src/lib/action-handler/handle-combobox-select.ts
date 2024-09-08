@@ -1,11 +1,11 @@
 import { RecordType, Row } from '@apps-next/core';
 import React from 'react';
-import { useMutation } from '../use-mutation';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
 import { useStoreValue, useStoreDispatch } from '../store.ts';
+import { useMutation } from '../use-mutation';
 
 export const useHandleSelectCombobox = () => {
-  const { mutate } = useMutation();
+  const { runMutate } = useMutation();
 
   const { list } = useStoreValue();
 
@@ -30,7 +30,7 @@ export const useHandleSelectCombobox = () => {
         selected: list?.focusedRelationField?.selected ?? [],
       });
 
-      mutate({
+      runMutate({
         mutation: mutation,
       });
     } else {
@@ -66,7 +66,7 @@ export const useHandleSelectCombobox = () => {
 
           const valueToUpdate =
             !field.relation && !field.enum ? value.raw : value.id;
-          mutate({
+          runMutate({
             mutation: {
               type: 'UPDATE_RECORD',
               handler: (items) => {

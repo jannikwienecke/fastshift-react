@@ -1,53 +1,89 @@
 'use client';
 
 import {
+  makeQueryKey,
+  QueryDto,
   QueryProps,
+  QueryReturnDto,
   QueryReturnOrUndefined,
   RecordType,
 } from '@apps-next/core';
-import { atom, useAtomValue } from 'jotai';
+import { useQuery as useTanstackQuery } from '@tanstack/react-query';
 import React from 'react';
+import { useApi } from './use-api';
+import { useAtomValue } from 'jotai';
 import { debouncedQueryAtom } from './ui-components';
 import { useView } from './use-view';
 
-export const queryDataAtom = atom<QueryReturnOrUndefined<RecordType>>({
-  data: [],
-  relationalData: {},
-  isLoading: false,
-  isError: false,
-  error: undefined,
-  isFetching: false,
-  isFetched: false,
-  refetch: () => null,
-} as QueryReturnOrUndefined<RecordType>);
+export const useStableQuery = (
+  fn: () => Promise<QueryReturnDto>,
+  args: QueryDto
+) => {
+  const result = useTanstackQuery({
+    queryKey: makeQueryKey({
+      viewName: args.viewConfig?.viewName,
+      query: args.query,
+      relation: args.relationQuery?.tableName,
+    }),
+    queryFn: fn,
+    enabled: args.disabled === true ? false : true,
+  });
 
-export const queryPropsAtom = atom<{
-  [queryKey: string]: Partial<QueryProps>;
-}>({});
+  const stored = React.useRef(result as any);
 
-export const useQueryAtom = atom<typeof useQuery>();
+  if (result.data !== undefined) {
+    stored.current = result;
+  } else {
+    stored.current = {
+      ...result,
+      data: stored.current?.data,
+    };
+  }
+
+  return stored.current;
+};
 
 export const useQuery = <QueryReturnType extends RecordType[]>(
   queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
-  const useQueryAdapter = useAtomValue(useQueryAtom) as typeof useQuery;
+  const prisma = useApi();
 
   const { viewConfigManager, registeredViews } = useView();
   const query = useAtomValue(debouncedQueryAtom);
 
-  const resturnData = useQueryAdapter<QueryReturnType>({
-    ...queryProps,
+  const queryPropsMerged = React.useMemo(() => {
+    return {
+      ...queryProps,
+      query: queryProps?.query || query,
+      registeredViews: queryProps?.registeredViews ?? registeredViews,
+      modelConfig:
+        queryProps?.viewConfigManager?.modelConfig ||
+        viewConfigManager.modelConfig,
+      viewConfig:
+        queryProps?.viewConfigManager?.viewConfig ||
+        viewConfigManager.viewConfig,
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      viewConfigManager: undefined,
+    };
+  }, [
+    query,
+    queryProps,
     registeredViews,
-    modelConfig: viewConfigManager.modelConfig,
-    query: queryProps?.query || query,
-    viewConfigManager: queryProps?.viewConfigManager ?? viewConfigManager,
-  });
+    viewConfigManager.modelConfig,
+    viewConfigManager.viewConfig,
+  ]);
 
-  React.useEffect(() => {
-    if (resturnData.error) {
-      console.error('Use Query Error: ', resturnData.error);
-    }
-  }, [resturnData.error]);
+  const queryReturn = useStableQuery(async () => {
+    const res = await prisma.viewLoader(queryPropsMerged);
 
-  return resturnData;
+    return res;
+  }, queryPropsMerged);
+
+  return {
+    ...queryReturn,
+    data: queryReturn.data?.data,
+    relationalData: queryReturn.data?.relationalData,
+  };
 };

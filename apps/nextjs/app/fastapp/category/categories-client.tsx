@@ -1,6 +1,6 @@
 'use client';
 
-import { DataType, setClientViewConfig, ViewConfigType } from '@apps-next/core';
+import { DataType, setClientViewConfig } from '@apps-next/core';
 import { makeHooks } from '@apps-next/react';
 import { List } from '@apps-next/ui';
 import { ColorComponent } from './categories.components';
@@ -17,12 +17,8 @@ setClientViewConfig<CategoryViewDataType>('category', {
   },
 });
 
-export const CategoriesClient = ({
-  viewConfig,
-}: {
-  viewConfig: ViewConfigType<'category'>;
-}) => {
-  const { useList } = makeHooks(viewConfig);
+export const CategoriesClient = () => {
+  const { useList } = makeHooks<CategoryViewDataType>();
 
   const getListProps = useList();
   return (

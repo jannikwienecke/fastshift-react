@@ -1,18 +1,27 @@
-import { QueryPrefetchProvider } from '@apps-next/query-adapter';
-import { prisma } from '../../../db';
+import { dehydrate } from '@tanstack/react-query';
+import { ClientViewProvider } from '../client-view-provider';
+import { prefetchView } from '../prefetch';
 import { ProjectsClient } from './projects-client';
 import { viewConfig } from './projects.config';
-import { prismaViewLoader } from '@apps-next/prisma-adapter';
 
 export const dynamic = 'force-dynamic';
 
-export default function FastAppTasksPage() {
+export default async function FastAppTasksPage() {
+  const queryClient = await prefetchView(viewConfig);
+
   return (
-    <QueryPrefetchProvider
+    <ClientViewProvider
+      queryClientState={dehydrate(queryClient)}
       viewConfig={viewConfig}
-      viewLoader={(props) => prismaViewLoader(prisma, props)}
     >
-      <ProjectsClient viewConfig={viewConfig} />
-    </QueryPrefetchProvider>
+      <ProjectsClient />
+    </ClientViewProvider>
   );
 }
+
+// hier weiter machen -> siehe diese page als beispiel
+// create a clientViewProvider -> One that is used for all pages
+// then import it here and wrap the client page view in it
+// check registered views -> currently we only use the global config default views
+// check if we can remove the global  provider or if we can remove some duplicated code
+// when updating state -> and the before/after state is the same -> do notjhing. Example checkbox project

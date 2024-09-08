@@ -1,9 +1,0 @@
-{
-  "name": "query",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/query-adapter/src",
-  "projectType": "library",
-  "tags": ["scope:query", "scope:adapter"],
-  "// targets": "to see all targets run: nx show project query --web",
-  "targets": {}
-}

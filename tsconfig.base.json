@@ -19,7 +19,6 @@
       "@apps-next/convex-adapter-app": ["libs/convex-adapter-app/src/index.ts"],
       "@apps-next/core": ["libs/core/src/index.ts"],
       "@apps-next/prisma-adapter": ["libs/prisma-adapter/src/index.ts"],
-      "@apps-next/query-adapter": ["libs/query-adapter/src/index.ts"],
       "@apps-next/react": ["libs/react/src/index.ts"],
       "@apps-next/ui": ["libs/ui/src/index.ts"]
     }

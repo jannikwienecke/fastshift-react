@@ -13,8 +13,6 @@ import {
 import { useAtomValue } from 'jotai';
 import React from 'react';
 import { HydrateAtoms } from './ui-components';
-import { useMutationAtom } from './use-mutation';
-import { useQueryAtom } from './use-query';
 
 export const ViewProvider = ({
   children,
@@ -53,17 +51,12 @@ export const ViewProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const queryAdapter = useAtomValue(useQueryAtom);
-  const mutationAdapter = useAtomValue(useMutationAtom);
-
   const viewConfigManager = new BaseViewConfigManager(viewConfig);
 
   return (
     <HydrateAtoms
       initialValues={[
         [viewConfigManagerAtom, viewConfigManager],
-        [useQueryAtom, () => queryAdapter],
-        [useMutationAtom, () => mutationAdapter],
         [registeredViewsAtom, patchedRegisteredViews],
       ]}
     >
@@ -71,29 +64,3 @@ export const ViewProvider = ({
     </HydrateAtoms>
   );
 };
-
-// export const ViewDataProvider = <
-//   TProps extends {
-//     data: QueryReturnOrUndefined;
-//     useList: typeof useList;
-//   }
-// >(props: {
-//   Component: (props: TProps) => React.ReactNode;
-//   view: { viewConfigManager: BaseViewConfigManager };
-// }) => {
-//   const Content = () => {
-//     const data = useQuery<TProps[]>();
-
-//     // eslint-disable-next-line
-//     // @ts-ignore
-//     return <props.Component data={data} useList={useList} useForm={useForm} />;
-//   };
-
-//   const Provider = (
-//     <ViewProvider view={props.view}>
-//       <Content />
-//     </ViewProvider>
-//   );
-
-//   return Provider;
-// };

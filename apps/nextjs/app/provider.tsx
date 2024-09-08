@@ -1,7 +1,7 @@
 'use client';
 
 import { ApiClientType, BaseConfigInterface } from '@apps-next/core';
-import { QueryProvider } from '@apps-next/query-adapter';
+import { QueryProvider } from '@apps-next/react';
 
 export const Provider = ({
   children,

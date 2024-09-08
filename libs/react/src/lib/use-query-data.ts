@@ -11,7 +11,6 @@ export const useQueryData = <
   const updateQueryData = useSetAtom(updateQueryDataAtom);
 
   const viewConfigManager = useAtomValue(viewConfigManagerAtom);
-
   const { data, relationalData } = useQuery();
 
   React.useEffect(() => {

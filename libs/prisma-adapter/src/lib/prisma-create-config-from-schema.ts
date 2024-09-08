@@ -66,14 +66,7 @@ export const createConfigFromPrismaSchema = <
     defaultViewConfigs,
   } as ConfigType;
 
-  return {
-    config: new BaseConfig(_config),
-    config_only: _config,
-    tableNames,
-    getTable: <TTableName extends TableName>(tableName: TTableName) => {
-      return tableName;
-    },
-  };
+  return new BaseConfig(_config);
 };
 
 // eslint-disable-next-line
