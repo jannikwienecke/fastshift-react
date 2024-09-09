@@ -1,9 +1,9 @@
-import { createServerViewConfig } from '@apps-next/core';
+import { createViewConfig } from '@apps-next/core';
 import { PrismaClientType } from '../../../db';
 import { globalConfig } from '../../global-config';
 import { configurePrismaLoader } from '@apps-next/prisma-adapter';
 
-const _viewConfig = createServerViewConfig(
+const _viewConfig = createViewConfig(
   'project',
   {
     displayField: { field: 'label' },

@@ -1,11 +1,11 @@
-import { createServerViewConfig } from '@apps-next/core';
+import { createViewConfig } from '@apps-next/core';
 
 import { configurePrismaLoader } from '@apps-next/prisma-adapter';
 import type { PrismaClientType } from '../../../db';
 import { globalConfig } from '../../global-config';
 
 export const viewConfig = configurePrismaLoader(
-  createServerViewConfig(
+  createViewConfig(
     'task',
     {
       displayField: { field: 'name' },
