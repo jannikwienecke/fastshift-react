@@ -1,6 +1,6 @@
 {
   "name": "@apps-next/prisma-adapter",
-  "version": "0.0.43",
+  "version": "0.0.593",
   "main": "index.js",
   "module": "index.mjs",
   "types": "index.d.ts",
@@ -12,6 +12,6 @@
     }
   },
   "dependencies": {
-    "@apps-next/core": "^0.0.41"
+    "@apps-next/core": "^0.0.593"
   }
 }

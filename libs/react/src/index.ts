@@ -8,4 +8,4 @@ export * from './lib/action-handler';
 export * from './lib/ui-components/render-combobox-field-value';
 export * from './lib/query-store';
 export * from './lib/store.ts/index';
-export * from './lib/query-provider';
+export * from './lib/client-view-provider';

@@ -5,7 +5,7 @@ import {
   BaseConfigInterface,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
-  ViewFieldsConfig,
+  clientConfigStore,
   clientViewConfigAtom,
   DataModelNew,
   globalConfigAtom,
@@ -16,36 +16,39 @@ import {
   RegisteredViews,
   registeredViewsAtom,
   viewConfigManagerAtom,
+  ViewFieldsConfig,
 } from '@apps-next/core';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Provider } from 'jotai';
 import React from 'react';
 import { QueryContext } from './query-context';
 import { QueryStore, queryStoreAtom } from './query-store';
 import { HydrateAtoms } from './ui-components';
 
-// used in apps like nextjs when prefetching data and creating
-// the view config in the server.
-// Used together with QueryPrefetchProvider
-
-type QueryProviderProps = {
+export type QueryProviderProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
   api: ApiClientType;
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
-  queryClient: QueryClient;
-  viewFieldsConfig: ViewFieldsConfig;
 } & { children: React.ReactNode };
 
-export const QueryProvider = (props: QueryProviderProps) => {
+type QueryProviderPropsWithViewFieldsConfig = QueryProviderProps & {
+  viewFieldsConfig: ViewFieldsConfig;
+  queryClient: QueryClient;
+};
+
+export const ClientViewProvider = (
+  props: QueryProviderPropsWithViewFieldsConfig
+) => {
   return (
     <QueryClientProvider client={props.queryClient}>
-      <Content {...props} />;
+      <Content {...props} />
     </QueryClientProvider>
   );
 };
 
-export const Content = (props: QueryProviderProps) => {
+export const Content = (props: QueryProviderPropsWithViewFieldsConfig) => {
   const api = props.api;
 
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
@@ -98,32 +101,34 @@ export const Content = (props: QueryProviderProps) => {
   ];
 
   return (
-    <QueryContext.Provider
-      value={{
-        prisma: {
-          ...props.api,
-          viewMutation(props) {
-            return api.viewMutation({
-              ...props,
-              mutation: {
-                ...props.mutation,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                handler: undefined,
-              },
-            });
+    <Provider store={clientConfigStore}>
+      <QueryContext.Provider
+        value={{
+          prisma: {
+            ...props.api,
+            viewMutation(props) {
+              return api.viewMutation({
+                ...props,
+                mutation: {
+                  ...props.mutation,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  handler: undefined,
+                },
+              });
+            },
           },
-        },
-        config: props.globalConfig,
-        provider: 'default',
-      }}
-    >
-      <HydrateAtoms
-        key={viewConfigManager.getViewName()}
-        initialValues={initialValues}
+          config: props.globalConfig,
+          provider: 'default',
+        }}
       >
-        {props.children}
-      </HydrateAtoms>
-    </QueryContext.Provider>
+        <HydrateAtoms
+          key={viewConfigManager.getViewName()}
+          initialValues={initialValues}
+        >
+          {props.children}
+        </HydrateAtoms>
+      </QueryContext.Provider>
+    </Provider>
   );
 };

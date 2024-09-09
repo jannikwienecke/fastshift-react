@@ -3,7 +3,7 @@ import './global.css';
 import { GeistSans } from 'geist/font/sans';
 
 import React from 'react';
-import { ReactQueryProvider } from './react-query-provider';
+import { GlobalProvider } from './react-query-provider';
 
 export const metadata = {
   title: 'Example App For FastApp Framework',
@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={GeistSans.className}>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <GlobalProvider>{children}</GlobalProvider>
       </body>
     </html>
   );

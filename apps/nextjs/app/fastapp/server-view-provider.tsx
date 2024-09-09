@@ -7,7 +7,8 @@ import {
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { prisma } from '../../db';
 import { globalConfig } from '../global-config';
-import { ClientViewProvider } from './client-view-provider';
+import { ViewProvider } from './client-view-provider';
+import { queryClient } from '../query-client';
 
 export const ServerViewProvider = async ({
   viewConfig,
@@ -16,14 +17,15 @@ export const ServerViewProvider = async ({
   viewConfig: ViewConfigType;
   children: React.ReactNode;
 }) => {
-  const queryClient = await prefetchViewQuery({
+  await prefetchViewQuery({
+    queryClient: queryClient,
     viewConfig,
     viewLoader: (props) => prismaViewLoader(prisma, props),
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ClientViewProvider
+      <ViewProvider
         views={getViews()}
         globalConfig={globalConfig.config}
         api={{
@@ -39,7 +41,7 @@ export const ServerViewProvider = async ({
         viewConfig={viewConfig}
       >
         {children}
-      </ClientViewProvider>
+      </ViewProvider>
     </HydrationBoundary>
   );
 };

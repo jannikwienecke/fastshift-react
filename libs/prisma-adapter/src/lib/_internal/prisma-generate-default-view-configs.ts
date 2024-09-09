@@ -46,7 +46,6 @@ export const generateDefaultViewConfigs = ({
 
     const displayField = getPrefferedDisplayField(options.map((f) => f.name));
 
-    console.log('GENERATE DEFAULT VIEW CONFIGS', tableName, displayField);
     const _config = createViewConfig(
       tableName as GetTableName,
       {

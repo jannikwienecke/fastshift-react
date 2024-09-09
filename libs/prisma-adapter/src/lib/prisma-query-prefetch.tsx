@@ -8,16 +8,16 @@ import {
 } from '@apps-next/core';
 
 import { QueryClient } from '@tanstack/react-query';
-import React from 'react';
 
 export async function prefetchViewQuery({
-  children,
   viewLoader,
   viewConfig,
-}: React.PropsWithChildren<{
+  queryClient,
+}: {
   viewLoader: ApiClientType['viewLoader'];
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
-}>) {
+  queryClient: QueryClient;
+}) {
   const viewConfigManager = new BaseViewConfigManager(viewConfig);
   const searchableFields = viewConfigManager.getSearchableField();
   const viewFields = viewConfigManager.viewConfig.viewFields;
@@ -26,8 +26,6 @@ export async function prefetchViewQuery({
   const registeredViewsServer = registeredViewsServerStore.get(
     registeredViewsServerAtom
   );
-
-  const queryClient = new QueryClient();
 
   const queryKey = makeQueryKey({
     viewName,
