@@ -1,6 +1,6 @@
 {
   "name": "@apps-next/ui",
-  "version": "0.0.16",
+  "version": "0.0.41",
   "main": "./index.js",
   "types": "./index.d.ts",
   "exports": {
@@ -10,7 +10,7 @@
     }
   },
   "dependencies": {
-    "@apps-next/core": "^0.0.16"
+    "@apps-next/core": "^0.0.41"
   },
   "devDependencies": {
     "@types/react": "npm:types-react@rc",

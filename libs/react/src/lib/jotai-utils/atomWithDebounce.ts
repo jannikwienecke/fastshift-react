@@ -2,7 +2,7 @@ import { atom, SetStateAction } from 'jotai';
 
 export function atomWithDebounce<T>(
   initialValue: T,
-  delayMilliseconds = 500,
+  delayMilliseconds = 250,
   shouldDebounceOnReset = false
 ) {
   const prevTimeoutAtom = atom<ReturnType<typeof setTimeout> | undefined>(

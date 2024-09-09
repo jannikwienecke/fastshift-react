@@ -19,12 +19,6 @@ export default defineConfig({
     }),
   ],
 
-  // resolve: {
-  //   alias: {
-  //     '@apps-next/core': '/libs/core/src/index.ts',
-  //   },
-  // },
-
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [ nxViteTsPaths() ],
@@ -40,18 +34,13 @@ export default defineConfig({
       transformMixedEsModules: true,
     },
     lib: {
-      entry: {
-        index: 'src/index.ts',
-      },
+      entry: 'src/index.ts',
+      name: 'prisma-adapter',
+      fileName: 'index',
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime'],
-      output: {
-        entryFileNames: (chunkInfo) => {
-          return `${chunkInfo.name}/index.[format].js`;
-        },
-      },
     },
   },
 

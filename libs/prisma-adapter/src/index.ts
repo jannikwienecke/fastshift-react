@@ -1,4 +1,3 @@
-// export * from './client';
 export * from './lib/prisma-configure-loader';
 export * from './lib/prisma-view-loader';
 export * from './lib/prisma-create-config-from-schema';

@@ -1,8 +1,5 @@
 import { atom, createStore } from 'jotai';
-import {
-  registeredViewsAtom,
-  registeredViewsServerAtom,
-} from './registered-view.store';
+import { registeredViewsServerAtom } from './registered-view.store';
 import {
   GetTableName,
   RecordType,
@@ -33,6 +30,9 @@ export type ClientViewConfig<T extends GetTableName, U extends RecordType> = {
 };
 
 export const clientViewConfigAtom = atom({} as ClientViewConfig<any, any>);
+
+export const getClientConfigs = () =>
+  clientConfigStore.get(clientViewConfigAtom);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AtomStore = any;

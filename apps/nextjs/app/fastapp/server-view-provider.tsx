@@ -1,9 +1,4 @@
-import {
-  getViews,
-  registeredViewsServerAtom,
-  registeredViewsServerStore,
-  ViewConfigType,
-} from '@apps-next/core';
+import { getViews, ViewConfigType } from '@apps-next/core';
 import {
   prefetchViewQuery,
   prismaViewLoader,

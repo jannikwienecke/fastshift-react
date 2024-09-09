@@ -9,7 +9,7 @@ export async function main() {
   console.log('🌱 Seeding Prisma database...');
 
   // Clear existing data
-  await waitFor(500);
+  await waitFor(1000);
   await prisma.taskTag.deleteMany({});
   await prisma.task.deleteMany({});
   await prisma.project.deleteMany({});

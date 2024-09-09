@@ -1,6 +1,6 @@
 {
   "name": "@apps-next/react",
-  "version": "0.0.16",
+  "version": "0.0.48",
   "main": "index.js",
   "module": "index.mjs",
   "types": "index.d.ts",
@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@apps-next/core": "^0.0.16"
+    "@apps-next/core": "^0.0.48"
   },
   "devDependencies": {
     "@types/react": "npm:types-react@rc",

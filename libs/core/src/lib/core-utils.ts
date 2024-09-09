@@ -12,7 +12,8 @@ export const invarant = (condition: boolean, message: string) => {
 };
 
 export const waitFor = (ms: number) => {
-  if (process.env['NODE_ENV'] === 'development') {
+  const env = process.env['NODE_ENV'];
+  if (!env || env === 'development') {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
