@@ -1,4 +1,4 @@
-import { registerViewServer } from './client-config.store';
+import { registerView } from './config.store';
 import {
   GetTableName,
   GlobalConfig,
@@ -6,7 +6,7 @@ import {
   ViewConfigType,
 } from './types';
 
-export function createServerViewConfig<T extends GetTableName>(
+export function createViewConfig<T extends GetTableName>(
   tableName: T,
   config: Partial<Omit<ViewConfigType<T>, 'viewFields' | 'tableName'>> &
     Pick<ViewConfigBaseInfo<T>, 'icon'>,
@@ -34,7 +34,7 @@ export function createServerViewConfig<T extends GetTableName>(
     },
   };
 
-  registerViewServer(viewName, viewConfig);
+  registerView(viewName, viewConfig);
 
   return viewConfig;
 }

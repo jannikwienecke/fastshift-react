@@ -11,7 +11,10 @@ import { viewConfigManagerAtom } from './view-config.store';
 
 export type ComponentType = 'list' | 'combobox';
 
-export type ClientViewConfig<T extends GetTableName, U extends RecordType> = {
+export type ViewFieldsConfig<
+  T extends GetTableName = any,
+  U extends RecordType = any
+> = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   [key in T]: {
@@ -29,18 +32,17 @@ export type ClientViewConfig<T extends GetTableName, U extends RecordType> = {
   };
 };
 
-export const clientViewConfigAtom = atom({} as ClientViewConfig<any, any>);
-
-export const getClientConfigs = () =>
-  clientConfigStore.get(clientViewConfigAtom);
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AtomStore = any;
 
-// TODO: Clean up -> refacotr this function -> Naming etc.
-export const setClientViewConfig = <T extends RecordType>(
+export const clientViewConfigAtom = atom({} as ViewFieldsConfig);
+
+export const getViewFieldsConfig = () =>
+  clientConfigStore.get(clientViewConfigAtom);
+
+export const setViewFieldsConfig = <T extends RecordType>(
   table: keyof RegisteredRouter['config']['_datamodel'],
-  data: ClientViewConfig<
+  data: ViewFieldsConfig<
     keyof RegisteredRouter['config']['_datamodel'],
     T
   >[keyof RegisteredRouter['config']['_datamodel']]
@@ -62,10 +64,7 @@ export const clientConfigAtom = atom((get) => {
 export const clientConfigStore: AtomStore = createStore();
 export const registeredViewsServerStore: AtomStore = createStore();
 
-export const registerViewServer = (
-  viewName: string,
-  viewConfig: ViewConfigType
-) => {
+export const registerView = (viewName: string, viewConfig: ViewConfigType) => {
   registeredViewsServerStore.set(registeredViewsServerAtom, (prev: any) => ({
     ...prev,
     [viewName]: viewConfig,

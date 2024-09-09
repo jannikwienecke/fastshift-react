@@ -5,11 +5,10 @@ import {
   BaseConfigInterface,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
-  ClientViewConfig,
+  ViewFieldsConfig,
   clientViewConfigAtom,
   DataModelNew,
   globalConfigAtom,
-  IncludeConfig,
   makeData,
   makeQueryKey,
   QueryReturnOrUndefined,
@@ -32,11 +31,10 @@ import { HydrateAtoms } from './ui-components';
 type QueryProviderProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
   api: ApiClientType;
-  includeConfig: IncludeConfig;
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
   queryClient: QueryClient;
-  clientConfig: ClientViewConfig<unknown, any>;
+  viewFieldsConfig: ViewFieldsConfig;
 } & { children: React.ReactNode };
 
 export const QueryProvider = (props: QueryProviderProps) => {
@@ -53,7 +51,6 @@ export const Content = (props: QueryProviderProps) => {
   const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
 
   const registeredViews = props.globalConfig.defaultViewConfigs;
-  // const queryClient = useQueryClient();
   const data = props.queryClient.getQueryData(
     makeQueryKey({
       viewName: viewConfigManager.getViewName(),
@@ -97,7 +94,7 @@ export const Content = (props: QueryProviderProps) => {
     ],
     [globalConfigAtom, props.globalConfig],
     [queryStoreAtom, queryStore],
-    [clientViewConfigAtom, props.clientConfig],
+    [clientViewConfigAtom, props.viewFieldsConfig],
   ];
 
   return (

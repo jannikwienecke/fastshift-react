@@ -1,6 +1,6 @@
 'use client';
 
-import { DataType, setClientViewConfig } from '@apps-next/core';
+import { DataType, setViewFieldsConfig } from '@apps-next/core';
 import {
   makeHooks,
   useCombobox,
@@ -28,7 +28,7 @@ type ProjectViewDataType = DataType<
   { owner: Owner; category: Category; tasks: Task[] }
 >;
 
-setClientViewConfig<ProjectViewDataType>('project', {
+setViewFieldsConfig<ProjectViewDataType>('project', {
   fields: {
     category: {
       component: {

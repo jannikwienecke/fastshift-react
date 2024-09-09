@@ -3,7 +3,7 @@
 import {
   ApiClientType,
   BaseConfigInterface,
-  getClientConfigs,
+  getViewFieldsConfig,
   RegisteredViews,
   ViewConfigType,
 } from '@apps-next/core';
@@ -51,9 +51,8 @@ export const ClientViewProvider = (props: {
   return (
     <QueryProvider
       {...props}
-      clientConfig={getClientConfigs()}
+      viewFieldsConfig={getViewFieldsConfig()}
       queryClient={queryClient}
-      includeConfig={{}}
     />
   );
 };

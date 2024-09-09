@@ -10,7 +10,7 @@ import {
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
 import { TaskViewDataType } from './tasks.types';
-import { setClientViewConfig } from '@apps-next/core';
+import { setViewFieldsConfig } from '@apps-next/core';
 import {
   CompletedComponent,
   PriorityComponent,
@@ -21,7 +21,7 @@ import {
   ProjectComponentCombobox,
 } from './tasks.components';
 
-setClientViewConfig<TaskViewDataType>('task', {
+setViewFieldsConfig<TaskViewDataType>('task', {
   fields: {
     completed: {
       component: {

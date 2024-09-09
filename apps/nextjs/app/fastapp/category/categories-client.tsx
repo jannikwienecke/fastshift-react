@@ -1,13 +1,13 @@
 'use client';
 
-import { DataType, setClientViewConfig } from '@apps-next/core';
+import { DataType, setViewFieldsConfig } from '@apps-next/core';
 import { makeHooks } from '@apps-next/react';
 import { List } from '@apps-next/ui';
 import { ColorComponent } from './categories.components';
 
 type CategoryViewDataType = DataType<'category'>;
 
-setClientViewConfig<CategoryViewDataType>('category', {
+setViewFieldsConfig<CategoryViewDataType>('category', {
   fields: {
     color: {
       component: {

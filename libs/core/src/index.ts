@@ -10,5 +10,5 @@ export * from './lib/registered-view.store';
 export * from './lib/core.constants';
 export * from './lib/include-config.store';
 export * from './lib/relational-view.helper';
-export * from './lib/client-config.store';
+export * from './lib/config.store';
 export * from './lib/data-model';
