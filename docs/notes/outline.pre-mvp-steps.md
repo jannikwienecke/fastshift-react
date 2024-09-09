@@ -58,3 +58,7 @@ Add a small doc section to each new progress step
     - [ ] remove any's
     - [ ] Write tests - use for both apps
     - [ ] Wishful thinking - Desired Api Design
+
+## Improvements
+
+- [ ] when updating state -> and the before/after state is the same -> do notjhing. Example checkbox project

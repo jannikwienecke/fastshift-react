@@ -11,6 +11,3 @@ export default async function FastAppProjectPage() {
     </ServerViewProvider>
   );
 }
-
-// one e2e test is failing -> check it
-// when updating state -> and the before/after state is the same -> do notjhing. Example checkbox project

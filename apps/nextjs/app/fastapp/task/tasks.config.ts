@@ -15,8 +15,8 @@ export const viewConfig = configurePrismaLoader(
   )
 )<PrismaClientType>({
   include: {
-    // tags: {
-    //   include: { tag: true },
-    // },
+    tags: {
+      include: { tag: true },
+    },
   },
 });
