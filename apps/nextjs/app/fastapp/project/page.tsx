@@ -12,9 +12,5 @@ export default async function FastAppProjectPage() {
   );
 }
 
-// hier weiter machen -> siehe diese page als beispiel
-// create a clientViewProvider -> One that is used for all pages
-// then import it here and wrap the client page view in it
-// check registered views -> currently we only use the global config default views
-// check if we can remove the global  provider or if we can remove some duplicated code
+// one e2e test is failing -> check it
 // when updating state -> and the before/after state is the same -> do notjhing. Example checkbox project
