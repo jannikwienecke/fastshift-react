@@ -11,7 +11,7 @@ export type QueryProps = {
   viewConfigManager?: BaseViewConfigManagerInterface;
   registeredViews: RegisteredViews;
   modelConfig?: ModelConfig;
-  viewName: string;
+  viewName?: string;
   relationQuery?: {
     tableName: string;
     recordId?: string;

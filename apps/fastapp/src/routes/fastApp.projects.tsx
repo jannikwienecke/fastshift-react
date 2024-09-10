@@ -6,6 +6,7 @@ import {
   getViews,
   makeHooks,
   QueryInput,
+  setViewFieldsConfig,
   useCombobox,
   useHandleSelectCombobox,
   useStoreValue,
@@ -15,6 +16,18 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { config } from '../global-config';
 
 type ProjectViewDataType = DataType<'projects', { categories: Categories }>;
+
+setViewFieldsConfig<ProjectViewDataType>('projects', {
+  fields: {
+    categories: {
+      component: {
+        list: ({ data }) => {
+          return <>{data.categories.label}</>;
+        },
+      },
+    },
+  },
+});
 
 const ProjectPage = () => {
   const { useList } = makeHooks<ProjectViewDataType>();

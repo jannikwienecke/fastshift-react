@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { DataModel, SearchableField } from './base.types';
+import { SearchableField } from './base.types';
 import { ViewConfigType, ViewFieldConfig } from './view-config.types';
 
 export type IncludeConfig = Record<string, string[]>;
@@ -39,10 +39,11 @@ export type ModelSchema = {
 };
 
 export interface BaseConfigInterface<
+  TDataModel extends Record<string, any> = any,
   TTables = any,
   DataModelType extends Record<string, any> = any
 > {
-  dataModel: ModelSchema;
+  dataModel: TDataModel;
   tableNames: TTables;
   viewFields: Record<string, ViewFieldConfig>;
   searchableFields: Record<string, SearchableField>;

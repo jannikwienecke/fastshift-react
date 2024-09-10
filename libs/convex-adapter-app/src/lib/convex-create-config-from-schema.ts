@@ -4,12 +4,12 @@ import {
   generateIncludeFields,
   generateViewFields,
   getTableNamesFromSchema,
+  ModelSchema,
 } from '@apps-next/core';
 import { Infer } from 'convex/values';
 import { ConvexSchemaType } from './_internal/types.convex';
 import { parseConvexSchemaToModelSchema } from './convex-normalize-schema';
 import { generateSearchableFieldsFromConvexSchema } from './convex-searchable-fields';
-import { generateDefaultViewConfigs } from '@apps-next/react';
 
 export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   schema: T
@@ -26,6 +26,7 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   const includeFields = generateIncludeFields(normalizedSchema);
 
   type ConfigType = BaseConfigInterface<
+    ModelSchema,
     keyof T['tables'],
     {
       [TKey in TableName]: Infer<T['tables'][TKey]['validator']>;
@@ -42,18 +43,5 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
     tableNames: tableNames as unknown as keyof T['tables'],
   };
 
-  // TODO: PRISAM and general -> need to be moved somethwre else. Cannot import from react in adapter
-  const defaultViewConfigs = generateDefaultViewConfigs({
-    tableNames,
-    dataModel: normalizedSchema,
-    config,
-    guessDisplayFieldIfNotProvided: true,
-  });
-
-  const _config = {
-    ...config,
-    defaultViewConfigs,
-  } as ConfigType;
-
-  return new BaseConfig(_config);
+  return new BaseConfig(config);
 };

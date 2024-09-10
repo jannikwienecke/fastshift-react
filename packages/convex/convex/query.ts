@@ -1,6 +1,6 @@
 import {
-  createViewLoaderHandler,
   viewMutationHandler,
+  makeViewLoaderHandler,
 } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
 
@@ -8,7 +8,7 @@ import { asyncMap } from 'convex-helpers';
 import { views } from '../src/index';
 
 export const viewLoader = server.query({
-  handler: createViewLoaderHandler(views),
+  handler: makeViewLoaderHandler(views),
 });
 
 export const viewMutation = server.mutation({

@@ -1,12 +1,11 @@
 import {
-  ViewFieldsConfig,
-  RecordType,
-  RegisteredRouter,
-  ViewConfigType,
-  RegisteredViews,
-  relationalViewHelper,
   BaseConfigInterface,
   BaseViewConfigManagerInterface,
+  RecordType,
+  RegisteredRouter,
+  RegisteredViews,
+  ViewConfigType,
+  ViewFieldsConfig,
 } from '@apps-next/core';
 import { atom, createStore } from 'jotai';
 
