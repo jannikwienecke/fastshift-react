@@ -1,11 +1,11 @@
 'use client';
 
 import { notFound } from 'next/navigation';
+import { useAtomValue } from 'jotai';
 import {
   registeredViewsAtom,
   registeredViewsServerAtom,
-} from '@apps-next/core';
-import { useAtomValue } from 'jotai';
+} from '@apps-next/react';
 
 export default function FallbackPage({
   params,

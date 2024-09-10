@@ -1,4 +1,4 @@
-import { GetTableDataType, GetTableName } from './base.types';
+import { GetTableDataType, GetTableName, RegisteredRouter } from './base.types';
 import { ViewConfigType } from './view-config.types';
 
 export type DataType<

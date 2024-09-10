@@ -1,4 +1,4 @@
-import { createViewConfig } from '@apps-next/core';
+import { createViewConfig } from '@apps-next/react';
 import { globalConfig } from '../../global-config';
 
 export const viewConfig = createViewConfig(

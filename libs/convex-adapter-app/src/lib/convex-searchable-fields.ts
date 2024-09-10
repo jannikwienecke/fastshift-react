@@ -1,23 +1,20 @@
 import { SearchableField } from '@apps-next/core';
-import { ConvexSchemaType } from './_internal/types.convex';
+import { ConvexSchema } from './_internal/convex-schema.types';
 
 export const generateSearchableFieldsFromConvexSchema = (
-  convexSchema: ConvexSchemaType
+  convexSchema: ConvexSchema
 ) => {
-  return Object.entries(convexSchema.tables).reduce(
-    (acc, [tableName, tableData]) => {
-      const searchIndex = tableData.searchIndexes?.[0];
+  return Object.entries(convexSchema).reduce((acc, [tableName, tableData]) => {
+    const searchIndex = tableData.searchIndexes?.[0];
 
-      if (searchIndex?.searchField && searchIndex?.indexDescriptor) {
-        acc[tableName] = {
-          field: searchIndex.searchField,
-          name: searchIndex.indexDescriptor,
-          filterFields: searchIndex.filterFields,
-        } satisfies SearchableField;
-      }
+    if (searchIndex?.searchField && searchIndex?.indexDescriptor) {
+      acc[tableName] = {
+        field: searchIndex.searchField,
+        name: searchIndex.indexDescriptor,
+        filterFields: searchIndex.filterFields,
+      } satisfies SearchableField;
+    }
 
-      return acc;
-    },
-    {} as Record<string, SearchableField>
-  );
+    return acc;
+  }, {} as Record<string, SearchableField>);
 };

@@ -1,6 +1,6 @@
-import { getViewConfigAtom } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
 import * as icons from 'react-icons/fa';
+import { getViewConfigAtom } from '../stores';
 
 export function Icon(props: { icon?: keyof typeof icons | null }) {
   const viewConfig = useAtomValue(getViewConfigAtom);

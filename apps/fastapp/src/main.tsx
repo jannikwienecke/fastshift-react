@@ -3,16 +3,11 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import * as ReactDOM from 'react-dom/client';
 
-import { api, schema } from '@apps-next/convex';
-import {
-  ConvexQueryProvider,
-  createConfigFromConvexSchema,
-} from '@apps-next/convex-adapter-app';
+import { api } from '@apps-next/convex';
+import { ConvexQueryProvider } from '@apps-next/convex-adapter-app';
 import { routeTree } from './routeTree.gen';
 
-import { llinfo } from '@apps-next/core';
-import '@picocss/pico/css/pico.classless.min.css';
-// import {api} from '@apps-next/convex'
+import { config } from './global-config';
 const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
@@ -22,15 +17,6 @@ const router = createRouter({
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
-  }
-}
-
-const config = createConfigFromConvexSchema(schema);
-llinfo('Global Config: ', config);
-
-declare module '@apps-next/core' {
-  interface Register {
-    config: typeof config;
   }
 }
 
@@ -46,10 +32,7 @@ ReactDOM.createRoot(root).render(
     <ConvexQueryProvider
       globalConfig={config}
       convexUrl={VITE_CONVEX_URL}
-      api={{
-        viewLoader: api.query.viewLoader,
-        viewMutation: api.query.viewMutation,
-      }}
+      viewLoader={api.query.viewLoader}
     >
       <RouterProvider router={router} />
 

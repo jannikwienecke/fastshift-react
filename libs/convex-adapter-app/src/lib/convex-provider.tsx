@@ -1,23 +1,24 @@
-import { ConvexQueryClient } from '@convex-dev/react-query';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import { convexQuery, ConvexQueryClient } from '@convex-dev/react-query';
 import {
-  ConvexApiType,
-  ConvexQueryProviderProps,
-} from './_internal/types.convex';
+  QueryClient,
+  QueryClientProvider,
+  QueryOptions,
+} from '@tanstack/react-query';
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import { ConvexQueryProviderProps } from './_internal/types.convex';
 
+import { GlobalConfig, QueryProps } from '@apps-next/core';
+import { QueryContext } from '@apps-next/react';
 import React from 'react';
 import { ConvexContext } from './_internal/convex-context';
-import { GlobalConfig } from '@apps-next/core';
 
 export const ConvexContextProvider = (
   props: React.PropsWithChildren<{
-    api: ConvexApiType;
     globalConfig: GlobalConfig;
   }>
 ) => {
   return (
-    <ConvexContext.Provider value={{ ...props.globalConfig, api: props.api }}>
+    <ConvexContext.Provider value={{ ...props.globalConfig }}>
       {props.children}
     </ConvexContext.Provider>
   );
@@ -41,17 +42,37 @@ export const ConvexQueryProvider = (props: ConvexQueryProviderProps) => {
 
   return (
     <ConvexContextProvider
-      api={props.api}
       globalConfig={{
         ...props.globalConfig,
         provider: 'convex',
       }}
     >
-      <ConvexProvider client={convex}>
-        <QueryClientProvider client={queryClient}>
-          {props.children}
-        </QueryClientProvider>
-      </ConvexProvider>
+      <QueryContext.Provider
+        value={{
+          prisma: {} as any,
+
+          // makeQueryOptions:
+
+          makeQueryOptions: (args: QueryProps) => {
+            const return_ = convexQuery(props.viewLoader, {
+              ...args,
+              viewConfig: undefined,
+              registeredViews: undefined,
+            });
+
+            return return_ as QueryOptions;
+          },
+
+          config: props.globalConfig.config,
+          provider: 'default',
+        }}
+      >
+        <ConvexProvider client={convex}>
+          <QueryClientProvider client={queryClient}>
+            {props.children}
+          </QueryClientProvider>
+        </ConvexProvider>
+      </QueryContext.Provider>
     </ConvexContextProvider>
   );
 };

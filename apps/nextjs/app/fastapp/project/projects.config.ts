@@ -1,4 +1,4 @@
-import { createViewConfig } from '@apps-next/core';
+import { createViewConfig } from '@apps-next/react';
 import { PrismaClientType } from '../../../db';
 import { globalConfig } from '../../global-config';
 import { configurePrismaLoader } from '@apps-next/prisma-adapter';

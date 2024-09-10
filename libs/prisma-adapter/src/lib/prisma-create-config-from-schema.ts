@@ -1,5 +1,4 @@
 import { BaseConfig, BaseConfigInterface } from '@apps-next/core';
-import { generateDefaultViewConfigs } from './_internal/prisma-generate-default-view-configs';
 import { generateViewFieldsFromPrismaSchema } from './_internal/prisma-generate-view-fields';
 import { getTableNamesFromPrismaSchema } from './_internal/prisma-get-tables-from-schema';
 import { GetPrismaTableName } from './_internal/prisma.type.helper';
@@ -53,17 +52,8 @@ export const createConfigFromPrismaSchema = <
     defaultViewConfigs: {},
   };
 
-  const defaultViewConfigs = generateDefaultViewConfigs({
-    tableNames: tableNames as string[],
-    dataModel: Prisma as any as Prisma['dmmf']['datamodel'],
-    config,
-    guessDisplayFieldIfNotProvided:
-      options?.smart?.guessDisplayFieldIfNotProvided,
-  });
-
   const _config = {
     ...config,
-    defaultViewConfigs,
   } as ConfigType;
 
   return new BaseConfig(_config);

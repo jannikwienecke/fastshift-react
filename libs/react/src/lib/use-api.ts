@@ -8,5 +8,5 @@ export const useApi = () => {
     throw new Error('ConvexContext not found');
   }
 
-  return prismaContext.prisma;
+  return prismaContext;
 };

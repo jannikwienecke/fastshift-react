@@ -1,7 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { GlobalConfig, MutationReturnDto } from '@apps-next/core';
-import { DefaultFunctionArgs, FunctionReference } from './convex.server.types';
+import {
+  GlobalConfig,
+  MutationReturnDto,
+  QueryProps,
+  QueryReturnDto,
+} from '@apps-next/core';
+import {
+  DefaultFunctionArgs,
+  FunctionReference,
+  Id,
+} from './convex.server.types';
+import { QueryOptions } from '@tanstack/react-query';
 
 export type ConvexServer = {
   query: (options: {
@@ -19,7 +29,7 @@ export type ViewLoader = FunctionReference<
   'query',
   'public',
   DefaultFunctionArgs,
-  ConvexRecordType[] | null
+  QueryReturnDto
 >;
 
 export type ViewMutation = FunctionReference<
@@ -36,14 +46,54 @@ export type ConvexApiType = {
 
 export type ConvexQueryProviderProps = React.PropsWithChildren<{
   convexUrl: string;
-  api: ConvexApiType;
+  // api: ConvexApiType;
+  // makeQueryOptions: (args: QueryProps) => QueryOptions;
+  viewLoader: ViewLoader;
   globalConfig: Omit<GlobalConfig, 'provider'>;
 }>;
 
-export type ConvexContextType = {
-  api: ConvexApiType;
-} & GlobalConfig;
+export type ConvexContextType = GlobalConfig;
 
 export type ConvexSchemaType = {
   tables: Record<string, any>;
 };
+
+export type ID = Id<any>;
+
+export type ConvexRecord = Record<string, any> & { _id?: ID };
+
+export type ConvexWhere = {
+  //
+};
+
+export type ConvexOrderBy = {
+  //
+};
+export type ConvexInclude = {
+  [key in string]: boolean | ConvexInclude;
+};
+
+export type ConvexFindManyArgs = {
+  take?: number;
+  where?: ConvexWhere;
+  orderBy?: ConvexOrderBy;
+  include?: ConvexInclude;
+  select?: ConvexInclude;
+};
+
+export type ConvexClient = {
+  [key in string]: {
+    take: (take: number) => Promise<ConvexRecord[]>;
+    // findMany: (args: ConvexFindManyArgs) => Promise<PrismaRecord[]>;
+    // create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
+    // delete: (args: { where: { id: ID } }) => Promise<void>;
+    // deleteMany: (args: { where: Record<string, unknown> }) => Promise<void>;
+    // update: (args: { where: { id: ID }; data: PrismaRecord }) => Promise<void>;
+    // findUnique: (args: {
+    //   where: { id: ID };
+    //   select: ConvexInclude;
+    // }) => Promise<PrismaRecord>;
+  };
+};
+
+export type DbMutation = ConvexClient[string];

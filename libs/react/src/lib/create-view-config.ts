@@ -1,10 +1,10 @@
-import { registerView } from './config.store';
 import {
   GetTableName,
-  GlobalConfig,
-  ViewConfigBaseInfo,
   ViewConfigType,
-} from './types';
+  ViewConfigBaseInfo,
+  GlobalConfig,
+} from '@apps-next/core';
+import { registerView } from './stores';
 
 export function createViewConfig<T extends GetTableName>(
   tableName: T,

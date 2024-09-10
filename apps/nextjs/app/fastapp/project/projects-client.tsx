@@ -1,8 +1,9 @@
 'use client';
 
-import { DataType, setViewFieldsConfig } from '@apps-next/core';
+import { DataType } from '@apps-next/core';
 import {
   makeHooks,
+  setViewFieldsConfig,
   useCombobox,
   useHandleSelectCombobox,
   useStoreDispatch,

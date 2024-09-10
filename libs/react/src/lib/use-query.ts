@@ -4,30 +4,48 @@ import {
   makeQueryKey,
   QueryDto,
   QueryProps,
-  QueryReturnDto,
   QueryReturnOrUndefined,
   RecordType,
 } from '@apps-next/core';
-import { useQuery as useTanstackQuery } from '@tanstack/react-query';
-import React from 'react';
-import { useApi } from './use-api';
+import { convexQuery } from '@convex-dev/react-query';
+import {
+  QueryOptions,
+  useQuery as useTanstackQuery,
+} from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
+import React from 'react';
 import { debouncedQueryAtom } from './ui-components';
+import { useApi } from './use-api';
 import { useView } from './use-view';
+import { PrismaContextType } from './query-context';
 
-export const useStableQuery = (
-  fn: () => Promise<QueryReturnDto>,
-  args: QueryDto
-) => {
+export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
+  const queryOptions = api.makeQueryOptions
+    ? api.makeQueryOptions({
+        ...args,
+        viewConfigManager: undefined,
+        viewName: args.viewConfig?.viewName ?? '',
+      })
+    : {
+        queryKey: makeQueryKey({
+          viewName: args.viewConfig?.viewName,
+          query: args.query,
+          relation: args.relationQuery?.tableName,
+        }),
+        queryFn: () => {
+          return api.prisma?.viewLoader(args);
+        },
+        enabled: args.disabled === true ? false : true,
+      };
+
   const result = useTanstackQuery({
-    queryKey: makeQueryKey({
-      viewName: args.viewConfig?.viewName,
-      query: args.query,
-      relation: args.relationQuery?.tableName,
-    }),
-    queryFn: fn,
+    ...queryOptions,
     enabled: args.disabled === true ? false : true,
-  });
+  } as any);
+
+  if (result.error) {
+    console.error('ERROR', result.error);
+  }
 
   const stored = React.useRef(result as any);
 
@@ -47,7 +65,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const prisma = useApi();
-
   const { viewConfigManager, registeredViews } = useView();
   const query = useAtomValue(debouncedQueryAtom);
 
@@ -75,11 +92,13 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     viewConfigManager.viewConfig,
   ]);
 
-  const queryReturn = useStableQuery(async () => {
-    const res = await prisma.viewLoader(queryPropsMerged);
+  // const queryReturn = useStableQuery(async () => {
+  //   const res = await prisma.viewLoader(queryPropsMerged);
 
-    return res;
-  }, queryPropsMerged);
+  //   return res;
+  // }, queryPropsMerged);
+
+  const queryReturn = useStableQuery(prisma, queryPropsMerged);
 
   return {
     ...queryReturn,

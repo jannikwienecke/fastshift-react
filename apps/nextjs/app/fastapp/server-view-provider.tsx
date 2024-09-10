@@ -1,4 +1,4 @@
-import { getViews, ViewConfigType } from '@apps-next/core';
+import { ViewConfigType } from '@apps-next/core';
 import {
   prefetchViewQuery,
   prismaViewLoader,
@@ -9,6 +9,7 @@ import { prisma } from '../../db';
 import { globalConfig } from '../global-config';
 import { ViewProvider } from './client-view-provider';
 import { queryClient } from '../query-client';
+import { getViews } from '@apps-next/react';
 
 export const ServerViewProvider = async ({
   viewConfig,
@@ -17,16 +18,19 @@ export const ServerViewProvider = async ({
   viewConfig: ViewConfigType;
   children: React.ReactNode;
 }) => {
+  const views = getViews();
+
   await prefetchViewQuery({
     queryClient: queryClient,
     viewConfig,
+    views,
     viewLoader: (props) => prismaViewLoader(prisma, props),
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ViewProvider
-        views={getViews()}
+        views={views}
         globalConfig={globalConfig.config}
         api={{
           viewLoader: async (dto) => {

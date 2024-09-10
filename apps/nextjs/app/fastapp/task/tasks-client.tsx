@@ -7,10 +7,10 @@ import {
   useStoreDispatch,
   useCombobox,
   QueryInput,
+  setViewFieldsConfig,
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
-import { TaskViewDataType } from './tasks.types';
-import { setViewFieldsConfig } from '@apps-next/core';
+import { DataType } from '@apps-next/core';
 import {
   CompletedComponent,
   PriorityComponent,
@@ -20,6 +20,15 @@ import {
   ProjectComponent,
   ProjectComponentCombobox,
 } from './tasks.components';
+import { Project, Tag } from '@prisma/client';
+
+type TaskViewDataType = DataType<
+  'task',
+  {
+    project?: Project;
+    tag: Tag[];
+  }
+>;
 
 setViewFieldsConfig<TaskViewDataType>('task', {
   fields: {

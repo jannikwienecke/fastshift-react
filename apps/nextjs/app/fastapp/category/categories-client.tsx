@@ -1,7 +1,7 @@
 'use client';
 
-import { DataType, setViewFieldsConfig } from '@apps-next/core';
-import { makeHooks } from '@apps-next/react';
+import { DataType } from '@apps-next/core';
+import { makeHooks, setViewFieldsConfig } from '@apps-next/react';
 import { List } from '@apps-next/ui';
 import { ColorComponent } from './categories.components';
 

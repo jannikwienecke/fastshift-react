@@ -1,12 +1,6 @@
-import {
-  clientConfigAtom,
-  clientViewConfigAtom,
-  ComponentType,
-  FieldConfig,
-  Row,
-} from '@apps-next/core';
+import { ComponentType, FieldConfig, Row } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
-import { useView } from '../use-view';
+import { clientConfigAtom } from '../stores';
 
 export const FieldValue = ({
   field,

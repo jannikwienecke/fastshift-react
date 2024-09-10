@@ -5,17 +5,12 @@ import {
   BaseConfigInterface,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
-  clientConfigStore,
-  clientViewConfigAtom,
   DataModelNew,
-  globalConfigAtom,
   makeData,
   makeQueryKey,
   QueryReturnOrUndefined,
   RecordType,
   RegisteredViews,
-  registeredViewsAtom,
-  viewConfigManagerAtom,
   ViewFieldsConfig,
 } from '@apps-next/core';
 
@@ -25,6 +20,13 @@ import React from 'react';
 import { QueryContext } from './query-context';
 import { QueryStore, queryStoreAtom } from './query-store';
 import { HydrateAtoms } from './ui-components';
+import {
+  viewConfigManagerAtom,
+  registeredViewsAtom,
+  globalConfigAtom,
+  clientViewConfigAtom,
+  clientConfigStore,
+} from './stores';
 
 export type QueryProviderProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];

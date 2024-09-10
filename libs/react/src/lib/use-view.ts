@@ -1,9 +1,6 @@
-import {
-  registeredViewsAtom,
-  viewConfigManagerAtom,
-  ViewConfigType,
-} from '@apps-next/core';
+import { ViewConfigType } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
+import { registeredViewsAtom, viewConfigManagerAtom } from './stores';
 
 export const useView = () => {
   const viewConfigManager = useAtomValue(viewConfigManagerAtom);

@@ -1,4 +1,4 @@
-import { getViews } from '@apps-next/core';
+import { getViews } from '@apps-next/react';
 import { FastAppLayout } from './fast-app-layout';
 
 export default function FastAppLayoutComponent({

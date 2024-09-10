@@ -156,16 +156,10 @@ export const prismaViewLoader = async (
 
     const include = helper.getInclude(viewConfigManager.getIncludeFields());
 
-    const getManyToManyField = (key: string) => {
-      return viewConfigManager
-        .getViewFieldList()
-        .find((f) => f.relation?.manyToManyRelation === key);
-    };
-
     const relationalDataPromises = Object.keys({
       ...include,
     }).map((key) => {
-      const manyToManyField = getManyToManyField(key);
+      const manyToManyField = viewConfigManager.getManyToManyField(key);
 
       const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
 
@@ -183,7 +177,7 @@ export const prismaViewLoader = async (
     const resultList = await Promise.all(relationalDataPromises);
 
     const relationalData = Object.keys(include).reduce((acc, key, index) => {
-      const field = getManyToManyField(key);
+      const field = viewConfigManager.getManyToManyField(key);
       const _key = field?.relation?.tableName ?? key;
 
       acc[_key] = resultList[index];

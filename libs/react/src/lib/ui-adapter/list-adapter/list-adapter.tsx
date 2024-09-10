@@ -1,5 +1,4 @@
 import {
-  getViewConfigAtom,
   ListGetProps,
   ListItem,
   ListProps,
@@ -11,6 +10,7 @@ import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
 import { useQueryData } from '../../use-query-data';
 import { useStoreDispatch, useStoreValue } from '../../store.ts';
+import { getViewConfigAtom } from '../../stores';
 
 export const useList = <T extends RecordType>() => {
   const dispatch = useStoreDispatch();

@@ -100,6 +100,12 @@ export class BaseViewConfigManager<
     return this.viewConfig.includeFields;
   }
 
+  getManyToManyField(key: string): FieldConfig | undefined {
+    return this.getViewFieldList().find(
+      (f) => f.relation?.manyToManyRelation === key
+    );
+  }
+
   getIncludeFieldsForRelation(
     tableName: string,
     registeredViews: RegisteredViews

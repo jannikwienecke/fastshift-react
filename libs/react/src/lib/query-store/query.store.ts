@@ -4,11 +4,10 @@ import { QueryStore } from './query.types';
 import {
   RecordType,
   QueryRelationalData,
-  registeredViewsAtom,
-  getViewConfigAtom,
   DataModelNew,
   makeData,
 } from '@apps-next/core';
+import { getViewConfigAtom, registeredViewsAtom } from '../stores';
 
 export const queryStoreAtom = atom<QueryStore<RecordType>>({
   dataModel: {} as DataModelNew<RecordType>,

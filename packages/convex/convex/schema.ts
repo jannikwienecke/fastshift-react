@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
+import { Doc } from './_generated/dataModel';
 
 const _schema = defineSchema({
   users: defineTable({
@@ -17,6 +18,7 @@ const _schema = defineSchema({
   tasks: defineTable({
     name: v.string(),
     completed: v.boolean(),
+    tags: v.optional(v.array(v.id('tags'))),
     projectId: v.id('projects'),
     priority: v.union(v.literal('low'), v.literal('medium'), v.literal('high')),
   }).searchIndex('name_search', {
@@ -54,3 +56,5 @@ const _schema = defineSchema({
 export default _schema;
 
 export const schema = _schema;
+
+export type Categories = Doc<'categories'>;

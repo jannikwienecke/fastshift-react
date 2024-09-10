@@ -53,10 +53,12 @@ export const makeData = (
               const value = item[key];
               const isArray = Array.isArray(value);
 
-              const data = makeData(
+              const _data = makeData(
                 registeredViews,
                 field.relation?.tableName ?? ''
-              )(isArray ? value : [value]);
+              );
+
+              const data = _data(isArray ? item[key] : [item[key]]);
 
               const r = isArray ? data.rows : data.rows?.[0];
 

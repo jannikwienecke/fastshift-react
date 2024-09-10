@@ -1,5 +1,6 @@
-import { clientConfigAtom, FieldConfig, Row } from '@apps-next/core';
+import { FieldConfig, Row } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
+import { clientConfigAtom } from '../stores';
 
 export const ComboboxFieldValue = ({
   value,

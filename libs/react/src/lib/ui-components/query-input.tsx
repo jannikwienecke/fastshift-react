@@ -18,7 +18,7 @@ export const QueryInput = () => {
   return (
     <div className="w-full pb-6 flex justify-end">
       <input
-        className="border border-black p-1 px-4 rounded-md w-[20rem]"
+        className="border border-background p-1 px-4 rounded-md w-[20rem]"
         placeholder="Search"
         value={currentValue ?? ''}
         onChange={(e) => setDebouncedValue(e.target.value)}

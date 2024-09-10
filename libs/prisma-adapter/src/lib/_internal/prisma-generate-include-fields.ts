@@ -13,6 +13,7 @@ export const generateIncludeFields = (_prisma: Record<string, any>) => {
         if (isIdField || !relation || isManyToManyRelation || isList)
           return null;
 
+        console.log('fieldName', fieldName);
         return fieldName;
       })
       .filter((f) => f !== null);

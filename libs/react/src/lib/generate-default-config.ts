@@ -1,14 +1,13 @@
 import {
+  ModelSchema,
   BaseConfigInterface,
-  createViewConfig,
+  ModelField,
+  schemaHelper,
+  getPrefferedDisplayField,
   GetTableName,
   RegisteredViews,
 } from '@apps-next/core';
-import { Prisma, PrismaField } from '../prisma.types';
-import {
-  getPrefferedDisplayField,
-  prismaViewFieldsHelper,
-} from './prisma-view-fields-helper';
+import { createViewConfig } from './create-view-config';
 
 export const generateDefaultViewConfigs = ({
   tableNames,
@@ -17,7 +16,7 @@ export const generateDefaultViewConfigs = ({
   guessDisplayFieldIfNotProvided,
 }: {
   tableNames: string[];
-  dataModel: Prisma['dmmf']['datamodel'];
+  dataModel: ModelSchema;
   config: BaseConfigInterface;
   guessDisplayFieldIfNotProvided?: boolean;
 }) => {
@@ -28,9 +27,9 @@ export const generateDefaultViewConfigs = ({
 
     if (!tableData) return acc;
 
-    const options = (tableData?.fields as PrismaField[])
+    const options = (tableData?.fields as ModelField[])
       .map((f) => {
-        const { isOptionForDisplayField } = prismaViewFieldsHelper(
+        const { isOptionForDisplayField } = schemaHelper(
           f,
           tableData,
           dataModel
@@ -45,7 +44,6 @@ export const generateDefaultViewConfigs = ({
       .filter((f) => f !== null);
 
     const displayField = getPrefferedDisplayField(options.map((f) => f.name));
-
     const _config = createViewConfig(
       tableName as GetTableName,
       {
