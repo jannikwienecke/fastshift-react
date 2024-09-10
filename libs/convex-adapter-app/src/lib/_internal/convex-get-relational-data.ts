@@ -1,0 +1,54 @@
+import {
+  DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
+  QueryDto,
+  QueryRelationalData,
+} from '@apps-next/core';
+import { ConvexViewConfigManager } from '../convex-view-config';
+import { queryHelper } from './convex-query-helper';
+import { GenericQueryCtx } from './convex.server.types';
+import { queryClient } from './convex-client';
+
+export const getRelationalData = async (
+  ctx: GenericQueryCtx,
+  viewConfigManager: ConvexViewConfigManager,
+  args: QueryDto
+) => {
+  const displayField = viewConfigManager.getDisplayFieldLabel();
+
+  const { getInclude } = queryHelper({ displayField, query: args.query });
+
+  const include = getInclude(viewConfigManager.getIncludeFields());
+
+  const relationalDataPromises = Object.keys({
+    ...include,
+  }).map((key) => {
+    const manyToManyField = viewConfigManager.getManyToManyField(key);
+
+    const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
+
+    let dbQuery = queryClient(ctx, key);
+    if (field.relation) {
+      dbQuery = queryClient(ctx, field.relation.tableName);
+    }
+
+    return dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  });
+
+  const resultList = await Promise.all(relationalDataPromises);
+
+  const relationalData = Object.keys(include).reduce((acc, key, index) => {
+    const manyToManyField = viewConfigManager.getManyToManyField(key);
+    const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
+
+    const _key = field?.relation?.tableName ?? key;
+
+    const rows = resultList[index];
+    acc[_key] = rows.map((row) => ({
+      ...row,
+      id: row._id,
+    }));
+    return acc;
+  }, {} as QueryRelationalData);
+
+  return relationalData;
+};

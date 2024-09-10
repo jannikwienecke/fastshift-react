@@ -3,7 +3,6 @@
 import {
   GlobalConfig,
   MutationReturnDto,
-  QueryProps,
   QueryReturnDto,
 } from '@apps-next/core';
 import {
@@ -11,7 +10,6 @@ import {
   FunctionReference,
   Id,
 } from './convex.server.types';
-import { QueryOptions } from '@tanstack/react-query';
 
 export type ConvexServer = {
   query: (options: {
@@ -81,9 +79,16 @@ export type ConvexFindManyArgs = {
   select?: ConvexInclude;
 };
 
+export type SearchFilterBuilder = {
+  search: (fieldName: string, query: string) => unknown;
+};
 export type ConvexClient = {
   [key in string]: {
     take: (take: number) => Promise<ConvexRecord[]>;
+    withSearchIndex: (
+      indexName: string,
+      search: (q: SearchFilterBuilder) => any
+    ) => ConvexClient[string];
     // findMany: (args: ConvexFindManyArgs) => Promise<PrismaRecord[]>;
     // create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
     // delete: (args: { where: { id: ID } }) => Promise<void>;
