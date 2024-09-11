@@ -21,9 +21,11 @@ const _schema = defineSchema({
     tags: v.optional(v.array(v.id('tags'))),
     projectId: v.id('projects'),
     priority: v.union(v.literal('low'), v.literal('medium'), v.literal('high')),
-  }).searchIndex('name_search', {
-    searchField: 'name',
-  }),
+  })
+    .index('projectId', ['projectId'])
+    .searchIndex('name_search', {
+      searchField: 'name',
+    }),
 
   tags: defineTable({ name: v.string(), color: v.string() }).searchIndex(
     'name',

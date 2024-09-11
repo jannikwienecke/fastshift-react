@@ -1,4 +1,8 @@
-import { BaseViewConfigManager, QueryDto } from '@apps-next/core';
+import {
+  BaseViewConfigManager,
+  DEFAULT_FETCH_LIMIT_QUERY,
+  QueryDto,
+} from '@apps-next/core';
 import { queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
 import { filterResults, withSearch } from './convex-searching';
@@ -15,13 +19,15 @@ export const getData = async (
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   const rows = filterResults(
-    await withSearch(dbQuery, { searchField, query: args.query }).take(10),
+    await withSearch(dbQuery, { searchField, query: args.query }).take(
+      DEFAULT_FETCH_LIMIT_QUERY
+    ),
     displayField,
     args.query,
     searchField
   );
 
-  const rawData = await mapWithInclude(rows, viewConfigManager, ctx);
+  const rawData = await mapWithInclude(rows, viewConfigManager, ctx, args);
 
   // console.log('rawData', rawData?.[rawData.length - 1]);
 

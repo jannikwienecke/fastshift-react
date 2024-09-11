@@ -48,7 +48,8 @@ export const handleRelationalTableQuery = async ({
   const rowsWithInclude = await mapWithInclude(
     rows,
     relationalViewManager,
-    ctx
+    ctx,
+    args
   );
 
   return {
@@ -60,6 +61,3 @@ export const handleRelationalTableQuery = async ({
     }),
   };
 };
-
-const firstLetterLowerCase = (str: string) =>
-  str.charAt(0).toLowerCase() + str.slice(1);

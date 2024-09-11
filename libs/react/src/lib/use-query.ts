@@ -43,11 +43,12 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const result = useTanstackQuery({
     ...queryOptions,
     enabled: args.disabled === true ? false : true,
+    retry: import.meta.env.DEV ? 0 : 3,
   } as any);
 
   if (result.error) {
+    console.error('USE QUERY', args.viewName);
     console.error('ERROR', result.error);
-    console.error('USE QUERY', args);
   }
 
   const stored = React.useRef(result as any);

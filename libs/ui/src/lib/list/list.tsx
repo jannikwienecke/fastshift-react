@@ -182,8 +182,8 @@ function ListValues({
           return (
             <List.Value
               key={
-                value.id + '_fieldName_' + value.relation?.fieldName ??
-                'NO_VALUE' + (value.relation?.fieldName.toString() ?? '')
+                value.id + '_fieldName_' + value.relation?.fieldName ||
+                'NO_VALUE' + (value.relation?.fieldName.toString() || '')
               }
             >
               <>{value.render ? value.render() : value.label}</>
