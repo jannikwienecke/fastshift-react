@@ -47,10 +47,9 @@ export type ConvexQueryProviderProps = React.PropsWithChildren<{
   // api: ConvexApiType;
   // makeQueryOptions: (args: QueryProps) => QueryOptions;
   viewLoader: ViewLoader;
+  viewMutation: ViewMutation;
   globalConfig: Omit<GlobalConfig, 'provider'>;
 }>;
-
-export type ConvexContextType = GlobalConfig;
 
 export type ConvexSchemaType = {
   tables: Record<string, any>;

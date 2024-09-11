@@ -2,6 +2,7 @@ import {
   lldebug,
   makeQueryKey,
   Mutation,
+  MutationProps,
   MutationReturnDto,
 } from '@apps-next/core';
 import {
@@ -19,107 +20,158 @@ export const useMutation = () => {
   const api = useApi();
   const queryClient = useQueryClient();
 
+  const { registeredViews } = useView();
+
+  const queryPropsMerged = React.useMemo(() => {
+    return {
+      query,
+      registeredViews,
+      modelConfig: viewConfigManager.modelConfig,
+      viewConfig: viewConfigManager.viewConfig,
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      viewConfigManager: undefined,
+    };
+  }, [
+    query,
+    registeredViews,
+    viewConfigManager.modelConfig,
+    viewConfigManager.viewConfig,
+  ]);
+
   const lastViewName = React.useRef('');
 
-  // const { mutate, isPending, mutateAsync } = useMutationTanstack({
-  //   mutationFn: api.viewMutation,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries();
-  //   },
-  //   onError: (error, variables, context) => {
-  //     const { previousState, previousStateAll } = (context as any) || {};
+  const { mutate, isPending, mutateAsync, error } = useMutationTanstack({
+    mutationFn: async (args: MutationProps) => {
+      return await api.mutationFn?.({
+        ...args,
+        mutation: {
+          ...args.mutation,
+          handler: undefined,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+    onError: (error, variables, context) => {
+      const { previousState, previousStateAll } = (context as any) || {};
 
-  //     const queryKey = makeQueryKey({
-  //       viewName: lastViewName.current,
-  //       query: variables.query,
-  //     });
+      const queryKey = makeQueryKey({
+        viewName: lastViewName.current,
+        query: variables.query,
+      });
 
-  //     const queryKeyAll = makeQueryKey({
-  //       viewName: lastViewName.current,
-  //       query: variables.query,
-  //     });
+      const queryKeyAll = makeQueryKey({
+        viewName: lastViewName.current,
+        query: variables.query,
+      });
 
-  //     queryClient.setQueryData(queryKey, previousState);
-  //     queryClient.setQueryData(queryKeyAll, previousStateAll);
-  //   },
-  //   onMutate: async (vars) => {
-  //     lastViewName.current = vars.viewConfig.viewName;
+      queryClient.setQueryData(queryKey, previousState);
+      queryClient.setQueryData(queryKeyAll, previousStateAll);
+    },
+    onMutate: async (vars) => {
+      lastViewName.current = vars.viewConfig.viewName;
 
-  //     const queryKey = makeQueryKey({
-  //       viewName: vars.viewConfig.viewName,
-  //       query: vars.query,
-  //     });
+      const _queryKeyAll = api?.makeQueryOptions?.({
+        ...queryPropsMerged,
+        query: '',
+        viewName: vars.viewConfig.viewName,
+      }).queryKey;
 
-  //     const queryKeyAll = makeQueryKey({
-  //       viewName: vars.viewConfig.viewName,
-  //     });
+      const _queryKey = api?.makeQueryOptions?.({
+        ...queryPropsMerged,
+        query: vars.query,
+        viewName: vars.viewConfig.viewName,
+      }).queryKey;
 
-  //     await queryClient.cancelQueries({
-  //       queryKey: queryKey,
-  //     });
+      const queryKey =
+        _queryKey ??
+        makeQueryKey({
+          viewName: vars.viewConfig.viewName,
+          query: vars.query,
+        });
 
-  //     await queryClient.cancelQueries({
-  //       queryKey: queryKeyAll,
-  //     });
+      const queryKeyAll =
+        _queryKeyAll ??
+        makeQueryKey({
+          viewName: vars.viewConfig.viewName,
+        });
 
-  //     const previousState = queryClient.getQueryData(queryKey);
-  //     const previousStateAll = queryClient.getQueryData(queryKeyAll);
+      await queryClient.cancelQueries({
+        queryKey: queryKey,
+      });
 
-  //     if ('handler' in vars.mutation) {
-  //       const newState = vars.mutation.handler?.(
-  //         (previousState as any).data || []
-  //       );
+      await queryClient.cancelQueries({
+        queryKey: queryKeyAll,
+      });
 
-  //       queryClient.setQueryData(queryKey, {
-  //         data: newState,
-  //       });
+      const previousState = queryClient.getQueryData(queryKey);
+      const previousStateAll = queryClient.getQueryData(queryKeyAll);
 
-  //       queryClient.setQueryData(queryKeyAll, {
-  //         data: newState,
-  //       });
+      if ('handler' in vars.mutation && previousState) {
+        const newState = vars.mutation.handler?.(
+          (previousState as any).data || []
+        );
 
-  //       return {
-  //         previousState,
-  //         previousStateAll,
-  //       };
-  //     } else {
-  //       return previousState;
-  //     }
-  //   },
-  // });
+        queryClient.setQueryData(queryKey, {
+          data: newState,
+        });
+
+        queryClient.setQueryData(queryKeyAll, {
+          data: newState,
+        });
+
+        return {
+          previousState,
+          previousStateAll,
+        };
+      } else {
+        return previousState;
+      }
+    },
+  });
+
+  console.log('error', error);
 
   const runMutateAsync = React.useCallback(
     async (args: { mutation: Mutation }): Promise<MutationReturnDto> => {
       lldebug('DISPATCH MUTATION2', args.mutation);
-      return Promise.resolve({} as any);
-      // try {
-      //   return await mutateAsync({
-      //     viewConfig: viewConfigManager.viewConfig,
-      //     mutation: args.mutation,
-      //     query,
-      //   });
-      //   return Promise.resolve({} as any);
-      // } catch (error) {
-      //   console.error('Error in runMutateAsync: ', error);
-      //   return { error: (error as any)?.message };
-      // }
+      if (!mutateAsync) throw new Error('mutateAsync is not defined');
+
+      try {
+        const res = await mutateAsync({
+          viewConfig: viewConfigManager.viewConfig,
+          mutation: args.mutation,
+          query,
+        });
+        if (!res) throw new Error('mutation failed');
+        return res;
+      } catch (error) {
+        console.error('Error in runMutateAsync: ', error);
+        return { error: (error as any)?.message };
+      }
     },
-    []
+    [mutateAsync, query, viewConfigManager.viewConfig]
   );
 
-  const runMutate = React.useCallback((args: { mutation: Mutation }) => {
-    lldebug('DISPATCH MUTATION: ', args.mutation);
-    // return mutate({
-    //   viewConfig: viewConfigManager.viewConfig,
-    //   mutation: args.mutation,
-    //   query,
-    // });
-  }, []);
+  const runMutate = React.useCallback(
+    (args: { mutation: Mutation }) => {
+      lldebug('DISPATCH MUTATION: ', args.mutation);
+      return mutate({
+        viewConfig: viewConfigManager.viewConfig,
+        mutation: args.mutation,
+        query,
+      });
+    },
+    [mutate, query, viewConfigManager.viewConfig]
+  );
 
   return {
-    mutateAsync: runMutateAsync,
-    mutate: runMutate,
-    isPending: false,
+    mutateAsync,
+    mutate,
+    isPending,
     runMutateAsync,
     runMutate,
   };

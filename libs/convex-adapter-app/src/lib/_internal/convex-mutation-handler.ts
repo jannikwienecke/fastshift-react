@@ -41,6 +41,8 @@ export const updateMutation = async (
 ) => {
   if (mutation.type !== 'UPDATE_RECORD') throw new Error('INVALID MUTATION-3');
 
+  console.log('updateMutation', mutation);
+
   await ctx.db.patch(mutation.payload.id, mutation.payload.record);
 
   return {
