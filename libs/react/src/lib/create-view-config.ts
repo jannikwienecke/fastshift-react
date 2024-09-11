@@ -15,9 +15,13 @@ export function createViewConfig<T extends GetTableName>(
   // Clean Up -> Duplicate code in ViewProvider
   const searchableFields = globalConfig.searchableFields[tableName as string];
   const viewFields = globalConfig.viewFields[tableName as string];
-  const includeFields = globalConfig.includeFields[tableName as string];
-
+  const includeFieldsDefault = globalConfig.includeFields[tableName as string];
   const viewName = config.viewName ?? (tableName as string);
+
+  const includeFields = [
+    ...includeFieldsDefault,
+    ...(config.includeFields ?? []),
+  ];
 
   const viewConfig: ViewConfigType<T> = {
     ...config,

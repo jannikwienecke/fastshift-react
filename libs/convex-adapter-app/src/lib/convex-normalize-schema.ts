@@ -15,22 +15,74 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
     for (const [fieldName, fieldSchema] of Object.entries(
       tableSchema.validator.fields
     )) {
+      let isManyToManyField = false;
+      let relationName = '';
+      let manyToManyModelName: string | undefined = undefined;
+
+      if (fieldSchema.kind === 'array') {
+        const optionNameManyToMany = tableName + fieldName;
+
+        manyToManyModelName = Object.keys(convexSchema).find(
+          (tableName) =>
+            tableName.replace('_', '').toLowerCase() === optionNameManyToMany
+        );
+
+        const manyToManyModel = convexSchema[manyToManyModelName ?? ''];
+
+        isManyToManyField = Object.values(
+          manyToManyModel.validator.fields
+        ).every((field) => {
+          return field.tableName === tableName || field.tableName === fieldName;
+        });
+
+        if (isManyToManyField) {
+          relationName = tableName + 'To' + manyToManyModelName;
+        }
+
+        // {
+        //     name: 'tags',
+        //     kind: 'object',
+        //     isList: true,
+        //     isRequired: true,
+        //     isUnique: false,
+        //     isId: false,
+        //     isReadOnly: false,
+        //     hasDefaultValue: false,
+        //     type: 'TaskTag',
+        //     relationName: 'TaskToTaskTag',
+        //     relationFromFields: [],
+        //     relationToFields: [],
+        //     isGenerated: false,
+        //     isUpdatedAt: false
+        //   }
+      }
       const field: ModelField = {
-        name: fieldSchema.tableName ?? fieldName,
-        relationFromFields: fieldSchema.tableName ? [fieldName] : [],
-        relationName: fieldSchema.tableName,
-        relationToFields: fieldSchema.tableName ? [fieldName] : [],
-        kind: fieldSchema.kind,
+        name: isManyToManyField
+          ? fieldName
+          : fieldSchema.tableName ?? fieldName,
+        relationFromFields: isManyToManyField
+          ? []
+          : fieldSchema.tableName
+          ? [fieldName]
+          : [],
+        relationName: relationName || fieldSchema.tableName,
+        relationToFields: isManyToManyField
+          ? []
+          : fieldSchema.tableName
+          ? [fieldName]
+          : [],
+        kind: isManyToManyField ? 'object' : fieldSchema.kind,
         isList: fieldSchema.kind === 'array',
         isRequired: fieldSchema.isOptional === 'required',
         isUnique: false, // Convex doesn't have a direct 'unique' property
         isId: false,
         isReadOnly: false, // Convex doesn't have a direct 'readOnly' property
         hasDefaultValue: false, // Convex doesn't have a direct 'default' property
-        type:
-          fieldSchema.kind === 'id' && fieldSchema.tableName
-            ? fieldSchema.tableName
-            : fieldSchema.kind,
+        type: manyToManyModelName
+          ? manyToManyModelName
+          : fieldSchema.kind === 'id' && fieldSchema.tableName
+          ? fieldSchema.tableName
+          : fieldSchema.kind,
       };
 
       if (fieldSchema.kind === 'union' && fieldSchema.members) {

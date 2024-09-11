@@ -5,8 +5,8 @@ export type DataType<
   T extends GetTableName = any,
   TCustomDataType extends Record<string, any> | undefined = undefined
 > = TCustomDataType extends undefined
-  ? GetTableDataType<T>
-  : TCustomDataType & GetTableDataType<T>;
+  ? GetTableDataType<T> & { id: string }
+  : TCustomDataType & GetTableDataType<T> & { id: string };
 
 // export type GetViewProps<
 //   T extends keyof RegisteredRouter['config']['_datamodel']

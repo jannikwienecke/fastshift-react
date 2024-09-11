@@ -29,6 +29,10 @@ export const deleteMutesttation = server.query({
   handler: async (ctx, args) => {
     console.log('deleteMutation');
 
+    // ctx.db
+    //   .query('tags')
+    //   .
+
     ctx.db
       .query('tasks')
       // .withSearchIndex('name_search', (q) => q.search('name', '123'))

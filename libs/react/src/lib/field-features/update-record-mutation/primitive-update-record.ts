@@ -19,7 +19,7 @@ export const PrimitiveFieldUpdate = ({
     },
     handler: (items) => {
       return items.map((item) => {
-        if (item.id === row.id) {
+        if (item['id'] === row.id) {
           const newValue = {
             ...item,
             [field.name]: value.raw,

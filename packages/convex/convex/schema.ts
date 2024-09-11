@@ -1,6 +1,6 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
-import { Doc } from './_generated/dataModel';
+import { Doc, TableNames } from './_generated/dataModel';
 
 const _schema = defineSchema({
   users: defineTable({
@@ -35,7 +35,7 @@ const _schema = defineSchema({
   tasks_tags: defineTable({
     taskId: v.id('tasks'),
     tagId: v.id('tags'),
-  }),
+  }).index('by_task_id', ['taskId']),
 
   projects: defineTable({
     label: v.string(),
@@ -59,8 +59,15 @@ export default _schema;
 
 export const schema = _schema;
 
-export type Categories = Doc<'categories'>;
-export type Users = Doc<'users'>;
-export type Owner = Doc<'owner'> & {
+export type MyDoc<T extends TableNames> = Doc<T> & {
+  id: string;
+};
+
+export type Categories = MyDoc<'categories'>;
+export type Users = MyDoc<'users'>;
+export type Owner = MyDoc<'owner'> & {
   users?: Users;
 };
+export type Tags = MyDoc<'tags'>;
+export type Tasks = MyDoc<'tasks'>;
+export type Projects = MyDoc<'projects'>;

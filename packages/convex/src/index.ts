@@ -18,6 +18,7 @@ export const tasksConfig = createViewConfig(
     displayField: {
       field: 'name',
     },
+    includeFields: ['tags'],
   },
   config.config
 );

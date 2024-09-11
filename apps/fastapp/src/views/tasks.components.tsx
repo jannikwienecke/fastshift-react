@@ -3,12 +3,13 @@
 import { useViewOf } from '@apps-next/react';
 import { Bubble, Icon } from '@apps-next/ui';
 import { DataType, GetTableName } from '@apps-next/core';
+import { Projects, Tags } from '@apps-next/convex';
 
 export type TaskViewDataType = DataType<
   'tasks',
   {
-    // project?: Project;
-    // tag: Tag[];
+    project?: Projects;
+    tags: Tags[];
   }
 >;
 
@@ -62,40 +63,43 @@ export const CompletedComponent = (props: { data: TaskViewDataType }) => {
   return <div>{completed ? '✅' : '❌'}</div>;
 };
 
-// export const TagsComponent = (props: { data: TaskViewDataType }) => {
-//   const tags = props.data.tag;
+export const TagsComponent = (props: { data: TaskViewDataType }) => {
+  const tags = props.data.tags;
+  // console.log('tags', props);
+  if (!tags) return null;
 
-//   if (!tags) return null;
+  const visibleTags = tags.slice(0, 4);
 
-//   const visibleTags = tags.slice(0, 4);
+  return (
+    <div className="flex items-center">
+      <>
+        {visibleTags.map((tag, index) => (
+          <div
+            key={tag.id + props.data.id}
+            className={index !== 0 ? '-ml-2' : ''}
+          >
+            <ViewBubble
+              tableName="tags"
+              value={tag.name}
+              color={tag.color}
+              showIcon={false}
+            />
+          </div>
+        ))}
 
-//   return (
-//     <div className="flex items-center">
-//       <>
-//         {visibleTags.map((tag, index) => (
-//           <div key={tag.id} className={index !== 0 ? '-ml-2' : ''}>
-//             <ViewBubble
-//               tableName="tag"
-//               value={tag.name}
-//               color={tag.color}
-//               showIcon={false}
-//             />
-//           </div>
-//         ))}
-
-//         {visibleTags.length < tags.length && (
-//           <div className={'-ml-2'}>
-//             <ViewBubble
-//               showIcon={false}
-//               tableName="tag"
-//               value={`+${tags.length - visibleTags.length} more`}
-//             />
-//           </div>
-//         )}
-//       </>
-//     </div>
-//   );
-// };
+        {visibleTags.length < tags.length && (
+          <div className={'-ml-2'}>
+            <ViewBubble
+              showIcon={false}
+              tableName="tags"
+              value={`+${tags.length - visibleTags.length} more`}
+            />
+          </div>
+        )}
+      </>
+    </div>
+  );
+};
 
 // export const TagsCombobox = (props: { data: TaskViewDataType['tag'][0] }) => {
 //   const tag = props.data;

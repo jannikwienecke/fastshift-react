@@ -12,6 +12,11 @@ export const globalConfig = createConfigFromPrismaSchema<PrismaClientType>(
   }
 );
 
+console.log('hier..');
+console.log(
+  Prisma.dmmf.datamodel.models.find((model) => model.name === 'task')
+);
+
 declare module '@apps-next/core' {
   interface Register {
     config: typeof globalConfig;

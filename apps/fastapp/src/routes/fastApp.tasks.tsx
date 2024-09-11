@@ -5,20 +5,29 @@ import {
   makeHooks,
   QueryInput,
   setViewFieldsConfig,
+  useCombobox,
+  useHandleSelectCombobox,
+  useStoreValue,
 } from '@apps-next/react';
-import { List } from '@apps-next/ui';
+import { ComboboxPopover, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { config, makeViewConfig } from '../global-config';
+import { config } from '../global-config';
 import {
   CompletedComponent,
   PriorityComponent,
   PriorityComponentCombobox,
+  TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
 import { tasksConfig } from '@apps-next/convex';
 
 setViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
+    tags: {
+      component: {
+        list: TagsComponent,
+      },
+    },
     completed: {
       component: {
         list: CompletedComponent,
@@ -52,14 +61,27 @@ const Task = () => {
   const { useList, useQueryData } = makeHooks(tasksConfig);
   const getListProps = useList();
 
+  const { handleClose, handleSelect } = useHandleSelectCombobox();
+
+  // TODO: we should not save it on list -> but have like selected: {type: "list or whatever"}
+  const { list } = useStoreValue();
+
+  const getComboboxProps = useCombobox({
+    state: list?.focusedRelationField ? list.focusedRelationField : null,
+    onSelect: handleSelect,
+    onClose: handleClose,
+  });
+
   return (
     <div className="p-2 flex gap-2 grow overflow-scroll">
+      <ComboboxPopover {...getComboboxProps()} />
+
       <div className="flex flex-col w-full ">
         <QueryInput />
 
         <List.Default
           {...getListProps({
-            fieldsRight: ['priority', 'completed'],
+            fieldsRight: ['priority', 'completed', 'tags'],
             fieldsLeft: [],
           })}
         />

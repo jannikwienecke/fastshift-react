@@ -47,16 +47,18 @@ export const makeData = (
           label: item ? item[label] : '',
           getValue: <K extends keyof T>(key: K) => {
             const field = viewConfigManager.getFieldBy(key.toString());
-            const viewConfig = registeredViews[field.relation?.tableName ?? ''];
 
+            const nameOfView =
+              (field.relation?.manyToManyRelation ||
+                field.relation?.tableName) ??
+              '';
+
+            const viewConfig = registeredViews[nameOfView];
             if (viewConfig) {
               const value = item[key];
               const isArray = Array.isArray(value);
 
-              const _data = makeData(
-                registeredViews,
-                field.relation?.tableName ?? ''
-              );
+              const _data = makeData(registeredViews, nameOfView);
 
               const data = _data(isArray ? item[key] : [item[key]]);
 

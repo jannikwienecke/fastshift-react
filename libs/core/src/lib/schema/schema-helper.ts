@@ -164,6 +164,8 @@ export const schemaHelper = (
 
       return rel;
     }
+
+    return undefined;
   };
 
   const isOptionForDisplayField = () => {

@@ -59,7 +59,9 @@ export const useHandleSelectCombobox = () => {
           if (!field) return;
 
           const newSelected = Array.isArray(selected)
-            ? updateManyToManyRelation(selected ?? [], value).map((v) => v.id)
+            ? updateManyToManyRelation(selected ?? [], value).map(
+                (v) => v['id']
+              )
             : selectedId;
 
           startSelectedRef.current = newSelected;
@@ -73,7 +75,7 @@ export const useHandleSelectCombobox = () => {
                 if (isManyToManyRelation) return items;
 
                 return items.map((item) => {
-                  if (item.id === row.id) {
+                  if (item['id'] === row.id) {
                     const newValue = {
                       ...item,
                       [field.name]: isManyToManyRelation
@@ -123,7 +125,7 @@ function updateManyToManyRelation(
   newValue: RecordType
 ) {
   const existingIndex = currentValues.findIndex(
-    (value) => value.id === newValue.id
+    (value) => value['id'] === newValue['id']
   );
   return existingIndex !== -1
     ? currentValues.filter((_, index) => index !== existingIndex)
