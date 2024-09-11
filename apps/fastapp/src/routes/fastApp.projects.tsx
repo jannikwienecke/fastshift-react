@@ -14,6 +14,7 @@ import {
 import { ComboboxPopover, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { config } from '../global-config';
+import { IconSubtask } from '@tabler/icons-react';
 
 type ProjectViewDataType = DataType<
   'projects',
@@ -26,6 +27,19 @@ setViewFieldsConfig<ProjectViewDataType>('projects', {
       component: {
         list: ({ data }) => {
           return <>{data.categories?.label ?? 'Set Category'}</>;
+        },
+      },
+    },
+    tasks: {
+      component: {
+        list: ({ data }) => {
+          const tasks = data.tasks.length;
+          return (
+            <div className="flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
+              {tasks}
+              <IconSubtask className="w-4 h-4" />
+            </div>
+          );
         },
       },
     },
@@ -66,7 +80,7 @@ const ProjectPage = () => {
 
         <List.Default
           {...getListProps({
-            fieldsRight: ['tasks', 'categories', 'owner'],
+            fieldsRight: ['categories', 'owner', 'tasks'],
             fieldsLeft: [],
           })}
         />

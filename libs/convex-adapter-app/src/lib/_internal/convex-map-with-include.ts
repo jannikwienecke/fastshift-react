@@ -96,11 +96,18 @@ export const getOneToManyRecords = async (props: HelperProps) => {
 
   const client = queryClient(ctx, field.relation.tableName);
 
-  return await client
+  const records = await client
     .withIndex(fieldNameOfTable, (q) =>
       q.eq(fieldNameOfTable, recordWithoutRelations['_id'])
     )
     .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+
+  return records.map((record) => {
+    return {
+      id: record._id,
+      ...record,
+    };
+  });
 };
 
 export const getManyToManyRecords = async (props: HelperProps) => {
