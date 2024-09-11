@@ -1,3 +1,4 @@
+import { getRelationTableName } from '@apps-next/core';
 import {
   ComboboxInitPayload,
   ComboboxStore,
@@ -15,7 +16,8 @@ export const ReferenceInitializer = (
     return store;
   }
 
-  const table = payload.field?.relation?.tableName ?? '';
+  const table = getRelationTableName(payload.field);
+
   const defaultValues = defaultData?.rows ?? [];
 
   const selectedValues = Array.isArray(selected)

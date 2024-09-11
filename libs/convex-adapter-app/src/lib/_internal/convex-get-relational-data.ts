@@ -1,5 +1,6 @@
 import {
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
+  getRelationTableName,
   QueryDto,
   QueryRelationalData,
 } from '@apps-next/core';
@@ -28,7 +29,10 @@ export const getRelationalData = async (
 
     let dbQuery = queryClient(ctx, key);
     if (field.relation) {
-      dbQuery = queryClient(ctx, field.relation.tableName);
+      dbQuery = queryClient(
+        ctx,
+        field.relation.manyToManyRelation || field.relation.tableName
+      );
     }
 
     return dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
@@ -40,7 +44,7 @@ export const getRelationalData = async (
     const manyToManyField = viewConfigManager.getManyToManyField(key);
     const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
 
-    const _key = field?.relation?.tableName ?? key;
+    const _key = getRelationTableName(field);
 
     const rows = resultList[index];
     acc[_key] = rows.map((row) => ({

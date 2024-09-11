@@ -26,7 +26,9 @@ export interface BaseViewConfigManagerInterface<
   getViewFieldList(): FieldConfig[];
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
+  getRelationFieldByTableName(tableName: string): FieldConfig;
   getIncludeFields(): IncludeConfig[string];
+
   modelConfig?: ModelConfig;
   form: FormManagerInterface;
 }
@@ -87,7 +89,9 @@ export class BaseViewConfigManager<
 
   getRelationFieldByTableName(tableName: string): FieldConfig {
     const field = this.getViewFieldList().find(
-      (f) => f.relation?.tableName === tableName
+      (f) =>
+        f.relation?.manyToManyRelation === tableName ||
+        f.relation?.tableName === tableName
     );
 
     if (!field) {

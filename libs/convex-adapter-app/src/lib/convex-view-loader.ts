@@ -25,7 +25,7 @@ export const viewLoaderHandler = async (
   );
 
   if (args.relationQuery?.tableName) {
-    return handleRelationalTableQuery({ ctx, args });
+    return handleRelationalTableQuery({ ctx, args, viewConfigManager });
   }
 
   invarant(Boolean(viewConfigManager), 'viewConfig is not defined');

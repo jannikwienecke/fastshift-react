@@ -1,4 +1,5 @@
 import {
+  BaseViewConfigManagerInterface,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   QueryDto,
   relationalViewHelper,
@@ -11,17 +12,22 @@ import { GenericQueryCtx } from './convex.server.types';
 export const handleRelationalTableQuery = async ({
   ctx,
   args,
+  viewConfigManager,
 }: {
   ctx: GenericQueryCtx;
   args: QueryDto;
+  viewConfigManager: BaseViewConfigManagerInterface;
 }) => {
-  if (!args.relationQuery?.tableName) throw new Error('No table name provided');
+  const relationQuery = args.relationQuery;
+  if (!relationQuery?.tableName) throw new Error('No table name provided');
 
-  const tableNameRelation = args.relationQuery?.tableName;
+  const field = viewConfigManager.getRelationFieldByTableName(
+    relationQuery.tableName
+  );
 
-  const dbQuery = queryClient(ctx, tableNameRelation);
+  const dbQuery = queryClient(ctx, field.name);
   const { relationalViewManager } = relationalViewHelper(
-    tableNameRelation,
+    field.name,
     args.registeredViews
   );
 
@@ -54,3 +60,6 @@ export const handleRelationalTableQuery = async ({
     }),
   };
 };
+
+const firstLetterLowerCase = (str: string) =>
+  str.charAt(0).toLowerCase() + str.slice(1);

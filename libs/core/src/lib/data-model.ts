@@ -38,7 +38,6 @@ export const makeData = (
     const viewConfigManager = new BaseViewConfigManager(viewConfig);
 
     const label = viewConfigManager.getDisplayFieldLabel();
-
     return {
       rows: data.map((item) => {
         return {
@@ -48,10 +47,7 @@ export const makeData = (
           getValue: <K extends keyof T>(key: K) => {
             const field = viewConfigManager.getFieldBy(key.toString());
 
-            const nameOfView =
-              (field.relation?.manyToManyRelation ||
-                field.relation?.tableName) ??
-              '';
+            const nameOfView = getRelationTableName(field);
 
             const viewConfig = registeredViews[nameOfView];
             if (viewConfig) {
@@ -106,4 +102,12 @@ export const makeRow = (
       field,
     }),
   };
+};
+
+export const getRelationTableName = (field?: FieldConfig | null) => {
+  if (!field?.relation) return '';
+
+  return (
+    (field.relation?.manyToManyRelation || field.relation?.tableName) ?? ''
+  );
 };

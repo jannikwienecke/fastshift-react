@@ -24,7 +24,7 @@ export const getData = async (
 
   const rawData = await mapWithInclude(rows, viewConfigManager, ctx);
 
-  console.log('rawData', rawData?.[rawData.length - 1]);
+  // console.log('rawData', rawData?.[rawData.length - 1]);
 
   return rawData.map((item) => {
     return {

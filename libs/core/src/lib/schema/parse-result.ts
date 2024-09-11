@@ -19,13 +19,10 @@ export const parseResult = ({
   };
 
   const parseResult = (result: RecordType[]) => {
-    console.log('PARSE RESULT');
-
     return result.map((r) => {
       return Object.keys(r).reduce((acc, key) => {
         if (include[key]) {
           const items = r[key] as RecordType[];
-          console.log({ items, key });
 
           let field: FieldConfig | undefined;
           try {

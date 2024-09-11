@@ -70,6 +70,7 @@ export const Content = (props: QueryProviderPropsWithViewFieldsConfig) => {
   const relationalDataModel = Object.entries(data?.relationalData ?? {}).reduce(
     (acc, [tableName, data]) => {
       const viewConfig = registeredViews[tableName];
+      console.log('===viewConfig', viewConfig?.tableName);
       acc[tableName] = makeData(registeredViews, viewConfig?.tableName)(data);
       return acc;
     },

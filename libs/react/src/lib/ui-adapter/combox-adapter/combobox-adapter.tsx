@@ -1,6 +1,7 @@
 import {
   ComboboxPopoverProps,
   FieldConfig,
+  getRelationTableName,
   makeData,
   Row,
 } from '@apps-next/core';
@@ -29,7 +30,7 @@ export const useCombobox = ({
   const { registeredViews } = useView();
   const query = useDebounce(store.query, 300);
 
-  const defaultData = useQueryDataOf(initialState?.field?.relation?.tableName);
+  const defaultData = useQueryDataOf(getRelationTableName(initialState?.field));
 
   const renderValue = (props: { value: Row; field: FieldConfig }) => (
     <ComboboxFieldValue {...props} />
@@ -49,14 +50,14 @@ export const useCombobox = ({
         type: 'HANDLE_QUERY_DATA',
         data: makeData(
           registeredViews,
-          initialState?.field?.relation?.tableName
+          getRelationTableName(initialState?.field)
         )(data ?? []).rows,
       });
     }
   }, [
     data,
     dispatch,
-    initialState?.field?.relation?.tableName,
+    initialState?.field,
     isFetched,
     isFetching,
     registeredViews,
