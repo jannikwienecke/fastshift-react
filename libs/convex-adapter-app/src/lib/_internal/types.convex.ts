@@ -81,13 +81,20 @@ export type ConvexFindManyArgs = {
 
 export type SearchFilterBuilder = {
   search: (fieldName: string, query: string) => unknown;
+  eq: (fieldName: string, value: unknown) => unknown;
 };
 export type ConvexClient = {
   [key in string]: {
     take: (take: number) => Promise<ConvexRecord[]>;
+    first: () => Promise<ConvexRecord>;
+    order: (direction: 'asc' | 'desc') => ConvexClient[string];
     withSearchIndex: (
       indexName: string,
       search: (q: SearchFilterBuilder) => any
+    ) => ConvexClient[string];
+    withIndex: (
+      indexName: string,
+      query: (q: SearchFilterBuilder) => any
     ) => ConvexClient[string];
     // findMany: (args: ConvexFindManyArgs) => Promise<PrismaRecord[]>;
     // create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;

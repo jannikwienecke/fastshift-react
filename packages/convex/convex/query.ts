@@ -31,7 +31,9 @@ export const deleteMutesttation = server.query({
 
     ctx.db
       .query('tasks')
-      .withSearchIndex('name_search', (q) => q.search('name', '123'));
+      // .withSearchIndex('name_search', (q) => q.search('name', '123'))
+      // .order('desc')
+      .take(10);
 
     const posts = await asyncMap(
       // one-to-many

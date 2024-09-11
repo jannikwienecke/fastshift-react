@@ -27,6 +27,7 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
         disabled: undefined as any,
         viewConfigManager: undefined,
         viewName: args.viewConfig?.viewName ?? '',
+        relationQuery: args.relationQuery,
       })
     : {
         queryKey: makeQueryKey({
@@ -46,6 +47,7 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
 
   if (result.error) {
     console.error('ERROR', result.error);
+    console.error('USE QUERY', args);
   }
 
   const stored = React.useRef(result as any);

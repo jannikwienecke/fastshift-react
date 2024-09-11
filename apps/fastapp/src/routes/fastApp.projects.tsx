@@ -1,4 +1,4 @@
-import { Categories, projectsConfig } from '@apps-next/convex';
+import { Categories, Owner, projectsConfig } from '@apps-next/convex';
 import { DataType } from '@apps-next/core';
 import {
   ClientViewProviderConvex,
@@ -15,14 +15,27 @@ import { ComboboxPopover, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { config } from '../global-config';
 
-type ProjectViewDataType = DataType<'projects', { categories: Categories }>;
+type ProjectViewDataType = DataType<
+  'projects',
+  { categories: Categories; owner: Owner }
+>;
 
 setViewFieldsConfig<ProjectViewDataType>('projects', {
   fields: {
     categories: {
       component: {
         list: ({ data }) => {
-          return <>{data.categories.label}</>;
+          return <>{data.categories?.label ?? 'Set Category'}</>;
+        },
+      },
+    },
+    owner: {
+      component: {
+        combobox: ({ data }) => {
+          return <>{data?.firstname + ' ' + data.lastname}</>;
+        },
+        list: ({ data }) => {
+          return <>{data.owner?.firstname ?? 'Set Owner'}</>;
         },
       },
     },
@@ -53,7 +66,7 @@ const ProjectPage = () => {
 
         <List.Default
           {...getListProps({
-            fieldsRight: ['categories'],
+            fieldsRight: ['categories', 'owner'],
             fieldsLeft: [],
           })}
         />

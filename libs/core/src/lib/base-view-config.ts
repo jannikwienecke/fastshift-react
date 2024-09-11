@@ -26,6 +26,7 @@ export interface BaseViewConfigManagerInterface<
   getViewFieldList(): FieldConfig[];
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
+  getIncludeFields(): IncludeConfig[string];
   modelConfig?: ModelConfig;
   form: FormManagerInterface;
 }

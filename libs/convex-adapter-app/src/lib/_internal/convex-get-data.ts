@@ -1,9 +1,9 @@
 import { QueryDto } from '@apps-next/core';
-import { asyncMap } from 'convex-helpers';
 import { ConvexViewConfigManager } from '../convex-view-config';
 import { queryClient } from './convex-client';
+import { mapWithInclude } from './convex-map-with-include';
+import { filterResults, withSearch } from './convex-searching';
 import { GenericQueryCtx } from './convex.server.types';
-import { withSearch } from './convex-searching';
 
 export const getData = async (
   ctx: GenericQueryCtx,
@@ -11,37 +11,18 @@ export const getData = async (
   args: QueryDto
 ) => {
   const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
-  const include = viewConfigManager.getIncludeFields();
 
   const searchField = viewConfigManager.getSearchableField();
+  const displayField = viewConfigManager.getDisplayFieldLabel();
 
-  const rawData = await asyncMap(
-    withSearch(dbQuery, { searchField, query: args.query }).take(10),
-    async (recordWithoutRelations) => {
-      const extendedRecord = await include.reduce(async (acc, key) => {
-        const field = viewConfigManager.getFieldBy(key);
-        if (!field.relation) {
-          return acc;
-        }
-
-        const accResolved = await acc;
-
-        const record = await ctx.db
-          .query(field.relation.tableName)
-          .withIndex('by_id', (q: any) =>
-            q.eq('_id', recordWithoutRelations[field.relation?.fieldName ?? ''])
-          )
-          .first();
-
-        return {
-          ...accResolved,
-          [field.relation.tableName]: record,
-        };
-      }, Promise.resolve(recordWithoutRelations));
-
-      return extendedRecord;
-    }
+  const rows = filterResults(
+    await withSearch(dbQuery, { searchField, query: args.query }).take(10),
+    displayField,
+    args.query,
+    searchField
   );
+
+  const rawData = await mapWithInclude(rows, viewConfigManager, ctx);
 
   return rawData.map((item) => {
     return {

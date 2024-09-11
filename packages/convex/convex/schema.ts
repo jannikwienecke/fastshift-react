@@ -50,6 +50,8 @@ const _schema = defineSchema({
   categories: defineTable({
     label: v.string(),
     color: v.string(),
+  }).searchIndex('label', {
+    searchField: 'label',
   }),
 });
 
@@ -58,3 +60,7 @@ export default _schema;
 export const schema = _schema;
 
 export type Categories = Doc<'categories'>;
+export type Users = Doc<'users'>;
+export type Owner = Doc<'owner'> & {
+  users?: Users;
+};
