@@ -8,7 +8,8 @@
     "types": ["vite/client", "vitest"],
     "declaration": true,
     "declarationMap": true,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+    "module": "esnext" // Add this line
   },
   "files": [],
   "include": [],

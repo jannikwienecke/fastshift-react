@@ -43,6 +43,8 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const result = useTanstackQuery({
     ...queryOptions,
     enabled: args.disabled === true ? false : true,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     retry: import.meta.env.DEV ? 0 : 3,
   } as any);
 
