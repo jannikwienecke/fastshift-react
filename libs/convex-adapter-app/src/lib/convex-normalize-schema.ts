@@ -38,23 +38,6 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
         if (isManyToManyField) {
           relationName = tableName + 'To' + manyToManyModelName;
         }
-
-        // {
-        //     name: 'tags',
-        //     kind: 'object',
-        //     isList: true,
-        //     isRequired: true,
-        //     isUnique: false,
-        //     isId: false,
-        //     isReadOnly: false,
-        //     hasDefaultValue: false,
-        //     type: 'TaskTag',
-        //     relationName: 'TaskToTaskTag',
-        //     relationFromFields: [],
-        //     relationToFields: [],
-        //     isGenerated: false,
-        //     isUpdatedAt: false
-        //   }
       }
       const field: ModelField = {
         name: isManyToManyField
@@ -87,6 +70,7 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
 
       if (fieldSchema.kind === 'union' && fieldSchema.members) {
         field.type = 'enum';
+        field.kind = 'enum';
         const enumName = `${tableName}_${fieldName}`;
         enums.push({
           name: enumName,
