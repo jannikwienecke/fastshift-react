@@ -133,8 +133,6 @@ export const useMutation = () => {
     },
   });
 
-  console.log('error', error);
-
   const runMutateAsync = React.useCallback(
     async (args: { mutation: Mutation }): Promise<MutationReturnDto> => {
       lldebug('DISPATCH MUTATION2', args.mutation);

@@ -6,6 +6,7 @@ import * as server from './_generated/server';
 
 import { asyncMap } from 'convex-helpers';
 import { views } from '../src/index';
+import { Id } from './_generated/dataModel';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -20,6 +21,8 @@ export const viewMutation = server.mutation({
 
 export const deleteMutation = server.mutation({
   handler: (ctx, args) => {
+    // ctx.db.patch('' as Id<'tasks'>, {projectId: '123'})
+
     console.log('deleteMutation');
     return {};
   },
@@ -28,16 +31,12 @@ export const deleteMutation = server.mutation({
 export const deleteMutesttation = server.query({
   handler: async (ctx, args) => {
     console.log('deleteMutation');
-
+    // ctx.db.
     // ctx.db
     //   .query('tags')
     //   .
 
-    ctx.db
-      .query('tasks')
-      // .withSearchIndex('name_search', (q) => q.search('name', '123'))
-      // .order('desc')
-      .take(10);
+    // ctx.db.query("categories").
 
     const posts = await asyncMap(
       // one-to-many

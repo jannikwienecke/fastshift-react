@@ -35,10 +35,10 @@ export const mapWithInclude = async (
       };
 
       try {
-        const includeField = await handleIncludeField(props)();
+        const { fn, key } = await handleIncludeField(props);
         return {
           ...accResolved,
-          [field.relation.tableName]: includeField,
+          [key ?? '']: await fn(),
         };
       } catch (error) {
         console.log('error', error);
@@ -68,16 +68,29 @@ type HelperProps = {
 
 export const handleIncludeField = (props: HelperProps) => {
   const { field } = props;
-
-  if (field.relation?.manyToManyTable && field.relation.type === 'manyToMany') {
-    return () => getManyToManyRecords(props);
+  if (
+    field.relation?.manyToManyTable &&
+    field.relation.manyToManyTable
+      .toLowerCase()
+      .includes(props.viewConfigManager.getTableName().toLowerCase())
+  ) {
+    return {
+      fn: () => getManyToManyRecords(props),
+      key: field.name,
+    };
   } else if (
     field.relation?.manyToManyTable &&
     field.relation.type === 'oneToMany'
   ) {
-    return () => getOneToManyRecords(props);
+    return {
+      fn: () => getOneToManyRecords(props),
+      key: field.relation?.tableName,
+    };
   } else {
-    return () => getOneToOneRecords(props);
+    return {
+      fn: () => getOneToOneRecords(props),
+      key: field.relation?.tableName,
+    };
   }
 };
 

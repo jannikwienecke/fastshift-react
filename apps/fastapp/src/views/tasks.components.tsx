@@ -65,7 +65,7 @@ export const CompletedComponent = (props: { data: TaskViewDataType }) => {
 
 export const TagsComponent = (props: { data: TaskViewDataType }) => {
   const tags = props.data.tags;
-  // console.log('tags', props);
+
   if (!tags) return null;
 
   const visibleTags = tags.slice(0, 4);

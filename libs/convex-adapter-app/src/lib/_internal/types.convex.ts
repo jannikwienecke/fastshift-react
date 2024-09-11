@@ -84,6 +84,7 @@ export type SearchFilterBuilder = {
 };
 export type ConvexClient = {
   [key in string]: {
+    collect: () => Promise<ConvexRecord[]>;
     take: (take: number) => Promise<ConvexRecord[]>;
     first: () => Promise<ConvexRecord>;
     order: (direction: 'asc' | 'desc') => ConvexClient[string];
@@ -95,6 +96,7 @@ export type ConvexClient = {
       indexName: string,
       query: (q: SearchFilterBuilder) => any
     ) => ConvexClient[string];
+    delete: (id: ID) => Promise<void>;
     // findMany: (args: ConvexFindManyArgs) => Promise<PrismaRecord[]>;
     // create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
     // delete: (args: { where: { id: ID } }) => Promise<void>;

@@ -42,12 +42,6 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
       },
     },
 
-    // tag: {
-    //   component: {
-    //     list: TagsComponent,
-    //     combobox: TagsCombobox,
-    //   },
-    // },
     // project: {
     //   component: {
     //     list: ProjectComponent,
