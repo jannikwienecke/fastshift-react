@@ -6,6 +6,5 @@ export default function FastAppLayoutComponent({
 }: {
   children: React.ReactNode;
 }) {
-  console.log('getViews', getViews());
   return <FastAppLayout views={getViews()}>{children}</FastAppLayout>;
 }

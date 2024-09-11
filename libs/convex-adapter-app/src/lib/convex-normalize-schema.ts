@@ -18,6 +18,9 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
       let isManyToManyField = false;
       let relationName = '';
       let manyToManyModelName: string | undefined = undefined;
+      let isList = false;
+      // hasManyTableName: Project has Many Tasks
+      let hasManyTableName = '';
 
       if (fieldSchema.kind === 'array') {
         const optionNameManyToMany = tableName + fieldName;
@@ -30,7 +33,8 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
         const manyToManyModel = convexSchema[manyToManyModelName ?? ''];
 
         isManyToManyField = Object.values(
-          manyToManyModel.validator.fields
+          //
+          manyToManyModel?.validator?.fields ?? {}
         ).every((field) => {
           return field.tableName === tableName || field.tableName === fieldName;
         });
@@ -39,6 +43,12 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
           relationName = tableName + 'To' + manyToManyModelName;
         }
       }
+
+      if (fieldSchema.element?.tableName) {
+        isList = true;
+        hasManyTableName = fieldSchema.element.tableName;
+      }
+
       const field: ModelField = {
         name: isManyToManyField
           ? fieldName
@@ -54,7 +64,8 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
           : fieldSchema.tableName
           ? [fieldName]
           : [],
-        kind: isManyToManyField ? 'object' : fieldSchema.kind,
+        // kind: isManyToManyField ? 'object' : fieldSchema.kind,
+        kind: hasManyTableName ? hasManyTableName : fieldSchema.kind,
         isList: fieldSchema.kind === 'array',
         isRequired: fieldSchema.isOptional === 'required',
         isUnique: false, // Convex doesn't have a direct 'unique' property
@@ -65,6 +76,8 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
           ? manyToManyModelName
           : fieldSchema.kind === 'id' && fieldSchema.tableName
           ? fieldSchema.tableName
+          : isList && hasManyTableName
+          ? hasManyTableName
           : fieldSchema.kind,
       };
 

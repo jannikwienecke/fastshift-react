@@ -1,18 +1,9 @@
 import {
   BaseConfigInterface,
-  BaseViewConfigManager,
   RegisteredViews,
-  SearchableField,
   ViewConfigType,
 } from '@apps-next/core';
 import { generateDefaultViewConfigs } from '@apps-next/react';
-import { ConvexViewConfig } from './convex-create-view-config';
-
-export class ConvexViewConfigManager extends BaseViewConfigManager<ConvexViewConfig> {
-  override getSearchableField(): SearchableField | undefined {
-    return this.viewConfig.query?.searchableFields;
-  }
-}
 
 export const makeViews = (
   globalConfig: BaseConfigInterface,

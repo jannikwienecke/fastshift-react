@@ -1,10 +1,13 @@
-import { MutationProps, MutationReturnDto } from '@apps-next/core';
+import {
+  BaseViewConfigManager,
+  MutationProps,
+  MutationReturnDto,
+} from '@apps-next/core';
 import { mutationHandlers } from './_internal/convex-mutation-handler';
 import {
   DefaultFunctionArgs,
   GenericQueryCtx,
 } from './_internal/convex.server.types';
-import { ConvexViewConfigManager } from './convex-view-config';
 
 export const viewMutationHandler = async (
   ctx: GenericQueryCtx,
@@ -12,7 +15,7 @@ export const viewMutationHandler = async (
 ): Promise<MutationReturnDto> => {
   const args = _args as MutationProps;
 
-  const viewConfigManager = new ConvexViewConfigManager(args.viewConfig);
+  const viewConfigManager = new BaseViewConfigManager(args.viewConfig);
   const { mutation } = args;
 
   const handler = mutationHandlers[mutation.type];

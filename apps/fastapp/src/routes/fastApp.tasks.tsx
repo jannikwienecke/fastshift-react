@@ -81,7 +81,7 @@ const Task = () => {
 
         <List.Default
           {...getListProps({
-            fieldsRight: ['priority', 'completed', 'tags'],
+            fieldsRight: ['tags', 'priority', 'completed'],
             fieldsLeft: [],
           })}
         />

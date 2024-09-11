@@ -35,7 +35,7 @@ const _schema = defineSchema({
   tasks_tags: defineTable({
     taskId: v.id('tasks'),
     tagId: v.id('tags'),
-  }).index('by_task_id', ['taskId']),
+  }).index('taskId', ['taskId']),
 
   projects: defineTable({
     label: v.string(),
@@ -43,6 +43,7 @@ const _schema = defineSchema({
     dueDate: v.number(),
     description: v.string(),
     categoryId: v.id('categories'),
+    tasks: v.optional(v.array(v.id('tasks'))),
   }).searchIndex('label', {
     searchField: 'label',
   }),

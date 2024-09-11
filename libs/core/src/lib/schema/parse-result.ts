@@ -59,8 +59,6 @@ export const parseResult = ({
           ) {
             const relation = field.relation;
 
-            console.log('relation===', relation);
-
             return {
               ...acc,
 

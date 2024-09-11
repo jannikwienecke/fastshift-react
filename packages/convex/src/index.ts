@@ -28,6 +28,7 @@ export const projectsConfig = createViewConfig(
   {
     viewName: 'project',
     icon: 'FaProjectDiagram',
+    // includeFields: ['tasks'],
     displayField: {
       field: 'label',
     },

@@ -12,6 +12,7 @@ created: 1723657175909
   - this allows for apps with such a routing structure /user/jannikwienecke/view/tasks
 - [ ] search for firstname + lastname, currently we can just always only for one field (displayField | searchField)
 - [ ] extend the default include: like. Project -> owner -> users. Currently just Project -> owner
+- [ ] currently the index name for many to many fields must be the same as the field name.
 
 ## BUGS
 

@@ -1,5 +1,4 @@
-import { QueryDto } from '@apps-next/core';
-import { ConvexViewConfigManager } from '../convex-view-config';
+import { BaseViewConfigManager, QueryDto } from '@apps-next/core';
 import { queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
 import { filterResults, withSearch } from './convex-searching';
@@ -7,7 +6,7 @@ import { GenericQueryCtx } from './convex.server.types';
 
 export const getData = async (
   ctx: GenericQueryCtx,
-  viewConfigManager: ConvexViewConfigManager,
+  viewConfigManager: BaseViewConfigManager,
   args: QueryDto
 ) => {
   const dbQuery = queryClient(ctx, viewConfigManager.getTableName());

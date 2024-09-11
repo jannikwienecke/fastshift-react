@@ -1,4 +1,5 @@
 import {
+  BaseViewConfigManager,
   invarant,
   QueryDto,
   QueryReturnDto,
@@ -11,7 +12,6 @@ import {
   DefaultFunctionArgs,
   GenericQueryCtx,
 } from './_internal/convex.server.types';
-import { ConvexViewConfigManager } from './convex-view-config';
 
 export const viewLoaderHandler = async (
   ctx: GenericQueryCtx,
@@ -19,7 +19,7 @@ export const viewLoaderHandler = async (
 ): Promise<QueryReturnDto> => {
   const args = _args as QueryDto;
 
-  const viewConfigManager = new ConvexViewConfigManager(
+  const viewConfigManager = new BaseViewConfigManager(
     args.viewConfig as ViewConfigType,
     args.modelConfig
   );

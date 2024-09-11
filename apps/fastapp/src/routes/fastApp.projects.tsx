@@ -1,4 +1,4 @@
-import { Categories, Owner, projectsConfig } from '@apps-next/convex';
+import { Categories, Owner, projectsConfig, Tasks } from '@apps-next/convex';
 import { DataType } from '@apps-next/core';
 import {
   ClientViewProviderConvex,
@@ -17,7 +17,7 @@ import { config } from '../global-config';
 
 type ProjectViewDataType = DataType<
   'projects',
-  { categories: Categories; owner: Owner }
+  { categories: Categories; owner: Owner; tasks: Tasks }
 >;
 
 setViewFieldsConfig<ProjectViewDataType>('projects', {
@@ -66,7 +66,7 @@ const ProjectPage = () => {
 
         <List.Default
           {...getListProps({
-            fieldsRight: ['categories', 'owner'],
+            fieldsRight: ['tasks', 'categories', 'owner'],
             fieldsLeft: [],
           })}
         />
