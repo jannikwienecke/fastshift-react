@@ -153,6 +153,7 @@ export const getManyToManyRecords = async (props: HelperProps) => {
       };
     });
   }
+  return records;
 };
 
 export const getOneToOneRecords = async (props: HelperProps) => {
