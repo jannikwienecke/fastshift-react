@@ -1,4 +1,4 @@
-import { ViewConfigType } from '@apps-next/core';
+import { GetTableName, ViewConfigType } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
 import { registeredViewsAtom, viewConfigManagerAtom } from './stores';
 
@@ -11,13 +11,13 @@ export const useView = () => {
   return { viewConfigManager, registeredViews };
 };
 
-export const useViewOf = (tableName: string) => {
+export const useViewOf = (tableName: GetTableName) => {
   const { registeredViews } = useView();
 
   const view = Object.values(registeredViews).find(
     (v) => v?.tableName === tableName
   );
 
-  if (!view) throw new Error(`No View For ${tableName} found`);
+  if (!view) throw new Error(`No View For ${tableName.toString()} found`);
   return view as ViewConfigType;
 };

@@ -175,9 +175,14 @@ export const getOneToOneRecords = async (props: HelperProps) => {
 
   const client = queryClient(ctx, field.relation.tableName);
 
-  return await client
+  const record = await client
     .withIndex('by_id', (q) =>
       q.eq('_id', recordWithoutRelations[field.relation?.fieldName ?? ''])
     )
     .first();
+
+  return {
+    id: record?._id,
+    ...record,
+  };
 };

@@ -2,6 +2,7 @@ import { test as base } from '@playwright/test';
 // eslint-disable-next-line
 import { main } from 'apps/nextjs/prisma/seed';
 import { seedDatabase } from './helpers/db-seed';
+// eslint-disable-next-line
 
 type Fixtures = {
   seedDatabase: () => Promise<void>;
