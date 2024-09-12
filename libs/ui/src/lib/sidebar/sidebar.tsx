@@ -1,9 +1,9 @@
 'use client';
-import { IconMenu2, IconX } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { createContext, useContext, useState } from 'react';
 import { cn } from '../utils';
+import { EyeClosedIcon, HamburgerMenuIcon } from '@radix-ui/react-icons';
 
 interface Links {
   label: string;
@@ -132,7 +132,7 @@ export const MobileSidebar = ({
       {...props}
     >
       <div className="flex justify-end z-20 w-full">
-        <IconMenu2
+        <HamburgerMenuIcon
           className="text-neutral-800 dark:text-neutral-200"
           onClick={() => setOpen(!open)}
         />
@@ -156,7 +156,7 @@ export const MobileSidebar = ({
               className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
               onClick={() => setOpen(!open)}
             >
-              <IconX />
+              <EyeClosedIcon />
             </div>
             {children}
           </motion.div>

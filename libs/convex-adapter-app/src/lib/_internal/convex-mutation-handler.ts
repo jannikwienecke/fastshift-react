@@ -1,5 +1,6 @@
 import {
   BaseViewConfigManagerInterface,
+  FieldConfig,
   ManyToManyMutationProps,
   MutationPropsServer,
 } from '@apps-next/core';
@@ -8,6 +9,7 @@ import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx, GenericQueryCtx } from './convex.server.types';
 import { mutationClient, queryClient } from './convex-client';
 import { ID } from './types.convex';
+import { toUnicode } from 'punycode';
 
 export const createMutation = async (
   ctx: ConvexContext,
@@ -56,12 +58,17 @@ export const updateMutation = async (
 
   const manyToManyRelations = Object.keys(data)
     .map((key) => {
-      const field = viewConfigManager.getFieldBy(key);
+      let field: FieldConfig | undefined;
+      try {
+        field = viewConfigManager.getFieldBy(key);
+      } catch (error) {
+        //
+      }
 
       if (
-        field.relation?.manyToManyRelation &&
-        field.relation.manyToManyTable &&
-        field.relation.manyToManyModelFields
+        field?.relation?.manyToManyRelation &&
+        field?.relation?.manyToManyTable &&
+        field?.relation?.manyToManyModelFields
       ) {
         const value = data[key];
         delete data[key];
@@ -82,12 +89,11 @@ export const updateMutation = async (
     })
     .filter(Boolean) as ManyToManyMutationProps[];
 
-  console.log('manyToManyRelations', manyToManyRelations);
   if (manyToManyRelations.length > 0) {
     await updateManyToManyMutation(ctx, props, manyToManyRelations);
+  } else {
+    await ctx.db.patch(mutation.payload.id, mutation.payload.record);
   }
-
-  //await ctx.db.patch(mutation.payload.id, mutation.payload.record);
 
   return {
     message: '200',
@@ -115,79 +121,35 @@ export const updateManyToManyMutation = async (
 
     if (!tableFieldName) return;
 
-    const exisitingValues: string[] = [];
-    if (fieldNameRelationTable) {
-      // TODO HIER WEITER MACHEN
-      console.log({ fieldNameTable: tableFieldName, fieldNameRelationTable });
-      console.log('MANY TO MANY FIELD');
-      // const allExisting = await relationTableClient.findMany({
-      //   where: {
-      //     // the table where we are currently on. Tasks -> has tags (we update a tag) -> taskId
-      //     [fieldNameTable]: id,
-      //     // the relation table field -> tagId
-      //   },
-      //   select: {
-      //     [fieldNameRelationTable]: true,
-      //   },
-      // });
+    let toDeleteIds: ID[] = [];
 
-      // const toDelete = allExisting
-      //   .map((v) => v?.[fieldNameRelationTable])
-      //   .filter((v) => !relation.values.includes(v));
+    const { allIds: allExistingIds, allExistingRelationIds } =
+      await getExistingIds(ctx, { viewConfigManager, mutation }, relation);
 
-      // await relationTableClient.deleteMany({
-      //   where: {
-      //     [fieldNameRelationTable]: {
-      //       in: toDelete,
-      //     },
-      //   },
-      // });
-    } else {
-      // CASE EXAMPLE:
-      // We are on view "projects". And Select or delselect a task
-      // we get all tasks ids of that project
-      // and we delete all that were not sent from the frontend
-      const allExistingIds = await getExistingIds(
-        ctx,
-        { viewConfigManager, mutation },
-        relation
-      );
+    const idsToCompare = allExistingRelationIds.length
+      ? allExistingRelationIds
+      : allExistingIds;
 
-      const toDelete = await getToDeleteIds(allExistingIds, relation);
-
-      exisitingValues.push(...allExistingIds);
-
-      for (const value of toDelete) {
-        await mutationClient(ctx).delete(value);
-      }
+    toDeleteIds = getToDeleteIds(idsToCompare, relation);
+    for (const value of toDeleteIds) {
+      const index = idsToCompare.indexOf(value);
+      const id = allExistingIds[index];
+      await mutationClient(ctx).delete(id);
     }
 
     // INSERT NEW VALUES
     for (const value of relation.values) {
-      if (exisitingValues.includes(value.toString())) {
+      if (idsToCompare.map((v) => v.toString()).includes(value.toString())) {
         continue;
       }
 
       if (!fieldNameRelationTable) {
-        // case: Update a task by setting the project id
         await ctx.db.patch(value, { [tableFieldName]: id });
       } else {
-        // const hasRecord = await relationTableClient.findMany({
-        //   where: {
-        //     // the table where we are currently on. Tasks -> has tags (we update a tag) -> taskId
-        //     [fieldNameTable]: id,
-        //     // the relation table field -> tagId
-        //     [fieldNameRelationTable]: value,
-        //   },
-        // });
-        // if (!(hasRecord.length > 0)) {
-        //   await relationTableClient.create({
-        //     data: {
-        //       [fieldNameTable]: id,
-        //       [fieldNameRelationTable]: value,
-        //     },
-        //   });
-        // }
+        await mutationClient(ctx).insert(relation.manyToManyTable, {
+          taskId: id,
+          tagId: value,
+        });
       }
     }
   }
@@ -201,16 +163,24 @@ export const getExistingIds = async (
   const { id } = mutation.payload;
   const tableFieldName = getTableFieldName(relation, viewConfigManager);
   const relationTableClient = queryClient(ctx, relation.manyToManyTable);
+  const relationTableFieldName = getRelationTableFieldName(relation);
 
-  const allExistingIds = await (
-    await relationTableClient
-      .withIndex(tableFieldName, (q) => q.eq(tableFieldName, id))
-      .collect()
-  )
-    .map((v) => v._id)
+  const allExisting = await relationTableClient
+    .withIndex(tableFieldName, (q) => q.eq(tableFieldName, id))
+    .collect();
+
+  const allExistingRelationIds = allExisting
+    .map((v) => v?.[relationTableFieldName ?? ''])
     .filter((f) => f !== undefined);
 
-  return allExistingIds;
+  const allExistingIds = allExisting
+    .map((v) => v?._id)
+    .filter((f) => f !== undefined);
+
+  return {
+    allIds: allExistingIds,
+    allExistingRelationIds,
+  };
 };
 
 /**
@@ -245,7 +215,7 @@ export const getRelationTableFieldName = (
   return fieldNameRelationTable;
 };
 
-export const getToDeleteIds = async (
+export const getToDeleteIds = (
   allExistingIds: ID[],
   relation: ManyToManyMutationProps
 ) => {

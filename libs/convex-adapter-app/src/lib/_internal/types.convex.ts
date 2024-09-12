@@ -97,6 +97,8 @@ export type ConvexClient = {
       query: (q: SearchFilterBuilder) => any
     ) => ConvexClient[string];
     delete: (id: ID) => Promise<void>;
+
+    insert: (tableName: string, data: RecordType) => Promise<void>;
     // findMany: (args: ConvexFindManyArgs) => Promise<PrismaRecord[]>;
     // create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
     // delete: (args: { where: { id: ID } }) => Promise<void>;
