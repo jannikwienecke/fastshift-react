@@ -22,6 +22,7 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   const searchableFields = generateSearchableFieldsFromConvexSchema(
     schema.tables
   );
+
   const viewFields = generateViewFields(normalizedSchema);
   const includeFields = generateIncludeFields(normalizedSchema);
   type ConfigType = BaseConfigInterface<

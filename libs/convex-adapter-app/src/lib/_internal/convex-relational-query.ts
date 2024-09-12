@@ -36,14 +36,14 @@ export const handleRelationalTableQuery = async ({
   let rows = await withSearch(dbQuery, {
     searchField,
     query: args.query,
-  }).take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  }).collect();
 
   rows = await filterResults(
     rows,
     relationalViewManager.getDisplayFieldLabel(),
     args.query ?? '',
     searchField
-  );
+  ).slice(0, DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
 
   const rowsWithInclude = await mapWithInclude(
     rows,

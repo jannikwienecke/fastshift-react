@@ -1,7 +1,11 @@
-import { BaseViewConfigManagerInterface } from '../base-view-config';
-import { FieldConfig, GetTableDataType, GetTableName } from './base.types';
-import { IncludeConfig } from './config.types';
 import * as icons from 'react-icons/fa';
+import {
+  FieldConfig,
+  GetTableDataType,
+  GetTableName,
+  SearchableField,
+} from './base.types';
+import { IncludeConfig } from './config.types';
 
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
@@ -23,7 +27,7 @@ export type ViewConfigType<T extends GetTableName = any> =
       cell?: (value: GetTableDataType<T>) => React.ReactNode;
     };
     query?: {
-      //
+      searchableFields: SearchableField;
     };
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;
