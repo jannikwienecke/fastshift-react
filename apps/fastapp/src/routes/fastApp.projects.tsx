@@ -13,8 +13,8 @@ import {
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { config } from '../global-config';
 import { FaTasks } from 'react-icons/fa';
+import { config } from '../global-config';
 
 type ProjectViewDataType = DataType<
   'projects',
@@ -93,6 +93,7 @@ const ProjectPage = () => {
 };
 
 export const Route = createFileRoute('/fastApp/projects')({
+  loader: async ({ context }) => context.preloadQuery(projectsConfig),
   component: () => {
     return (
       <ClientViewProviderConvex

@@ -88,6 +88,7 @@ const Task = () => {
 };
 
 export const Route = createFileRoute('/fastApp/tasks')({
+  loader: async ({ context }) => context.preloadQuery(tasksConfig),
   component: () => {
     return (
       <ClientViewProviderConvex

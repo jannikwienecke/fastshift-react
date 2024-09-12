@@ -10,6 +10,8 @@ import {
   FunctionReference,
   Id,
 } from './convex.server.types';
+import { QueryClient } from '@tanstack/react-query';
+import { ConvexReactClient } from 'convex/react';
 
 export type ConvexServer = {
   query: (options: {
@@ -43,12 +45,11 @@ export type ConvexApiType = {
 };
 
 export type ConvexQueryProviderProps = React.PropsWithChildren<{
-  convexUrl: string;
-  // api: ConvexApiType;
-  // makeQueryOptions: (args: QueryProps) => QueryOptions;
   viewLoader: ViewLoader;
   viewMutation: ViewMutation;
   globalConfig: Omit<GlobalConfig, 'provider'>;
+  queryClient: QueryClient;
+  convex: ConvexReactClient;
 }>;
 
 export type ConvexSchemaType = {

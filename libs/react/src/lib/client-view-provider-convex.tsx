@@ -17,14 +17,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Provider } from 'jotai';
 import React from 'react';
 import { QueryStore, queryStoreAtom } from './query-store';
-import { HydrateAtoms } from './ui-components';
 import {
-  viewConfigManagerAtom,
-  registeredViewsAtom,
-  globalConfigAtom,
-  clientViewConfigAtom,
   clientConfigStore,
+  clientViewConfigAtom,
+  globalConfigAtom,
+  registeredViewsAtom,
+  viewConfigManagerAtom,
 } from './stores';
+import { HydrateAtoms } from './ui-components';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
@@ -39,14 +39,20 @@ type QueryProviderPropsWithViewFieldsConfig = QueryProviderConvexProps & {
 export const ClientViewProviderConvex = (
   props: QueryProviderPropsWithViewFieldsConfig
 ) => {
-  const viewConfigManager = new BaseViewConfigManager(props.viewConfig);
+  const viewConfigManager = React.useMemo(
+    () => new BaseViewConfigManager(props.viewConfig),
+    [props.viewConfig]
+  );
 
   const registeredViews = props.globalConfig.defaultViewConfigs;
 
-  const views = {
-    ...props.globalConfig.defaultViewConfigs,
-    ...props.views,
-  };
+  const views = React.useMemo(
+    () => ({
+      ...props.globalConfig.defaultViewConfigs,
+      ...props.views,
+    }),
+    [props.globalConfig.defaultViewConfigs, props.views]
+  );
 
   const queryClient = useQueryClient();
 
@@ -70,28 +76,40 @@ export const ClientViewProviderConvex = (
     {} as { [key: string]: DataModelNew<RecordType> }
   );
 
-  const queryStore: QueryStore<RecordType> = {
-    dataModel,
-    relationalDataModel,
-    loading: false,
-    error: null,
-    page: 1,
-    hasNextPage: false,
-    hasPreviousPage: false,
-    isInitialized: true,
-    viewName: viewConfigManager.getViewName(),
-  };
+  const queryStore: QueryStore<RecordType> = React.useMemo(
+    () => ({
+      dataModel,
+      relationalDataModel,
+      loading: false,
+      error: null,
+      page: 1,
+      hasNextPage: false,
+      hasPreviousPage: false,
+      isInitialized: true,
+      viewName: viewConfigManager.getViewName(),
+    }),
+    [dataModel, relationalDataModel, viewConfigManager]
+  );
 
-  const initialValues = [
-    [viewConfigManagerAtom, viewConfigManager],
-    [registeredViewsAtom, views],
-    [globalConfigAtom, props.globalConfig],
-    [queryStoreAtom, queryStore],
-    [clientViewConfigAtom, props.viewFieldsConfig],
-  ];
+  const initialValues = React.useMemo(
+    () => [
+      [viewConfigManagerAtom, viewConfigManager],
+      [registeredViewsAtom, views],
+      [globalConfigAtom, props.globalConfig],
+      [queryStoreAtom, queryStore],
+      [clientViewConfigAtom, props.viewFieldsConfig],
+    ],
+    [
+      viewConfigManager,
+      views,
+      props.globalConfig,
+      queryStore,
+      props.viewFieldsConfig,
+    ]
+  );
 
   return (
-    <Provider store={clientConfigStore}>
+    <Provider key={viewConfigManager.getViewName()} store={clientConfigStore}>
       <HydrateAtoms
         key={viewConfigManager.getViewName()}
         initialValues={initialValues}

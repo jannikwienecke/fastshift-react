@@ -3,7 +3,12 @@ import { cn, Sidebar, SidebarBody, SidebarLink } from '@apps-next/ui';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  ErrorComponent,
+  Link,
+  Outlet,
+} from '@tanstack/react-router';
 import {
   FaICursor,
   FaLongArrowAltLeft,
@@ -15,6 +20,9 @@ import {
 
 export const Route = createFileRoute('/fastApp')({
   component: FastAppLayoutComponent,
+  errorComponent: (props) => {
+    return <ErrorComponent {...props} />;
+  },
 });
 
 function FastAppLayoutComponent() {
@@ -112,6 +120,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
 export const Logo = ({
   onTogglePin,
   pinned,

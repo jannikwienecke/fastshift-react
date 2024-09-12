@@ -1,5 +1,7 @@
+import { ConvexPreloadQuery } from '@apps-next/convex-adapter-app';
+import { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Outlet, createRootRoute } from '@tanstack/react-router';
+import { Outlet, createRootRouteWithContext } from '@tanstack/react-router';
 import React from 'react';
 
 const TanStackRouterDevtools =
@@ -14,7 +16,12 @@ const TanStackRouterDevtools =
         }))
       );
 
-export const Route = createRootRoute({
+type Context = {
+  queryClient: QueryClient;
+  preloadQuery: ConvexPreloadQuery;
+};
+
+export const Route = createRootRouteWithContext<Context>()({
   component: RootComponent,
 });
 
