@@ -1,6 +1,7 @@
 import { test as base } from '@playwright/test';
 // eslint-disable-next-line
 import { main } from 'apps/nextjs/prisma/seed';
+import { seedDatabase } from './helpers/db-seed';
 
 type Fixtures = {
   seedDatabase: () => Promise<void>;
@@ -18,8 +19,9 @@ export const test = base.extend<Fixtures>({
       // This will run before each test that uses this fixture
       console.log('Run: Seeding the database...');
       try {
-        await main();
+        // await main();
         // hier
+        await seedDatabase();
         console.log('Database seeded successfully');
       } catch (error) {
         console.error('Error seeding database:', error);

@@ -2,7 +2,7 @@ import * as server from './_generated/server';
 import { faker } from '@faker-js/faker';
 import { Id } from './_generated/dataModel';
 
-const init = server.internalMutation({
+const init = server.mutation({
   handler: async (ctx) => {
     console.log('init');
 
