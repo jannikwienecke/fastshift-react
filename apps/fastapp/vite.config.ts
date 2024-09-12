@@ -29,6 +29,7 @@ export default defineConfig({
     outDir: '../../dist/apps/apps-next',
     emptyOutDir: true,
     reportCompressedSize: true,
+    chunkSizeWarningLimit: 1000,
     commonjsOptions: {
       transformMixedEsModules: true,
     },

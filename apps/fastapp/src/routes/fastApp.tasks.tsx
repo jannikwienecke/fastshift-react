@@ -52,7 +52,7 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
 });
 
 const Task = () => {
-  const { useList, useQueryData } = makeHooks(tasksConfig);
+  const { useList } = makeHooks(tasksConfig);
   const getListProps = useList();
 
   const { handleClose, handleSelect } = useHandleSelectCombobox();
