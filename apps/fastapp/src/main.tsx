@@ -1,4 +1,3 @@
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -36,8 +35,6 @@ ReactDOM.createRoot(root).render(
       viewMutation={api.query.viewMutation}
     >
       <RouterProvider router={router} />
-
-      <ReactQueryDevtools initialIsOpen={false} />
     </ConvexQueryProvider>
   </React.StrictMode>
 );

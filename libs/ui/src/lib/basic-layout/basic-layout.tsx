@@ -1,6 +1,6 @@
 'use client';
 
-import { RegisteredViews, ViewConfigType } from '@apps-next/core';
+import { RegisteredViews } from '@apps-next/core';
 import { Icon } from '../icon';
 
 export const BasicLayout = ({
