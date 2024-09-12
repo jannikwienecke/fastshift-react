@@ -5,9 +5,7 @@ import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 
 // Import specific icons from react-icons
 import { FaReact as NextJsIcon } from 'react-icons/fa'; // Example icon for Next.js
-import { SiSvelte as SvelteKitIcon } from 'react-icons/si'; // Example icon for SvelteKit
 import { FaVuejs as NuxtJsIcon } from 'react-icons/fa'; // Example icon for Nuxt.js
-import { SiRemix as RemixIcon } from 'react-icons/si'; // Example icon for Remix
 import { FaMeteor as AstroIcon } from 'react-icons/fa'; // Example icon for Astro
 
 // Replace the alias import with a relative path
@@ -34,7 +32,7 @@ const frameworks = [
   {
     value: 'sveltekit',
     label: 'SvelteKit',
-    icon: <SvelteKitIcon />, // Using SiSvelte as a placeholder
+    icon: <NextJsIcon />, // Using SiSvelte as a placeholder
   },
   {
     value: 'nuxt.js',
@@ -44,7 +42,7 @@ const frameworks = [
   {
     value: 'remix',
     label: 'Remix',
-    icon: <RemixIcon />, // Using SiRemix as a placeholder
+    icon: <NextJsIcon />, // Using SiRemix as a placeholder
   },
   {
     value: 'astro',

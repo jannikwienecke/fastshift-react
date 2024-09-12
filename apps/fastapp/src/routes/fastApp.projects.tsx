@@ -14,7 +14,7 @@ import {
 import { ComboboxPopover, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { config } from '../global-config';
-import { IconSubtask } from '@tabler/icons-react';
+import { FaTasks } from 'react-icons/fa';
 
 type ProjectViewDataType = DataType<
   'projects',
@@ -37,7 +37,7 @@ setViewFieldsConfig<ProjectViewDataType>('projects', {
           return (
             <div className="flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
               {tasks}
-              <IconSubtask className="w-4 h-4" />
+              <FaTasks className="w-4 h-4" />
             </div>
           );
         },

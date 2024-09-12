@@ -1,16 +1,17 @@
 import { cn, Sidebar, SidebarBody, SidebarLink } from '@apps-next/ui';
-import {
-  IconArrowLeft,
-  IconBrandTabler,
-  IconPinned,
-  IconPinnedOff,
-  IconSettings,
-  IconUserBolt,
-} from '@tabler/icons-react';
+
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
+import {
+  FaICursor,
+  FaLongArrowAltLeft,
+  FaPiggyBank,
+  FaPinterest,
+  FaTasks,
+  FaTerminal,
+} from 'react-icons/fa';
 
 export const Route = createFileRoute('/fastApp')({
   component: FastAppLayoutComponent,
@@ -30,28 +31,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
       label: 'Projects',
       href: '/fastApp/projects',
       icon: (
-        <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <FaTerminal className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
       label: 'Tasks',
       href: '/fastApp/tasks',
       icon: (
-        <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <FaTasks className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
       label: 'Settings',
       href: '#',
       icon: (
-        <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <FaICursor className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
       label: 'Logout',
       href: '#',
       icon: (
-        <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <FaLongArrowAltLeft className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
   ];
@@ -84,7 +85,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               className={cn('mt-8 flex flex-col gap-2 ', open ? '' : 'items')}
             >
               {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
+                <SidebarLink className="pl-4" key={idx} link={link} />
               ))}
             </div>
           </div>
@@ -135,9 +136,9 @@ export const Logo = ({
           <div className="cursor-pointer" onClick={onTogglePin}>
             {/* close icon */}
             {pinned ? (
-              <IconPinned className="text-black dark:text-white h-4 w-4" />
+              <FaPinterest className="text-black dark:text-white h-4 w-4" />
             ) : (
-              <IconPinnedOff className="text-black dark:text-white h-4 w-4" />
+              <FaPiggyBank className="text-black dark:text-white h-4 w-4" />
             )}
           </div>
         </div>

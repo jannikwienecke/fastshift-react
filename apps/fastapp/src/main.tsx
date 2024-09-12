@@ -10,7 +10,7 @@ import { routeTree } from './routeTree.gen';
 import { config } from './global-config';
 const router = createRouter({
   routeTree,
-  defaultPreload: 'intent',
+  defaultPreload: 'viewport',
   defaultStaleTime: 5000,
 });
 
