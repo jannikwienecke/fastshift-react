@@ -46,6 +46,8 @@ export const useMutation = () => {
     mutationFn: async (args: MutationProps) => {
       return await api.mutationFn?.({
         ...args,
+        viewName: viewConfigManager.viewConfig.viewName,
+        viewConfig: undefined,
         mutation: {
           ...args.mutation,
           handler: undefined,
@@ -55,6 +57,7 @@ export const useMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries();
     },
+
     onError: (error, variables, context) => {
       const { previousState, previousStateAll } = (context as any) || {};
 
@@ -71,6 +74,7 @@ export const useMutation = () => {
       queryClient.setQueryData(queryKey, previousState);
       queryClient.setQueryData(queryKeyAll, previousStateAll);
     },
+
     onMutate: async (vars) => {
       lastViewName.current = vars.viewConfig.viewName;
 
@@ -158,13 +162,19 @@ export const useMutation = () => {
     (args: { mutation: Mutation }) => {
       lldebug('DISPATCH MUTATION: ', args.mutation);
       return mutate({
-        viewConfig: viewConfigManager.viewConfig,
         mutation: args.mutation,
         query,
+        viewConfig: viewConfigManager.viewConfig,
       });
     },
     [mutate, query, viewConfigManager.viewConfig]
   );
+
+  React.useEffect(() => {
+    if (error) {
+      console.log('Error in useMutation: ', error);
+    }
+  }, [error]);
 
   return {
     mutateAsync,

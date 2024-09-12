@@ -113,6 +113,7 @@ function ListIcon({
   icon?: React.FC<React.ComponentProps<'div'>>;
 } & React.ComponentPropsWithoutRef<'div'>) {
   if (!Icon) return null;
+
   return (
     <div className="grid place-items-center text-muted-foreground">
       {Icon && <Icon {...props} />}

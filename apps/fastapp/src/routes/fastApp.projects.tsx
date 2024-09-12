@@ -1,4 +1,10 @@
-import { Categories, Owner, projectsConfig, Tasks } from '@apps-next/convex';
+import {
+  Categories,
+  Owner,
+  projectsConfig,
+  Tasks,
+  tasksConfig,
+} from '@apps-next/convex';
 import { DataType } from '@apps-next/core';
 import {
   ClientViewProviderConvex,
@@ -13,7 +19,6 @@ import {
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { FaTasks } from 'react-icons/fa';
 import { config } from '../global-config';
 
 type ProjectViewDataType = DataType<
@@ -37,7 +42,7 @@ setViewFieldsConfig<ProjectViewDataType>('projects', {
           return (
             <div className="flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
               {tasks}
-              <FaTasks className="w-4 h-4" />
+              <tasksConfig.icon className="w-4 h-4" />
             </div>
           );
         },

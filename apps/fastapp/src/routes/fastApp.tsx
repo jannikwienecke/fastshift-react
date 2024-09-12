@@ -10,13 +10,12 @@ import {
   Outlet,
 } from '@tanstack/react-router';
 import {
-  FaICursor,
-  FaLongArrowAltLeft,
-  FaPiggyBank,
-  FaPinterest,
-  FaTasks,
-  FaTerminal,
-} from 'react-icons/fa';
+  CircleIcon,
+  DotIcon,
+  IconJarLogoIcon,
+  MixIcon,
+  SunIcon,
+} from '@radix-ui/react-icons';
 
 export const Route = createFileRoute('/fastApp')({
   component: FastAppLayoutComponent,
@@ -39,28 +38,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
       label: 'Projects',
       href: '/fastApp/projects',
       icon: (
-        <FaTerminal className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
+        <DotIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
       label: 'Tasks',
       href: '/fastApp/tasks',
       icon: (
-        <FaTasks className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
+        <CircleIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
       label: 'Settings',
       href: '#',
       icon: (
-        <FaICursor className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
+        <MixIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
       label: 'Logout',
       href: '#',
       icon: (
-        <FaLongArrowAltLeft className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
+        <SunIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
   ];
@@ -145,9 +144,9 @@ export const Logo = ({
           <div className="cursor-pointer" onClick={onTogglePin}>
             {/* close icon */}
             {pinned ? (
-              <FaPinterest className="text-black dark:text-white h-4 w-4" />
+              <IconJarLogoIcon className="text-black dark:text-white h-4 w-4" />
             ) : (
-              <FaPiggyBank className="text-black dark:text-white h-4 w-4" />
+              <IconJarLogoIcon className="text-black dark:text-white h-4 w-4" />
             )}
           </div>
         </div>

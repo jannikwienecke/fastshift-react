@@ -1,12 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
-
-// Import specific icons from react-icons
-import { FaReact as NextJsIcon } from 'react-icons/fa'; // Example icon for Next.js
-import { FaVuejs as NuxtJsIcon } from 'react-icons/fa'; // Example icon for Nuxt.js
-import { FaMeteor as AstroIcon } from 'react-icons/fa'; // Example icon for Astro
+import { CaretSortIcon, CheckIcon, DotIcon } from '@radix-ui/react-icons';
 
 // Replace the alias import with a relative path
 // import { cn } from '@/lib/utils';
@@ -27,27 +22,27 @@ const frameworks = [
   {
     value: 'next.js',
     label: 'Next.js',
-    icon: <NextJsIcon />, // Using FaReact as a placeholder
+    icon: <DotIcon />, // Using FaReact as a placeholder
   },
   {
     value: 'sveltekit',
     label: 'SvelteKit',
-    icon: <NextJsIcon />, // Using SiSvelte as a placeholder
+    icon: <DotIcon />, // Using SiSvelte as a placeholder
   },
   {
     value: 'nuxt.js',
     label: 'Nuxt.js',
-    icon: <NuxtJsIcon />, // Using FaVuejs as a placeholder
+    icon: <DotIcon />, // Using FaVuejs as a placeholder
   },
   {
     value: 'remix',
     label: 'Remix',
-    icon: <NextJsIcon />, // Using SiRemix as a placeholder
+    icon: <DotIcon />, // Using SiRemix as a placeholder
   },
   {
     value: 'astro',
     label: 'Astro',
-    icon: <AstroIcon />, // Using FaMeteor as a placeholder
+    icon: <DotIcon />, // Using FaMeteor as a placeholder
   },
 ];
 

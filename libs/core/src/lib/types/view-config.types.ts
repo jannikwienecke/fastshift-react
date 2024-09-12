@@ -1,4 +1,3 @@
-import * as icons from 'react-icons/fa';
 import {
   FieldConfig,
   GetTableDataType,
@@ -12,7 +11,8 @@ export type ViewFieldConfig = Record<string, FieldConfig>;
 export type ViewConfigBaseInfo<T extends GetTableName> = {
   viewName: string;
   tableName: T;
-  icon: keyof typeof icons;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon: React.FC<any>;
   iconColor?: string;
   relativePath?: string;
 };

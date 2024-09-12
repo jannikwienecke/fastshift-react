@@ -3,6 +3,7 @@ import {
   makeViews,
 } from '@apps-next/convex-adapter-app';
 import { createViewConfig } from '@apps-next/react';
+import { CircleIcon, CubeIcon } from '@radix-ui/react-icons';
 import schema from '../convex/schema';
 
 export * from '../convex/_generated/api';
@@ -14,7 +15,7 @@ export const tasksConfig = createViewConfig(
   'tasks',
   {
     viewName: 'task',
-    icon: 'FaAddressBook',
+    icon: CubeIcon,
     displayField: {
       field: 'name',
     },
@@ -27,7 +28,7 @@ export const projectsConfig = createViewConfig(
   'projects',
   {
     viewName: 'project',
-    icon: 'FaProjectDiagram',
+    icon: CircleIcon,
     includeFields: ['tasks'],
     displayField: {
       field: 'label',

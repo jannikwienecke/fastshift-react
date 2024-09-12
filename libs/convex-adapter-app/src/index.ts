@@ -7,4 +7,4 @@ export * from './lib/convex-searchable-fields';
 export * from './lib/_internal/types.convex';
 export * from './lib/convex-create-config-from-schema';
 export * from './lib/convex-normalize-schema';
-export * from './lib/make-view-loader';
+export * from './lib/make-view-handler';

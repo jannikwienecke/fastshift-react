@@ -8,6 +8,7 @@ import {
   RegisteredViews,
 } from '@apps-next/core';
 import { createViewConfig } from './create-view-config';
+import { DotIcon } from '@radix-ui/react-icons';
 
 export const generateDefaultViewConfigs = ({
   tableNames,
@@ -54,7 +55,7 @@ export const generateDefaultViewConfigs = ({
         displayField: {
           field: guessDisplayFieldIfNotProvided ? displayField ?? 'id' : 'id',
         },
-        icon: 'FaDotCircle',
+        icon: DotIcon,
       },
       config
     );

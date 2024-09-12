@@ -1,6 +1,3 @@
-import * as icons from 'react-icons/fa';
-
-export function Icon({ icon }: { icon: keyof typeof icons }) {
-  const Icon = icons[icon];
-  return <Icon className="text-foreground/60" />;
+export function Icon(props: { icon: React.FC<any> }) {
+  return <props.icon className="text-foreground/60" />;
 }
