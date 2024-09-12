@@ -1,15 +1,15 @@
 'use client';
 
+import { Projects, Tags } from '@apps-next/convex';
+import { DataType, GetTableName } from '@apps-next/core';
 import { useViewOf } from '@apps-next/react';
 import { Bubble, Icon } from '@apps-next/ui';
-import { DataType, GetTableName } from '@apps-next/core';
-import { Projects, Tags } from '@apps-next/convex';
 
 export type TaskViewDataType = DataType<
   'tasks',
   {
-    project?: Projects;
-    tags: Tags[];
+    projects: Projects;
+    tags?: Tags[];
   }
 >;
 
@@ -19,7 +19,7 @@ export const ViewBubble = (props: {
   color?: string;
   showIcon?: boolean;
 }) => {
-  const view = useViewOf(props.tableName as string);
+  const view = useViewOf(props.tableName);
   return (
     <Bubble
       label={props.value}
@@ -119,26 +119,25 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
 //   );
 // };
 
-// export const ProjectComponent = (props: { data: TaskViewDataType }) => {
-//   const project = props.data.project;
+export const ProjectComponent = (props: { data: TaskViewDataType }) => {
+  const project = props.data.projects;
+  if (!project?.label) {
+    return <>Set Project</>;
+  }
 
-//   if (!project?.label) {
-//     return <>Set Project</>;
-//   }
+  return <ViewBubble tableName="projects" value={String(project.label)} />;
+};
 
-//   return <ViewBubble tableName="project" value={String(project.label)} />;
-// };
+export const ProjectComponentCombobox = (props: {
+  data: TaskViewDataType['projects'];
+}) => {
+  const project = props.data;
+  const view = useViewOf('projects');
 
-// export const ProjectComponentCombobox = (props: {
-//   data: TaskViewDataType['project'];
-// }) => {
-//   const project = props.data;
-//   const view = useViewOf('project');
-
-//   return (
-//     <div className="flex gap-2 items-center w-full">
-//       <Icon icon={view.icon} />
-//       <div>{project?.label}</div>
-//     </div>
-//   );
-// };
+  return (
+    <div className="flex gap-2 items-center w-full">
+      <Icon icon={view.icon} />
+      <div>{project?.label}</div>
+    </div>
+  );
+};

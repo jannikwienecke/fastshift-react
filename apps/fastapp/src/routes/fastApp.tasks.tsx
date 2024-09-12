@@ -1,3 +1,4 @@
+import { tasksConfig } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
   getViewFieldsConfig,
@@ -16,10 +17,11 @@ import {
   CompletedComponent,
   PriorityComponent,
   PriorityComponentCombobox,
+  ProjectComponent,
+  ProjectComponentCombobox,
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
-import { tasksConfig } from '@apps-next/convex';
 
 setViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -42,23 +44,24 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
       },
     },
 
-    // project: {
-    //   component: {
-    //     list: ProjectComponent,
-    //     combobox: ProjectComponentCombobox,
-    //   },
-    // },
+    projects: {
+      component: {
+        list: ProjectComponent,
+        combobox: ProjectComponentCombobox,
+      },
+    },
   },
 });
 
 const Task = () => {
-  const { useList } = makeHooks(tasksConfig);
+  const { useList } = makeHooks<TaskViewDataType>();
   const getListProps = useList();
 
   const { handleClose, handleSelect } = useHandleSelectCombobox();
 
   // TODO: we should not save it on list -> but have like selected: {type: "list or whatever"}
   const { list } = useStoreValue();
+  console.log(list);
 
   const getComboboxProps = useCombobox({
     state: list?.focusedRelationField ? list.focusedRelationField : null,
@@ -76,7 +79,7 @@ const Task = () => {
         <List.Default
           {...getListProps({
             fieldsRight: ['tags', 'priority', 'completed'],
-            fieldsLeft: [],
+            fieldsLeft: ['projects'],
           })}
         />
       </div>

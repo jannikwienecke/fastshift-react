@@ -3,10 +3,13 @@ import { ViewConfigType } from './view-config.types';
 
 export type DataType<
   T extends GetTableName = any,
-  TCustomDataType extends Record<string, any> | undefined = undefined
+  TCustomDataType extends
+    | Partial<Record<GetTableName, any>>
+    | undefined = undefined
 > = TCustomDataType extends undefined
   ? GetTableDataType<T> & { id: string }
   : TCustomDataType & GetTableDataType<T> & { id: string };
+// : TCustomDataType & GetTableDataType<T> & { id: string };
 
 // export type GetViewProps<
 //   T extends keyof RegisteredRouter['config']['_datamodel']
