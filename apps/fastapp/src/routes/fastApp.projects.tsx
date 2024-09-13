@@ -58,6 +58,32 @@ setViewFieldsConfig<ProjectViewDataType>('projects', {
         },
       },
     },
+    label: {
+      component: {
+        list: ({ data }) => {
+          return <>{data.label}</>;
+        },
+      },
+    },
+    dueDate: {
+      component: {
+        list: ({ data }) => {
+          const date = new Date(data.dueDate);
+          const formatter = new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: '2-digit',
+          });
+          return (
+            <div className="flex flex-col items-start">
+              <span className="text-xs text-foreground/80">
+                {formatter.format(date)}
+              </span>
+            </div>
+          );
+        },
+      },
+    },
   },
 });
 
@@ -86,7 +112,7 @@ const ProjectPage = () => {
         <List.Default
           {...getListProps({
             fieldsRight: ['categories', 'owner', 'tasks'],
-            fieldsLeft: [],
+            fieldsLeft: ['label', 'dueDate'], // Add both label and dueDate to the left fields
           })}
         />
       </div>

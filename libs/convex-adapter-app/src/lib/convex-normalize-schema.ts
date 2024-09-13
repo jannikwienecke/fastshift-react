@@ -1,6 +1,16 @@
 import { ModelSchema, ModelField, EnumType } from '@apps-next/core';
 import { ConvexSchema } from './_internal/convex-schema.types';
 
+const typeMapping: Record<string, string> = {
+  boolean: 'Boolean',
+  string: 'String',
+  number: 'Number',
+  object: 'object',
+  array: 'array',
+  id: 'id',
+  enum: 'enum',
+  union: 'union',
+};
 function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
   schema: T
 ): ModelSchema {
@@ -49,6 +59,14 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
         hasManyTableName = fieldSchema.element.tableName;
       }
 
+      const type = manyToManyModelName
+        ? manyToManyModelName
+        : fieldSchema.kind === 'id' && fieldSchema.tableName
+        ? fieldSchema.tableName
+        : isList && hasManyTableName
+        ? hasManyTableName
+        : typeMapping[fieldSchema.kind as string] ?? 'String';
+
       const field: ModelField = {
         name: isManyToManyField
           ? fieldName
@@ -72,13 +90,7 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
         isId: false,
         isReadOnly: false, // Convex doesn't have a direct 'readOnly' property
         hasDefaultValue: false, // Convex doesn't have a direct 'default' property
-        type: manyToManyModelName
-          ? manyToManyModelName
-          : fieldSchema.kind === 'id' && fieldSchema.tableName
-          ? fieldSchema.tableName
-          : isList && hasManyTableName
-          ? hasManyTableName
-          : fieldSchema.kind,
+        type,
       };
 
       if (fieldSchema.kind === 'union' && fieldSchema.members) {

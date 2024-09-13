@@ -19,7 +19,6 @@ export const useList = <T extends RecordType>() => {
   const { selected } = useStoreValue();
 
   const viewConfig = useAtomValue(getViewConfigAtom);
-
   return <Props extends ListGetProps<T>>(
     options?: Props
   ): ListProps<T & ListItem> => {
