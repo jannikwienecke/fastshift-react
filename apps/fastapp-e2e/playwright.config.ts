@@ -30,6 +30,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     cwd: workspaceRoot,
   },
+  workers: 1,
   projects: [
     {
       name: 'chromium',
