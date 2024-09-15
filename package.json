@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "postinstall": "NX_CLOUD_DISTRIBUTED_EXECUTION=false npx nx prisma-generate nextjs",
     "build-all-libs": "nx build core; nx build react; nx build apps-next-ui; nx build prisma-adapter",
     "publish-all": "bash publish-all.sh"
   },
