@@ -28,6 +28,7 @@ export interface BaseViewConfigManagerInterface<
   getFieldBy(fieldName: string): FieldConfig;
   getRelationFieldByTableName(tableName: string): FieldConfig;
   getIncludeFields(): IncludeConfig[string];
+  getManyToManyField(key: string): FieldConfig | undefined;
 
   modelConfig?: ModelConfig;
   form: FormManagerInterface;

@@ -32,7 +32,10 @@ export const ReferenceInitializer = (
     .map((id) => values.find((v) => v.id === id))
     .filter((v) => v !== undefined);
 
-  const multiple = Boolean(field?.relation?.manyToManyRelation);
+  const multiple =
+    payload.multiple !== undefined
+      ? payload.multiple
+      : Boolean(field?.relation?.manyToManyRelation);
 
   return {
     ...DEFAULT_STORE,

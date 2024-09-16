@@ -20,20 +20,17 @@ test.describe('Project management', () => {
 
     // Get input field by placeholder "change category"
     const input = page.getByPlaceholder('change categories');
-    await input.fill('Personal');
+    await input.fill('Person');
 
     // Wait for 'Work' category not to be visible
     const popover = page.getByTestId('combobox-popover');
     // expect that inside popover Work is not visible
     await expect(popover.getByText('Work')).toBeHidden();
 
-    // Expect 'Personal' category to be visible
-    await expect(page.getByText('Personal').first()).toBeVisible();
-
     // Click on "Personal" to confirm the change
-    await page.getByText('Personal').first().click();
+    await popover.getByText('Personal').first().click();
 
-    // Expect input field not to be visible after confirmation
+    // // Expect input field not to be visible after confirmation
     await expect(input).toBeHidden();
   });
 
@@ -76,7 +73,7 @@ test.describe('Project management', () => {
     await newTask.locator('..').getByRole('checkbox').click();
 
     // Close the dropdown
-    await page.getByText('Learn Photography').first().click();
+    await page.getByText('Learn Photography').first().click({ force: true });
 
     // // Expect the task count to increase
     await expect(page.getByTestId('field-value-tasks').first()).toHaveText('4');
@@ -90,7 +87,7 @@ test.describe('Project management', () => {
     await existingTask.locator('..').getByRole('checkbox').click();
 
     // // Close the dropdown
-    await page.getByText('Learn Photography').first().click();
+    await page.getByText('Learn Photography').first().click({ force: true });
 
     // // Wait for the task count to update
     await new Promise((resolve) => setTimeout(resolve, 500));

@@ -2,19 +2,19 @@ import {
   BaseViewConfigManagerInterface,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   FieldConfig,
-  QueryDto,
+  QueryServerProps,
 } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
+import { queryClient } from './convex-client';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
-import { queryClient } from './convex-client';
 
 export const mapWithInclude = async (
   rows: ConvexRecord[],
-  viewConfigManager: BaseViewConfigManagerInterface,
   ctx: GenericQueryCtx,
-  args: QueryDto
+  args: QueryServerProps
 ) => {
+  const { viewConfigManager } = args;
   const include = viewConfigManager.getIncludeFields();
 
   return await asyncMap(rows, async (recordWithoutRelations) => {

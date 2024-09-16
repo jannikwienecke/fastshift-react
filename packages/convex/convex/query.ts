@@ -16,11 +16,28 @@ export const viewMutation = server.mutation({
 });
 
 export const deleteMutation = server.mutation({
-  handler: (ctx, args) => {
+  handler: async (ctx, args) => {
     // ctx.db.patch('' as Id<'tasks'>, {projectId: '123'})
 
     console.log('deleteMutation');
-    return {};
+
+    const projectIds = ['123', '456'];
+
+    const tasks = await ctx.db
+      .query('tasks')
+      .filter((q) =>
+        q.or(
+          ...projectIds.map((projectId) =>
+            q.eq(q.field('projectId'), projectId)
+          )
+        )
+      )
+      .collect();
+
+    // const tasks = await ctx.db
+    //   .query('tasks')
+    //   .filter((q) => q.field('projectId').oneOf(projectIds))
+    //   .collect();
   },
 });
 

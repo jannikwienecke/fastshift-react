@@ -1,7 +1,6 @@
 import {
-  BaseViewConfigManagerInterface,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
-  QueryDto,
+  QueryServerProps,
   relationalViewHelper,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
@@ -12,12 +11,12 @@ import { GenericQueryCtx } from './convex.server.types';
 export const handleRelationalTableQuery = async ({
   ctx,
   args,
-  viewConfigManager,
 }: {
   ctx: GenericQueryCtx;
-  args: QueryDto;
-  viewConfigManager: BaseViewConfigManagerInterface;
+  args: QueryServerProps;
 }) => {
+  const { viewConfigManager } = args;
+
   const relationQuery = args.relationQuery;
   if (!relationQuery?.tableName) throw new Error('No table name provided');
 
@@ -45,12 +44,7 @@ export const handleRelationalTableQuery = async ({
     searchField
   ).slice(0, DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
 
-  const rowsWithInclude = await mapWithInclude(
-    rows,
-    relationalViewManager,
-    ctx,
-    args
-  );
+  const rowsWithInclude = await mapWithInclude(rows, ctx, args);
 
   return {
     data: rowsWithInclude.map((row) => {

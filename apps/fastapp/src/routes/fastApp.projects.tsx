@@ -112,7 +112,7 @@ const ProjectPage = () => {
         <List.Default
           {...getListProps({
             fieldsRight: ['categories', 'owner', 'tasks'],
-            fieldsLeft: ['label', 'dueDate'], // Add both label and dueDate to the left fields
+            fieldsLeft: ['label', 'dueDate'],
           })}
         />
       </div>

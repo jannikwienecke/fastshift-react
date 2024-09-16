@@ -1,9 +1,8 @@
 import {
-  BaseViewConfigManager,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   getRelationTableName,
-  QueryDto,
   QueryRelationalData,
+  QueryServerProps,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
 import { queryHelper } from './convex-query-helper';
@@ -11,9 +10,10 @@ import { GenericQueryCtx } from './convex.server.types';
 
 export const getRelationalData = async (
   ctx: GenericQueryCtx,
-  viewConfigManager: BaseViewConfigManager,
-  args: QueryDto
+  args: QueryServerProps
 ) => {
+  const { viewConfigManager } = args;
+
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   const { getInclude } = queryHelper({ displayField, query: args.query });

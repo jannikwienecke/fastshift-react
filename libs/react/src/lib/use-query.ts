@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  convertFiltersForBackend,
   makeQueryKey,
   QueryDto,
   QueryProps,
@@ -11,6 +12,7 @@ import { useQuery as useTanstackQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import React from 'react';
 import { PrismaContextType } from './query-context';
+import { useFilter } from './store.ts';
 import { debouncedQueryAtom } from './ui-components';
 import { useApi } from './use-api';
 import { useView } from './use-view';
@@ -28,12 +30,14 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
         viewConfigManager: undefined,
         viewName: args.viewConfig?.viewName ?? '',
         relationQuery: args.relationQuery,
+        filters: args.relationQuery?.tableName ? '' : args.filters ?? '',
       })
     : {
         queryKey: makeQueryKey({
           viewName: args.viewConfig?.viewName,
           query: args.query,
           relation: args.relationQuery?.tableName,
+          filters: args.filters,
         }),
         queryFn: () => {
           return api.prisma?.viewLoader(args);
@@ -73,6 +77,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const prisma = useApi();
   const { viewConfigManager, registeredViews } = useView();
   const query = useAtomValue(debouncedQueryAtom);
+  const { filter } = useFilter();
+  const parsedFilters = convertFiltersForBackend(filter.fitlers);
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -85,6 +91,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       viewConfig:
         queryProps?.viewConfigManager?.viewConfig ||
         viewConfigManager.viewConfig,
+      filters: parsedFilters,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -96,6 +103,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     registeredViews,
     viewConfigManager.modelConfig,
     viewConfigManager.viewConfig,
+    parsedFilters,
   ]);
 
   const queryReturn = useStableQuery(prisma, queryPropsMerged);

@@ -57,27 +57,25 @@ export type ComboboxProps = {
   };
 };
 
-export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> =
-  | {
-      input?: {
-        query: string;
-        placeholder: string;
-        onChange: (query: string) => void;
-      };
+export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> = {
+  input?: {
+    query: string;
+    placeholder: string;
+    onChange: (query: string) => void;
+  };
 
-      values: T[];
-      onChange: (value: T) => void;
-      selected: ComboxboxItem[] | null;
-      open: boolean;
-      onOpenChange: (open: boolean) => void;
-      tableName: string;
-      render: (value: T) => React.ReactNode;
-      multiple: boolean;
-      rect: DOMRect | null;
-      searchable: boolean;
-    }
-  | undefined
-  | null;
+  values: T[];
+  onChange: (value: T) => void;
+  selected: ComboxboxItem[] | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  tableName: string;
+  render: (value: T) => React.ReactNode;
+  multiple: boolean;
+  rect: DOMRect | null;
+  searchable: boolean;
+  name: string;
+};
 
 export type ComboboxAdapterOptions<T extends ComboxboxItem> = {
   onClose: () => void;
