@@ -68,7 +68,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const allIds = arrayIntersection(
     manyToManyFilters.length ? idsManyToManyFilters : null,
     oneToManyFilters.length ? idsOneToManyFilters : null,
-    idsSearchAndFilter
+    idsSearchAndFilter.length ? idsSearchAndFilter : null
   );
 
   const hasAnyFilterSet =
@@ -77,8 +77,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     filterWithSearchField ||
     manyToManyFilters.length ||
     oneToManyFilters.length;
-
-  console.log(hasAnyFilterSet);
 
   const rows = filterResults(
     hasAnyFilterSet
