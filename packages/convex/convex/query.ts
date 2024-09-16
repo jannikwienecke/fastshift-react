@@ -6,6 +6,9 @@ import * as server from './_generated/server';
 
 import { asyncMap } from 'convex-helpers';
 import { views } from '../src/index';
+import { Id } from './_generated/dataModel';
+import { getManyVia } from 'convex-helpers/server/relationships';
+import { ID } from '@apps-next/core';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -22,17 +25,64 @@ export const deleteMutation = server.mutation({
     console.log('deleteMutation');
 
     const projectIds = ['123', '456'];
-
+    const tagIds = ['123', '456'];
     const tasks = await ctx.db
       .query('tasks')
       .filter((q) =>
-        q.or(
-          ...projectIds.map((projectId) =>
-            q.eq(q.field('projectId'), projectId)
+        q.and(
+          q.or(
+            ...projectIds.map((projectId) =>
+              q.eq(q.field('projectId'), projectId)
+            )
           )
         )
       )
       .collect();
+
+    const taskIds = [] as Id<'tasks'>[];
+
+    // ctx.db.query("tasks").withSearchIndex('name_search', (q) => q.search('name', '123')).
+
+    // const tasks = ctx.db
+    //   .query('tasks')
+    //   .filter((q) =>
+    //     q.or(...taskIds.map((taskId) => q.eq(q.field('_id'), taskId)))
+    //   )
+    //   .collect();
+
+    const res = ctx.db
+      .query('tasks')
+      //   .withSearchIndex('name_search', (q) => q.search('name', '123'))
+
+      //  filter by completed
+      .filter((q) => q.eq(q.field('completed'), true));
+
+    // asyncMap([] as ID<"tasks">[], async (taskId) => {
+    //   const task = await ctx.db.query('tasks').withIndex('by_id', (q) => q.eq(q.field('_id'), taskId)).first();
+    //   return task;
+    // });
+
+    // const taskIds: Id<'tasks'>[] = [];
+    // const taskTags = await ctx.db
+    // .query("tasks_tags")
+    // .withIndex("taskId", (q) =>
+    //   q.eq("taskId", taskIds)
+    // )
+    // .collect();
+
+    const tags = await ctx.db
+      .query('tags')
+      .filter((q) =>
+        q.or(...tagIds.map((tagId) => q.eq(q.field('_id'), tagId)))
+      )
+      .collect();
+
+    // const taskTags = await ctx.db
+    //   .query('tasks_tags')
+    //   .withIndex('taskId', (q) => q.in('taskId', '123'))
+    //   .collect();
+
+    // tasks.filter((task) => task.tags?.includes('123'));
 
     // const tasks = await ctx.db
     //   .query('tasks')

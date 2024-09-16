@@ -64,7 +64,7 @@ export class BaseViewConfigManager<
   }
 
   getSearchableField(): SearchableField | undefined {
-    return this.viewConfig.query?.searchableFields;
+    return this.viewConfig.query?.searchableField;
   }
 
   getViewFieldList(): FieldConfig[] {

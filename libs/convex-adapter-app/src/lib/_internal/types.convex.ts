@@ -79,9 +79,16 @@ export type ConvexFindManyArgs = {
   select?: ConvexInclude;
 };
 
+type QFieldReturn = {
+  //
+};
+type QField = (fieldName: string) => QFieldReturn;
+
 export type SearchFilterBuilder = {
   search: (fieldName: string, query: string) => unknown;
-  eq: (fieldName: string, value: unknown) => unknown;
+  eq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
+  or: (...args: unknown[]) => unknown;
+  field: QField;
 };
 export type ConvexClient = {
   [key in string]: {
@@ -98,6 +105,7 @@ export type ConvexClient = {
       query: (q: SearchFilterBuilder) => any
     ) => ConvexClient[string];
     delete: (id: ID) => Promise<void>;
+    filter: (query: (q: SearchFilterBuilder) => any) => ConvexClient[string];
 
     insert: (tableName: string, data: RecordType) => Promise<void>;
     // findMany: (args: ConvexFindManyArgs) => Promise<PrismaRecord[]>;

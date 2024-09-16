@@ -18,6 +18,7 @@ const _schema = defineSchema({
   tasks: defineTable({
     name: v.string(),
     completed: v.boolean(),
+    description: v.optional(v.string()),
     tags: v.optional(v.array(v.id('tags'))),
     projectId: v.id('projects'),
     priority: v.union(v.literal('low'), v.literal('medium'), v.literal('high')),
@@ -37,7 +38,9 @@ const _schema = defineSchema({
   tasks_tags: defineTable({
     taskId: v.id('tasks'),
     tagId: v.id('tags'),
-  }).index('taskId', ['taskId']),
+  })
+    .index('taskId', ['taskId'])
+    .index('tagId', ['tagId']),
 
   projects: defineTable({
     label: v.string(),

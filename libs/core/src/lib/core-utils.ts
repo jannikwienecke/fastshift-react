@@ -1,6 +1,6 @@
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
-import { QUERY_KEY_PREFIX } from './types';
+import { ID, QUERY_KEY_PREFIX } from './types';
 import {
   FilterOperatorTypePrimitive,
   FilterOperatorTypeRelation,
@@ -137,3 +137,16 @@ export const parseFilterStringForServer = (
     })
     .filter(Boolean) as FilterType[];
 };
+
+export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] {
+  if (arrays.length === 0) return [];
+  const allIds = [...new Set(arrays.filter((a) => a != null).flat())];
+
+  const result = allIds.filter((value) => {
+    return arrays
+      .filter((a) => a != null)
+      .every((array) => array?.includes(value));
+  });
+
+  return result;
+}

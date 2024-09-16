@@ -269,18 +269,21 @@ const init = server.mutation({
         completed: false,
         projectId: projects[0],
         priority: 'high',
+        description: 'Design mockups for the website redesign',
       },
       {
         name: 'Develop frontend',
         completed: false,
         projectId: projects[0],
         priority: 'medium',
+        description: 'Develop frontend for the website redesign',
       },
       {
         name: 'Implement responsive design',
         completed: false,
         projectId: projects[0],
         priority: 'high',
+        description: 'Implement responsive design for the website redesign',
       },
 
       {
@@ -288,18 +291,21 @@ const init = server.mutation({
         completed: true,
         projectId: projects[1],
         priority: 'high',
+        description: 'Create a workout schedule for weight loss',
       },
       {
         name: 'Research healthy recipes',
         completed: false,
         projectId: projects[1],
         priority: 'medium',
+        description: 'Research healthy recipes for weight loss',
       },
       {
         name: 'Buy workout equipment',
         completed: false,
         projectId: projects[1],
         priority: 'low',
+        description: 'Buy workout equipment for weight loss',
       },
 
       {
@@ -307,12 +313,14 @@ const init = server.mutation({
         completed: false,
         projectId: projects[2],
         priority: 'high',
+        description: 'Track monthly expenses to reduce expenses',
       },
       {
         name: 'Create savings plan',
         completed: false,
         projectId: projects[2],
         priority: 'medium',
+        description: 'Create savings plan to reduce expenses',
       },
       {
         name: 'Review investment options',
@@ -652,6 +660,7 @@ const init = server.mutation({
         completed: task.completed,
         projectId: task.projectId,
         priority: task.priority as any,
+        description: task.description,
       });
 
       // Add tags to each task (0 to 4 tags)

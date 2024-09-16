@@ -8,7 +8,7 @@ export type FilterOperatorTypeRelation = {
 };
 
 export type FilterOperatorTypePrimitive = {
-  label: 'contains' | 'does not contain';
+  label: 'contains' | 'does not contain' | 'is';
   icon?: Icon;
 };
 
