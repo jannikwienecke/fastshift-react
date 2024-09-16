@@ -58,16 +58,12 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     })
   );
 
-  console.log(primitiveFilters.length, args.query, filterWithSearchField);
-
   const idsSearchAndFilter =
     primitiveFilters.length || args.query || filterWithSearchField
       ? (await queryWithSearchAndFilter.collect())
           .map((row, index) => row._id)
           .filter((a) => a !== undefined)
       : [];
-
-  console.log(idsSearchAndFilter.length);
 
   const allIds = arrayIntersection(
     manyToManyFilters.length ? idsManyToManyFilters : null,
@@ -216,3 +212,9 @@ const defaultFilters: FilterType[] = [
 //   );
 //   return tasks;
 // };
+
+// NEXT STEPS
+// - [ ] write tests for (oneToManyFilters, manyToManyFilters)
+// - [ ] refacotr above code and code in convex-seaching
+// - [ ] update the ui so we can set primitive filters
+// - [ ] write tests for (primitiveFilters)
