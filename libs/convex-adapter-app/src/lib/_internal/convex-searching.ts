@@ -43,9 +43,18 @@ export const withPrimitiveFilters = (
   let _query = dbQuery;
   primitiveFilters.forEach((filter) => {
     const value = filter.type === 'primitive' ? filter.value : null;
-    _query = dbQuery.filter((q) =>
-      q.eq(q.field(filter.field.name), value?.raw)
-    );
+    _query = dbQuery.filter((q) => {
+      const _value =
+        filter.field.type === 'Boolean'
+          ? value?.raw === 'false'
+            ? false
+            : true
+          : filter.field.type === 'Number'
+          ? Number(value?.raw)
+          : value?.raw;
+
+      return q.eq(q.field(filter.field.name), _value);
+    });
   });
 
   return _query;

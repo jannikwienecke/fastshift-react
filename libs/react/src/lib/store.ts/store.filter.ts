@@ -1,4 +1,11 @@
-import { FieldConfig, FilterType, Row } from '@apps-next/core';
+import {
+  FieldConfig,
+  FieldType,
+  FilterOperatorTypePrimitive,
+  FilterOperatorTypeRelation,
+  FilterType,
+  Row,
+} from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 type SelectFilterValueAction = {
@@ -23,6 +30,31 @@ const isRelation = (field: FieldConfig) => {
   );
 };
 
+const DEFAULT_OPERATOR = {
+  label: 'is',
+} as const;
+
+export const DEFAULT_OPERATOR_PRIMITIVE: Partial<{
+  [key in FieldType]: FilterOperatorTypePrimitive;
+}> = {
+  Boolean: DEFAULT_OPERATOR,
+  String: {
+    label: 'contains',
+  },
+  Number: DEFAULT_OPERATOR,
+  Enum: DEFAULT_OPERATOR,
+  Date: DEFAULT_OPERATOR,
+};
+
+export const DEFAULT_OPERATOR_RELATION: Partial<{
+  [key in FieldType]: FilterOperatorTypeRelation;
+}> = {
+  Enum: DEFAULT_OPERATOR,
+  Reference: DEFAULT_OPERATOR,
+  OneToOneReference: DEFAULT_OPERATOR,
+  Union: DEFAULT_OPERATOR,
+};
+
 export const setFilterAtom = atom(
   null,
   (get, set, filter: SelectFilterValueAction) => {
@@ -40,17 +72,17 @@ export const setFilterAtom = atom(
               type: 'relation',
               field: filter.field,
               values: [filter.value],
-              operator: {
-                label: 'is',
-              },
+              operator:
+                DEFAULT_OPERATOR_RELATION[filter.field.type] ??
+                DEFAULT_OPERATOR,
             }
           : {
               type: 'primitive',
               field: filter.field,
               value: filter.value,
-              operator: {
-                label: 'contains',
-              },
+              operator:
+                DEFAULT_OPERATOR_PRIMITIVE[filter.field.type] ??
+                DEFAULT_OPERATOR,
             }
       );
     }
@@ -72,7 +104,7 @@ export const setFilterAtom = atom(
         exitingFilter.values.push(filter.value);
       }
     } else if (exitingFilter && exitingFilter.type === 'primitive') {
-      throw new Error('primitive filter not yet supported');
+      exitingFilter.value = filter.value;
     }
 
     filters = filterState.fitlers.map((f) => {
