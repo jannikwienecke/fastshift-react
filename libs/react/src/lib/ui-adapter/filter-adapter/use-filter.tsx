@@ -4,6 +4,7 @@ import {
   FieldConfig,
   Row,
 } from '@apps-next/core';
+import { useFilterStore } from '../../store.ts/store.filter.js';
 import { FilterValue } from '../../ui-components/render-filter-value.js';
 import {
   useCombobox,
@@ -16,15 +17,34 @@ export function useFilter({
 }: {
   onSelect: (props: { field: FieldConfig; value: Row }) => void;
 }) {
+  const { filter } = useFilterStore();
   const { filterState, select, close, open } = useFiltering();
+
+  const getSelected = () => {
+    const activeFilter = filter.fitlers.find(
+      (f) => f.field.name === filterState.selectedField?.name
+    );
+
+    if (!activeFilter) return [];
+
+    const values =
+      activeFilter?.type === 'relation'
+        ? activeFilter.values
+        : [activeFilter?.value];
+
+    return values;
+  };
 
   const props = {
     state: {
       field: filterState.selectedField,
       // row: filterState.selectedField ? ('test' as Row) : null,
       rect: filterState.rect ?? ({} as DOMRect),
-      selected: [],
-      multiple: filterState.selectedField?.relation ? true : false,
+      selected: getSelected(),
+      multiple: true,
+      // filterState.selectedField?.relation || filterState.selectedField?.enum
+      //   ? true
+      //   : false,
     },
     onClose: close,
     onSelect: (value) => {
@@ -50,7 +70,6 @@ export function useFilter({
       };
     }
 
-    console.log('RETURN ');
     return {
       ...filterState,
       name: 'filter',
@@ -62,7 +81,7 @@ export function useFilter({
           console.log('onChange', query);
         },
         query: filterState.query,
-        placeholder: 'Filter...123',
+        placeholder: 'Filter...',
       },
       selected: null,
       onChange: (value) => {
@@ -70,7 +89,6 @@ export function useFilter({
       },
 
       onOpenChange: (isOpen) => {
-        console.log('onOpenChange', isOpen);
         if (!isOpen) {
           close();
         } else {

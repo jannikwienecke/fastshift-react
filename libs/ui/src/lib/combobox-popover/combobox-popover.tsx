@@ -33,6 +33,7 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
           props.children
         ) : rect?.width ? (
           <>
+            {/* FILTR TRIGGER MUST BE A BUTTON */}
             <button
               style={{
                 position: 'fixed',

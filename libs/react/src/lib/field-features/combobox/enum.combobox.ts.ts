@@ -19,6 +19,11 @@ export const EnumInitializer = (
     return makeRow(v.name, v.name, v.name, field);
   });
 
+  const multiple =
+    payload.multiple !== undefined
+      ? payload.multiple
+      : Boolean(field?.relation?.manyToManyRelation);
+
   return {
     ...DEFAULT_STORE,
     ...payload,
@@ -27,7 +32,7 @@ export const EnumInitializer = (
     values,
     fallbackData: values,
 
-    multiple: false,
+    multiple,
     selected: [
       makeRow(
         selected.toString(),

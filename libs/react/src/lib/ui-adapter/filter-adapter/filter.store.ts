@@ -48,7 +48,6 @@ export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
 });
 
 export const closeFilterAtom = atom(null, (get, set) => {
-  console.log('CLOSE FILTER');
   set(filterStateAtom, { ...get(filterStateAtom), ...DEFAULT_FILTER_STATE });
 });
 

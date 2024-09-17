@@ -37,9 +37,8 @@ const FilterList = (props: FilterProps) => {
     <div className="flex flex-row gap-2 items-center flex-wrap text-xs">
       {props.filters.map((f) => {
         return (
-          <span ref={ref}>
+          <span key={`filter-${f.name}-${f.operator}`} ref={ref}>
             <FilterItem
-              key={`filter-${f.name}-${f.operator}`}
               filter={f}
               onRemove={() => {
                 props.onRemove(f);
@@ -104,7 +103,6 @@ const FilterButton = (props: {
   hasFilter: boolean;
   label?: string;
 }) => {
-  console.log(props.comboboxProps.input?.placeholder);
   return (
     <ComboboxPopover {...props.comboboxProps}>
       <button
