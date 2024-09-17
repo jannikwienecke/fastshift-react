@@ -15,17 +15,19 @@ import { ComboboxInitPayload, useComboboxStore } from './_combobox.store/store';
 
 export type UseComboboAdaper = typeof useCombobox;
 
+export type UseComboboxProps = {
+  state: Omit<ComboboxInitPayload, 'defaultData' | 'registeredViews'> | null;
+  onClose: () => void;
+  onSelect: (value: Row) => void;
+  renderValue?: (props: { value: Row; field: FieldConfig }) => React.ReactNode;
+};
+
 export const useCombobox = ({
   state: initialState,
   onClose,
   onSelect,
   ...props
-}: {
-  state: Omit<ComboboxInitPayload, 'defaultData' | 'registeredViews'> | null;
-  onClose: () => void;
-  onSelect: (value: Row) => void;
-  renderValue?: (props: { value: Row; field: FieldConfig }) => React.ReactNode;
-}) => {
+}: UseComboboxProps) => {
   const prevFieldName = usePrevious(initialState?.field?.name);
 
   const [store, dispatch] = useComboboxStore();
@@ -68,7 +70,8 @@ export const useCombobox = ({
   const lastInitialState = useRef(initialState);
 
   React.useEffect(() => {
-    if (lastInitialState.current?.row === initialState?.row) return;
+    if (lastInitialState.current?.field?.name === initialState?.field?.name)
+      return;
 
     lastInitialState.current = initialState;
     if (!initialState?.field) {

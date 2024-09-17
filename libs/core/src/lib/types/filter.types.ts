@@ -26,5 +26,12 @@ export type FilterType =
       value: Row;
     };
 
+export type FilterItemType = {
+  label: string;
+  icon?: Icon;
+  operator: string;
+  value: string;
+  name: string;
+};
 // format to send the filters to the backend
 // i need to send the FilterType[] to the backend. Pls suggest a format and a function to convert the FilterType[] to the format

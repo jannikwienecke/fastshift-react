@@ -78,16 +78,19 @@ export const useMutation = () => {
     onMutate: async (vars) => {
       lastViewName.current = vars.viewConfig.viewName;
 
+      // TODO: Fix This. getting and setting queryKey must happen in 1 location!
       const _queryKeyAll = api?.makeQueryOptions?.({
         ...queryPropsMerged,
         query: '',
         viewName: vars.viewConfig.viewName,
+        filters: '',
       }).queryKey;
 
       const _queryKey = api?.makeQueryOptions?.({
         ...queryPropsMerged,
         query: vars.query,
         viewName: vars.viewConfig.viewName,
+        filters: '',
       }).queryKey;
 
       const queryKey =

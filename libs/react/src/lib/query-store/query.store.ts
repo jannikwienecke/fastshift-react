@@ -8,6 +8,7 @@ import {
   makeData,
 } from '@apps-next/core';
 import { getViewConfigAtom, registeredViewsAtom } from '../stores';
+import { getViewByName } from '../use-view';
 
 export const queryStoreAtom = atom<QueryStore<RecordType>>({
   dataModel: {} as DataModelNew<RecordType>,
@@ -43,8 +44,8 @@ export const updateQueryDataAtom = atom<
 
   const relationalDataModel = Object.entries(relationalDataRaw).reduce(
     (acc, [tableName, data]) => {
-      const viewConfig = registeredViews[tableName];
-      const _data = makeData(registeredViews, viewConfig?.tableName)(data);
+      const viewConfig = getViewByName(registeredViews, tableName);
+      const _data = makeData(registeredViews, viewConfig?.viewName)(data);
 
       acc[tableName] = _data;
       return acc;

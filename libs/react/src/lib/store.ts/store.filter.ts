@@ -95,7 +95,7 @@ export const setFilterAtom = atom(
   }
 );
 
-export const useFilter = () => {
+export const useFilterState = () => {
   const setFilter = useSetAtom(setFilterAtom);
   const filter = useAtomValue(filterAtom);
 

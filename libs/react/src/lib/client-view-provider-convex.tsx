@@ -25,6 +25,7 @@ import {
   viewConfigManagerAtom,
 } from './stores';
 import { HydrateAtoms } from './ui-components';
+import { getViewByName } from './use-view';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
@@ -64,13 +65,14 @@ export const ClientViewProviderConvex = (
 
   const dataModel = makeData(
     views,
-    viewConfigManager.getViewName()
+    viewConfigManager.getTableName()
   )(data?.data ?? []);
 
   const relationalDataModel = Object.entries(data?.relationalData ?? {}).reduce(
     (acc, [tableName, data]) => {
-      const viewConfig = registeredViews[tableName];
-      acc[tableName] = makeData(registeredViews, viewConfig?.tableName)(data);
+      const viewConfig = getViewByName(registeredViews, tableName);
+
+      acc[tableName] = makeData(registeredViews, viewConfig.viewName)(data);
       return acc;
     },
     {} as { [key: string]: DataModelNew<RecordType> }

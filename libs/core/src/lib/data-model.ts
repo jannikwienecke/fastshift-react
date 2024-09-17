@@ -1,3 +1,4 @@
+import { getViewByName } from '@apps-next/react';
 import { BaseViewConfigManager } from './base-view-config';
 import { RecordType, FieldConfig, RegisteredViews, ID } from './types';
 
@@ -25,14 +26,11 @@ export type DataModelNew<T extends RecordType = RecordType> = {
   rows: Row<T>[];
 };
 
-export const makeData = (
-  registeredViews: RegisteredViews,
-  viewName: string
-) => {
+export const makeData = (registeredViews: RegisteredViews, name: string) => {
   return <T extends RecordType = RecordType>(data: T[]): DataModelNew<T> => {
-    const viewConfig = registeredViews[viewName as string];
+    const viewConfig = getViewByName(registeredViews, name);
     if (!viewConfig) {
-      throw new Error(`View ${viewName} not found`);
+      throw new Error(`View ${name} not found`);
     }
 
     const viewConfigManager = new BaseViewConfigManager(viewConfig);
@@ -47,14 +45,17 @@ export const makeData = (
           getValue: <K extends keyof T>(key: K) => {
             const field = viewConfigManager.getFieldBy(key.toString());
 
-            const nameOfView = getRelationTableName(field);
+            const nameOfTable = getRelationTableName(field);
 
-            const viewConfig = registeredViews[nameOfView];
+            const viewConfig = field.relation
+              ? getViewByName(registeredViews, nameOfTable)
+              : undefined;
+
             if (viewConfig) {
               const value = item[key];
               const isArray = Array.isArray(value);
 
-              const _data = makeData(registeredViews, nameOfView);
+              const _data = makeData(registeredViews, nameOfTable);
 
               const data = _data(isArray ? item[key] : [item[key]]);
 

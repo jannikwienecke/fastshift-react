@@ -5,8 +5,9 @@ import {
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
-import { filterResults, withSearch } from './convex-searching';
+import { withSearch } from './convex-searching';
 import { GenericQueryCtx } from './convex.server.types';
+import { filterResults } from './convex-filter-results';
 
 export const handleRelationalTableQuery = async ({
   ctx,

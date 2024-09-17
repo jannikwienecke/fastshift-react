@@ -1,4 +1,5 @@
 import { RecordType } from './base.types';
+import { FilterItemType } from './filter.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
@@ -90,4 +91,10 @@ export type ComboboAdapterProps = {
     id: string | number | (string | number)[];
     label: string;
   };
+};
+
+export type FilterProps = {
+  filters: FilterItemType[];
+  onOpen: () => void;
+  comboboxProps: ComboboxPopoverProps;
 };

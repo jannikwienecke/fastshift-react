@@ -11,3 +11,5 @@ export * from './lib/bubble';
 export * from './lib/components';
 export * from './lib/combobox-popover';
 export * from './lib/basic-layout';
+
+export * from './lib/filter';

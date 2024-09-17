@@ -14,6 +14,7 @@ export const makeViews = (
     dataModel: globalConfig.dataModel,
     config: globalConfig,
     guessDisplayFieldIfNotProvided: true,
+    userDefinedViews: views,
   });
 
   const userDefinedViews = views.reduce((prev, currentView) => {

@@ -15,7 +15,7 @@ test.describe('Task management', () => {
     // Click on the first project (Website Redesign)
     const firstListItem = page.getByTestId('list-item').first();
     await firstListItem
-      .getByText('Learn Photography')
+      .getByText('website redesign')
       .first()
       .click({ force: true });
 
@@ -41,10 +41,9 @@ test.describe('Task management', () => {
   });
 
   test('Can add and remove tags from a task', async ({ page }) => {
-    const firstListItem = page.getByTestId('list-item').first();
+    const firstListItem = page.getByTestId('list-item').nth(2);
 
     await expect(firstListItem.getByText('Long-term')).toBeVisible();
-    await expect(firstListItem.getByText('Important')).toBeVisible();
     await expect(firstListItem.getByText('Creative')).toBeHidden();
 
     // click on the first tag "Planning"
@@ -74,7 +73,7 @@ test.describe('Task management', () => {
 
     // close popover -> click /assign launch/i
     await page
-      .getByText(/learn photography/i)
+      .getByText(/website redesign/i)
       .first()
       .click({ force: true });
 
@@ -83,7 +82,7 @@ test.describe('Task management', () => {
   });
 
   test('can chaange the priority of a task', async ({ page }) => {
-    const firstListItem = page.getByTestId('list-item').first();
+    const firstListItem = page.getByTestId('list-item').nth(5);
 
     // get by test id priority
     // const priority = firstListItem.getByTestId('priority');
@@ -96,7 +95,7 @@ test.describe('Task management', () => {
 
     // close popover by clicking /assign launch/i
     await page
-      .getByText(/learn photography/i)
+      .getByText(/website redesign/i)
       .first()
       .click({ force: true });
 
@@ -104,7 +103,7 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText('🟢')).toBeHidden();
   });
 
-  test("can filter tasks by projects and tags", async ({ page }) => {
+  test('can filter tasks by projects and tags', async ({ page }) => {
     // click on the filter button
     await page.getByText('Filter').click();
 
@@ -114,9 +113,9 @@ test.describe('Task management', () => {
     await popover.getByText('Projects').click();
 
     // assert that the projects popover is visible
-    await popover.getByText('fitness plan').click()
+    await popover.getByText('fitness plan').click();
 
-    await page.getByText('tasks').first().click({force: true})
+    await page.getByText('tasks').first().click({ force: true });
     // expect popover to be hidden
     await expect(popover.getByText('fitness plan')).toBeHidden();
 
@@ -127,15 +126,13 @@ test.describe('Task management', () => {
     await page.getByTestId('filter-button').click();
 
     // assert that the projects popover is visible
-    await popover.getByText('tags').click()
+    await popover.getByText('tags').click();
 
-    await popover.getByText(/technical/i).click()
+    await popover.getByText(/technical/i).click();
 
-    await page.getByText('tasks').first().click({force: true})
+    await page.getByText('tasks').first().click({ force: true });
 
     await expect(page.getByText(/technical/i)).toHaveCount(2);
     await expect(page.getByText('fitness plan')).toHaveCount(2);
-
-
   });
 });
