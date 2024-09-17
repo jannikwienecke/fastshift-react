@@ -96,5 +96,6 @@ export type ComboboAdapterProps = {
 export type FilterProps = {
   filters: FilterItemType[];
   onOpen: () => void;
+  onRemove: (filter: FilterItemType) => void;
   comboboxProps: ComboboxPopoverProps;
 };

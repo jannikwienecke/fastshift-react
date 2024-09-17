@@ -50,7 +50,7 @@ export const closeFilterAtom = atom(null, (get, set) => {
   set(filterStateAtom, { ...get(filterStateAtom), ...DEFAULT_FILTER_STATE });
 });
 
-export const useFilterStore = () => {
+export const useFiltering = () => {
   const filterState = useAtomValue(filterStateAtom);
   const open = useSetAtom(openFilterAtom);
   const select = useSetAtom(selectFilterAtom);

@@ -15,7 +15,7 @@ export const FilterDefault = (props: FilterProps) => {
   return (
     <>
       <div className="flex flex-row gap-2 items-center">
-        {filters.length > 0 && <FilterList filters={filters} />}
+        {filters.length > 0 && <FilterList {...props} />}
 
         <FilterButton
           comboboxProps={comboboxProps}
@@ -27,17 +27,27 @@ export const FilterDefault = (props: FilterProps) => {
   );
 };
 
-const FilterList = (props: { filters: FilterItemType[] }) => {
+const FilterList = (props: FilterProps) => {
   return (
     <div className="flex flex-row gap-2 items-center flex-wrap text-xs">
       {props.filters.map((f) => {
-        return <FilterItem key={`filter-${f.name}-${f.operator}`} {...f} />;
+        return (
+          <FilterItem
+            key={`filter-${f.name}-${f.operator}`}
+            filter={f}
+            onRemove={() => props.onRemove(f)}
+          />
+        );
       })}
     </div>
   );
 };
 
-const FilterItem = (filter: FilterItemType) => {
+const FilterItem = (props: {
+  filter: FilterItemType;
+  onRemove: () => void;
+}) => {
+  const { filter, onRemove } = props;
   return (
     <div className="border border-input rounded-sm text-muted-foreground ">
       <div className="flex flex-row items-center flex-wrap">
@@ -65,9 +75,9 @@ const FilterItem = (filter: FilterItemType) => {
           <div>{filter.value}</div>
         </div>
 
-        <div className="px-2 hover:bg-accent py-1">
+        <button className="px-2 hover:bg-accent py-1" onClick={onRemove}>
           <Cross2Icon className="w-4 h-4 text-foreground" />
-        </div>
+        </button>
       </div>
     </div>
   );

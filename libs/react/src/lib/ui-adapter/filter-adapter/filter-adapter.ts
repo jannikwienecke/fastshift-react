@@ -1,6 +1,6 @@
 import { FilterItemType, FilterProps, FilterType } from '@apps-next/core';
-import { useFilterState } from '../../store.ts';
-import { useFilterStore } from './filter.store.js';
+import { useFilterStore } from '../../store.ts';
+import { useFiltering } from './filter.store.js';
 import { useFilter } from './use-filter.js';
 
 export const getFilterValue = (f: FilterType) => {
@@ -14,7 +14,8 @@ export const getFilterValue = (f: FilterType) => {
 };
 
 export const useFilterAdapter = (): (() => FilterProps) => {
-  const { setFilter } = useFilterState();
+  const { setFilter, filter, removeFilter } = useFilterStore();
+  const { open } = useFiltering();
 
   const { getFilterComboboxProps } = useFilter({
     onSelect: (props) => {
@@ -24,9 +25,6 @@ export const useFilterAdapter = (): (() => FilterProps) => {
       });
     },
   });
-
-  const { open } = useFilterStore();
-  const { filter } = useFilterState();
 
   const filters_ = filter.fitlers.map((f) => {
     return {
@@ -42,6 +40,10 @@ export const useFilterAdapter = (): (() => FilterProps) => {
       onOpen: () => open(true),
       filters: filters_,
       comboboxProps: getFilterComboboxProps(),
+      onRemove: ({ name }) => {
+        const f = filter.fitlers.find((f) => f.field.name === name);
+        f && removeFilter(f);
+      },
     };
   };
 };

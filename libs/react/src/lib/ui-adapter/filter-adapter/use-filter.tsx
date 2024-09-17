@@ -5,21 +5,18 @@ import {
   Row,
 } from '@apps-next/core';
 import { FilterValue } from '../../ui-components/render-filter-value.js';
-import { useFilterStore } from './filter.store.js';
-import { useView } from '../../use-view.js';
-import { useFilterState } from '../../store.ts/store.filter.js';
 import {
   useCombobox,
   UseComboboxProps,
 } from '../combox-adapter/combobox-adapter.js';
-import React from 'react';
+import { useFiltering } from './filter.store.js';
 
 export function useFilter({
   onSelect,
 }: {
   onSelect: (props: { field: FieldConfig; value: Row }) => void;
 }) {
-  const { filterState, open, select, close } = useFilterStore();
+  const { filterState, select, close } = useFiltering();
 
   const props = {
     state: {
@@ -68,7 +65,6 @@ export function useFilter({
       },
       selected: null,
       onChange: (value) => {
-        console.log('SELECT!!!');
         select(value);
       },
 
@@ -80,10 +76,6 @@ export function useFilter({
       },
       render: (value) => <FilterValue value={value} />,
     };
-  };
-
-  const handleOpen = () => {
-    open(true);
   };
 
   return {

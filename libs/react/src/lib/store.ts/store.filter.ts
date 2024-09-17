@@ -95,12 +95,23 @@ export const setFilterAtom = atom(
   }
 );
 
-export const useFilterState = () => {
+export const removeFilterAtom = atom(null, (get, set, filter: FilterType) => {
+  const filters = get(filterAtom).fitlers;
+  const newFilters = filters.filter((f) => f.field.name !== filter.field.name);
+  set(filterAtom, {
+    ...get(filterAtom),
+    fitlers: newFilters,
+  });
+});
+
+export const useFilterStore = () => {
   const setFilter = useSetAtom(setFilterAtom);
+  const removeFilter = useSetAtom(removeFilterAtom);
   const filter = useAtomValue(filterAtom);
 
   return {
     setFilter,
+    removeFilter,
     filter,
   };
 };
