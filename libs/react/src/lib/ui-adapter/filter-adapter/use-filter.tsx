@@ -16,13 +16,13 @@ export function useFilter({
 }: {
   onSelect: (props: { field: FieldConfig; value: Row }) => void;
 }) {
-  const { filterState, select, close } = useFiltering();
+  const { filterState, select, close, open } = useFiltering();
 
   const props = {
     state: {
       field: filterState.selectedField,
       // row: filterState.selectedField ? ('test' as Row) : null,
-      rect: {} as DOMRect,
+      rect: filterState.rect ?? ({} as DOMRect),
       selected: [],
       multiple: filterState.selectedField?.relation ? true : false,
     },
@@ -50,6 +50,7 @@ export function useFilter({
       };
     }
 
+    console.log('RETURN ');
     return {
       ...filterState,
       name: 'filter',
@@ -61,17 +62,19 @@ export function useFilter({
           console.log('onChange', query);
         },
         query: filterState.query,
-        placeholder: 'Filter...',
+        placeholder: 'Filter...123',
       },
       selected: null,
       onChange: (value) => {
         select(value);
       },
 
-      onOpenChange: (open) => {
-        console.log('onOpenChange', open);
-        if (!open) {
+      onOpenChange: (isOpen) => {
+        console.log('onOpenChange', isOpen);
+        if (!isOpen) {
           close();
+        } else {
+          open(true);
         }
       },
       render: (value) => <FilterValue value={value} />,

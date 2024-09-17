@@ -9,6 +9,7 @@ import {
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { ListFilter } from 'lucide-react';
 import { ComboboxPopover } from '../combobox-popover';
+import React from 'react';
 
 export const FilterDefault = (props: FilterProps) => {
   const { filters, onOpen, comboboxProps } = props;
@@ -17,26 +18,39 @@ export const FilterDefault = (props: FilterProps) => {
       <div className="flex flex-row gap-2 items-center">
         {filters.length > 0 && <FilterList {...props} />}
 
-        <FilterButton
-          comboboxProps={comboboxProps}
-          onOpen={onOpen}
-          hasFilter={filters.length > 0}
-        />
+        <div className="relative">
+          <FilterButton
+            comboboxProps={comboboxProps}
+            onOpen={onOpen}
+            hasFilter={filters.length > 0}
+          />
+        </div>
       </div>
     </>
   );
 };
 
 const FilterList = (props: FilterProps) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex flex-row gap-2 items-center flex-wrap text-xs">
       {props.filters.map((f) => {
         return (
-          <FilterItem
-            key={`filter-${f.name}-${f.operator}`}
-            filter={f}
-            onRemove={() => props.onRemove(f)}
-          />
+          <span ref={ref}>
+            <FilterItem
+              key={`filter-${f.name}-${f.operator}`}
+              filter={f}
+              onRemove={() => {
+                props.onRemove(f);
+              }}
+              onSelect={() => {
+                const rect = ref.current?.getBoundingClientRect();
+                if (!rect) return;
+                props.onSelect(f, rect);
+              }}
+            />
+          </span>
         );
       })}
     </div>
@@ -46,6 +60,7 @@ const FilterList = (props: FilterProps) => {
 const FilterItem = (props: {
   filter: FilterItemType;
   onRemove: () => void;
+  onSelect: () => void;
 }) => {
   const { filter, onRemove } = props;
   return (
@@ -72,7 +87,7 @@ const FilterItem = (props: {
             </div>
           ) : null}
 
-          <div>{filter.value}</div>
+          <div onClick={props.onSelect}>{filter.value}</div>
         </div>
 
         <button className="px-2 hover:bg-accent py-1" onClick={onRemove}>
@@ -89,6 +104,7 @@ const FilterButton = (props: {
   hasFilter: boolean;
   label?: string;
 }) => {
+  console.log(props.comboboxProps.input?.placeholder);
   return (
     <ComboboxPopover {...props.comboboxProps}>
       <button

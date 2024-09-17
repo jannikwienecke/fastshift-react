@@ -10,6 +10,7 @@ type FilterState = {
   id: string | null;
   registeredViews: RegisteredViews;
   selectedField: FieldConfig | null;
+  rect: DOMRect | null;
 };
 
 const DEFAULT_FILTER_STATE: FilterState = {
@@ -20,6 +21,7 @@ const DEFAULT_FILTER_STATE: FilterState = {
   id: null,
   registeredViews: {},
   selectedField: null,
+  rect: null,
 };
 
 export const filterStateAtom = atom<FilterState>(DEFAULT_FILTER_STATE);
@@ -50,16 +52,22 @@ export const closeFilterAtom = atom(null, (get, set) => {
   set(filterStateAtom, { ...get(filterStateAtom), ...DEFAULT_FILTER_STATE });
 });
 
+const setPositionAtom = atom(null, (get, set, rect: DOMRect) => {
+  set(filterStateAtom, { ...get(filterStateAtom), rect });
+});
+
 export const useFiltering = () => {
   const filterState = useAtomValue(filterStateAtom);
   const open = useSetAtom(openFilterAtom);
   const select = useSetAtom(selectFilterAtom);
   const close = useSetAtom(closeFilterAtom);
+  const setPosition = useSetAtom(setPositionAtom);
 
   return {
     filterState,
     open,
     select,
     close,
+    setPosition,
   };
 };

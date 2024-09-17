@@ -10,7 +10,6 @@ import {
   useFilterAdapter,
   useHandleSelectCombobox,
   useStoreValue,
-  useView,
 } from '@apps-next/react';
 import { ComboboxPopover, Filter, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
@@ -56,8 +55,6 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
 });
 
 const Task = () => {
-  const { registeredViews } = useView();
-
   const { useList } = makeHooks<TaskViewDataType>();
   const getListProps = useList();
 
@@ -116,12 +113,12 @@ export const Route = createFileRoute('/fastApp/tasks')({
 });
 
 // STATE: FILTERS
-// - it kind of works, we need a lot of clean up
+// - it kind of works, we need a lot of clean up -> check
 // and the query builder for the filter is not yet generic
-// we need to extract the ui component for the filter
-// we need to move the filter adapter to its own folder and files
+// we need to extract the ui component for the filter -> check
+// we need to move the filter adapter to its own folder and files -> check
 // we need to handle the different operations like is in or is not in
 // we need to persist the filters somewhere (own db table that we expose?)
-// we need to update the ui so that we can update the filters
+// we need to update the ui so that we can update the filters -> check
 // we need to pass in the current active filters to the filter adapter so it shows what is currently active
 // we need to style the ui

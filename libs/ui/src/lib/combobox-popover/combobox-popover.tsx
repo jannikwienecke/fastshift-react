@@ -29,19 +29,21 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
       }}
     >
       <PopoverTrigger asChild>
-        {props.children || !rect ? (
+        {props.children && !rect?.width ? (
           props.children
-        ) : (
-          <div
-            style={{
-              position: 'fixed',
-              top: `${rect.top + rect.height}px`,
-              left: `${rect.left - rect.width / 2}px`,
-              width: `${0}px`,
-              height: `${0}px`,
-            }}
-          />
-        )}
+        ) : rect?.width ? (
+          <>
+            <button
+              style={{
+                position: 'fixed',
+                top: `${rect.top + rect.height}px`,
+                left: `${rect.left - rect.width / 2}px`,
+                width: `${0}px`,
+                height: `${0}px`,
+              }}
+            />
+          </>
+        ) : null}
       </PopoverTrigger>
 
       {comboboxProps.open && input && (

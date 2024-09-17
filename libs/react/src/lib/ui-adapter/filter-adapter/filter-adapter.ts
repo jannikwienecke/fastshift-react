@@ -15,7 +15,7 @@ export const getFilterValue = (f: FilterType) => {
 
 export const useFilterAdapter = (): (() => FilterProps) => {
   const { setFilter, filter, removeFilter } = useFilterStore();
-  const { open } = useFiltering();
+  const { open, select, setPosition } = useFiltering();
 
   const { getFilterComboboxProps } = useFilter({
     onSelect: (props) => {
@@ -35,14 +35,26 @@ export const useFilterAdapter = (): (() => FilterProps) => {
     } satisfies FilterItemType;
   });
 
+  const getFilter = (name: string) => {
+    const _f = filter.fitlers.find((f) => f.field.name === name);
+    if (!_f) throw new Error('Filter not found');
+    return _f;
+  };
+
   return (): FilterProps => {
     return {
       onOpen: () => open(true),
       filters: filters_,
+
       comboboxProps: getFilterComboboxProps(),
-      onRemove: ({ name }) => {
-        const f = filter.fitlers.find((f) => f.field.name === name);
-        f && removeFilter(f);
+      onRemove: ({ name }) => removeFilter(getFilter(name)),
+      onSelect: ({ name }, rect) => {
+        setPosition(rect);
+
+        select({
+          id: name,
+          label: name,
+        });
       },
     };
   };
