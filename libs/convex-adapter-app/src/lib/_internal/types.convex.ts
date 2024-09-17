@@ -22,7 +22,7 @@ export type ConvexServer = {
 
 export type RecordType = Record<string, unknown>;
 export type ConvexRecordType = {
-  _id: string;
+  _id: ID;
 } & RecordType;
 
 export type ViewLoader = FunctionReference<
@@ -58,7 +58,7 @@ export type ConvexSchemaType = {
 
 export type ID = Id<any>;
 
-export type ConvexRecord = Record<string, any> & { _id?: ID };
+export type ConvexRecord = Record<string, any> & { _id: ID };
 
 export type ConvexWhere = {
   //
