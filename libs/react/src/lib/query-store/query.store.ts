@@ -6,9 +6,9 @@ import {
   QueryRelationalData,
   DataModelNew,
   makeData,
+  getViewByName,
 } from '@apps-next/core';
 import { getViewConfigAtom, registeredViewsAtom } from '../stores';
-import { getViewByName } from '../use-view';
 
 export const queryStoreAtom = atom<QueryStore<RecordType>>({
   dataModel: {} as DataModelNew<RecordType>,

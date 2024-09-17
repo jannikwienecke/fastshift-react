@@ -1,6 +1,6 @@
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
-import { ID, QUERY_KEY_PREFIX } from './types';
+import { ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
 import {
   FilterOperatorTypePrimitive,
   FilterOperatorTypeRelation,
@@ -150,3 +150,19 @@ export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] {
 
   return result;
 }
+
+export const getViewByName = (views: RegisteredViews, name: string) => {
+  const viewConfigByViewName = Object.values(views).find(
+    (v) => v?.viewName === name
+  );
+
+  if (viewConfigByViewName) return viewConfigByViewName;
+
+  const viewConfigByTableName = Object.values(views).find(
+    (v) => v?.tableName === name
+  );
+
+  if (!viewConfigByTableName) throw new Error(`No View For ${name} found`);
+
+  return viewConfigByTableName;
+};

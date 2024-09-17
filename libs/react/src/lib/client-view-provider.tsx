@@ -6,6 +6,7 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   DataModelNew,
+  getViewByName,
   makeData,
   makeQueryKey,
   QueryReturnOrUndefined,
@@ -27,7 +28,6 @@ import {
   clientViewConfigAtom,
   clientConfigStore,
 } from './stores';
-import { getViewByName } from './use-view';
 
 export type QueryProviderProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];

@@ -3,7 +3,7 @@ import { MutationProps, QueryDto, RegisteredViews } from '@apps-next/core';
 import { GenericQueryCtx } from './_internal/convex.server.types';
 import { viewLoaderHandler } from './convex-view-loader';
 import { viewMutationHandler } from './view-mutation';
-import { getViewByName } from '@apps-next/react';
+import { getViewByName } from '@apps-next/core';
 
 export const makeViewLoaderHandler =
   (views: RegisteredViews) => (ctx: GenericQueryCtx, args: any) => {

@@ -1,6 +1,5 @@
-import { ComboxboxItem } from '@apps-next/core';
-import { getViewByName, useView } from '../use-view';
-import { CodeIcon } from '@radix-ui/react-icons';
+import { ComboxboxItem, getViewByName } from '@apps-next/core';
+import { useView } from '../use-view';
 
 export const FilterValue = (props: { value: ComboxboxItem }) => {
   const { viewConfigManager, registeredViews } = useView();

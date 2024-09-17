@@ -21,19 +21,3 @@ export const useViewOf = (tableName: GetTableName) => {
   if (!view) throw new Error(`No View For ${tableName.toString()} found`);
   return view as ViewConfigType;
 };
-
-export const getViewByName = (views: RegisteredViews, name: string) => {
-  const viewConfigByViewName = Object.values(views).find(
-    (v) => v?.viewName === name
-  );
-
-  if (viewConfigByViewName) return viewConfigByViewName;
-
-  const viewConfigByTableName = Object.values(views).find(
-    (v) => v?.tableName === name
-  );
-
-  if (!viewConfigByTableName) throw new Error(`No View For ${name} found`);
-
-  return viewConfigByTableName;
-};

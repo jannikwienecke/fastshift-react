@@ -5,6 +5,7 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   DataModelNew,
+  getViewByName,
   makeData,
   makeQueryKey,
   QueryReturnOrUndefined,
@@ -25,7 +26,6 @@ import {
   viewConfigManagerAtom,
 } from './stores';
 import { HydrateAtoms } from './ui-components';
-import { getViewByName } from './use-view';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];

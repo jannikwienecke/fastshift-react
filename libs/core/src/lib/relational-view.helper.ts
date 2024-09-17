@@ -1,5 +1,5 @@
-import { getViewByName } from '@apps-next/react';
 import { BaseViewConfigManager } from './base-view-config';
+import { getViewByName } from './core-utils';
 import { RecordType, RegisteredViews } from './types';
 
 export const relationalViewHelper = (

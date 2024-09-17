@@ -3,9 +3,8 @@ import {
   makeViews,
 } from '@apps-next/convex-adapter-app';
 import { createViewConfig } from '@apps-next/react';
-import { CircleIcon, CubeIcon, TokensIcon } from '@radix-ui/react-icons';
+import { CubeIcon, TokensIcon } from '@radix-ui/react-icons';
 import schema from '../convex/schema';
-import { AtomIcon, BugIcon } from 'lucide-react';
 
 export * from '../convex/_generated/api';
 export * from '../convex/schema';

@@ -10,7 +10,6 @@ import {
 } from '@apps-next/core';
 import { createViewConfig } from './create-view-config';
 import { CubeIcon, DotIcon } from '@radix-ui/react-icons';
-import { getViewByName } from './use-view';
 
 export const generateDefaultViewConfigs = ({
   tableNames,
