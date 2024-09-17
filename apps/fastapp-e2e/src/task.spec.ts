@@ -103,4 +103,39 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText('🟡')).toBeVisible();
     await expect(firstListItem.getByText('🟢')).toBeHidden();
   });
+
+  test("can filter tasks by projects and tags", async ({ page }) => {
+    // click on the filter button
+    await page.getByText('Filter').click();
+
+    const popover = page.getByTestId('combobox-popover');
+
+    // click on projects
+    await popover.getByText('Projects').click();
+
+    // assert that the projects popover is visible
+    await popover.getByText('fitness plan').click()
+
+    await page.getByText('tasks').first().click({force: true})
+    // expect popover to be hidden
+    await expect(popover.getByText('fitness plan')).toBeHidden();
+
+    // expect to see 3 times the text "fitness plan"
+    await expect(page.getByText('fitness plan')).toHaveCount(4);
+
+    // click on the filter button
+    await page.getByTestId('filter-button').click();
+
+    // assert that the projects popover is visible
+    await popover.getByText('tags').click()
+
+    await popover.getByText(/technical/i).click()
+
+    await page.getByText('tasks').first().click({force: true})
+
+    await expect(page.getByText(/technical/i)).toHaveCount(2);
+    await expect(page.getByText('fitness plan')).toHaveCount(2);
+
+
+  });
 });

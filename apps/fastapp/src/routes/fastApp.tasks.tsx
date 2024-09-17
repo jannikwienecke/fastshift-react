@@ -324,6 +324,7 @@ const Task = () => {
 
           <ComboboxPopover {...getFilterComboboxProps()}>
             <button
+              data-testid="filter-button"
               onClick={filterDisplayProps.onOpen}
               className="flex flex-row text-xs items-center p-1 px-2 rounded-sm border border-input bg-background hover:bg-accent hover:text-accent-foreground"
             >
