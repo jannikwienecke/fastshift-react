@@ -1,4 +1,4 @@
-import { FilterType, ID, SearchableField } from '@apps-next/core';
+import { FilterType, SearchableField } from '@apps-next/core';
 import { ConvexClient } from './types.convex';
 
 export const withSearch = (
@@ -49,4 +49,18 @@ export const withPrimitiveFilters = (
   });
 
   return _query;
+};
+
+export const withEnumFilters = (
+  enumFilters: FilterType[],
+  dbQuery: ConvexClient[string]
+) => {
+  const filter = enumFilters?.[0];
+  if (!filter) return dbQuery;
+
+  const values = filter.type === 'relation' ? filter.values : [filter.value];
+
+  return dbQuery.filter((q) =>
+    q.or(...values.map((value) => q.eq(q.field(filter.field.name), value.raw)))
+  );
 };

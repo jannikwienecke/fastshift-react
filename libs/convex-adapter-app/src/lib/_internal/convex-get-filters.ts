@@ -5,7 +5,10 @@ export const getManyToManyFilters = (filters: FilterType[]) =>
 
 export const getRelationalFilters = (filters: FilterType[]) =>
   filters?.filter(
-    (f) => f.type === 'relation' && !f.field.relation?.manyToManyTable
+    (f) =>
+      f.type === 'relation' &&
+      !f.field.relation?.manyToManyTable &&
+      !f.field.enum
   ) ?? [];
 
 export const getPrimitiveFilters = (filters: FilterType[]) =>
@@ -20,6 +23,9 @@ export const getFilterWithSearchField = (
   searchField: SearchableField | undefined
 ) => filters.find((f) => searchField?.field === f.field.name);
 
+export const getEnumFilters = (filters: FilterType[]) =>
+  filters.filter((f) => f.type === 'relation' && f.field.enum);
+
 export const getFilterTypes = (
   filters: FilterType[] | undefined,
   searchField: SearchableField | undefined
@@ -30,6 +36,7 @@ export const getFilterTypes = (
       oneToManyFilters: [],
       manyToManyFilters: [],
       filterWithSearchField: undefined,
+      enumFilters: [],
     };
 
   return {
@@ -37,5 +44,6 @@ export const getFilterTypes = (
     oneToManyFilters: getRelationalFilters(filters),
     manyToManyFilters: getManyToManyFilters(filters),
     filterWithSearchField: getFilterWithSearchField(filters, searchField),
+    enumFilters: getEnumFilters(filters),
   };
 };

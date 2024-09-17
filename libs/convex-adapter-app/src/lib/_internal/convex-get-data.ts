@@ -5,7 +5,11 @@ import {
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
-import { withPrimitiveFilters, withSearch } from './convex-searching';
+import {
+  withEnumFilters,
+  withPrimitiveFilters,
+  withSearch,
+} from './convex-searching';
 import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { filterResults } from './convex-filter-results';
@@ -29,6 +33,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     oneToManyFilters,
     manyToManyFilters,
     filterWithSearchField,
+    enumFilters,
   } = getFilterTypes(filters, searchField);
 
   const idsManyToManyFilters = await getIdsFromManyToManyFilters(
@@ -43,17 +48,23 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
-  const queryWithSearchAndFilter = withPrimitiveFilters(
-    primitiveFilters,
-    withSearch(dbQuery, {
-      searchField,
-      query: args.query,
-      filterWithSearch: filterWithSearchField,
-    })
+  const queryWithSearchAndFilter = withEnumFilters(
+    enumFilters,
+    withPrimitiveFilters(
+      primitiveFilters,
+      withSearch(dbQuery, {
+        searchField,
+        query: args.query,
+        filterWithSearch: filterWithSearchField,
+      })
+    )
   );
 
   const idsSearchAndFilter =
-    primitiveFilters.length || args.query || filterWithSearchField
+    enumFilters ||
+    primitiveFilters.length ||
+    args.query ||
+    filterWithSearchField
       ? (await queryWithSearchAndFilter.collect())
           .map((row) => row._id)
           .filter((a) => a !== undefined)
@@ -70,7 +81,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     args.query ||
     filterWithSearchField ||
     manyToManyFilters.length ||
-    oneToManyFilters.length;
+    oneToManyFilters.length ||
+    enumFilters.length;
 
   const rows = filterResults(
     hasAnyFilterSet
