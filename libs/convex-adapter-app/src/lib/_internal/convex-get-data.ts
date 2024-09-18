@@ -4,6 +4,13 @@ import {
   QueryServerProps,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
+import { filterResults } from './convex-filter-results';
+import { getFilterTypes } from './convex-get-filters';
+import {
+  getIdsFromManyToManyFilters,
+  getIdsFromOneToManyFilters,
+  getRecordsByIds,
+} from './convex-get-ids-from';
 import { mapWithInclude } from './convex-map-with-include';
 import {
   withEnumFilters,
@@ -12,13 +19,7 @@ import {
 } from './convex-searching';
 import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
-import { filterResults } from './convex-filter-results';
-import { getFilterTypes } from './convex-get-filters';
-import {
-  getIdsFromManyToManyFilters,
-  getIdsFromOneToManyFilters,
-  getRecordsByIds,
-} from './convex-get-ids-from';
+import { ConvexRecord } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { viewConfigManager, filters } = args;
@@ -34,9 +35,14 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     manyToManyFilters,
     filterWithSearchField,
     enumFilters,
+    hasOneToManyFilter,
+    hasManyToManyFilter,
   } = getFilterTypes(filters, searchField);
 
-  const idsManyToManyFilters = await getIdsFromManyToManyFilters(
+  const {
+    ids: idsManyToManyFilters,
+    idsToRemove: idsManyToManyFiltersToRemove,
+  } = await getIdsFromManyToManyFilters(
     manyToManyFilters,
     ctx,
     viewConfigManager
@@ -59,7 +65,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   );
 
   const idsSearchAndFilter =
-    enumFilters ||
+    enumFilters.length ||
     primitiveFilters.length ||
     args.query ||
     filterWithSearchField
@@ -68,14 +74,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
           .filter((a) => a !== undefined)
       : [];
 
-  const hasOneToManyFilter = oneToManyFilters.find(
-    (f) => f.operator.label === 'is'
-  )
-    ? idsOneToManyFilters
-    : null;
-
   const allIds = arrayIntersection(
-    manyToManyFilters.length ? idsManyToManyFilters : null,
+    hasManyToManyFilter ? idsManyToManyFilters : null,
     hasOneToManyFilter ? idsOneToManyFilters : null,
     idsSearchAndFilter.length ? idsSearchAndFilter : null
   );
@@ -84,35 +84,57 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     primitiveFilters.length ||
     args.query ||
     filterWithSearchField ||
-    manyToManyFilters.length ||
+    hasManyToManyFilter ||
     hasOneToManyFilter ||
     enumFilters.length;
 
-  const idsToRemove = idsOneToManyFiltersToRemove;
-
-  const rows = filterResults(
-    hasAnyFilterSet
-      ? await getRecordsByIds(allIds, dbQuery)
-      : await dbQuery.take(DEFAULT_FETCH_LIMIT_QUERY),
-    // : await dbQuery.collect(),
-    displayField,
-    args.query,
-    searchField,
-    filters?.filter((f) => f.type === 'primitive' && f.field.type === 'String')
+  const idsToRemove = Array.from(
+    new Set([...idsManyToManyFiltersToRemove, ...idsOneToManyFiltersToRemove])
   );
 
+  const fetch = async (multiple?: number) => {
+    const idsAfterRemove = allIds.filter((id) => !idsToRemove.includes(id));
+
+    const r = await filterResults(
+      hasAnyFilterSet
+        ? await getRecordsByIds(idsAfterRemove, dbQuery)
+        : await dbQuery.take(DEFAULT_FETCH_LIMIT_QUERY * (multiple ?? 1)),
+      displayField,
+      args.query,
+      searchField,
+      filters?.filter(
+        (f) => f.type === 'primitive' && f.field.type === 'String'
+      )
+    );
+
+    return r;
+  };
+
+  const rows: ConvexRecord[] = [];
+
+  for (let i = 1; i < (hasAnyFilterSet ? 2 : 10); i++) {
+    const newRows = await fetch(i);
+    const filtered = newRows.filter(
+      (r) =>
+        !idsToRemove.includes(r._id) && !rows.map((r) => r._id).includes(r._id)
+    );
+
+    rows.push(...filtered);
+
+    if (
+      rows.length >= DEFAULT_FETCH_LIMIT_QUERY ||
+      filtered.length === 0 ||
+      newRows.length < DEFAULT_FETCH_LIMIT_QUERY
+    ) {
+      break;
+    }
+  }
+
   const rawData = await mapWithInclude(
-    rows.filter((r) => !idsToRemove.includes(r._id)),
-    // rows,
+    rows.slice(0, DEFAULT_FETCH_LIMIT_QUERY),
     ctx,
     args
   );
 
   return parseConvexData(rawData);
 };
-
-// NEXT STEPS
-// - [x] write tests for (oneToManyFilters, manyToManyFilters)
-// - [x] refacotr above code and code in convex-seaching
-// - [ ] update the ui so we can set primitive filters
-// - [ ] write tests for (primitiveFilters)

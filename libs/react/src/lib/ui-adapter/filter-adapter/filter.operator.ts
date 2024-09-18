@@ -80,3 +80,7 @@ export const initOperator = (field: FieldConfig) => {
 
   return operator;
 };
+
+export const isRelationNegateOperator = (operator: FilterOperatorType) => {
+  return operator.label === 'is not' || operator.label === 'is not any of';
+};

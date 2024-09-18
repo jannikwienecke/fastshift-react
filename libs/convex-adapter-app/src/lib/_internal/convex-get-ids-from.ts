@@ -8,7 +8,7 @@ import { asyncMap } from 'convex-helpers';
 import { queryClient } from './convex-client';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexClient } from './types.convex';
-
+import { isRelationNegateOperator } from '@apps-next/react';
 /*
   Get records by ids
   @param ids
@@ -36,7 +36,9 @@ export const getIdsFromManyToManyFilters = async (
   manyToManyFilters: FilterType[],
   ctx: GenericQueryCtx,
   viewConfigManager: BaseViewConfigManagerInterface
-): Promise<ID[]> => {
+) => {
+  const idsToRemove = [] as ID[];
+
   const idsLists = await asyncMap(manyToManyFilters, async (filter) => {
     // e.g.: at TaskView -> tagId
     const fieldNameFilter =
@@ -58,11 +60,17 @@ export const getIdsFromManyToManyFilters = async (
     const idLists = await asyncMap(values, async (value) => {
       if (!manyToManyTable || !fieldNameFilter) return null;
 
-      return (
-        await queryClient(ctx, manyToManyTable)
-          .withIndex(fieldNameFilter, (q) => q.eq(fieldNameFilter, value.id))
-          .collect()
-      )?.map((manyToManyRow) => manyToManyRow[fieldNameView]);
+      const rows = await queryClient(ctx, manyToManyTable)
+        .withIndex(fieldNameFilter, (q) => q.eq(fieldNameFilter, value.id))
+        .collect();
+
+      if (isRelationNegateOperator(filter.operator)) {
+        idsToRemove.push(
+          ...rows.map((manyToManyRow) => manyToManyRow[fieldNameView])
+        );
+      } else {
+        return rows?.map((manyToManyRow) => manyToManyRow[fieldNameView]);
+      }
     });
 
     const ids = idLists.filter((id) => id !== null).flat() as ID[];
@@ -70,7 +78,10 @@ export const getIdsFromManyToManyFilters = async (
     return [...new Set(ids)];
   });
 
-  return [...new Set(idsLists.flat())];
+  return {
+    ids: [...new Set(idsLists.flat())],
+    idsToRemove: [...new Set(idsToRemove)],
+  };
 };
 
 /**
@@ -101,14 +112,14 @@ export const getIdsFromOneToManyFilters = async (
       const id = row.id;
       if (!id) return null;
 
-      const tasks = await queryClient(ctx, tableName)
+      const rows = await queryClient(ctx, tableName)
         .withIndex(fieldName, (q) => q.eq(fieldName, id))
         .collect();
 
-      if (filter.operator.label === 'is not') {
-        idsToRemove.push(...tasks.map((task) => task._id));
+      if (isRelationNegateOperator(filter.operator)) {
+        idsToRemove.push(...rows.map((task) => task._id));
       } else {
-        return tasks.map((task) => task._id);
+        return rows.map((row) => row._id);
       }
     });
 
