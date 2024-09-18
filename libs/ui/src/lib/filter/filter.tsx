@@ -43,6 +43,11 @@ const FilterList = (props: FilterProps) => {
               onRemove={() => {
                 props.onRemove(f);
               }}
+              onOperatorClicked={() => {
+                const rect = ref.current?.getBoundingClientRect();
+                if (!rect) return;
+                props.onOperatorClicked(f, rect);
+              }}
               onSelect={() => {
                 const rect = ref.current?.getBoundingClientRect();
                 if (!rect) return;
@@ -60,6 +65,7 @@ const FilterItem = (props: {
   filter: FilterItemType;
   onRemove: () => void;
   onSelect: () => void;
+  onOperatorClicked: () => void;
 }) => {
   const { filter, onRemove } = props;
   return (
@@ -75,9 +81,12 @@ const FilterItem = (props: {
           <div>{filter.label}</div>
         </div>
 
-        <div className="border-r-[1px] py-1 border-r-input/30 px-3 hover:bg-accent">
+        <button
+          onClick={props.onOperatorClicked}
+          className="border-r-[1px] py-1 border-r-input/30 px-3 hover:bg-accent"
+        >
           {filter.operator}
-        </div>
+        </button>
 
         <div className="flex items-center px-1 gap-[1px] border-r-[1px] border-r-input/30 pr-2 py-1 hover:bg-accent">
           {filter.icon ? (

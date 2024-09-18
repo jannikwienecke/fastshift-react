@@ -4,6 +4,7 @@ import { FilterItemType } from './filter.types';
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
   label: string;
+  icon?: React.FC<any>;
 };
 
 export type ListValueProps = {
@@ -98,5 +99,6 @@ export type FilterProps = {
   onOpen: () => void;
   onRemove: (filter: FilterItemType) => void;
   onSelect: (filter: FilterItemType, rect: DOMRect) => void;
+  onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
   comboboxProps: ComboboxPopoverProps;
 };

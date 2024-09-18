@@ -15,7 +15,7 @@ export const getFilterValue = (f: FilterType) => {
 
 export const useFilterAdapter = (): (() => FilterProps) => {
   const { setFilter, filter, removeFilter } = useFilterStore();
-  const { open, select, setPosition } = useFiltering();
+  const { open, select, setPosition, openOperatorOptions } = useFiltering();
 
   const { getFilterComboboxProps } = useFilter({
     onSelect: (props) => {
@@ -55,6 +55,11 @@ export const useFilterAdapter = (): (() => FilterProps) => {
           id: name,
           label: name,
         });
+      },
+      onOperatorClicked: (filter, rect) => {
+        setPosition(rect);
+        const _f = getFilter(filter.name);
+        openOperatorOptions(_f.field);
       },
     };
   };
