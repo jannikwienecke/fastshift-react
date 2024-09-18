@@ -4,7 +4,7 @@ import {
   FieldConfig,
   Row,
 } from '@apps-next/core';
-import { useFilterStore } from '../../store.ts/store.filter.js';
+import { useFilterStore } from './store.filter.js';
 import { FilterValue } from '../../ui-components/render-filter-value.js';
 import {
   useCombobox,
@@ -85,6 +85,8 @@ export function useFilter({
       },
       selected: null,
       onChange: (value) => {
+        console.log('onChange', value);
+
         select(value);
       },
 

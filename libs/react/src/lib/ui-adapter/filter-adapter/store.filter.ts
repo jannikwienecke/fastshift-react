@@ -1,14 +1,9 @@
-import {
-  FieldConfig,
-  FieldType,
-  FilterOperatorTypePrimitive,
-  FilterOperatorTypeRelation,
-  FilterType,
-  Row,
-} from '@apps-next/core';
+import { FieldConfig, FilterType, Row } from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { operator } from './filter.operator';
+import { filterUtil } from './filter.utils';
 
-type SelectFilterValueAction = {
+export type SelectFilterValueAction = {
   value: Row;
   field: FieldConfig;
 };
@@ -21,40 +16,6 @@ export const filterAtom = atom<FilterStore>({
   fitlers: [],
 });
 
-const isRelation = (field: FieldConfig) => {
-  return (
-    field.type === 'Reference' ||
-    field.type === 'OneToOneReference' ||
-    field.type === 'Union' ||
-    field.type === 'Enum'
-  );
-};
-
-const DEFAULT_OPERATOR = {
-  label: 'is',
-} as const;
-
-export const DEFAULT_OPERATOR_PRIMITIVE: Partial<{
-  [key in FieldType]: FilterOperatorTypePrimitive;
-}> = {
-  Boolean: DEFAULT_OPERATOR,
-  String: {
-    label: 'contains',
-  },
-  Number: DEFAULT_OPERATOR,
-  Enum: DEFAULT_OPERATOR,
-  Date: DEFAULT_OPERATOR,
-};
-
-export const DEFAULT_OPERATOR_RELATION: Partial<{
-  [key in FieldType]: FilterOperatorTypeRelation;
-}> = {
-  Enum: DEFAULT_OPERATOR,
-  Reference: DEFAULT_OPERATOR,
-  OneToOneReference: DEFAULT_OPERATOR,
-  Union: DEFAULT_OPERATOR,
-};
-
 export const setFilterAtom = atom(
   null,
   (get, set, filter: SelectFilterValueAction) => {
@@ -66,25 +27,7 @@ export const setFilterAtom = atom(
     );
 
     if (!exitingFilter) {
-      filters.push(
-        isRelation(filter.field)
-          ? {
-              type: 'relation',
-              field: filter.field,
-              values: [filter.value],
-              operator:
-                DEFAULT_OPERATOR_RELATION[filter.field.type] ??
-                DEFAULT_OPERATOR,
-            }
-          : {
-              type: 'primitive',
-              field: filter.field,
-              value: filter.value,
-              operator:
-                DEFAULT_OPERATOR_PRIMITIVE[filter.field.type] ??
-                DEFAULT_OPERATOR,
-            }
-      );
+      filters.push(filterUtil().create(filter));
     }
 
     if (exitingFilter && exitingFilter.type === 'relation') {
@@ -108,21 +51,15 @@ export const setFilterAtom = atom(
     }
 
     filters = filterState.fitlers.map((f) => {
-      if (f.type === 'relation') {
-        const hasMoreThanOneValue = f.values.length > 1;
-        return {
-          ...f,
-          operator: {
-            label: hasMoreThanOneValue ? 'is any of' : 'is',
-          },
-        };
-      }
-      return f;
+      return {
+        ...f,
+        operator: operator().value(f),
+      };
     });
 
     set(filterAtom, {
       ...filterState,
-      fitlers: filters,
+      fitlers: [...filters],
     });
   }
 );

@@ -84,12 +84,17 @@ type QFieldReturn = {
 };
 type QField = (fieldName: string) => QFieldReturn;
 
+export type OperatorFns = {
+  eq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
+  neq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
+  or: (...args: unknown[]) => unknown;
+};
+
 export type SearchFilterBuilder = {
   search: (fieldName: string, query: string) => unknown;
-  eq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
-  or: (...args: unknown[]) => unknown;
   field: QField;
-};
+} & OperatorFns;
+
 export type ConvexClient = {
   [key in string]: {
     collect: () => Promise<ConvexRecord[]>;

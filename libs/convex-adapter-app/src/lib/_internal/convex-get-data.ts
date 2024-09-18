@@ -42,11 +42,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
-  const idsOneToManyFilters = await getIdsFromOneToManyFilters(
-    oneToManyFilters,
-    ctx,
-    viewConfigManager
-  );
+  // HIER WEITER MACHEN -> same for many to many
+  const { ids: idsOneToManyFilters, idsToRemove: idsOneToManyFiltersToRemove } =
+    await getIdsFromOneToManyFilters(oneToManyFilters, ctx, viewConfigManager);
 
   const queryWithSearchAndFilter = withEnumFilters(
     enumFilters,
@@ -70,9 +68,15 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
           .filter((a) => a !== undefined)
       : [];
 
+  const hasOneToManyFilter = oneToManyFilters.find(
+    (f) => f.operator.label === 'is'
+  )
+    ? idsOneToManyFilters
+    : null;
+
   const allIds = arrayIntersection(
     manyToManyFilters.length ? idsManyToManyFilters : null,
-    oneToManyFilters.length ? idsOneToManyFilters : null,
+    hasOneToManyFilter ? idsOneToManyFilters : null,
     idsSearchAndFilter.length ? idsSearchAndFilter : null
   );
 
@@ -81,20 +85,28 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     args.query ||
     filterWithSearchField ||
     manyToManyFilters.length ||
-    oneToManyFilters.length ||
+    hasOneToManyFilter ||
     enumFilters.length;
+
+  const idsToRemove = idsOneToManyFiltersToRemove;
 
   const rows = filterResults(
     hasAnyFilterSet
       ? await getRecordsByIds(allIds, dbQuery)
       : await dbQuery.take(DEFAULT_FETCH_LIMIT_QUERY),
+    // : await dbQuery.collect(),
     displayField,
     args.query,
     searchField,
     filters?.filter((f) => f.type === 'primitive' && f.field.type === 'String')
   );
 
-  const rawData = await mapWithInclude(rows, ctx, args);
+  const rawData = await mapWithInclude(
+    rows.filter((r) => !idsToRemove.includes(r._id)),
+    // rows,
+    ctx,
+    args
+  );
 
   return parseConvexData(rawData);
 };

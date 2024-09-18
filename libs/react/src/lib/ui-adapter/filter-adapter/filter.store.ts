@@ -1,12 +1,15 @@
-import { ComboxboxItem, RegisteredViews, FieldConfig } from '@apps-next/core';
+import {
+  ComboxboxItem,
+  FieldConfig,
+  FilterType,
+  RegisteredViews,
+} from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { getViewConfigAtom } from '../../stores';
-import {
-  EqualIcon,
-  EqualNotIcon,
-  ArrowBigRight,
-  ArrowBigLeft,
-} from 'lucide-react';
+import { operator } from './filter.operator';
+import { filterAtom } from './store.filter';
+import { filterUtil } from './filter.utils';
+
 type FilterState = {
   query: string;
   values: ComboxboxItem[];
@@ -16,6 +19,7 @@ type FilterState = {
   registeredViews: RegisteredViews;
   selectedField: FieldConfig | null;
   rect: DOMRect | null;
+  selectedOperatorField: FieldConfig | null;
 };
 
 const DEFAULT_FILTER_STATE: FilterState = {
@@ -27,6 +31,7 @@ const DEFAULT_FILTER_STATE: FilterState = {
   registeredViews: {},
   selectedField: null,
   rect: null,
+  selectedOperatorField: null,
 };
 
 export const filterStateAtom = atom<FilterState>(DEFAULT_FILTER_STATE);
@@ -46,10 +51,25 @@ export const openFilterAtom = atom(false, (get, set, open: boolean) => {
 });
 
 export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
-  const viewConfigManager = get(getViewConfigAtom);
-  const field = viewConfigManager.getFieldBy(value.id.toString());
+  const state = get(filterStateAtom);
+  const { selectedOperatorField } = state;
+  if (selectedOperatorField) {
+    const filterStore = get(filterAtom);
 
-  set(filterStateAtom, { ...get(filterStateAtom), selectedField: field });
+    const updatedFilters = filterStore.fitlers.map((f) => {
+      if (f.field.name === selectedOperatorField.name) {
+        return filterUtil().update(f, value);
+      }
+      return f;
+    });
+
+    set(filterAtom, { ...filterStore, fitlers: updatedFilters });
+  } else {
+    const viewConfigManager = get(getViewConfigAtom);
+    const field = viewConfigManager.getFieldBy(value.id.toString());
+
+    set(filterStateAtom, { ...get(filterStateAtom), selectedField: field });
+  }
 });
 
 export const closeFilterAtom = atom(null, (get, set) => {
@@ -63,36 +83,19 @@ const setPositionAtom = atom(null, (get, set, rect: DOMRect) => {
 export const openOperatorOptionsFilterAtom = atom(
   null,
   (get, set, field: FieldConfig) => {
-    // HIER WEITER MACHEN
-    // have one file that manages and stores all the operators
-    // DICT for all field types matches with the available operators
-    // and also a function that updates the operator based on the current value
-    // for example if 2 values are selected, then -> in instead of is
-    // make this dynamic based on the field type
-    const values = [
-      {
-        id: 'eq',
-        label: 'Equal to',
-        icon: EqualIcon,
-      },
-      {
-        id: 'neq',
-        label: 'Not equal to',
-        icon: EqualNotIcon,
-      },
-      {
-        id: 'gt',
-        label: 'Greater than',
-        icon: ArrowBigRight,
-      },
-      {
-        id: 'lt',
-        label: 'Less than',
-        icon: ArrowBigLeft,
-      },
-    ] satisfies ComboxboxItem[];
+    const filterStore = get(filterAtom);
+    const currentFilter = filterStore.fitlers?.find(
+      (f) => f.field.name === field.name
+    );
 
-    set(filterStateAtom, { ...get(filterStateAtom), values, open: true });
+    const options = operator().makeOptionsFrom(field, currentFilter);
+
+    set(filterStateAtom, {
+      ...get(filterStateAtom),
+      values: options,
+      open: true,
+      selectedOperatorField: field,
+    });
   }
 );
 

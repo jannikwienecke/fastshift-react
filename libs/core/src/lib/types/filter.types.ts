@@ -2,27 +2,29 @@ import { Row } from '../data-model';
 import { FieldConfig } from './base.types';
 
 type Icon = React.FC<any>;
-export type FilterOperatorTypeRelation = {
-  label: 'is any of' | 'is not' | 'is';
+export type FilterOperatorType = {
+  label:
+    | 'is'
+    | 'is not'
+    | 'is any of'
+    | 'is not any of'
+    | 'contains'
+    | 'does not contain';
   icon?: Icon;
-};
-
-export type FilterOperatorTypePrimitive = {
-  label: 'contains' | 'does not contain' | 'is';
-  icon?: Icon;
+  many?: boolean;
 };
 
 export type FilterType =
   | {
       type: 'relation';
       field: FieldConfig;
-      operator: FilterOperatorTypeRelation;
+      operator: FilterOperatorType;
       values: Row[];
     }
   | {
       type: 'primitive';
       field: FieldConfig;
-      operator: FilterOperatorTypePrimitive;
+      operator: FilterOperatorType;
       value: Row;
     };
 

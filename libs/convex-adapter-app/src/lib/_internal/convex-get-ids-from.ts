@@ -86,6 +86,8 @@ export const getIdsFromOneToManyFilters = async (
   ctx: GenericQueryCtx,
   viewConfigManager: BaseViewConfigManagerInterface
 ) => {
+  const idsToRemove = [] as ID[];
+
   const tableName = viewConfigManager.getTableName();
 
   const listOfIds = await asyncMap(relationalFilters ?? [], async (filter) => {
@@ -103,7 +105,11 @@ export const getIdsFromOneToManyFilters = async (
         .withIndex(fieldName, (q) => q.eq(fieldName, id))
         .collect();
 
-      return tasks.map((task) => task._id);
+      if (filter.operator.label === 'is not') {
+        idsToRemove.push(...tasks.map((task) => task._id));
+      } else {
+        return tasks.map((task) => task._id);
+      }
     });
 
     const ids = mapped
@@ -114,5 +120,8 @@ export const getIdsFromOneToManyFilters = async (
     return ids as ID[];
   });
 
-  return [...new Set(listOfIds.flat())];
+  return {
+    ids: [...new Set(listOfIds.flat())],
+    idsToRemove: [...new Set(idsToRemove)],
+  };
 };

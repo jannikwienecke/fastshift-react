@@ -1,11 +1,7 @@
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
 import { ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
-import {
-  FilterOperatorTypePrimitive,
-  FilterOperatorTypeRelation,
-  FilterType,
-} from './types/filter.types';
+import { FilterOperatorType, FilterType } from './types/filter.types';
 
 export const invarant = (condition: boolean, message: string) => {
   const prefix = 'Invariant failed';
@@ -119,7 +115,7 @@ export const parseFilterStringForServer = (
         return {
           field,
           operator: {
-            label: decodedOperator as FilterOperatorTypeRelation['label'],
+            label: decodedOperator as FilterOperatorType['label'],
           },
           values,
           type: 'relation',
@@ -128,7 +124,7 @@ export const parseFilterStringForServer = (
         return {
           field,
           operator: {
-            label: decodedOperator as FilterOperatorTypePrimitive['label'],
+            label: decodedOperator as FilterOperatorType['label'],
           },
           value: makeRow(decodedValue, decodedValue, decodedValue, field),
           type: 'primitive',

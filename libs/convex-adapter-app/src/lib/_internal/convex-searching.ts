@@ -1,5 +1,6 @@
 import { FilterType, SearchableField } from '@apps-next/core';
 import { ConvexClient } from './types.convex';
+import { queryBuilder } from './convex-operators';
 
 export const withSearch = (
   dbQuery: ConvexClient[string],
@@ -53,7 +54,10 @@ export const withPrimitiveFilters = (
           ? Number(value?.raw)
           : value?.raw;
 
-      return q.eq(q.field(filter.field.name), _value);
+      return queryBuilder(q, filter.operator)(
+        q.field(filter.field.name),
+        _value
+      );
     });
   });
 
