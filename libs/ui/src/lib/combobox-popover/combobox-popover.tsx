@@ -28,13 +28,14 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
         comboboxProps.onOpenChange?.(open);
       }}
     >
-      <PopoverTrigger asChild>
-        {props.children && !rect?.width ? (
-          props.children
-        ) : rect?.width ? (
-          <>
-            {/* FILTR TRIGGER MUST BE A BUTTON */}
-            <button
+      {props.children && !rect?.width ? (
+        <PopoverTrigger asChild>{props.children}</PopoverTrigger>
+      ) : null}
+
+      {rect ? (
+        <>
+          <PopoverTrigger asChild>
+            <div
               style={{
                 position: 'fixed',
                 top: `${rect.top + rect.height}px`,
@@ -43,9 +44,9 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
                 height: `${0}px`,
               }}
             />
-          </>
-        ) : null}
-      </PopoverTrigger>
+          </PopoverTrigger>
+        </>
+      ) : null}
 
       {comboboxProps.open && input && (
         <PopoverContent

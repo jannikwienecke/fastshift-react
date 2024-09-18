@@ -204,30 +204,3 @@ List.ValuesRight = ListValues;
 List.Value = Value;
 List.Icon = ListIcon;
 List.Default = ListDefault;
-
-// CONTINUE HERE:
-// add icons to views/tables and show in the list - check!
-// handle check state of all items in list store - check!
-// handle when clicking on a relational field like user etc... -> check!
-// change the combobox placeholder text -> NEXT TO DOa -> Check!
-// change icon color to more grayish and the relational field labels as well -> Check!
-// make icons a bit smaller -> Check!
-// left padding bit less in list item, padding top/bottom bit more in list item -> Check!
-
-// make combobox work for
-// - [x] Add many to many fields -> Check
-// - [x] combobox when removing query -> "" it should show the default ones -> Check!
-// - [ ] insteed of preloading the relational quries in useeffect -> do it in the initial query
-// - [ ] For many to many fiels, load all items that are selected + other items that are not selected
-// - -  [ ] same for non relational fields: Always load the selected one + other items that are not selected
-// - [ ] positioning of the combobox dropdown
-// - [ ] enum fields
-// handle actions like delete, edit, etc... (... icon next to list show on hover -see linear)
-// - [ ] Add commandbar
-// - [ ] Click list edit field -> check!
-// - [ ] Add filter component
-// - [ ] Can be filter
-// - [ ] Can do pagination
-// two ways when clicking on a field
-// 1. open a dropdown to update that field value -> DEFAULT -> check!
-// 2. open the record behind that field -> CAN BE SELECTED IN THE CONFIG
