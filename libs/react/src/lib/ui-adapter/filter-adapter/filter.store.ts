@@ -57,9 +57,15 @@ export const setFilterAtom = atom(
       };
     });
 
+    const filtersWithValues = [
+      ...filters.filter(
+        (f) => !(f.type === 'relation' && f.values.length === 0)
+      ),
+    ];
+
     set(filterAtom, {
       ...filterState,
-      fitlers: [...filters],
+      fitlers: filtersWithValues,
     });
   }
 );
