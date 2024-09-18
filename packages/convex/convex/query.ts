@@ -40,6 +40,16 @@ export const deleteMutation = server.mutation({
       .collect();
 
     const taskIds = [] as Id<'tasks'>[];
+    // ctx.db
+    //   .query('tasks')
+    //   .paginate({ cursor: '', numItems: 1 })
+    //   .filter((q) =>
+    //     q.or(
+    //       ...['low', 'medium'].map((priority) =>
+    //         q.eq(q.field('priority'), priority)
+    //       )
+    //     )
+    //   );
 
     // ctx.db.query("tasks").withSearchIndex('name_search', (q) => q.search('name', '123')).
 

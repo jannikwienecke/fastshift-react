@@ -68,6 +68,7 @@ export const getIdsFromManyToManyFilters = async (
         idsToRemove.push(
           ...rows.map((manyToManyRow) => manyToManyRow[fieldNameView])
         );
+        return [];
       } else {
         return rows?.map((manyToManyRow) => manyToManyRow[fieldNameView]);
       }
@@ -118,6 +119,7 @@ export const getIdsFromOneToManyFilters = async (
 
       if (isRelationNegateOperator(filter.operator)) {
         idsToRemove.push(...rows.map((task) => task._id));
+        return [];
       } else {
         return rows.map((row) => row._id);
       }
