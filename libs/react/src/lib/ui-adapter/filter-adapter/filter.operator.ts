@@ -24,7 +24,7 @@ export const operator = () => {
 
   const _primitive = (filter: FilterType) => {
     if (!value(filter)) return null;
-    return initOperator(filter.field);
+    return filter.operator || initOperator(filter.field);
   };
 
   const _relation = (filter: FilterType) => {
@@ -32,6 +32,11 @@ export const operator = () => {
     if (!_values) return null;
 
     const hasMoreThanOneValue = _values.length > 1;
+
+    if (isRelationNegateOperator(filter.operator)) {
+      return hasMoreThanOneValue ? operatorMap.isNotAnyOf : operatorMap.isNot;
+    }
+
     return hasMoreThanOneValue ? operatorMap.isAnyOf : operatorMap.is;
   };
 

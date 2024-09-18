@@ -4,13 +4,13 @@ import {
   FieldConfig,
   Row,
 } from '@apps-next/core';
-import { useFilterStore } from './store.filter.js';
+import { useFilterStore } from './filter.store.js';
 import { FilterValue } from '../../ui-components/render-filter-value.js';
 import {
   useCombobox,
   UseComboboxProps,
 } from '../combox-adapter/combobox-adapter.js';
-import { useFiltering } from './filter.store.js';
+import { useFiltering } from './filter.state.js';
 
 export function useFilter({
   onSelect,

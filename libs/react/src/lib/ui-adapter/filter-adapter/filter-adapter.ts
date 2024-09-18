@@ -1,6 +1,6 @@
 import { FilterItemType, FilterProps, FilterType } from '@apps-next/core';
 import { useFilterStore } from '../../store.ts';
-import { useFiltering } from './filter.store.js';
+import { useFiltering } from './filter.state.js';
 import { useFilter } from './use-filter.js';
 
 export const getFilterValue = (f: FilterType) => {

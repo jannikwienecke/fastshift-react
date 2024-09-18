@@ -1,118 +1,86 @@
-import {
-  ComboxboxItem,
-  FieldConfig,
-  FilterType,
-  RegisteredViews,
-} from '@apps-next/core';
+import { FieldConfig, FilterType, Row } from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
-import { getViewConfigAtom } from '../../stores';
 import { operator } from './filter.operator';
-import { filterAtom } from './store.filter';
 import { filterUtil } from './filter.utils';
 
-type FilterState = {
-  query: string;
-  values: ComboxboxItem[];
-  open: boolean;
-  tableName: string;
-  id: string | null;
-  registeredViews: RegisteredViews;
-  selectedField: FieldConfig | null;
-  rect: DOMRect | null;
-  selectedOperatorField: FieldConfig | null;
+export type SelectFilterValueAction = {
+  value: Row;
+  field: FieldConfig;
 };
 
-const DEFAULT_FILTER_STATE: FilterState = {
-  query: '',
-  values: [],
-  open: false,
-  tableName: '',
-  id: null,
-  registeredViews: {},
-  selectedField: null,
-  rect: null,
-  selectedOperatorField: null,
+export type FilterStore = {
+  fitlers: FilterType[];
 };
 
-export const filterStateAtom = atom<FilterState>(DEFAULT_FILTER_STATE);
-
-export const openFilterAtom = atom(false, (get, set, open: boolean) => {
-  const viewConfigManager = get(getViewConfigAtom);
-  const viewFields = viewConfigManager.getViewFieldList();
-
-  const values = viewFields.map((field) => {
-    return {
-      id: field.name,
-      label: field.name,
-    };
-  });
-
-  set(filterStateAtom, { ...get(filterStateAtom), open, values });
+export const filterAtom = atom<FilterStore>({
+  fitlers: [],
 });
 
-export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
-  const state = get(filterStateAtom);
-  const { selectedOperatorField } = state;
-  if (selectedOperatorField) {
-    const filterStore = get(filterAtom);
-
-    const updatedFilters = filterStore.fitlers.map((f) => {
-      if (f.field.name === selectedOperatorField.name) {
-        return filterUtil().update(f, value);
-      }
-      return f;
-    });
-
-    set(filterAtom, { ...filterStore, fitlers: updatedFilters });
-  } else {
-    const viewConfigManager = get(getViewConfigAtom);
-    const field = viewConfigManager.getFieldBy(value.id.toString());
-
-    set(filterStateAtom, { ...get(filterStateAtom), selectedField: field });
-  }
-});
-
-export const closeFilterAtom = atom(null, (get, set) => {
-  set(filterStateAtom, { ...get(filterStateAtom), ...DEFAULT_FILTER_STATE });
-});
-
-const setPositionAtom = atom(null, (get, set, rect: DOMRect) => {
-  set(filterStateAtom, { ...get(filterStateAtom), rect });
-});
-
-export const openOperatorOptionsFilterAtom = atom(
+export const setFilterAtom = atom(
   null,
-  (get, set, field: FieldConfig) => {
-    const filterStore = get(filterAtom);
-    const currentFilter = filterStore.fitlers?.find(
-      (f) => f.field.name === field.name
+  (get, set, filter: SelectFilterValueAction) => {
+    const filterState = get(filterAtom);
+    let filters = filterState.fitlers;
+
+    const exitingFilter = filters.find(
+      (f) => f.field.name === filter.field.name
     );
 
-    const options = operator().makeOptionsFrom(field, currentFilter);
+    if (!exitingFilter) {
+      filters.push(filterUtil().create(filter));
+    }
 
-    set(filterStateAtom, {
-      ...get(filterStateAtom),
-      values: options,
-      open: true,
-      selectedOperatorField: field,
+    if (exitingFilter && exitingFilter.type === 'relation') {
+      const exitingValue = exitingFilter.values.find(
+        (v) => v.id === filter.value.id
+      );
+
+      if (exitingValue) {
+        exitingFilter.values = exitingFilter.values.filter(
+          (v) => v.id !== filter.value.id
+        );
+
+        if (exitingFilter.values.length === 0) {
+          filters = filters.filter((f) => f.field.name !== filter.field.name);
+        }
+      } else {
+        exitingFilter.values.push(filter.value);
+      }
+    } else if (exitingFilter && exitingFilter.type === 'primitive') {
+      exitingFilter.value = filter.value;
+    }
+
+    filters = filterState.fitlers.map((f) => {
+      return {
+        ...f,
+        operator: operator().value(f),
+      };
+    });
+
+    set(filterAtom, {
+      ...filterState,
+      fitlers: [...filters],
     });
   }
 );
 
-export const useFiltering = () => {
-  const filterState = useAtomValue(filterStateAtom);
-  const open = useSetAtom(openFilterAtom);
-  const select = useSetAtom(selectFilterAtom);
-  const close = useSetAtom(closeFilterAtom);
-  const setPosition = useSetAtom(setPositionAtom);
-  const openOperatorOptions = useSetAtom(openOperatorOptionsFilterAtom);
+export const removeFilterAtom = atom(null, (get, set, filter: FilterType) => {
+  const filters = get(filterAtom).fitlers;
+  const newFilters = filters.filter((f) => f.field.name !== filter.field.name);
+  set(filterAtom, {
+    ...get(filterAtom),
+    fitlers: newFilters,
+  });
+});
+
+export const useFilterStore = () => {
+  const setFilter = useSetAtom(setFilterAtom);
+  const removeFilter = useSetAtom(removeFilterAtom);
+  const filter = useAtomValue(filterAtom);
 
   return {
-    filterState,
-    open,
-    select,
-    close,
-    setPosition,
-    openOperatorOptions,
+    setFilter,
+    removeFilter,
+    filter,
   };
 };

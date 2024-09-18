@@ -1,7 +1,7 @@
 import { ComboxboxItem, FieldConfig, FilterType, Row } from '@apps-next/core';
 import { initOperator } from './filter.operator';
 import { operators } from './filter.operator.define';
-import { SelectFilterValueAction } from './store.filter';
+import { SelectFilterValueAction } from './filter.store';
 
 const isRelation = (field: FieldConfig) => {
   return (
