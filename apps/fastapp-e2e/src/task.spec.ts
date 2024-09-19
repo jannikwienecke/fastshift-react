@@ -109,30 +109,74 @@ test.describe('Task management', () => {
 
     const popover = page.getByTestId('combobox-popover');
 
-    // click on projects
+    // filter by project
     await popover.getByText('Projects').click();
-
-    // assert that the projects popover is visible
     await popover.getByText('fitness plan').click();
-
     await page.getByText('tasks').first().click({ force: true });
-    // expect popover to be hidden
     await expect(popover.getByText('fitness plan')).toBeHidden();
-
-    // expect to see 3 times the text "fitness plan"
     await expect(page.getByText('fitness plan')).toHaveCount(4);
 
-    // click on the filter button
-    await page.getByTestId('filter-button').click();
+    // change filter from "is" to "is not"
+    const filterList = page.getByTestId('filter-list');
+    await filterList.getByText('is').click();
+    await popover.getByText('is not').click();
+    await page.getByText('tasks').first().click({ force: true });
+    // its 1 because we stil see thte name in the filter
+    await expect(page.getByText('fitness plan')).toHaveCount(1);
 
-    // assert that the projects popover is visible
-    await popover.getByText('tags').click();
+    // click on 'fitness plan'
+    await page.getByText('fitness plan').click();
+    await popover.getByText('learn spanish').click();
+    await page.getByText('tasks').first().click({ force: true });
+    await expect(page.getByText('fitness plan')).toHaveCount(0);
+    await expect(page.getByText('learn spanish')).toHaveCount(0);
 
-    await popover.getByText(/technical/i).click();
-
+    await filterList.getByText('is not any of').click();
+    await popover.getByText('is any of').click();
+    await expect(page.getByText('fitness plan')).toHaveCount(3);
+    await expect(page.getByText('learn spanish')).toHaveCount(3);
     await page.getByText('tasks').first().click({ force: true });
 
-    await expect(page.getByText(/technical/i)).toHaveCount(2);
-    await expect(page.getByText('fitness plan')).toHaveCount(2);
+    await page.getByTestId('filter-button').click();
+    await popover.getByText('tags').click();
+    await popover.getByText(/important/i).click();
+    await page.getByText('tasks').first().click({ force: true });
+
+    const tagsFilterItem = page.getByTestId('filter-item-tags');
+    await tagsFilterItem.getByText('is').click();
+    await popover.getByText('is not').click();
+    await page.getByText('tasks').first().click({ force: true });
+    await expect(page.getByText(/important/i)).toHaveCount(1);
+  });
+
+  test('can filter tasks by completed and priority', async ({ page }) => {
+    // click on the filter button
+    await page.getByText('Filter').click();
+
+    const popover = page.getByTestId('combobox-popover');
+
+    await popover.getByText(/completed/i).click();
+    await popover.getByText(/true/i).click();
+    await page.getByText('tasks').first().click({ force: true });
+
+    await expect(page.getByTestId('list-item')).toHaveCount(1);
+
+    const filterList = page.getByTestId('filter-list');
+    await filterList.getByText(/true/i).click();
+    await popover.getByText(/false/i).click();
+    await page.getByText('tasks').first().click({ force: true });
+    await expect(page.getByTestId('list-item')).not.toHaveCount(1);
+
+    await page.getByTestId('filter-button').click();
+    await popover.getByText(/priority/i).click();
+    await popover.getByText(/🟡/i).click();
+    await page.getByText('tasks').first().click({ force: true });
+
+    await expect(page.getByText(/🟢/i).first()).toBeHidden();
+
+    await filterList.getByText(/medium/i).click();
+    await popover.getByText(/🟢/i).click();
+    await page.getByText('tasks').first().click({ force: true });
+    await expect(page.getByText(/🟢/i).first()).toBeVisible();
   });
 });

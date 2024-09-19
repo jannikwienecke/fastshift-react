@@ -32,7 +32,10 @@ export const FilterDefault = (props: FilterProps) => {
 
 const FilterList = (props: FilterProps) => {
   return (
-    <div className="flex flex-row gap-2 items-center flex-wrap text-xs">
+    <div
+      data-testid="filter-list"
+      className="flex flex-row gap-2 items-center flex-wrap text-xs"
+    >
       {props.filters.map((f) => {
         const ref = React.createRef<HTMLDivElement>();
         return (
@@ -68,7 +71,10 @@ const FilterItem = (props: {
 }) => {
   const { filter, onRemove } = props;
   return (
-    <div className="border border-input rounded-sm text-muted-foreground ">
+    <div
+      data-testid={`filter-item-${filter.name}`}
+      className="border border-input rounded-sm text-muted-foreground "
+    >
       <div className="flex flex-row items-center flex-wrap">
         <div className="flex items-center gap-[1px] border-r-[1px] pl-2 border-r-input/30 pr-2 py-1">
           {filter.icon ? (

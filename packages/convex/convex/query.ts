@@ -40,6 +40,8 @@ export const deleteMutation = server.mutation({
       .collect();
 
     const taskIds = [] as Id<'tasks'>[];
+
+    // ctx.db.query('tasks').filter((q) => q.neq(q.field('priority'), 'medium'))
     // ctx.db
     //   .query('tasks')
     //   .paginate({ cursor: '', numItems: 1 })
