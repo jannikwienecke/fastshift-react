@@ -73,6 +73,7 @@ export const closeFieldOptionsFilterAtom = atom(null, (get, set) => {
     open: false,
     selectedOperatorField: null,
     values: [],
+    rect: null,
   });
 });
 
