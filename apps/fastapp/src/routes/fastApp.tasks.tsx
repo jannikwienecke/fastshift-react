@@ -11,9 +11,11 @@ import {
   useFilterAdapter,
   useFilterStore,
   useHandleSelectCombobox,
+  useInputDialogAdapter,
+  useInputDialogStore,
   useStoreValue,
 } from '@apps-next/react';
-import { ComboboxPopover, Filter, List } from '@apps-next/ui';
+import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { config } from '../global-config';
 import {
@@ -62,9 +64,23 @@ const Task = () => {
 
   const { handleClose, handleSelect } = useHandleSelectCombobox();
 
-  const getFilterProps = useFilterAdapter();
+  const { handleSelectFromFilter } = useInputDialogStore();
 
-  const { closeAll, propsForCombobox, handleSelectValue } = useFilterStore();
+  const {
+    closeAll,
+    propsForCombobox,
+    handleSelectValue,
+    handleEnterValueFromInputDialog,
+  } = useFilterStore();
+
+  const getInputDialogProps = useInputDialogAdapter({
+    onSave: handleEnterValueFromInputDialog,
+    onCancel: closeAll,
+  });
+
+  const getFilterProps = useFilterAdapter({
+    onSelect: handleSelectFromFilter,
+  });
 
   const { list } = useStoreValue();
 
@@ -93,6 +109,8 @@ const Task = () => {
       </div>
 
       <ComboboxPopover {...getComboboxProps()} />
+
+      <InputDialog.Default {...getInputDialogProps()} />
 
       <div className="flex flex-col w-full ">
         <QueryInput />

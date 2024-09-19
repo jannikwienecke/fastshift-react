@@ -1,9 +1,10 @@
-import { FieldConfig, FilterType, Row } from '@apps-next/core';
+import { FieldConfig, FilterType, makeRow, Row } from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { operator } from './filter.operator';
 import { filterUtil } from './filter.utils';
 import { filterStateAtom, useFiltering } from './filter.state';
 import { UseComboboxProps } from '../combox-adapter';
+import { InputDialogValueDict } from '../input-dialog';
 
 export type SelectFilterValueAction = {
   value: Row;
@@ -113,6 +114,27 @@ const handleSelectValueAtom = atom(null, (get, set, value: Row) => {
   });
 });
 
+const handleEnterValueAtom = atom(
+  null,
+  (get, set, props: InputDialogValueDict) => {
+    console.log(props);
+    const { field, value } = Object.values(props)?.[0] ?? {};
+    if (!field || !value) return;
+
+    set(filterStateAtom, {
+      ...get(filterStateAtom),
+      selectedField: null,
+      open: false,
+      rect: null,
+    });
+
+    set(setFilterAtom, {
+      value: makeRow(value, value, value, field),
+      field,
+    });
+  }
+);
+
 export const useFilterStore = () => {
   const props = useFiltering();
 
@@ -122,12 +144,15 @@ export const useFilterStore = () => {
   const selected = useAtomValue(selectedFilterAtom);
   const handleSelectValue = useSetAtom(handleSelectValueAtom);
 
+  const handleEnterValueFromInputDialog = useSetAtom(handleEnterValueAtom);
+
   return {
     setFilter,
     removeFilter,
     filter,
     selected,
     handleSelectValue,
+    handleEnterValueFromInputDialog,
     propsForCombobox: {
       field: props.filterState.selectedField,
       rect: props.filterState.rect ?? ({} as DOMRect),

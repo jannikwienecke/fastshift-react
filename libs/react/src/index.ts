@@ -15,3 +15,4 @@ export * from './lib/stores';
 export * from './lib/generate-default-config';
 export * from './lib/create-view-config';
 export * from './lib/ui-adapter/filter-adapter';
+export * from './lib/ui-adapter/input-dialog';

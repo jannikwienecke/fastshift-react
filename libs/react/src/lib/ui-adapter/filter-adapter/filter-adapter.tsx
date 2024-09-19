@@ -19,7 +19,9 @@ export const getFilterValue = (f: FilterType) => {
   return f.value.label;
 };
 
-export const useFilterAdapter = (): (() => FilterProps) => {
+export const useFilterAdapter = (props?: {
+  onSelect?: (value: ComboxboxItem) => void;
+}): (() => FilterProps) => {
   const { filter, removeFilter } = useFilterStore();
   const {
     open,
@@ -45,9 +47,9 @@ export const useFilterAdapter = (): (() => FilterProps) => {
     },
     selected: null,
     onChange: (value) => {
-      console.log('value', value);
       select(value);
       close();
+      props?.onSelect?.(value);
     },
 
     onOpenChange: (isOpen) => {
@@ -82,13 +84,16 @@ export const useFilterAdapter = (): (() => FilterProps) => {
 
       comboboxProps: comboboxProps,
       onRemove: ({ name }) => removeFilter(getFilter(name)),
-      onSelect: ({ name }, rect) => {
+      onSelect: (value, rect) => {
         setPosition(rect);
+        const comboboxValue = {
+          id: value.name,
+          label: value.name,
+        };
 
-        select({
-          id: name,
-          label: name,
-        });
+        select(comboboxValue);
+
+        props?.onSelect?.(comboboxValue);
       },
       onOperatorClicked: (filter, rect) => {
         setPosition(rect);

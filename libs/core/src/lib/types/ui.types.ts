@@ -102,3 +102,18 @@ export type FilterProps = {
   onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
   comboboxProps: ComboboxPopoverProps;
 };
+
+export type InputDialogProps = {
+  open: boolean;
+  title: string;
+  onSubmit: () => void;
+  onCancel: () => void;
+  onOpenChange: (open: boolean) => void;
+  className?: string;
+  inputList: {
+    id: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder: string;
+  }[];
+};
