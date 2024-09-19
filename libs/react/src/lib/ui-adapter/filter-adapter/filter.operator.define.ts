@@ -71,7 +71,7 @@ export const optionsOperatorMap: Partial<{
   Boolean: [operatorMap.is, operatorMap.isNot],
   String: [operatorMap.contains, operatorMap.doesNotContain],
   Number: [operatorMap.is, operatorMap.isNot],
-  Enum: [operatorMap.is, operatorMap.isAnyOf],
+  Enum: defaultOperators,
   Date: [operatorMap.is, operatorMap.isAnyOf],
   Reference: defaultOperators,
   OneToOneReference: defaultOperators,

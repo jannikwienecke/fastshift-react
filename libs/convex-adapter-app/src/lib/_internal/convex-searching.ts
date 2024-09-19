@@ -74,6 +74,10 @@ export const withEnumFilters = (
   const values = filter.type === 'relation' ? filter.values : [filter.value];
 
   return dbQuery.filter((q) =>
-    q.or(...values.map((value) => q.eq(q.field(filter.field.name), value.raw)))
+    q.or(
+      ...values.map((value) =>
+        queryBuilder(q, filter.operator)(q.field(filter.field.name), value.raw)
+      )
+    )
   );
 };

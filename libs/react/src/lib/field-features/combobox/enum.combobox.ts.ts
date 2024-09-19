@@ -24,6 +24,13 @@ export const EnumInitializer = (
       ? payload.multiple
       : Boolean(field?.relation?.manyToManyRelation);
 
+  const _selected =
+    typeof selected === 'string'
+      ? [makeRow(selected, selected, selected, field)]
+      : Array.isArray(selected)
+      ? selected
+      : [selected];
+
   return {
     ...DEFAULT_STORE,
     ...payload,
@@ -31,15 +38,7 @@ export const EnumInitializer = (
     open: true,
     values,
     fallbackData: values,
-
     multiple,
-    selected: [
-      makeRow(
-        selected.toString(),
-        selected.toString(),
-        selected.toString(),
-        field
-      ),
-    ],
+    selected: _selected,
   };
 };

@@ -5,7 +5,9 @@ export const operatorMap: Partial<{
   [key in FilterOperatorType['label']]: keyof OperatorFns;
 }> = {
   is: 'eq',
+  'is any of': 'eq',
   'is not': 'neq',
+  'is not any of': 'neq',
 };
 
 export const queryBuilder = (
