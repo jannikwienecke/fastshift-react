@@ -58,6 +58,7 @@ export const useFilterAdapter = (): (() => FilterProps) => {
       },
       onOperatorClicked: (filter, rect) => {
         setPosition(rect);
+
         const _f = getFilter(filter.name);
         openOperatorOptions(_f.field);
       },

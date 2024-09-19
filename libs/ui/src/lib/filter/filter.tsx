@@ -31,11 +31,10 @@ export const FilterDefault = (props: FilterProps) => {
 };
 
 const FilterList = (props: FilterProps) => {
-  const ref = React.useRef<HTMLDivElement>(null);
-
   return (
     <div className="flex flex-row gap-2 items-center flex-wrap text-xs">
       {props.filters.map((f) => {
+        const ref = React.createRef<HTMLDivElement>();
         return (
           <span key={`filter-${f.name}-${f.operator}`} ref={ref}>
             <FilterItem

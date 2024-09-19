@@ -38,13 +38,9 @@ export function useFilter({
   const props = {
     state: {
       field: filterState.selectedField,
-      // row: filterState.selectedField ? ('test' as Row) : null,
       rect: filterState.rect ?? ({} as DOMRect),
       selected: getSelected(),
       multiple: true,
-      // filterState.selectedField?.relation || filterState.selectedField?.enum
-      //   ? true
-      //   : false,
     },
     onClose: close,
     onSelect: (value) => {
@@ -75,7 +71,7 @@ export function useFilter({
       name: 'filter',
       multiple: false,
       searchable: true,
-      rect: null,
+      rect: filterState.rect,
       input: {
         onChange: (query) => {
           console.log('onChange', query);
@@ -85,8 +81,6 @@ export function useFilter({
       },
       selected: null,
       onChange: (value) => {
-        console.log('onChange', value);
-
         select(value);
       },
 
