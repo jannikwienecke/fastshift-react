@@ -1,6 +1,7 @@
 import { FilterType, SearchableField } from '@apps-next/core';
-import { ConvexClient } from './types.convex';
+import { isEnumNegateOperator } from '@apps-next/react';
 import { queryBuilder } from './convex-operators';
+import { ConvexClient, SearchFilterBuilder } from './types.convex';
 
 export const withSearch = (
   dbQuery: ConvexClient[string],
@@ -68,16 +69,28 @@ export const withEnumFilters = (
   enumFilters: FilterType[],
   dbQuery: ConvexClient[string]
 ) => {
-  const filter = enumFilters?.[0];
-  if (!filter) return dbQuery;
+  let _dbQuery = dbQuery;
 
-  const values = filter.type === 'relation' ? filter.values : [filter.value];
+  enumFilters.forEach((filter) => {
+    const values = filter.type === 'relation' ? filter.values : [filter.value];
 
-  return dbQuery.filter((q) =>
-    q.or(
-      ...values.map((value) =>
-        queryBuilder(q, filter.operator)(q.field(filter.field.name), value.raw)
+    const _andOr = (q: SearchFilterBuilder, filter: FilterType) =>
+      isEnumNegateOperator(filter.operator) ? q.and : q.or;
+
+    _dbQuery = dbQuery.filter((q) =>
+      _andOr(
+        q,
+        filter
+      )(
+        ...values.map((value) =>
+          queryBuilder(q, filter.operator)(
+            q.field(filter.field.name),
+            value.raw
+          )
+        )
       )
-    )
-  );
+    );
+  });
+
+  return _dbQuery;
 };

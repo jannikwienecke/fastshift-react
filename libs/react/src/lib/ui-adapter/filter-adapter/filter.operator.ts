@@ -89,3 +89,7 @@ export const initOperator = (field: FieldConfig) => {
 export const isRelationNegateOperator = (operator: FilterOperatorType) => {
   return operator.label === 'is not' || operator.label === 'is not any of';
 };
+
+export const isEnumNegateOperator = (operator: FilterOperatorType) => {
+  return operator.label === 'is not' || operator.label === 'is not any of';
+};

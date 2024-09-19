@@ -88,6 +88,7 @@ export type OperatorFns = {
   eq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
   neq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
   or: (...args: unknown[]) => unknown;
+  and: (...args: unknown[]) => unknown;
 };
 
 export type SearchFilterBuilder = {
@@ -113,15 +114,6 @@ export type ConvexClient = {
     filter: (query: (q: SearchFilterBuilder) => any) => ConvexClient[string];
 
     insert: (tableName: string, data: RecordType) => Promise<void>;
-    // findMany: (args: ConvexFindManyArgs) => Promise<PrismaRecord[]>;
-    // create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
-    // delete: (args: { where: { id: ID } }) => Promise<void>;
-    // deleteMany: (args: { where: Record<string, unknown> }) => Promise<void>;
-    // update: (args: { where: { id: ID }; data: PrismaRecord }) => Promise<void>;
-    // findUnique: (args: {
-    //   where: { id: ID };
-    //   select: ConvexInclude;
-    // }) => Promise<PrismaRecord>;
   };
 };
 
