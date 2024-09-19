@@ -1,7 +1,13 @@
-import { FilterItemType, FilterProps, FilterType } from '@apps-next/core';
-import { useFilterStore } from '../../store.ts';
+import {
+  ComboboxPopoverProps,
+  ComboxboxItem,
+  FilterItemType,
+  FilterProps,
+  FilterType,
+} from '@apps-next/core';
+import { useFilterStore } from '../../store.ts/index.js';
+import { FilterValue } from '../../ui-components/render-filter-value.js';
 import { useFiltering } from './filter.state.js';
-import { useFilter } from './use-filter.js';
 
 export const getFilterValue = (f: FilterType) => {
   if (f.type === 'relation') {
@@ -14,17 +20,45 @@ export const getFilterValue = (f: FilterType) => {
 };
 
 export const useFilterAdapter = (): (() => FilterProps) => {
-  const { setFilter, filter, removeFilter } = useFilterStore();
-  const { open, select, setPosition, openOperatorOptions } = useFiltering();
+  const { filter, removeFilter } = useFilterStore();
+  const {
+    open,
+    select,
+    setPosition,
+    openOperatorOptions,
+    filterState,
+    closeFieldOptions: close,
+  } = useFiltering();
 
-  const { getFilterComboboxProps } = useFilter({
-    onSelect: (props) => {
-      setFilter({
-        field: props.field,
-        value: props.value,
-      });
+  const comboboxProps = {
+    ...filterState,
+    name: 'filter',
+    multiple: false,
+    searchable: true,
+    rect: filterState.rect,
+    input: {
+      onChange: (query) => {
+        console.log('onChange', query);
+      },
+      query: filterState.query,
+      placeholder: 'Filter...',
     },
-  });
+    selected: null,
+    onChange: (value) => {
+      console.log('value', value);
+      select(value);
+      close();
+    },
+
+    onOpenChange: (isOpen) => {
+      if (!isOpen) {
+        close();
+      } else {
+        open(true);
+      }
+    },
+    render: (value) => <FilterValue value={value} />,
+  } satisfies ComboboxPopoverProps<ComboxboxItem>;
 
   const filters_ = filter.fitlers.map((f) => {
     return {
@@ -46,7 +80,7 @@ export const useFilterAdapter = (): (() => FilterProps) => {
       onOpen: () => open(true),
       filters: filters_,
 
-      comboboxProps: getFilterComboboxProps(),
+      comboboxProps: comboboxProps,
       onRemove: ({ name }) => removeFilter(getFilter(name)),
       onSelect: ({ name }, rect) => {
         setPosition(rect);

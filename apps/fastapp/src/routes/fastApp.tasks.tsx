@@ -7,7 +7,9 @@ import {
   QueryInput,
   setViewFieldsConfig,
   useCombobox,
+  UseComboboxProps,
   useFilterAdapter,
+  useFilterStore,
   useHandleSelectCombobox,
   useStoreValue,
 } from '@apps-next/react';
@@ -62,14 +64,27 @@ const Task = () => {
 
   const getFilterProps = useFilterAdapter();
 
-  // // TODO: we should not save it on list -> but have like selected: {type: "list or whatever"}
+  const { closeAll, propsForCombobox, handleSelectValue } = useFilterStore();
+
   const { list } = useStoreValue();
 
-  const getComboboxProps = useCombobox({
+  const filterComboboxProps = {
+    state: propsForCombobox,
+    onClose: closeAll,
+    onSelect: handleSelectValue,
+  } satisfies UseComboboxProps;
+
+  const listComboboxProps = {
     state: list?.focusedRelationField ? list.focusedRelationField : null,
     onSelect: handleSelect,
     onClose: handleClose,
-  });
+  } satisfies UseComboboxProps;
+
+  // // TODO: we should not save it on list -> but have like selected: {type: "list or whatever"}
+
+  const getComboboxProps = useCombobox(
+    list?.focusedRelationField ? listComboboxProps : filterComboboxProps
+  );
 
   return (
     <div className="p-2 flex flex-col gap-2 grow overflow-scroll">

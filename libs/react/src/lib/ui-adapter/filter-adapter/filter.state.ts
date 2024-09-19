@@ -67,7 +67,16 @@ export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
   }
 });
 
-export const closeFilterAtom = atom(null, (get, set) => {
+export const closeFieldOptionsFilterAtom = atom(null, (get, set) => {
+  set(filterStateAtom, {
+    ...get(filterStateAtom),
+    open: false,
+    selectedOperatorField: null,
+    values: [],
+  });
+});
+
+export const closeAllFilterAtom = atom(null, (get, set) => {
   set(filterStateAtom, { ...get(filterStateAtom), ...DEFAULT_FILTER_STATE });
 });
 
@@ -98,16 +107,17 @@ export const useFiltering = () => {
   const filterState = useAtomValue(filterStateAtom);
   const open = useSetAtom(openFilterAtom);
   const select = useSetAtom(selectFilterAtom);
-  const close = useSetAtom(closeFilterAtom);
+  const closeFieldOptions = useSetAtom(closeFieldOptionsFilterAtom);
   const setPosition = useSetAtom(setPositionAtom);
   const openOperatorOptions = useSetAtom(openOperatorOptionsFilterAtom);
-
+  const closeAll = useSetAtom(closeAllFilterAtom);
   return {
     filterState,
     open,
     select,
-    close,
+    closeFieldOptions,
     setPosition,
     openOperatorOptions,
+    closeAll,
   };
 };
