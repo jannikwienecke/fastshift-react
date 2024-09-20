@@ -145,6 +145,7 @@ export const Route = createFileRoute('/fastApp/tasks')({
 });
 
 // STATE: FILTERS
+// when filtering the field options -> the filteing process does not work. e.g.: enter "tag" , delete it and enter "project"
 // we need to handle the different operations like is in or is not in
 // we need to persist the filters somewhere (own db table that we expose?)
 // we need to style the ui

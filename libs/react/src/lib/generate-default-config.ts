@@ -60,7 +60,9 @@ export const generateDefaultViewConfigs = ({
           relativePath: tableName,
           viewName: tableName as string,
           displayField: {
-            field: guessDisplayFieldIfNotProvided ? displayField ?? 'id' : 'id',
+            field: (guessDisplayFieldIfNotProvided
+              ? displayField ?? 'id'
+              : 'id') as never,
           },
           icon: CubeIcon,
         },
