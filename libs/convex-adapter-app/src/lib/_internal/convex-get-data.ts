@@ -24,9 +24,29 @@ import { ConvexRecord } from './types.convex';
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { viewConfigManager, filters } = args;
 
+  const isTask = viewConfigManager?.getTableName() === 'tasks';
+  const log = (...args: any[]) => {
+    if (!isTask) return;
+    console.log('___: ', ...args);
+  };
+
   const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
 
-  const searchField = viewConfigManager.getSearchableField();
+  const searchFields = viewConfigManager.getSearchableFields();
+  const primarySearchField = viewConfigManager.getPrimarySearchField();
+
+  // TODO: REFACTOR THIS PART
+  const filtersWithSearchField = filters?.filter((f) =>
+    searchFields?.map((f) => f.field).includes(f.field.name)
+  );
+
+  const searchField =
+    filtersWithSearchField?.length === 1
+      ? searchFields?.find(
+          (f) => f.field === filtersWithSearchField[0].field.name
+        )
+      : searchFields?.find((f) => f.field === primarySearchField);
+
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   const {
@@ -37,6 +57,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     enumFilters,
     hasOneToManyFilter,
     hasManyToManyFilter,
+    stringFilters,
   } = getFilterTypes(filters, searchField);
 
   const {
@@ -48,7 +69,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
-  // HIER WEITER MACHEN -> same for many to many
   const { ids: idsOneToManyFilters, idsToRemove: idsOneToManyFiltersToRemove } =
     await getIdsFromOneToManyFilters(oneToManyFilters, ctx, viewConfigManager);
 
@@ -92,20 +112,38 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     new Set([...idsManyToManyFiltersToRemove, ...idsOneToManyFiltersToRemove])
   );
 
+  let searchAll = false;
   const fetch = async (multiple?: number) => {
+    if (searchAll) {
+      return [];
+    }
+
+    searchAll = Boolean(stringFilters?.length || (args.query && !searchField));
+
+    // TODO: mhhh Thoughts. Continue here.
+    // Do the same with Index as with searchindex
+    // for fields like dueDate or completed
+
     const idsAfterRemove = allIds.filter((id) => !idsToRemove.includes(id));
 
+    log('idsAfterRemove', idsAfterRemove, { hasAnyFilterSet });
+
+    const rowsBeforeFilter = hasAnyFilterSet
+      ? await getRecordsByIds(idsAfterRemove, dbQuery)
+      : searchAll
+      ? await dbQuery.collect()
+      : await dbQuery.take(DEFAULT_FETCH_LIMIT_QUERY * (multiple ?? 1));
+
+    log('Rows Before::: ', rowsBeforeFilter.length);
     const r = await filterResults(
-      hasAnyFilterSet
-        ? await getRecordsByIds(idsAfterRemove, dbQuery)
-        : await dbQuery.take(DEFAULT_FETCH_LIMIT_QUERY * (multiple ?? 1)),
+      rowsBeforeFilter,
       displayField,
       args.query,
       searchField,
-      filters?.filter(
-        (f) => f.type === 'primitive' && f.field.type === 'String'
-      )
+      stringFilters
     );
+
+    log('Rows After::: ', r.length);
 
     return r;
   };
@@ -124,7 +162,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     if (
       rows.length >= DEFAULT_FETCH_LIMIT_QUERY ||
       filtered.length === 0 ||
-      newRows.length < DEFAULT_FETCH_LIMIT_QUERY
+      newRows.length === 0
     ) {
       break;
     }

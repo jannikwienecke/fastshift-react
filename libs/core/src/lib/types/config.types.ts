@@ -46,7 +46,8 @@ export interface BaseConfigInterface<
   dataModel: TDataModel;
   tableNames: TTables;
   viewFields: Record<string, ViewFieldConfig>;
-  searchableFields: Record<string, SearchableField>;
+  searchableFields: Record<string, SearchableField[]>;
+  primarySearchField?: keyof TDataModel;
   includeFields: IncludeConfig;
   _datamodel: DataModelType;
   defaultViewConfigs: Partial<Record<string, ViewConfigType<any>>>;

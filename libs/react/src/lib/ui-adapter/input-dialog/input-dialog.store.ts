@@ -52,6 +52,7 @@ const closeAtom = atom(null, (get, set) => {
     ...get(inputDialogStateAtom),
     field: null,
     open: false,
+    valueDict: {},
   });
 });
 
@@ -67,9 +68,13 @@ export const useInputDialogStore = () => {
   const handleSelectFromFilter = (value: ComboxboxItem) => {
     const field = viewConfigManager?.getFieldBy(value.id.toString());
     if (!field) return;
+    console.log('field', field);
+
     if (field.type !== 'String') {
       return;
     }
+
+    setField(field);
   };
 
   return {

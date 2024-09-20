@@ -22,7 +22,7 @@ export const getFilterValue = (f: FilterType) => {
 export const useFilterAdapter = (props?: {
   onSelect?: (value: ComboxboxItem) => void;
 }): (() => FilterProps) => {
-  const { filter, removeFilter } = useFilterStore();
+  const { filter, removeFilter, setQuery } = useFilterStore();
   const {
     open,
     select,
@@ -41,6 +41,7 @@ export const useFilterAdapter = (props?: {
     input: {
       onChange: (query) => {
         console.log('onChange', query);
+        setQuery(query);
       },
       query: filterState.query,
       placeholder: 'Filter...',

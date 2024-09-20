@@ -32,7 +32,7 @@ export const filterResults = (
         const valueOfField = row[filter.field.name]?.toLowerCase();
         if (!valueOfField) return false;
 
-        return valueOfField?.includes(stringFilterValue);
+        return valueOfField?.includes(stringFilterValue.toLowerCase());
       });
 
     return includesQuery && hasAllStringFilters;

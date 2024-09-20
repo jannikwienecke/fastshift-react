@@ -1,4 +1,4 @@
-import { tasksConfig } from '@apps-next/convex';
+import { config, tasksConfig } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
   getViewFieldsConfig,
@@ -17,7 +17,6 @@ import {
 } from '@apps-next/react';
 import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { config } from '../global-config';
 import {
   CompletedComponent,
   PriorityComponent,

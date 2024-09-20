@@ -27,7 +27,8 @@ export type ViewConfigType<T extends GetTableName = any> =
       cell?: (value: GetTableDataType<T>) => React.ReactNode;
     };
     query?: {
-      searchableField?: SearchableField;
+      searchableFields?: SearchableField[];
+      primarySearchField?: keyof GetTableDataType<T>;
     };
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;

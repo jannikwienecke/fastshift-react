@@ -31,7 +31,10 @@ export const handleRelationalTableQuery = async ({
     args.registeredViews
   );
 
-  const searchField = relationalViewManager.getSearchableField();
+  // TODO: REFACTOR THIS PART
+  const searchFields = relationalViewManager.getSearchableFields();
+  const primarySearchField = relationalViewManager.getPrimarySearchField();
+  const searchField = searchFields?.find((f) => f.field === primarySearchField);
 
   let rows = await withSearch(dbQuery, {
     searchField,

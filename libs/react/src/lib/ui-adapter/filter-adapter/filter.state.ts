@@ -104,6 +104,19 @@ export const openOperatorOptionsFilterAtom = atom(
   }
 );
 
+export const setQueryAtom = atom(null, (get, set, query: string) => {
+  const values = get(filterStateAtom).values;
+  const valuesWithQuery = values.filter((v) =>
+    v.label.toLowerCase().includes(query.toLowerCase())
+  );
+
+  set(filterStateAtom, {
+    ...get(filterStateAtom),
+    query,
+    values: valuesWithQuery,
+  });
+});
+
 export const useFiltering = () => {
   const filterState = useAtomValue(filterStateAtom);
   const open = useSetAtom(openFilterAtom);
@@ -112,6 +125,8 @@ export const useFiltering = () => {
   const setPosition = useSetAtom(setPositionAtom);
   const openOperatorOptions = useSetAtom(openOperatorOptionsFilterAtom);
   const closeAll = useSetAtom(closeAllFilterAtom);
+  const setQuery = useSetAtom(setQueryAtom);
+
   return {
     filterState,
     open,
@@ -120,5 +135,6 @@ export const useFiltering = () => {
     setPosition,
     openOperatorOptions,
     closeAll,
+    setQuery,
   };
 };

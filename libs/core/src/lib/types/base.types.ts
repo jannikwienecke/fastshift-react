@@ -56,7 +56,9 @@ export type FieldConfig = {
 };
 
 export type GetTableName = keyof RegisteredRouter['config']['_datamodel'];
-// export type GetTableName = RegisteredRouter['config']['tableNames'][number];
+
+// export type GetTableNameSecond =
+//   RegisteredRouter['config']['tableNames'][number];
 
 export type GetTableDataType<T extends GetTableName> =
   RegisteredRouter['config']['_datamodel'][T];

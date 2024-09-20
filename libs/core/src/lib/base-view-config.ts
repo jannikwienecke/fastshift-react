@@ -20,7 +20,8 @@ export interface BaseViewConfigManagerInterface<
 > {
   viewConfig: TViewConfig;
   getDisplayFieldLabel(): string;
-  getSearchableField(): SearchableField | undefined;
+  getSearchableFields(): SearchableField[] | undefined;
+  getPrimarySearchField(): string | undefined;
   getTableName(): string;
   getViewName(): string;
   getViewFieldList(): FieldConfig[];
@@ -63,9 +64,15 @@ export class BaseViewConfigManager<
     return this.viewConfig.displayField.field as string;
   }
 
-  getSearchableField(): SearchableField | undefined {
-    return this.viewConfig.query?.searchableField;
+  getSearchableFields(): SearchableField[] | undefined {
+    return this.viewConfig.query?.searchableFields;
   }
+
+  getPrimarySearchField() {
+    return (this.viewConfig.query?.primarySearchField as string) ?? undefined;
+  }
+
+  // getPrimarySearchField add
 
   getViewFieldList(): FieldConfig[] {
     // return Object.values(this.modelConfig?.viewFields ?? {});

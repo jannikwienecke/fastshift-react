@@ -262,6 +262,7 @@ const init = server.mutation({
       projects.push(projectId);
     }
 
+    const tommorow = new Date().getTime() + 1000 * 60 * 60 * 24;
     // Create tasks
     const taskData = [
       {
@@ -270,6 +271,7 @@ const init = server.mutation({
         projectId: projects[0],
         priority: 'high',
         description: 'Design mockups for the website redesign',
+        dueDate: tommorow,
       },
       {
         name: 'Develop frontend',
@@ -661,6 +663,7 @@ const init = server.mutation({
         projectId: task.projectId,
         priority: task.priority as any,
         description: task.description,
+        dueDate: task.dueDate,
       });
 
       // Add tags to each task (0 to 4 tags)

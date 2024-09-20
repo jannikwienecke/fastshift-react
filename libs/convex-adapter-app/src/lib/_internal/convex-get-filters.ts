@@ -26,19 +26,27 @@ export const getFilterWithSearchField = (
 export const getEnumFilters = (filters: FilterType[]) =>
   filters.filter((f) => f.type === 'relation' && f.field.enum);
 
-export const hasOneToManyFilter = (filters: FilterType[]) =>
+export const getHasOneToManyFilter = (filters: FilterType[]) =>
   getRelationalFilters(filters).find(
     (f) => f.operator.label === 'is' || f.operator.label === 'is any of'
   )
     ? true
     : false;
 
-export const hasManyToManyFilter = (filters: FilterType[]) =>
+export const getHasManyToManyFilter = (filters: FilterType[]) =>
   getManyToManyFilters(filters).find(
     (f) => f.operator.label === 'is' || f.operator.label === 'is any of'
   )
     ? true
     : false;
+
+export const getStringFilters = (
+  filters: FilterType[],
+  searchField: SearchableField | undefined
+) =>
+  filters
+    .filter((f) => f.field.type === 'String')
+    .filter((f) => f.field.name !== searchField?.field);
 
 export const getFilterTypes = (
   filters: FilterType[] | undefined,
@@ -53,15 +61,21 @@ export const getFilterTypes = (
       enumFilters: [],
       hasOneToManyFilter: false,
       hasManyToManyFilter: false,
+      stringFilters: [],
     };
 
+  const filterWithSearchField = getFilterWithSearchField(filters, searchField);
+
+  const _filters = filters.filter((f) => f.field.name !== searchField?.field);
+
   return {
-    primitiveFilters: getPrimitiveFilters(filters),
-    oneToManyFilters: getRelationalFilters(filters),
-    manyToManyFilters: getManyToManyFilters(filters),
-    filterWithSearchField: getFilterWithSearchField(filters, searchField),
+    filterWithSearchField,
+    primitiveFilters: getPrimitiveFilters(_filters),
+    oneToManyFilters: getRelationalFilters(_filters),
+    manyToManyFilters: getManyToManyFilters(_filters),
     enumFilters: getEnumFilters(filters),
-    hasOneToManyFilter: hasOneToManyFilter(filters),
-    hasManyToManyFilter: hasManyToManyFilter(filters),
+    hasOneToManyFilter: getHasOneToManyFilter(filters),
+    hasManyToManyFilter: getHasManyToManyFilter(filters),
+    stringFilters: getStringFilters(_filters, searchField),
   };
 };
