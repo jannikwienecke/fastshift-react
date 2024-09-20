@@ -18,6 +18,21 @@ export const viewMutation = server.mutation({
   handler: makeViewMutationHandler(views),
 });
 
+export const testQuery = server.query({
+  handler(ctx, args_0) {
+    console.log('testQuery');
+
+    const now = new Date().getTime();
+    const query = ctx.db
+      .query('tasks')
+      // .filter((q) => q.gte(q.field('dueDate'), now));
+      .withIndex('dueDate', (q) => q.gte('dueDate', now));
+
+    console.log(query);
+    return query.collect();
+  },
+});
+
 export const deleteMutation = server.mutation({
   handler: async (ctx, args) => {
     // ctx.db.patch('' as Id<'tasks'>, {projectId: '123'})

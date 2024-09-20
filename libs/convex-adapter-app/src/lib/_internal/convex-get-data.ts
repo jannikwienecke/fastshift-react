@@ -126,7 +126,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const idsAfterRemove = allIds.filter((id) => !idsToRemove.includes(id));
 
-    log('idsAfterRemove', idsAfterRemove, { hasAnyFilterSet });
+    log('idsAfterRemove: ', idsAfterRemove.length);
 
     const rowsBeforeFilter = hasAnyFilterSet
       ? await getRecordsByIds(idsAfterRemove, dbQuery)
