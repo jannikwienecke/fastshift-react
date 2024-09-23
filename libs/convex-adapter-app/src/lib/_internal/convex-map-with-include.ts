@@ -1,21 +1,38 @@
 import {
+  BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   FieldConfig,
+  getViewByName,
   QueryServerProps,
+  RegisteredViews,
 } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
 import { queryClient } from './convex-client';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
 
+const cachedWarnings = new Map<string, boolean>();
+const logWarningNoIndex = (fieldName: string, tableName: string) => {
+  const key = `${fieldName}-${tableName}`;
+  if (cachedWarnings.has(key)) {
+    return;
+  }
+  cachedWarnings.set(key, true);
+  console.warn(
+    `CAUTION: Querying without index. Consider setting an index for field "${fieldName}" in table "${tableName}"`
+  );
+};
+
 export const mapWithInclude = async (
   rows: ConvexRecord[],
   ctx: GenericQueryCtx,
   args: QueryServerProps
 ) => {
-  const { viewConfigManager } = args;
+  const { viewConfigManager, registeredViews } = args;
   const include = viewConfigManager.getIncludeFields();
+
+  cachedWarnings.clear();
 
   return await asyncMap(rows, async (recordWithoutRelations) => {
     const extendedRecord = await include.reduce(async (acc, key) => {
@@ -32,6 +49,7 @@ export const mapWithInclude = async (
         viewConfigManager,
         ctx,
         recordWithoutRelations,
+        registeredViews,
       };
 
       try {
@@ -45,9 +63,9 @@ export const mapWithInclude = async (
         const invalidIndex = String(error).toLowerCase().includes('index');
         if (invalidIndex) {
           throw new Error(
-            `Please use the field name as the index name. ${error} ${JSON.stringify(
-              field.relation
-            )}`
+            `Please define an index for the field ${
+              field.name
+            }. ${error} ${JSON.stringify(field.relation)}`
           );
         } else {
           throw error;
@@ -64,6 +82,7 @@ type HelperProps = {
   viewConfigManager: BaseViewConfigManagerInterface;
   ctx: GenericQueryCtx;
   recordWithoutRelations: ConvexRecord;
+  registeredViews: RegisteredViews;
 };
 
 export const handleIncludeField = (props: HelperProps) => {
@@ -95,10 +114,21 @@ export const handleIncludeField = (props: HelperProps) => {
 };
 
 export const getOneToManyRecords = async (props: HelperProps) => {
-  const { field, viewConfigManager, ctx, recordWithoutRelations } = props;
+  const {
+    field,
+    viewConfigManager,
+    ctx,
+    recordWithoutRelations,
+    registeredViews,
+  } = props;
 
   if (!field.relation) return [];
+  const viewOfField = getViewByName(registeredViews, field.relation.tableName);
+  const indexFieldsOfField = new BaseViewConfigManager(
+    viewOfField
+  ).getIndexFields();
 
+  const client = queryClient(ctx, field.relation.tableName);
   const fieldNameOfTable = field.relation.manyToManyModelFields?.find(
     (f) => f.name === viewConfigManager.getTableName()
   )?.relation?.fieldName;
@@ -107,13 +137,24 @@ export const getOneToManyRecords = async (props: HelperProps) => {
     throw new Error('Field name of table not found');
   }
 
-  const client = queryClient(ctx, field.relation.tableName);
+  const indexField = indexFieldsOfField.find(
+    (f) => f.fields?.[0] === fieldNameOfTable
+  );
 
-  const records = await client
-    .withIndex(fieldNameOfTable, (q) =>
-      q.eq(fieldNameOfTable, recordWithoutRelations['_id'])
-    )
-    .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  let records: ConvexRecord[] = [];
+  if (indexField) {
+    records = await client
+      .withIndex(indexField.name, (q) =>
+        q.eq(indexField.fields?.[0], recordWithoutRelations['_id'])
+      )
+      .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  } else {
+    logWarningNoIndex(fieldNameOfTable, field.relation.tableName);
+    const allRecordsOfTable = await client.collect();
+    records = allRecordsOfTable.filter(
+      (r) => r[fieldNameOfTable] === recordWithoutRelations['_id']
+    );
+  }
 
   return records.map((record) => {
     return {
@@ -124,12 +165,26 @@ export const getOneToManyRecords = async (props: HelperProps) => {
 };
 
 export const getManyToManyRecords = async (props: HelperProps) => {
-  const { field, viewConfigManager, ctx, recordWithoutRelations } = props;
+  const {
+    field,
+    viewConfigManager,
+    ctx,
+    recordWithoutRelations,
+    registeredViews,
+  } = props;
   // handle many to many
   // like: Tasks has Many tags <-> Tags has Many Tasks
   // we have a tasks_tags table
   // query the table with the task id
   if (!field.relation?.manyToManyTable) return [];
+
+  const viewOfField = getViewByName(
+    registeredViews,
+    field.relation.manyToManyTable
+  );
+  const indexFieldsOfField = new BaseViewConfigManager(
+    viewOfField
+  ).getIndexFields();
 
   const fieldNameManyToMany = field.relation.manyToManyModelFields?.find(
     (f) => f.name === viewConfigManager.getTableName()
@@ -143,13 +198,27 @@ export const getManyToManyRecords = async (props: HelperProps) => {
     throw new Error('Many to many field name not found');
   }
 
+  const indexField = indexFieldsOfField.find(
+    (f) => f.fields?.[0] === fieldNameManyToMany
+  );
+
   const client = queryClient(ctx, field.relation.manyToManyTable);
 
-  let records = await client
-    .withIndex(fieldNameManyToMany, (q) =>
-      q.eq(fieldNameManyToMany, recordWithoutRelations._id)
-    )
-    .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  let records: ConvexRecord[] = [];
+  if (indexField) {
+    records = await client
+      .withIndex(indexField.name, (q) =>
+        q.eq(indexField.fields?.[0], recordWithoutRelations._id)
+      )
+      .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  } else {
+    logWarningNoIndex(fieldNameManyToMany, field.relation.manyToManyTable);
+
+    const allRecordsOfTable = await client.collect();
+    records = allRecordsOfTable.filter(
+      (r) => r[fieldNameManyToMany] === recordWithoutRelations._id
+    );
+  }
 
   if (records.length) {
     records = await asyncMap(records, async (manyToManyValue) => {
