@@ -3,12 +3,20 @@ import {
   InputDialogValueDict,
   useInputDialogStore,
 } from './input-dialog.store';
+import React from 'react';
 
 export const useInputDialogAdapter = (props: {
   onSave: (valueDict: InputDialogValueDict) => void;
   onCancel?: () => void;
+  defaultValue?: string;
 }): (() => InputDialogProps) => {
   const { state, updateValue, close } = useInputDialogStore();
+
+  React.useEffect(() => {
+    if (props.defaultValue && state.field?.name) {
+      updateValue({ name: state.field.name, value: props.defaultValue });
+    }
+  }, [props.defaultValue, state.field?.name, updateValue]);
 
   return () => {
     return {

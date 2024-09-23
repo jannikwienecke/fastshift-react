@@ -70,11 +70,13 @@ const Task = () => {
     propsForCombobox,
     handleSelectValue,
     handleEnterValueFromInputDialog,
+    activeFilterValue,
   } = useFilterStore();
 
   const getInputDialogProps = useInputDialogAdapter({
     onSave: handleEnterValueFromInputDialog,
     onCancel: closeAll,
+    defaultValue: activeFilterValue,
   });
 
   const getFilterProps = useFilterAdapter({

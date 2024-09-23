@@ -146,8 +146,17 @@ export const useFilterStore = () => {
 
   const handleEnterValueFromInputDialog = useSetAtom(handleEnterValueAtom);
 
+  const activeFilter = filter.fitlers.find(
+    (f) => f.field.name === props.filterState.selectedField?.name
+  );
+
+  const activeFilterValue =
+    activeFilter?.type === 'primitive' ? activeFilter.value.raw : undefined;
+
   return {
     setFilter,
+    activeFilterValue,
+    activeFilter,
     removeFilter,
     filter,
     selected,
