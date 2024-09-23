@@ -34,6 +34,10 @@ export const handleRelationalTableQuery = async ({
   const searchFields = relationalViewManager.getSearchableFields() || [];
 
   const fetch = async () => {
+    if (!args.query) {
+      return await dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+    }
+
     if (searchFields.length && args.query) {
       return await withSearch(dbQuery, {
         searchFields,
