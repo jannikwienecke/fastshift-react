@@ -28,14 +28,13 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     console.log('___: ', ...args);
   };
 
-  const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
-
   const _indexFields = viewConfigManager.getIndexFields();
   const _searchFields = viewConfigManager.getSearchableFields();
 
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   const {
+    filtersWithoutIndexOrSearchField,
     oneToManyFilters,
     manyToManyFilters,
     hasOneToManyFilter,
@@ -47,10 +46,16 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   } = getFilterTypes(filters, _searchFields, _indexFields);
 
   const isIndexSearch = filtersWithIndexField?.find(
-    (f) => f.operator.label === 'contains'
+    ({ operator }) =>
+      operator.label === 'contains' ||
+      operator.label === 'is' ||
+      operator.label === 'is any of'
   );
   const isSearchFieldSearch = filtersWithSearchField?.find(
-    (f) => f.operator.label === 'contains'
+    ({ operator }) =>
+      operator.label === 'contains' ||
+      operator.label === 'is' ||
+      operator.label === 'is any of'
   );
 
   const {
@@ -106,6 +111,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   );
 
   const fetch = async (multiple?: number) => {
+    const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
+
     const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
 
     const getAll = () => {
@@ -114,16 +121,21 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       );
       return dbQuery.collect();
     };
+
+    const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
+
     const rowsBeforeFilter =
       allIds !== null
         ? await getRecordsByIds(idsAfterRemove ?? [], dbQuery)
-        : await getAll();
+        : anyFilter
+        ? await getAll()
+        : await dbQuery.take(DEFAULT_FETCH_LIMIT_QUERY);
 
     const r = await filterResults(
       rowsBeforeFilter,
       displayField,
       args.query,
-      filters,
+      filtersWithoutIndexOrSearchField,
       searchFields
     );
 
@@ -133,6 +145,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const rows: ConvexRecord[] = [];
 
   const newRows = await fetch();
+
   const filtered = newRows.filter(
     (r) =>
       !idsToRemove.includes(r._id) && !rows.map((r) => r._id).includes(r._id)
@@ -148,3 +161,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   return parseConvexData(rawData);
 };
+
+// TODO: IN THE VIEW LOADER / VIEW MUTATIONS
+// HANDLE INDEXES CORRECTLY. Currently we just use the name of the field

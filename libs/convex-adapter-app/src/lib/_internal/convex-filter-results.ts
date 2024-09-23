@@ -60,6 +60,7 @@ export const filterResults = (
 
   const filterEnumFilters = (row: ConvexRecord) => {
     if (!enumFilters.length) return true;
+
     return enumFilters.every((filter) => {
       const value = row[filter.field.name];
       const is =

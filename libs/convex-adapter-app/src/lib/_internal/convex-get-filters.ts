@@ -98,6 +98,7 @@ export const getFilterTypes = (
   );
 
   return {
+    filtersWithoutIndexOrSearchField: _filters,
     filtersWithIndexField,
     filtersWithSearchField,
     indexFields,
@@ -105,9 +106,9 @@ export const getFilterTypes = (
     primitiveFilters: getPrimitiveFilters(_filters),
     oneToManyFilters: getRelationalFilters(_filters),
     manyToManyFilters: getManyToManyFilters(_filters),
-    enumFilters: getEnumFilters(filters),
-    hasOneToManyFilter: getHasOneToManyFilter(filters),
-    hasManyToManyFilter: getHasManyToManyFilter(filters),
+    enumFilters: getEnumFilters(_filters),
+    hasOneToManyFilter: getHasOneToManyFilter(_filters),
+    hasManyToManyFilter: getHasManyToManyFilter(_filters),
     stringFilters: getStringFilters(_filters),
   };
 };

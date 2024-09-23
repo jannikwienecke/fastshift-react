@@ -160,15 +160,26 @@ export const getIdsFromIndexFilters = async (
       if (!indexField) return [];
 
       const value = filterUtil().getValue(currentIndexFilter);
-      const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
+      const _values = filterUtil()
+        .getValues(currentIndexFilter)
+        .map((v) => v.raw);
+      const values = _values.length ? _values : [value];
 
-      const rows = await dbQuery
-        .withIndex(indexField.name, (q) =>
-          q.eq(indexField.field.toString(), value)
-        )
-        .collect();
+      const idsList = await asyncMap(values, async (value) => {
+        const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
 
-      const ids = rows.map((r) => r._id);
+        const rows = await dbQuery
+          .withIndex(indexField.name, (q) =>
+            q.eq(indexField.field.toString(), value)
+          )
+          .collect();
+
+        const ids = rows.map((r) => r._id);
+
+        return ids;
+      });
+
+      const ids = idsList.flat();
 
       if (currentIndexFilter.operator.label === 'does not contain') {
         idsIndexFieldToRemove.push(...ids);
