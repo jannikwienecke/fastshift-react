@@ -31,7 +31,7 @@ const _schema = defineSchema({
       searchField: 'name',
     })
     // .index('description', ['description'])
-    .index('subtitle', ['subtitle'])
+    // .index('subtitle', ['subtitle'])
 
     .searchIndex('description_search', {
       searchField: 'description',

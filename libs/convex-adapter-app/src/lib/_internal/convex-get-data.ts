@@ -36,13 +36,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   const {
-    primitiveFilters,
     oneToManyFilters,
     manyToManyFilters,
-    enumFilters,
     hasOneToManyFilter,
     hasManyToManyFilter,
-    stringFilters,
     filtersWithIndexField,
     filtersWithSearchField,
     searchFields,
@@ -91,28 +88,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
-  // HIER WEITER MACHEN
-  // for enum filters & primitive filters
-  // we do a regular filter after we fetched the rows (like the string filters)
-  // since the dbQuery.filter is the same
-  // then: check if it works if we set a index for the enum filters
-
-  // dbQuery = withEnumFilters(
-  //   enumFilters,
-  //   withPrimitiveFilters(primitiveFilters, dbQuery)
-  // );
-
-  // const idsSearchAndFilter =
-  //   enumFilters.length || primitiveFilters.length
-  //     ? (await queryWithSearchAndFilter.collect())
-  //         .map((row) => row._id)
-  //         .filter((a) => a !== undefined)
-  //     : [];
-
   const allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
     hasOneToManyFilter ? idsOneToManyFilters : null,
-    // idsSearchAndFilter.length ? idsSearchAndFilter : null,
     isIndexSearch ? idsIndexField : null,
     isSearchFieldSearch ? idsSearchField : null,
     args.query ? idsQuerySearch : null
@@ -145,7 +123,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       rowsBeforeFilter,
       displayField,
       args.query,
-      stringFilters,
+      filters,
       searchFields
     );
 

@@ -46,9 +46,16 @@ export const filterUtil = () => {
     return value;
   };
 
+  const getValues = (filter: FilterType) => {
+    const value = filter?.type === 'relation' ? filter.values : [];
+
+    return value;
+  };
+
   return {
     create: from,
     update,
     getValue,
+    getValues,
   };
 };
