@@ -1,15 +1,19 @@
 import {
+  BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   FieldConfig,
+  getViewByName,
   ManyToManyMutationProps,
   MutationPropsServer,
+  RegisteredViews,
 } from '@apps-next/core';
 import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
 import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx, GenericQueryCtx } from './convex.server.types';
 import { mutationClient, queryClient } from './convex-client';
-import { ID } from './types.convex';
+import { ConvexRecord, ID } from './types.convex';
 import { toUnicode } from 'punycode';
+import { getRelationTableRecords } from './convex-get-relation-table-records';
 
 export const createMutation = async (
   ctx: ConvexContext,
@@ -110,7 +114,7 @@ export const mutationHandlers: MUTATION_HANDLER_CONVEX = {
 // TODO refactor this whole function -> split into oneToMany and manyToMany
 export const updateManyToManyMutation = async (
   ctx: GenericMutationCtx,
-  { viewConfigManager, mutation }: MutationPropsServer,
+  { viewConfigManager, mutation, registeredViews }: MutationPropsServer,
   manyToManyRelations: ManyToManyMutationProps[]
 ) => {
   const { id } = mutation.payload;
@@ -124,7 +128,11 @@ export const updateManyToManyMutation = async (
     let toDeleteIds: ID[] = [];
 
     const { allIds: allExistingIds, allExistingRelationIds } =
-      await getExistingIds(ctx, { viewConfigManager, mutation }, relation);
+      await getExistingIds(
+        ctx,
+        { viewConfigManager, mutation, registeredViews },
+        relation
+      );
 
     const idsToCompare = allExistingRelationIds.length
       ? allExistingRelationIds
@@ -157,17 +165,20 @@ export const updateManyToManyMutation = async (
 
 export const getExistingIds = async (
   ctx: GenericQueryCtx,
-  { viewConfigManager, mutation }: MutationPropsServer,
+  { viewConfigManager, mutation, registeredViews }: MutationPropsServer,
   relation: ManyToManyMutationProps
 ) => {
   const { id } = mutation.payload;
   const tableFieldName = getTableFieldName(relation, viewConfigManager);
-  const relationTableClient = queryClient(ctx, relation.manyToManyTable);
   const relationTableFieldName = getRelationTableFieldName(relation);
 
-  const allExisting = await relationTableClient
-    .withIndex(tableFieldName, (q) => q.eq(tableFieldName, id))
-    .collect();
+  const allExisting = await getRelationTableRecords({
+    registeredViews,
+    id,
+    relation: relation.manyToManyTable,
+    fieldName: tableFieldName,
+    ctx,
+  });
 
   const allExistingRelationIds = allExisting
     .map((v) => v?.[relationTableFieldName ?? ''])

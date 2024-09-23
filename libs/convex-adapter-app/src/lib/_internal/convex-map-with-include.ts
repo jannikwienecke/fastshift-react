@@ -11,18 +11,7 @@ import { asyncMap } from 'convex-helpers';
 import { queryClient } from './convex-client';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
-
-const cachedWarnings = new Map<string, boolean>();
-const logWarningNoIndex = (fieldName: string, tableName: string) => {
-  const key = `${fieldName}-${tableName}`;
-  if (cachedWarnings.has(key)) {
-    return;
-  }
-  cachedWarnings.set(key, true);
-  console.warn(
-    `CAUTION: Querying without index. Consider setting an index for field "${fieldName}" in table "${tableName}"`
-  );
-};
+import { getRelationTableRecords } from './convex-get-relation-table-records';
 
 export const mapWithInclude = async (
   rows: ConvexRecord[],
@@ -31,8 +20,6 @@ export const mapWithInclude = async (
 ) => {
   const { viewConfigManager, registeredViews } = args;
   const include = viewConfigManager.getIncludeFields();
-
-  cachedWarnings.clear();
 
   return await asyncMap(rows, async (recordWithoutRelations) => {
     const extendedRecord = await include.reduce(async (acc, key) => {
@@ -123,12 +110,7 @@ export const getOneToManyRecords = async (props: HelperProps) => {
   } = props;
 
   if (!field.relation) return [];
-  const viewOfField = getViewByName(registeredViews, field.relation.tableName);
-  const indexFieldsOfField = new BaseViewConfigManager(
-    viewOfField
-  ).getIndexFields();
 
-  const client = queryClient(ctx, field.relation.tableName);
   const fieldNameOfTable = field.relation.manyToManyModelFields?.find(
     (f) => f.name === viewConfigManager.getTableName()
   )?.relation?.fieldName;
@@ -137,24 +119,13 @@ export const getOneToManyRecords = async (props: HelperProps) => {
     throw new Error('Field name of table not found');
   }
 
-  const indexField = indexFieldsOfField.find(
-    (f) => f.fields?.[0] === fieldNameOfTable
-  );
-
-  let records: ConvexRecord[] = [];
-  if (indexField) {
-    records = await client
-      .withIndex(indexField.name, (q) =>
-        q.eq(indexField.fields?.[0], recordWithoutRelations['_id'])
-      )
-      .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
-  } else {
-    logWarningNoIndex(fieldNameOfTable, field.relation.tableName);
-    const allRecordsOfTable = await client.collect();
-    records = allRecordsOfTable.filter(
-      (r) => r[fieldNameOfTable] === recordWithoutRelations['_id']
-    );
-  }
+  const records = await getRelationTableRecords({
+    registeredViews,
+    ctx,
+    fieldName: fieldNameOfTable,
+    relation: field.relation.tableName,
+    id: recordWithoutRelations['_id'],
+  });
 
   return records.map((record) => {
     return {
@@ -178,14 +149,6 @@ export const getManyToManyRecords = async (props: HelperProps) => {
   // query the table with the task id
   if (!field.relation?.manyToManyTable) return [];
 
-  const viewOfField = getViewByName(
-    registeredViews,
-    field.relation.manyToManyTable
-  );
-  const indexFieldsOfField = new BaseViewConfigManager(
-    viewOfField
-  ).getIndexFields();
-
   const fieldNameManyToMany = field.relation.manyToManyModelFields?.find(
     (f) => f.name === viewConfigManager.getTableName()
   )?.relation?.fieldName;
@@ -198,27 +161,13 @@ export const getManyToManyRecords = async (props: HelperProps) => {
     throw new Error('Many to many field name not found');
   }
 
-  const indexField = indexFieldsOfField.find(
-    (f) => f.fields?.[0] === fieldNameManyToMany
-  );
-
-  const client = queryClient(ctx, field.relation.manyToManyTable);
-
-  let records: ConvexRecord[] = [];
-  if (indexField) {
-    records = await client
-      .withIndex(indexField.name, (q) =>
-        q.eq(indexField.fields?.[0], recordWithoutRelations._id)
-      )
-      .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
-  } else {
-    logWarningNoIndex(fieldNameManyToMany, field.relation.manyToManyTable);
-
-    const allRecordsOfTable = await client.collect();
-    records = allRecordsOfTable.filter(
-      (r) => r[fieldNameManyToMany] === recordWithoutRelations._id
-    );
-  }
+  let records = await getRelationTableRecords({
+    registeredViews,
+    ctx,
+    fieldName: fieldNameManyToMany,
+    relation: field.relation.manyToManyTable,
+    id: recordWithoutRelations['_id'],
+  });
 
   if (records.length) {
     records = await asyncMap(records, async (manyToManyValue) => {
