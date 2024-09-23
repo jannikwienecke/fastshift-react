@@ -15,6 +15,7 @@ const fieldTypeMapping: PrismaFieldTypeMapping = {
   Boolean: 'Boolean',
   Int: 'Number',
   Enum: 'Enum',
+  Number: 'Number',
 };
 
 export const schemaHelper = (

@@ -117,3 +117,8 @@ export type InputDialogProps = {
     placeholder: string;
   }[];
 };
+
+export type DatePickerProps = {
+  selected: Date | undefined;
+  onSelect: (date: Date) => void;
+};

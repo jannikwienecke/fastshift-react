@@ -10,6 +10,7 @@ const typeMapping: Record<string, string> = {
   id: 'id',
   enum: 'enum',
   union: 'union',
+  float64: 'Number',
 };
 function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
   schema: T
