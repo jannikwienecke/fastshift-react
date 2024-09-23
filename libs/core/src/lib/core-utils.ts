@@ -134,8 +134,9 @@ export const parseFilterStringForServer = (
     .filter(Boolean) as FilterType[];
 };
 
-export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] {
-  if (arrays.length === 0) return [];
+export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] | null {
+  if (arrays.filter((a) => a != null).length === 0) return null;
+
   const allIds = [...new Set(arrays.filter((a) => a != null).flat())];
 
   const result = allIds.filter((value) => {

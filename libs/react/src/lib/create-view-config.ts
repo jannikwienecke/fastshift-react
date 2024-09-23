@@ -14,6 +14,7 @@ export function createViewConfig<T extends GetTableName>(
 ) {
   // Clean Up -> Duplicate code in ViewProvider
   const searchableFields = globalConfig.searchableFields[tableName as string];
+  const indexFields = globalConfig.indexFields[tableName as string];
   const viewFields = globalConfig.viewFields[tableName as string];
   const includeFieldsDefault = globalConfig.includeFields[tableName as string];
   const viewName = config.viewName ?? (tableName as string);
@@ -35,6 +36,7 @@ export function createViewConfig<T extends GetTableName>(
     viewName,
     query: {
       searchableFields: searchableFields,
+      indexFields: indexFields,
       ...config.query,
     },
   };

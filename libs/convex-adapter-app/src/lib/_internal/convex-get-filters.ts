@@ -1,4 +1,9 @@
-import { FilterType, SearchableField } from '@apps-next/core';
+import { FilterType, IndexField, SearchableField } from '@apps-next/core';
+
+export type SearchField = {
+  field: string | symbol | number;
+  name: string;
+};
 
 export const getManyToManyFilters = (filters: FilterType[]) =>
   filters?.filter((f) => f.field.relation?.manyToManyTable) ?? [];
@@ -18,10 +23,14 @@ export const getPrimitiveFilters = (filters: FilterType[]) =>
       (f.field.type === 'Boolean' || f.field.type === 'Number')
   );
 
-export const getFilterWithSearchField = (
+export const getFiltersWithIndexOrSearchField = (
   filters: FilterType[],
-  searchField: SearchableField | undefined
-) => filters.find((f) => searchField?.field === f.field.name);
+  searchFields: SearchField[] | undefined
+) => {
+  return filters.filter((f) =>
+    searchFields?.find((s) => s.field === f.field.name)
+  );
+};
 
 export const getEnumFilters = (filters: FilterType[]) =>
   filters.filter((f) => f.type === 'relation' && f.field.enum);
@@ -40,17 +49,13 @@ export const getHasManyToManyFilter = (filters: FilterType[]) =>
     ? true
     : false;
 
-export const getStringFilters = (
-  filters: FilterType[],
-  searchField: SearchableField | undefined
-) =>
-  filters
-    .filter((f) => f.field.type === 'String')
-    .filter((f) => f.field.name !== searchField?.field);
+export const getStringFilters = (filters: FilterType[]) =>
+  filters.filter((f) => f.field.type === 'String');
 
 export const getFilterTypes = (
   filters: FilterType[] | undefined,
-  searchField: SearchableField | undefined
+  _searchFields: SearchableField[] | undefined,
+  _indexFields: IndexField[] | undefined
 ) => {
   if (!filters)
     return {
@@ -64,18 +69,45 @@ export const getFilterTypes = (
       stringFilters: [],
     };
 
-  const filterWithSearchField = getFilterWithSearchField(filters, searchField);
+  const indexFields = _indexFields
+    ?.filter((f) => f.fields.length === 1)
+    .map((f) => ({
+      name: f.name,
+      field: f.fields[0]?.toString(),
+    }));
 
-  const _filters = filters.filter((f) => f.field.name !== searchField?.field);
+  const searchFields = _searchFields?.map((f) => ({
+    name: f.name,
+    field: f.field.toString(),
+  }));
+
+  const filtersWithSearchField = getFiltersWithIndexOrSearchField(
+    filters,
+    searchFields
+  );
+  const filtersWithIndexField = getFiltersWithIndexOrSearchField(
+    filters,
+    indexFields
+  );
+
+  // remove all filter that are either in searchFields or indexFields
+  const _filters = filters.filter(
+    (f) =>
+      !searchFields?.find((s) => s.field === f.field.name) &&
+      !indexFields?.find((i) => i.field === f.field.name)
+  );
 
   return {
-    filterWithSearchField,
+    filtersWithIndexField,
+    filtersWithSearchField,
+    indexFields,
+    searchFields,
     primitiveFilters: getPrimitiveFilters(_filters),
     oneToManyFilters: getRelationalFilters(_filters),
     manyToManyFilters: getManyToManyFilters(_filters),
     enumFilters: getEnumFilters(filters),
     hasOneToManyFilter: getHasOneToManyFilter(filters),
     hasManyToManyFilter: getHasManyToManyFilter(filters),
-    stringFilters: getStringFilters(_filters, searchField),
+    stringFilters: getStringFilters(_filters),
   };
 };

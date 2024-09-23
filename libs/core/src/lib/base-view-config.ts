@@ -2,6 +2,7 @@ import { invarant } from './core-utils';
 import {
   FieldConfig,
   IncludeConfig,
+  IndexField,
   RegisteredViews,
   SearchableField,
   ViewConfigType,
@@ -27,6 +28,7 @@ export interface BaseViewConfigManagerInterface<
   getViewFieldList(): FieldConfig[];
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
+  getIndexFields(): IndexField[];
   getRelationFieldByTableName(tableName: string): FieldConfig;
   getIncludeFields(): IncludeConfig[string];
   getManyToManyField(key: string): FieldConfig | undefined;
@@ -66,6 +68,10 @@ export class BaseViewConfigManager<
 
   getSearchableFields(): SearchableField[] | undefined {
     return this.viewConfig.query?.searchableFields;
+  }
+
+  getIndexFields(): IndexField[] {
+    return this.viewConfig.query?.indexFields ?? [];
   }
 
   getPrimarySearchField() {

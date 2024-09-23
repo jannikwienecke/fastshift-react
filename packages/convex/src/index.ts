@@ -11,7 +11,6 @@ export * from '../convex/_generated/api';
 export * from '../convex/schema';
 
 export const config = createConfigFromConvexSchema(schema);
-
 declare module '@apps-next/core' {
   interface Register {
     config: typeof config;

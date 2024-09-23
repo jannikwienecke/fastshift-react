@@ -1,41 +1,40 @@
-import { FilterType, SearchableField } from '@apps-next/core';
+import { FilterType } from '@apps-next/core';
 import { isEnumNegateOperator } from '@apps-next/react';
+import { asyncMap } from 'convex-helpers';
+import { SearchField } from './convex-get-filters';
 import { queryBuilder } from './convex-operators';
-import { ConvexClient, SearchFilterBuilder } from './types.convex';
+import {
+  ConvexClient,
+  ConvexRecord,
+  SearchFilterBuilder,
+} from './types.convex';
 
-export const withSearch = (
+export const withSearch = async (
   dbQuery: ConvexClient[string],
   {
-    searchField,
+    searchFields,
     query,
-    filterWithSearch,
   }: {
-    searchField?: SearchableField;
-    query?: string;
-    filterWithSearch?: FilterType;
+    searchFields: SearchField[];
+    query: string;
   }
-): ConvexClient[string] => {
-  if ((!searchField || !query) && !filterWithSearch) return dbQuery;
-  // if (!searchField) return dbQuery.order('desc');
+): Promise<ConvexRecord[]> => {
+  const rowsList = await asyncMap(searchFields, async (searchField) => {
+    const rows = await dbQuery
+      .withSearchIndex(searchField.name, (q) =>
+        q.search(searchField.field.toString(), query ?? '')
+      )
+      .collect();
 
-  // if (!query) return dbQuery.order('desc');
+    return rows;
+  });
 
-  if (!searchField) return dbQuery;
-  if (query) {
-    if (!searchField) return dbQuery;
+  const rows = rowsList.flat();
+  const uniqueIds = [...new Set(rows.map((r) => r._id))];
 
-    return dbQuery.withSearchIndex(searchField.name, (q) =>
-      q.search(searchField.field.toString(), query ?? '')
-    );
-  }
-
-  const value =
-    filterWithSearch?.type === 'primitive' ? filterWithSearch.value.raw : '';
-  if (!value) return dbQuery;
-
-  return dbQuery.withSearchIndex(searchField.name, (q) =>
-    q.search(searchField.field.toString(), value)
-  );
+  return uniqueIds
+    .map((id) => rows.find((r) => r._id === id))
+    .filter((r) => r !== undefined);
 };
 
 export const withPrimitiveFilters = (

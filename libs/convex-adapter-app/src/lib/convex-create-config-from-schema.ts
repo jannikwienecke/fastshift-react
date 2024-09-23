@@ -9,7 +9,10 @@ import {
 import { Infer } from 'convex/values';
 import { ConvexSchemaType } from './_internal/types.convex';
 import { parseConvexSchemaToModelSchema } from './convex-normalize-schema';
-import { generateSearchableFieldsFromConvexSchema } from './convex-searchable-fields';
+import {
+  generateIndexFieldsFromConvexSchema,
+  generateSearchableFieldsFromConvexSchema,
+} from './convex-searchable-fields';
 
 export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   schema: T
@@ -22,6 +25,8 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   const searchableFields = generateSearchableFieldsFromConvexSchema(
     schema.tables
   );
+
+  const indexFields = generateIndexFieldsFromConvexSchema(schema.tables);
 
   const viewFields = generateViewFields(normalizedSchema);
   const includeFields = generateIncludeFields(normalizedSchema);
@@ -37,6 +42,7 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
     _datamodel: {} as T,
     includeFields,
     searchableFields,
+    indexFields,
     viewFields,
     dataModel: normalizedSchema,
     defaultViewConfigs: {},

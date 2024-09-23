@@ -43,6 +43,9 @@ export const deleteMutation = server.mutation({
     const tagIds = ['123', '456'];
     const tasks = await ctx.db
       .query('tasks')
+      // .withIndex('description', q => q.eq('description', '123'))
+      // .withSearchIndex('name_search', (q) => q.search('name', '123'))
+
       .filter((q) =>
         q.and(
           q.or(

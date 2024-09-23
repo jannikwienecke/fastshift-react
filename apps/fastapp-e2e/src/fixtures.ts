@@ -2,10 +2,12 @@ import { test as base } from '@playwright/test';
 // eslint-disable-next-line
 import { main } from 'apps/nextjs/prisma/seed';
 import { seedDatabase } from './helpers/db-seed';
+import { TaskPage } from './task-page';
 // eslint-disable-next-line
 
 type Fixtures = {
   seedDatabase: () => Promise<void>;
+  taskPage: TaskPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -39,6 +41,11 @@ export const test = base.extend<Fixtures>({
     },
     { auto: true },
   ], // Setting auto: true makes this fixture run for every test
+
+  taskPage: async ({ page }, use) => {
+    const taskPage = new TaskPage(page);
+    await use(taskPage);
+  },
 });
 
 export { expect } from '@playwright/test';

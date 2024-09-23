@@ -4,11 +4,12 @@ import {
   FilterType,
   ID,
 } from '@apps-next/core';
+import { filterUtil, isRelationNegateOperator } from '@apps-next/react';
 import { asyncMap } from 'convex-helpers';
 import { queryClient } from './convex-client';
+import { SearchField } from './convex-get-filters';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexClient } from './types.convex';
-import { isRelationNegateOperator } from '@apps-next/react';
 /*
   Get records by ids
   @param ids
@@ -137,4 +138,119 @@ export const getIdsFromOneToManyFilters = async (
     ids: [...new Set(listOfIds.flat())],
     idsToRemove: [...new Set(idsToRemove)],
   };
+};
+
+export const getIdsFromIndexFilters = async (
+  filtersWithIndexField: FilterType[] | undefined,
+  indexFields: SearchField[] | undefined,
+  ctx: GenericQueryCtx,
+  viewConfigManager: BaseViewConfigManagerInterface
+) => {
+  if (!indexFields) return { ids: [], idsToRemove: [] };
+
+  const idsIndexFieldToRemove: ID[] = [];
+
+  const idsIndexField = await asyncMap(
+    filtersWithIndexField ?? [],
+    async (currentIndexFilter) => {
+      const indexField = indexFields.find(
+        (f) => f.field === currentIndexFilter.field.name
+      );
+
+      if (!indexField) return [];
+
+      const value = filterUtil().getValue(currentIndexFilter);
+      const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
+
+      const rows = await dbQuery
+        .withIndex(indexField.name, (q) =>
+          q.eq(indexField.field.toString(), value)
+        )
+        .collect();
+
+      const ids = rows.map((r) => r._id);
+
+      if (currentIndexFilter.operator.label === 'does not contain') {
+        idsIndexFieldToRemove.push(...ids);
+        return [];
+      }
+
+      return ids;
+    }
+  );
+
+  return {
+    ids: [...new Set(idsIndexField.flat())],
+    idsToRemove: [...new Set(idsIndexFieldToRemove)],
+  };
+};
+
+export const getIdsFromSearchFilters = async (
+  filters: FilterType[] | undefined,
+  searchFields: SearchField[] | undefined,
+  ctx: GenericQueryCtx,
+  viewConfigManager: BaseViewConfigManagerInterface
+) => {
+  if (!searchFields) return { ids: [], idsToRemove: [] };
+
+  const idsIndexFieldToRemove: ID[] = [];
+
+  const idsIndexField = await asyncMap(filters ?? [], async (currentFilter) => {
+    const searchField = searchFields.find(
+      (f) => f.field === currentFilter.field.name
+    );
+
+    if (!searchField) return [];
+
+    const value = filterUtil().getValue(currentFilter);
+    const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
+
+    const rows = await dbQuery
+      .withSearchIndex(searchField.name, (q) =>
+        q.search(searchField.field.toString(), value)
+      )
+      .collect();
+
+    const ids = rows.map((r) => r._id);
+
+    if (currentFilter.operator.label === 'does not contain') {
+      idsIndexFieldToRemove.push(...ids);
+      return [];
+    }
+
+    return ids;
+  });
+
+  return {
+    ids: [...new Set(idsIndexField.flat())],
+    idsToRemove: [...new Set(idsIndexFieldToRemove)],
+  };
+};
+
+export const getIdsFromQuerySearch = async (
+  query: string | undefined,
+  searchFields: SearchField[] | undefined,
+  ctx: GenericQueryCtx,
+  viewConfigManager: BaseViewConfigManagerInterface
+) => {
+  if (!searchFields || !query) return [];
+
+  const idsIndexField = await asyncMap(
+    searchFields ?? [],
+    async (searchField) => {
+      const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
+
+      const rows = await dbQuery
+        .withSearchIndex(searchField.name, (q) =>
+          q.search(searchField.field.toString(), query)
+        )
+        .collect();
+
+      const ids = rows.map((r) => r._id);
+
+      return ids;
+    }
+  );
+
+  return [...new Set(idsIndexField.flat())];
 };

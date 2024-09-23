@@ -34,6 +34,9 @@ export const useFilterAdapter = (props?: {
 
   const comboboxProps = {
     ...filterState,
+    values: filterState.query.length
+      ? filterState.filteredValues
+      : filterState.values,
     name: 'filter',
     multiple: false,
     searchable: true,

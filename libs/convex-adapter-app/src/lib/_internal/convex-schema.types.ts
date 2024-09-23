@@ -25,8 +25,13 @@ export type ConvexSearchIndex = {
   filterFields: string[];
 };
 
+export type ConvexIndex = {
+  fields: string[];
+  indexDescriptor: string;
+};
+
 export type ConvexTable = {
-  indexes: unknown[];
+  indexes: ConvexIndex[];
   searchIndexes: ConvexSearchIndex[];
   vectorIndexes: unknown[];
   validator: ConvexTableValidator;

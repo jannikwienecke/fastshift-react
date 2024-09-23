@@ -2,6 +2,7 @@ import {
   FieldConfig,
   GetTableDataType,
   GetTableName,
+  IndexField,
   SearchableField,
 } from './base.types';
 import { IncludeConfig } from './config.types';
@@ -28,6 +29,7 @@ export type ViewConfigType<T extends GetTableName = any> =
     };
     query?: {
       searchableFields?: SearchableField[];
+      indexFields?: IndexField[];
       primarySearchField?: keyof GetTableDataType<T>;
     };
     loader?: {

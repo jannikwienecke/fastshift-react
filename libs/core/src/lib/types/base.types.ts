@@ -74,6 +74,11 @@ export type SearchableField<TDataModel extends Record<string, any> = any> = {
   filterFields: GetFieldName<TDataModel>[];
 };
 
+export type IndexField<TDataModel extends Record<string, any> = any> = {
+  fields: GetFieldName<TDataModel>[];
+  name: string;
+};
+
 export type GlobalConfig = {
   provider: DataProvider;
   config: BaseConfigInterface;

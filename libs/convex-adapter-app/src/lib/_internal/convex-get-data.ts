@@ -7,16 +7,14 @@ import { queryClient } from './convex-client';
 import { filterResults } from './convex-filter-results';
 import { getFilterTypes } from './convex-get-filters';
 import {
+  getIdsFromIndexFilters,
   getIdsFromManyToManyFilters,
   getIdsFromOneToManyFilters,
+  getIdsFromQuerySearch,
+  getIdsFromSearchFilters,
   getRecordsByIds,
 } from './convex-get-ids-from';
 import { mapWithInclude } from './convex-map-with-include';
-import {
-  withEnumFilters,
-  withPrimitiveFilters,
-  withSearch,
-} from './convex-searching';
 import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
@@ -32,20 +30,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
 
-  const searchFields = viewConfigManager.getSearchableFields();
-  const primarySearchField = viewConfigManager.getPrimarySearchField();
-
-  // TODO: REFACTOR THIS PART
-  const filtersWithSearchField = filters?.filter((f) =>
-    searchFields?.map((f) => f.field).includes(f.field.name)
-  );
-
-  const searchField =
-    filtersWithSearchField?.length === 1
-      ? searchFields?.find(
-          (f) => f.field === filtersWithSearchField[0].field.name
-        )
-      : searchFields?.find((f) => f.field === primarySearchField);
+  const _indexFields = viewConfigManager.getIndexFields();
+  const _searchFields = viewConfigManager.getSearchableFields();
 
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
@@ -53,12 +39,22 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     primitiveFilters,
     oneToManyFilters,
     manyToManyFilters,
-    filterWithSearchField,
     enumFilters,
     hasOneToManyFilter,
     hasManyToManyFilter,
     stringFilters,
-  } = getFilterTypes(filters, searchField);
+    filtersWithIndexField,
+    filtersWithSearchField,
+    searchFields,
+    indexFields,
+  } = getFilterTypes(filters, _searchFields, _indexFields);
+
+  const isIndexSearch = filtersWithIndexField?.find(
+    (f) => f.operator.label === 'contains'
+  );
+  const isSearchFieldSearch = filtersWithSearchField?.find(
+    (f) => f.operator.label === 'contains'
+  );
 
   const {
     ids: idsManyToManyFilters,
@@ -72,101 +68,99 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { ids: idsOneToManyFilters, idsToRemove: idsOneToManyFiltersToRemove } =
     await getIdsFromOneToManyFilters(oneToManyFilters, ctx, viewConfigManager);
 
-  const queryWithSearchAndFilter = withEnumFilters(
-    enumFilters,
-    withPrimitiveFilters(
-      primitiveFilters,
-      withSearch(dbQuery, {
-        searchField,
-        query: args.query,
-        filterWithSearch: filterWithSearchField,
-      })
-    )
+  const { ids: idsIndexField, idsToRemove: idsIndexFieldToRemove } =
+    await getIdsFromIndexFilters(
+      filtersWithIndexField,
+      indexFields,
+      ctx,
+      viewConfigManager
+    );
+
+  const { ids: idsSearchField, idsToRemove: idsSearchToRemove } =
+    await getIdsFromSearchFilters(
+      filtersWithSearchField,
+      searchFields,
+      ctx,
+      viewConfigManager
+    );
+
+  const idsQuerySearch = await getIdsFromQuerySearch(
+    args.query,
+    searchFields,
+    ctx,
+    viewConfigManager
   );
 
-  const idsSearchAndFilter =
-    enumFilters.length ||
-    primitiveFilters.length ||
-    args.query ||
-    filterWithSearchField
-      ? (await queryWithSearchAndFilter.collect())
-          .map((row) => row._id)
-          .filter((a) => a !== undefined)
-      : [];
+  // HIER WEITER MACHEN
+  // for enum filters & primitive filters
+  // we do a regular filter after we fetched the rows (like the string filters)
+  // since the dbQuery.filter is the same
+  // then: check if it works if we set a index for the enum filters
+
+  // dbQuery = withEnumFilters(
+  //   enumFilters,
+  //   withPrimitiveFilters(primitiveFilters, dbQuery)
+  // );
+
+  // const idsSearchAndFilter =
+  //   enumFilters.length || primitiveFilters.length
+  //     ? (await queryWithSearchAndFilter.collect())
+  //         .map((row) => row._id)
+  //         .filter((a) => a !== undefined)
+  //     : [];
 
   const allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
     hasOneToManyFilter ? idsOneToManyFilters : null,
-    idsSearchAndFilter.length ? idsSearchAndFilter : null
+    // idsSearchAndFilter.length ? idsSearchAndFilter : null,
+    isIndexSearch ? idsIndexField : null,
+    isSearchFieldSearch ? idsSearchField : null,
+    args.query ? idsQuerySearch : null
   );
-
-  const hasAnyFilterSet =
-    primitiveFilters.length ||
-    args.query ||
-    filterWithSearchField ||
-    hasManyToManyFilter ||
-    hasOneToManyFilter ||
-    enumFilters.length;
 
   const idsToRemove = Array.from(
-    new Set([...idsManyToManyFiltersToRemove, ...idsOneToManyFiltersToRemove])
+    new Set([
+      ...idsManyToManyFiltersToRemove,
+      ...idsOneToManyFiltersToRemove,
+      ...idsSearchToRemove,
+      ...idsIndexFieldToRemove,
+    ])
   );
 
-  let searchAll = false;
   const fetch = async (multiple?: number) => {
-    if (searchAll) {
-      return [];
-    }
+    const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
 
-    searchAll = Boolean(stringFilters?.length || (args.query && !searchField));
+    const getAll = () => {
+      console.warn(
+        'Querying complete table. Use Index or search index if possible.'
+      );
+      return dbQuery.collect();
+    };
+    const rowsBeforeFilter =
+      allIds !== null
+        ? await getRecordsByIds(idsAfterRemove ?? [], dbQuery)
+        : await getAll();
 
-    // TODO: mhhh Thoughts. Continue here.
-    // Do the same with Index as with searchindex
-    // for fields like dueDate or completed
-
-    const idsAfterRemove = allIds.filter((id) => !idsToRemove.includes(id));
-
-    log('idsAfterRemove: ', idsAfterRemove.length);
-
-    const rowsBeforeFilter = hasAnyFilterSet
-      ? await getRecordsByIds(idsAfterRemove, dbQuery)
-      : searchAll
-      ? await dbQuery.collect()
-      : await dbQuery.take(DEFAULT_FETCH_LIMIT_QUERY * (multiple ?? 1));
-
-    log('Rows Before::: ', rowsBeforeFilter.length);
     const r = await filterResults(
       rowsBeforeFilter,
       displayField,
       args.query,
-      searchField,
-      stringFilters
+      stringFilters,
+      searchFields
     );
-
-    log('Rows After::: ', r.length);
 
     return r;
   };
 
   const rows: ConvexRecord[] = [];
 
-  for (let i = 1; i < (hasAnyFilterSet ? 2 : 10); i++) {
-    const newRows = await fetch(i);
-    const filtered = newRows.filter(
-      (r) =>
-        !idsToRemove.includes(r._id) && !rows.map((r) => r._id).includes(r._id)
-    );
+  const newRows = await fetch();
+  const filtered = newRows.filter(
+    (r) =>
+      !idsToRemove.includes(r._id) && !rows.map((r) => r._id).includes(r._id)
+  );
 
-    rows.push(...filtered);
-
-    if (
-      rows.length >= DEFAULT_FETCH_LIMIT_QUERY ||
-      filtered.length === 0 ||
-      newRows.length === 0
-    ) {
-      break;
-    }
-  }
+  rows.push(...filtered);
 
   const rawData = await mapWithInclude(
     rows.slice(0, DEFAULT_FETCH_LIMIT_QUERY),

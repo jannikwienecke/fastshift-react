@@ -4,10 +4,10 @@ import {
   relationalViewHelper,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
+import { filterResults } from './convex-filter-results';
 import { mapWithInclude } from './convex-map-with-include';
 import { withSearch } from './convex-searching';
 import { GenericQueryCtx } from './convex.server.types';
-import { filterResults } from './convex-filter-results';
 
 export const handleRelationalTableQuery = async ({
   ctx,
@@ -31,22 +31,32 @@ export const handleRelationalTableQuery = async ({
     args.registeredViews
   );
 
-  // TODO: REFACTOR THIS PART
-  const searchFields = relationalViewManager.getSearchableFields();
-  const primarySearchField = relationalViewManager.getPrimarySearchField();
-  const searchField = searchFields?.find((f) => f.field === primarySearchField);
+  const searchFields = relationalViewManager.getSearchableFields() || [];
 
-  let rows = await withSearch(dbQuery, {
-    searchField,
-    query: args.query,
-  }).collect();
+  const fetch = async () => {
+    if (searchFields.length && args.query) {
+      return await withSearch(dbQuery, {
+        searchFields,
+        query: args.query,
+      });
+    } else {
+      // if we dont have a search field, we need to query the complete table
+      // and then filter the results.
+      console.warn(
+        'Slow Query. No search field provided. Querying the complete table.'
+      );
+      const rows = await dbQuery.collect();
+      return filterResults(
+        rows,
+        relationalViewManager.getDisplayFieldLabel(),
+        args.query ?? '',
+        [],
+        searchFields
+      ).slice(0, DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+    }
+  };
 
-  rows = await filterResults(
-    rows,
-    relationalViewManager.getDisplayFieldLabel(),
-    args.query ?? '',
-    searchField
-  ).slice(0, DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  const rows = await fetch();
 
   const rowsWithInclude = await mapWithInclude(rows, ctx, args);
 

@@ -272,6 +272,7 @@ const init = server.mutation({
         priority: 'high',
         description: 'Design mockups for the website redesign',
         dueDate: tommorow,
+        subtitle: 'test',
       },
       {
         name: 'Develop frontend',
@@ -664,6 +665,7 @@ const init = server.mutation({
         priority: task.priority as any,
         description: task.description,
         dueDate: task.dueDate,
+        subtitle: task.subtitle,
       });
 
       // Add tags to each task (0 to 4 tags)

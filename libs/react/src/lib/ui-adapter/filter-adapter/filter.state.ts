@@ -8,6 +8,7 @@ import { filterAtom } from './filter.store';
 type FilterState = {
   query: string;
   values: ComboxboxItem[];
+  filteredValues: ComboxboxItem[];
   open: boolean;
   tableName: string;
   id: string | null;
@@ -20,6 +21,7 @@ type FilterState = {
 const DEFAULT_FILTER_STATE: FilterState = {
   query: '',
   values: [],
+  filteredValues: [],
   open: false,
   tableName: '',
   id: null,
@@ -113,7 +115,7 @@ export const setQueryAtom = atom(null, (get, set, query: string) => {
   set(filterStateAtom, {
     ...get(filterStateAtom),
     query,
-    values: valuesWithQuery,
+    filteredValues: valuesWithQuery,
   });
 });
 

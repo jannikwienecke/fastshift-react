@@ -66,15 +66,14 @@ export const useInputDialogStore = () => {
   const close = useSetAtom(closeAtom);
 
   const handleSelectFromFilter = (value: ComboxboxItem) => {
-    const field = viewConfigManager?.getFieldBy(value.id.toString());
-    if (!field) return;
-    console.log('field', field);
-
-    if (field.type !== 'String') {
-      return;
+    try {
+      const field = viewConfigManager?.getFieldBy(value.id.toString());
+      if (field?.type === 'String') {
+        setField(field);
+      }
+    } catch (error) {
+      //
     }
-
-    setField(field);
   };
 
   return {
