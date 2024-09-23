@@ -23,10 +23,10 @@ export const testQuery = server.query({
     console.log('testQuery');
 
     const now = new Date().getTime();
-    const query = ctx.db
-      .query('tasks')
-      // .filter((q) => q.gte(q.field('dueDate'), now));
-      .withIndex('dueDate', (q) => q.gte('dueDate', now));
+    const query = ctx.db.query('tasks');
+    // .withIndex('projectId', (q) => q.eq('projectId', ''))
+    // .filter((q) => q.gte(q.field('dueDate'), now));
+    // .withIndex('dueDate', (q) => q.gte('dueDate', now));
 
     console.log(query);
     return query.collect();

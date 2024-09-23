@@ -111,7 +111,6 @@ export const mutationHandlers: MUTATION_HANDLER_CONVEX = {
   UPDATE_RECORD: updateMutation,
 };
 
-// TODO refactor this whole function -> split into oneToMany and manyToMany
 export const updateManyToManyMutation = async (
   ctx: GenericMutationCtx,
   { viewConfigManager, mutation, registeredViews }: MutationPropsServer,

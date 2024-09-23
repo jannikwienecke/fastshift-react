@@ -167,6 +167,3 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   return parseConvexData(rawData);
 };
-
-// TODO: IN THE VIEW LOADER / VIEW MUTATIONS
-// HANDLE INDEXES CORRECTLY. Currently we just use the name of the field
