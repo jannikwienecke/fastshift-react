@@ -3,6 +3,7 @@ import {
   DEFAULT_FETCH_LIMIT_QUERY,
   FilterType,
   ID,
+  RegisteredViews,
 } from '@apps-next/core';
 import { filterUtil, isRelationNegateOperator } from '@apps-next/react';
 import { asyncMap } from 'convex-helpers';
@@ -10,6 +11,7 @@ import { queryClient } from './convex-client';
 import { SearchField } from './convex-get-filters';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexClient } from './types.convex';
+import { getRelationTableRecords } from './convex-get-relation-table-records';
 /*
   Get records by ids
   @param ids
@@ -36,7 +38,8 @@ export const getRecordsByIds = async (
 export const getIdsFromManyToManyFilters = async (
   manyToManyFilters: FilterType[],
   ctx: GenericQueryCtx,
-  viewConfigManager: BaseViewConfigManagerInterface
+  viewConfigManager: BaseViewConfigManagerInterface,
+  registeredViews: RegisteredViews
 ) => {
   const idsToRemove = [] as ID[];
 
@@ -61,9 +64,13 @@ export const getIdsFromManyToManyFilters = async (
     const idLists = await asyncMap(values, async (value) => {
       if (!manyToManyTable || !fieldNameFilter) return null;
 
-      const rows = await queryClient(ctx, manyToManyTable)
-        .withIndex(fieldNameFilter, (q) => q.eq(fieldNameFilter, value.id))
-        .collect();
+      const rows = await getRelationTableRecords({
+        registeredViews,
+        ctx,
+        id: value.id,
+        fieldName: fieldNameFilter,
+        relation: manyToManyTable,
+      });
 
       if (isRelationNegateOperator(filter.operator)) {
         idsToRemove.push(
@@ -75,7 +82,17 @@ export const getIdsFromManyToManyFilters = async (
       }
     });
 
-    const ids = idLists.filter((id) => id !== null).flat() as ID[];
+    // sort by how many times the id appears
+    const ids = idLists
+      .filter((id) => id !== null)
+      .flat()
+      .sort((a, b) => {
+        return (
+          idLists.filter((id) => id === a).length -
+          idLists.filter((id) => id === b).length
+        );
+      })
+      .reverse();
 
     return [...new Set(ids)];
   });
@@ -97,7 +114,8 @@ export const getIdsFromManyToManyFilters = async (
 export const getIdsFromOneToManyFilters = async (
   relationalFilters: FilterType[],
   ctx: GenericQueryCtx,
-  viewConfigManager: BaseViewConfigManagerInterface
+  viewConfigManager: BaseViewConfigManagerInterface,
+  registeredViews: RegisteredViews
 ) => {
   const idsToRemove = [] as ID[];
 
@@ -114,9 +132,13 @@ export const getIdsFromOneToManyFilters = async (
       const id = row.id;
       if (!id) return null;
 
-      const rows = await queryClient(ctx, tableName)
-        .withIndex(fieldName, (q) => q.eq(fieldName, id))
-        .collect();
+      const rows = await getRelationTableRecords({
+        registeredViews,
+        ctx,
+        id,
+        fieldName,
+        relation: tableName,
+      });
 
       if (isRelationNegateOperator(filter.operator)) {
         idsToRemove.push(...rows.map((task) => task._id));

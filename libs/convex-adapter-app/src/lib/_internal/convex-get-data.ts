@@ -20,7 +20,7 @@ import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
-  const { viewConfigManager, filters } = args;
+  const { viewConfigManager, filters, registeredViews } = args;
 
   const isTask = viewConfigManager?.getTableName() === 'tasks';
   const log = (...args: any[]) => {
@@ -64,11 +64,17 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   } = await getIdsFromManyToManyFilters(
     manyToManyFilters,
     ctx,
-    viewConfigManager
+    viewConfigManager,
+    registeredViews
   );
 
   const { ids: idsOneToManyFilters, idsToRemove: idsOneToManyFiltersToRemove } =
-    await getIdsFromOneToManyFilters(oneToManyFilters, ctx, viewConfigManager);
+    await getIdsFromOneToManyFilters(
+      oneToManyFilters,
+      ctx,
+      viewConfigManager,
+      registeredViews
+    );
 
   const { ids: idsIndexField, idsToRemove: idsIndexFieldToRemove } =
     await getIdsFromIndexFilters(
