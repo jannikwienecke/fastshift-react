@@ -48,6 +48,7 @@ export const useMutation = () => {
         ...args,
         viewName: viewConfigManager.viewConfig.viewName,
         viewConfig: undefined,
+        registeredViews: undefined,
         mutation: {
           ...args.mutation,
           handler: undefined,
@@ -148,6 +149,7 @@ export const useMutation = () => {
       try {
         const res = await mutateAsync({
           viewConfig: viewConfigManager.viewConfig,
+          registeredViews,
           mutation: args.mutation,
           query,
         });
@@ -158,7 +160,7 @@ export const useMutation = () => {
         return { error: (error as any)?.message };
       }
     },
-    [mutateAsync, query, viewConfigManager.viewConfig]
+    [mutateAsync, query, viewConfigManager.viewConfig, registeredViews]
   );
 
   const runMutate = React.useCallback(
@@ -168,9 +170,10 @@ export const useMutation = () => {
         mutation: args.mutation,
         query,
         viewConfig: viewConfigManager.viewConfig,
+        registeredViews,
       });
     },
-    [mutate, query, viewConfigManager.viewConfig]
+    [mutate, query, viewConfigManager.viewConfig, registeredViews]
   );
 
   React.useEffect(() => {
