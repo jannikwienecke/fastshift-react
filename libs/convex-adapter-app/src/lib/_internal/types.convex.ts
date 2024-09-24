@@ -87,6 +87,10 @@ type QField = (fieldName: string) => QFieldReturn;
 export type OperatorFns = {
   eq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
   neq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
+  gt: (fieldName: string | QFieldReturn, value: unknown) => OperatorFns;
+  gte: (fieldName: string | QFieldReturn, value: unknown) => OperatorFns;
+  lt: (fieldName: string | QFieldReturn, value: unknown) => OperatorFns;
+  lte: (fieldName: string | QFieldReturn, value: unknown) => OperatorFns;
   or: (...args: unknown[]) => unknown;
   and: (...args: unknown[]) => unknown;
 };

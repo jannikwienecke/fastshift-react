@@ -3,6 +3,7 @@
 import {
   ComboboxPopoverProps,
   ComboxboxItem,
+  DatePickerProps,
   FilterItemType,
   FilterProps,
 } from '@apps-next/core';
@@ -10,21 +11,26 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { ListFilter } from 'lucide-react';
 import { ComboboxPopover } from '../combobox-popover';
 import React from 'react';
+import { DatePicker } from '../date-picker';
 
 export const FilterDefault = (props: FilterProps) => {
-  const { filters, onOpen, comboboxProps } = props;
+  const { filters, onOpen, comboboxProps, datePickerProps } = props;
   return (
     <>
       <div className="flex flex-row gap-2 items-center">
         {filters.length > 0 && <FilterList {...props} />}
 
-        <div className="relative">
-          <FilterButton
-            comboboxProps={comboboxProps}
-            onOpen={onOpen}
-            hasFilter={filters.length > 0}
-          />
-        </div>
+        {datePickerProps ? (
+          <FilterDatePicker {...datePickerProps} />
+        ) : (
+          <div className="relative">
+            <FilterButton
+              comboboxProps={comboboxProps}
+              onOpen={onOpen}
+              hasFilter={filters.length > 0}
+            />
+          </div>
+        )}
       </div>
     </>
   );
@@ -113,7 +119,7 @@ const FilterItem = (props: {
 
 const FilterButton = (props: {
   comboboxProps: ComboboxPopoverProps<ComboxboxItem>;
-  onOpen: () => void;
+  onOpen: (rect: DOMRect) => void;
   hasFilter: boolean;
   label?: string;
 }) => {
@@ -121,7 +127,7 @@ const FilterButton = (props: {
     <ComboboxPopover {...props.comboboxProps}>
       <button
         data-testid="filter-button"
-        onClick={props.onOpen}
+        onClick={(e) => props.onOpen(e.currentTarget.getBoundingClientRect())}
         className="flex flex-row text-xs items-center p-1 px-2 rounded-sm border border-input bg-background hover:bg-accent hover:text-accent-foreground"
       >
         <ListFilter className="w-4 h-4" />
@@ -136,9 +142,15 @@ const FilterButton = (props: {
   );
 };
 
+const FilterDatePicker = (props: DatePickerProps) => {
+  console.log(props);
+  return <DatePicker {...props} />;
+};
+
 export const Filter = {
   Default: FilterDefault,
   Button: FilterButton,
   Item: FilterItem,
   List: FilterList,
+  DatePicker: FilterDatePicker,
 };

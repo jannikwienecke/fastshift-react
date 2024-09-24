@@ -96,11 +96,12 @@ export type ComboboAdapterProps = {
 
 export type FilterProps = {
   filters: FilterItemType[];
-  onOpen: () => void;
+  onOpen: (rect: DOMRect) => void;
   onRemove: (filter: FilterItemType) => void;
   onSelect: (filter: FilterItemType, rect: DOMRect) => void;
   onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
   comboboxProps: ComboboxPopoverProps;
+  datePickerProps: DatePickerProps | null;
 };
 
 export type InputDialogProps = {
@@ -121,4 +122,7 @@ export type InputDialogProps = {
 export type DatePickerProps = {
   selected: Date | undefined;
   onSelect: (date: Date) => void;
+  rect: DOMRect | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };

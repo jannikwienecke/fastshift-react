@@ -20,15 +20,15 @@ export const viewMutation = server.mutation({
 
 export const testQuery = server.query({
   handler(ctx, args_0) {
-    console.log('testQuery');
+    console.log('testQuery...');
 
     const now = new Date().getTime();
-    const query = ctx.db.query('tasks');
-    // .withIndex('projectId', (q) => q.eq('projectId', ''))
-    // .filter((q) => q.gte(q.field('dueDate'), now));
-    // .withIndex('dueDate', (q) => q.gte('dueDate', now));
+    const query = ctx.db
+      .query('tasks')
+      .withIndex('dueDate', (q) =>
+        q.gt('dueDate', now).lt('dueDate', now + 1000 * 60 * 60 * 24)
+      );
 
-    console.log(query);
     return query.collect();
   },
 });

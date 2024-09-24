@@ -25,6 +25,9 @@ export const tasksConfig = createViewConfig(
     displayField: {
       field: 'name',
     },
+    fields: {
+      dueDate: { isDateField: true },
+    },
     includeFields: ['tags'],
     query: {
       primarySearchField: 'name',

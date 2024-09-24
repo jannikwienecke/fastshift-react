@@ -5,12 +5,16 @@ import {
   ID,
   RegisteredViews,
 } from '@apps-next/core';
-import { filterUtil, isRelationNegateOperator } from '@apps-next/react';
+import {
+  dateUtils,
+  filterUtil,
+  isRelationNegateOperator,
+} from '@apps-next/react';
 import { asyncMap } from 'convex-helpers';
 import { queryClient } from './convex-client';
 import { SearchField } from './convex-get-filters';
 import { GenericQueryCtx } from './convex.server.types';
-import { ConvexClient } from './types.convex';
+import { ConvexClient, ConvexRecord } from './types.convex';
 import { getRelationTableRecords } from './convex-get-relation-table-records';
 /*
   Get records by ids
@@ -190,11 +194,38 @@ export const getIdsFromIndexFilters = async (
       const idsList = await asyncMap(values, async (value) => {
         const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
 
-        const rows = await dbQuery
-          .withIndex(indexField.name, (q) =>
-            q.eq(indexField.field.toString(), value)
-          )
-          .collect();
+        let rows: ConvexRecord[] = [];
+        if (
+          currentIndexFilter.field.type === 'Date' &&
+          currentIndexFilter.type === 'primitive' &&
+          currentIndexFilter.date
+        ) {
+          const { start, end } = dateUtils.getStartAndEndDate(
+            currentIndexFilter.date
+          );
+          console.log({
+            start: start?.toLocaleDateString(),
+            end: end?.toLocaleDateString(),
+          });
+
+          if (!start || !end) {
+            throw new Error('Start or end date is undefined');
+          }
+
+          rows = await dbQuery
+            .withIndex(indexField.name, (q) =>
+              q
+                .gt(indexField.field.toString(), start.getTime())
+                .lt(indexField.field.toString(), end.getTime())
+            )
+            .collect();
+        } else {
+          rows = await dbQuery
+            .withIndex(indexField.name, (q) =>
+              q.eq(indexField.field.toString(), value)
+            )
+            .collect();
+        }
 
         const ids = rows.map((r) => r._id);
 

@@ -14,3 +14,4 @@ export * from './lib/basic-layout';
 
 export * from './lib/filter';
 export * from './lib/input-dialog';
+export * from './lib/date-picker';

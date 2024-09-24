@@ -24,13 +24,31 @@ export function createViewConfig<T extends GetTableName>(
     ...(config.includeFields ?? []),
   ];
 
+  // override fields based on config
+  const viewFields_ = Object.entries(viewFields ?? {}).reduce(
+    (acc, [field, fieldConfig]) => {
+      const override = config.fields?.[field as keyof typeof config.fields];
+      if (!override) {
+        acc[field] = fieldConfig;
+      } else {
+        acc[field] = {
+          ...fieldConfig,
+          type: override.isDateField ? 'Date' : fieldConfig.type,
+        };
+      }
+
+      return acc;
+    },
+    { ...viewFields }
+  );
+
   const viewConfig: ViewConfigType<T> = {
     ...config,
     displayField: {
       field: config.displayField?.field as any,
       cell: config.displayField?.cell,
     },
-    viewFields: viewFields,
+    viewFields: viewFields_,
     includeFields,
     tableName,
     viewName,

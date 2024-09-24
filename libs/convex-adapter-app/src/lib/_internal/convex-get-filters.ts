@@ -1,4 +1,5 @@
 import { FilterType, IndexField, SearchableField } from '@apps-next/core';
+import { filterUtil, dateUtils } from '@apps-next/react';
 
 export type SearchField = {
   field: string | symbol | number;
@@ -52,12 +53,20 @@ export const getHasManyToManyFilter = (filters: FilterType[]) =>
 export const getStringFilters = (filters: FilterType[]) =>
   filters.filter((f) => f.field.type === 'String');
 
+export const getDateFilters = (filters: FilterType[]) =>
+  filters
+    .filter((f) => f.field.type === 'Date')
+    .map((f) => ({
+      ...f,
+      date: dateUtils.parseOption(filterUtil().getValue(f)),
+    }));
+
 export const getFilterTypes = (
-  filters: FilterType[] | undefined,
+  filtersUnparsed: FilterType[] | undefined,
   _searchFields: SearchableField[] | undefined,
   _indexFields: IndexField[] | undefined
 ) => {
-  if (!filters)
+  if (!filtersUnparsed)
     return {
       primitiveFilters: [],
       oneToManyFilters: [],
@@ -67,7 +76,18 @@ export const getFilterTypes = (
       hasOneToManyFilter: false,
       hasManyToManyFilter: false,
       stringFilters: [],
+      dateFilters: [],
     };
+
+  const filters = [...filtersUnparsed].map((f) => {
+    if (f.field.type === 'Date') {
+      return {
+        ...f,
+        date: dateUtils.parseOption(filterUtil().getValue(f)),
+      };
+    }
+    return f;
+  });
 
   const indexFields = _indexFields
     ?.filter((f) => f.fields.length === 1)
@@ -90,6 +110,8 @@ export const getFilterTypes = (
     indexFields
   );
 
+  const dateFilters = getDateFilters(filters);
+
   // remove all filter that are either in searchFields or indexFields
   const _filters = filters.filter(
     (f) =>
@@ -103,6 +125,7 @@ export const getFilterTypes = (
     filtersWithSearchField,
     indexFields,
     searchFields,
+    dateFilters,
     primitiveFilters: getPrimitiveFilters(_filters),
     oneToManyFilters: getRelationalFilters(_filters),
     manyToManyFilters: getManyToManyFilters(_filters),

@@ -26,6 +26,7 @@ export type FilterType =
       field: FieldConfig;
       operator: FilterOperatorType;
       value: Row;
+      date?: FilterDateType;
     };
 
 export type FilterItemType = {
@@ -37,3 +38,25 @@ export type FilterItemType = {
 };
 // format to send the filters to the backend
 // i need to send the FilterType[] to the backend. Pls suggest a format and a function to convert the FilterType[] to the format
+
+export type FilterDateType = {
+  operator:
+    | 'less than'
+    | 'less than or equal to'
+    | 'greater than'
+    | 'greater than or equal to'
+    | 'equal to'
+    | 'not equal to';
+  value?: number;
+  unit:
+    | 'day'
+    | 'days'
+    | 'week'
+    | 'month'
+    | 'year'
+    | 'today'
+    | 'tomorrow'
+    | 'yesterday'
+    | 'weeks'
+    | 'months';
+};

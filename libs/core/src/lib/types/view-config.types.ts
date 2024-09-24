@@ -1,5 +1,6 @@
 import {
   FieldConfig,
+  FieldType,
   GetTableDataType,
   GetTableName,
   IndexField,
@@ -26,6 +27,11 @@ export type ViewConfigType<T extends GetTableName = any> =
     displayField: {
       field: keyof GetTableDataType<T>;
       cell?: (value: GetTableDataType<T>) => React.ReactNode;
+    };
+    fields?: {
+      [field in keyof GetTableDataType<T>]?: {
+        isDateField?: boolean;
+      };
     };
     query?: {
       searchableFields?: SearchableField[];

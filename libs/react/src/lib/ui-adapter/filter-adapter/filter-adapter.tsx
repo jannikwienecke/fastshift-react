@@ -1,13 +1,16 @@
 import {
   ComboboxPopoverProps,
   ComboxboxItem,
+  DatePickerProps,
   FilterItemType,
   FilterProps,
   FilterType,
+  makeRow,
 } from '@apps-next/core';
 import { useFilterStore } from '../../store.ts/index.js';
 import { FilterValue } from '../../ui-components/render-filter-value.js';
 import { useFiltering } from './filter.state.js';
+import React from 'react';
 
 export const getFilterValue = (f: FilterType) => {
   if (f.type === 'relation') {
@@ -22,14 +25,17 @@ export const getFilterValue = (f: FilterType) => {
 export const useFilterAdapter = (props?: {
   onSelect?: (value: ComboxboxItem) => void;
 }): (() => FilterProps) => {
-  const { filter, removeFilter, setQuery } = useFilterStore();
+  const { filter, removeFilter, setQuery, handleSelectValue } =
+    useFilterStore();
   const {
     open,
     select,
+
     setPosition,
     openOperatorOptions,
     filterState,
     closeFieldOptions: close,
+    selectDate,
   } = useFiltering();
 
   const comboboxProps = {
@@ -52,7 +58,6 @@ export const useFilterAdapter = (props?: {
     selected: null,
     onChange: (value) => {
       select(value);
-      close();
       props?.onSelect?.(value);
     },
 
@@ -65,6 +70,32 @@ export const useFilterAdapter = (props?: {
     },
     render: (value) => <FilterValue value={value} />,
   } satisfies ComboboxPopoverProps<ComboxboxItem>;
+
+  const datePickerProps = {
+    selected: new Date(),
+    onSelect: (date) => {
+      if (!filterState.selectedDateField) return;
+      selectDate(date);
+      const value = date.getTime();
+      handleSelectValue(
+        makeRow(
+          value,
+          date.toLocaleDateString(),
+          value,
+          filterState.selectedDateField
+        )
+      );
+    },
+    open: filterState.showDatePicker,
+    rect: filterState.rect,
+    onOpenChange: (open) => {
+      console.log('onOpenChange', open);
+
+      if (!open) {
+        close();
+      }
+    },
+  } satisfies DatePickerProps;
 
   const filters_ = filter.fitlers.map((f) => {
     return {
@@ -83,9 +114,13 @@ export const useFilterAdapter = (props?: {
 
   return (): FilterProps => {
     return {
-      onOpen: () => open(true),
+      onOpen: (rect: DOMRect) => {
+        console.log('onOpen');
+        open(true);
+        setPosition(rect);
+      },
       filters: filters_,
-
+      datePickerProps: filterState.showDatePicker ? datePickerProps : null,
       comboboxProps: comboboxProps,
       onRemove: ({ name }) => removeFilter(getFilter(name)),
       onSelect: (value, rect) => {

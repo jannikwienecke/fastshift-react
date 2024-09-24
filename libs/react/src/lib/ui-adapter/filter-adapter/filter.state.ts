@@ -1,9 +1,15 @@
-import { ComboxboxItem, FieldConfig, RegisteredViews } from '@apps-next/core';
+import {
+  ComboxboxItem,
+  FieldConfig,
+  makeRow,
+  RegisteredViews,
+} from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { getViewConfigAtom } from '../../stores';
 import { operator } from './filter.operator';
 import { filterUtil } from './filter.utils';
-import { filterAtom } from './filter.store';
+import { filterAtom, setFilterAtom } from './filter.store';
+import { dateUtils } from './date.utils';
 
 type FilterState = {
   query: string;
@@ -16,6 +22,8 @@ type FilterState = {
   selectedField: FieldConfig | null;
   rect: DOMRect | null;
   selectedOperatorField: FieldConfig | null;
+  selectedDateField: FieldConfig | null;
+  showDatePicker: boolean;
 };
 
 const DEFAULT_FILTER_STATE: FilterState = {
@@ -29,6 +37,8 @@ const DEFAULT_FILTER_STATE: FilterState = {
   selectedField: null,
   rect: null,
   selectedOperatorField: null,
+  showDatePicker: false,
+  selectedDateField: null,
 };
 
 export const filterStateAtom = atom<FilterState>(DEFAULT_FILTER_STATE);
@@ -50,7 +60,28 @@ export const openFilterAtom = atom(false, (get, set, open: boolean) => {
 export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
   const state = get(filterStateAtom);
   const { selectedOperatorField } = state;
-  if (selectedOperatorField) {
+
+  if (state.selectedDateField) {
+    console.log('selectedDateField', value);
+    if (value.id === 'Select specific date') {
+      set(filterStateAtom, { ...get(filterStateAtom), showDatePicker: true });
+    } else {
+      set(setFilterAtom, {
+        field: state.selectedDateField,
+        value: makeRow(
+          value.id.toString(),
+          value.id.toString(),
+          value.id,
+          state.selectedDateField
+        ),
+      });
+      // TODO: HIER WEITER MACHEN
+      // handle what happens when the user selects a date
+      // also handle case to change the operator of the filter
+      // handle all backend logic for date filters
+      // handle case when select from the date picker....
+    }
+  } else if (selectedOperatorField) {
     const filterStore = get(filterAtom);
 
     const updatedFilters = filterStore.fitlers.map((f) => {
@@ -65,7 +96,25 @@ export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
     const viewConfigManager = get(getViewConfigAtom);
     const field = viewConfigManager.getFieldBy(value.id.toString());
 
-    set(filterStateAtom, { ...get(filterStateAtom), selectedField: field });
+    if (field.type === 'Date') {
+      const options = dateUtils.getOptions('');
+      set(filterStateAtom, {
+        ...get(filterStateAtom),
+        open: true,
+        values: options,
+        selectedField: field,
+        selectedDateField: field,
+      });
+    } else {
+      set(filterStateAtom, {
+        ...get(filterStateAtom),
+        selectedField: field,
+        open: false,
+        selectedOperatorField: null,
+        values: [],
+        rect: null,
+      });
+    }
   }
 });
 
@@ -74,6 +123,8 @@ export const closeFieldOptionsFilterAtom = atom(null, (get, set) => {
     ...get(filterStateAtom),
     open: false,
     selectedOperatorField: null,
+    selectedDateField: null,
+    showDatePicker: false,
     values: [],
     rect: null,
   });
@@ -107,16 +158,37 @@ export const openOperatorOptionsFilterAtom = atom(
 );
 
 export const setQueryAtom = atom(null, (get, set, query: string) => {
-  const values = get(filterStateAtom).values;
-  const valuesWithQuery = values.filter((v) =>
-    v.label.toLowerCase().includes(query.toLowerCase())
+  const { values, selectedDateField } = get(filterStateAtom);
+
+  if (selectedDateField) {
+    const options = dateUtils.getOptions(query);
+
+    set(filterStateAtom, {
+      ...get(filterStateAtom),
+      filteredValues: options,
+      query,
+    });
+  } else {
+    const valuesWithQuery = values.filter((v) =>
+      v.label.toLowerCase().includes(query.toLowerCase())
+    );
+
+    set(filterStateAtom, {
+      ...get(filterStateAtom),
+      query,
+      filteredValues: valuesWithQuery,
+    });
+  }
+});
+
+const selectDateAtom = atom(null, (get, set, date: Date) => {
+  const filterStore = get(filterAtom);
+  const currentFilter = filterStore.fitlers?.find(
+    (f) => f.field.name === get(filterStateAtom).selectedDateField?.name
   );
 
-  set(filterStateAtom, {
-    ...get(filterStateAtom),
-    query,
-    filteredValues: valuesWithQuery,
-  });
+  console.log('selectDate', date);
+  console.log('currentFilter', currentFilter);
 });
 
 export const useFiltering = () => {
@@ -128,7 +200,7 @@ export const useFiltering = () => {
   const openOperatorOptions = useSetAtom(openOperatorOptionsFilterAtom);
   const closeAll = useSetAtom(closeAllFilterAtom);
   const setQuery = useSetAtom(setQueryAtom);
-
+  const selectDate = useSetAtom(selectDateAtom);
   return {
     filterState,
     open,
@@ -138,5 +210,6 @@ export const useFiltering = () => {
     openOperatorOptions,
     closeAll,
     setQuery,
+    selectDate,
   };
 };
