@@ -14,7 +14,7 @@ class DateOptions {
   ].map((name) => ({ id: name, label: name }));
 
   private value: string;
-  private hasIn: boolean;
+  private hasFromNow: boolean;
   private hasAgo: boolean;
   private hasDays: boolean;
   private hasWeek: boolean;
@@ -23,7 +23,10 @@ class DateOptions {
 
   constructor(value: string) {
     this.value = value.toLowerCase();
-    this.hasIn = this.value.includes('in');
+    this.hasFromNow =
+      'from now'.includes(this.value) ||
+      this.value.includes('from') ||
+      this.value.includes('now');
     this.hasAgo = this.value.includes('ago');
     this.hasDays = this.value.includes('days');
     this.hasWeek = this.value.includes('week');
@@ -39,7 +42,7 @@ class DateOptions {
       return this.getDefaultOptions();
     } else if (this.hasWeek || this.hasDays) {
       return this.getWeekOrDayOptions();
-    } else if (this.hasIn || this.hasAgo) {
+    } else if (this.hasFromNow || this.hasAgo) {
       return this.getRelativeOptions();
     } else if (this.hasNumber) {
       return this.getNumberOptions();
@@ -55,11 +58,11 @@ class DateOptions {
     };
 
     const additionalOptions = [
-      'In 3 days',
+      '3 days from now',
       '3 days ago',
-      'In one week',
+      'One week from now',
       'One week ago',
-      'In one month',
+      'One month from now',
       'One month ago',
     ].map((option) => ({ id: option, label: option }));
 
@@ -78,16 +81,19 @@ class DateOptions {
     const numbers = number ? [number] : [1, 3, 7];
     const options: ComboxboxItem[] = [];
 
-    if (number === 1 && !this.hasIn && !this.hasAgo) {
+    if (number === 1 && !this.hasFromNow && !this.hasAgo) {
       options.push({ id: `This ${unit}`, label: `This ${unit}` });
       options.push({ id: `Last ${unit}`, label: `Last ${unit}` });
     }
 
     numbers.forEach((num) => {
-      if (this.hasIn || !this.hasAgo) {
-        options.push({ id: `In ${num} ${unit}`, label: `In ${num} ${unit}` });
+      if (this.hasFromNow || !this.hasAgo) {
+        options.push({
+          id: `${num} ${unit} from now`,
+          label: `${num} ${unit} from now`,
+        });
       }
-      if (this.hasAgo || !this.hasIn) {
+      if (this.hasAgo || !this.hasFromNow) {
         options.push({ id: `${num} ${unit} ago`, label: `${num} ${unit} ago` });
       }
     });
@@ -102,13 +108,13 @@ class DateOptions {
 
     units.forEach((unit) => {
       const unitLabel = number === 1 ? unit : `${unit}s`;
-      if (this.hasIn || !this.hasAgo) {
+      if (this.hasFromNow || !this.hasAgo) {
         options.push({
-          id: `In ${number} ${unitLabel}`,
-          label: `In ${number} ${unitLabel}`,
+          id: `${number} ${unitLabel} from now`,
+          label: `${number} ${unitLabel} from now`,
         });
       }
-      if (this.hasAgo || !this.hasIn) {
+      if (this.hasAgo || !this.hasFromNow) {
         options.push({
           id: `${number} ${unitLabel} ago`,
           label: `${number} ${unitLabel} ago`,
@@ -127,8 +133,8 @@ class DateOptions {
     units.forEach((unit) => {
       const unitLabel = number === 1 ? unit : `${unit}s`;
       options.push({
-        id: `In ${number} ${unitLabel}`,
-        label: `In ${number} ${unitLabel}`,
+        id: `${number} ${unitLabel} from now`,
+        label: `${number} ${unitLabel} from now`,
       });
       options.push({
         id: `${number} ${unitLabel} ago`,
@@ -160,12 +166,16 @@ class DateOptions {
 class DateOptionParser {
   public static parse(option: string): FilterDateType {
     const lowerOption = option.toLowerCase();
-    const number = lowerOption.match(/\d+/)
+    let number = lowerOption.match(/\d+/)
       ? parseInt(lowerOption.match(/\d+/)?.[0] || '', 10)
       : null;
 
-    if (lowerOption.startsWith('in ') && number) {
-      const unit = lowerOption.split(' ')[2];
+    if (lowerOption.includes('one')) {
+      number = 1;
+    }
+
+    if (lowerOption.endsWith('from now') && number) {
+      const unit = lowerOption.split(' ')[1];
       return {
         operator: 'equal to',
         value: number,
@@ -197,7 +207,7 @@ class DateOptionParser {
         case 'yesterday':
           return { operator: 'equal to', unit: 'yesterday' };
         default:
-          throw new Error('Invalid option format');
+          throw new Error(`Invalid option format: ${option}`);
       }
     }
   }

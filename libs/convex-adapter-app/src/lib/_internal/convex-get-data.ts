@@ -49,13 +49,19 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     ({ operator }) =>
       operator.label === 'contains' ||
       operator.label === 'is' ||
-      operator.label === 'is any of'
+      operator.label === 'is any of' ||
+      operator.label === 'before' ||
+      operator.label === 'after' ||
+      operator.label === 'within'
   );
   const isSearchFieldSearch = filtersWithSearchField?.find(
     ({ operator }) =>
       operator.label === 'contains' ||
       operator.label === 'is' ||
-      operator.label === 'is any of'
+      operator.label === 'is any of' ||
+      operator.label === 'before' ||
+      operator.label === 'after' ||
+      operator.label === 'within'
   );
 
   const {

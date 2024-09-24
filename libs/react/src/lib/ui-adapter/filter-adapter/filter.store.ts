@@ -50,7 +50,10 @@ export const setFilterAtom = atom(
         exitingFilter.values.push(filter.value);
       }
     } else if (exitingFilter && exitingFilter.type === 'primitive') {
-      exitingFilter.value = filter.value;
+      const newFilter = filterUtil().create(filter);
+
+      exitingFilter.value = newFilter.value;
+      exitingFilter.operator = newFilter.operator;
     }
 
     filters = filterState.fitlers.map((f) => {
@@ -117,7 +120,6 @@ const handleSelectValueAtom = atom(null, (get, set, value: Row) => {
 const handleEnterValueAtom = atom(
   null,
   (get, set, props: InputDialogValueDict) => {
-    console.log(props);
     const { field, value } = Object.values(props)?.[0] ?? {};
     if (!field || !value) return;
 

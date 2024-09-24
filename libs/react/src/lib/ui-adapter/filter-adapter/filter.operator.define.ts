@@ -1,9 +1,31 @@
 import { FieldType, FilterOperatorType } from '@apps-next/core';
-import { CircleAlert, EqualIcon, EqualNotIcon, PlusIcon } from 'lucide-react';
+import {
+  CalendarArrowDown,
+  CalendarArrowUp,
+  CircleAlert,
+  EqualIcon,
+  EqualNotIcon,
+  PlusIcon,
+} from 'lucide-react';
 
 const IS_OPERATOR: FilterOperatorType = {
   label: 'is',
   icon: EqualIcon,
+};
+
+const BEFORE_OPERATOR: FilterOperatorType = {
+  label: 'before',
+  icon: CalendarArrowUp,
+};
+
+const WITHIN_OPERATOR: FilterOperatorType = {
+  label: 'within',
+  icon: CalendarArrowUp,
+};
+
+const AFTER_OPERATOR: FilterOperatorType = {
+  label: 'after',
+  icon: CalendarArrowDown,
 };
 
 const IS_NOT_OPERATOR: FilterOperatorType = {
@@ -40,6 +62,9 @@ export const operatorMap = {
   doesNotContain: DOES_NOT_CONTAIN_OPERATOR,
   isAnyOf: IS_ANY_OF_OPERATOR,
   isNotAnyOf: IS_NOT_ANY_OF_OPERATOR,
+  before: BEFORE_OPERATOR,
+  after: AFTER_OPERATOR,
+  within: WITHIN_OPERATOR,
 };
 
 export const operators = Object.values(operatorMap);
@@ -59,7 +84,7 @@ export const defaultOperatorMap: Partial<{
   String: operatorMap.contains,
   Number: defaultOperator,
   Enum: defaultOperator,
-  Date: defaultOperator,
+  Date: operatorMap.before,
   Reference: defaultOperator,
   OneToOneReference: defaultOperator,
   Union: defaultOperator,
@@ -72,10 +97,15 @@ export const optionsOperatorMap: Partial<{
   String: [operatorMap.contains, operatorMap.doesNotContain],
   Number: [operatorMap.is, operatorMap.isNot],
   Enum: defaultOperators,
-  Date: [operatorMap.is, operatorMap.isAnyOf],
+  Date: [operatorMap.before, operatorMap.after, operatorMap.within],
   Reference: defaultOperators,
   OneToOneReference: defaultOperators,
   Union: [operatorMap.is, operatorMap.isAnyOf],
 };
 
 export default operatorMap;
+
+// hier weiter machen
+// handle within / before /after
+// for this week / last week and so on -> default should be within
+// handle in backend different oerators

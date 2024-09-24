@@ -3,6 +3,7 @@ import {
   FieldConfig,
   FilterOperatorType,
   FilterType,
+  Row,
 } from '@apps-next/core';
 import {
   defaultOperator,
@@ -10,6 +11,7 @@ import {
   operatorMap,
   optionsOperatorMap,
 } from './filter.operator.define';
+import { dateUtils } from './date.utils';
 
 export const operator = () => {
   const value = (f: FilterType) => (f.type === 'primitive' ? f.value : null);
@@ -24,7 +26,7 @@ export const operator = () => {
 
   const _primitive = (filter: FilterType) => {
     if (!value(filter)) return null;
-    return filter.operator || initOperator(filter.field);
+    return filter.operator || initOperator(filter.field, value(filter));
   };
 
   const _relation = (filter: FilterType) => {
@@ -79,7 +81,11 @@ export const operator = () => {
   };
 };
 
-export const initOperator = (field: FieldConfig) => {
+export const initOperator = (field: FieldConfig, value?: Row | null) => {
+  if (field.type === 'Date') {
+    return initDateOperator(field, value);
+  }
+
   const operator = defaultOperatorMap[field.type];
   if (!operator) return defaultOperator;
 
@@ -92,4 +98,20 @@ export const isRelationNegateOperator = (operator: FilterOperatorType) => {
 
 export const isEnumNegateOperator = (operator: FilterOperatorType) => {
   return operator.label === 'is not' || operator.label === 'is not any of';
+};
+
+export const initDateOperator = (field: FieldConfig, value?: Row | null) => {
+  const operator = defaultOperatorMap[field.type];
+  if (!operator) return defaultOperator;
+  if (!value) return operator;
+
+  const date = dateUtils.parseOption(value.raw);
+
+  if (date.unit === 'week' || date.unit === 'month' || date.unit === 'year') {
+    if (!date.value || (date.value === -1 && date.operator === 'equal to')) {
+      return operatorMap.within;
+    }
+  }
+
+  return operator;
 };

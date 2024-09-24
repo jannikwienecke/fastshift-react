@@ -9,7 +9,10 @@ export type FilterOperatorType = {
     | 'is any of'
     | 'is not any of'
     | 'contains'
-    | 'does not contain';
+    | 'does not contain'
+    | 'before'
+    | 'after'
+    | 'within';
   icon?: Icon;
   many?: boolean;
 };

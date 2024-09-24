@@ -1,4 +1,5 @@
 import {
+  convertFiltersForBackend,
   lldebug,
   makeQueryKey,
   Mutation,
@@ -11,7 +12,7 @@ import {
 } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import React from 'react';
-import { debouncedQueryAtom, useView } from '..';
+import { debouncedQueryAtom, useFilterStore, useView } from '..';
 import { useApi } from './use-api';
 
 export const useMutation = () => {
@@ -21,6 +22,8 @@ export const useMutation = () => {
   const queryClient = useQueryClient();
 
   const { registeredViews } = useView();
+  const { filter } = useFilterStore();
+  const parsedFilters = convertFiltersForBackend(filter.fitlers);
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -91,7 +94,7 @@ export const useMutation = () => {
         ...queryPropsMerged,
         query: vars.query,
         viewName: vars.viewConfig.viewName,
-        filters: '',
+        filters: parsedFilters,
       }).queryKey;
 
       const queryKey =

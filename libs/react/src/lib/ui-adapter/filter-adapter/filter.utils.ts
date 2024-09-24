@@ -23,7 +23,7 @@ export const filterUtil = () => {
       values: values as Row[],
       value: value as Row,
       field: filter.field,
-      operator: initOperator(filter.field),
+      operator: initOperator(filter.field, value),
     } satisfies FilterType;
   };
 
