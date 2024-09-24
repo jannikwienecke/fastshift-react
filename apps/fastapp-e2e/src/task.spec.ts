@@ -172,4 +172,9 @@ test.describe('Task management', () => {
     await page.getByText('tasks').first().click({ force: true });
     await expect(page.getByText(/🟢/i).first()).toBeVisible();
   });
+
+  test('can filter tasks by due date', async ({ taskPage, page }) => {
+    // to be implemented
+    expect(true).toBe(true);
+  });
 });

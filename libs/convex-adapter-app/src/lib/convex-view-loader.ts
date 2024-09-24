@@ -21,6 +21,12 @@ export const viewLoaderHandler = async (
 ): Promise<QueryReturnDto> => {
   const args = _args as QueryDto;
 
+  if (args.relationQuery && !args.relationQuery.tableName) {
+    return {
+      data: [],
+    };
+  }
+
   const viewConfigManager = new BaseViewConfigManager(
     args.viewConfig as ViewConfigType,
     args.modelConfig

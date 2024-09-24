@@ -29,7 +29,7 @@ export type FilterType =
       field: FieldConfig;
       operator: FilterOperatorType;
       value: Row;
-      date?: FilterDateType;
+      date?: FilterDateType | null;
     };
 
 export type FilterItemType = {
@@ -50,7 +50,7 @@ export type FilterDateType = {
     | 'greater than or equal to'
     | 'equal to'
     | 'not equal to';
-  value?: number;
+  value?: number | string;
   unit:
     | 'day'
     | 'days'
@@ -61,5 +61,6 @@ export type FilterDateType = {
     | 'tomorrow'
     | 'yesterday'
     | 'weeks'
-    | 'months';
+    | 'months'
+    | 'quarter';
 };

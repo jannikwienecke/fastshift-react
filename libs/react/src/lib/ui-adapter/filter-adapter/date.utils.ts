@@ -1,4 +1,25 @@
-import { ComboxboxItem, FilterDateType } from '@apps-next/core';
+import {
+  ComboxboxItem,
+  FilterDateType,
+  FilterOperatorType,
+} from '@apps-next/core';
+
+export const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+export const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'];
 
 class DateOptions {
   private static staticOptions: ComboxboxItem[] = [
@@ -12,6 +33,9 @@ class DateOptions {
     'This year',
     'Last year',
   ].map((name) => ({ id: name, label: name }));
+
+  private static months = MONTHS;
+  private static quarters = QUARTERS;
 
   private value: string;
   private hasFromNow: boolean;
@@ -37,9 +61,104 @@ class DateOptions {
       this.value.includes('two');
   }
 
+  private getDate(): ComboxboxItem[] | null {
+    const number = this.extractNumber(this.value);
+
+    if (
+      (number?.toString().startsWith('201') ||
+        number?.toString().startsWith('202')) &&
+      number > 2000 &&
+      number < 2030
+    ) {
+      const optionsMonths = DateOptions.months.map((month) => {
+        return {
+          id: month + ' ' + number,
+          label: month + ' ' + number,
+        };
+      });
+
+      const optionsQuarters = DateOptions.quarters.map((quarter) => {
+        return {
+          id: quarter + ' ' + number,
+          label: quarter + ' ' + number,
+        };
+      });
+
+      if (number.toString() === this.value) {
+        return [
+          {
+            id: this.value,
+            label: this.value,
+          },
+          ...optionsMonths,
+          ...optionsQuarters,
+        ];
+      } else {
+        const valueWithoutNumber = this.value
+          .replace(/\d+/g, '')
+          .split(' ')
+          .join('');
+
+        return [
+          {
+            id: number.toString(),
+            label: number.toString(),
+          },
+          ...[...optionsMonths, ...optionsQuarters].filter((o) => {
+            return o.id.toLowerCase().includes(valueWithoutNumber);
+          }),
+        ];
+      }
+    }
+
+    const matchingMonths = MONTHS.map((m) => m.slice(0, 2).toLowerCase());
+
+    const isMonth = matchingMonths.filter((m) => this.value.includes(m));
+    const months = MONTHS.filter((m) => m.toLowerCase().includes(this.value));
+
+    const matchingQuarters = QUARTERS.filter((q) =>
+      this.value.includes(q.toLowerCase())
+    );
+    // TODOL hier weiter machen. check ob alles passt
+    // fix when select only year like 2024
+    // refactor this and the operator utils page
+    // tests schreiben....
+    const currentYear = new Date().getFullYear();
+
+    const years = [];
+    for (let i = currentYear - 1; i <= currentYear + 2; i++) {
+      years.push(i);
+    }
+
+    if (isMonth.length === 1 && months.length === 1) {
+      const month = months[0];
+
+      return years.map((year) => ({
+        id: month + ' ' + year,
+        label: month + ' ' + year,
+      }));
+    } else if (isMonth.length && months.length > 0) {
+      return months.map((m) => ({
+        id: m + ' ' + currentYear,
+        label: m + ' ' + currentYear,
+      }));
+    } else if (matchingQuarters.length && matchingQuarters.length > 0) {
+      return matchingQuarters.map((q) => ({
+        id: q + ' ' + currentYear,
+        label: q + ' ' + currentYear,
+      }));
+    }
+
+    return null;
+  }
+
   public getOptions(): ComboxboxItem[] {
     if (!this.value) {
       return this.getDefaultOptions();
+    } else if (this.getDate()) {
+      const dateOptions = this.getDate();
+      if (!dateOptions) throw new Error('Date options not found');
+      return dateOptions;
     } else if (this.hasWeek || this.hasDays) {
       return this.getWeekOrDayOptions();
     } else if (this.hasFromNow || this.hasAgo) {
@@ -64,6 +183,7 @@ class DateOptions {
       'One week ago',
       'One month from now',
       'One month ago',
+      'No date defined',
     ].map((option) => ({ id: option, label: option }));
 
     const all = [...DateOptions.staticOptions, ...additionalOptions];
@@ -89,12 +209,21 @@ class DateOptions {
     numbers.forEach((num) => {
       if (this.hasFromNow || !this.hasAgo) {
         options.push({
-          id: `${num} ${unit} from now`,
-          label: `${num} ${unit} from now`,
+          id: `${num === 1 ? 'One' : num} ${
+            num > 1 ? unit + 's' : unit
+          } from now`,
+          label: `${num === 1 ? 'One' : num} ${
+            num > 1 ? unit + 's' : unit
+          } from now`,
         });
       }
       if (this.hasAgo || !this.hasFromNow) {
-        options.push({ id: `${num} ${unit} ago`, label: `${num} ${unit} ago` });
+        options.push({
+          id: `${num === 1 ? 'One' : num} ${num > 1 ? unit + 's' : unit} ago`,
+          label: `${num === 1 ? 'One' : num} ${
+            num > 1 ? unit + 's' : unit
+          } ago`,
+        });
       }
     });
 
@@ -164,7 +293,10 @@ class DateOptions {
 }
 
 class DateOptionParser {
-  public static parse(option: string): FilterDateType {
+  public static parse(
+    option: string,
+    operator: FilterOperatorType
+  ): FilterDateType | null {
     const lowerOption = option.toLowerCase();
     let number = lowerOption.match(/\d+/)
       ? parseInt(lowerOption.match(/\d+/)?.[0] || '', 10)
@@ -174,18 +306,34 @@ class DateOptionParser {
       number = 1;
     }
 
+    const includesQuarter = QUARTERS.some((quarter) =>
+      lowerOption.includes(quarter.toLowerCase())
+    );
+
+    const includesMonth = MONTHS.some((month) =>
+      lowerOption.includes(month.toLowerCase())
+    );
+
+    if (includesQuarter || includesMonth) {
+      return {
+        operator: 'equal to',
+        value: lowerOption,
+        unit: includesQuarter ? 'quarter' : 'month',
+      };
+    }
+
     if (lowerOption.endsWith('from now') && number) {
       const unit = lowerOption.split(' ')[1];
       return {
-        operator: 'equal to',
+        operator: operator.label === 'before' ? 'equal to' : 'greater than',
         value: number,
         unit: unit as FilterDateType['unit'],
       };
     } else if (lowerOption.endsWith(' ago') && number) {
       const unit = lowerOption.split(' ')[1];
       return {
-        operator: 'less than',
-        value: number,
+        operator: operator.label === 'after' ? 'equal to' : 'less than',
+        value: number * -1,
         unit: unit as FilterDateType['unit'],
       };
     } else if (lowerOption.startsWith('this ')) {
@@ -206,6 +354,8 @@ class DateOptionParser {
           return { operator: 'equal to', unit: 'tomorrow' };
         case 'yesterday':
           return { operator: 'equal to', unit: 'yesterday' };
+        case 'no date defined':
+          return null;
         default:
           throw new Error(`Invalid option format: ${option}`);
       }
@@ -214,8 +364,14 @@ class DateOptionParser {
 }
 
 class DateCalculator {
-  public static getStartAndEndDate(dateFilter: FilterDateType) {
-    const { unit, operator, value: valueRaw } = dateFilter;
+  public static getStartAndEndDate(
+    dateFilter: FilterDateType | null | undefined
+  ) {
+    const { unit, operator, value: valueRaw } = dateFilter ?? {};
+
+    if (!unit || !operator) {
+      return { start: undefined, end: undefined };
+    }
 
     const now = new Date();
     const startOfDay = new Date(now.setHours(0, 0, 0, 0));
@@ -246,7 +402,20 @@ class DateCalculator {
       };
     }
 
-    const value = operator === 'less than' ? (valueRaw ?? 1) * -1 : valueRaw;
+    // const value = operator === 'less than' ? (valueRaw ?? 1) * -1 : valueRaw;
+    const isMonths = MONTHS.some((month) =>
+      valueRaw?.toString().includes(month.toLowerCase())
+    );
+
+    const isQuarters = QUARTERS.some((quarter) =>
+      valueRaw?.toString().includes(quarter.toLowerCase())
+    );
+
+    const isYear = ['201', '202', '203'].some((year) =>
+      valueRaw?.toString().includes(year)
+    );
+
+    const value = isMonths || isQuarters || isYear ? 1 : +(valueRaw || 1);
 
     const multiplier =
       unit === 'weeks' || unit === 'week'
@@ -258,7 +427,42 @@ class DateCalculator {
     let start: Date | undefined;
     let end: Date | undefined;
 
-    if (unit === 'weeks' || unit === 'week') {
+    if (isMonths && valueRaw && typeof valueRaw === 'string') {
+      const year = valueRaw?.split(' ')[1];
+      const month = valueRaw?.split(' ')[0];
+      const index = MONTHS.map((m) => m.toLowerCase()).indexOf(
+        month.toLowerCase()
+      );
+
+      const start = new Date(+year, index, 1);
+      const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+
+      return { start, end };
+    } else if (isQuarters && valueRaw && typeof valueRaw === 'string') {
+      const year = valueRaw?.split(' ')[1];
+      const quarter = valueRaw?.split(' ')[0].toLowerCase();
+
+      switch (quarter) {
+        case 'q1':
+          start = new Date(+year, 0, 1);
+          end = new Date(+year, 2, 31);
+          break;
+        case 'q2':
+          start = new Date(+year, 3, 1);
+          end = new Date(+year, 5, 30);
+          break;
+        case 'q3':
+          start = new Date(+year, 6, 1);
+          end = new Date(+year, 8, 30);
+          break;
+        case 'q4':
+          start = new Date(+year, 9, 1);
+          end = new Date(+year, 11, 31);
+          break;
+      }
+
+      return { start, end };
+    } else if (unit === 'weeks' || unit === 'week') {
       start = new Date();
       end = new Date();
       //   if unit is "week" -> start should be the first of the week
@@ -296,6 +500,14 @@ class DateCalculator {
     _start?.setHours(0, 0, 0, 0);
     _end?.setHours(23, 59, 59, 999);
 
+    if (operator === 'greater than') {
+      return { start: _end, end: undefined };
+    }
+
+    if (operator === 'less than') {
+      return { start: undefined, end: _start };
+    }
+
     return { start: _start, end: _end };
   }
 }
@@ -305,11 +517,14 @@ export const dateUtils = {
     const dateOptions = new DateOptions(value);
     return dateOptions.getOptions();
   },
-  parseOption: (option: string): FilterDateType => {
-    return DateOptionParser.parse(option);
+  parseOption: (
+    option: string,
+    operator: FilterOperatorType
+  ): FilterDateType | null => {
+    return DateOptionParser.parse(option, operator);
   },
 
-  getStartAndEndDate: (dateFilter: FilterDateType) => {
+  getStartAndEndDate: (dateFilter: FilterDateType | null | undefined) => {
     return DateCalculator.getStartAndEndDate(dateFilter);
   },
 };

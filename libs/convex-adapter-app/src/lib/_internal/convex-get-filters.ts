@@ -54,12 +54,7 @@ export const getStringFilters = (filters: FilterType[]) =>
   filters.filter((f) => f.field.type === 'String');
 
 export const getDateFilters = (filters: FilterType[]) =>
-  filters
-    .filter((f) => f.field.type === 'Date')
-    .map((f) => ({
-      ...f,
-      date: dateUtils.parseOption(filterUtil().getValue(f)),
-    }));
+  filters.filter((f) => f.field.type === 'Date');
 
 export const getFilterTypes = (
   filtersUnparsed: FilterType[] | undefined,
@@ -83,7 +78,7 @@ export const getFilterTypes = (
     if (f.field.type === 'Date') {
       return {
         ...f,
-        date: dateUtils.parseOption(filterUtil().getValue(f)),
+        date: dateUtils.parseOption(filterUtil().getValue(f), f.operator),
       };
     }
     return f;

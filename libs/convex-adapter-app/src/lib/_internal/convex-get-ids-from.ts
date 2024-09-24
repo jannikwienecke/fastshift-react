@@ -13,9 +13,9 @@ import {
 import { asyncMap } from 'convex-helpers';
 import { queryClient } from './convex-client';
 import { SearchField } from './convex-get-filters';
+import { getRelationTableRecords } from './convex-get-relation-table-records';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexClient, ConvexRecord } from './types.convex';
-import { getRelationTableRecords } from './convex-get-relation-table-records';
 /*
   Get records by ids
   @param ids
@@ -171,14 +171,14 @@ export const getIdsFromIndexFilters = async (
   indexFields: SearchField[] | undefined,
   ctx: GenericQueryCtx,
   viewConfigManager: BaseViewConfigManagerInterface
-) => {
+): Promise<{ ids: ID[]; idsToRemove: ID[] }> => {
   if (!indexFields) return { ids: [], idsToRemove: [] };
 
   const idsIndexFieldToRemove: ID[] = [];
 
   const idsIndexField = await asyncMap(
     filtersWithIndexField ?? [],
-    async (currentIndexFilter) => {
+    async (currentIndexFilter): Promise<ID[]> => {
       const indexField = indexFields.find(
         (f) => f.field === currentIndexFilter.field.name
       );
@@ -197,8 +197,7 @@ export const getIdsFromIndexFilters = async (
         let rows: ConvexRecord[] = [];
         if (
           currentIndexFilter.field.type === 'Date' &&
-          currentIndexFilter.type === 'primitive' &&
-          currentIndexFilter.date
+          currentIndexFilter.type === 'primitive'
         ) {
           const { start, end } = dateUtils.getStartAndEndDate(
             currentIndexFilter.date
@@ -208,17 +207,33 @@ export const getIdsFromIndexFilters = async (
             end: end?.toLocaleDateString(),
           });
 
-          if (!start || !end) {
-            throw new Error('Start or end date is undefined');
-          }
+          if (!start && !end) {
+            rows = await dbQuery
+              .withIndex(indexField.name, (q) =>
+                q.eq(indexField.field.toString(), undefined)
+              )
+              .collect();
+          } else if (start || end) {
+            rows = await dbQuery
+              .withIndex(indexField.name, (q) => {
+                if (start && end) {
+                  return q
+                    .gt(indexField.field.toString(), start.getTime())
+                    .lt(indexField.field.toString(), end.getTime());
+                }
+                if (start) {
+                  return q.gt(indexField.field.toString(), start.getTime());
+                }
+                if (end) {
+                  return q
+                    .lt(indexField.field.toString(), end.getTime())
+                    .gt(indexField.field.toString(), 0);
+                }
 
-          rows = await dbQuery
-            .withIndex(indexField.name, (q) =>
-              q
-                .gt(indexField.field.toString(), start.getTime())
-                .lt(indexField.field.toString(), end.getTime())
-            )
-            .collect();
+                return q;
+              })
+              .collect();
+          }
         } else {
           rows = await dbQuery
             .withIndex(indexField.name, (q) =>
@@ -227,9 +242,16 @@ export const getIdsFromIndexFilters = async (
             .collect();
         }
 
-        const ids = rows.map((r) => r._id);
+        if (currentIndexFilter.operator.label !== 'is not') {
+          const ids = rows.map((r) => r._id);
 
-        return ids;
+          return ids;
+        } else {
+          const ids = rows.map((r) => r._id);
+
+          idsIndexFieldToRemove.push(...ids);
+          return [];
+        }
       });
 
       const ids = idsList.flat();

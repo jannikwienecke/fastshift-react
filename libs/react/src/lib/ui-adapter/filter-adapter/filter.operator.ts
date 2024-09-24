@@ -11,7 +11,18 @@ import {
   operatorMap,
   optionsOperatorMap,
 } from './filter.operator.define';
-import { dateUtils } from './date.utils';
+import { dateUtils, MONTHS, QUARTERS } from './date.utils';
+
+const isMonthOrQuarter = (value: string) => {
+  const lowerOption = value.toLowerCase();
+  const isMonth = MONTHS.some((month) =>
+    lowerOption.includes(month.toLowerCase())
+  );
+  const isQuarter = QUARTERS.some((quarter) =>
+    lowerOption.includes(quarter.toLowerCase())
+  );
+  return isMonth || isQuarter;
+};
 
 export const operator = () => {
   const value = (f: FilterType) => (f.type === 'primitive' ? f.value : null);
@@ -66,6 +77,10 @@ export const operator = () => {
 
     const _isMany = hasMoreThanOneValue(filter);
 
+    if (field.type === 'Date') {
+      return getOptionsForDateField(field, filter);
+    }
+
     return operators
       .filter((operator) => (_isMany ? operator.many : !operator.many))
       .map((operator) => ({
@@ -105,13 +120,89 @@ export const initDateOperator = (field: FieldConfig, value?: Row | null) => {
   if (!operator) return defaultOperator;
   if (!value) return operator;
 
-  const date = dateUtils.parseOption(value.raw);
+  const date = dateUtils.parseOption(value.raw, operator);
 
-  if (date.unit === 'week' || date.unit === 'month' || date.unit === 'year') {
+  const _isMonthOrQuarter = isMonthOrQuarter(value.raw);
+  if (
+    !date ||
+    date.unit === 'today' ||
+    date.unit === 'tomorrow' ||
+    date.unit === 'yesterday' ||
+    _isMonthOrQuarter
+  ) {
+    return operatorMap.is;
+  }
+
+  if (
+    date &&
+    (date.unit === 'week' || date.unit === 'month' || date.unit === 'year')
+  ) {
     if (!date.value || (date.value === -1 && date.operator === 'equal to')) {
       return operatorMap.within;
     }
   }
 
+  if (value.raw.includes('ago')) {
+    return operatorMap.after;
+  }
+
   return operator;
+};
+
+export const getOptionsForDateField = (
+  field: FieldConfig,
+  filter?: FilterType
+): ComboxboxItem[] => {
+  const operators = optionsOperatorMap[field.type];
+  if (!operators) return [];
+
+  const value = filter?.type === 'primitive' ? filter.value : null;
+
+  const date = dateUtils.parseOption(value?.raw, operators[0]);
+
+  const _isMonthOrQuarter = isMonthOrQuarter(value?.raw);
+
+  if (
+    !date ||
+    date.unit === 'today' ||
+    date.unit === 'tomorrow' ||
+    date.unit === 'yesterday' ||
+    _isMonthOrQuarter
+  ) {
+    return [
+      {
+        id: operatorMap.is.label,
+        label: operatorMap.is.label,
+        icon: operatorMap.is.icon,
+      },
+      {
+        id: operatorMap.isNot.label,
+        label: operatorMap.isNot.label,
+        icon: operatorMap.isNot.icon,
+      },
+    ];
+  }
+
+  if (
+    date &&
+    (date.unit === 'week' || date.unit === 'month' || date.unit === 'year')
+  ) {
+    if (!date.value || (date.value === -1 && date.operator === 'equal to')) {
+      return [
+        {
+          id: operatorMap.within.label,
+          label: operatorMap.within.label,
+          icon: operatorMap.within.icon,
+        },
+      ];
+    }
+  }
+
+  return operators
+    .filter((o) => o.label !== 'within')
+    .map((operator) => ({
+      id: operator.label,
+      label: operator.label,
+      icon: operator.icon,
+    }));
 };
