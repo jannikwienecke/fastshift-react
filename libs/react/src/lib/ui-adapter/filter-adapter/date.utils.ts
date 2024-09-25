@@ -192,7 +192,7 @@ class DateOptions {
       option.label.toLowerCase().includes(this.value)
     );
 
-    return [...allFiltered, selectSpecificDate];
+    return [selectSpecificDate, ...allFiltered];
   }
 
   private getWeekOrDayOptions(): ComboxboxItem[] {

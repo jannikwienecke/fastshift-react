@@ -106,7 +106,11 @@ const FilterItem = (props: {
           <div onClick={props.onSelect}>{filter.value}</div>
         </button>
 
-        <button className="px-2 hover:bg-accent py-1" onClick={onRemove}>
+        <button
+          data-testid={`remove-filter-${filter.name}`}
+          className="px-2 hover:bg-accent py-1"
+          onClick={onRemove}
+        >
           <Cross2Icon className="w-4 h-4 text-foreground" />
         </button>
       </div>

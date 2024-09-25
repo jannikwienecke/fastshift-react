@@ -29,7 +29,7 @@ export function DatePicker({
         />
       </PopoverTrigger>
 
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent data-testid="date-picker" className="w-auto p-0">
         <Calendar
           mode="single"
           selected={selected}

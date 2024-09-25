@@ -174,7 +174,101 @@ test.describe('Task management', () => {
   });
 
   test('can filter tasks by due date', async ({ taskPage, page }) => {
-    // to be implemented
-    expect(true).toBe(true);
+    const listItem = await taskPage.getListItem(0);
+    const listItem2 = await taskPage.getListItem(1);
+    // before filter -> this is our first list item
+    await expect(listItem.getByText(/design mockups/i)).toBeVisible();
+
+    await taskPage.openFilter(/dueDate/i);
+    await taskPage.comboboxPopover.getByText(/today/i).click();
+    await taskPage.expectToSeeFilter(/dueDate/i, 'is', 'today');
+
+    // after filter -> this is our first list item
+    await expect(listItem.getByText(/develop frontend/i)).toBeVisible();
+    await expect(
+      listItem2.getByText(/implement responsive design/i)
+    ).toBeVisible();
+
+    // now we change the filter from is -> is not
+    await taskPage.filterList.getByText(/is/i).click();
+    await taskPage.comboboxPopover.getByText(/is not/i).click();
+    await taskPage.expectToSeeFilter(/dueDate/i, 'is not', 'today');
+    await expect(listItem.getByText(/design mockups/i)).toBeVisible();
+
+    // after remove filter -> this is our first list item again
+    await expect(listItem.getByText(/design mockups/i)).toBeVisible();
+
+    await taskPage.openFilter(/dueDate/i);
+    await taskPage.comboboxPopover.getByText(/this month/i).click();
+    await taskPage.expectToSeeFilter(/dueDate/i, 'within', 'this month');
+
+    await page.getByText(/this month/i).click();
+    await taskPage.filterAndSelect('3 week', /3 weeks from now/i);
+    await taskPage.expectToSeeFilter(/dueDate/i, 'before', '3 weeks from now');
+
+    await taskPage.openFilter(/dueDate/i);
+    await taskPage.filterAndSelect('no date', /no date defined/i);
+    await taskPage.expectToSeeFilter(/dueDate/i, 'is', /no date defined/i);
+
+    await taskPage.filterBySpecificDate(new Date().getDate().toString());
+
+    await taskPage.closePopover();
+
+    await taskPage.removeFilter('dueDate');
+
+    await testingQueryBehavior({ taskPage, page });
   });
 });
+
+const testingQueryBehavior = async ({ taskPage, page }) => {
+  await taskPage.openFilter(/dueDate/i);
+  const input = page.getByPlaceholder(/filter/i);
+
+  const getByText = (l: RegExp) => taskPage.comboboxPopover.getByText(l);
+
+  await input.fill('week');
+  await expect(getByText(/this week/i)).toBeVisible();
+  await expect(getByText(/last week/i)).toBeVisible();
+  await expect(getByText(/one week from now/i)).toBeVisible();
+  await expect(getByText(/one week ago/i)).toBeVisible();
+
+  await input.fill('week 3');
+  await expect(getByText(/3 weeks from now/i)).toBeVisible();
+  await expect(getByText(/3 weeks ago/i)).toBeVisible();
+
+  await input.fill('month');
+  await expect(getByText(/this month/i)).toBeVisible();
+  await expect(getByText(/last month/i)).toBeVisible();
+  await expect(getByText(/one month from now/i)).toBeVisible();
+  await expect(getByText(/one month ago/i)).toBeVisible();
+
+  await input.fill('year');
+  await expect(getByText(/this year/i)).toBeVisible();
+  await expect(getByText(/last year/i)).toBeVisible();
+
+  await input.fill('from now 12');
+  await expect(getByText(/12 days from now/i)).toBeVisible();
+  await expect(getByText(/12 weeks from now/i)).toBeVisible();
+  await expect(getByText(/12 months from now/i)).toBeVisible();
+
+  await input.fill('2024');
+  await expect(getByText(/2024/i).first()).toBeVisible();
+  await expect(getByText(/january 2024/i)).toBeVisible();
+  await expect(getByText(/march 2024/i)).toBeVisible();
+  await expect(getByText(/december 2024/i)).toBeVisible();
+
+  await input.fill('2024 aug');
+  await expect(getByText(/2024/i).first()).toBeVisible();
+  await expect(getByText(/august 2024/i)).toBeVisible();
+
+  await input.fill('august');
+  const year = new Date().getFullYear();
+  await expect(page.getByText(`august ${year}`)).toBeVisible();
+  await expect(page.getByText(`august ${year - 1}`)).toBeVisible();
+  await expect(page.getByText(`august ${year + 1}`)).toBeVisible();
+  await expect(page.getByText(`august ${year + 2}`)).toBeVisible();
+
+  await input.fill('today');
+  await expect(getByText(/today/i)).toBeVisible();
+  await expect(getByText(/select specific date/i)).toBeVisible();
+};
