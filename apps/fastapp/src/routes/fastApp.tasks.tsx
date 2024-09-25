@@ -100,7 +100,9 @@ const Task = () => {
   const filterComboboxProps = {
     state: propsForCombobox,
     onClose: closeAll,
-    onSelect: handleSelectValue,
+    onSelect: (props) => {
+      handleSelectValue(props);
+    },
   } satisfies UseComboboxProps;
 
   const listComboboxProps = {

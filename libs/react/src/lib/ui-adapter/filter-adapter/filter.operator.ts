@@ -37,6 +37,7 @@ export const operator = () => {
 
   const _primitive = (filter: FilterType) => {
     if (!value(filter)) return null;
+
     return filter.operator || initOperator(filter.field, value(filter));
   };
 
@@ -122,13 +123,18 @@ export const initDateOperator = (field: FieldConfig, value?: Row | null) => {
 
   const date = dateUtils.parseOption(value.raw, operator);
 
+  const isYear = ['201', '202', '203'].some((year) =>
+    value.raw?.toString().includes(year)
+  );
+
   const _isMonthOrQuarter = isMonthOrQuarter(value.raw);
   if (
     !date ||
     date.unit === 'today' ||
     date.unit === 'tomorrow' ||
     date.unit === 'yesterday' ||
-    _isMonthOrQuarter
+    _isMonthOrQuarter ||
+    isYear
   ) {
     return operatorMap.is;
   }
@@ -161,13 +167,17 @@ export const getOptionsForDateField = (
   const date = dateUtils.parseOption(value?.raw, operators[0]);
 
   const _isMonthOrQuarter = isMonthOrQuarter(value?.raw);
+  const isYear = ['201', '202', '203'].some((year) =>
+    value?.raw?.toString().includes(year)
+  );
 
   if (
     !date ||
     date.unit === 'today' ||
     date.unit === 'tomorrow' ||
     date.unit === 'yesterday' ||
-    _isMonthOrQuarter
+    _isMonthOrQuarter ||
+    isYear
   ) {
     return [
       {

@@ -62,5 +62,6 @@ export type FilterDateType = {
     | 'yesterday'
     | 'weeks'
     | 'months'
-    | 'quarter';
+    | 'quarter'
+    | 'iso-date';
 };

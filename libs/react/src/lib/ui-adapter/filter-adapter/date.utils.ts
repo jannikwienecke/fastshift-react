@@ -120,9 +120,9 @@ class DateOptions {
       this.value.includes(q.toLowerCase())
     );
     // TODOL hier weiter machen. check ob alles passt
-    // fix when select only year like 2024
-    // refactor this and the operator utils page
     // tests schreiben....
+    // after tests: refactor this and the operator utils page
+    // handle use case: switch between match all filters and match any filters
     const currentYear = new Date().getFullYear();
 
     const years = [];
@@ -297,7 +297,7 @@ class DateOptionParser {
     option: string,
     operator: FilterOperatorType
   ): FilterDateType | null {
-    const lowerOption = option.toLowerCase();
+    const lowerOption = option.toString().toLowerCase();
     let number = lowerOption.match(/\d+/)
       ? parseInt(lowerOption.match(/\d+/)?.[0] || '', 10)
       : null;
@@ -314,7 +314,19 @@ class DateOptionParser {
       lowerOption.includes(month.toLowerCase())
     );
 
-    if (includesQuarter || includesMonth) {
+    const isYear = ['201', '202', '203'].some((year) =>
+      lowerOption.includes(year)
+    );
+
+    const isIsoDate = !Number.isNaN(new Date(lowerOption)?.getTime());
+
+    if (isIsoDate) {
+      return {
+        operator: 'equal to',
+        value: lowerOption,
+        unit: 'iso-date',
+      };
+    } else if (includesQuarter || includesMonth || isYear) {
       return {
         operator: 'equal to',
         value: lowerOption,
@@ -415,6 +427,8 @@ class DateCalculator {
       valueRaw?.toString().includes(year)
     );
 
+    const isIsoDate = unit === 'iso-date';
+
     const value = isMonths || isQuarters || isYear ? 1 : +(valueRaw || 1);
 
     const multiplier =
@@ -427,7 +441,14 @@ class DateCalculator {
     let start: Date | undefined;
     let end: Date | undefined;
 
-    if (isMonths && valueRaw && typeof valueRaw === 'string') {
+    if (isIsoDate && valueRaw) {
+      const date = new Date(valueRaw.toString());
+
+      start = new Date(date.setHours(0, 0, 0, 0));
+      end = new Date(date.setHours(23, 59, 59, 999));
+
+      return { start, end };
+    } else if (isMonths && valueRaw && typeof valueRaw === 'string') {
       const year = valueRaw?.split(' ')[1];
       const month = valueRaw?.split(' ')[0];
       const index = MONTHS.map((m) => m.toLowerCase()).indexOf(
@@ -461,6 +482,10 @@ class DateCalculator {
           break;
       }
 
+      return { start, end };
+    } else if (isYear && valueRaw && typeof valueRaw === 'string') {
+      start = new Date(+valueRaw, 0, 1);
+      end = new Date(+valueRaw, 11, 31);
       return { start, end };
     } else if (unit === 'weeks' || unit === 'week') {
       start = new Date();

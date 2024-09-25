@@ -39,9 +39,7 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
               style={{
                 position: 'fixed',
                 top: `${rect.top + rect.height}px`,
-                left: `${rect.left - rect.width / 2}px`,
-                width: `${0}px`,
-                height: `${0}px`,
+                left: `${rect.left}px`,
               }}
             />
           </PopoverTrigger>
@@ -73,10 +71,11 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
                   )}
                 />
               ) : null}
-
-              <div className="text-foreground text-xs px-1 py-[1px] rounded-sm border-[1px]">
-                {comboboxProps.tableName.slice(0, 1).toUpperCase()}
-              </div>
+              {comboboxProps.tableName ? (
+                <div className="text-foreground text-xs px-1 py-[1px] rounded-sm border-[1px]">
+                  {comboboxProps.tableName.slice(0, 1).toUpperCase()}
+                </div>
+              ) : null}
             </div>
 
             <CommandList>

@@ -63,7 +63,6 @@ export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
 
   if (state.selectedDateField) {
     if (value.id === 'Select specific date') {
-      console.log('show date picker');
       set(filterStateAtom, { ...get(filterStateAtom), showDatePicker: true });
     } else {
       set(setFilterAtom, {
@@ -112,7 +111,6 @@ export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
         selectedField: field,
         selectedDateField: field,
         query: '',
-        rect: null,
       });
     } else {
       set(filterStateAtom, {
@@ -121,7 +119,6 @@ export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
         open: false,
         selectedOperatorField: null,
         values: [],
-        rect: null,
         query: '',
       });
     }
@@ -172,13 +169,18 @@ export const setQueryAtom = atom(null, (get, set, query: string) => {
 });
 
 const selectDateAtom = atom(null, (get, set, date: Date) => {
-  const filterStore = get(filterAtom);
-  const currentFilter = filterStore.fitlers?.find(
-    (f) => f.field.name === get(filterStateAtom).selectedDateField?.name
-  );
+  const state = get(filterStateAtom);
+  if (!state.selectedDateField) return;
 
-  console.log('selectDate', date);
-  console.log('currentFilter', currentFilter);
+  set(setFilterAtom, {
+    field: state.selectedDateField,
+    value: makeRow(
+      date.toDateString(),
+      date.toDateString(),
+      date.toISOString(),
+      state.selectedDateField
+    ),
+  });
 });
 
 const derivedFilteredValuesAtom = atom((get) => {

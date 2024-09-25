@@ -20,17 +20,14 @@ export const FilterDefault = (props: FilterProps) => {
       <div className="flex flex-row gap-2 items-center">
         {filters.length > 0 && <FilterList {...props} />}
 
-        {datePickerProps ? (
-          <FilterDatePicker {...datePickerProps} />
-        ) : (
-          <div className="relative">
-            <FilterButton
-              comboboxProps={comboboxProps}
-              onOpen={onOpen}
-              hasFilter={filters.length > 0}
-            />
-          </div>
-        )}
+        {datePickerProps ? <FilterDatePicker {...datePickerProps} /> : null}
+
+        <FilterButton
+          comboboxProps={comboboxProps}
+          datePickerIsOpen={datePickerProps?.open}
+          onOpen={onOpen}
+          hasFilter={filters.length > 0}
+        />
       </div>
     </>
   );
@@ -79,7 +76,7 @@ const FilterItem = (props: {
   return (
     <div
       data-testid={`filter-item-${filter.name}`}
-      className="border border-input rounded-sm text-muted-foreground "
+      className="border border-input rounded-sm text-muted-foreground relative"
     >
       <div className="flex flex-row items-center flex-wrap">
         <div className="flex items-center gap-[1px] border-r-[1px] pl-2 border-r-input/30 pr-2 py-1">
@@ -99,7 +96,7 @@ const FilterItem = (props: {
           {filter.operator}
         </button>
 
-        <div className="flex items-center px-1 gap-[1px] border-r-[1px] border-r-input/30 pr-2 py-1 hover:bg-accent">
+        <button className="flex items-center px-1 gap-[1px] border-r-[1px] border-r-input/30 pr-2 py-1 hover:bg-accent">
           {filter.icon ? (
             <div>
               <filter.icon className="w-4 h-4 text-muted-foreground" />
@@ -107,7 +104,7 @@ const FilterItem = (props: {
           ) : null}
 
           <div onClick={props.onSelect}>{filter.value}</div>
-        </div>
+        </button>
 
         <button className="px-2 hover:bg-accent py-1" onClick={onRemove}>
           <Cross2Icon className="w-4 h-4 text-foreground" />
@@ -119,31 +116,46 @@ const FilterItem = (props: {
 
 const FilterButton = (props: {
   comboboxProps: ComboboxPopoverProps<ComboxboxItem>;
+  datePickerIsOpen?: boolean;
   onOpen: (rect: DOMRect) => void;
   hasFilter: boolean;
   label?: string;
 }) => {
-  return (
-    <ComboboxPopover {...props.comboboxProps}>
-      <button
-        data-testid="filter-button"
-        onClick={(e) => props.onOpen(e.currentTarget.getBoundingClientRect())}
-        className="flex flex-row text-xs items-center p-1 px-2 rounded-sm border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-      >
-        <ListFilter className="w-4 h-4" />
+  const filterTriggerBtn = (
+    <button
+      data-testid="filter-button"
+      onClick={(e) => props.onOpen(e.currentTarget.getBoundingClientRect())}
+      className="flex flex-row text-xs items-center p-1 px-2 rounded-sm border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+    >
+      <ListFilter className="w-4 h-4" />
 
-        {props.hasFilter ? (
-          <span></span>
-        ) : (
-          <span className="pl-2">{props.label || 'Filter'}</span>
-        )}
-      </button>
-    </ComboboxPopover>
+      {props.hasFilter ? (
+        <></>
+      ) : (
+        <span className="pl-2">{props.label || 'Filter'}</span>
+      )}
+    </button>
+  );
+
+  return (
+    <>
+      {!props.datePickerIsOpen ? (
+        <ComboboxPopover
+          {...props.comboboxProps}
+          rect={props.hasFilter ? props.comboboxProps.rect : null}
+        >
+          {filterTriggerBtn}
+        </ComboboxPopover>
+      ) : null}
+
+      {(props.hasFilter && props.comboboxProps.rect) || props.datePickerIsOpen
+        ? filterTriggerBtn
+        : null}
+    </>
   );
 };
 
 const FilterDatePicker = (props: DatePickerProps) => {
-  console.log(props);
   return <DatePicker {...props} />;
 };
 

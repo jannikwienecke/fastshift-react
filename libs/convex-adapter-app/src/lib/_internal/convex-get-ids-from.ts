@@ -202,6 +202,7 @@ export const getIdsFromIndexFilters = async (
           const { start, end } = dateUtils.getStartAndEndDate(
             currentIndexFilter.date
           );
+
           console.log({
             start: start?.toLocaleDateString(),
             end: end?.toLocaleDateString(),

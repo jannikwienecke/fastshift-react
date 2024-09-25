@@ -76,9 +76,10 @@ export const getFilterTypes = (
 
   const filters = [...filtersUnparsed].map((f) => {
     if (f.field.type === 'Date') {
+      const date = dateUtils.parseOption(filterUtil().getValue(f), f.operator);
       return {
         ...f,
-        date: dateUtils.parseOption(filterUtil().getValue(f), f.operator),
+        date,
       };
     }
     return f;
