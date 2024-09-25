@@ -1,8 +1,10 @@
 import { RecordType } from './base.types';
+import { FilterItemType } from './filter.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
   label: string;
+  icon?: React.FC<any>;
 };
 
 export type ListValueProps = {
@@ -57,27 +59,25 @@ export type ComboboxProps = {
   };
 };
 
-export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> =
-  | {
-      input?: {
-        query: string;
-        placeholder: string;
-        onChange: (query: string) => void;
-      };
+export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> = {
+  input?: {
+    query: string;
+    placeholder: string;
+    onChange: (query: string) => void;
+  };
 
-      values: T[];
-      onChange: (value: T) => void;
-      selected: ComboxboxItem[] | null;
-      open: boolean;
-      onOpenChange: (open: boolean) => void;
-      tableName: string;
-      render: (value: T) => React.ReactNode;
-      multiple: boolean;
-      rect: DOMRect | null;
-      searchable: boolean;
-    }
-  | undefined
-  | null;
+  values: T[];
+  onChange: (value: T) => void;
+  selected: ComboxboxItem[] | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  tableName: string;
+  render: (value: T) => React.ReactNode;
+  multiple: boolean;
+  rect: DOMRect | null;
+  searchable: boolean;
+  name: string;
+};
 
 export type ComboboxAdapterOptions<T extends ComboxboxItem> = {
   onClose: () => void;
@@ -92,4 +92,37 @@ export type ComboboAdapterProps = {
     id: string | number | (string | number)[];
     label: string;
   };
+};
+
+export type FilterProps = {
+  filters: FilterItemType[];
+  onOpen: (rect: DOMRect) => void;
+  onRemove: (filter: FilterItemType) => void;
+  onSelect: (filter: FilterItemType, rect: DOMRect) => void;
+  onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
+  comboboxProps: ComboboxPopoverProps;
+  datePickerProps: DatePickerProps | null;
+};
+
+export type InputDialogProps = {
+  open: boolean;
+  title: string;
+  onSubmit: () => void;
+  onCancel: () => void;
+  onOpenChange: (open: boolean) => void;
+  className?: string;
+  inputList: {
+    id: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder: string;
+  }[];
+};
+
+export type DatePickerProps = {
+  selected: Date | undefined;
+  onSelect: (date: Date) => void;
+  rect: DOMRect | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };

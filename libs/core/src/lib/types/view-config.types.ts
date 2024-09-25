@@ -1,7 +1,9 @@
 import {
   FieldConfig,
+  FieldType,
   GetTableDataType,
   GetTableName,
+  IndexField,
   SearchableField,
 } from './base.types';
 import { IncludeConfig } from './config.types';
@@ -26,8 +28,15 @@ export type ViewConfigType<T extends GetTableName = any> =
       field: keyof GetTableDataType<T>;
       cell?: (value: GetTableDataType<T>) => React.ReactNode;
     };
+    fields?: {
+      [field in keyof GetTableDataType<T>]?: {
+        isDateField?: boolean;
+      };
+    };
     query?: {
-      searchableFields?: SearchableField;
+      searchableFields?: SearchableField[];
+      indexFields?: IndexField[];
+      primarySearchField?: keyof GetTableDataType<T>;
     };
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;

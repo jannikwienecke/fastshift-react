@@ -27,13 +27,15 @@ export const BooleanInitializer = (
 
     multiple: false,
     searchable: false,
-    selected: [
-      makeRow(
-        selected ? 'true' : 'false',
-        selected ? 'true' : 'false',
-        selected,
-        field
-      ),
-    ],
+    selected: Array.isArray(selected)
+      ? selected
+      : [
+          makeRow(
+            selected ? 'true' : 'false',
+            selected ? 'true' : 'false',
+            selected,
+            field
+          ),
+        ],
   };
 };

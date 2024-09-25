@@ -16,13 +16,14 @@ export const viewMutationHandler = async (
   const args = _args as MutationProps;
 
   const viewConfigManager = new BaseViewConfigManager(args.viewConfig);
-  const { mutation } = args;
+  const { mutation, registeredViews } = args;
 
   const handler = mutationHandlers[mutation.type];
 
   await handler(ctx, {
     mutation,
     viewConfigManager,
+    registeredViews,
   });
 
   return {

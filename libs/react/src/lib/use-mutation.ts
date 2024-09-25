@@ -1,4 +1,5 @@
 import {
+  convertFiltersForBackend,
   lldebug,
   makeQueryKey,
   Mutation,
@@ -11,7 +12,7 @@ import {
 } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import React from 'react';
-import { debouncedQueryAtom, useView } from '..';
+import { debouncedQueryAtom, useFilterStore, useView } from '..';
 import { useApi } from './use-api';
 
 export const useMutation = () => {
@@ -21,6 +22,8 @@ export const useMutation = () => {
   const queryClient = useQueryClient();
 
   const { registeredViews } = useView();
+  const { filter } = useFilterStore();
+  const parsedFilters = convertFiltersForBackend(filter.filters);
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -48,6 +51,7 @@ export const useMutation = () => {
         ...args,
         viewName: viewConfigManager.viewConfig.viewName,
         viewConfig: undefined,
+        registeredViews: undefined,
         mutation: {
           ...args.mutation,
           handler: undefined,
@@ -78,16 +82,19 @@ export const useMutation = () => {
     onMutate: async (vars) => {
       lastViewName.current = vars.viewConfig.viewName;
 
+      // TODO: Fix This. getting and setting queryKey must happen in 1 location!
       const _queryKeyAll = api?.makeQueryOptions?.({
         ...queryPropsMerged,
         query: '',
         viewName: vars.viewConfig.viewName,
+        filters: '',
       }).queryKey;
 
       const _queryKey = api?.makeQueryOptions?.({
         ...queryPropsMerged,
         query: vars.query,
         viewName: vars.viewConfig.viewName,
+        filters: parsedFilters,
       }).queryKey;
 
       const queryKey =
@@ -145,6 +152,7 @@ export const useMutation = () => {
       try {
         const res = await mutateAsync({
           viewConfig: viewConfigManager.viewConfig,
+          registeredViews,
           mutation: args.mutation,
           query,
         });
@@ -155,7 +163,7 @@ export const useMutation = () => {
         return { error: (error as any)?.message };
       }
     },
-    [mutateAsync, query, viewConfigManager.viewConfig]
+    [mutateAsync, query, viewConfigManager.viewConfig, registeredViews]
   );
 
   const runMutate = React.useCallback(
@@ -165,9 +173,10 @@ export const useMutation = () => {
         mutation: args.mutation,
         query,
         viewConfig: viewConfigManager.viewConfig,
+        registeredViews,
       });
     },
-    [mutate, query, viewConfigManager.viewConfig]
+    [mutate, query, viewConfigManager.viewConfig, registeredViews]
   );
 
   React.useEffect(() => {

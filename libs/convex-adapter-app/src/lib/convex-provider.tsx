@@ -52,6 +52,7 @@ export const preloadQuery = (
   convexQuery(viewLoader, {
     query: '',
     viewName: viewConfig.viewName,
+    filters: '',
   });
 
 export type ConvexContext = {

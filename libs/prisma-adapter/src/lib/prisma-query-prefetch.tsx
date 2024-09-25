@@ -20,7 +20,7 @@ export async function prefetchViewQuery({
   views: RegisteredViews;
 }) {
   const viewConfigManager = new BaseViewConfigManager(viewConfig);
-  const searchableFields = viewConfigManager.getSearchableField();
+  const searchableFields = viewConfigManager.getSearchableFields();
   const viewFields = viewConfigManager.viewConfig.viewFields;
   const viewName = viewConfigManager.getViewName();
 
@@ -39,7 +39,7 @@ export async function prefetchViewQuery({
           registeredViews: views,
           modelConfig: {
             viewFields: viewFields,
-            searchableFields: searchableFields,
+            searchableFields: searchableFields?.[0],
           },
           viewConfig: {
             ...viewConfigManager.viewConfig,

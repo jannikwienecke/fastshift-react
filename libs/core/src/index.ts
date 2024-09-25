@@ -9,3 +9,4 @@ export * from './lib/relational-view.helper';
 export * from './lib/config.store';
 export * from './lib/data-model';
 export * from './lib/schema';
+export * from './lib/types/filter.types';

@@ -1,8 +1,10 @@
 import {
   BaseViewConfigManager,
   invarant,
+  parseFilterStringForServer,
   QueryDto,
   QueryReturnDto,
+  QueryServerProps,
   ViewConfigType,
 } from '@apps-next/core';
 import { getData } from './_internal/convex-get-data';
@@ -19,19 +21,36 @@ export const viewLoaderHandler = async (
 ): Promise<QueryReturnDto> => {
   const args = _args as QueryDto;
 
+  if (args.relationQuery && !args.relationQuery.tableName) {
+    return {
+      data: [],
+    };
+  }
+
   const viewConfigManager = new BaseViewConfigManager(
     args.viewConfig as ViewConfigType,
     args.modelConfig
   );
 
+  const parsedFilters = parseFilterStringForServer(
+    args.filters ?? '',
+    viewConfigManager
+  );
+
+  const serverProps: QueryServerProps = {
+    ...args,
+    viewConfigManager,
+    filters: parsedFilters,
+  };
+
   if (args.relationQuery?.tableName) {
-    return handleRelationalTableQuery({ ctx, args, viewConfigManager });
+    return handleRelationalTableQuery({ ctx, args: serverProps });
   }
 
   invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
 
   return {
-    data: await getData(ctx, viewConfigManager, args),
-    relationalData: await getRelationalData(ctx, viewConfigManager, args),
+    data: await getData(ctx, serverProps),
+    relationalData: await getRelationalData(ctx, serverProps),
   };
 };

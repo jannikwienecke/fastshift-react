@@ -16,8 +16,8 @@ export type ComboboxInitDict = Partial<{
 export const helper = (payload: ComboboxInitPayload) => {
   const { row, field } = payload;
 
-  if (!row || !field) throw new Error('Invalid payload');
-  const id = row.id + field.name;
+  if (!field) throw new Error('Invalid payload');
+  const id = row ? row.id : 'no-id' + field.name;
 
   return {
     ...payload,

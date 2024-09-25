@@ -56,7 +56,9 @@ export type FieldConfig = {
 };
 
 export type GetTableName = keyof RegisteredRouter['config']['_datamodel'];
-// export type GetTableName = RegisteredRouter['config']['tableNames'][number];
+
+// export type GetTableNameSecond =
+//   RegisteredRouter['config']['tableNames'][number];
 
 export type GetTableDataType<T extends GetTableName> =
   RegisteredRouter['config']['_datamodel'][T];
@@ -70,6 +72,11 @@ export type SearchableField<TDataModel extends Record<string, any> = any> = {
   field: GetFieldName<TDataModel>;
   name: string;
   filterFields: GetFieldName<TDataModel>[];
+};
+
+export type IndexField<TDataModel extends Record<string, any> = any> = {
+  fields: GetFieldName<TDataModel>[];
+  name: string;
 };
 
 export type GlobalConfig = {

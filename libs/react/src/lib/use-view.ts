@@ -1,4 +1,4 @@
-import { GetTableName, ViewConfigType } from '@apps-next/core';
+import { GetTableName, RegisteredViews, ViewConfigType } from '@apps-next/core';
 import { useAtomValue } from 'jotai';
 import { registeredViewsAtom, viewConfigManagerAtom } from './stores';
 

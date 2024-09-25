@@ -1,6 +1,6 @@
 import { BaseViewConfigManagerInterface } from '../base-view-config';
 import { FieldConfig, ID } from './base.types';
-import { ViewConfigType } from './view-config.types';
+import { RegisteredViews, ViewConfigType } from './view-config.types';
 
 type MutationRecord = Record<string, any>;
 
@@ -41,10 +41,12 @@ export type MutationProps = {
   viewConfig: ViewConfigType;
   mutation: Mutation;
   query: string;
+  registeredViews: RegisteredViews;
 };
 
 export type MutationPropsServer = {
   viewConfigManager: BaseViewConfigManagerInterface;
+  registeredViews: RegisteredViews;
   mutation: Mutation;
 };
 

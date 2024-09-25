@@ -1,23 +1,23 @@
 import {
-  BaseViewConfigManagerInterface,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
-  QueryDto,
+  QueryServerProps,
   relationalViewHelper,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
+import { filterResults } from './convex-filter-results';
 import { mapWithInclude } from './convex-map-with-include';
-import { filterResults, withSearch } from './convex-searching';
+import { withSearch } from './convex-searching';
 import { GenericQueryCtx } from './convex.server.types';
 
 export const handleRelationalTableQuery = async ({
   ctx,
   args,
-  viewConfigManager,
 }: {
   ctx: GenericQueryCtx;
-  args: QueryDto;
-  viewConfigManager: BaseViewConfigManagerInterface;
+  args: QueryServerProps;
 }) => {
+  const { viewConfigManager } = args;
+
   const relationQuery = args.relationQuery;
   if (!relationQuery?.tableName) throw new Error('No table name provided');
 
@@ -31,26 +31,38 @@ export const handleRelationalTableQuery = async ({
     args.registeredViews
   );
 
-  const searchField = relationalViewManager.getSearchableField();
+  const searchFields = relationalViewManager.getSearchableFields() || [];
 
-  let rows = await withSearch(dbQuery, {
-    searchField,
-    query: args.query,
-  }).collect();
+  const fetch = async () => {
+    if (!args.query) {
+      return await dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+    }
 
-  rows = await filterResults(
-    rows,
-    relationalViewManager.getDisplayFieldLabel(),
-    args.query ?? '',
-    searchField
-  ).slice(0, DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+    if (searchFields.length && args.query) {
+      return await withSearch(dbQuery, {
+        searchFields,
+        query: args.query,
+      });
+    } else {
+      // if we dont have a search field, we need to query the complete table
+      // and then filter the results.
+      console.warn(
+        'Slow Query. No search field provided. Querying the complete table.'
+      );
+      const rows = await dbQuery.collect();
+      return filterResults(
+        rows,
+        relationalViewManager.getDisplayFieldLabel(),
+        args.query ?? '',
+        [],
+        searchFields
+      ).slice(0, DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+    }
+  };
 
-  const rowsWithInclude = await mapWithInclude(
-    rows,
-    relationalViewManager,
-    ctx,
-    args
-  );
+  const rows = await fetch();
+
+  const rowsWithInclude = await mapWithInclude(rows, ctx, args);
 
   return {
     data: rowsWithInclude.map((row) => {

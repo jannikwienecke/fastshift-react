@@ -6,6 +6,7 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   DataModelNew,
+  getViewByName,
   makeData,
   makeQueryKey,
   QueryReturnOrUndefined,
@@ -69,8 +70,8 @@ export const Content = (props: QueryProviderPropsWithViewFieldsConfig) => {
 
   const relationalDataModel = Object.entries(data?.relationalData ?? {}).reduce(
     (acc, [tableName, data]) => {
-      const viewConfig = registeredViews[tableName];
-      acc[tableName] = makeData(registeredViews, viewConfig?.tableName)(data);
+      const viewConfig = getViewByName(registeredViews, tableName);
+      acc[tableName] = makeData(registeredViews, viewConfig.viewName)(data);
       return acc;
     },
     {} as { [key: string]: DataModelNew<RecordType> }

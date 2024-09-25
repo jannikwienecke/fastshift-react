@@ -2,7 +2,7 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import * as ReactDOM from 'react-dom/client';
 
-import { api } from '@apps-next/convex';
+import { api, config } from '@apps-next/convex';
 import {
   ConvexQueryProvider,
   preloadQuery,
@@ -12,7 +12,6 @@ import { routeTree } from './routeTree.gen';
 import { ConvexQueryClient } from '@convex-dev/react-query';
 import { QueryClient } from '@tanstack/react-query';
 import { ConvexReactClient } from 'convex/react';
-import { config } from './global-config';
 
 const VITE_CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
 

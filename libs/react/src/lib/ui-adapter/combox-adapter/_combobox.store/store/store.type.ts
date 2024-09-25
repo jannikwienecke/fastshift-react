@@ -28,9 +28,11 @@ export type ComboboxStore = {
 
 export type ComboboxInitPayload = Pick<
   ComboboxStore,
-  'field' | 'row' | 'rect' | 'defaultData' | 'registeredViews'
+  'field' | 'rect' | 'defaultData' | 'registeredViews'
 > & {
   selected: Row | Row[] | string;
+  multiple?: boolean;
+  row?: Row;
 };
 
 export const DEFAULT_STORE: ComboboxStore = {

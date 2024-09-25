@@ -1,20 +1,24 @@
 import {
+  BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   FieldConfig,
-  QueryDto,
+  getViewByName,
+  QueryServerProps,
+  RegisteredViews,
 } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
+import { queryClient } from './convex-client';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
-import { queryClient } from './convex-client';
+import { getRelationTableRecords } from './convex-get-relation-table-records';
 
 export const mapWithInclude = async (
   rows: ConvexRecord[],
-  viewConfigManager: BaseViewConfigManagerInterface,
   ctx: GenericQueryCtx,
-  args: QueryDto
+  args: QueryServerProps
 ) => {
+  const { viewConfigManager, registeredViews } = args;
   const include = viewConfigManager.getIncludeFields();
 
   return await asyncMap(rows, async (recordWithoutRelations) => {
@@ -32,6 +36,7 @@ export const mapWithInclude = async (
         viewConfigManager,
         ctx,
         recordWithoutRelations,
+        registeredViews,
       };
 
       try {
@@ -45,9 +50,9 @@ export const mapWithInclude = async (
         const invalidIndex = String(error).toLowerCase().includes('index');
         if (invalidIndex) {
           throw new Error(
-            `Please use the field name as the index name. ${error} ${JSON.stringify(
-              field.relation
-            )}`
+            `Please define an index for the field ${
+              field.name
+            }. ${error} ${JSON.stringify(field.relation)}`
           );
         } else {
           throw error;
@@ -64,6 +69,7 @@ type HelperProps = {
   viewConfigManager: BaseViewConfigManagerInterface;
   ctx: GenericQueryCtx;
   recordWithoutRelations: ConvexRecord;
+  registeredViews: RegisteredViews;
 };
 
 export const handleIncludeField = (props: HelperProps) => {
@@ -95,7 +101,13 @@ export const handleIncludeField = (props: HelperProps) => {
 };
 
 export const getOneToManyRecords = async (props: HelperProps) => {
-  const { field, viewConfigManager, ctx, recordWithoutRelations } = props;
+  const {
+    field,
+    viewConfigManager,
+    ctx,
+    recordWithoutRelations,
+    registeredViews,
+  } = props;
 
   if (!field.relation) return [];
 
@@ -107,13 +119,13 @@ export const getOneToManyRecords = async (props: HelperProps) => {
     throw new Error('Field name of table not found');
   }
 
-  const client = queryClient(ctx, field.relation.tableName);
-
-  const records = await client
-    .withIndex(fieldNameOfTable, (q) =>
-      q.eq(fieldNameOfTable, recordWithoutRelations['_id'])
-    )
-    .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  const records = await getRelationTableRecords({
+    registeredViews,
+    ctx,
+    fieldName: fieldNameOfTable,
+    relation: field.relation.tableName,
+    id: recordWithoutRelations['_id'],
+  });
 
   return records.map((record) => {
     return {
@@ -124,7 +136,13 @@ export const getOneToManyRecords = async (props: HelperProps) => {
 };
 
 export const getManyToManyRecords = async (props: HelperProps) => {
-  const { field, viewConfigManager, ctx, recordWithoutRelations } = props;
+  const {
+    field,
+    viewConfigManager,
+    ctx,
+    recordWithoutRelations,
+    registeredViews,
+  } = props;
   // handle many to many
   // like: Tasks has Many tags <-> Tags has Many Tasks
   // we have a tasks_tags table
@@ -143,13 +161,13 @@ export const getManyToManyRecords = async (props: HelperProps) => {
     throw new Error('Many to many field name not found');
   }
 
-  const client = queryClient(ctx, field.relation.manyToManyTable);
-
-  let records = await client
-    .withIndex(fieldNameManyToMany, (q) =>
-      q.eq(fieldNameManyToMany, recordWithoutRelations._id)
-    )
-    .take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+  let records = await getRelationTableRecords({
+    registeredViews,
+    ctx,
+    fieldName: fieldNameManyToMany,
+    relation: field.relation.manyToManyTable,
+    id: recordWithoutRelations['_id'],
+  });
 
   if (records.length) {
     records = await asyncMap(records, async (manyToManyValue) => {

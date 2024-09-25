@@ -1,35 +1,95 @@
-import { SearchableField } from '@apps-next/core';
-import { ConvexClient, ConvexRecord } from './types.convex';
+import { FilterType } from '@apps-next/core';
+import { isEnumNegateOperator } from '@apps-next/react';
+import { asyncMap } from 'convex-helpers';
+import { SearchField } from './convex-get-filters';
+import { queryBuilder } from './convex-operators';
+import {
+  ConvexClient,
+  ConvexRecord,
+  SearchFilterBuilder,
+} from './types.convex';
 
-export const withSearch = (
+export const withSearch = async (
   dbQuery: ConvexClient[string],
   {
-    searchField,
+    searchFields,
     query,
   }: {
-    searchField?: SearchableField;
-    query?: string;
+    searchFields: SearchField[];
+    query: string;
   }
-) => {
-  if (!searchField) return dbQuery.order('desc');
+): Promise<ConvexRecord[]> => {
+  const rowsList = await asyncMap(searchFields, async (searchField) => {
+    const rows = await dbQuery
+      .withSearchIndex(searchField.name, (q) =>
+        q.search(searchField.field.toString(), query ?? '')
+      )
+      .collect();
 
-  if (!query) return dbQuery.order('desc');
+    return rows;
+  });
 
-  return dbQuery.withSearchIndex(searchField?.name, (q) =>
-    q.search(searchField.field.toString(), query ?? '')
-  );
+  const rows = rowsList.flat();
+  const uniqueIds = [...new Set(rows.map((r) => r._id))];
+
+  return uniqueIds
+    .map((id) => rows.find((r) => r._id === id))
+    .filter((r) => r !== undefined);
 };
 
-export const filterResults = (
-  rows: ConvexRecord[],
-  filterField: string,
-  query?: string,
-  searchField?: SearchableField
+export const withPrimitiveFilters = (
+  primitiveFilters: FilterType[],
+  dbQuery: ConvexClient[string]
 ) => {
-  if (searchField?.field) return rows;
-  if (!query) return rows;
+  let _query = dbQuery;
+  primitiveFilters.forEach((filter) => {
+    const value = filter.type === 'primitive' ? filter.value : null;
+    _query = dbQuery.filter((q) => {
+      const _value =
+        filter.field.type === 'Boolean'
+          ? value?.raw === 'false'
+            ? false
+            : true
+          : filter.field.type === 'Number'
+          ? Number(value?.raw)
+          : value?.raw;
 
-  return rows.filter((row) =>
-    row[filterField].toLowerCase().includes(query.toLowerCase())
-  );
+      return queryBuilder(q, filter.operator)(
+        q.field(filter.field.name),
+        _value
+      );
+    });
+  });
+
+  return _query;
+};
+
+export const withEnumFilters = (
+  enumFilters: FilterType[],
+  dbQuery: ConvexClient[string]
+) => {
+  let _dbQuery = dbQuery;
+
+  enumFilters.forEach((filter) => {
+    const values = filter.type === 'relation' ? filter.values : [filter.value];
+
+    const _andOr = (q: SearchFilterBuilder, filter: FilterType) =>
+      isEnumNegateOperator(filter.operator) ? q.and : q.or;
+
+    _dbQuery = dbQuery.filter((q) =>
+      _andOr(
+        q,
+        filter
+      )(
+        ...values.map((value) =>
+          queryBuilder(q, filter.operator)(
+            q.field(filter.field.name),
+            value.raw
+          )
+        )
+      )
+    );
+  });
+
+  return _dbQuery;
 };

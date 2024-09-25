@@ -1,4 +1,5 @@
 import { BaseViewConfigManager } from './base-view-config';
+import { getViewByName } from './core-utils';
 import { RecordType, RegisteredViews } from './types';
 
 export const relationalViewHelper = (
@@ -8,7 +9,7 @@ export const relationalViewHelper = (
   const getRelationalView = (relationalTableName: string) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const relationalView = views[relationalTableName];
+    const relationalView = getViewByName(views, relationalTableName);
     if (!relationalView) {
       throw new Error(
         `relationalViewHelper: view not found for ${relationalTableName}`

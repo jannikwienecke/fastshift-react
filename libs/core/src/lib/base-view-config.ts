@@ -2,6 +2,7 @@ import { invarant } from './core-utils';
 import {
   FieldConfig,
   IncludeConfig,
+  IndexField,
   RegisteredViews,
   SearchableField,
   ViewConfigType,
@@ -20,14 +21,17 @@ export interface BaseViewConfigManagerInterface<
 > {
   viewConfig: TViewConfig;
   getDisplayFieldLabel(): string;
-  getSearchableField(): SearchableField | undefined;
+  getSearchableFields(): SearchableField[] | undefined;
+  getPrimarySearchField(): string | undefined;
   getTableName(): string;
   getViewName(): string;
   getViewFieldList(): FieldConfig[];
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
+  getIndexFields(): IndexField[];
   getRelationFieldByTableName(tableName: string): FieldConfig;
   getIncludeFields(): IncludeConfig[string];
+  getManyToManyField(key: string): FieldConfig | undefined;
 
   modelConfig?: ModelConfig;
   form: FormManagerInterface;
@@ -62,9 +66,19 @@ export class BaseViewConfigManager<
     return this.viewConfig.displayField.field as string;
   }
 
-  getSearchableField(): SearchableField | undefined {
+  getSearchableFields(): SearchableField[] | undefined {
     return this.viewConfig.query?.searchableFields;
   }
+
+  getIndexFields(): IndexField[] {
+    return this.viewConfig.query?.indexFields ?? [];
+  }
+
+  getPrimarySearchField() {
+    return (this.viewConfig.query?.primarySearchField as string) ?? undefined;
+  }
+
+  // getPrimarySearchField add
 
   getViewFieldList(): FieldConfig[] {
     // return Object.values(this.modelConfig?.viewFields ?? {});

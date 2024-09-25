@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
-    "convex": "^1.14.0"
+    "convex": "^1.14.0",
+    "convex-helpers": "^0.1.58"
   },
   "main": "./index.js",
   "module": "./index.mjs",

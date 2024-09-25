@@ -5,7 +5,7 @@ import {
   makeData,
   Row,
 } from '@apps-next/core';
-import { useDebounce } from '@uidotdev/usehooks';
+import { useDebounce, usePrevious } from '@uidotdev/usehooks';
 import React, { useRef } from 'react';
 import { useQuery } from '../../use-query';
 import { useQueryDataOf } from '../../use-query-data-relational';
@@ -15,17 +15,21 @@ import { ComboboxInitPayload, useComboboxStore } from './_combobox.store/store';
 
 export type UseComboboAdaper = typeof useCombobox;
 
+export type UseComboboxProps = {
+  state: Omit<ComboboxInitPayload, 'defaultData' | 'registeredViews'> | null;
+  onClose: () => void;
+  onSelect: (value: Row) => void;
+  renderValue?: (props: { value: Row; field: FieldConfig }) => React.ReactNode;
+};
+
 export const useCombobox = ({
   state: initialState,
   onClose,
   onSelect,
   ...props
-}: {
-  state: Omit<ComboboxInitPayload, 'defaultData' | 'registeredViews'> | null;
-  onClose: () => void;
-  onSelect: (value: Row) => void;
-  renderValue?: (props: { value: Row; field: FieldConfig }) => React.ReactNode;
-}) => {
+}: UseComboboxProps) => {
+  const prevFieldName = usePrevious(initialState?.field?.name);
+
   const [store, dispatch] = useComboboxStore();
   const { registeredViews } = useView();
   const query = useDebounce(store.query, 300);
@@ -64,8 +68,10 @@ export const useCombobox = ({
   ]);
 
   const lastInitialState = useRef(initialState);
+
   React.useEffect(() => {
-    if (lastInitialState.current?.row === initialState?.row) return;
+    if (lastInitialState.current?.field?.name === initialState?.field?.name)
+      return;
 
     lastInitialState.current = initialState;
     if (!initialState?.field) {
@@ -80,13 +86,15 @@ export const useCombobox = ({
         },
       });
     }
-  }, [dispatch, initialState, defaultData, registeredViews]);
+  }, [dispatch, initialState, defaultData, registeredViews, prevFieldName]);
 
   const getComboboxProps = () => {
     return {
       ...store,
-      onOpenChange: () => {
-        onClose?.();
+      onOpenChange: (open) => {
+        if (!open && initialState?.field) {
+          onClose?.();
+        }
       },
       onChange: (value) => {
         dispatch({ type: 'SELECT_VALUE', payload: value });
@@ -109,7 +117,9 @@ export const useCombobox = ({
           dispatch({ type: 'UPDATE_QUERY', payload: query });
         },
       },
+
       multiple: store.multiple,
+      name: initialState?.field?.name ?? '',
     } satisfies ComboboxPopoverProps<Row>;
   };
 

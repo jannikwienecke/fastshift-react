@@ -1,5 +1,6 @@
 import {
   Categories,
+  config,
   Owner,
   projectsConfig,
   Tasks,
@@ -19,7 +20,6 @@ import {
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { config } from '../global-config';
 
 type ProjectViewDataType = DataType<
   'projects',
@@ -112,7 +112,7 @@ const ProjectPage = () => {
         <List.Default
           {...getListProps({
             fieldsRight: ['categories', 'owner', 'tasks'],
-            fieldsLeft: ['label', 'dueDate'], // Add both label and dueDate to the left fields
+            fieldsLeft: ['label', 'dueDate'],
           })}
         />
       </div>

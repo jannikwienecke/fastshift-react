@@ -3,11 +3,13 @@ import {
   ModelConfig,
 } from '../base-view-config';
 import { RecordType } from './base.types';
+import { FilterType } from './filter.types';
 import { MutationProps, MutationReturnDto } from './mutation.types';
 import { RegisteredViews, ViewConfigType } from './view-config.types';
 
 export type QueryProps = {
   query?: string;
+  filters?: string;
   viewConfigManager?: BaseViewConfigManagerInterface;
   registeredViews: RegisteredViews;
   modelConfig?: ModelConfig;
@@ -21,7 +23,13 @@ export type QueryProps = {
 
 export type QueryDto = {
   viewConfig?: ViewConfigType;
+  filters?: string;
 } & Omit<QueryProps, 'viewConfigManager'>;
+
+export type QueryServerProps = {
+  filters?: FilterType[];
+  viewConfigManager: BaseViewConfigManagerInterface;
+} & Omit<QueryProps, 'filters'>;
 
 export type QueryRelationalData = {
   [key: string]: RecordType[];

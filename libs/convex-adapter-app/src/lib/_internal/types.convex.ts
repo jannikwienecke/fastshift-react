@@ -22,7 +22,7 @@ export type ConvexServer = {
 
 export type RecordType = Record<string, unknown>;
 export type ConvexRecordType = {
-  _id: string;
+  _id: ID;
 } & RecordType;
 
 export type ViewLoader = FunctionReference<
@@ -58,7 +58,7 @@ export type ConvexSchemaType = {
 
 export type ID = Id<any>;
 
-export type ConvexRecord = Record<string, any> & { _id?: ID };
+export type ConvexRecord = Record<string, any> & { _id: ID };
 
 export type ConvexWhere = {
   //
@@ -79,10 +79,27 @@ export type ConvexFindManyArgs = {
   select?: ConvexInclude;
 };
 
+type QFieldReturn = {
+  //
+};
+type QField = (fieldName: string) => QFieldReturn;
+
+export type OperatorFns = {
+  eq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
+  neq: (fieldName: string | QFieldReturn, value: unknown) => unknown;
+  gt: (fieldName: string | QFieldReturn, value: unknown) => OperatorFns;
+  gte: (fieldName: string | QFieldReturn, value: unknown) => OperatorFns;
+  lt: (fieldName: string | QFieldReturn, value: unknown) => OperatorFns;
+  lte: (fieldName: string | QFieldReturn, value: unknown) => OperatorFns;
+  or: (...args: unknown[]) => unknown;
+  and: (...args: unknown[]) => unknown;
+};
+
 export type SearchFilterBuilder = {
   search: (fieldName: string, query: string) => unknown;
-  eq: (fieldName: string, value: unknown) => unknown;
-};
+  field: QField;
+} & OperatorFns;
+
 export type ConvexClient = {
   [key in string]: {
     collect: () => Promise<ConvexRecord[]>;
@@ -98,17 +115,9 @@ export type ConvexClient = {
       query: (q: SearchFilterBuilder) => any
     ) => ConvexClient[string];
     delete: (id: ID) => Promise<void>;
+    filter: (query: (q: SearchFilterBuilder) => any) => ConvexClient[string];
 
     insert: (tableName: string, data: RecordType) => Promise<void>;
-    // findMany: (args: ConvexFindManyArgs) => Promise<PrismaRecord[]>;
-    // create: (args: { data: PrismaRecord }) => Promise<PrismaRecord>;
-    // delete: (args: { where: { id: ID } }) => Promise<void>;
-    // deleteMany: (args: { where: Record<string, unknown> }) => Promise<void>;
-    // update: (args: { where: { id: ID }; data: PrismaRecord }) => Promise<void>;
-    // findUnique: (args: {
-    //   where: { id: ID };
-    //   select: ConvexInclude;
-    // }) => Promise<PrismaRecord>;
   };
 };
 

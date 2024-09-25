@@ -262,6 +262,13 @@ const init = server.mutation({
       projects.push(projectId);
     }
 
+    const tommorow = new Date().getTime() + 1000 * 60 * 60 * 24;
+    const today = new Date().getTime();
+    const yesterday = today - 1000 * 60 * 60 * 24;
+    const in2Weeks = today + 1000 * 60 * 60 * 24 * 14;
+    const in4Weeks = today + 1000 * 60 * 60 * 24 * 28;
+    const ago5Weeks = today - 1000 * 60 * 60 * 24 * 35;
+
     // Create tasks
     const taskData = [
       {
@@ -269,18 +276,25 @@ const init = server.mutation({
         completed: false,
         projectId: projects[0],
         priority: 'high',
+        description: 'Design mockups for the website redesign',
+        dueDate: tommorow,
+        subtitle: 'test',
       },
       {
         name: 'Develop frontend',
         completed: false,
         projectId: projects[0],
         priority: 'medium',
+        dueDate: today,
+        description: 'Develop frontend for the website redesign',
       },
       {
         name: 'Implement responsive design',
         completed: false,
         projectId: projects[0],
         priority: 'high',
+        dueDate: today,
+        description: 'Implement responsive design for the website redesign',
       },
 
       {
@@ -288,18 +302,23 @@ const init = server.mutation({
         completed: true,
         projectId: projects[1],
         priority: 'high',
+        dueDate: yesterday,
+        description: 'Create a workout schedule for weight loss',
       },
       {
         name: 'Research healthy recipes',
         completed: false,
         projectId: projects[1],
         priority: 'medium',
+        dueDate: yesterday,
+        description: 'Research healthy recipes for weight loss',
       },
       {
         name: 'Buy workout equipment',
         completed: false,
         projectId: projects[1],
         priority: 'low',
+        description: 'Buy workout equipment for weight loss',
       },
 
       {
@@ -307,17 +326,22 @@ const init = server.mutation({
         completed: false,
         projectId: projects[2],
         priority: 'high',
+        dueDate: in2Weeks,
+        description: 'Track monthly expenses to reduce expenses',
       },
       {
         name: 'Create savings plan',
         completed: false,
         projectId: projects[2],
         priority: 'medium',
+        dueDate: in4Weeks,
+        description: 'Create savings plan to reduce expenses',
       },
       {
         name: 'Review investment options',
         completed: false,
         projectId: projects[2],
+        dueDate: ago5Weeks,
         priority: 'low',
       },
 
@@ -325,6 +349,7 @@ const init = server.mutation({
         name: 'Study Spanish vocabulary',
         completed: false,
         projectId: projects[3],
+        dueDate: ago5Weeks,
         priority: 'medium',
       },
       {
@@ -652,6 +677,9 @@ const init = server.mutation({
         completed: task.completed,
         projectId: task.projectId,
         priority: task.priority as any,
+        description: task.description,
+        dueDate: task.dueDate,
+        subtitle: task.subtitle,
       });
 
       // Add tags to each task (0 to 4 tags)

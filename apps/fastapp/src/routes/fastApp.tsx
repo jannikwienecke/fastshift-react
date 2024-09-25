@@ -4,18 +4,18 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 import {
-  createFileRoute,
-  ErrorComponent,
-  Link,
-  Outlet,
-} from '@tanstack/react-router';
-import {
   CircleIcon,
   DotIcon,
   IconJarLogoIcon,
   MixIcon,
   SunIcon,
 } from '@radix-ui/react-icons';
+import {
+  createFileRoute,
+  ErrorComponent,
+  Link,
+  Outlet,
+} from '@tanstack/react-router';
 
 export const Route = createFileRoute('/fastApp')({
   component: FastAppLayoutComponent,
