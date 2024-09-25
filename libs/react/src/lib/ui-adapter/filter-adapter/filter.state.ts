@@ -83,14 +83,14 @@ export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
   } else if (selectedOperatorField) {
     const filterStore = get(filterAtom);
 
-    const updatedFilters = filterStore.fitlers.map((f) => {
+    const updatedFilters = filterStore.filters.map((f) => {
       if (f.field.name === selectedOperatorField.name) {
         return filterUtil().update(f, value);
       }
       return f;
     });
 
-    set(filterAtom, { ...filterStore, fitlers: updatedFilters });
+    set(filterAtom, { ...filterStore, filters: updatedFilters });
     set(filterStateAtom, {
       ...get(filterStateAtom),
       open: false,
@@ -144,7 +144,7 @@ export const openOperatorOptionsFilterAtom = atom(
   null,
   (get, set, field: FieldConfig) => {
     const filterStore = get(filterAtom);
-    const currentFilter = filterStore.fitlers?.find(
+    const currentFilter = filterStore.filters?.find(
       (f) => f.field.name === field.name
     );
 
@@ -175,7 +175,7 @@ const selectDateAtom = atom(null, (get, set, date: Date) => {
   set(setFilterAtom, {
     field: state.selectedDateField,
     value: makeRow(
-      date.toDateString(),
+      date.toISOString(),
       date.toDateString(),
       date.toISOString(),
       state.selectedDateField

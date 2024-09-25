@@ -67,7 +67,7 @@ export const useFilterAdapter = (props?: {
     render: (value) => <FilterValue value={value} />,
   } satisfies ComboboxPopoverProps<ComboxboxItem>;
 
-  const currentDateFilter = filter.fitlers?.find(
+  const currentDateFilter = filter.filters?.find(
     (f) => f.field.name === filterState.selectedDateField?.name
   );
 
@@ -88,7 +88,7 @@ export const useFilterAdapter = (props?: {
     },
   } satisfies DatePickerProps;
 
-  const filters_ = filter.fitlers.map((f) => {
+  const filters_ = filter.filters.map((f) => {
     return {
       label: f.field.name,
       name: f.field.name,
@@ -98,7 +98,7 @@ export const useFilterAdapter = (props?: {
   });
 
   const getFilter = (name: string) => {
-    const _f = filter.fitlers.find((f) => f.field.name === name);
+    const _f = filter.filters.find((f) => f.field.name === name);
     if (!_f) throw new Error('Filter not found');
     return _f;
   };

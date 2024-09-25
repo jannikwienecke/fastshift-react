@@ -3,48 +3,17 @@ import {
   FilterDateType,
   FilterOperatorType,
 } from '@apps-next/core';
-
-export const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-export const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'];
+import { DEFAULT_DATE_OPTIONS, MONTHS, QUARTERS } from './filter.constants';
+import { filterHelper, stringsToComboxboxItems } from './filter.utils';
 
 class DateOptions {
-  private static staticOptions: ComboxboxItem[] = [
-    'Today',
-    'Tomorrow',
-    'Yesterday',
-    'This week',
-    'Last week',
-    'This month',
-    'Last month',
-    'This year',
-    'Last year',
-  ].map((name) => ({ id: name, label: name }));
-
-  private static months = MONTHS;
-  private static quarters = QUARTERS;
-
   private value: string;
   private hasFromNow: boolean;
   private hasAgo: boolean;
   private hasDays: boolean;
   private hasWeek: boolean;
-  private hasMonth: boolean;
   private hasNumber: boolean;
-
+  private hasMonth: boolean;
   constructor(value: string) {
     this.value = value.toLowerCase();
     this.hasFromNow =
@@ -52,231 +21,225 @@ class DateOptions {
       this.value.includes('from') ||
       this.value.includes('now');
     this.hasAgo = this.value.includes('ago');
-    this.hasDays = this.value.includes('days');
-    this.hasWeek = this.value.includes('week');
-    this.hasMonth = this.value.includes('month');
+    this.hasDays = this.value.includes('day');
+    this.hasWeek = this.value.includes('we');
+    this.hasMonth = this.value.includes('mon');
     this.hasNumber =
       /\d/.test(this.value) ||
       this.value.includes('one') ||
       this.value.includes('two');
   }
 
-  private getDate(): ComboxboxItem[] | null {
+  private getYearFromNumber(value: string): number | undefined {
     const number = this.extractNumber(this.value);
-
-    if (
+    const isYear =
       (number?.toString().startsWith('201') ||
         number?.toString().startsWith('202')) &&
       number > 2000 &&
-      number < 2030
-    ) {
-      const optionsMonths = DateOptions.months.map((month) => {
-        return {
-          id: month + ' ' + number,
-          label: month + ' ' + number,
-        };
-      });
+      number < 2030;
 
-      const optionsQuarters = DateOptions.quarters.map((quarter) => {
-        return {
-          id: quarter + ' ' + number,
-          label: quarter + ' ' + number,
-        };
-      });
-
-      if (number.toString() === this.value) {
-        return [
-          {
-            id: this.value,
-            label: this.value,
-          },
-          ...optionsMonths,
-          ...optionsQuarters,
-        ];
-      } else {
-        const valueWithoutNumber = this.value
-          .replace(/\d+/g, '')
-          .split(' ')
-          .join('');
-
-        return [
-          {
-            id: number.toString(),
-            label: number.toString(),
-          },
-          ...[...optionsMonths, ...optionsQuarters].filter((o) => {
-            return o.id.toLowerCase().includes(valueWithoutNumber);
-          }),
-        ];
-      }
+    if (isYear && number) {
+      return number;
     }
 
-    const matchingMonths = MONTHS.map((m) => m.slice(0, 2).toLowerCase());
+    return undefined;
+  }
 
-    const isMonth = matchingMonths.filter((m) => this.value.includes(m));
+  private generateOptions(
+    value: string | number,
+    items: (string | number)[],
+    reverse?: boolean
+  ): ComboxboxItem[] {
+    return items.map((item) => {
+      if (reverse) {
+        return {
+          id: value + ' ' + item,
+          label: value + ' ' + item,
+        };
+      }
+
+      return {
+        id: item + ' ' + value,
+        label: item + ' ' + value,
+      };
+    });
+  }
+
+  private generateFromNowOptions(num: number, unit: string) {
+    return {
+      id: `${num === 1 ? 'One' : num} ${num > 1 ? unit + 's' : unit} from now`,
+      label: `${num === 1 ? 'One' : num} ${
+        num > 1 ? unit + 's' : unit
+      } from now`,
+    };
+  }
+
+  private generateAgoOptions(num: number, unit: string) {
+    return {
+      id: `${num === 1 ? 'One' : num} ${num > 1 ? unit + 's' : unit} ago`,
+      label: `${num === 1 ? 'One' : num} ${num > 1 ? unit + 's' : unit} ago`,
+    };
+  }
+
+  private handleYearInput(): ComboxboxItem[] | null {
+    const year = this.getYearFromNumber(this.value);
+
+    if (!year) return null;
+
+    const optionsMonths = this.generateOptions(year, MONTHS);
+    const optionsQuarters = this.generateOptions(year, QUARTERS);
+
+    if (year.toString() === this.value) {
+      // we typed 2024 for example
+      return [
+        {
+          id: this.value,
+          label: this.value,
+        },
+        ...optionsMonths,
+        ...optionsQuarters,
+      ];
+    } else {
+      const valueWithoutNumber = this.value
+        .replace(/\d+/g, '')
+        .split(' ')
+        .join('');
+
+      return [
+        {
+          id: year.toString(),
+          label: year.toString(),
+        },
+        ...[...optionsMonths, ...optionsQuarters].filter((o) => {
+          return o.id.toString().toLowerCase().includes(valueWithoutNumber);
+        }),
+      ];
+    }
+  }
+
+  private getYearsAroundCurrentYear(): number[] {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = currentYear - 1; i <= currentYear + 2; i++) {
+      years.push(i);
+    }
+    return years;
+  }
+
+  private handleOnlyMonthInput(): ComboxboxItem[] | null {
+    const monthsStartingLetters = MONTHS.map((m) =>
+      m.slice(0, 2).toLowerCase()
+    );
+    const matchingMonths = monthsStartingLetters.filter((m) =>
+      this.value.includes(m)
+    );
     const months = MONTHS.filter((m) => m.toLowerCase().includes(this.value));
 
     const matchingQuarters = QUARTERS.filter((q) =>
       this.value.includes(q.toLowerCase())
     );
-    // TODOL hier weiter machen. check ob alles passt
-    // tests schreiben....
-    // after tests: refactor this and the operator utils page
-    // handle use case: switch between match all filters and match any filters
+
     const currentYear = new Date().getFullYear();
+    const years = this.getYearsAroundCurrentYear();
 
-    const years = [];
-    for (let i = currentYear - 1; i <= currentYear + 2; i++) {
-      years.push(i);
-    }
-
-    if (isMonth.length === 1 && months.length === 1) {
+    if (matchingMonths.length === 1 && months.length === 1) {
       const month = months[0];
 
-      return years.map((year) => ({
-        id: month + ' ' + year,
-        label: month + ' ' + year,
-      }));
-    } else if (isMonth.length && months.length > 0) {
-      return months.map((m) => ({
-        id: m + ' ' + currentYear,
-        label: m + ' ' + currentYear,
-      }));
+      return this.generateOptions(month, years, true);
+    } else if (matchingMonths.length && months.length > 0) {
+      return this.generateOptions(currentYear, months);
     } else if (matchingQuarters.length && matchingQuarters.length > 0) {
-      return matchingQuarters.map((q) => ({
-        id: q + ' ' + currentYear,
-        label: q + ' ' + currentYear,
-      }));
+      return this.generateOptions(currentYear, matchingQuarters);
     }
 
     return null;
   }
 
+  private getDate(): ComboxboxItem[] | null {
+    const optionsYear = this.handleYearInput();
+    const optionsMonth = this.handleOnlyMonthInput();
+
+    if (optionsYear) return optionsYear;
+    if (optionsMonth) return optionsMonth;
+
+    return null;
+  }
+
   public getOptions(): ComboxboxItem[] {
+    let options: ComboxboxItem[] = [];
     if (!this.value) {
-      return this.getDefaultOptions();
+      options = this.getDefaultOptions();
     } else if (this.getDate()) {
       const dateOptions = this.getDate();
       if (!dateOptions) throw new Error('Date options not found');
-      return dateOptions;
-    } else if (this.hasWeek || this.hasDays) {
-      return this.getWeekOrDayOptions();
-    } else if (this.hasFromNow || this.hasAgo) {
-      return this.getRelativeOptions();
-    } else if (this.hasNumber) {
-      return this.getNumberOptions();
+      options = dateOptions;
+    } else if (this.hasWeek || this.hasDays || this.hasMonth) {
+      options = this.getWeekMonthDayOptions();
+    } else if (this.hasNumber || this.hasFromNow || this.hasAgo) {
+      options = this.getNumberOptions();
     } else {
-      return this.getDefaultOptions();
+      options = this.getDefaultOptions();
     }
+
+    const defaultOptions = stringsToComboxboxItems(
+      DEFAULT_DATE_OPTIONS.filter((option) =>
+        option.toLowerCase().includes(this.value)
+      ).filter((option) => !options.some((o) => o.id === option))
+    );
+
+    return [...defaultOptions, ...options];
   }
 
   private getDefaultOptions(): ComboxboxItem[] {
-    const selectSpecificDate = {
-      id: 'Select specific date',
-      label: 'Select specific date',
-    };
+    const selectSpecificDate = 'Select specific date';
 
-    const additionalOptions = [
-      '3 days from now',
-      '3 days ago',
-      'One week from now',
-      'One week ago',
-      'One month from now',
-      'One month ago',
-      'No date defined',
-    ].map((option) => ({ id: option, label: option }));
-
-    const all = [...DateOptions.staticOptions, ...additionalOptions];
-
-    const allFiltered = all.filter((option) =>
-      option.label.toLowerCase().includes(this.value)
+    const allFiltered = DEFAULT_DATE_OPTIONS.filter((option) =>
+      option.toLowerCase().includes(this.value)
     );
 
-    return [selectSpecificDate, ...allFiltered];
+    return stringsToComboxboxItems([selectSpecificDate, ...allFiltered]);
   }
 
-  private getWeekOrDayOptions(): ComboxboxItem[] {
-    const unit = this.hasWeek ? 'week' : 'day';
-    const number = this.extractNumber(this.value) || 1;
-    const numbers = number ? [number] : [1, 3, 7];
-    const options: ComboxboxItem[] = [];
+  private getWeekMonthDayOptions(): ComboxboxItem[] {
+    const unit = this.hasWeek ? 'week' : this.hasMonth ? 'month' : 'day';
+    const number = this.extractNumber(this.value);
+    const numbers = number ? [number] : [4, 6];
 
-    if (number === 1 && !this.hasFromNow && !this.hasAgo) {
-      options.push({ id: `This ${unit}`, label: `This ${unit}` });
-      options.push({ id: `Last ${unit}`, label: `Last ${unit}` });
-    }
-
-    numbers.forEach((num) => {
+    return numbers.reduce((acc, num) => {
       if (this.hasFromNow || !this.hasAgo) {
-        options.push({
-          id: `${num === 1 ? 'One' : num} ${
-            num > 1 ? unit + 's' : unit
-          } from now`,
-          label: `${num === 1 ? 'One' : num} ${
-            num > 1 ? unit + 's' : unit
-          } from now`,
-        });
+        acc.push(this.generateFromNowOptions(num, unit));
       }
+
       if (this.hasAgo || !this.hasFromNow) {
-        options.push({
-          id: `${num === 1 ? 'One' : num} ${num > 1 ? unit + 's' : unit} ago`,
-          label: `${num === 1 ? 'One' : num} ${
-            num > 1 ? unit + 's' : unit
-          } ago`,
-        });
+        acc.push(this.generateAgoOptions(num, unit));
       }
-    });
 
-    return options;
-  }
-
-  private getRelativeOptions(): ComboxboxItem[] {
-    const options = this.getFilteredStaticOptions();
-    const units = ['day', 'week', 'month'];
-    const number = this.extractNumber(this.value) || 1;
-
-    units.forEach((unit) => {
-      const unitLabel = number === 1 ? unit : `${unit}s`;
-      if (this.hasFromNow || !this.hasAgo) {
-        options.push({
-          id: `${number} ${unitLabel} from now`,
-          label: `${number} ${unitLabel} from now`,
-        });
-      }
-      if (this.hasAgo || !this.hasFromNow) {
-        options.push({
-          id: `${number} ${unitLabel} ago`,
-          label: `${number} ${unitLabel} ago`,
-        });
-      }
-    });
-
-    return options;
+      return acc;
+    }, [] as ComboxboxItem[]);
   }
 
   private getNumberOptions(): ComboxboxItem[] {
     const number = this.extractNumber(this.value) || 1;
     const units = ['day', 'week', 'month'];
-    const options: ComboxboxItem[] = [];
 
-    units.forEach((unit) => {
-      const unitLabel = number === 1 ? unit : `${unit}s`;
-      options.push({
-        id: `${number} ${unitLabel} from now`,
-        label: `${number} ${unitLabel} from now`,
-      });
-      options.push({
-        id: `${number} ${unitLabel} ago`,
-        label: `${number} ${unitLabel} ago`,
-      });
-    });
+    const defaultOptions = number ? [] : this.getFilteredStaticOptions();
+    return units.reduce((acc, unit) => {
+      if (this.hasFromNow || !this.hasAgo) {
+        acc.push(this.generateFromNowOptions(number, unit));
+      }
+      if (this.hasAgo || !this.hasFromNow) {
+        acc.push(this.generateAgoOptions(number, unit));
+      }
 
-    return options;
+      return acc;
+    }, defaultOptions as ComboxboxItem[]);
   }
 
   private getFilteredStaticOptions(): ComboxboxItem[] {
-    return DateOptions.staticOptions.filter((option) =>
-      option.label.toLowerCase().includes(this.value)
+    return stringsToComboxboxItems(
+      DEFAULT_DATE_OPTIONS.filter((option) =>
+        option.toLowerCase().includes(this.value)
+      )
     );
   }
 
@@ -306,19 +269,7 @@ class DateOptionParser {
       number = 1;
     }
 
-    const includesQuarter = QUARTERS.some((quarter) =>
-      lowerOption.includes(quarter.toLowerCase())
-    );
-
-    const includesMonth = MONTHS.some((month) =>
-      lowerOption.includes(month.toLowerCase())
-    );
-
-    const isYear = ['201', '202', '203'].some((year) =>
-      lowerOption.includes(year)
-    );
-
-    const isIsoDate = !Number.isNaN(new Date(lowerOption)?.getTime());
+    const { year, month, quarter, isIsoDate } = filterHelper(lowerOption);
 
     if (isIsoDate) {
       return {
@@ -326,11 +277,11 @@ class DateOptionParser {
         value: lowerOption,
         unit: 'iso-date',
       };
-    } else if (includesQuarter || includesMonth || isYear) {
+    } else if (quarter || month || year) {
       return {
         operator: 'equal to',
         value: lowerOption,
-        unit: includesQuarter ? 'quarter' : 'month',
+        unit: quarter ? 'quarter' : month ? 'month' : 'year',
       };
     }
 
@@ -359,18 +310,19 @@ class DateOptionParser {
         value: -1,
       };
     } else {
-      switch (lowerOption) {
-        case 'today':
-          return { operator: 'equal to', unit: 'today' };
-        case 'tomorrow':
-          return { operator: 'equal to', unit: 'tomorrow' };
-        case 'yesterday':
-          return { operator: 'equal to', unit: 'yesterday' };
-        case 'no date defined':
-          return null;
-        default:
-          throw new Error(`Invalid option format: ${option}`);
+      const validOptions = ['today', 'tomorrow', 'yesterday'];
+      if (validOptions.includes(lowerOption)) {
+        return {
+          operator: 'equal to',
+          unit: lowerOption as FilterDateType['unit'],
+        };
       }
+
+      if (lowerOption.includes('no date defined')) {
+        return null;
+      }
+
+      throw new Error(`Invalid option format: ${option}`);
     }
   }
 }
@@ -414,22 +366,13 @@ class DateCalculator {
       };
     }
 
-    // const value = operator === 'less than' ? (valueRaw ?? 1) * -1 : valueRaw;
-    const isMonths = MONTHS.some((month) =>
-      valueRaw?.toString().includes(month.toLowerCase())
-    );
-
-    const isQuarters = QUARTERS.some((quarter) =>
-      valueRaw?.toString().includes(quarter.toLowerCase())
-    );
-
-    const isYear = ['201', '202', '203'].some((year) =>
-      valueRaw?.toString().includes(year)
+    const { year, month, quarter } = filterHelper(
+      valueRaw?.toString().toLowerCase() || ''
     );
 
     const isIsoDate = unit === 'iso-date';
 
-    const value = isMonths || isQuarters || isYear ? 1 : +(valueRaw || 1);
+    const value = month || quarter || year ? 1 : +(valueRaw || 1);
 
     const multiplier =
       unit === 'weeks' || unit === 'week'
@@ -443,12 +386,17 @@ class DateCalculator {
 
     if (isIsoDate && valueRaw) {
       const date = new Date(valueRaw.toString());
+      const day = date.getDate();
+      const month = date.getMonth();
+      const year = date.getFullYear();
 
-      start = new Date(date.setHours(0, 0, 0, 0));
-      end = new Date(date.setHours(23, 59, 59, 999));
+      start = new Date(year, month, day + 1);
+      end = new Date(year, month, day + 1);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
 
       return { start, end };
-    } else if (isMonths && valueRaw && typeof valueRaw === 'string') {
+    } else if (month && valueRaw && typeof valueRaw === 'string') {
       const year = valueRaw?.split(' ')[1];
       const month = valueRaw?.split(' ')[0];
       const index = MONTHS.map((m) => m.toLowerCase()).indexOf(
@@ -459,7 +407,7 @@ class DateCalculator {
       const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
 
       return { start, end };
-    } else if (isQuarters && valueRaw && typeof valueRaw === 'string') {
+    } else if (quarter && valueRaw && typeof valueRaw === 'string') {
       const year = valueRaw?.split(' ')[1];
       const quarter = valueRaw?.split(' ')[0].toLowerCase();
 
@@ -483,7 +431,7 @@ class DateCalculator {
       }
 
       return { start, end };
-    } else if (isYear && valueRaw && typeof valueRaw === 'string') {
+    } else if (year && valueRaw && typeof valueRaw === 'string') {
       start = new Date(+valueRaw, 0, 1);
       end = new Date(+valueRaw, 11, 31);
       return { start, end };
@@ -535,6 +483,33 @@ class DateCalculator {
 
     return { start: _start, end: _end };
   }
+}
+
+/**
+ * Checks if a given string is a valid ISO 8601 date string.
+ *
+ * @param str The string to check.
+ * @returns True if the string is a valid ISO 8601 date string, false otherwise.
+ */
+export function isValidISOString(str: string): boolean {
+  if (typeof str !== 'string') {
+    return false;
+  }
+
+  // Regular expression for ISO 8601 date format
+  // This regex allows for:
+  // - Optional fractional seconds
+  // - Optional timezone offset
+  const isoRegex =
+    /^\d{4}-\d{2}-\d{2}t\d{2}:\d{2}:\d{2}(\.\d+)?(z|([+-]\d{2}:\d{2}))$/;
+
+  if (!isoRegex.test(str.toLowerCase())) {
+    return false;
+  }
+
+  // Additional check: Try parsing the string as a date
+  const date = new Date(str);
+  return !isNaN(date.getTime());
 }
 
 export const dateUtils = {

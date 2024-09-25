@@ -270,5 +270,4 @@ const testingQueryBehavior = async ({ taskPage, page }) => {
 
   await input.fill('today');
   await expect(getByText(/today/i)).toBeVisible();
-  await expect(getByText(/select specific date/i)).toBeVisible();
 };

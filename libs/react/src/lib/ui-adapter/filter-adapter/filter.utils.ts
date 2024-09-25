@@ -1,7 +1,15 @@
-import { ComboxboxItem, FieldConfig, FilterType, Row } from '@apps-next/core';
+import {
+  ComboxboxItem,
+  FieldConfig,
+  FilterDateType,
+  FilterType,
+  Row,
+} from '@apps-next/core';
 import { initOperator } from './filter.operator';
-import { operators } from './filter.operator.define';
+import operatorMap, { operators } from './filter.operator.define';
 import { SelectFilterValueAction } from './filter.store';
+import { MONTHS, QUARTERS } from './filter.constants';
+import { dateUtils, isValidISOString } from './date.utils';
 
 const isRelation = (field: FieldConfig) => {
   return (
@@ -58,4 +66,58 @@ export const filterUtil = () => {
     getValue,
     getValues,
   };
+};
+
+export const filterHelper = (value: string) => {
+  const getYearFilterValue = () =>
+    ['201', '202', '203'].some((year) => value.includes(year));
+
+  const getMonthFilterValue = () =>
+    MONTHS.find((month) => value.includes(month.toLowerCase()));
+
+  const getQuarterFilterValue = () =>
+    QUARTERS.find((quarter) => value.includes(quarter.toLowerCase()));
+
+  const isIsoDate = isValidISOString(value);
+  return {
+    year: getYearFilterValue(),
+    month: getMonthFilterValue(),
+    quarter: getQuarterFilterValue(),
+    isIsoDate,
+  };
+};
+
+export const dateOperator = (value: string, date?: FilterDateType | null) => {
+  const { year, month, quarter } = filterHelper(value);
+  let operator = operatorMap.before;
+
+  if (
+    !date ||
+    date.unit === 'today' ||
+    date.unit === 'tomorrow' ||
+    date.unit === 'yesterday' ||
+    year ||
+    month ||
+    quarter
+  ) {
+    operator = operatorMap.is;
+  } else if (
+    date &&
+    (date.unit === 'week' || date.unit === 'month' || date.unit === 'year')
+  ) {
+    if (!date.value || (date.value === -1 && date.operator === 'equal to')) {
+      operator = operatorMap.within;
+    }
+  } else if (value.includes('ago')) {
+    operator = operatorMap.after;
+  }
+
+  return operator;
+};
+
+export const stringsToComboxboxItems = (strings: string[]) => {
+  return strings.map((string) => ({
+    id: string,
+    label: string,
+  }));
 };

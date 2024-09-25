@@ -78,7 +78,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const { viewConfigManager, registeredViews } = useView();
   const query = useAtomValue(debouncedQueryAtom);
   const { filter } = useFilterStore();
-  const parsedFilters = convertFiltersForBackend(filter.fitlers);
+  const parsedFilters = convertFiltersForBackend(filter.filters);
 
   const queryPropsMerged = React.useMemo(() => {
     return {

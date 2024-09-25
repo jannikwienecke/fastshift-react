@@ -104,8 +104,3 @@ export const optionsOperatorMap: Partial<{
 };
 
 export default operatorMap;
-
-// hier weiter machen
-// handle within / before /after
-// for this week / last week and so on -> default should be within
-// handle in backend different oerators

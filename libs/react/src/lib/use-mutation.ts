@@ -23,7 +23,7 @@ export const useMutation = () => {
 
   const { registeredViews } = useView();
   const { filter } = useFilterStore();
-  const parsedFilters = convertFiltersForBackend(filter.fitlers);
+  const parsedFilters = convertFiltersForBackend(filter.filters);
 
   const queryPropsMerged = React.useMemo(() => {
     return {

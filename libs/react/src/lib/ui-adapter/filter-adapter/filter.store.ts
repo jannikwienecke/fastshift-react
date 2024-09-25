@@ -12,18 +12,18 @@ export type SelectFilterValueAction = {
 };
 
 export type FilterStore = {
-  fitlers: FilterType[];
+  filters: FilterType[];
 };
 
 export const filterAtom = atom<FilterStore>({
-  fitlers: [],
+  filters: [],
 });
 
 export const setFilterAtom = atom(
   null,
   (get, set, filter: SelectFilterValueAction) => {
     const filterState = get(filterAtom);
-    let filters = filterState.fitlers;
+    let filters = filterState.filters;
 
     const exitingFilter = filters.find(
       (f) => f.field.name === filter.field.name
@@ -31,9 +31,14 @@ export const setFilterAtom = atom(
 
     if (!exitingFilter) {
       filters.push(filterUtil().create(filter));
+      set(filterAtom, {
+        ...filterState,
+        filters,
+      });
+      return;
     }
 
-    if (exitingFilter && exitingFilter.type === 'relation') {
+    if (exitingFilter.type === 'relation') {
       const exitingValue = exitingFilter.values.find(
         (v) => v.id === filter.value.id
       );
@@ -49,39 +54,36 @@ export const setFilterAtom = atom(
       } else {
         exitingFilter.values.push(filter.value);
       }
-    } else if (exitingFilter && exitingFilter.type === 'primitive') {
+
+      // remove filters without values and update operator
+      filters = filters
+        .filter((f) => !(f.type === 'relation' && f.values.length === 0))
+        .map((f) => {
+          return {
+            ...f,
+            operator: operator().value(f),
+          };
+        });
+    } else if (exitingFilter.type === 'primitive') {
       const newFilter = filterUtil().create(filter);
 
       exitingFilter.value = newFilter.value;
       exitingFilter.operator = newFilter.operator;
     }
 
-    filters = filterState.fitlers.map((f) => {
-      return {
-        ...f,
-        operator: operator().value(f),
-      };
-    });
-
-    const filtersWithValues = [
-      ...filters.filter(
-        (f) => !(f.type === 'relation' && f.values.length === 0)
-      ),
-    ];
-
     set(filterAtom, {
       ...filterState,
-      fitlers: filtersWithValues,
+      filters,
     });
   }
 );
 
 export const removeFilterAtom = atom(null, (get, set, filter: FilterType) => {
-  const filters = get(filterAtom).fitlers;
+  const filters = get(filterAtom).filters;
   const newFilters = filters.filter((f) => f.field.name !== filter.field.name);
   set(filterAtom, {
     ...get(filterAtom),
-    fitlers: newFilters,
+    filters: newFilters,
   });
 });
 
@@ -90,7 +92,7 @@ const selectedFilterAtom = atom((get) => {
     const filter = get(filterAtom);
     const filterState = get(filterStateAtom);
 
-    const activeFilter = filter.fitlers.find(
+    const activeFilter = filter.filters.find(
       (f) => f.field.name === filterState.selectedField?.name
     );
 
@@ -148,7 +150,7 @@ export const useFilterStore = () => {
 
   const handleEnterValueFromInputDialog = useSetAtom(handleEnterValueAtom);
 
-  const activeFilter = filter.fitlers.find(
+  const activeFilter = filter.filters.find(
     (f) => f.field.name === props.filterState.selectedField?.name
   );
 

@@ -5,24 +5,14 @@ import {
   FilterType,
   Row,
 } from '@apps-next/core';
+import { dateUtils } from './date.utils';
 import {
   defaultOperator,
   defaultOperatorMap,
   operatorMap,
   optionsOperatorMap,
 } from './filter.operator.define';
-import { dateUtils, MONTHS, QUARTERS } from './date.utils';
-
-const isMonthOrQuarter = (value: string) => {
-  const lowerOption = value.toLowerCase();
-  const isMonth = MONTHS.some((month) =>
-    lowerOption.includes(month.toLowerCase())
-  );
-  const isQuarter = QUARTERS.some((quarter) =>
-    lowerOption.includes(quarter.toLowerCase())
-  );
-  return isMonth || isQuarter;
-};
+import { dateOperator } from './filter.utils';
 
 export const operator = () => {
   const value = (f: FilterType) => (f.type === 'primitive' ? f.value : null);
@@ -123,36 +113,7 @@ export const initDateOperator = (field: FieldConfig, value?: Row | null) => {
 
   const date = dateUtils.parseOption(value.raw, operator);
 
-  const isYear = ['201', '202', '203'].some((year) =>
-    value.raw?.toString().includes(year)
-  );
-
-  const _isMonthOrQuarter = isMonthOrQuarter(value.raw);
-  if (
-    !date ||
-    date.unit === 'today' ||
-    date.unit === 'tomorrow' ||
-    date.unit === 'yesterday' ||
-    _isMonthOrQuarter ||
-    isYear
-  ) {
-    return operatorMap.is;
-  }
-
-  if (
-    date &&
-    (date.unit === 'week' || date.unit === 'month' || date.unit === 'year')
-  ) {
-    if (!date.value || (date.value === -1 && date.operator === 'equal to')) {
-      return operatorMap.within;
-    }
-  }
-
-  if (value.raw.includes('ago')) {
-    return operatorMap.after;
-  }
-
-  return operator;
+  return dateOperator(value.raw.toString().toLowerCase(), date);
 };
 
 export const getOptionsForDateField = (
@@ -166,19 +127,9 @@ export const getOptionsForDateField = (
 
   const date = dateUtils.parseOption(value?.raw, operators[0]);
 
-  const _isMonthOrQuarter = isMonthOrQuarter(value?.raw);
-  const isYear = ['201', '202', '203'].some((year) =>
-    value?.raw?.toString().includes(year)
-  );
+  const operator = dateOperator(value?.raw.toString().toLowerCase(), date);
 
-  if (
-    !date ||
-    date.unit === 'today' ||
-    date.unit === 'tomorrow' ||
-    date.unit === 'yesterday' ||
-    _isMonthOrQuarter ||
-    isYear
-  ) {
+  if (operator.label === 'is') {
     return [
       {
         id: operatorMap.is.label,
@@ -193,19 +144,13 @@ export const getOptionsForDateField = (
     ];
   }
 
-  if (
-    date &&
-    (date.unit === 'week' || date.unit === 'month' || date.unit === 'year')
-  ) {
-    if (!date.value || (date.value === -1 && date.operator === 'equal to')) {
-      return [
-        {
-          id: operatorMap.within.label,
-          label: operatorMap.within.label,
-          icon: operatorMap.within.icon,
-        },
-      ];
-    }
+  if (operator.label === 'within') {
+    return [
+      {
+        ...operator,
+        id: operatorMap.within.label,
+      },
+    ];
   }
 
   return operators
