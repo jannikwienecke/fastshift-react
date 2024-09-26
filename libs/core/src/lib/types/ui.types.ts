@@ -29,6 +29,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
   items: TItem[];
   onSelect: (item: TItem) => void;
   selected: Record<string, any>[];
+  contextMenu?: React.ReactNode;
 };
 
 export type ListGetProps<T> = {
@@ -125,4 +126,18 @@ export type DatePickerProps = {
   rect: DOMRect | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+};
+
+export type ContextMenuProps = {
+  items: {
+    id: string;
+    label: string;
+    icon?: React.FC<any>;
+    shortcut?: string;
+    options?: {
+      id: string;
+      label: string;
+      render: () => React.ReactNode;
+    }[];
+  }[];
 };

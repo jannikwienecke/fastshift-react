@@ -1,28 +1,36 @@
+import { ListItem, ListProps, ListValueProps } from '@apps-next/core';
 import React from 'react';
 import { Checkbox } from '../components/checkbox';
+import { ContextMenu } from '../context-menu';
 import { cn } from '../utils';
-import { ListItem, ListProps, ListValueProps } from '@apps-next/core';
 
 export function ListDefault<TItem extends ListItem = ListItem>({
   items,
   onSelect,
   selected,
+  ...props
 }: ListProps<TItem>) {
   return (
     <List onSelect={onSelect} selected={selected}>
       {items.map((item) => {
         return (
-          <List.Item key={item.id} className="" item={item}>
-            <div className="flex gap-1 pr-2">
-              <List.Control />
-              <List.Icon icon={item?.icon} />
-            </div>
+          <ContextMenu.Context>
+            <ContextMenu.Trigger>
+              {props.contextMenu ? props.contextMenu : null}
 
-            <List.Values>
-              <ListValues values={item.valuesLeft} />
-              <ListValues values={item.valuesRight} />
-            </List.Values>
-          </List.Item>
+              <List.Item key={item.id} className="" item={item}>
+                <div className="flex gap-1 pr-2">
+                  <List.Control />
+                  <List.Icon icon={item?.icon} />
+                </div>
+
+                <List.Values>
+                  <ListValues values={item.valuesLeft} />
+                  <ListValues values={item.valuesRight} />
+                </List.Values>
+              </List.Item>
+            </ContextMenu.Trigger>
+          </ContextMenu.Context>
         );
       })}
     </List>

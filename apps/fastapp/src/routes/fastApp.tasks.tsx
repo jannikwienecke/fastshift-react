@@ -8,6 +8,7 @@ import {
   setViewFieldsConfig,
   useCombobox,
   UseComboboxProps,
+  useContextMenu,
   useFilterAdapter,
   useFilterStore,
   useHandleSelectCombobox,
@@ -16,40 +17,39 @@ import {
   useStoreValue,
 } from '@apps-next/react';
 import {
-  Button,
-  Calendar,
   ComboboxPopover,
-  DatePicker,
+  ContextMenu,
   Filter,
   InputDialog,
   List,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
 } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import {
   CompletedComponent,
+  CompletedComponentCombobox,
   PriorityComponent,
   PriorityComponentCombobox,
   ProjectComponent,
   ProjectComponentCombobox,
+  TagsCombobox,
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
-import React from 'react';
 
 setViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
     tags: {
       component: {
         list: TagsComponent,
+        combobox: TagsCombobox,
+        contextMenu: TagsCombobox,
       },
     },
     completed: {
       component: {
         list: CompletedComponent,
-        // combobox: CompletedComponent,
+        combobox: CompletedComponentCombobox,
+        contextMenu: CompletedComponentCombobox,
       },
     },
 
@@ -57,6 +57,7 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
       component: {
         list: PriorityComponent,
         combobox: PriorityComponentCombobox,
+        contextMenu: PriorityComponentCombobox,
       },
     },
 
@@ -64,6 +65,7 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
       component: {
         list: ProjectComponent,
         combobox: ProjectComponentCombobox,
+        contextMenu: ProjectComponentCombobox,
       },
     },
   },
@@ -117,17 +119,16 @@ const Task = () => {
     list?.focusedRelationField ? listComboboxProps : filterComboboxProps
   );
 
+  const getContextMenuProps = useContextMenu();
   return (
     <div className="p-2 flex flex-col gap-2 grow overflow-scroll">
       <div className="flex flex-col w-full ">
         <Filter.Default {...getFilterProps()} />
       </div>
-
       <ComboboxPopover {...getComboboxProps()} />
-
       <InputDialog.Default {...getInputDialogProps()} />
 
-      <div className="flex flex-col w-full ">
+      <div className="flex flex-col w-full relative">
         <QueryInput />
 
         <List.Default
@@ -135,10 +136,10 @@ const Task = () => {
             fieldsRight: ['tags', 'priority', 'completed'],
             fieldsLeft: ['name', 'projects'],
           })}
+          contextMenu={<ContextMenu.Default {...getContextMenuProps()} />}
         />
       </div>
       <hr />
-
       <Outlet />
     </div>
   );

@@ -17,6 +17,9 @@ export type ViewFieldsConfig<
           combobox: (props: {
             data: U[key] extends Array<unknown> ? U[key][0] : U[key];
           }) => React.ReactNode;
+          contextMenu: (props: {
+            data: U[key] extends Array<unknown> ? U[key][0] : U[key];
+          }) => React.ReactNode;
         }>;
       };
     }>;

@@ -9,7 +9,7 @@ export type TaskViewDataType = DataType<
   'tasks',
   {
     projects: Projects;
-    tags?: Tags[];
+    tags: Tags[];
   }
 >;
 
@@ -63,6 +63,14 @@ export const CompletedComponent = (props: { data: TaskViewDataType }) => {
   return <div>{completed ? '✅' : '❌'}</div>;
 };
 
+export const CompletedComponentCombobox = (props: {
+  data: TaskViewDataType['completed'];
+}) => {
+  const completed = props.data;
+
+  return <div>{completed ? '✅' : '❌'}</div>;
+};
+
 export const TagsComponent = (props: { data: TaskViewDataType }) => {
   const tags = props.data.tags;
 
@@ -101,23 +109,23 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
   );
 };
 
-// export const TagsCombobox = (props: { data: TaskViewDataType['tag'][0] }) => {
-//   const tag = props.data;
+export const TagsCombobox = (props: { data: TaskViewDataType['tags'][0] }) => {
+  const tag = props.data;
 
-//   if (!tag) return null;
-//   return (
-//     <div className="flex gap-[2px] text-sm">
-//       <div key={tag.id} className="flex items-center">
-//         <div
-//           style={{ backgroundColor: tag.color }}
-//           className="w-[10px] h-[10px] rounded-full mr-3"
-//         />
+  if (!tag) return null;
+  return (
+    <div className="flex gap-[2px] text-sm">
+      <div key={tag.id} className="flex items-center">
+        <div
+          style={{ backgroundColor: tag.color }}
+          className="w-[10px] h-[10px] rounded-full mr-3"
+        />
 
-//         <div>{tag.name}</div>
-//       </div>
-//     </div>
-//   );
-// };
+        <div>{tag.name}</div>
+      </div>
+    </div>
+  );
+};
 
 export const ProjectComponent = (props: { data: TaskViewDataType }) => {
   const project = props.data.projects;
