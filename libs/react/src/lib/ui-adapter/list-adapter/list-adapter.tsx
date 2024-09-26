@@ -81,6 +81,7 @@ export const useList = <T extends RecordType>() => {
         dataModel.rows?.map((item) => ({
           ...item.raw,
           id: item.id,
+          onContextMenu: () => dispatch({ type: 'CONTEXT_MENU', row: item }),
           icon: Icon,
           valuesLeft: _renderLabel
             ? renderLabel(item)

@@ -1,8 +1,8 @@
 import { ContextMenuProps } from '@apps-next/core';
 import { SearchIcon } from 'lucide-react';
 import {
-  ContextMenuContent,
   ContextMenuItem,
+  ContextMenuContent,
   ContextMenuShortcut,
   ContextMenuSub,
   ContextMenuSubContent,
@@ -16,7 +16,7 @@ export const ContextMenuDefault = (props: ContextMenuProps) => {
     <ContextMenuContent className="w-48 py-2">
       {props.items.map((item) => {
         return (
-          <>
+          <div className="w-full" key={item.id}>
             {item.options ? (
               <ContextMenuSub>
                 <ContextMenuSubTrigger className="w-full">
@@ -34,13 +34,23 @@ export const ContextMenuDefault = (props: ContextMenuProps) => {
                 </ContextMenuSubTrigger>
 
                 <ContextMenuSubContent className="w-48">
-                  <ContextMenu.SearchItem label="Search" />
+                  <ContextMenu.SearchItem
+                    onClick={() => {
+                      item.onClick();
+                    }}
+                    label="Search"
+                  />
 
                   <ContextMenu.SubList options={item.options} />
                 </ContextMenuSubContent>
               </ContextMenuSub>
             ) : (
-              <ContextMenuItem>
+              <ContextMenuItem
+                onSelect={() => {
+                  console.log('item.onClick');
+                  item.onClick();
+                }}
+              >
                 <div className="flex gap-2">
                   <ContextMenu.Icon icon={item.icon} />
 
@@ -50,7 +60,7 @@ export const ContextMenuDefault = (props: ContextMenuProps) => {
                 <ContextMenu.Shortcut shortcut={item.shortcut} />
               </ContextMenuItem>
             )}
-          </>
+          </div>
         );
       })}
 
@@ -114,9 +124,12 @@ const Shortcut = (props: { shortcut?: string }) => {
   return <ContextMenuShortcut>{props.shortcut}</ContextMenuShortcut>;
 };
 
-const SearchItem = (props: { label: string }) => {
+const SearchItem = (props: { label: string; onClick: () => void }) => {
   return (
-    <ContextMenuItem className="cursor-pointer border-b border-gray-100 pb-1">
+    <ContextMenuItem
+      className="cursor-pointer border-b border-gray-100 pb-1"
+      onSelect={props.onClick}
+    >
       <div className="flex items-center gap-2 border-gray-100 cursor-pointer w-full">
         <div>
           <SearchIcon className="w-4 h-4" />

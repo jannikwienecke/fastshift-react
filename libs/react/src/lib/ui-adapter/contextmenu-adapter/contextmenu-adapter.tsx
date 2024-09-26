@@ -1,9 +1,23 @@
-import { ContextMenuProps, getViewByName, makeRow } from '@apps-next/core';
+import {
+  ContextMenuProps,
+  FieldConfig,
+  getViewByName,
+  makeRow,
+  RecordType,
+  Row,
+} from '@apps-next/core';
 import { ContextMenuValue } from '../../ui-components';
 import { useQueryData } from '../../use-query-data';
 import { useView } from '../../use-view';
 
-export const useContextMenu = (): (() => ContextMenuProps) => {
+export type ContextMenuAdapterProps = {
+  onSelectField: (field: FieldConfig, row: Row<RecordType>) => void;
+  selectedRow?: Row<RecordType> | null;
+};
+
+export const useContextMenu = (
+  props: ContextMenuAdapterProps
+): (() => ContextMenuProps) => {
   const { viewConfigManager, registeredViews } = useView();
   const fields = viewConfigManager.getViewFieldList();
   const { relationalDataModel } = useQueryData();
@@ -35,6 +49,11 @@ export const useContextMenu = (): (() => ContextMenuProps) => {
           icon: viewOfField?.icon,
           shortcut: field.name.toUpperCase().slice(0, 1),
           options,
+          onClick: () => {
+            if (!props.selectedRow) return;
+
+            props.onSelectField(field, props.selectedRow);
+          },
         };
       }),
     };

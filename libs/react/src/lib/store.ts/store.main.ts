@@ -51,6 +51,15 @@ export const storeReducer = (prev: Store, action: StoreAction): Store => {
       };
     }
 
+    if (action.type === 'CONTEXT_MENU') {
+      return {
+        ...prev,
+        contextMenu: {
+          row: action.row,
+        },
+      };
+    }
+
     if (action.type === 'SELECT_RELATIONAL_FIELD') {
       if (prev.list?.focusedRelationField) return prev;
 

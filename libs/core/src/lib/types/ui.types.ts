@@ -23,6 +23,7 @@ export type ListItem = {
   icon?: (props: any) => React.ReactNode;
   valuesLeft: ListValueProps[];
   valuesRight: ListValueProps[];
+  onContextMenu?: () => void;
 };
 
 export type ListProps<TItem extends ListItem = ListItem> = {
@@ -134,6 +135,7 @@ export type ContextMenuProps = {
     label: string;
     icon?: React.FC<any>;
     shortcut?: string;
+    onClick: () => void;
     options?: {
       id: string;
       label: string;

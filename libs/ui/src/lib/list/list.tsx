@@ -14,11 +14,11 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     <List onSelect={onSelect} selected={selected}>
       {items.map((item) => {
         return (
-          <ContextMenu.Context>
-            <ContextMenu.Trigger>
+          <ContextMenu.Context key={item.id}>
+            <ContextMenu.Trigger onContextMenu={item?.onContextMenu}>
               {props.contextMenu ? props.contextMenu : null}
 
-              <List.Item key={item.id} className="" item={item}>
+              <List.Item className="" item={item}>
                 <div className="flex gap-1 pr-2">
                   <List.Control />
                   <List.Icon icon={item?.icon} />

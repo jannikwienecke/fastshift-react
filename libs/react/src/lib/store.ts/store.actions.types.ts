@@ -17,6 +17,10 @@ export type StoreAction =
       record: RecordType;
     }
   | {
+      type: 'CONTEXT_MENU';
+      row: Row;
+    }
+  | {
       type: 'SELECT_RELATIONAL_FIELD';
       field: FieldConfig;
       row: Row;

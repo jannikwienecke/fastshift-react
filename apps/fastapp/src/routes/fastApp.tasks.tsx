@@ -97,7 +97,7 @@ const Task = () => {
     onSelect: handleSelectFromFilter,
   });
 
-  const { list } = useStoreValue();
+  const { list, contextMenu } = useStoreValue();
 
   const filterComboboxProps = {
     state: propsForCombobox,
@@ -119,7 +119,13 @@ const Task = () => {
     list?.focusedRelationField ? listComboboxProps : filterComboboxProps
   );
 
-  const getContextMenuProps = useContextMenu();
+  const getContextMenuProps = useContextMenu({
+    onSelectField: (field, row) => {
+      console.log(field, row);
+    },
+    selectedRow: contextMenu?.row,
+  });
+
   return (
     <div className="p-2 flex flex-col gap-2 grow overflow-scroll">
       <div className="flex flex-col w-full ">

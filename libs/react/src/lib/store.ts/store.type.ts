@@ -20,10 +20,14 @@ export type Store = {
       rect: DOMRect;
     };
   };
+  contextMenu?: {
+    row: Row | null;
+  };
 };
 
 export const DEFAULT_STORE: Store = {
   selected: [],
+
   selectedRelationalField: null,
   edit: {
     isEditing: false,
