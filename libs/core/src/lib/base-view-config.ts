@@ -34,7 +34,6 @@ export interface BaseViewConfigManagerInterface<
   getManyToManyField(key: string): FieldConfig | undefined;
 
   modelConfig?: ModelConfig;
-  form: FormManagerInterface;
 }
 
 export class BaseViewConfigManager<
@@ -43,14 +42,9 @@ export class BaseViewConfigManager<
 {
   viewConfig: TViewConfig;
 
-  constructor(
-    viewConfig: TViewConfig,
-    public modelConfig?: ModelConfig,
-    public form: FormManagerInterface = new FormManager(this)
-  ) {
+  constructor(viewConfig: TViewConfig, public modelConfig?: ModelConfig) {
     this.viewConfig = viewConfig;
     this.modelConfig = modelConfig;
-    this.form = form;
   }
 
   getTableName(): string {

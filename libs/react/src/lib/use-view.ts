@@ -1,10 +1,9 @@
-import { GetTableName, RegisteredViews, ViewConfigType } from '@apps-next/core';
-import { useAtomValue } from 'jotai';
-import { registeredViewsAtom, viewConfigManagerAtom } from './stores';
+import { GetTableName, ViewConfigType } from '@apps-next/core';
+import { store$ } from './legend-store/legend.store';
 
 export const useView = () => {
-  const viewConfigManager = useAtomValue(viewConfigManagerAtom);
-  const registeredViews = useAtomValue(registeredViewsAtom);
+  const viewConfigManager = store$.viewConfigManager.get();
+  const registeredViews = store$.views.get();
 
   if (!viewConfigManager) throw new Error('View Config Manager not found');
 

@@ -26,6 +26,10 @@ export type DataModelNew<T extends RecordType = RecordType> = {
   rows: Row<T>[];
 };
 
+export type RelationalDataModel<T extends RecordType = RecordType> = {
+  [key: string]: DataModelNew<T>;
+};
+
 export const makeData = (registeredViews: RegisteredViews, name: string) => {
   return <T extends RecordType = RecordType>(data: T[]): DataModelNew<T> => {
     const viewConfig = getViewByName(registeredViews, name);

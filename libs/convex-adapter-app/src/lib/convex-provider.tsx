@@ -55,6 +55,14 @@ export const preloadQuery = (
     filters: '',
   });
 
+export const getQueryKeyFn =
+  (viewLoader: ViewLoader) => (viewConfig: ViewConfigType) =>
+    convexQuery(viewLoader, {
+      viewName: viewConfig.viewName,
+      query: '',
+      filters: '',
+    }).queryKey;
+
 export type ConvexContext = {
   viewLoader: ViewLoader;
 };

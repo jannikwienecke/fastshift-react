@@ -1,8 +1,7 @@
-import { config, tasksConfig } from '@apps-next/convex';
+import { config, tasksConfig, views } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
   getViewFieldsConfig,
-  getViews,
   makeHooks,
   QueryInput,
   setViewFieldsConfig,
@@ -15,18 +14,8 @@ import {
   useInputDialogStore,
   useStoreValue,
 } from '@apps-next/react';
-import {
-  Button,
-  Calendar,
-  ComboboxPopover,
-  DatePicker,
-  Filter,
-  InputDialog,
-  List,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@apps-next/ui';
+import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
+import { observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import {
   CompletedComponent,
@@ -37,7 +26,7 @@ import {
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
-import React from 'react';
+import { getQueryKey } from '../main';
 
 setViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -70,9 +59,6 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
 });
 
 const Task = () => {
-  const { useList } = makeHooks<TaskViewDataType>();
-  const getListProps = useList();
-
   const { handleClose, handleSelect } = useHandleSelectCombobox();
 
   const { handleSelectFromFilter } = useInputDialogStore();
@@ -117,6 +103,7 @@ const Task = () => {
     list?.focusedRelationField ? listComboboxProps : filterComboboxProps
   );
 
+  console.log('RENDERING TASK PAGE....');
   return (
     <div className="p-2 flex flex-col gap-2 grow overflow-scroll">
       <div className="flex flex-col w-full ">
@@ -130,12 +117,7 @@ const Task = () => {
       <div className="flex flex-col w-full ">
         <QueryInput />
 
-        <List.Default
-          {...getListProps({
-            fieldsRight: ['tags', 'priority', 'completed'],
-            fieldsLeft: ['name', 'projects'],
-          })}
-        />
+        <RenderList />
       </div>
       <hr />
 
@@ -144,6 +126,22 @@ const Task = () => {
   );
 };
 
+const RenderList = observer(() => {
+  const { useList } = makeHooks<TaskViewDataType>();
+  const getListProps = useList();
+
+  return (
+    <>
+      <List.Default
+        {...getListProps({
+          fieldsRight: ['tags', 'priority', 'completed'],
+          fieldsLeft: ['name', 'projects'],
+        })}
+      />
+    </>
+  );
+});
+
 export const Route = createFileRoute('/fastApp/tasks')({
   loader: async ({ context }) => context.preloadQuery(tasksConfig),
   component: () => {
@@ -151,17 +149,12 @@ export const Route = createFileRoute('/fastApp/tasks')({
       <ClientViewProviderConvex
         viewConfig={tasksConfig}
         globalConfig={config.config}
-        views={getViews()}
+        views={views}
         viewFieldsConfig={getViewFieldsConfig()}
+        queryKey={getQueryKey(tasksConfig)}
       >
         <Task />
       </ClientViewProviderConvex>
     );
   },
 });
-
-// STATE: FILTERS
-// when filtering the field options -> the filteing process does not work. e.g.: enter "tag" , delete it and enter "project"
-// we need to handle the different operations like is in or is not in
-// we need to persist the filters somewhere (own db table that we expose?)
-// we need to style the ui

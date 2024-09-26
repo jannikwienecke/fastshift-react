@@ -11,6 +11,7 @@ export * from '../convex/_generated/api';
 export * from '../convex/schema';
 
 export const config = createConfigFromConvexSchema(schema);
+
 declare module '@apps-next/core' {
   interface Register {
     config: typeof config;
@@ -26,6 +27,9 @@ export const tasksConfig = createViewConfig(
       field: 'name',
     },
     fields: {
+      // TODO: add smart feature..
+      // dueDate (date in the name -> date field)
+      // dueDate (date with upper case D -> Due Date)
       dueDate: { isDateField: true },
     },
     includeFields: ['tags'],

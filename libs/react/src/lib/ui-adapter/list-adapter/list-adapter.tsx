@@ -1,28 +1,26 @@
 import {
+  DataModelNew,
   ListGetProps,
   ListItem,
   ListProps,
   RecordType,
   Row,
 } from '@apps-next/core';
-import { useAtomValue } from 'jotai';
+import { store$ } from '../../legend-store/legend.store.js';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
-import { useQueryData } from '../../use-query-data';
-import { useStoreDispatch, useStoreValue } from '../../store.ts';
-import { getViewConfigAtom } from '../../stores';
+import { useView } from '../../use-view.js';
 
 export const useList = <T extends RecordType>() => {
-  const dispatch = useStoreDispatch();
+  const dataModel = store$.dataModel.get() as DataModelNew<T>;
+  const selected = store$.list.selected.get();
 
-  const { dataModel } = useQueryData<T[]>();
-  const { selected } = useStoreValue();
+  const { viewConfigManager } = useView();
 
-  const viewConfig = useAtomValue(getViewConfigAtom);
   return <Props extends ListGetProps<T>>(
     options?: Props
   ): ListProps<T & ListItem> => {
-    const { list } = viewConfig.viewConfig.ui || {};
+    const { list } = viewConfigManager.viewConfig.ui || {};
     const fieldsLeft = options?.fieldsLeft ?? list?.fieldsLeft ?? [];
     const fieldsRight = options?.fieldsRight ?? list?.fieldsRight ?? [];
     const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
@@ -48,7 +46,7 @@ export const useList = <T extends RecordType>() => {
             throw new Error(
               `Field ${field?.name} not found in row ${
                 row.id
-              } of view ${viewConfig.getViewName()}`
+              } of view ${viewConfigManager.getViewName()}`
             );
           }
 
@@ -75,10 +73,10 @@ export const useList = <T extends RecordType>() => {
     };
 
     return {
-      onSelect: (item) => dispatch({ type: 'SELECT_RECORD', record: item }),
+      onSelect: (item) => store$.selectListItem(item),
       selected,
       items:
-        dataModel.rows?.map((item) => ({
+        dataModel.rows.map((item) => ({
           ...item.raw,
           id: item.id,
           icon: Icon,

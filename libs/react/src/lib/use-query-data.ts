@@ -2,8 +2,9 @@ import { RecordType } from '@apps-next/core';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { QueryStore, queryStoreAtom, updateQueryDataAtom } from './query-store';
-import { viewConfigManagerAtom } from './stores';
 import { useQuery } from './use-query';
+import { useView } from './use-view';
+import { store$ } from './legend-store/legend.store';
 
 export const useQueryData = <
   QueryReturnType extends RecordType[]
@@ -11,10 +12,13 @@ export const useQueryData = <
   const queryStore = useAtomValue(queryStoreAtom);
   const updateQueryData = useSetAtom(updateQueryDataAtom);
 
-  const viewConfigManager = useAtomValue(viewConfigManagerAtom);
+  const { viewConfigManager } = useView();
   const { data, relationalData } = useQuery();
 
   React.useEffect(() => {
+    store$.createDataModel(data ?? []);
+    store$.createRelationalDataModel(relationalData ?? {});
+
     updateQueryData({
       dataRaw: data || [],
       relationalDataRaw: relationalData || {},

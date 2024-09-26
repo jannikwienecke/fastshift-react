@@ -1,15 +1,18 @@
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-import React from 'react';
 import * as ReactDOM from 'react-dom/client';
 
 import { api, config } from '@apps-next/convex';
 import {
   ConvexQueryProvider,
+  getQueryKeyFn,
   preloadQuery,
 } from '@apps-next/convex-adapter-app';
 import { routeTree } from './routeTree.gen';
 
+import { store$ } from '@apps-next/react';
 import { ConvexQueryClient } from '@convex-dev/react-query';
+import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/local-storage';
+import { syncObservable } from '@legendapp/state/sync';
 import { QueryClient } from '@tanstack/react-query';
 import { ConvexReactClient } from 'convex/react';
 
@@ -19,7 +22,7 @@ const convex = new ConvexReactClient(VITE_CONVEX_URL);
 
 const convexQueryClient = new ConvexQueryClient(convex);
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryKeyHashFn: convexQueryClient.hashFn(),
@@ -29,6 +32,15 @@ const queryClient = new QueryClient({
 });
 
 convexQueryClient.connect(queryClient);
+
+syncObservable(store$, {
+  persist: {
+    name: 'store-global',
+    plugin: ObservablePersistLocalStorage,
+  },
+});
+
+export const getQueryKey = getQueryKeyFn(api.query.viewLoader);
 
 const router = createRouter({
   routeTree,
@@ -55,15 +67,15 @@ if (!root) throw new Error('root not found');
 export const loader = api.query.viewLoader;
 
 ReactDOM.createRoot(root).render(
-  <React.StrictMode>
-    <ConvexQueryProvider
-      queryClient={queryClient}
-      convex={convex}
-      globalConfig={config}
-      viewLoader={api.query.viewLoader}
-      viewMutation={api.query.viewMutation}
-    >
-      <RouterProvider router={router} />
-    </ConvexQueryProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <ConvexQueryProvider
+    queryClient={queryClient}
+    convex={convex}
+    globalConfig={config}
+    viewLoader={api.query.viewLoader}
+    viewMutation={api.query.viewMutation}
+  >
+    <RouterProvider router={router} />
+  </ConvexQueryProvider>
+  // </React.StrictMode>
 );

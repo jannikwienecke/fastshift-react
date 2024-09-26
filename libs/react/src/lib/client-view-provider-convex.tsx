@@ -7,7 +7,6 @@ import {
   DataModelNew,
   getViewByName,
   makeData,
-  makeQueryKey,
   QueryReturnOrUndefined,
   RecordType,
   RegisteredViews,
@@ -17,6 +16,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Provider } from 'jotai';
 import React from 'react';
+import { store$ } from './legend-store/legend.store';
 import { QueryStore, queryStoreAtom } from './query-store';
 import {
   clientConfigStore,
@@ -31,6 +31,7 @@ export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
+  queryKey: any[];
 } & { children: React.ReactNode };
 
 type QueryProviderPropsWithViewFieldsConfig = QueryProviderConvexProps & {
@@ -45,8 +46,6 @@ export const ClientViewProviderConvex = (
     [props.viewConfig]
   );
 
-  const registeredViews = props.globalConfig.defaultViewConfigs;
-
   const views = React.useMemo(
     () => ({
       ...props.globalConfig.defaultViewConfigs,
@@ -58,9 +57,7 @@ export const ClientViewProviderConvex = (
   const queryClient = useQueryClient();
 
   const data = queryClient.getQueryData(
-    makeQueryKey({
-      viewName: viewConfigManager.getViewName(),
-    })
+    props.queryKey
   ) as QueryReturnOrUndefined;
 
   const dataModel = makeData(
@@ -68,11 +65,18 @@ export const ClientViewProviderConvex = (
     viewConfigManager.getTableName()
   )(data?.data ?? []);
 
+  store$.init(
+    data?.data ?? [],
+    data?.relationalData ?? {},
+    viewConfigManager,
+    views
+  );
+
   const relationalDataModel = Object.entries(data?.relationalData ?? {}).reduce(
     (acc, [tableName, data]) => {
-      const viewConfig = getViewByName(registeredViews, tableName);
+      const viewConfig = getViewByName(views, tableName);
 
-      acc[tableName] = makeData(registeredViews, viewConfig.viewName)(data);
+      acc[tableName] = makeData(views, viewConfig.viewName)(data);
       return acc;
     },
     {} as { [key: string]: DataModelNew<RecordType> }

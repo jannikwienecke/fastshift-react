@@ -11,12 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LegendImport } from './routes/legend'
 import { Route as FastAppImport } from './routes/fastApp'
 import { Route as IndexImport } from './routes/index'
 import { Route as FastAppTasksImport } from './routes/fastApp.tasks'
 import { Route as FastAppProjectsImport } from './routes/fastApp.projects'
 
 // Create/Update Routes
+
+const LegendRoute = LegendImport.update({
+  path: '/legend',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const FastAppRoute = FastAppImport.update({
   path: '/fastApp',
@@ -56,6 +62,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FastAppImport
       parentRoute: typeof rootRoute
     }
+    '/legend': {
+      id: '/legend'
+      path: '/legend'
+      fullPath: '/legend'
+      preLoaderRoute: typeof LegendImport
+      parentRoute: typeof rootRoute
+    }
     '/fastApp/projects': {
       id: '/fastApp/projects'
       path: '/projects'
@@ -81,6 +94,7 @@ export const routeTree = rootRoute.addChildren({
     FastAppProjectsRoute,
     FastAppTasksRoute,
   }),
+  LegendRoute,
 })
 
 /* prettier-ignore-end */
@@ -92,7 +106,8 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/fastApp"
+        "/fastApp",
+        "/legend"
       ]
     },
     "/": {
@@ -104,6 +119,9 @@ export const routeTree = rootRoute.addChildren({
         "/fastApp/projects",
         "/fastApp/tasks"
       ]
+    },
+    "/legend": {
+      "filePath": "legend.tsx"
     },
     "/fastApp/projects": {
       "filePath": "fastApp.projects.tsx",

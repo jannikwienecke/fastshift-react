@@ -75,7 +75,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const prisma = useApi();
-  const { viewConfigManager, registeredViews } = useView();
+  const { registeredViews, viewConfigManager } = useView();
+
   const query = useAtomValue(debouncedQueryAtom);
   const { filter } = useFilterStore();
   const parsedFilters = convertFiltersForBackend(filter.filters);
