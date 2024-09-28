@@ -6,6 +6,8 @@ import {
 import { DEFAULT_DATE_OPTIONS, MONTHS, QUARTERS } from './filter.constants';
 import { filterHelper, stringsToComboxboxItems } from './filter.utils';
 
+export const FILTER_SPECIFIC = 'Select specific date';
+
 class DateOptions {
   private value: string;
   private hasFromNow: boolean;
@@ -191,13 +193,11 @@ class DateOptions {
   }
 
   private getDefaultOptions(): ComboxboxItem[] {
-    const selectSpecificDate = 'Select specific date';
-
     const allFiltered = DEFAULT_DATE_OPTIONS.filter((option) =>
       option.toLowerCase().includes(this.value)
     );
 
-    return stringsToComboxboxItems([selectSpecificDate, ...allFiltered]);
+    return stringsToComboxboxItems([FILTER_SPECIFIC, ...allFiltered]);
   }
 
   private getWeekMonthDayOptions(): ComboxboxItem[] {

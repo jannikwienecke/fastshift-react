@@ -6,10 +6,9 @@ import {
   FilterProps,
   FilterType,
 } from '@apps-next/core';
-import { useFilterStore } from '../../store.ts/index.js';
 import { FilterValue } from '../../ui-components/render-filter-value.js';
-import { useFiltering } from './filter.state.js';
 import { filterUtil } from './filter.utils.js';
+import { filterValuesStore$, store$ } from '../../legend-store';
 
 export const getFilterValue = (f: FilterType) => {
   if (f.type === 'relation') {
@@ -24,71 +23,49 @@ export const getFilterValue = (f: FilterType) => {
 export const useFilterAdapter = (props?: {
   onSelect?: (value: ComboxboxItem) => void;
 }): (() => FilterProps) => {
-  const { filter, removeFilter, setQuery } = useFilterStore();
-  const {
-    open,
-    select,
-    setPosition,
-    openOperatorOptions,
-    filterState,
-    closeFieldOptions: close,
-    selectDate,
-  } = useFiltering();
-
   const comboboxProps = {
-    ...filterState,
-    values: filterState.query.length
-      ? filterState.filteredValues
-      : filterState.values,
+    ...store$.filter.get(),
+    values: filterValuesStore$.values.get(),
     name: 'filter',
     multiple: false,
     searchable: true,
-    rect: filterState.rect,
     input: {
-      onChange: (query) => {
-        setQuery(query);
-      },
-      query: filterState.query,
+      onChange: store$.filterUpdateQuery,
+      query: store$.filter.query.get(),
       placeholder: 'Filter...',
     },
     selected: null,
     onChange: (value) => {
-      select(value);
-      props?.onSelect?.(value);
+      store$.filterSelectFilterType(value);
     },
 
     onOpenChange: (isOpen) => {
       if (!isOpen) {
-        close();
-      } else {
-        open(true);
+        store$.filterClose();
       }
     },
     render: (value) => <FilterValue value={value} />,
   } satisfies ComboboxPopoverProps<ComboxboxItem>;
 
-  const currentDateFilter = filter.filters?.find(
-    (f) => f.field.name === filterState.selectedDateField?.name
-  );
+  const currentDateFilter = store$.filter.filters
+    .get()
+    ?.find((f) => f.field.name === store$.filter.selectedDateField.get()?.name);
 
   const datePickerProps = {
     selected: currentDateFilter
       ? new Date(filterUtil().getValue(currentDateFilter))
       : undefined,
-    onSelect: (date) => {
-      if (!filterState.selectedDateField) return;
-      selectDate(date);
-    },
-    open: filterState.showDatePicker,
-    rect: filterState.rect,
+    onSelect: store$.filterSelectFromDatePicker,
+    open: store$.filter.showDatePicker.get(),
+    rect: store$.filter.rect.get(),
     onOpenChange: (open) => {
       if (!open) {
-        close();
+        store$.filterCloseAll();
       }
     },
   } satisfies DatePickerProps;
 
-  const filters_ = filter.filters.map((f) => {
+  const filters_ = store$.filter.filters.get().map((f) => {
     return {
       label: f.field.name,
       name: f.field.name,
@@ -98,37 +75,26 @@ export const useFilterAdapter = (props?: {
   });
 
   const getFilter = (name: string) => {
-    const _f = filter.filters.find((f) => f.field.name === name);
+    const _f = store$.filter.filters.get().find((f) => f.field.name === name);
     if (!_f) throw new Error('Filter not found');
     return _f;
   };
 
   return (): FilterProps => {
     return {
-      onOpen: (rect: DOMRect) => {
-        open(true);
-        setPosition(rect);
-      },
+      onOpen: store$.filterOpen,
       filters: filters_,
-      datePickerProps: filterState.showDatePicker ? datePickerProps : null,
+      datePickerProps: store$.filter.showDatePicker.get()
+        ? datePickerProps
+        : null,
       comboboxProps: comboboxProps,
-      onRemove: ({ name }) => removeFilter(getFilter(name)),
+      onRemove: ({ name }) => store$.filterRemoveFilter(getFilter(name)),
       onSelect: (value, rect) => {
-        setPosition(rect);
-        const comboboxValue = {
-          id: value.name,
-          label: value.name,
-        };
-
-        select(comboboxValue);
-
-        props?.onSelect?.(comboboxValue);
+        const filter = getFilter(value.name);
+        store$.filterOpenExisting(filter, rect);
       },
       onOperatorClicked: (filter, rect) => {
-        setPosition(rect);
-
-        const _f = getFilter(filter.name);
-        openOperatorOptions(_f.field);
+        store$.filterOpenOperator(getFilter(filter.name), rect);
       },
     };
   };

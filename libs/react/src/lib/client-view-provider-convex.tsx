@@ -12,7 +12,7 @@ import {
   RegisteredViews,
   ViewFieldsConfig,
 } from '@apps-next/core';
-
+import { observer } from '@legendapp/state/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Provider } from 'jotai';
 import React from 'react';
@@ -27,6 +27,8 @@ import {
 } from './stores';
 import { HydrateAtoms } from './ui-components';
 import { useQueryData } from './use-query-data';
+import { useQuery } from './use-query';
+import { addEffects } from './legend-store';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
@@ -127,8 +129,11 @@ export const ClientViewProviderConvex = (
   );
 };
 
-const Content = (props: { children: React.ReactNode }) => {
+const Content = observer((props: { children: React.ReactNode }) => {
+  useQuery();
   useQueryData();
 
+  addEffects(store$);
+
   return <> {props.children}</>;
-};
+});

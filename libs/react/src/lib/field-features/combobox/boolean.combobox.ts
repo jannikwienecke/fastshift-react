@@ -1,15 +1,14 @@
 import { makeRow } from '@apps-next/core';
-import { helper } from './feature.combobox.shared';
+import { DEFAULT_COMBOBOX_STATE } from '../../legend-store/legend.store.constants';
 import {
   ComboboxInitPayload,
-  LegendStore,
+  ComboboxState,
 } from '../../legend-store/legend.store.types';
-import { DEFAULT_COMBOBOX_STATE } from '../../legend-store/legend.store.constants';
+import { helper } from './feature.combobox.shared';
 
 export const BooleanInitializer = (
-  store: LegendStore['combobox'],
   payload: ComboboxInitPayload
-): LegendStore['combobox'] => {
+): ComboboxState => {
   const { id, field, selected } = helper(payload);
 
   const values = [
@@ -22,9 +21,7 @@ export const BooleanInitializer = (
     ...payload,
     id,
     open: true,
-    values,
     fallbackData: values,
-
     multiple: false,
     searchable: false,
     selected: Array.isArray(selected)

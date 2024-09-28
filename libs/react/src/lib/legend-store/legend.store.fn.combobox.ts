@@ -1,23 +1,23 @@
 import { getRelationTableName, makeData } from '@apps-next/core';
 import { comboboInitialize } from '../field-features/combobox';
 import { StoreFn } from './legend.store.types';
+import { comboboxStore$ } from './legend.store.derived';
 
 export const comboboxInit: StoreFn<'comboboxInit'> = (store$) => (payload) => {
-  const initState = comboboInitialize(store$.combobox.get(), payload);
+  const initState = comboboInitialize(payload);
 
   store$.combobox.set({ ...initState });
 };
 
 export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
   (store$) => (value) => {
-    if (!store$.combobox.get().multiple) {
+    const state = comboboxStore$.get();
+    if (!state.multiple) {
       store$.combobox.selected.set([value]);
     } else {
-      const selected = store$.combobox
-        .get()
-        .selected.some((s) => s.id === value.id)
-        ? store$.combobox.selected.get().filter((s) => s.id !== value.id)
-        : [...store$.combobox.selected.get(), value];
+      const selected = state.selected.some((s) => s.id === value.id)
+        ? state.selected.filter((s) => s.id !== value.id)
+        : [...state.selected, value];
 
       store$.combobox.selected.set(selected);
     }
@@ -27,12 +27,13 @@ export const comboboxUpdateQuery: StoreFn<'comboboxUpdateQuery'> =
   (store$) => (query) => {
     if (query === '') {
       store$.combobox.query.set('');
-      store$.combobox.values.set(store$.combobox.fallbackData.get());
-    } else if (store$.combobox.field.get()?.enum) {
+      store$.combobox.values.set(null);
+    } else if (comboboxStore$.field.get()?.enum) {
+      const values = comboboxStore$.values.get();
       store$.combobox.values.set(
-        store$.combobox.values
-          .get()
-          .filter((v) => v.label.toLowerCase().includes(query.toLowerCase()))
+        values?.filter((v) =>
+          v.label.toLowerCase().includes(query.toLowerCase())
+        ) || []
       );
     } else {
       store$.combobox.query.set(query);
@@ -41,8 +42,9 @@ export const comboboxUpdateQuery: StoreFn<'comboboxUpdateQuery'> =
 
 export const comboboxHandleQueryData: StoreFn<'comboboxHandleQueryData'> =
   (store$) => (data) => {
-    const prevSelected = store$.combobox.selected.get();
-    const tableName = getRelationTableName(store$.combobox.field.get());
+    const prevSelected = comboboxStore$.selected.get();
+    const field = comboboxStore$.field.get();
+    const tableName = getRelationTableName(field);
 
     const dataModel = makeData(store$.views.get(), tableName)(data);
 

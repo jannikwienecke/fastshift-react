@@ -11,8 +11,8 @@ import {
 import { useQuery as useTanstackQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import React from 'react';
+import { store$ } from './legend-store/legend.store';
 import { PrismaContextType } from './query-context';
-import { useFilterStore } from './store.ts';
 import { debouncedQueryAtom } from './ui-components';
 import { useApi } from './use-api';
 import { useView } from './use-view';
@@ -78,8 +78,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const { registeredViews, viewConfigManager } = useView();
 
   const query = useAtomValue(debouncedQueryAtom);
-  const { filter } = useFilterStore();
-  const parsedFilters = convertFiltersForBackend(filter.filters);
+  const filters = store$.filter.filters.get();
+  const parsedFilters = convertFiltersForBackend(filters);
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -109,7 +109,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const queryReturn = useStableQuery(prisma, queryPropsMerged);
 
-  console.log(queryReturn.data);
   return {
     ...queryReturn,
     data: queryReturn.data?.data,

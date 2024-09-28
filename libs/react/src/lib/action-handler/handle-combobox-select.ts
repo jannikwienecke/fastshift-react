@@ -1,19 +1,19 @@
 import { RecordType, Row } from '@apps-next/core';
 import React from 'react';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
-import { store$ } from '../legend-store/legend.store';
+import { comboboxStore$, store$ } from '../legend-store';
 import { useMutation } from '../use-mutation';
 
 export const useHandleSelectCombobox = () => {
   const { runMutate } = useMutation();
 
-  const { selected, row, field } = store$.combobox.get();
+  const { selected, row, field } = comboboxStore$.get();
 
   const startSelectedRef = React.useRef<string | string[]>();
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleSelect = (value: Row) => {
-    if (!row) throw new Error('no row');
+    if (!row) return;
     if (!field) throw new Error('no field');
 
     const isManyToManyRelation = field?.relation?.manyToManyRelation;
@@ -59,7 +59,6 @@ export const useHandleSelectCombobox = () => {
               )
             : selectedId;
 
-          console.log(newSelected);
           startSelectedRef.current = newSelected;
 
           const valueToUpdate =

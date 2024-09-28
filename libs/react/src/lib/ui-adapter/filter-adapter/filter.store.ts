@@ -166,12 +166,12 @@ export const useFilterStore = () => {
     selected,
     handleSelectValue,
     handleEnterValueFromInputDialog,
-    propsForCombobox: {
-      field: props.filterState.selectedField,
-      rect: props.filterState.rect ?? ({} as DOMRect),
-      selected,
-      multiple: true,
-    } satisfies UseComboboxProps['state'],
+    // propsForCombobox: {
+    //   field: props.filterState.selectedField,
+    //   rect: props.filterState.rect ?? ({} as DOMRect),
+    //   selected,
+    //   multiple: true,
+    // } satisfies UseComboboxProps['state'],
     ...props,
   };
 };

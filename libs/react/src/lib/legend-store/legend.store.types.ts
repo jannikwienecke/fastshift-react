@@ -1,7 +1,9 @@
 import {
   BaseViewConfigManagerInterface,
+  ComboxboxItem,
   DataModelNew,
   FieldConfig,
+  FilterType,
   QueryRelationalData,
   RecordType,
   RegisteredViews,
@@ -10,9 +12,9 @@ import {
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 
-type ComboboxState = {
+export type ComboboxState = {
   query: string;
-  values: Row[];
+  values: Row[] | null;
   defaultData: DataModelNew | null;
   fallbackData: Row[];
   selected: Row[];
@@ -26,13 +28,28 @@ type ComboboxState = {
   searchable: boolean;
 };
 
+export type FilterStore = {
+  query: string;
+  values: Row[];
+  filteredValues: ComboxboxItem[];
+  open: boolean;
+  tableName: string;
+  id: string | null;
+  selectedField: FieldConfig | null;
+  rect: DOMRect | null;
+  selectedOperatorField: FieldConfig | null;
+  selectedDateField: FieldConfig | null;
+  showDatePicker: boolean;
+  filters: FilterType[];
+};
+
 export type ComboboxInitPayload = Pick<
   ComboboxState,
   'field' | 'rect' | 'defaultData'
 > & {
   selected: Row | Row[] | string;
   multiple?: boolean;
-  row?: Row;
+  row?: Row<any> | null;
 };
 
 export type LegendStore = {
@@ -49,7 +66,7 @@ export type LegendStore = {
     selected: RecordType[];
     selectedRelationField?: {
       field: FieldConfig;
-      row: Row;
+      row?: Row | null;
       rect: DOMRect;
       selected: Row | Row[] | string;
     };
@@ -77,13 +94,31 @@ export type LegendStore = {
   deselectRelationField: () => void;
 
   // combobox state
-  combobox: ComboboxState;
+  combobox: {
+    values: Row[] | null;
+    query: string;
+    selected: Row[];
+    field: FieldConfig | null;
+    multiple: boolean;
+  };
 
-  // combobox methods
   comboboxInit: (payload: ComboboxInitPayload) => void;
   comboboxSelectValue: (value: Row) => void;
   comboboxUpdateQuery: (query: string) => void;
   comboboxHandleQueryData: (data: RecordType[]) => void;
+
+  // filter state
+  filter: FilterStore;
+  filterOpen: (rect: DOMRect) => void;
+  filterClose: () => void;
+  filterCloseAll: () => void;
+  filterUpdateQuery: (query: string) => void;
+  filterSelectFilterType: (selected: ComboxboxItem) => void;
+  filterSelectFilterValue: (value: Row) => void;
+  filterRemoveFilter: (filter: FilterType) => void;
+  filterOpenExisting: (filter: FilterType, rect: DOMRect) => void;
+  filterOpenOperator: (filter: FilterType, rect: DOMRect) => void;
+  filterSelectFromDatePicker: (date: Date) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

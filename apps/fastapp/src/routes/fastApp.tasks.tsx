@@ -5,18 +5,18 @@ import {
   makeHooks,
   QueryInput,
   setViewFieldsConfig,
+  store$,
   useCombobox,
-  UseComboboxProps,
   useFilterAdapter,
   useFilterStore,
   useHandleSelectCombobox,
   useInputDialogAdapter,
   useInputDialogStore,
-  useStoreValue,
 } from '@apps-next/react';
 import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { getQueryKey } from '../main';
 import {
   CompletedComponent,
   PriorityComponent,
@@ -26,7 +26,6 @@ import {
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
-import { getQueryKey } from '../main';
 
 setViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -63,13 +62,14 @@ const Task = observer(() => {
 
   const { handleSelectFromFilter } = useInputDialogStore();
 
-  const {
-    closeAll,
-    propsForCombobox,
-    handleSelectValue,
-    handleEnterValueFromInputDialog,
-    activeFilterValue,
-  } = useFilterStore();
+  // HIER WEITER MACHEN
+  // REMOVE ALL FROM useFilterStore -> move to legend store
+  // for the useInputDialogStore
+  // then -> remove all the adapter hooks
+  // have functions exported like getFilterProps that access the legend store
+  // then: opmtimize list view with the For loop from legend state lib
+  const { closeAll, handleEnterValueFromInputDialog, activeFilterValue } =
+    useFilterStore();
 
   const getInputDialogProps = useInputDialogAdapter({
     onSave: handleEnterValueFromInputDialog,
@@ -81,27 +81,17 @@ const Task = observer(() => {
     onSelect: handleSelectFromFilter,
   });
 
-  const { list } = useStoreValue();
-
-  const filterComboboxProps = {
-    state: propsForCombobox,
-    onClose: closeAll,
-    onSelect: (props) => {
-      handleSelectValue(props);
+  const getComboboxProps = useCombobox({
+    onClose: () => {
+      handleClose();
+      store$.filterCloseAll();
     },
-  } satisfies UseComboboxProps;
+    onSelect: (props) => {
+      store$.filterSelectFilterValue(props);
 
-  const listComboboxProps = {
-    state: list?.focusedRelationField ? list.focusedRelationField : null,
-    onSelect: handleSelect,
-    onClose: handleClose,
-  } satisfies UseComboboxProps;
-
-  // // TODO: we should not save it on list -> but have like selected: {type: "list or whatever"}
-
-  const getComboboxProps = useCombobox(
-    list?.focusedRelationField ? listComboboxProps : filterComboboxProps
-  );
+      handleSelect(props);
+    },
+  });
 
   return (
     <div className="p-2 flex flex-col gap-2 grow overflow-scroll">

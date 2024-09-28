@@ -9,7 +9,7 @@ import { getViewConfigAtom } from '../../stores';
 import { operator } from './filter.operator';
 import { filterUtil } from './filter.utils';
 import { filterAtom, setFilterAtom } from './filter.store';
-import { dateUtils } from './date.utils';
+import { dateUtils, FILTER_SPECIFIC } from './date.utils';
 
 type FilterState = {
   query: string;
@@ -62,7 +62,7 @@ export const selectFilterAtom = atom(null, (get, set, value: ComboxboxItem) => {
   const { selectedOperatorField } = state;
 
   if (state.selectedDateField) {
-    if (value.id === 'Select specific date') {
+    if (value.id === FILTER_SPECIFIC) {
       set(filterStateAtom, { ...get(filterStateAtom), showDatePicker: true });
     } else {
       set(setFilterAtom, {

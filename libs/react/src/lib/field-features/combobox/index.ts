@@ -1,7 +1,5 @@
-import {
-  ComboboxInitPayload,
-  LegendStore,
-} from '../../legend-store/legend.store.types';
+import { DEFAULT_COMBOBOX_STATE } from '../../legend-store/legend.store.constants';
+import { ComboboxInitPayload } from '../../legend-store/legend.store.types';
 import { BooleanInitializer } from './boolean.combobox';
 import { EnumInitializer } from './enum.combobox.ts';
 import { ComboboxInitDict } from './feature.combobox.shared';
@@ -16,13 +14,10 @@ export const ComboboInitDict: ComboboxInitDict = {
   Enum: EnumInitializer,
 };
 
-export const comboboInitialize = (
-  store: LegendStore['combobox'],
-  action: ComboboxInitPayload
-) => {
+export const comboboInitialize = (action: ComboboxInitPayload) => {
   const type = action.field?.type;
-  if (!type) return store;
+  if (!type) throw new Error('Combobox type is required');
 
   const initialize = ComboboInitDict[type];
-  return initialize ? initialize(store, action) : store;
+  return initialize ? initialize(action) : DEFAULT_COMBOBOX_STATE;
 };

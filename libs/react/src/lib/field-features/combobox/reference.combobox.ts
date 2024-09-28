@@ -1,19 +1,18 @@
 import { getRelationTableName } from '@apps-next/core';
 import {
   ComboboxInitPayload,
-  LegendStore,
+  ComboboxState,
 } from '../../legend-store/legend.store.types';
 import { helper } from './feature.combobox.shared';
 import { DEFAULT_COMBOBOX_STATE } from '../../legend-store/legend.store.constants';
 
 export const ReferenceInitializer = (
-  store: LegendStore['combobox'],
   payload: ComboboxInitPayload
-): LegendStore['combobox'] => {
+): ComboboxState => {
   const { id, field, selected, defaultData } = helper(payload);
 
   if (!Array.isArray(selected) && typeof selected !== 'object') {
-    return store;
+    return DEFAULT_COMBOBOX_STATE;
   }
 
   const table = getRelationTableName(payload.field);
@@ -43,7 +42,6 @@ export const ReferenceInitializer = (
     id,
     tableName: table,
     open: true,
-    values: uniqueValues,
     selected: selectedValues,
     fallbackData: uniqueValues,
     multiple,

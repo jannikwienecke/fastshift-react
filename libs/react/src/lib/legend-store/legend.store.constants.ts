@@ -4,11 +4,11 @@ import {
   RegisteredViews,
   RelationalDataModel,
 } from '@apps-next/core';
-import { LegendStore } from './legend.store.types';
+import { ComboboxState, FilterStore, LegendStore } from './legend.store.types';
 
-export const DEFAULT_COMBOBOX_STATE: LegendStore['combobox'] = {
+export const DEFAULT_COMBOBOX_STATE: ComboboxState = {
   query: '',
-  values: [],
+  values: null,
   selected: [],
   fallbackData: [],
   open: false,
@@ -22,6 +22,21 @@ export const DEFAULT_COMBOBOX_STATE: LegendStore['combobox'] = {
   searchable: true,
 };
 
+export const DEFAULT_FILTER_STATE: FilterStore = {
+  query: '',
+  values: [],
+  filteredValues: [],
+  open: false,
+  tableName: '',
+  id: null,
+  selectedField: null,
+  rect: null,
+  selectedOperatorField: null,
+  showDatePicker: false,
+  selectedDateField: null,
+  filters: [],
+};
+
 export const DEFAULT_LEGEND_STORE: Pick<
   LegendStore,
   | 'dataModel'
@@ -30,12 +45,20 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'list'
   | 'relationalDataModel'
   | 'combobox'
+  | 'filter'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
   viewConfigManager: {} as BaseViewConfigManagerInterface,
   relationalDataModel: {} as RelationalDataModel,
-  combobox: DEFAULT_COMBOBOX_STATE,
+  combobox: {
+    values: null,
+    query: '',
+    selected: [],
+    field: null,
+    multiple: false,
+  },
+  filter: DEFAULT_FILTER_STATE,
   list: {
     selected: [],
   },
