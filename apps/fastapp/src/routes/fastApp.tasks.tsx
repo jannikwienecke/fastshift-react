@@ -63,6 +63,7 @@ const Task = observer(() => {
   const { handleSelectFromFilter } = useInputDialogStore();
 
   // HIER WEITER MACHEN
+  // first: prevent opening the combobox when is a primitive field and not date
   // REMOVE ALL FROM useFilterStore -> move to legend store
   // for the useInputDialogStore
   // then -> remove all the adapter hooks
