@@ -109,6 +109,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const queryReturn = useStableQuery(prisma, queryPropsMerged);
 
+  console.log(queryReturn.data);
   return {
     ...queryReturn,
     data: queryReturn.data?.data,

@@ -1,7 +1,7 @@
 import {
-  ComboboxStore,
   ComboboxInitPayload,
-} from '../../ui-adapter/combox-adapter/_combobox.store/store';
+  LegendStore,
+} from '../../legend-store/legend.store.types';
 import { BooleanInitializer } from './boolean.combobox';
 import { EnumInitializer } from './enum.combobox.ts';
 import { ComboboxInitDict } from './feature.combobox.shared';
@@ -17,7 +17,7 @@ export const ComboboInitDict: ComboboxInitDict = {
 };
 
 export const comboboInitialize = (
-  store: ComboboxStore,
+  store: LegendStore['combobox'],
   action: ComboboxInitPayload
 ) => {
   const type = action.field?.type;

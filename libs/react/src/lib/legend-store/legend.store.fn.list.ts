@@ -13,3 +13,13 @@ export const listSelect: StoreFn<'selectListItem'> =
       store$.list.selected.set([...allSelected, record]);
     }
   };
+
+export const listSelectRelationField: StoreFn<'selectRelationField'> =
+  (store$) => (props) => {
+    store$.list.selectedRelationField.set(props);
+  };
+
+export const listDeselectRelationField: StoreFn<'deselectRelationField'> =
+  (store$) => () => {
+    store$.list.selectedRelationField.set(undefined);
+  };

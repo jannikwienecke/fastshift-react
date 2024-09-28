@@ -26,6 +26,7 @@ import {
   viewConfigManagerAtom,
 } from './stores';
 import { HydrateAtoms } from './ui-components';
+import { useQueryData } from './use-query-data';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
@@ -120,8 +121,14 @@ export const ClientViewProviderConvex = (
         key={viewConfigManager.getViewName()}
         initialValues={initialValues}
       >
-        {props.children}
+        <Content>{props.children}</Content>
       </HydrateAtoms>
     </Provider>
   );
+};
+
+const Content = (props: { children: React.ReactNode }) => {
+  useQueryData();
+
+  return <> {props.children}</>;
 };

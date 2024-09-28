@@ -1,12 +1,39 @@
 import {
   BaseViewConfigManagerInterface,
   DataModelNew,
+  FieldConfig,
   QueryRelationalData,
   RecordType,
   RegisteredViews,
   RelationalDataModel,
+  Row,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
+
+type ComboboxState = {
+  query: string;
+  values: Row[];
+  defaultData: DataModelNew | null;
+  fallbackData: Row[];
+  selected: Row[];
+  open: boolean;
+  field: FieldConfig | null;
+  tableName: string;
+  row: Row | null;
+  rect: DOMRect | null;
+  id: string | null;
+  multiple: boolean;
+  searchable: boolean;
+};
+
+export type ComboboxInitPayload = Pick<
+  ComboboxState,
+  'field' | 'rect' | 'defaultData'
+> & {
+  selected: Row | Row[] | string;
+  multiple?: boolean;
+  row?: Row;
+};
 
 export type LegendStore = {
   // MAIN DATA MODEL
@@ -20,6 +47,12 @@ export type LegendStore = {
   //   list state
   list: {
     selected: RecordType[];
+    selectedRelationField?: {
+      field: FieldConfig;
+      row: Row;
+      rect: DOMRect;
+      selected: Row | Row[] | string;
+    };
   };
 
   //   METHODS
@@ -35,6 +68,22 @@ export type LegendStore = {
 
   //   list methods
   selectListItem: (record: RecordType) => void;
+  selectRelationField: (props: {
+    field: FieldConfig;
+    row: Row;
+    selected: Row | Row[];
+    rect: DOMRect;
+  }) => void;
+  deselectRelationField: () => void;
+
+  // combobox state
+  combobox: ComboboxState;
+
+  // combobox methods
+  comboboxInit: (payload: ComboboxInitPayload) => void;
+  comboboxSelectValue: (value: Row) => void;
+  comboboxUpdateQuery: (query: string) => void;
+  comboboxHandleQueryData: (data: RecordType[]) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

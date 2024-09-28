@@ -1,15 +1,15 @@
 import { makeRow } from '@apps-next/core';
 import {
   ComboboxInitPayload,
-  ComboboxStore,
-  DEFAULT_STORE,
-} from '../../ui-adapter/combox-adapter/_combobox.store/store';
+  LegendStore,
+} from '../../legend-store/legend.store.types';
 import { helper } from './feature.combobox.shared';
+import { DEFAULT_COMBOBOX_STATE } from '../../legend-store/legend.store.constants';
 
 export const EnumInitializer = (
-  store: ComboboxStore,
+  store: LegendStore['combobox'],
   payload: ComboboxInitPayload
-): ComboboxStore => {
+): LegendStore['combobox'] => {
   const { selected } = payload;
 
   const { id, field } = helper(payload);
@@ -32,7 +32,7 @@ export const EnumInitializer = (
       : [selected];
 
   return {
-    ...DEFAULT_STORE,
+    ...DEFAULT_COMBOBOX_STATE,
     ...payload,
     id,
     open: true,

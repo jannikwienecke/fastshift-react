@@ -1,46 +1,41 @@
 import { RecordType, Row } from '@apps-next/core';
 import React from 'react';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
-import { useStoreValue, useStoreDispatch } from '../store.ts';
+import { store$ } from '../legend-store/legend.store';
 import { useMutation } from '../use-mutation';
 
 export const useHandleSelectCombobox = () => {
   const { runMutate } = useMutation();
 
-  const { list } = useStoreValue();
-
-  const dispatch = useStoreDispatch();
+  const { selected, row, field } = store$.combobox.get();
 
   const startSelectedRef = React.useRef<string | string[]>();
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleSelect = (value: Row) => {
-    const { row, field } = list?.focusedRelationField || {};
-
     if (!row) throw new Error('no row');
     if (!field) throw new Error('no field');
 
     const isManyToManyRelation = field?.relation?.manyToManyRelation;
 
-    if (field.type === 'Boolean') {
+    if (field.type === 'Boolean' && row) {
       const mutation = handleSelectUpdate({
         field,
         row,
         value,
-        selected: list?.focusedRelationField?.selected ?? [],
+        selected: selected ?? [],
       });
 
       runMutate({
         mutation: mutation,
       });
     } else {
-      const selected = list?.focusedRelationField?.selected;
       const selectedId =
         typeof selected === 'string'
           ? selected
           : Array.isArray(selected)
           ? selected.map((v) => v.id)
-          : selected?.id;
+          : (selected as Row)?.id;
 
       if (!startSelectedRef.current && selected) {
         startSelectedRef.current = Array.isArray(selected)
@@ -64,6 +59,7 @@ export const useHandleSelectCombobox = () => {
               )
             : selectedId;
 
+          console.log(newSelected);
           startSelectedRef.current = newSelected;
 
           const valueToUpdate =
@@ -104,16 +100,14 @@ export const useHandleSelectCombobox = () => {
     // behavour for the combobox
     if (!isManyToManyRelation) {
       setTimeout(() => {
-        dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
+        store$.deselectRelationField();
       }, 100);
     }
-
-    dispatch({ type: 'UPDATE_SELECTED_RELATIONAL_FIELD', selected: value });
   };
 
   const handleClose = () => {
     setTimeout(() => {
-      dispatch({ type: 'DESELECT_RELATIONAL_FIELD' });
+      store$.deselectRelationField();
     }, 100);
   };
 

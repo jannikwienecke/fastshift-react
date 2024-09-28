@@ -1,13 +1,13 @@
 import { FieldType } from '@apps-next/core';
 import {
   ComboboxInitPayload,
-  ComboboxStore,
-} from '../../ui-adapter/combox-adapter/_combobox.store/store';
+  LegendStore,
+} from '../../legend-store/legend.store.types';
 
 type ComboboxInitialize = (
-  store: ComboboxStore,
+  store: LegendStore['combobox'],
   action: ComboboxInitPayload
-) => ComboboxStore;
+) => LegendStore['combobox'];
 
 export type ComboboxInitDict = Partial<{
   [key in FieldType]: ComboboxInitialize;

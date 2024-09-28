@@ -1,17 +1,10 @@
-import {
-  ComboboxPopoverProps,
-  FieldConfig,
-  getRelationTableName,
-  makeData,
-  Row,
-} from '@apps-next/core';
-import { useDebounce, usePrevious } from '@uidotdev/usehooks';
-import React, { useRef } from 'react';
-import { useQuery } from '../../use-query';
-import { useQueryDataOf } from '../../use-query-data-relational';
-import { useView } from '../../use-view';
+import { ComboboxPopoverProps, FieldConfig, Row } from '@apps-next/core';
+import { useDebounce } from '@uidotdev/usehooks';
+import React from 'react';
+import { store$ } from '../../legend-store/legend.store';
 import { ComboboxFieldValue } from '../../ui-components/render-combobox-field-value';
-import { ComboboxInitPayload, useComboboxStore } from './_combobox.store/store';
+import { useQuery } from '../../use-query';
+import { ComboboxInitPayload } from '../../legend-store/legend.store.types';
 
 export type UseComboboAdaper = typeof useCombobox;
 
@@ -28,20 +21,16 @@ export const useCombobox = ({
   onSelect,
   ...props
 }: UseComboboxProps) => {
-  const prevFieldName = usePrevious(initialState?.field?.name);
-
-  const [store, dispatch] = useComboboxStore();
-  const { registeredViews } = useView();
-  const query = useDebounce(store.query, 300);
-
-  const defaultData = useQueryDataOf(getRelationTableName(initialState?.field));
+  const store = store$.combobox.get();
 
   const renderValue = (props: { value: Row; field: FieldConfig }) => (
     <ComboboxFieldValue {...props} />
   );
 
+  const query = useDebounce(store.query, 300);
+
   const { data, isFetching, isFetched } = useQuery({
-    query: query,
+    query,
     relationQuery: {
       tableName: store.tableName ?? '',
     },
@@ -49,44 +38,10 @@ export const useCombobox = ({
   });
 
   React.useEffect(() => {
-    if (isFetched && !isFetching && initialState?.field?.relation?.tableName) {
-      dispatch({
-        type: 'HANDLE_QUERY_DATA',
-        data: makeData(
-          registeredViews,
-          getRelationTableName(initialState?.field)
-        )(data ?? []).rows,
-      });
+    if (isFetched && !isFetching && data) {
+      store$.comboboxHandleQueryData(data);
     }
-  }, [
-    data,
-    dispatch,
-    initialState?.field,
-    isFetched,
-    isFetching,
-    registeredViews,
-  ]);
-
-  const lastInitialState = useRef(initialState);
-
-  React.useEffect(() => {
-    if (lastInitialState.current?.field?.name === initialState?.field?.name)
-      return;
-
-    lastInitialState.current = initialState;
-    if (!initialState?.field) {
-      dispatch({ type: 'CLOSE' });
-    } else {
-      dispatch({
-        type: 'INITIALIZE',
-        payload: {
-          ...initialState,
-          defaultData,
-          registeredViews,
-        },
-      });
-    }
-  }, [dispatch, initialState, defaultData, registeredViews, prevFieldName]);
+  }, [data, isFetched, isFetching]);
 
   const getComboboxProps = () => {
     return {
@@ -97,7 +52,7 @@ export const useCombobox = ({
         }
       },
       onChange: (value) => {
-        dispatch({ type: 'SELECT_VALUE', payload: value });
+        store$.comboboxSelectValue(value);
         onSelect?.(value);
       },
 
@@ -114,7 +69,7 @@ export const useCombobox = ({
         placeholder: '',
         query: store.query,
         onChange(query) {
-          dispatch({ type: 'UPDATE_QUERY', payload: query });
+          store$.comboboxUpdateQuery(query);
         },
       },
 

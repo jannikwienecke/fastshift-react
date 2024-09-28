@@ -33,12 +33,12 @@ export const queryClient = new QueryClient({
 
 convexQueryClient.connect(queryClient);
 
-syncObservable(store$, {
-  persist: {
-    name: 'store-global',
-    plugin: ObservablePersistLocalStorage,
-  },
-});
+// syncObservable(store$, {
+//   persist: {
+//     name: 'store-global',
+//     plugin: ObservablePersistLocalStorage,
+//   },
+// });
 
 export const getQueryKey = getQueryKeyFn(api.query.viewLoader);
 

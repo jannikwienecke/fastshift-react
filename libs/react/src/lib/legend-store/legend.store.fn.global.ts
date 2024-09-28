@@ -14,7 +14,10 @@ export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
       {} as RelationalDataModel
     );
 
-    store$.relationalDataModel.set(relationalDataModel);
+    store$.relationalDataModel.set({
+      ...store$.relationalDataModel.get(),
+      ...relationalDataModel,
+    });
   };
 
 export const createDataModel: StoreFn<'createDataModel'> =
