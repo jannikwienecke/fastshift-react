@@ -13,6 +13,18 @@ export type UseComboboxProps = {
   renderValue?: (props: { value: Row; field: FieldConfig }) => React.ReactNode;
 };
 
+// const state$ = observable(
+//   syncedQuery({
+//     queryClient,
+//     query: {
+//       queryKey: ['user'],
+//       queryFn: async () => {
+//         return fetch('https://reqres.in/api/users/1').then((v) => v.json());
+//       },
+//     },
+//   })
+// );
+
 export const useCombobox = ({
   onClose,
   onSelect,

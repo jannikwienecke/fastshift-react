@@ -17,20 +17,22 @@ export type FilterOperatorType = {
   many?: boolean;
 };
 
-export type FilterType =
-  | {
-      type: 'relation';
-      field: FieldConfig;
-      operator: FilterOperatorType;
-      values: Row[];
-    }
-  | {
-      type: 'primitive';
-      field: FieldConfig;
-      operator: FilterOperatorType;
-      value: Row;
-      date?: FilterDateType | null;
-    };
+export type FilterPrimitiveType = {
+  type: 'primitive';
+  field: FieldConfig;
+  operator: FilterOperatorType;
+  value: Row;
+  date?: FilterDateType | null;
+};
+
+export type FilterRelationType = {
+  type: 'relation';
+  field: FieldConfig;
+  operator: FilterOperatorType;
+  values: Row[];
+};
+
+export type FilterType = FilterRelationType | FilterPrimitiveType;
 
 export type FilterItemType = {
   label: string;

@@ -1,4 +1,9 @@
-import { makeRow, Row } from '@apps-next/core';
+import {
+  FilterPrimitiveType,
+  FilterRelationType,
+  makeRow,
+  Row,
+} from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import {
   dateUtils,
@@ -78,9 +83,6 @@ export const filterSelectFilterType: StoreFn<'filterSelectFilterType'> =
         store$.filter.query.set('');
       }
     }
-
-    // HIER WEITER MACHEN -> HANDLE DATE AND OEPRATOR FILTER TYPE CLICKED
-    // TODO: MISSING IMPLEMENTATION FOR DATE AND OTHER...
   };
 
 export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
@@ -118,7 +120,9 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
         return;
 
       (
-        store$.filter.filters[existingFilterIndex] as Observable<any>
+        store$.filter.filters[
+          existingFilterIndex
+        ] as Observable<FilterRelationType>
       ).values.set([...exitingFilter.values, value]);
     };
 
@@ -128,7 +132,9 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
         return;
 
       (
-        store$.filter.filters[existingFilterIndex] as Observable<any>
+        store$.filter.filters[
+          existingFilterIndex
+        ] as Observable<FilterRelationType>
       ).values.set(exitingFilter.values.filter((v) => v.id !== value.id));
     };
 
@@ -165,16 +171,11 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
     if (exitingFilter && exitingFilter.type === 'primitive') {
       const newFilter = filterUtil().create(filter);
 
-      exitingFilter.value = newFilter.value;
-      exitingFilter.operator = newFilter.operator;
-
-      (store$.filter.filters[existingFilterIndex] as Observable<any>).value.set(
-        null
-      );
-
-      (store$.filter.filters[existingFilterIndex] as Observable<any>).value.set(
-        newFilter.value
-      );
+      (
+        store$.filter.filters[
+          existingFilterIndex
+        ] as Observable<FilterPrimitiveType>
+      ).value.set(newFilter.value);
     }
     resetFilter();
   };

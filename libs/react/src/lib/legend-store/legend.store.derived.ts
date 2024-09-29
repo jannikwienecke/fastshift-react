@@ -29,6 +29,8 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const selectedOfFilter = filter ? filterUtil().getValues(filter) : null;
 
   if (!field || !rect) return DEFAULT_COMBOBOX_STATE;
+  if (field.type === 'String' || field.type === 'Number')
+    return DEFAULT_COMBOBOX_STATE;
 
   const tableName = getRelationTableName(field);
   const defaultData = store$.relationalDataModel[tableName].get();
@@ -94,18 +96,4 @@ export const filterValuesStore$ = observable<FilterStore>(() => {
     ...store$.filter.get(),
     values,
   };
-});
-
-export const filterValues$ = observable(() => {
-  if (store$.filter.query.get() === '') {
-    return filterValuesStore$.values.get();
-  }
-
-  const filteredValues = filterValuesStore$.values.get().filter((value) => {
-    return value.label
-      .toLowerCase()
-      .includes(store$.filter.query.get().toLowerCase());
-  });
-
-  return filteredValues;
 });

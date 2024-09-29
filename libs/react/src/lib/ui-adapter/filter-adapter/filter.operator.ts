@@ -123,7 +123,8 @@ export const getOptionsForDateField = (
   const operators = optionsOperatorMap[field.type];
   if (!operators) return [];
 
-  const value = filter?.type === 'primitive' ? filter.value : null;
+  const value =
+    filter?.type === 'primitive' && filter.value ? filter.value : null;
 
   const date = dateUtils.parseOption(value?.raw, operators[0]);
 

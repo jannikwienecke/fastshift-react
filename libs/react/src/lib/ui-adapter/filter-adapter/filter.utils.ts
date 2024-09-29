@@ -49,7 +49,7 @@ export const filterUtil = () => {
   };
 
   const getValue = (filter: FilterType) => {
-    const value = filter?.type === 'primitive' ? filter.value.raw : '';
+    const value = filter?.type === 'primitive' ? filter.value?.raw : '';
 
     return value;
   };

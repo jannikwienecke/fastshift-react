@@ -1,13 +1,13 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
+  makeFilterProps,
   getViewFieldsConfig,
   makeHooks,
   QueryInput,
   setViewFieldsConfig,
   store$,
   useCombobox,
-  useFilterAdapter,
   useFilterStore,
   useHandleSelectCombobox,
   useInputDialogAdapter,
@@ -60,10 +60,10 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
 const Task = observer(() => {
   const { handleClose, handleSelect } = useHandleSelectCombobox();
 
-  const { handleSelectFromFilter } = useInputDialogStore();
+  useInputDialogStore();
 
   // HIER WEITER MACHEN
-  // first: prevent opening the combobox when is a primitive field and not date
+  // the filter operator is not updating when chaging the filter date value
   // REMOVE ALL FROM useFilterStore -> move to legend store
   // for the useInputDialogStore
   // then -> remove all the adapter hooks
@@ -72,14 +72,11 @@ const Task = observer(() => {
   const { closeAll, handleEnterValueFromInputDialog, activeFilterValue } =
     useFilterStore();
 
+  const { makeFilterProps } = makeHooks<TaskViewDataType>();
   const getInputDialogProps = useInputDialogAdapter({
     onSave: handleEnterValueFromInputDialog,
     onCancel: closeAll,
     defaultValue: activeFilterValue,
-  });
-
-  const getFilterProps = useFilterAdapter({
-    onSelect: handleSelectFromFilter,
   });
 
   const getComboboxProps = useCombobox({
@@ -97,7 +94,7 @@ const Task = observer(() => {
   return (
     <div className="p-2 flex flex-col gap-2 grow overflow-scroll">
       <div className="flex flex-col w-full ">
-        <Filter.Default {...getFilterProps()} />
+        <Filter.Default {...makeFilterProps({ hideFields: ['subtitle'] })} />
       </div>
 
       <ComboboxPopover {...getComboboxProps()} />
