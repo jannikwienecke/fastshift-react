@@ -44,6 +44,7 @@ export type FilterStore = {
   selectedDateField: FieldConfig | null;
   showDatePicker: boolean;
   filters: FilterType[];
+  selectedIds: string[];
 };
 
 export type ComboboxInitPayload = Pick<

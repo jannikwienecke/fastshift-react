@@ -223,6 +223,7 @@ class DateOptions {
     const units = ['day', 'week', 'month'];
 
     const defaultOptions = number ? [] : this.getFilteredStaticOptions();
+
     return units.reduce((acc, unit) => {
       if (this.hasFromNow || !this.hasAgo) {
         acc.push(this.generateFromNowOptions(number, unit));

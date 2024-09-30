@@ -1,15 +1,43 @@
-import { ComboxboxItem, getViewByName, ViewConfigType } from '@apps-next/core';
+import {
+  ComboxboxItem,
+  FieldConfig,
+  getViewByName,
+  makeRow,
+  ViewConfigType,
+} from '@apps-next/core';
 import { useView } from '../use-view';
+import { ComboboxFieldValue } from './render-combobox-field-value';
 
-export const FilterValue = (props: { value: ComboxboxItem }) => {
+export const FilterValue = (props: {
+  value: ComboxboxItem;
+  field: FieldConfig | null;
+}) => {
   const { viewConfigManager, registeredViews } = useView();
 
   let name = '';
   let view: ViewConfigType | undefined;
   let Icon: React.FC<any> | undefined;
 
+  const selectedField = props.field;
+
+  if (selectedField) {
+    return (
+      <ComboboxFieldValue
+        field={selectedField}
+        value={makeRow(
+          props.value.id.toString(),
+          props.value.label,
+          props.value.label,
+          selectedField
+        )}
+      />
+    );
+  }
+
   try {
-    const field = viewConfigManager.getFieldBy(props.value.id.toString());
+    const field =
+      selectedField ?? viewConfigManager.getFieldBy(props.value.id.toString());
+
     view = field.relation
       ? getViewByName(registeredViews, field.name)
       : undefined;

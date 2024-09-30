@@ -35,6 +35,7 @@ export const DEFAULT_FILTER_STATE: FilterStore = {
   showDatePicker: false,
   selectedDateField: null,
   filters: [],
+  selectedIds: [],
 };
 
 export const DEFAULT_LEGEND_STORE: Pick<

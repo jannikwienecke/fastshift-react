@@ -1,8 +1,4 @@
 import { makeRow } from '@apps-next/core';
-import {
-  filterCloseAll,
-  filterSelectFilterValue,
-} from './legend.store.fn.filter';
 import { StoreFn } from './legend.store.types';
 
 export const inputDialogSave: StoreFn<'inputDialogSave'> = (store$) => () => {
@@ -15,10 +11,10 @@ export const inputDialogSave: StoreFn<'inputDialogSave'> = (store$) => () => {
   const value = valueDict[filterField.name].get()?.value;
   if (!value) return;
 
-  filterSelectFilterValue(store$)(makeRow(value, value, value, filterField));
-  filterCloseAll(store$)();
+  store$.filterSelectFilterValue(makeRow(value, value, value, filterField));
+  store$.filterCloseAll();
 };
 
 export const inputDialogClose: StoreFn<'inputDialogClose'> = (store$) => () => {
-  filterCloseAll(store$)();
+  store$.filterCloseAll();
 };

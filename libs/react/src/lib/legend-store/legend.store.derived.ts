@@ -1,24 +1,18 @@
-import {
-  ComboxboxItem,
-  Row,
-  getRelationTableName,
-  makeRow,
-} from '@apps-next/core';
+import { Row, getRelationTableName, makeRow } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
-import { filterUtil, operator } from '../ui-adapter/filter-adapter';
+import { filterUtil } from '../ui-adapter/filter-adapter';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
-import { ComboboxState, FilterStore } from './legend.store.types';
+import { ComboboxState } from './legend.store.types';
 
 export const comboboxDebouncedQuery$ = observable('');
 
 export const comboboxStore$ = observable<ComboboxState>(() => {
   const selectedFilterField = store$.filter.selectedField.get();
   const selectedListField = store$.list.selectedRelationField.field.get();
-  const selectedDateField = store$.filter.selectedDateField.get();
 
-  const field = selectedFilterField || selectedListField || selectedDateField;
+  const field = selectedFilterField || selectedListField;
 
   const rect =
     store$.filter.rect.get() || store$.list.selectedRelationField.rect.get();
@@ -31,14 +25,16 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const selectedOfFilter = filter ? filterUtil().getValues(filter) : null;
 
   if (!field || !rect) return DEFAULT_COMBOBOX_STATE;
-  if (field.type === 'String' || field.type === 'Number')
+  if (
+    field.type === 'String' ||
+    field.type === 'Number' ||
+    field.type === 'Boolean' ||
+    selectedFilterField?.enum
+  )
     return DEFAULT_COMBOBOX_STATE;
 
   const tableName = getRelationTableName(field);
   const defaultData = store$.relationalDataModel[tableName].get();
-  const enumValues = field.enum?.values.map((v) =>
-    makeRow(v.name, v.name, v.name, field)
-  );
 
   const { values } = store$.combobox.get();
 
@@ -59,6 +55,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const selectedIds = defaultSelected.map((row) => row.id);
 
+  const query = comboboxDebouncedQuery$.get().toLowerCase();
   const _values = (
     filterValues.length
       ? filterValues
@@ -68,43 +65,23 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   ).filter((row) => !selectedIds.includes(row.id.toString()));
 
   const filteredDefaultSelected = defaultSelected.filter((v) =>
-    v.label.toLowerCase().includes(comboboxDebouncedQuery$.get().toLowerCase())
+    v.label.toLowerCase().includes(query)
   );
 
-  const valuesForEnum = field.enum && values ? values : enumValues;
+  let enumValues: Row[] | null = null;
+  if (field?.enum) {
+    enumValues = field.enum?.values
+      .filter((v) => v.name.toLowerCase().includes(query))
+      .map((v) => makeRow(v.name, v.name, v.name, field));
+  }
 
   return {
     ...state,
     rect: state.rect ?? store$.filter.rect.get(),
     open: !store$.filter.showDatePicker.get() ? true : false,
     field,
-    values: valuesForEnum ?? [...filteredDefaultSelected, ..._values],
+    values: enumValues ?? [...filteredDefaultSelected, ..._values],
     query: store$.combobox.query.get(),
     selected: state.selected,
   } satisfies ComboboxState;
-});
-
-// derived stores from main store
-export const filterValuesStore$ = observable<FilterStore>(() => {
-  const viewConfigManager = store$.viewConfigManager.get();
-  const viewFields = viewConfigManager.getViewFieldList();
-  const operatorField = store$.filter.selectedOperatorField.get();
-
-  let values: ComboxboxItem[] = viewFields.map((field) => {
-    return {
-      id: field.name,
-      label: field.name,
-    };
-  });
-
-  if (operatorField) {
-    const allFilters = store$.filter.filters.get();
-    const filter = allFilters.find((f) => f.field.name === operatorField.name);
-    values = filter ? operator().makeOptionsFrom(filter.field, filter) : [];
-  }
-
-  return {
-    ...store$.filter.get(),
-    values,
-  };
 });

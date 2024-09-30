@@ -41,21 +41,25 @@ export const makeFilterProps = <T extends RecordType>(
     ...store$.filter.get(),
     values: filterComboboxValues$.get(),
     name: 'filter',
-    multiple: false,
     searchable: true,
+    multiple: store$.filter.selectedField.enum ? true : false,
     input: {
       onChange: store$.filterUpdateQuery,
       query: store$.filter.query.get(),
       placeholder: options?.placeholder ?? 'Filter...',
     },
-    selected: null,
     onChange: store$.filterSelectFilterType,
-
+    selected: store$.filter.selectedIds.get().map((v) => ({
+      id: v,
+      label: v,
+    })),
     onOpenChange: (isOpen) => {
       if (isOpen) return;
       store$.filterCloseAll();
     },
-    render: (value) => <FilterValue value={value} />,
+    render: (value) => (
+      <FilterValue value={value} field={store$.filter.selectedField.get()} />
+    ),
   } satisfies ComboboxPopoverProps<ComboxboxItem>;
 
   const datePickerProps = {

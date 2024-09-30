@@ -7,7 +7,6 @@ import {
 import { comboboInitialize } from '../field-features/combobox';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
 import { comboboxStore$ } from './legend.store.derived';
-import { filterSelectFilterValue } from './legend.store.fn.filter';
 import { StoreFn } from './legend.store.types';
 
 export const comboboxInit: StoreFn<'comboboxInit'> = (store$) => (payload) => {
@@ -20,27 +19,28 @@ export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   // TODO BUILD EVENT DRIVEN
   // add events and attach function that reacts to the events
   store$.deselectRelationField();
-  store$.filterClose();
+  store$.filterCloseAll();
 };
 
 export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
   (store$) => (value) => {
-    if (store$.filter.selectedField.get()) {
-      filterSelectFilterValue(store$)(value);
-    }
-
     const state = comboboxStore$.get();
-    if (!state.multiple) {
-      store$.combobox.selected.set([value]);
+
+    if (store$.filter.selectedField.get()) {
+      store$.filterSelectFilterValue(value);
     } else {
-      const selected = state.selected.some((s) => s.id === value.id)
-        ? state.selected.filter((s) => s.id !== value.id)
-        : [...state.selected, value];
+      if (!state.multiple) {
+        store$.combobox.selected.set([value]);
+      } else {
+        const selected = state.selected.some((s) => s.id === value.id)
+          ? state.selected.filter((s) => s.id !== value.id)
+          : [...state.selected, value];
 
-      store$.combobox.selected.set(selected);
+        store$.combobox.selected.set(selected);
+      }
+
+      store$.comboboxRunSelectMutation(value);
     }
-
-    store$.comboboxRunSelectMutation(value);
   };
 
 export const comboboxUpdateQuery: StoreFn<'comboboxUpdateQuery'> =

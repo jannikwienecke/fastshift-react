@@ -6,9 +6,9 @@ import {
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import {
-  dateUtils,
   FILTER_SPECIFIC,
   filterUtil,
+  operator,
 } from '../ui-adapter/filter-adapter';
 import { StoreFn } from './legend.store.types';
 
@@ -25,7 +25,7 @@ export const filterClose: StoreFn<'filterClose'> = (store$) => () => {
 };
 
 export const filterCloseAll: StoreFn<'filterCloseAll'> = (store$) => () => {
-  filterClose(store$)();
+  store$.filterClose();
   store$.filter.selectedField.set(null);
   store$.filter.selectedOperatorField.set(null);
   store$.filter.selectedDateField.set(null);
@@ -37,6 +37,7 @@ export const filterUpdateQuery: StoreFn<'filterUpdateQuery'> =
     store$.filter.query.set(query);
   };
 
+// handle filtering from filter list
 export const filterSelectFilterType: StoreFn<'filterSelectFilterType'> =
   (store$) => (selected) => {
     const id = selected.id.toString();
@@ -44,18 +45,35 @@ export const filterSelectFilterType: StoreFn<'filterSelectFilterType'> =
 
     const selectedOperatorField = store$.filter.selectedOperatorField.get();
     const selectedDateField = store$.filter.selectedDateField.get();
+    const selectedField = store$.filter.selectedField.get();
 
-    if (selectedDateField && selected.id === FILTER_SPECIFIC) {
+    if (selectedField?.type === 'Boolean' || selectedField?.enum) {
+      const row = makeRow(
+        selected.id.toString(),
+        selected.id.toString(),
+        selected.id,
+        selectedField
+      );
+
+      const thisId = selected.id.toString();
+      const currentIds = store$.filter.selectedIds.get();
+      store$.filter.selectedIds.set(
+        currentIds.includes(thisId)
+          ? currentIds.filter((id) => id !== thisId)
+          : [...currentIds, thisId]
+      );
+      store$.filterSelectFilterValue(row);
+    } else if (selectedDateField && selected.id === FILTER_SPECIFIC) {
       store$.filter.showDatePicker.set(true);
     } else if (selectedDateField) {
-      const x = makeRow(
+      const row = makeRow(
         selected.id.toString(),
         selected.id.toString(),
         selected.id,
         selectedDateField
       );
 
-      filterSelectFilterValue(store$)(x);
+      store$.filterSelectFilterValue(row);
     } else if (selectedOperatorField) {
       store$.filter.filters.set(
         store$.filter.filters.get().map((f) => {
@@ -70,13 +88,10 @@ export const filterSelectFilterType: StoreFn<'filterSelectFilterType'> =
     } else {
       const field = viewConfigManager.getFieldBy(id);
 
-      if (field.type === 'Date') {
-        const options = dateUtils.getOptions('');
-        store$.filter.values.set(
-          options.map((o) => makeRow(o.id.toString(), o.label, o.id, field))
-        );
+      if (field.type === 'Boolean' || field.enum) {
+        store$.filter.selectedField.set(field);
+      } else if (field.type === 'Date') {
         store$.filter.selectedDateField.set(field);
-        store$.filter.open.set(false);
       } else {
         store$.filter.selectedField.set(field);
         store$.filter.open.set(false);
@@ -114,22 +129,27 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
       (f) => f.field.name === filter.field.name
     );
 
-    const updateFilterValue = (value: Row) => {
-      if (!exitingFilter || exitingFilter.type !== 'relation') return;
-      if (store$.filter.filters[existingFilterIndex].get().type !== 'relation')
-        return;
+    const getByIndex = (index: number) => {
+      return store$.filter.filters[index];
+    };
 
-      (
-        store$.filter.filters[
-          existingFilterIndex
-        ] as Observable<FilterRelationType>
+    const updateFilterValue = (value: Row) => {
+      const filter = getByIndex(existingFilterIndex).get();
+
+      if (!exitingFilter || exitingFilter.type !== 'relation') return;
+      if (filter.type !== 'relation') return;
+
+      const _ = (
+        getByIndex(existingFilterIndex) as Observable<FilterRelationType>
       ).values.set([...exitingFilter.values, value]);
+
+      getByIndex(existingFilterIndex).operator.set(operator().value(filter));
     };
 
     const removeFilterValue = (value: Row) => {
+      const filter = getByIndex(existingFilterIndex).get();
       if (!exitingFilter || exitingFilter.type !== 'relation') return;
-      if (store$.filter.filters[existingFilterIndex].get().type !== 'relation')
-        return;
+      if (filter.type !== 'relation') return;
 
       (
         store$.filter.filters[
@@ -199,16 +219,15 @@ export const filterRemoveFilter: StoreFn<'filterRemoveFilter'> =
 export const filterOpenExisting: StoreFn<'filterOpenExisting'> =
   (store$) => (filter, rect) => {
     store$.filter.rect.set(rect);
-    store$.filter.selectedField.set(filter.field);
 
     if (filter.field.type === 'Date') {
       store$.filter.selectedDateField.set(filter.field);
-      const options = dateUtils.getOptions('');
-      store$.filter.values.set(
-        options.map((o) =>
-          makeRow(o.id.toString(), o.label, o.id, filter.field)
-        )
-      );
+    } else {
+      store$.filter.selectedField.set(filter.field);
+    }
+
+    if (!filter.field.relation) {
+      store$.filter.open.set(true);
     }
   };
 
@@ -216,6 +235,7 @@ export const filterOpenOperator: StoreFn<'filterOpenOperator'> =
   (store$) => (filter, rect) => {
     store$.filter.rect.set(rect);
     store$.filter.selectedOperatorField.set(filter.field);
+    store$.filter.selectedField.set(null);
     store$.filter.open.set(true);
   };
 
