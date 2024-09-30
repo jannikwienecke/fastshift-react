@@ -9,9 +9,11 @@ import {
 } from '@apps-next/core';
 import { QueryOptions } from '@tanstack/react-query';
 
+export type MakeQueryOptions = (args: QueryProps) => QueryOptions;
+
 export type PrismaContextType = {
   prisma?: ApiClientType;
-  makeQueryOptions?: (args: QueryProps) => QueryOptions;
+  makeQueryOptions?: MakeQueryOptions;
   mutationFn?: (...args: any) => Promise<MutationReturnDto>;
 } & GlobalConfig;
 

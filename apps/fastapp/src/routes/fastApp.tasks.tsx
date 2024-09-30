@@ -1,16 +1,10 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
-  makeFilterProps,
   getViewFieldsConfig,
   makeHooks,
   QueryInput,
   setViewFieldsConfig,
-  store$,
-  useCombobox,
-  useFilterStore,
-  useHandleSelectCombobox,
-  useInputDialogAdapter,
   useInputDialogStore,
 } from '@apps-next/react';
 import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
@@ -58,38 +52,13 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
 });
 
 const Task = observer(() => {
-  const { handleClose, handleSelect } = useHandleSelectCombobox();
-
   useInputDialogStore();
 
   // HIER WEITER MACHEN
-  // the filter operator is not updating when chaging the filter date value
-  // REMOVE ALL FROM useFilterStore -> move to legend store
-  // for the useInputDialogStore
-  // then -> remove all the adapter hooks
-  // have functions exported like getFilterProps that access the legend store
   // then: opmtimize list view with the For loop from legend state lib
-  const { closeAll, handleEnterValueFromInputDialog, activeFilterValue } =
-    useFilterStore();
 
-  const { makeFilterProps } = makeHooks<TaskViewDataType>();
-  const getInputDialogProps = useInputDialogAdapter({
-    onSave: handleEnterValueFromInputDialog,
-    onCancel: closeAll,
-    defaultValue: activeFilterValue,
-  });
-
-  const getComboboxProps = useCombobox({
-    onClose: () => {
-      handleClose();
-      store$.filterCloseAll();
-    },
-    onSelect: (props) => {
-      store$.filterSelectFilterValue(props);
-
-      handleSelect(props);
-    },
-  });
+  const { makeFilterProps, makeInputDialogProps, makeComboboxProps } =
+    makeHooks<TaskViewDataType>();
 
   return (
     <div className="p-2 flex flex-col gap-2 grow overflow-scroll">
@@ -97,9 +66,9 @@ const Task = observer(() => {
         <Filter.Default {...makeFilterProps({ hideFields: ['subtitle'] })} />
       </div>
 
-      <ComboboxPopover {...getComboboxProps()} />
+      <ComboboxPopover {...makeComboboxProps()} />
 
-      <InputDialog.Default {...getInputDialogProps()} />
+      <InputDialog.Default {...makeInputDialogProps()} />
 
       <div className="flex flex-col w-full ">
         <QueryInput />

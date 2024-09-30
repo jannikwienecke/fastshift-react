@@ -2,8 +2,10 @@ import { observable } from '@legendapp/state';
 import { DEFAULT_LEGEND_STORE } from './legend.store.constants';
 import { LegendStore } from './legend.store.types';
 import {
+  comboboxClose,
   comboboxHandleQueryData,
   comboboxInit,
+  comboboxRunSelectMutation,
   comboboxSelectValue,
   comboboxUpdateQuery,
 } from './legend.store.fn.combobox';
@@ -29,6 +31,10 @@ import {
   listSelect,
   listSelectRelationField,
 } from './legend.store.fn.list';
+import {
+  inputDialogClose,
+  inputDialogSave,
+} from './legend.store.fn.input-dialog';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -42,8 +48,11 @@ export const store$ = observable<LegendStore>({
   deselectRelationField: (...props) =>
     listDeselectRelationField(store$)(...props),
   comboboxInit: (...props) => comboboxInit(store$)(...props),
+  comboboxClose: (...props) => comboboxClose(store$)(...props),
   selectRelationField: (...props) => listSelectRelationField(store$)(...props),
   comboboxSelectValue: (...props) => comboboxSelectValue(store$)(...props),
+  comboboxRunSelectMutation: (...props) =>
+    comboboxRunSelectMutation(store$)(...props),
   comboboxUpdateQuery: (...props) => comboboxUpdateQuery(store$)(...props),
   comboboxHandleQueryData: (...props) =>
     comboboxHandleQueryData(store$)(...props),
@@ -62,4 +71,8 @@ export const store$ = observable<LegendStore>({
   filterOpenOperator: (...props) => filterOpenOperator(store$)(...props),
   filterSelectFromDatePicker: (...props) =>
     filterSelectFromDatePicker(store$)(...props),
+
+  // input dialog methods
+  inputDialogSave: (...props) => inputDialogSave(store$)(...props),
+  inputDialogClose: (...props) => inputDialogClose(store$)(...props),
 });

@@ -5,6 +5,7 @@ import { ConvexQueryProviderProps, ViewLoader } from './_internal/types.convex';
 
 import { QueryProps, ViewConfigType } from '@apps-next/core';
 import { QueryContext } from '@apps-next/react';
+import React from 'react';
 
 export const ConvexQueryProvider = (props: ConvexQueryProviderProps) => {
   const { queryClient, convex } = props;
@@ -21,20 +22,25 @@ export const ConvexQueryProvider = (props: ConvexQueryProviderProps) => {
 const ProviderContent = (props: ConvexQueryProviderProps) => {
   const mutationFn = useConvexMutation(props.viewMutation);
 
+  const makeQueryOptions = React.useCallback(
+    (args: QueryProps) => {
+      const return_ = convexQuery(props.viewLoader, {
+        ...args,
+        viewConfig: undefined,
+        registeredViews: undefined,
+      });
+
+      return return_ as QueryOptions;
+    },
+    [props.viewLoader]
+  );
+
   return (
     <QueryContext.Provider
       value={{
         mutationFn,
 
-        makeQueryOptions: (args: QueryProps) => {
-          const return_ = convexQuery(props.viewLoader, {
-            ...args,
-            viewConfig: undefined,
-            registeredViews: undefined,
-          });
-
-          return return_ as QueryOptions;
-        },
+        makeQueryOptions,
 
         config: props.globalConfig.config,
         provider: 'default',

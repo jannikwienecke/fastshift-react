@@ -1,4 +1,5 @@
 import { Observable, observable } from '@legendapp/state';
+import { comboboxDebouncedQuery$ } from './legend.store.derived';
 import { LegendStore } from './legend.store.types';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
@@ -19,5 +20,18 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       store$.combobox.query.set('');
       store$.combobox.multiple.set(false);
     }
+
+    let timeout: NodeJS.Timeout;
+    store$.combobox.query.onChange(() => {
+      clearTimeout(timeout);
+
+      if (store$.combobox.query.get() === '') {
+        comboboxDebouncedQuery$.set('');
+      } else {
+        timeout = setTimeout(() => {
+          comboboxDebouncedQuery$.set(store$.combobox.query.get());
+        }, 200);
+      }
+    });
   }).onChange(() => null);
 };

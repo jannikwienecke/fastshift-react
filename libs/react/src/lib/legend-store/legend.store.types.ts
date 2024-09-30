@@ -4,6 +4,8 @@ import {
   DataModelNew,
   FieldConfig,
   FilterType,
+  Mutation,
+  MutationReturnDto,
   QueryRelationalData,
   RecordType,
   RegisteredViews,
@@ -11,6 +13,7 @@ import {
   Row,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
+import { InputDialogValueDict } from '../ui-adapter/input-dialog';
 
 export type ComboboxState = {
   query: string;
@@ -61,6 +64,11 @@ export type LegendStore = {
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
 
+  api?: {
+    mutate?: (props: { mutation: Mutation }) => void;
+    mutateAsync?: (args: { mutation: Mutation }) => Promise<MutationReturnDto>;
+  };
+
   //   list state
   list: {
     selected: RecordType[];
@@ -104,6 +112,8 @@ export type LegendStore = {
 
   comboboxInit: (payload: ComboboxInitPayload) => void;
   comboboxSelectValue: (value: Row) => void;
+  comboboxClose: () => void;
+  comboboxRunSelectMutation: (value: Row) => void;
   comboboxUpdateQuery: (query: string) => void;
   comboboxHandleQueryData: (data: RecordType[]) => void;
 
@@ -119,6 +129,13 @@ export type LegendStore = {
   filterOpenExisting: (filter: FilterType, rect: DOMRect) => void;
   filterOpenOperator: (filter: FilterType, rect: DOMRect) => void;
   filterSelectFromDatePicker: (date: Date) => void;
+
+  // input dialog state
+  inputDialog: {
+    valueDict: InputDialogValueDict;
+  };
+  inputDialogSave: () => void;
+  inputDialogClose: () => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

@@ -41,11 +41,12 @@ export type FieldRelationType = {
   manyToManyTable?: string;
   manyToManyModelFields?: FieldConfig[];
 };
-export type FieldConfig = {
+
+export type FieldConfig<TName = string> = {
   isId?: boolean;
   isRelationalIdField?: boolean;
   type: FieldType;
-  name: string;
+  name: TName;
   isList: boolean;
   isRequired?: boolean;
   relation?: FieldRelationType;

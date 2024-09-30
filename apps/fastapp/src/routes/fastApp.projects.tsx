@@ -11,15 +11,16 @@ import {
   ClientViewProviderConvex,
   getViewFieldsConfig,
   getViews,
+  makeComboboxProps,
   makeHooks,
   QueryInput,
   setViewFieldsConfig,
-  useCombobox,
   useHandleSelectCombobox,
   useStoreValue,
 } from '@apps-next/react';
 import { ComboboxPopover, List } from '@apps-next/ui';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { getQueryKey } from '../main';
 
 type ProjectViewDataType = DataType<
   'projects',
@@ -96,15 +97,15 @@ const ProjectPage = () => {
   // TODO: we should not save it on list -> but have like selected: {type: "list or whatever"}
   const { list } = useStoreValue();
 
-  const getComboboxProps = useCombobox({
-    state: list?.focusedRelationField ? list.focusedRelationField : null,
-    onSelect: handleSelect,
-    onClose: handleClose,
-  });
+  // const getComboboxProps = makeComboboxProps({
+  //   state: list?.focusedRelationField ? list.focusedRelationField : null,
+  //   onSelect: handleSelect,
+  //   onClose: handleClose,
+  // });
 
   return (
     <div className="p-2 flex gap-2 grow overflow-scroll">
-      <ComboboxPopover {...getComboboxProps()} />
+      {/* <ComboboxPopover {...getComboboxProps()} /> */}
 
       <div className="flex flex-col w-full ">
         <QueryInput />
@@ -132,6 +133,7 @@ export const Route = createFileRoute('/fastApp/projects')({
         globalConfig={config.config}
         views={getViews()}
         viewFieldsConfig={getViewFieldsConfig()}
+        queryKey={getQueryKey(tasksConfig)}
       >
         <ProjectPage />
       </ClientViewProviderConvex>

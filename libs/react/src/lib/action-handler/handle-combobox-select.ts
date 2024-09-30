@@ -104,13 +104,7 @@ export const useHandleSelectCombobox = () => {
     }
   };
 
-  const handleClose = () => {
-    setTimeout(() => {
-      store$.deselectRelationField();
-    }, 100);
-  };
-
-  return { handleSelect, handleClose };
+  return { handleSelect };
 };
 
 function updateManyToManyRelation(

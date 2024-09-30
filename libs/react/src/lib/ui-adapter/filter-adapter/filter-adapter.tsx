@@ -53,7 +53,7 @@ export const makeFilterProps = <T extends RecordType>(
 
     onOpenChange: (isOpen) => {
       if (isOpen) return;
-      store$.filterClose();
+      store$.filterCloseAll();
     },
     render: (value) => <FilterValue value={value} />,
   } satisfies ComboboxPopoverProps<ComboxboxItem>;

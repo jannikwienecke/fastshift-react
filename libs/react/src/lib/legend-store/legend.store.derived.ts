@@ -1,15 +1,12 @@
-import {
-  ComboxboxItem,
-  Row,
-  getRelationTableName,
-  makeRow,
-} from '@apps-next/core';
+import { ComboxboxItem, Row, getRelationTableName } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
+import { filterUtil, operator } from '../ui-adapter/filter-adapter';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
 import { ComboboxState, FilterStore } from './legend.store.types';
-import { filterUtil, operator } from '../ui-adapter/filter-adapter';
+
+export const comboboxDebouncedQuery$ = observable('');
 
 export const comboboxStore$ = observable<ComboboxState>(() => {
   const selectedFilterField = store$.filter.selectedField.get();
@@ -57,17 +54,21 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const _values = (
     filterValues.length
       ? filterValues
-      : values !== null && store$.combobox.query.get().length
+      : values !== null && comboboxDebouncedQuery$.get().length
       ? values
       : defaultData?.rows ?? values ?? []
   ).filter((row) => !selectedIds.includes(row.id.toString()));
+
+  const filteredDefaultSelected = defaultSelected.filter((v) =>
+    v.label.toLowerCase().includes(comboboxDebouncedQuery$.get().toLowerCase())
+  );
 
   return {
     ...state,
     rect: state.rect ?? store$.filter.rect.get(),
     open: !store$.filter.showDatePicker.get() ? true : false,
     field,
-    values: [...defaultSelected, ..._values],
+    values: [...filteredDefaultSelected, ..._values],
     query: store$.combobox.query.get(),
     selected: state.selected,
   } satisfies ComboboxState;

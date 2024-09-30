@@ -46,6 +46,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'relationalDataModel'
   | 'combobox'
   | 'filter'
+  | 'inputDialog'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -61,5 +62,8 @@ export const DEFAULT_LEGEND_STORE: Pick<
   filter: DEFAULT_FILTER_STATE,
   list: {
     selected: [],
+  },
+  inputDialog: {
+    valueDict: {},
   },
 };

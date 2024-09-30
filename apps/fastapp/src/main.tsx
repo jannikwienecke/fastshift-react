@@ -9,10 +9,7 @@ import {
 } from '@apps-next/convex-adapter-app';
 import { routeTree } from './routeTree.gen';
 
-import { store$ } from '@apps-next/react';
 import { ConvexQueryClient } from '@convex-dev/react-query';
-import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/local-storage';
-import { syncObservable } from '@legendapp/state/sync';
 import { QueryClient } from '@tanstack/react-query';
 import { ConvexReactClient } from 'convex/react';
 

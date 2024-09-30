@@ -1,18 +1,20 @@
-import { ComboxboxItem, FieldConfig } from '@apps-next/core';
+import { ComboxboxItem, FieldConfig, RecordType } from '@apps-next/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { viewConfigManagerAtom } from '../../stores';
 
-export type InputDialogValueDict = Record<
-  string,
-  {
-    value: string;
-    field?: FieldConfig | null;
-  }
+export type InputDialogValueDict<T extends RecordType = RecordType> = Partial<
+  Record<
+    keyof T,
+    {
+      value: string;
+      field?: FieldConfig | null;
+    }
+  >
 >;
 
-type InputDialogState = {
+type InputDialogState<T extends RecordType = RecordType> = {
   field: FieldConfig | null;
-  valueDict: InputDialogValueDict;
+  valueDict: InputDialogValueDict<T>;
   open: boolean;
 };
 

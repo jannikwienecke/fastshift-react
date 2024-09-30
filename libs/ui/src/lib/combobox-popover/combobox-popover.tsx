@@ -20,6 +20,7 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
   const { input, rect, ...comboboxProps } = props || {};
 
   if (!props) return null;
+
   return (
     <Popover
       modal={true}

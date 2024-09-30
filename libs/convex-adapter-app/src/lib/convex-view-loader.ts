@@ -20,6 +20,7 @@ export const viewLoaderHandler = async (
   _args: DefaultFunctionArgs
 ): Promise<QueryReturnDto> => {
   const args = _args as QueryDto;
+
   if (args.relationQuery && !args.relationQuery.tableName) {
     return {
       data: [],

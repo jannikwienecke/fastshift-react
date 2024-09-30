@@ -175,7 +175,11 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
         store$.filter.filters[
           existingFilterIndex
         ] as Observable<FilterPrimitiveType>
-      ).value.set(newFilter.value);
+      ).set({
+        ...exitingFilter,
+        ...newFilter,
+        type: 'primitive',
+      });
     }
     resetFilter();
   };

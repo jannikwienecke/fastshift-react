@@ -1,55 +1,34 @@
-import { InputDialogProps } from '@apps-next/core';
+import { InputDialogProps, RecordType } from '@apps-next/core';
+import { store$ } from '../../legend-store';
 import {
-  InputDialogValueDict,
-  useInputDialogStore,
-} from './input-dialog.store';
-import React from 'react';
+  inputDialogState$,
+  inputDialogProps,
+  MakeInputDialogProps,
+} from '../../legend-store/legend.store.derived.input-dialog';
+import { InputDialogValueDict } from './input-dialog.store';
 
-export const useInputDialogAdapter = (props: {
-  onSave: (valueDict: InputDialogValueDict) => void;
-  onCancel?: () => void;
-  defaultValue?: string;
-}): (() => InputDialogProps) => {
-  const { state, updateValue, close } = useInputDialogStore();
+export const makeInputDialogProps = <T extends RecordType = RecordType>(
+  props?: MakeInputDialogProps<T>
+): InputDialogProps => {
+  inputDialogProps.set(props);
 
-  React.useEffect(() => {
-    if (props.defaultValue && state.field?.name) {
-      updateValue({ name: state.field.name, value: props.defaultValue });
-    }
-  }, [props.defaultValue, state.field?.name, updateValue]);
+  return {
+    ...inputDialogState$.get(),
+    onSubmit: props?.onSave
+      ? () =>
+          props.onSave?.(
+            store$.inputDialog.valueDict.get() as InputDialogValueDict<T>
+          )
+      : () => store$.inputDialogSave(),
 
-  return () => {
-    return {
-      inputList: state.field
-        ? [
-            {
-              id: state.field.name,
-              value: state.valueDict?.[state.field.name]?.value ?? '',
-              onChange: (e) => {
-                if (!state.field) return;
-                const value = e.target.value;
-                updateValue({ name: state.field?.name, value });
-              },
-              placeholder: state.field.name,
-            },
-          ]
-        : [],
-      open: state.field !== null,
-      title: 'Filter by ' + state.field?.name,
-      onSubmit: () => {
-        props.onSave(state.valueDict);
-        close();
-      },
-      onCancel: () => {
-        close();
-        props.onCancel?.();
-      },
-      onOpenChange: (isOpen) => {
-        if (!isOpen) {
-          close();
-          props.onCancel?.();
-        }
-      },
-    };
+    onCancel: props?.onCancel
+      ? () => props.onCancel?.()
+      : () => store$.inputDialogClose(),
+
+    onOpenChange: (isOpen) => {
+      if (!isOpen) {
+        props?.onCancel ? props.onCancel?.() : store$.inputDialogClose();
+      }
+    },
   };
 };
