@@ -5,7 +5,7 @@ import {
   inputDialogProps,
   MakeInputDialogProps,
 } from '../../legend-store/legend.store.derived.input-dialog';
-import { InputDialogValueDict } from './input-dialog.store';
+import { InputDialogValueDict } from '../../legend-store';
 
 export const makeInputDialogProps = <T extends RecordType = RecordType>(
   props?: MakeInputDialogProps<T>

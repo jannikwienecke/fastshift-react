@@ -13,7 +13,16 @@ import {
   Row,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
-import { InputDialogValueDict } from '../ui-adapter/input-dialog';
+
+export type InputDialogValueDict<T extends RecordType = RecordType> = Partial<
+  Record<
+    keyof T,
+    {
+      value: string;
+      field?: FieldConfig | null;
+    }
+  >
+>;
 
 export type ComboboxState = {
   query: string;

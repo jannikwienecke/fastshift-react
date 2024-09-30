@@ -9,7 +9,11 @@ import { isValidISOString } from './date.utils';
 import { MONTHS, QUARTERS } from './filter.constants';
 import { initOperator } from './filter.operator';
 import operatorMap, { operators } from './filter.operator.define';
-import { SelectFilterValueAction } from './filter.store';
+
+export type SelectFilterValueAction = {
+  value: Row;
+  field: FieldConfig;
+};
 
 const isRelation = (field: FieldConfig) => {
   return (

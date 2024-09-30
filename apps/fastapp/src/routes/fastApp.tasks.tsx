@@ -5,7 +5,6 @@ import {
   makeHooks,
   QueryInput,
   setViewFieldsConfig,
-  useInputDialogStore,
 } from '@apps-next/react';
 import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
@@ -52,8 +51,6 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
 });
 
 const Task = observer(() => {
-  useInputDialogStore();
-
   // HIER WEITER MACHEN
   // then: opmtimize list view with the For loop from legend state lib
 
@@ -83,9 +80,12 @@ const Task = observer(() => {
 });
 
 const RenderList = observer(() => {
+  // parse this list to makeListProps -> no usage of hook
   const { useList } = makeHooks<TaskViewDataType>();
   const getListProps = useList();
 
+  // optimize this list with the For loop from legend state lib
+  // list should "neber update" if only one list item changes
   return (
     <>
       <List.Default
@@ -102,6 +102,7 @@ export const Route = createFileRoute('/fastApp/tasks')({
   loader: async ({ context }) => context.preloadQuery(tasksConfig),
   component: () => {
     return (
+      // write abstaction -> Application code - not lib code
       <ClientViewProviderConvex
         viewConfig={tasksConfig}
         globalConfig={config.config}

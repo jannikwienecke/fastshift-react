@@ -12,7 +12,7 @@ import {
 } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import React from 'react';
-import { debouncedQueryAtom, useFilterStore, useView } from '..';
+import { debouncedQueryAtom, store$, useView } from '..';
 import { useApi } from './use-api';
 
 export const useMutation = () => {
@@ -22,8 +22,8 @@ export const useMutation = () => {
   const queryClient = useQueryClient();
 
   const { registeredViews } = useView();
-  const { filter } = useFilterStore();
-  const parsedFilters = convertFiltersForBackend(filter.filters);
+  const filters = store$.filter.filters.get();
+  const parsedFilters = convertFiltersForBackend(filters);
 
   const queryPropsMerged = React.useMemo(() => {
     return {

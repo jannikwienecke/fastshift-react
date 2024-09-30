@@ -1,7 +1,7 @@
 import { FieldConfig, RecordType } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { InputDialogValueDict } from '../ui-adapter/input-dialog';
 import { store$ } from './legend.store';
+import { InputDialogValueDict } from './legend.store.types';
 
 export type InputDialogProps = {
   open: boolean;
