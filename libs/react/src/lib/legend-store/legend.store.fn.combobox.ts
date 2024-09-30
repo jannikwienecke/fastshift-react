@@ -49,6 +49,8 @@ export const comboboxUpdateQuery: StoreFn<'comboboxUpdateQuery'> =
       store$.combobox.query.set('');
       store$.combobox.values.set(null);
     } else if (comboboxStore$.field.get()?.enum) {
+      store$.combobox.query.set(query);
+
       const values = comboboxStore$.values.get();
       store$.combobox.values.set(
         values?.filter((v) =>

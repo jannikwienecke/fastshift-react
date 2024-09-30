@@ -1,4 +1,9 @@
-import { ComboxboxItem, Row, getRelationTableName } from '@apps-next/core';
+import {
+  ComboxboxItem,
+  Row,
+  getRelationTableName,
+  makeRow,
+} from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
 import { filterUtil, operator } from '../ui-adapter/filter-adapter';
@@ -31,6 +36,9 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const tableName = getRelationTableName(field);
   const defaultData = store$.relationalDataModel[tableName].get();
+  const enumValues = field.enum?.values.map((v) =>
+    makeRow(v.name, v.name, v.name, field)
+  );
 
   const { values } = store$.combobox.get();
 
@@ -63,12 +71,14 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     v.label.toLowerCase().includes(comboboxDebouncedQuery$.get().toLowerCase())
   );
 
+  const valuesForEnum = field.enum && values ? values : enumValues;
+
   return {
     ...state,
     rect: state.rect ?? store$.filter.rect.get(),
     open: !store$.filter.showDatePicker.get() ? true : false,
     field,
-    values: [...filteredDefaultSelected, ..._values],
+    values: valuesForEnum ?? [...filteredDefaultSelected, ..._values],
     query: store$.combobox.query.get(),
     selected: state.selected,
   } satisfies ComboboxState;
