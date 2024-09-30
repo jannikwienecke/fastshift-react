@@ -67,6 +67,9 @@ const Task = observer(() => {
         fieldsLeft: ['name', 'projects'],
         fieldsRight: ['tags', 'completed', 'priority'],
       }}
+      filterOptions={{
+        hideFields: ['subtitle'],
+      }}
       RenderInputDialog={observer(() => (
         <InputDialog.Default {...makeInputDialogProps({})} />
       ))}
@@ -162,6 +165,7 @@ const RenderQueryInput = observer(() => {
 const RenderList = observer((props: { options?: MakeListPropsOptions }) => {
   const { makeListProps } = makeHooks<TaskViewDataType>();
   console.log('Render List');
+
   return (
     <Memo>
       {() => {
