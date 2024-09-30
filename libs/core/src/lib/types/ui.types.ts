@@ -31,13 +31,13 @@ export type ListProps<TItem extends ListItem = ListItem> = {
   selected: Record<string, any>[];
 };
 
-export type ListGetProps<T> = {
+export type MakeListPropsOptions<T = RecordType> = {
   fieldsLeft: (keyof T)[];
   fieldsRight: (keyof T)[];
 };
 
 export type ListAdapter<T extends RecordType> = <
-  Props extends ListGetProps<T>
+  Props extends MakeListPropsOptions<T>
 >() => (options?: Props) => ListProps;
 
 export type ComboboxProps = {

@@ -1,27 +1,15 @@
-import { FieldConfig, RecordType } from '@apps-next/core';
+import { FieldConfig, InputDialogProps, RecordType } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
-import { InputDialogValueDict } from './legend.store.types';
+import { InputDialogState, InputDialogValueDict } from './legend.store.types';
 
-export type InputDialogProps = {
-  open: boolean;
-  title: string;
-  className?: string;
-  inputList: {
-    id: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    placeholder: string;
-  }[];
-};
-
-export const DEFAULT_DIALOG_PROPS: InputDialogProps = {
+export const DEFAULT_DIALOG_PROPS: InputDialogState = {
   open: false,
   title: '',
   inputList: [],
 };
 
-export type MakeInputDialogProps<T extends RecordType = RecordType> = {
+export type MakeInputDialogPropsOptions<T extends RecordType = RecordType> = {
   onSave?: (valueDict: InputDialogValueDict<T>) => void;
   onCancel?: () => void;
   defaultValue?: InputDialogValueDict<T>;
@@ -29,7 +17,7 @@ export type MakeInputDialogProps<T extends RecordType = RecordType> = {
 };
 
 export const inputDialogProps = observable(
-  {} as MakeInputDialogProps | undefined
+  {} as MakeInputDialogPropsOptions | undefined
 );
 // derived stores from main store
 export const inputDialogState$ = observable<InputDialogProps>(() => {
@@ -53,7 +41,7 @@ export const inputDialogState$ = observable<InputDialogProps>(() => {
       },
       placeholder: filterField.name,
     },
-  ] satisfies InputDialogProps['inputList'];
+  ] satisfies InputDialogState['inputList'];
 
   const titleFn = inputDialogProps?.titleFn?.get();
   return {
@@ -62,5 +50,5 @@ export const inputDialogState$ = observable<InputDialogProps>(() => {
       ? titleFn({ field: filterField })
       : 'Filter by ' + filterField.name,
     inputList,
-  } satisfies InputDialogProps;
+  } satisfies InputDialogState;
 });

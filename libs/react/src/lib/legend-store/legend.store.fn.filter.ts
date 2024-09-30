@@ -226,7 +226,7 @@ export const filterOpenExisting: StoreFn<'filterOpenExisting'> =
       store$.filter.selectedField.set(filter.field);
     }
 
-    if (!filter.field.relation) {
+    if (!filter.field.relation && filter.field.type !== 'String') {
       store$.filter.open.set(true);
     }
   };

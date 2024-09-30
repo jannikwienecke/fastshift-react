@@ -1,6 +1,6 @@
 import {
   DataModelNew,
-  ListGetProps,
+  MakeListPropsOptions,
   ListItem,
   ListProps,
   RecordType,
@@ -14,7 +14,7 @@ import { ListFieldValue } from '../../ui-components/render-list-field-value';
 export const listItems$ = observable<ListProps['items']>([]);
 
 export const makeListProps = <T extends RecordType = RecordType>(
-  options: ListGetProps<T>
+  options?: MakeListPropsOptions<T>
 ): ListProps<T & ListItem> => {
   const viewConfigManager = store$.viewConfigManager.get();
   const selected = store$.list.selected.get();

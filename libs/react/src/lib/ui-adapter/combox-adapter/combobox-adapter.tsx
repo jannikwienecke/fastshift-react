@@ -8,7 +8,7 @@ import React from 'react';
 import { comboboxStore$, store$ } from '../../legend-store';
 import { ComboboxFieldValue } from '../../ui-components/render-combobox-field-value';
 
-export type UseComboboxProps<T extends RecordType = RecordType> = {
+export type MakeComboboxPropsOptions<T extends RecordType = RecordType> = {
   onClose?: () => void;
   onSelect?: (value: Row<T>) => void;
   renderValue?: (props: {
@@ -18,7 +18,7 @@ export type UseComboboxProps<T extends RecordType = RecordType> = {
 };
 
 export const makeComboboxProps = <T extends RecordType = RecordType>(
-  props?: UseComboboxProps<T>
+  props?: MakeComboboxPropsOptions<T>
 ): ComboboxPopoverProps<Row> => {
   const store = comboboxStore$.get();
 

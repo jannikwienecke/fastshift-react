@@ -3,12 +3,12 @@ import { store$ } from '../../legend-store';
 import {
   inputDialogState$,
   inputDialogProps,
-  MakeInputDialogProps,
+  MakeInputDialogPropsOptions,
 } from '../../legend-store/legend.store.derived.input-dialog';
 import { InputDialogValueDict } from '../../legend-store';
 
 export const makeInputDialogProps = <T extends RecordType = RecordType>(
-  props?: MakeInputDialogProps<T>
+  props?: MakeInputDialogPropsOptions<T>
 ): InputDialogProps => {
   inputDialogProps.set(props);
 

@@ -11,10 +11,21 @@ import {
   RegisteredViews,
   RelationalDataModel,
   Row,
-  ViewFieldConfig,
   ViewFieldsConfig,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
+
+export type InputDialogState = {
+  open: boolean;
+  title: string;
+  className?: string;
+  inputList: {
+    id: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder: string;
+  }[];
+};
 
 export type InputDialogValueDict<T extends RecordType = RecordType> = Partial<
   Record<

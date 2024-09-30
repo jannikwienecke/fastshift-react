@@ -73,21 +73,31 @@ export function ListControl() {
   );
 }
 
-const ItemContext = React.createContext<{ item: ListItem }>(
-  {} as { item: ListItem }
+const ItemContext = React.createContext<{
+  item: {
+    id: ListItem['id'];
+  };
+}>(
+  {} as {
+    item: {
+      id: ListItem['id'];
+    };
+  }
 );
 const ItemProvider = ItemContext.Provider;
 
 function Item(
   props: React.ComponentPropsWithoutRef<'li'> & {
     children: React.ReactNode;
-    item: ListItem;
+    item: {
+      id: ListItem['id'];
+    };
   }
 ) {
   const { children, className, item, ...restProps } = props;
   const { selected } = React.useContext(ListContext);
 
-  const isSelected = selected?.map((i) => i.id).includes(item.id);
+  const isSelected = selected?.map((i) => i.id).includes(item.id.toString());
 
   return (
     <ItemProvider value={{ item }}>
