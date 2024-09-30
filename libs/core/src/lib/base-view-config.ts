@@ -132,7 +132,7 @@ export class BaseViewConfigManager<
     }
 
     return view.includeFields.filter((field) => {
-      const isList = view.viewFields[field].isList;
+      const isList = view.viewFields[field]?.isList;
       if (isList) {
         return false;
       }

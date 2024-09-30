@@ -49,7 +49,7 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
 
       {comboboxProps.open && input && (
         <PopoverContent
-          className="p-0"
+          className="p-0 mx-1"
           side="bottom"
           align="start"
           sideOffset={5}

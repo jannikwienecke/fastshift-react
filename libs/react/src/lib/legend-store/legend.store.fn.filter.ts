@@ -134,22 +134,22 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
     };
 
     const updateFilterValue = (value: Row) => {
-      const filter = getByIndex(existingFilterIndex).get();
+      const filter = getByIndex(existingFilterIndex)?.get();
 
       if (!exitingFilter || exitingFilter.type !== 'relation') return;
-      if (filter.type !== 'relation') return;
+      if (!filter || filter.type !== 'relation') return;
 
       const _ = (
         getByIndex(existingFilterIndex) as Observable<FilterRelationType>
       ).values.set([...exitingFilter.values, value]);
 
-      getByIndex(existingFilterIndex).operator.set(operator().value(filter));
+      getByIndex(existingFilterIndex)?.operator.set(operator().value(filter));
     };
 
     const removeFilterValue = (value: Row) => {
-      const filter = getByIndex(existingFilterIndex).get();
+      const filter = getByIndex(existingFilterIndex)?.get();
       if (!exitingFilter || exitingFilter.type !== 'relation') return;
-      if (filter.type !== 'relation') return;
+      if (filter?.type !== 'relation') return;
 
       (
         store$.filter.filters[

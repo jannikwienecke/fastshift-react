@@ -34,7 +34,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     return DEFAULT_COMBOBOX_STATE;
 
   const tableName = getRelationTableName(field);
-  const defaultData = store$.relationalDataModel[tableName].get();
+  const defaultData = store$.relationalDataModel[tableName]?.get();
 
   const { values } = store$.combobox.get();
 
@@ -43,7 +43,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const state = comboboInitialize({
     field,
     row,
-    defaultData,
+    defaultData: defaultData ?? null,
     rect,
     multiple: selectedFilterField ? true : undefined,
     selected: storeSelected.length

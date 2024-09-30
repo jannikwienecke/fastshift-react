@@ -4,6 +4,8 @@
     "allowJs": false,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
+    "noPropertyAccessFromIndexSignature": false,
+
     "strict": true,
     "types": ["vite/client", "vitest"]
   },

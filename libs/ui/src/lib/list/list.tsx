@@ -55,7 +55,7 @@ export function ListControl() {
   const { selected, onSelect } = React.useContext(ListContext);
   const { item } = React.useContext(ItemContext);
 
-  const isSelected = selected?.map((i) => i.id).includes(item.id);
+  const isSelected = selected?.map((i) => i['id']).includes(item['id']);
   return (
     <div
       className={cn(
@@ -74,14 +74,10 @@ export function ListControl() {
 }
 
 const ItemContext = React.createContext<{
-  item: {
-    id: ListItem['id'];
-  };
+  item: ListItem;
 }>(
   {} as {
-    item: {
-      id: ListItem['id'];
-    };
+    item: ListItem;
   }
 );
 const ItemProvider = ItemContext.Provider;
@@ -89,15 +85,13 @@ const ItemProvider = ItemContext.Provider;
 function Item(
   props: React.ComponentPropsWithoutRef<'li'> & {
     children: React.ReactNode;
-    item: {
-      id: ListItem['id'];
-    };
+    item: ListItem;
   }
 ) {
   const { children, className, item, ...restProps } = props;
   const { selected } = React.useContext(ListContext);
 
-  const isSelected = selected?.map((i) => i.id).includes(item.id.toString());
+  const isSelected = selected?.map((i) => i['id']).includes(item.id);
 
   return (
     <ItemProvider value={{ item }}>
@@ -157,7 +151,7 @@ function Value({
   const { item } = React.useContext(ItemContext);
   const { selected } = React.useContext(ListContext);
 
-  const isSelected = selected?.map((i) => i.id).includes(item.id);
+  const isSelected = selected?.map((i) => i['id']).includes(item.id);
 
   return (
     <div

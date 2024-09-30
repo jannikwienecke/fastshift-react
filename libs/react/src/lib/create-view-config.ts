@@ -4,7 +4,6 @@ import {
   ViewConfigBaseInfo,
   GlobalConfig,
 } from '@apps-next/core';
-import { registerView } from './stores';
 
 export function createViewConfig<T extends GetTableName>(
   tableName: T,
@@ -16,7 +15,8 @@ export function createViewConfig<T extends GetTableName>(
   const searchableFields = globalConfig.searchableFields[tableName as string];
   const indexFields = globalConfig.indexFields[tableName as string];
   const viewFields = globalConfig.viewFields[tableName as string];
-  const includeFieldsDefault = globalConfig.includeFields[tableName as string];
+  const includeFieldsDefault =
+    globalConfig.includeFields[tableName as string] ?? [];
   const viewName = config.viewName ?? (tableName as string);
 
   const includeFields = [
@@ -58,8 +58,6 @@ export function createViewConfig<T extends GetTableName>(
       ...config.query,
     },
   };
-
-  registerView(viewName, viewConfig);
 
   return viewConfig;
 }

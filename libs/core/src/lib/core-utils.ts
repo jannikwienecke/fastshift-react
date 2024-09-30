@@ -104,9 +104,9 @@ export const parseFilterStringForServer = (
         return null;
       }
 
-      const decodedOperator = decodeURIComponent(operator);
-      const decodedValue = decodeURIComponent(value);
-      const decodedType = decodeURIComponent(type);
+      const decodedOperator = decodeURIComponent(operator ?? '');
+      const decodedValue = decodeURIComponent(value ?? '');
+      const decodedType = decodeURIComponent(type ?? '');
 
       if (decodedType === 'relation') {
         const values = decodedValue

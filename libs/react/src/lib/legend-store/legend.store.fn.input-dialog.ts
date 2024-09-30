@@ -8,7 +8,7 @@ export const inputDialogSave: StoreFn<'inputDialogSave'> = (store$) => () => {
   if (!filterField?.name) return;
 
   // handle case: saving for a filter field
-  const value = valueDict[filterField.name].get()?.value;
+  const value = valueDict[filterField.name]?.get()?.value;
   if (!value) return;
 
   store$.filterSelectFilterValue(makeRow(value, value, value, filterField));

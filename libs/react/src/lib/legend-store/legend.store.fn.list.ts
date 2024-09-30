@@ -16,6 +16,7 @@ export const listSelect: StoreFn<'selectListItem'> =
 
 export const listSelectRelationField: StoreFn<'selectRelationField'> =
   (store$) => (props) => {
+    console.log('props', props);
     store$.list.selectedRelationField.set(props);
   };
 

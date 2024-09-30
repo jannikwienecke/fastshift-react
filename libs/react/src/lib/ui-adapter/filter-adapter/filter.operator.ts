@@ -121,12 +121,13 @@ export const getOptionsForDateField = (
   filter?: FilterType
 ): ComboxboxItem[] => {
   const operators = optionsOperatorMap[field.type];
-  if (!operators) return [];
+  const _operator = operators?.[0];
+  if (!operators?.length || !_operator) return [];
 
   const value =
     filter?.type === 'primitive' && filter.value ? filter.value : null;
 
-  const date = dateUtils.parseOption(value?.raw, operators[0]);
+  const date = dateUtils.parseOption(value?.raw, _operator);
 
   const operator = dateOperator(value?.raw.toString().toLowerCase(), date);
 

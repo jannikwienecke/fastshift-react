@@ -89,7 +89,7 @@ export const getFilterTypes = (
     ?.filter((f) => f.fields.length === 1)
     .map((f) => ({
       name: f.name,
-      field: f.fields[0]?.toString(),
+      field: f.fields[0]?.toString() ?? '',
     }));
 
   const searchFields = _searchFields?.map((f) => ({

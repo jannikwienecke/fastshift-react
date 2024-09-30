@@ -146,7 +146,7 @@ class DateOptions {
 
     if (matchingMonths.length === 1 && months.length === 1) {
       const month = months[0];
-
+      if (!month) return null;
       return this.generateOptions(month, years, true);
     } else if (matchingMonths.length && months.length > 0) {
       return this.generateOptions(currentYear, months);
@@ -400,6 +400,8 @@ class DateCalculator {
     } else if (month && valueRaw && typeof valueRaw === 'string') {
       const year = valueRaw?.split(' ')[1];
       const month = valueRaw?.split(' ')[0];
+      if (!year || !month) return { start: undefined, end: undefined };
+
       const index = MONTHS.map((m) => m.toLowerCase()).indexOf(
         month.toLowerCase()
       );
@@ -410,7 +412,9 @@ class DateCalculator {
       return { start, end };
     } else if (quarter && valueRaw && typeof valueRaw === 'string') {
       const year = valueRaw?.split(' ')[1];
-      const quarter = valueRaw?.split(' ')[0].toLowerCase();
+      if (!year) return { start: undefined, end: undefined };
+
+      const quarter = valueRaw?.split(' ')[0]?.toLowerCase();
 
       switch (quarter) {
         case 'q1':

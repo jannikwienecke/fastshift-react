@@ -1,19 +1,15 @@
 import {
-  BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   FieldConfig,
-  getViewByName,
   ManyToManyMutationProps,
   MutationPropsServer,
-  RegisteredViews,
 } from '@apps-next/core';
-import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
+import { mutationClient } from './convex-client';
+import { getRelationTableRecords } from './convex-get-relation-table-records';
 import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx, GenericQueryCtx } from './convex.server.types';
-import { mutationClient, queryClient } from './convex-client';
-import { ConvexRecord, ID } from './types.convex';
-import { toUnicode } from 'punycode';
-import { getRelationTableRecords } from './convex-get-relation-table-records';
+import { ID } from './types.convex';
+import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
 
 export const createMutation = async (
   ctx: ConvexContext,
@@ -141,7 +137,7 @@ export const updateManyToManyMutation = async (
     for (const value of toDeleteIds) {
       const index = idsToCompare.indexOf(value);
       const id = allExistingIds[index];
-      await mutationClient(ctx).delete(id);
+      if (id) await mutationClient(ctx).delete(id);
     }
 
     // INSERT NEW VALUES

@@ -16,10 +16,10 @@ import {
 } from '../../legend-store/legend.store.derived.filter.js';
 import { FilterValue } from '../../ui-components/render-filter-value.js';
 
-export const getFilterValue = (f: FilterType) => {
+export const getFilterValue = (f: FilterType): string => {
   if (f.type === 'relation') {
     return f.values.length === 1
-      ? f.values[0].label
+      ? f.values[0]?.label ?? ''
       : `${f.values.length} ${f.field.name}`;
   }
 

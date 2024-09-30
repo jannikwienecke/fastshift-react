@@ -256,10 +256,16 @@ const init = server.mutation({
 
     const projects: Id<'projects'>[] = [];
     for (const project of projectData) {
-      const projectId = await ctx.db.insert('projects', {
-        ...project,
-      });
-      projects.push(projectId);
+      if (project && project.ownerId && project.categoryId) {
+        const projectId = await ctx.db.insert('projects', {
+          ownerId: project.ownerId,
+          categoryId: project.categoryId,
+          label: project.label,
+          description: project.description,
+          dueDate: project.dueDate,
+        });
+        projects.push(projectId);
+      }
     }
 
     const tommorow = new Date().getTime() + 1000 * 60 * 60 * 24;
@@ -670,24 +676,28 @@ const init = server.mutation({
       },
     ];
 
+    let taskId: Id<'tasks'> | undefined;
     for (let i = 0; i < taskData.length; i++) {
       const task = taskData[i];
-      const taskId = await ctx.db.insert('tasks', {
-        name: task.name,
-        completed: task.completed,
-        projectId: task.projectId,
-        priority: task.priority as any,
-        description: task.description,
-        dueDate: task.dueDate,
-        subtitle: task.subtitle,
-      });
+
+      if (task) {
+        taskId = await ctx.db.insert('tasks', {
+          name: task.name,
+          completed: task.completed,
+          projectId: task.projectId as any,
+          priority: task.priority as any,
+          description: task.description,
+          dueDate: task.dueDate,
+          subtitle: task.subtitle,
+        });
+      }
 
       // Add tags to each task (0 to 4 tags)
       const numTags = i % 5;
       for (let j = 0; j < numTags; j++) {
         await ctx.db.insert('tasks_tags', {
-          tagId: createdTags[(i + j) % 10],
-          taskId: taskId,
+          tagId: createdTags[(i + j) % 10] as any,
+          taskId: taskId as any,
         });
       }
     }

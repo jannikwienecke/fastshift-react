@@ -1,9 +1,6 @@
-import { atom } from 'jotai';
 import { store$ } from '../legend-store';
 import { observer } from '@legendapp/state/react';
 import { Input } from '@apps-next/ui';
-
-export const queryAtom = atom('');
 
 export const QueryInput = observer(() => {
   return (

@@ -47,10 +47,11 @@ export const getRelationalData = async (
     const _key = getRelationTableName(field);
 
     const rows = resultList[index];
-    acc[_key] = rows.map((row) => ({
-      ...row,
-      id: row._id,
-    }));
+    acc[_key] =
+      rows?.map((row) => ({
+        ...row,
+        id: row._id,
+      })) ?? [];
     return acc;
   }, {} as QueryRelationalData);
 

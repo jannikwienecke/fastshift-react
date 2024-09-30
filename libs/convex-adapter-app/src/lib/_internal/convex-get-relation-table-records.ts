@@ -36,7 +36,7 @@ export const getRelationTableRecords = async ({
   let records: ConvexRecord[] = [];
   if (indexField) {
     records = await relationTableClient
-      .withIndex(indexField.name, (q) => q.eq(indexField.fields?.[0], id))
+      .withIndex(indexField.name, (q) => q.eq(indexField.fields?.[0] ?? '', id))
       .collect();
   } else {
     logWarningNoIndex(fieldName, relation);

@@ -29,7 +29,7 @@ export function AnimatedTab<T extends TabItem>({
           key={tab.id}
           onClick={() => handleTabClick(tab)}
           className={`relative z-10 px-4 py-2 text-sm font-medium transition-colors duration-300 ${
-            activeTab.id === tab.id
+            activeTab?.id === tab.id
               ? 'text-white'
               : 'text-gray-700 hover:text-gray-900'
           }`}
@@ -42,7 +42,7 @@ export function AnimatedTab<T extends TabItem>({
         initial={false}
         animate={{
           width: `${100 / tabs.length}%`,
-          x: `${tabs.findIndex((tab) => tab.id === activeTab.id) * 100}%`,
+          x: `${tabs.findIndex((tab) => tab.id === activeTab?.id) * 100}%`,
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       />

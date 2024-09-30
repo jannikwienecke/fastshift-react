@@ -6,12 +6,11 @@ import {
 } from '@apps-next/core';
 import {
   ClientViewProviderConvex,
-  getViewFieldsConfig,
   MakeComboboxPropsOptions,
   makeHooks,
   QueryInput,
-  setViewFieldsConfig,
   MakeInputDialogPropsOptions,
+  makeViewFieldsConfig,
 } from '@apps-next/react';
 import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
@@ -28,7 +27,7 @@ import {
   TaskViewDataType,
 } from '../views/tasks.components';
 
-setViewFieldsConfig<TaskViewDataType>('tasks', {
+const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
     tags: {
       component: {
@@ -181,7 +180,7 @@ export const Route = createFileRoute('/fastApp/tasks')({
         viewConfig={tasksConfig}
         globalConfig={config.config}
         views={views}
-        viewFieldsConfig={getViewFieldsConfig()}
+        viewFieldsConfig={viewFieldsConfig}
         queryKey={getQueryKey(tasksConfig)}
       >
         <Task />

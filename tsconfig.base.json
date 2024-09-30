@@ -12,6 +12,7 @@
     "module": "esnext",
     "lib": ["es2020", "dom"],
     "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",

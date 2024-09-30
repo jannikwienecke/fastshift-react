@@ -1,7 +1,6 @@
 import { FieldConfig, Row } from '@apps-next/core';
-import { FieldValue } from './render-field-value';
-import { useStoreDispatch } from '../store.ts';
 import { store$ } from '../legend-store/legend.store';
+import { FieldValue } from './render-field-value';
 
 export const ListFieldValue = ({
   row,
@@ -10,7 +9,6 @@ export const ListFieldValue = ({
   row: Row;
   field: FieldConfig;
 }) => {
-  const dispatch = useStoreDispatch();
   return (
     <span
       style={{
@@ -23,14 +21,6 @@ export const ListFieldValue = ({
         const rect = e.currentTarget.getBoundingClientRect();
 
         store$.selectRelationField({
-          field,
-          row,
-          selected: row.getValue(field.name),
-          rect,
-        });
-
-        dispatch({
-          type: 'SELECT_RELATIONAL_FIELD',
           field,
           row,
           selected: row.getValue(field.name),

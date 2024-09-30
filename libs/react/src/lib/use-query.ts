@@ -9,7 +9,6 @@ import {
   RecordType,
 } from '@apps-next/core';
 import { useQuery as useTanstackQuery } from '@tanstack/react-query';
-import { useAtomValue } from 'jotai';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
 import { PrismaContextType } from './query-context';

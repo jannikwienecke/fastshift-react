@@ -29,12 +29,12 @@ export const inputDialogState$ = observable<InputDialogProps>(() => {
   const inputList = [
     {
       id: filterField.name,
-      value: store$.inputDialog.valueDict[filterField.name].get()?.value ?? '',
+      value: store$.inputDialog.valueDict[filterField.name]?.get()?.value ?? '',
       onChange: (e) => {
         if (!filterField) return;
 
         const value = e.target.value;
-        store$.inputDialog.valueDict[filterField.name].set({
+        store$.inputDialog.valueDict[filterField.name]?.set({
           value,
           field: filterField,
         });

@@ -10,5 +10,5 @@ export const getComponent = ({
 }) => {
   return store$.viewFieldsConfig.get()?.[
     store$.viewConfigManager.get().getTableName()
-  ].fields?.[fieldName]?.component?.[componentType];
+  ]?.fields?.[fieldName]?.component?.[componentType];
 };

@@ -1,142 +1,148 @@
-import {
-  Categories,
-  config,
-  Owner,
-  projectsConfig,
-  Tasks,
-  tasksConfig,
-} from '@apps-next/convex';
-import { DataType } from '@apps-next/core';
-import {
-  ClientViewProviderConvex,
-  getViewFieldsConfig,
-  getViews,
-  makeComboboxProps,
-  makeHooks,
-  QueryInput,
-  setViewFieldsConfig,
-  useHandleSelectCombobox,
-  useStoreValue,
-} from '@apps-next/react';
-import { ComboboxPopover, List } from '@apps-next/ui';
-import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { getQueryKey } from '../main';
+// import {
+//   Categories,
+//   config,
+//   Owner,
+//   projectsConfig,
+//   Tasks,
+//   tasksConfig,
+// } from '@apps-next/convex';
+// import { DataType } from '@apps-next/core';
+// import {
+//   ClientViewProviderConvex,
+//   makeComboboxProps,
+//   makeHooks,
+//   QueryInput,
+//   useHandleSelectCombobox,
+// } from '@apps-next/react';
+// import { ComboboxPopover, List } from '@apps-next/ui';
+// import { createFileRoute, Outlet } from '@tanstack/react-router';
+// import { getQueryKey } from '../main';
 
-type ProjectViewDataType = DataType<
-  'projects',
-  { categories: Categories; owner: Owner; tasks: Tasks }
->;
+import { projectsConfig } from '@apps-next/convex';
+import { createFileRoute } from '@tanstack/react-router';
 
-setViewFieldsConfig<ProjectViewDataType>('projects', {
-  fields: {
-    categories: {
-      component: {
-        list: ({ data }) => {
-          return <>{data.categories?.label ?? 'Set Category'}</>;
-        },
-      },
-    },
-    tasks: {
-      component: {
-        list: ({ data }) => {
-          const tasks = data.tasks.length;
-          return (
-            <div className="flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
-              {tasks}
-              <tasksConfig.icon className="w-4 h-4" />
-            </div>
-          );
-        },
-      },
-    },
-    owner: {
-      component: {
-        combobox: ({ data }) => {
-          return <>{data?.firstname + ' ' + data.lastname}</>;
-        },
-        list: ({ data }) => {
-          return <>{data.owner?.firstname ?? 'Set Owner'}</>;
-        },
-      },
-    },
-    label: {
-      component: {
-        list: ({ data }) => {
-          return <>{data.label}</>;
-        },
-      },
-    },
-    dueDate: {
-      component: {
-        list: ({ data }) => {
-          const date = new Date(data.dueDate);
-          const formatter = new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: '2-digit',
-          });
-          return (
-            <div className="flex flex-col items-start">
-              <span className="text-xs text-foreground/80">
-                {formatter.format(date)}
-              </span>
-            </div>
-          );
-        },
-      },
-    },
-  },
-});
+// type ProjectViewDataType = DataType<
+//   'projects',
+//   { categories: Categories; owner: Owner; tasks: Tasks }
+// >;
 
-const ProjectPage = () => {
-  const { useList } = makeHooks<ProjectViewDataType>();
-  const getListProps = useList();
+// setViewFieldsConfig<ProjectViewDataType>('projects', {
+//   fields: {
+//     categories: {
+//       component: {
+//         list: ({ data }) => {
+//           return <>{data.categories?.label ?? 'Set Category'}</>;
+//         },
+//       },
+//     },
+//     tasks: {
+//       component: {
+//         list: ({ data }) => {
+//           const tasks = data.tasks.length;
+//           return (
+//             <div className="flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
+//               {tasks}
+//               <tasksConfig.icon className="w-4 h-4" />
+//             </div>
+//           );
+//         },
+//       },
+//     },
+//     owner: {
+//       component: {
+//         combobox: ({ data }) => {
+//           return <>{data?.firstname + ' ' + data.lastname}</>;
+//         },
+//         list: ({ data }) => {
+//           return <>{data.owner?.firstname ?? 'Set Owner'}</>;
+//         },
+//       },
+//     },
+//     label: {
+//       component: {
+//         list: ({ data }) => {
+//           return <>{data.label}</>;
+//         },
+//       },
+//     },
+//     dueDate: {
+//       component: {
+//         list: ({ data }) => {
+//           const date = new Date(data.dueDate);
+//           const formatter = new Intl.DateTimeFormat('en-GB', {
+//             day: '2-digit',
+//             month: 'short',
+//             year: '2-digit',
+//           });
+//           return (
+//             <div className="flex flex-col items-start">
+//               <span className="text-xs text-foreground/80">
+//                 {formatter.format(date)}
+//               </span>
+//             </div>
+//           );
+//         },
+//       },
+//     },
+//   },
+// });
 
-  const { handleClose, handleSelect } = useHandleSelectCombobox();
+// const ProjectPage = () => {
+//   const { useList } = makeHooks<ProjectViewDataType>();
+//   const getListProps = useList();
 
-  // TODO: we should not save it on list -> but have like selected: {type: "list or whatever"}
-  const { list } = useStoreValue();
+//   const { handleClose, handleSelect } = useHandleSelectCombobox();
 
-  // const getComboboxProps = makeComboboxProps({
-  //   state: list?.focusedRelationField ? list.focusedRelationField : null,
-  //   onSelect: handleSelect,
-  //   onClose: handleClose,
-  // });
+//   // TODO: we should not save it on list -> but have like selected: {type: "list or whatever"}
+//   const { list } = useStoreValue();
 
-  return (
-    <div className="p-2 flex gap-2 grow overflow-scroll">
-      {/* <ComboboxPopover {...getComboboxProps()} /> */}
+//   // const getComboboxProps = makeComboboxProps({
+//   //   state: list?.focusedRelationField ? list.focusedRelationField : null,
+//   //   onSelect: handleSelect,
+//   //   onClose: handleClose,
+//   // });
 
-      <div className="flex flex-col w-full ">
-        <QueryInput />
+//   return (
+//     <div className="p-2 flex gap-2 grow overflow-scroll">
+//       {/* <ComboboxPopover {...getComboboxProps()} /> */}
 
-        <List.Default
-          {...getListProps({
-            fieldsRight: ['categories', 'owner', 'tasks'],
-            fieldsLeft: ['label', 'dueDate'],
-          })}
-        />
-      </div>
-      <hr />
+//       <div className="flex flex-col w-full ">
+//         <QueryInput />
 
-      <Outlet />
-    </div>
-  );
-};
+//         <List.Default
+//           {...getListProps({
+//             fieldsRight: ['categories', 'owner', 'tasks'],
+//             fieldsLeft: ['label', 'dueDate'],
+//           })}
+//         />
+//       </div>
+//       <hr />
+
+//       <Outlet />
+//     </div>
+//   );
+// };
+
+// export const Route = createFileRoute('/fastApp/projects')({
+//   loader: async ({ context }) => context.preloadQuery(projectsConfig),
+//   component: () => {
+//     return (
+//       <ClientViewProviderConvex
+//         viewConfig={projectsConfig}
+//         globalConfig={config.config}
+//         views={getViews()}
+//         viewFieldsConfig={getViewFieldsConfig()}
+//         queryKey={getQueryKey(tasksConfig)}
+//       >
+//         <ProjectPage />
+//       </ClientViewProviderConvex>
+//     );
+//   },
+// });
 
 export const Route = createFileRoute('/fastApp/projects')({
   loader: async ({ context }) => context.preloadQuery(projectsConfig),
   component: () => {
-    return (
-      <ClientViewProviderConvex
-        viewConfig={projectsConfig}
-        globalConfig={config.config}
-        views={getViews()}
-        viewFieldsConfig={getViewFieldsConfig()}
-        queryKey={getQueryKey(tasksConfig)}
-      >
-        <ProjectPage />
-      </ClientViewProviderConvex>
-    );
+    return <></>;
   },
 });

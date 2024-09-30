@@ -7,7 +7,7 @@ export const generateViewFields = (_prisma: Record<string, any>) => {
   const viewFields = Object.fromEntries(
     Object.entries(Prisma.models).map(([index, tableData]) => {
       return [
-        Prisma.models[+index].name.toLowerCase(),
+        Prisma.models[+index]?.name?.toLowerCase(),
         Object.fromEntries(parseFields(tableData, Prisma)),
       ];
     })
