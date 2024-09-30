@@ -1,34 +1,25 @@
-import { atom, useAtomValue, useSetAtom } from 'jotai';
-import { atomWithDebounce } from '../jotai-utils';
+import { atom } from 'jotai';
+import { store$ } from '../legend-store';
+import { observer } from '@legendapp/state/react';
+import { Input } from '@apps-next/ui';
 
 export const queryAtom = atom('');
 
-export const {
-  isDebouncingAtom,
-  debouncedValueAtom: debouncedQueryAtom,
-  clearTimeoutAtom,
-  currentValueAtom,
-} = atomWithDebounce('');
-
-export const QueryInput = () => {
-  const setReset = useSetAtom(debouncedQueryAtom);
-  const setDebouncedValue = useSetAtom(debouncedQueryAtom);
-  const currentValue = useAtomValue(currentValueAtom);
-
+export const QueryInput = observer(() => {
   return (
     <div className="w-full pb-6 flex justify-end">
-      <input
-        className="border border-background p-1 px-4 rounded-md w-[20rem]"
+      <Input
+        className="w-[20rem] mx-2"
         placeholder="Search"
-        value={currentValue ?? ''}
-        onChange={(e) => setDebouncedValue(e.target.value)}
+        value={store$.globalQuery.get()}
+        onChange={(e) => store$.globalQueryUpdate(e.target.value)}
       />
       <button
         className="border border-red-500 p-1 px-4 rounded-md"
-        onClick={() => setReset('')}
+        onClick={store$.globalQueryReset}
       >
         Reset
       </button>
     </div>
   );
-};
+});

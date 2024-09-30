@@ -65,68 +65,17 @@ export const ClientViewProviderConvex = (
     props.queryKey
   ) as QueryReturnOrUndefined;
 
-  const dataModel = makeData(
-    views,
-    viewConfigManager.getTableName()
-  )(data?.data ?? []);
-
   store$.init(
     data?.data ?? [],
     data?.relationalData ?? {},
     viewConfigManager,
-    views
-  );
-
-  const relationalDataModel = Object.entries(data?.relationalData ?? {}).reduce(
-    (acc, [tableName, data]) => {
-      const viewConfig = getViewByName(views, tableName);
-
-      acc[tableName] = makeData(views, viewConfig.viewName)(data);
-      return acc;
-    },
-    {} as { [key: string]: DataModelNew<RecordType> }
-  );
-
-  const queryStore: QueryStore<RecordType> = React.useMemo(
-    () => ({
-      dataModel,
-      relationalDataModel,
-      loading: false,
-      error: null,
-      page: 1,
-      hasNextPage: false,
-      hasPreviousPage: false,
-      isInitialized: true,
-      viewName: viewConfigManager.getViewName(),
-    }),
-    [dataModel, relationalDataModel, viewConfigManager]
-  );
-
-  const initialValues = React.useMemo(
-    () => [
-      [viewConfigManagerAtom, viewConfigManager],
-      [registeredViewsAtom, views],
-      [globalConfigAtom, props.globalConfig],
-      [queryStoreAtom, queryStore],
-      [clientViewConfigAtom, props.viewFieldsConfig],
-    ],
-    [
-      viewConfigManager,
-      views,
-      props.globalConfig,
-      queryStore,
-      props.viewFieldsConfig,
-    ]
+    views,
+    props.viewFieldsConfig
   );
 
   return (
     <Provider key={viewConfigManager.getViewName()} store={clientConfigStore}>
-      <HydrateAtoms
-        key={viewConfigManager.getViewName()}
-        initialValues={initialValues}
-      >
-        <Content>{props.children}</Content>
-      </HydrateAtoms>
+      <Content>{props.children}</Content>
     </Provider>
   );
 };

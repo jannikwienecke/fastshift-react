@@ -11,6 +11,8 @@ import {
   RegisteredViews,
   RelationalDataModel,
   Row,
+  ViewFieldConfig,
+  ViewFieldsConfig,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 
@@ -69,6 +71,7 @@ export type LegendStore = {
   // MAIN DATA MODEL
   dataModel: DataModelNew;
   relationalDataModel: RelationalDataModel;
+  viewFieldsConfig: ViewFieldsConfig;
 
   //   VIEW STATE
   viewConfigManager: BaseViewConfigManagerInterface;
@@ -78,6 +81,9 @@ export type LegendStore = {
     mutate?: (props: { mutation: Mutation }) => void;
     mutateAsync?: (args: { mutation: Mutation }) => Promise<MutationReturnDto>;
   };
+
+  globalQuery: string;
+  globalQueryDebounced: string;
 
   //   list state
   list: {
@@ -95,11 +101,16 @@ export type LegendStore = {
     data: RecordType[],
     relationalData: QueryRelationalData,
     viewConfigManager: BaseViewConfigManagerInterface,
-    views: RegisteredViews
+    views: RegisteredViews,
+    viewFieldsConfig: ViewFieldsConfig
   ) => void;
 
   createDataModel: (data: RecordType[]) => void;
   createRelationalDataModel: (data: QueryRelationalData) => void;
+
+  // global query
+  globalQueryUpdate: (query: string) => void;
+  globalQueryReset: () => void;
 
   //   list methods
   selectListItem: (record: RecordType) => void;

@@ -42,7 +42,7 @@ export const makeFilterProps = <T extends RecordType>(
     values: filterComboboxValues$.get(),
     name: 'filter',
     searchable: true,
-    multiple: store$.filter.selectedField.enum ? true : false,
+    multiple: store$.filter.selectedField.enum.get() ? true : false,
     input: {
       onChange: store$.filterUpdateQuery,
       query: store$.filter.query.get(),

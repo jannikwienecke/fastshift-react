@@ -13,7 +13,6 @@ import { useAtomValue } from 'jotai';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
 import { PrismaContextType } from './query-context';
-import { debouncedQueryAtom } from './ui-components';
 import { useApi } from './use-api';
 import { useView } from './use-view';
 
@@ -77,7 +76,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const prisma = useApi();
   const { registeredViews, viewConfigManager } = useView();
 
-  const query = useAtomValue(debouncedQueryAtom);
+  const query = store$.globalQueryDebounced.get();
   const filters = store$.filter.filters.get();
   const parsedFilters = convertFiltersForBackend(filters);
 

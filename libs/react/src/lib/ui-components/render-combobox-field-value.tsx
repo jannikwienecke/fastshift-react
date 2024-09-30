@@ -1,6 +1,5 @@
 import { FieldConfig, Row } from '@apps-next/core';
-import { useAtomValue } from 'jotai';
-import { clientConfigAtom } from '../stores';
+import { getComponent } from './ui-components.helper';
 
 export const ComboboxFieldValue = ({
   value,
@@ -11,12 +10,12 @@ export const ComboboxFieldValue = ({
 }) => {
   const fieldName = field.name;
 
-  // TODO: FIX NAMING -> OR MERGE THEM clientConfigAtom and getViewConfigAtom
-  const injectedViewConfig = useAtomValue(clientConfigAtom);
   const componentType = 'combobox';
 
-  const ComponentToRender =
-    injectedViewConfig?.fields[fieldName]?.component?.[componentType];
+  const ComponentToRender = getComponent({
+    componentType,
+    fieldName,
+  });
 
   return (
     <>

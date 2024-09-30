@@ -2,12 +2,13 @@ import { config, tasksConfig, views } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
   getViewFieldsConfig,
+  listItems$,
   makeHooks,
   QueryInput,
   setViewFieldsConfig,
 } from '@apps-next/react';
 import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
-import { observer } from '@legendapp/state/react';
+import { For, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { getQueryKey } from '../main';
 import {
@@ -19,6 +20,7 @@ import {
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
+import { ListItem, ListProps } from '@apps-next/core';
 
 setViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -49,6 +51,50 @@ setViewFieldsConfig<TaskViewDataType>('tasks', {
     },
   },
 });
+
+function ListDefault<TItem extends ListItem = ListItem>({
+  onSelect,
+  selected,
+}: ListProps<TItem>) {
+  console.log('RENDER LIST');
+  return (
+    <List.Provider onSelect={onSelect} selected={selected}>
+      <For each={listItems$}>
+        {(item) => {
+          console.log('RENDER LIST ITEM');
+          return (
+            <List.Item key={item.id.get()} className="" item={item.get()}>
+              <div className="flex gap-1 pr-2">
+                <List.Control />
+                <List.Icon icon={item.icon.get()} />
+              </div>
+
+              <List.Values>
+                <List.ValuesLeft values={item.valuesLeft.get()} />
+                <List.ValuesRight values={item.valuesRight.get()} />
+              </List.Values>
+            </List.Item>
+          );
+        }}
+      </For>
+      {/* {items.map((item) => {
+        return (
+          <List.Item key={item.id} className="" item={item}>
+            <div className="flex gap-1 pr-2">
+              <List.Control />
+              <List.Icon icon={item?.icon} />
+            </div>
+
+            <List.Values>
+              <List.ValuesLeft values={item.valuesLeft} />
+              <List.ValuesRight values={item.valuesRight} />
+            </List.Values>
+          </List.Item>
+        );
+      })} */}
+    </List.Provider>
+  );
+}
 
 const Task = observer(() => {
   // HIER WEITER MACHEN
@@ -81,15 +127,13 @@ const Task = observer(() => {
 
 const RenderList = observer(() => {
   // parse this list to makeListProps -> no usage of hook
-  const { useList } = makeHooks<TaskViewDataType>();
-  const getListProps = useList();
-
+  const { makeListProps } = makeHooks<TaskViewDataType>();
   // optimize this list with the For loop from legend state lib
   // list should "neber update" if only one list item changes
   return (
     <>
-      <List.Default
-        {...getListProps({
+      <ListDefault
+        {...makeListProps({
           fieldsRight: ['tags', 'priority', 'completed'],
           fieldsLeft: ['name', 'projects'],
         })}

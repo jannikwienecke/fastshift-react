@@ -27,6 +27,8 @@ export const viewLoaderHandler = async (
     };
   }
 
+  console.log('LOADER::: ', args.query);
+
   const viewConfigManager = new BaseViewConfigManager(
     args.viewConfig as ViewConfigType,
     args.modelConfig

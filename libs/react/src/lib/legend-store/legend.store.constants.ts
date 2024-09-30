@@ -3,6 +3,7 @@ import {
   DataModelNew,
   RegisteredViews,
   RelationalDataModel,
+  ViewFieldsConfig,
 } from '@apps-next/core';
 import { ComboboxState, FilterStore, LegendStore } from './legend.store.types';
 
@@ -42,17 +43,25 @@ export const DEFAULT_LEGEND_STORE: Pick<
   LegendStore,
   | 'dataModel'
   | 'views'
+  | 'viewFieldsConfig'
   | 'viewConfigManager'
   | 'list'
   | 'relationalDataModel'
   | 'combobox'
   | 'filter'
   | 'inputDialog'
+  | 'globalQuery'
+  | 'globalQueryDebounced'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
   viewConfigManager: {} as BaseViewConfigManagerInterface,
   relationalDataModel: {} as RelationalDataModel,
+  viewFieldsConfig: {} as ViewFieldsConfig,
+
+  globalQuery: '',
+  globalQueryDebounced: '',
+
   combobox: {
     values: null,
     query: '',

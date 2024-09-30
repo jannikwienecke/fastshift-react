@@ -35,6 +35,10 @@ import {
   inputDialogClose,
   inputDialogSave,
 } from './legend.store.fn.input-dialog';
+import {
+  globalQueryReset,
+  globalQueryUpdate,
+} from './legend.store.fn.global-query';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -43,6 +47,11 @@ export const store$ = observable<LegendStore>({
   createDataModel: (...props) => createDataModel(store$)(...props),
   createRelationalDataModel: (...props) =>
     createRelationalDataModel(store$)(...props),
+
+  // global query methods
+  globalQueryUpdate: (...props) => globalQueryUpdate(store$)(...props),
+  globalQueryReset: (...props) => globalQueryReset(store$)(...props),
+
   //   list methods
   selectListItem: (...props) => listSelect(store$)(...props),
   deselectRelationField: (...props) =>

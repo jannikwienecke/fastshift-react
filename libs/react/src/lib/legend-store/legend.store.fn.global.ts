@@ -31,9 +31,11 @@ export const createDataModel: StoreFn<'createDataModel'> =
   };
 
 export const init: StoreFn<'init'> =
-  (store$) => (data, relationalData, viewConfigManager, views) => {
+  (store$) =>
+  (data, relationalData, viewConfigManager, views, viewFieldsConfig) => {
     store$.views.set(views);
     store$.viewConfigManager.set(viewConfigManager);
+    store$.viewFieldsConfig.set(viewFieldsConfig);
 
     createDataModel(store$)(data);
     createRelationalDataModel(store$)(relationalData);

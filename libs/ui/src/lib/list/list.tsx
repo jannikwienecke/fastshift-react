@@ -204,3 +204,4 @@ List.ValuesRight = ListValues;
 List.Value = Value;
 List.Icon = ListIcon;
 List.Default = ListDefault;
+List.Provider = List;

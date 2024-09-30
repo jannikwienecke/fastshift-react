@@ -10,14 +10,13 @@ import {
   useMutation as useMutationTanstack,
   useQueryClient,
 } from '@tanstack/react-query';
-import { useAtomValue } from 'jotai';
 import React from 'react';
-import { debouncedQueryAtom, store$, useView } from '..';
+import { store$, useView } from '..';
 import { useApi } from './use-api';
 
 export const useMutation = () => {
   const { viewConfigManager } = useView();
-  const query = useAtomValue(debouncedQueryAtom);
+  const query = store$.globalQueryDebounced.get();
   const api = useApi();
   const queryClient = useQueryClient();
 
