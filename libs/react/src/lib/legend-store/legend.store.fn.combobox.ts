@@ -212,7 +212,7 @@ const updateDataModel = (
     .get()
     ?.rows.map((row) => row.raw)
     .map((row) => {
-      if (row.id === selectedRelationField?.row?.id) {
+      if (row['id'] === selectedRelationField?.row?.id) {
         return {
           ...row,
           [selectedRelationField?.field?.name]: Array.isArray(selected)
@@ -240,11 +240,11 @@ export const getIds = (
 
   const data = store$.dataModel.rows.get().find((r) => r.id === row.id);
   const valueIdsAfter: string[] = data?.raw?.[field.name]?.map(
-    (v: RecordType) => v.id
+    (v: RecordType) => v['id']
   );
 
   const existingIds: string[] = row.raw?.[field.name]?.map(
-    (v: RecordType) => v.id
+    (v: RecordType) => v['id']
   );
   const newIds_ = selected
     .map((s) => s.id)
