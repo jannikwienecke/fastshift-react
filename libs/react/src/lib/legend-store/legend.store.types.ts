@@ -128,7 +128,6 @@ export type LegendStore = {
   selectRelationField: (props: {
     field: FieldConfig;
     row: Row;
-    selected: Row | Row[];
     rect: DOMRect;
   }) => void;
   deselectRelationField: () => void;

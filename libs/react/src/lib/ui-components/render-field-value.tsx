@@ -1,5 +1,4 @@
 import { ComponentType, FieldConfig, Row } from '@apps-next/core';
-import { store$ } from '../legend-store';
 import { getComponent } from './ui-components.helper';
 
 export const FieldValue = ({

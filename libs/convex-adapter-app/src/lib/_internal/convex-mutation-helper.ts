@@ -35,9 +35,9 @@ export const deleteIds = async (
       )?._id;
 
       // TODO:
-      // RUN TESTS
-      // BUILD SUCCESS
-      // COMMIT AND PUSH
+      // RUN TESTS -> check
+      // BUILD SUCCESS -> check
+      // COMMIT AND PUSH -> check
       // HANDLE CASE: Mutation does not work (comment out next line)
       // and make sure the client reflects the changes
       // update the list.selectedRelationField.row.raw for non many to many relations

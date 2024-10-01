@@ -23,7 +23,6 @@ export const ListFieldValue = ({
         store$.selectRelationField({
           field,
           row,
-          selected: row.getValue(field.name),
           rect,
         });
       }}

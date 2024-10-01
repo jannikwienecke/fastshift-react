@@ -61,21 +61,9 @@ export const useMutation = () => {
       queryClient.invalidateQueries();
     },
 
-    onError: (error, variables, context) => {
-      const { previousState, previousStateAll } = (context as any) || {};
-
-      const queryKey = makeQueryKey({
-        viewName: lastViewName.current,
-        query: variables.query,
-      });
-
-      const queryKeyAll = makeQueryKey({
-        viewName: lastViewName.current,
-        query: variables.query,
-      });
-
-      queryClient.setQueryData(queryKey, previousState);
-      queryClient.setQueryData(queryKeyAll, previousStateAll);
+    onError: () => {
+      queryClient.invalidateQueries();
+      queryClient.resetQueries();
     },
 
     onMutate: async (vars) => {
@@ -158,7 +146,7 @@ export const useMutation = () => {
         if (!res) throw new Error('mutation failed');
         return res;
       } catch (error) {
-        console.error('Error in runMutateAsync: ', error);
+        // console.error('Error in runMutateAsync: ', error);
         return { error: (error as any)?.message };
       }
     },

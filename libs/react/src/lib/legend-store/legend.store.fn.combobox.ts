@@ -8,12 +8,20 @@ import {
 import { Observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
-import { comboboxStore$ } from './legend.store.derived';
+import {
+  comboboxStore$,
+  initSelected$,
+  newSelected$,
+  removedSelected$,
+} from './legend.store.derived';
 import { LegendStore, StoreFn } from './legend.store.types';
 
 export const comboboxInit: StoreFn<'comboboxInit'> = (store$) => (payload) => {
   const initState = comboboInitialize(payload);
 
+  newSelected$.set([]);
+  removedSelected$.set([]);
+  initSelected$.set(null);
   store$.combobox.set({ ...initState });
 };
 
@@ -22,6 +30,9 @@ export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   // add events and attach function that reacts to the events
   store$.deselectRelationField();
   store$.filterCloseAll();
+  newSelected$.set([]);
+  removedSelected$.set([]);
+  initSelected$.set(null);
 };
 
 export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
@@ -41,6 +52,18 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
           : [...state.selected, value];
 
         store$.combobox.selected.set(selected);
+
+        if (!state.selected.map((s) => s.id).includes(value.id)) {
+          newSelected$.set([...newSelected$.get(), value]);
+
+          removedSelected$.set(
+            removedSelected$.get().filter((s) => s.id !== value.id)
+          );
+        } else {
+          removedSelected$.set([...removedSelected$.get(), value]);
+          newSelected$.set(newSelected$.get().filter((s) => s.id !== value.id));
+        }
+
         store$.comboboxRunSelectMutation(value, selected);
       }
     }
@@ -91,10 +114,15 @@ export const comboboxHandleQueryData: StoreFn<'comboboxHandleQueryData'> =
 
 let timeout: NodeJS.Timeout | null = null;
 let runningMutation = false;
+let backupDataModelRows: RecordType[] | undefined = undefined;
 
 export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
   (store$) => (value, newSelected) => {
     const runMutation = store$.api?.mutateAsync;
+
+    if (!backupDataModelRows) {
+      storeBackupDataModel(store$);
+    }
 
     const selected = store$.combobox.selected.get();
     const { row, field } = comboboxStore$.get();
@@ -168,9 +196,15 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
         if (!mutation) return;
         try {
           runningMutation = true;
-          await runMutation({
+          const result = await runMutation({
             mutation: mutation,
           });
+
+          if (result.error) {
+            resetDataModel(store$);
+          }
+
+          backupDataModelRows = undefined;
 
           if (isManyToManyRelation) {
             const updatedRow = {
@@ -183,8 +217,6 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
             // also update for non many to many relations
             store$.list.selectedRelationField.row.raw.set(updatedRow);
           }
-        } catch (error) {
-          console.log(error);
         } finally {
           runningMutation = false;
         }
@@ -213,11 +245,15 @@ const updateDataModel = (
     ?.rows.map((row) => row.raw)
     .map((row) => {
       if (row['id'] === selectedRelationField?.row?.id) {
+        const sorted = Array.isArray(selected)
+          ? selected
+              .map((s) => s.raw)
+              .sort((a, b) => b._creationTime - a._creationTime)
+          : selected.raw;
+
         return {
           ...row,
-          [selectedRelationField?.field?.name]: Array.isArray(selected)
-            ? selected.map((s) => s.raw)
-            : selected.raw,
+          [selectedRelationField?.field?.name]: sorted,
         };
       }
 
@@ -225,6 +261,16 @@ const updateDataModel = (
     });
 
   store$.createDataModel(rows);
+};
+
+export const storeBackupDataModel = (store$: Observable<LegendStore>) => {
+  backupDataModelRows = [...store$.dataModel.rows.get().map((r) => r.raw)];
+};
+
+export const resetDataModel = (store$: Observable<LegendStore>) => {
+  if (!backupDataModelRows) return;
+
+  store$.createDataModel(backupDataModelRows);
 };
 
 export const getIds = (
