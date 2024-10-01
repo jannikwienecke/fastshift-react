@@ -1,13 +1,9 @@
-import {
-  getRelationTableName,
-  makeData,
-  RecordType,
-  Row,
-} from '@apps-next/core';
+import { getRelationTableName, makeData, Row } from '@apps-next/core';
+import { Observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
 import { comboboxStore$ } from './legend.store.derived';
-import { StoreFn } from './legend.store.types';
+import { LegendStore, StoreFn } from './legend.store.types';
 
 export const comboboxInit: StoreFn<'comboboxInit'> = (store$) => (payload) => {
   const initState = comboboInitialize(payload);
@@ -31,15 +27,16 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
     } else {
       if (!state.multiple) {
         store$.combobox.selected.set([value]);
+
+        store$.comboboxRunSelectMutation(value, value);
       } else {
         const selected = state.selected.some((s) => s.id === value.id)
           ? state.selected.filter((s) => s.id !== value.id)
           : [...state.selected, value];
 
         store$.combobox.selected.set(selected);
+        store$.comboboxRunSelectMutation(value, selected);
       }
-
-      store$.comboboxRunSelectMutation(value);
     }
   };
 
@@ -87,9 +84,10 @@ export const comboboxHandleQueryData: StoreFn<'comboboxHandleQueryData'> =
   };
 
 let timeout: NodeJS.Timeout | null = null;
+let runningMutation = false;
 
 export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
-  (store$) => (value) => {
+  (store$) => (value, newSelected) => {
     const runMutation = store$.api?.mutateAsync;
 
     const selected = store$.combobox.selected.get();
@@ -123,66 +121,49 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
 
     const selectedId = getSelectedId(selected);
 
+    if (!runningMutation) {
+      // only run a optimisic update if we are not already running a mutation
+      updateDataModel(store$, newSelected);
+    }
+
     if (timeout) {
       clearTimeout(timeout);
       timeout = null;
     }
 
     timeout = setTimeout(
-      () => {
+      async () => {
         if (!field) return;
 
         const valueToUpdate =
           !field.relation && !field.enum ? value.raw : value.id;
 
-        runMutation({
-          mutation: {
-            type: 'UPDATE_RECORD',
-            handler: (items) => {
-              if (isManyToManyRelation) return items;
-
-              return items.map((item) => {
-                if (item['id'] === row.id) {
-                  const newValue = {
-                    ...item,
-                    [field.name]: isManyToManyRelation
-                      ? updateManyToManyRelation(item[field.name], value)
-                      : value.raw,
-                  };
-                  return newValue;
-                }
-                return item;
-              });
-            },
-            payload: {
-              id: row.id,
-              // TODO: Select Combobox improvement
-              // send a list of new ids
-              // and a list of deleted ids
-              record: {
-                [field.relation?.fieldName ?? field.name]: isManyToManyRelation
-                  ? selectedId
-                  : valueToUpdate,
+        try {
+          runningMutation = true;
+          await runMutation({
+            mutation: {
+              type: 'UPDATE_RECORD',
+              payload: {
+                id: row.id,
+                // TODO: Select Combobox improvement
+                // send a list of new ids
+                // and a list of deleted ids
+                record: {
+                  [field.relation?.fieldName ?? field.name]:
+                    isManyToManyRelation ? selectedId : valueToUpdate,
+                },
               },
             },
-          },
-        });
+          });
+        } catch (error) {
+          console.log(error);
+        } finally {
+          runningMutation = false;
+        }
       },
-      isManyToManyRelation ? 500 : 0
+      isManyToManyRelation ? 1000 : 0
     );
   };
-
-function updateManyToManyRelation(
-  currentValues: RecordType[],
-  newValue: RecordType
-) {
-  const existingIndex = currentValues.findIndex(
-    (value) => value['id'] === newValue['id']
-  );
-  return existingIndex !== -1
-    ? currentValues.filter((_, index) => index !== existingIndex)
-    : [...currentValues, newValue];
-}
 
 export const getSelectedId = (selected: Row | Row[]) => {
   return typeof selected === 'string'
@@ -190,4 +171,30 @@ export const getSelectedId = (selected: Row | Row[]) => {
     : Array.isArray(selected)
     ? selected.map((v) => v.id)
     : (selected as Row)?.id;
+};
+
+const updateDataModel = (
+  store$: Observable<LegendStore>,
+  selected: Row[] | Row
+) => {
+  const selectedRelationField = store$.list.selectedRelationField.get();
+  if (!selectedRelationField) return;
+
+  const rows = store$.dataModel
+    .get()
+    ?.rows.map((row) => row.raw)
+    .map((row) => {
+      if (row.id === selectedRelationField?.row?.id) {
+        return {
+          ...row,
+          [selectedRelationField?.field?.name]: Array.isArray(selected)
+            ? selected.map((s) => s.raw)
+            : selected.raw,
+        };
+      }
+
+      return row;
+    });
+
+  store$.createDataModel(rows);
 };
