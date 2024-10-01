@@ -136,6 +136,7 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
     if (!isManyToManyRelation) {
       setTimeout(() => {
         store$.deselectRelationField();
+        store$.comboboxClose();
       }, 100);
     }
 
