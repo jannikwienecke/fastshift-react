@@ -1,4 +1,6 @@
 import {
+  FieldConfig,
+  NONE_OPTION,
   RecordType,
   Row,
   getRelationTableName,
@@ -102,12 +104,22 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     );
   }
 
+  let noneOption: [Row] | null = null;
+  if (selectedFilterField && !selectedFilterField.isRequired) {
+    const label = `No ${selectedFilterField.name}`;
+    noneOption = [makeRow(NONE_OPTION, label, label, {} as FieldConfig)];
+  }
+
   return {
     ...state,
     rect: state.rect ?? store$.filter.rect.get(),
     open: !store$.filter.showDatePicker.get() ? true : false,
     field,
-    values: enumValues ?? [...defaultDataSelected, ...defaultDataNotSelected],
+    values: enumValues ?? [
+      ...(noneOption ?? []),
+      ...defaultDataSelected,
+      ...defaultDataNotSelected,
+    ],
     query: store$.combobox.query.get(),
     selected: selectedListField ? selectedOfList || [] : selectedOfFilter ?? [],
   } satisfies ComboboxState;

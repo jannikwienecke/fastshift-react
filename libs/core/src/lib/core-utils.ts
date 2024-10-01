@@ -159,7 +159,10 @@ export const getViewByName = (views: RegisteredViews, name: string) => {
     (v) => v?.tableName === name
   );
 
-  if (!viewConfigByTableName) throw new Error(`No View For ${name} found`);
+  if (!viewConfigByTableName) {
+    console.log(views, name);
+    throw new Error(`No View For ${name} found`);
+  }
 
   return viewConfigByTableName;
 };

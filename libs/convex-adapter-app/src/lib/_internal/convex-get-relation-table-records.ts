@@ -3,6 +3,7 @@ import {
   ID,
   getViewByName,
   BaseViewConfigManager,
+  NONE_OPTION,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
 import { GenericQueryCtx } from './convex.server.types';
@@ -36,7 +37,9 @@ export const getRelationTableRecords = async ({
   let records: ConvexRecord[] = [];
   if (indexField) {
     records = await relationTableClient
-      .withIndex(indexField.name, (q) => q.eq(indexField.fields?.[0] ?? '', id))
+      .withIndex(indexField.name, (q) =>
+        q.eq(indexField.fields?.[0] ?? '', id === NONE_OPTION ? undefined : id)
+      )
       .collect();
   } else {
     logWarningNoIndex(fieldName, relation);

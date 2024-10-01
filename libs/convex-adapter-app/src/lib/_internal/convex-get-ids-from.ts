@@ -3,6 +3,7 @@ import {
   DEFAULT_FETCH_LIMIT_QUERY,
   FilterType,
   ID,
+  NONE_OPTION,
   RegisteredViews,
 } from '@apps-next/core';
 import {
@@ -68,21 +69,54 @@ export const getIdsFromManyToManyFilters = async (
     const idLists = await asyncMap(values, async (value) => {
       if (!manyToManyTable || !fieldNameFilter) return null;
 
-      const rows = await getRelationTableRecords({
-        registeredViews,
-        ctx,
-        id: value.id,
-        fieldName: fieldNameFilter,
-        relation: manyToManyTable,
-      });
+      if (value.id === NONE_OPTION) {
+        // if we want all the "tasks" that have no tags
+        // (many to many table is "tasks_tags")
+        // we first get all the records from the "tasks" table
+        // then we filter the tasks tags to get all the tasks with a tag
+        // then we find the tasks that have no tags
+        // expensive operation
 
-      if (isRelationNegateOperator(filter.operator)) {
-        idsToRemove.push(
-          ...rows.map((manyToManyRow) => manyToManyRow[fieldNameView])
+        const viewRecords = await queryClient(
+          ctx,
+          viewConfigManager.getTableName()
+        ).collect();
+
+        const manyToManyRecordIds = await asyncMap(
+          viewRecords,
+          async (record) => {
+            const rows = await getRelationTableRecords({
+              registeredViews,
+              ctx,
+              id: (record as any)._id,
+              fieldName: fieldNameView,
+              relation: manyToManyTable,
+            });
+            return rows[0]?.[fieldNameView];
+          }
         );
-        return [];
+
+        const recordsWithoutManyToMany = viewRecords.filter(
+          (record) => !manyToManyRecordIds.some((id) => id === record?._id)
+        );
+
+        return recordsWithoutManyToMany.map((r) => r._id);
       } else {
-        return rows?.map((manyToManyRow) => manyToManyRow[fieldNameView]);
+        const rows = await getRelationTableRecords({
+          registeredViews,
+          ctx,
+          id: value.id,
+          fieldName: fieldNameFilter,
+          relation: manyToManyTable,
+        });
+        if (isRelationNegateOperator(filter.operator)) {
+          idsToRemove.push(
+            ...rows.map((manyToManyRow) => manyToManyRow[fieldNameView])
+          );
+          return [];
+        } else {
+          return rows?.map((manyToManyRow) => manyToManyRow[fieldNameView]);
+        }
       }
     });
 
