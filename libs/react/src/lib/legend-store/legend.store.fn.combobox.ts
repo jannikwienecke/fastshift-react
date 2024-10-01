@@ -1,4 +1,10 @@
-import { getRelationTableName, makeData, Row } from '@apps-next/core';
+import {
+  getRelationTableName,
+  makeData,
+  Mutation,
+  RecordType,
+  Row,
+} from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
@@ -119,8 +125,6 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       return;
     }
 
-    const selectedId = getSelectedId(selected);
-
     if (!runningMutation) {
       // only run a optimisic update if we are not already running a mutation
       updateDataModel(store$, newSelected);
@@ -138,23 +142,47 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
         const valueToUpdate =
           !field.relation && !field.enum ? value.raw : value.id;
 
+        let mutation: Mutation | undefined = undefined;
+        if (isManyToManyRelation) {
+          const { idsToDelete, newIds } = getIds(store$, selected);
+          mutation = {
+            type: 'SELECT_RECORDS',
+            payload: {
+              id: row.id,
+              table: getRelationTableName(field),
+              idsToDelete,
+              newIds,
+            },
+          };
+        } else {
+          mutation = {
+            type: 'UPDATE_RECORD',
+            payload: {
+              id: row.id,
+              record: {
+                [field.relation?.fieldName ?? field.name]: valueToUpdate,
+              },
+            },
+          };
+        }
+        if (!mutation) return;
         try {
           runningMutation = true;
           await runMutation({
-            mutation: {
-              type: 'UPDATE_RECORD',
-              payload: {
-                id: row.id,
-                // TODO: Select Combobox improvement
-                // send a list of new ids
-                // and a list of deleted ids
-                record: {
-                  [field.relation?.fieldName ?? field.name]:
-                    isManyToManyRelation ? selectedId : valueToUpdate,
-                },
-              },
-            },
+            mutation: mutation,
           });
+
+          if (isManyToManyRelation) {
+            const updatedRow = {
+              ...store$.list.selectedRelationField.row.raw.get(),
+              [field.name]: store$.dataModel.rows
+                .get()
+                ?.find((r) => r.id === row.id)?.raw?.[field.name],
+            };
+
+            // also update for non many to many relations
+            store$.list.selectedRelationField.row.raw.set(updatedRow);
+          }
         } catch (error) {
           console.log(error);
         } finally {
@@ -197,4 +225,35 @@ const updateDataModel = (
     });
 
   store$.createDataModel(rows);
+};
+
+export const getIds = (
+  store$: Observable<LegendStore>,
+  selected: Row[] | Row
+) => {
+  if (!Array.isArray(selected)) return { idsToDelete: [], newIds: [] };
+
+  const row = store$.list.selectedRelationField.row.get();
+  const field = store$.list.selectedRelationField.field.get();
+
+  if (!row || !field) return { idsToDelete: [], newIds: [] };
+
+  const data = store$.dataModel.rows.get().find((r) => r.id === row.id);
+  const valueIdsAfter: string[] = data?.raw?.[field.name]?.map(
+    (v: RecordType) => v.id
+  );
+
+  const existingIds: string[] = row.raw?.[field.name]?.map(
+    (v: RecordType) => v.id
+  );
+  const newIds_ = selected
+    .map((s) => s.id)
+    .filter((id) => !existingIds.includes(id));
+
+  const idsToDelete = existingIds.filter((id) => !valueIdsAfter.includes(id));
+
+  return {
+    idsToDelete,
+    newIds: newIds_,
+  };
 };

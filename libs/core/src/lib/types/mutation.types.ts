@@ -9,13 +9,21 @@ export type MutationRecordPayload = {
   id: ID;
 };
 
+export type MutationSelectRecordsPayload = {
+  id: ID;
+  idsToDelete: ID[];
+  newIds: ID[];
+  table: string;
+};
+
 export type MutationWithoutRecordPayload = {
   id: ID;
 };
 
 export type MutationPayload =
   | MutationRecordPayload
-  | MutationWithoutRecordPayload;
+  | MutationWithoutRecordPayload
+  | MutationSelectRecordsPayload;
 
 export type CREATE_RECORD = {
   type: 'CREATE_RECORD';
@@ -29,13 +37,23 @@ export type UPDATE_RECORD = {
   handler?: (items: MutationRecord[]) => MutationRecord[];
 };
 
+export type SELECT_RECORDS = {
+  type: 'SELECT_RECORDS';
+  payload: MutationSelectRecordsPayload;
+  handler?: (items: MutationRecord[]) => MutationRecord[];
+};
+
 export type DELETE_RECORD = {
   type: 'DELETE_RECORD';
   payload: MutationWithoutRecordPayload;
   handler?: (items: MutationRecord[]) => MutationRecord[];
 };
 
-export type Mutation = CREATE_RECORD | UPDATE_RECORD | DELETE_RECORD;
+export type Mutation =
+  | CREATE_RECORD
+  | UPDATE_RECORD
+  | SELECT_RECORDS
+  | DELETE_RECORD;
 
 export type MutationProps = {
   viewConfig: ViewConfigType;

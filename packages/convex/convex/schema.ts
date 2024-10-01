@@ -21,7 +21,7 @@ const _schema = defineSchema({
     description: v.optional(v.string()),
     subtitle: v.optional(v.string()),
     tags: v.optional(v.array(v.id('tags'))),
-    projectId: v.id('projects'),
+    projectId: v.optional(v.id('projects')),
     priority: v.union(v.literal('low'), v.literal('medium'), v.literal('high')),
     dueDate: v.optional(v.number()),
   })

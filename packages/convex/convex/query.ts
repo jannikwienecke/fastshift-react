@@ -19,7 +19,7 @@ export const viewMutation = server.mutation({
 });
 
 export const testQuery = server.query({
-  handler(ctx, args_0) {
+  async handler(ctx, args_0) {
     console.log('testQuery...');
 
     const now = new Date().getTime();
