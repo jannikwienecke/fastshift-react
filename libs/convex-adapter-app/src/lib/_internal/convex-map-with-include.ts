@@ -185,7 +185,7 @@ export const getManyToManyRecords = async (props: HelperProps) => {
     });
   }
 
-  return [...records].sort((a, b) => b._creationTime - a._creationTime);
+  return [...records].sort((a, b) => b['_creationTime'] - a['_creationTime']);
 };
 
 export const getOneToOneRecords = async (props: HelperProps) => {

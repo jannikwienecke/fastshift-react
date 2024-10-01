@@ -41,6 +41,7 @@ export const deleteMutation = server.mutation({
 
     const projectIds = ['123', '456'];
     const tagIds = ['123', '456'];
+    // ctx.db.query('tasks_tags').withIndex('taskId', (q) => q.eq('taskId', '123')).order('asc')
     const tasks = await ctx.db
       .query('tasks')
       // .withIndex('description', q => q.eq('description', '123'))

@@ -78,7 +78,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     : defaultData?.rows ?? values ?? [];
 
   const defaultDataSelected = theValues.filter((row) =>
-    defaultSelected?.find?.((s) => s.id === row.id)
+    defaultSelected?.find?.((s) => s['id'] === row['id'])
   );
 
   const defaultDataNotSelected = theValues.filter(
@@ -86,7 +86,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   );
 
   const selectedOfList = defaultData?.rows.filter((r) => {
-    const isInDefault = defaultSelected?.find?.((s) => s.id === r.id);
+    const isInDefault = defaultSelected?.find?.((s) => s['id'] === r['id']);
     const isInNewSelected = newSelectedIds.includes(r.id.toString());
     const isInRemovedSelected = removedSelectedIds.includes(r.id.toString());
 

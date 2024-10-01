@@ -218,9 +218,6 @@ test.describe('Task management', () => {
 
     await testingQueryBehavior({ taskPage, page });
   });
-
-  // TODO ADD TEST FOR BOOLEAN COMBOBOX LIST
-  // and BOOLEAN FILTER -> currently we are select true and false -> only one
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {

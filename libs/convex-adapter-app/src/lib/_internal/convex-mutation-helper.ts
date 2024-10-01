@@ -42,6 +42,9 @@ export const deleteIds = async (
       // and make sure the client reflects the changes -> check
       // update the list.selectedRelationField.row.raw for non many to many relations -> check
       // handle case project filter in task view -> no project assigned
+
+      // TODO ADD TEST FOR BOOLEAN COMBOBOX LIST
+      // and BOOLEAN FILTER -> currently we are select true and false -> only one
       if (_id) await mutationClient(ctx).delete(_id);
     }
   });

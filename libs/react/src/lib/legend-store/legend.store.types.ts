@@ -103,7 +103,6 @@ export type LegendStore = {
       field: FieldConfig;
       row?: Row | null;
       rect: DOMRect;
-      selected: Row | Row[] | string;
     };
   };
 
