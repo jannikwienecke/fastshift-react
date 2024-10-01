@@ -202,6 +202,9 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
 
           if (result.error) {
             resetDataModel(store$);
+            removedSelected$.set([]);
+            newSelected$.set([]);
+            initSelected$.set(null);
           }
 
           backupDataModelRows = undefined;

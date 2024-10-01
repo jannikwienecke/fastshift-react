@@ -15,6 +15,8 @@ export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed
 export const newSelected$ = observable<Row[]>([]);
 export const removedSelected$ = observable<Row[]>([]);
+// we need to save which items were selected when the combobox is opened
+// so that we can track which items are shown on the top (when adding a new item it should not move to the top. it should stay where it is)
 export const initSelected$ = observable<Row[] | null>(null);
 
 export const comboboxStore$ = observable<ComboboxState>(() => {
@@ -45,7 +47,10 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const filterValues = store$.filter.values.get();
 
   const defaultSelected =
-    initSelected$.get() ?? (row?.raw?.[tableName] as RecordType[] | null);
+    initSelected$.get() ??
+    (selectedListField
+      ? (row?.raw?.[tableName] as RecordType[])
+      : selectedOfFilter);
 
   const state = comboboInitialize({
     field,
@@ -91,8 +96,10 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     return false;
   });
 
-  if (initSelected$.get() === null && defaultSelected) {
-    initSelected$.set(selectedOfList ?? []);
+  if (initSelected$.get() === null) {
+    initSelected$.set(
+      selectedListField ? selectedOfList || [] : selectedOfFilter || []
+    );
   }
 
   return {
@@ -102,6 +109,6 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     field,
     values: enumValues ?? [...defaultDataSelected, ...defaultDataNotSelected],
     query: store$.combobox.query.get(),
-    selected: selectedOfFilter ?? selectedOfList ?? [],
+    selected: selectedListField ? selectedOfList || [] : selectedOfFilter ?? [],
   } satisfies ComboboxState;
 });
