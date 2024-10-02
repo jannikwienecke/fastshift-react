@@ -24,7 +24,7 @@ export const createDataModel: StoreFn<'createDataModel'> =
   (store$) => (data) => {
     const dataModel = makeData(
       store$.views.get(),
-      store$.viewConfigManager.get().getTableName()
+      store$.viewConfigManager.get().getTableName?.()
     )(data);
 
     store$.dataModel.set(dataModel);

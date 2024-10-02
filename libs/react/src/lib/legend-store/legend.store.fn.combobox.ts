@@ -1,6 +1,7 @@
 import {
   getRelationTableName,
   makeData,
+  makeDayMonthString,
   makeRow,
   Mutation,
   RecordType,
@@ -9,7 +10,11 @@ import {
 import { Observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
-import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
+import {
+  dateUtils,
+  operatorMap,
+  SELECT_FILTER_DATE,
+} from '../ui-adapter/filter-adapter';
 import {
   comboboxStore$,
   initSelected$,
@@ -45,12 +50,8 @@ export const comboboxSelectDate: StoreFn<'comboboxSelectDate'> =
 
     store$.combobox.datePicker.selected.set(date);
 
-    const formatter = new Intl.DateTimeFormat('en-GB', {
-      day: '2-digit',
-      month: 'short',
-    });
+    const dateString = makeDayMonthString(date);
 
-    const dateString = formatter.format(date);
     const dateAsNumber = date.getTime();
 
     console.log({ dateString, dateAsNumber });
@@ -187,9 +188,29 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       return;
     }
 
+    // TODO REFACTOR THIS -> GET VALUE PART
+    const selectedRelationField = store$.list.selectedRelationField.get();
+    if (!selectedRelationField) return;
+    let dateValueToUpdate: number | undefined = undefined;
+    if (
+      selectedRelationField.field.type === 'Date' &&
+      !Array.isArray(newSelected)
+    ) {
+      const parsed = dateUtils.parseOption(newSelected.id, operatorMap.is);
+      const { start } = dateUtils.getStartAndEndDate(parsed);
+      start?.setHours(2, 0, 0, 0);
+      dateValueToUpdate = start?.getTime();
+    }
+
+    const valueToUpdate = Array.isArray(newSelected)
+      ? newSelected
+          .map((s) => s.raw)
+          .sort((a, b) => b._creationTime - a._creationTime)
+      : dateValueToUpdate ?? newSelected.raw;
+
     if (!runningMutation) {
       // only run a optimisic update if we are not already running a mutation
-      updateDataModel(store$, newSelected);
+      updateDataModel(store$, valueToUpdate);
     }
 
     if (timeout) {
@@ -201,8 +222,11 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       async () => {
         if (!field) return;
 
-        const valueToUpdate =
-          !field.relation && !field.enum ? value.raw : value.id;
+        const valueToUpdate = dateValueToUpdate
+          ? dateValueToUpdate
+          : !field.relation && !field.enum
+          ? value.raw
+          : value.id;
 
         let mutation: Mutation | undefined = undefined;
         if (isManyToManyRelation) {
@@ -273,10 +297,7 @@ export const getSelectedId = (selected: Row | Row[]) => {
     : (selected as Row)?.id;
 };
 
-const updateDataModel = (
-  store$: Observable<LegendStore>,
-  selected: Row[] | Row
-) => {
+const updateDataModel = (store$: Observable<LegendStore>, value: any) => {
   const selectedRelationField = store$.list.selectedRelationField.get();
   if (!selectedRelationField) return;
 
@@ -285,15 +306,9 @@ const updateDataModel = (
     ?.rows.map((row) => row.raw)
     .map((row) => {
       if (row['id'] === selectedRelationField?.row?.id) {
-        const sorted = Array.isArray(selected)
-          ? selected
-              .map((s) => s.raw)
-              .sort((a, b) => b._creationTime - a._creationTime)
-          : selected.raw;
-
         return {
           ...row,
-          [selectedRelationField?.field?.name]: sorted,
+          [selectedRelationField?.field?.name]: value,
         };
       }
 

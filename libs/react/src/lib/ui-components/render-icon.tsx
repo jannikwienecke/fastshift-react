@@ -4,7 +4,8 @@ import { store$ } from '../legend-store';
 export function Icon(props: { icon?: React.FC<any> }) {
   const iconColor = store$.viewConfigManager.viewConfig.iconColor.get();
 
-  const Icon = props.icon || store$.viewConfigManager.viewConfig.get().icon;
+  const Icon = props.icon || store$.viewConfigManager.viewConfig.get()?.icon;
 
+  if (!Icon) return null;
   return <Icon style={{ color: iconColor }} className="w-3 h-3" />;
 }

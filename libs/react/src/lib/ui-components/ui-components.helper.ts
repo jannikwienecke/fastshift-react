@@ -9,6 +9,6 @@ export const getComponent = ({
   componentType: ComponentType;
 }) => {
   return store$.viewFieldsConfig.get()?.[
-    store$.viewConfigManager.get().getTableName()
+    store$.viewConfigManager.get().getTableName?.()
   ]?.fields?.[fieldName]?.component?.[componentType];
 };

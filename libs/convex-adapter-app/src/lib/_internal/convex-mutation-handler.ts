@@ -49,27 +49,7 @@ export const updateMutation = async (
 
   console.log('updateMutation', mutation.payload);
 
-  const record = Object.entries(mutation.payload.record).reduce(
-    (acc, [key, value]) => {
-      let field: FieldConfig | undefined = undefined;
-      try {
-        field = props.viewConfigManager.getFieldBy(key);
-      } catch (error) {
-        //
-      }
-      if (field?.type === 'Date' && typeof value === 'string') {
-        const date = dateUtils.parseOption(value as string, operatorMap.is);
-        const { start, end } = dateUtils.getStartAndEndDate(date);
-        acc[key] = start?.getTime() ?? end?.getTime();
-      } else {
-        acc[key] = value;
-      }
-      return acc;
-    },
-    {} as Record<string, any>
-  );
-
-  await ctx.db.patch(mutation.payload.id, record);
+  await ctx.db.patch(mutation.payload.id, mutation.payload.record);
 
   return {
     message: '200',

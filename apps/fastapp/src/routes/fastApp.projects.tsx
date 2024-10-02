@@ -9,6 +9,7 @@ import {
 } from '@apps-next/convex';
 import {
   DataType,
+  makeDayMonthString,
   MakeFilterPropsOptions,
   MakeListPropsOptions,
   RecordType,
@@ -25,7 +26,7 @@ import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
-import { getQueryKey } from '../main';
+import { getQueryKey } from '../query-client';
 
 type ProjectViewDataType = DataType<
   'projects',
@@ -75,15 +76,11 @@ const viewFieldsConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
       component: {
         list: ({ data }) => {
           const date = new Date(data.dueDate);
-          const formatter = new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: '2-digit',
-          });
+
           return (
             <div className="flex flex-col items-start">
               <span className="text-xs text-foreground/80">
-                {formatter.format(date)}
+                {makeDayMonthString(date)}
               </span>
             </div>
           );

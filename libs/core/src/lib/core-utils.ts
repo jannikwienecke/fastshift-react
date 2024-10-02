@@ -166,3 +166,12 @@ export const getViewByName = (views: RegisteredViews, name: string) => {
 
   return viewConfigByTableName;
 };
+
+export const makeDayMonthString = (date: Date) => {
+  const formatter = new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: 'short',
+  });
+
+  return formatter.format(date);
+};

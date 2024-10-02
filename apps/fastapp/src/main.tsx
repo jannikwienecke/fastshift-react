@@ -4,31 +4,11 @@ import * as ReactDOM from 'react-dom/client';
 import { api, config } from '@apps-next/convex';
 import {
   ConvexQueryProvider,
-  getQueryKeyFn,
   preloadQuery,
 } from '@apps-next/convex-adapter-app';
+
+import { convex, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
-
-import { ConvexQueryClient } from '@convex-dev/react-query';
-import { QueryClient } from '@tanstack/react-query';
-import { ConvexReactClient } from 'convex/react';
-
-const VITE_CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
-
-const convex = new ConvexReactClient(VITE_CONVEX_URL);
-
-const convexQueryClient = new ConvexQueryClient(convex);
-
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      queryKeyHashFn: convexQueryClient.hashFn(),
-      queryFn: convexQueryClient.queryFn(),
-    },
-  },
-});
-
-convexQueryClient.connect(queryClient);
 
 // syncObservable(store$, {
 //   persist: {
@@ -36,8 +16,6 @@ convexQueryClient.connect(queryClient);
 //     plugin: ObservablePersistLocalStorage,
 //   },
 // });
-
-export const getQueryKey = getQueryKeyFn(api.query.viewLoader);
 
 const router = createRouter({
   routeTree,

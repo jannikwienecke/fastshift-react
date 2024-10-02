@@ -1,5 +1,6 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
 import {
+  makeDayMonthString,
   MakeFilterPropsOptions,
   MakeListPropsOptions,
   RecordType,
@@ -18,7 +19,7 @@ import { Memo, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { CalendarIcon } from 'lucide-react';
 import React from 'react';
-import { getQueryKey } from '../main';
+import { getQueryKey } from '../query-client';
 import {
   CompletedComponent,
   CompletedComponentCombobox,
@@ -63,10 +64,6 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
           if (!data.dueDate) return null;
 
           const date = new Date(data.dueDate);
-          const formatter = new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: 'short',
-          });
 
           const today = new Date();
           today.setHours(0, 0, 0, 0);
@@ -92,7 +89,7 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
                 />
               </div>
               <span className="text-xs text-foreground/80">
-                {formatter.format(date)}
+                {makeDayMonthString(date)}
               </span>
             </div>
           );
