@@ -12,13 +12,14 @@ import {
   MakeInputDialogPropsOptions,
   makeViewFieldsConfig,
 } from '@apps-next/react';
-import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
+import { cn, ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
 import { getQueryKey } from '../main';
 import {
   CompletedComponent,
+  CompletedComponentCombobox,
   PriorityComponent,
   PriorityComponentCombobox,
   ProjectComponent,
@@ -26,6 +27,7 @@ import {
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
+import { CalendarIcon } from 'lucide-react';
 
 const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -37,7 +39,7 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
     completed: {
       component: {
         list: CompletedComponent,
-        // combobox: CompletedComponent,
+        combobox: CompletedComponentCombobox,
       },
     },
 
@@ -54,6 +56,48 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
         combobox: ProjectComponentCombobox,
       },
     },
+    dueDate: {
+      component: {
+        list: ({ data }) => {
+          if (!data.dueDate) return null;
+
+          const date = new Date(data.dueDate);
+          const formatter = new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: 'short',
+          });
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const isInTheNext7Days =
+            date.getTime() >= today.getTime() &&
+            date.getTime() < new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
+
+          const isOverdue = date.getTime() < today.getTime();
+
+          return (
+            <div className="flex flex-row items-center gap-1 border border-foreground/10 rounded-lg px-1 p-1">
+              <div>
+                <CalendarIcon
+                  className={cn(
+                    'w-4 h-4',
+                    isInTheNext7Days
+                      ? 'text-orange-500'
+                      : isOverdue
+                      ? 'text-red-500'
+                      : 'text-foreground/80'
+                  )}
+                />
+              </div>
+              <span className="text-xs text-foreground/80">
+                {formatter.format(date)}
+              </span>
+            </div>
+          );
+        },
+      },
+    },
   },
 });
 
@@ -64,7 +108,7 @@ const Task = observer(() => {
   return (
     <DefaultTemplate<TaskViewDataType>
       listOptions={{
-        fieldsLeft: ['name', 'projects'],
+        fieldsLeft: ['name', 'projects', 'dueDate'],
         fieldsRight: ['tags', 'completed', 'priority'],
       }}
       filterOptions={{

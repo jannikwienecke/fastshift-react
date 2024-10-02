@@ -17,11 +17,18 @@ export const ComboboxFieldValue = ({
     fieldName,
   });
 
+  const raw =
+    field.type === 'Boolean' && typeof value.raw === 'string'
+      ? value.raw === 'true'
+        ? true
+        : false
+      : value.raw;
+
   return (
     <>
       {ComponentToRender ? (
         <>
-          <ComponentToRender data={value.raw} />
+          <ComponentToRender data={raw} />
         </>
       ) : (
         <>{value.label}</>
