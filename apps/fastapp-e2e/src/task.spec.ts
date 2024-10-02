@@ -97,6 +97,16 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText('🟢')).toBeHidden();
   });
 
+  test('can change the completed status of a task', async ({ taskPage }) => {
+    const firstListItem = await taskPage.getListItem(0);
+
+    await firstListItem.getByText('❌').click();
+
+    await taskPage.comboboxPopover.getByText('true').click();
+
+    await expect(firstListItem.getByText('✅')).toBeVisible();
+  });
+
   test('can filter tasks by projects and tags', async ({ taskPage, page }) => {
     // click on the filter button
     await taskPage.filterButton.click();
