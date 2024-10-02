@@ -51,14 +51,21 @@ export const ClientViewProviderConvex = (
     props.queryKey
   ) as QueryReturnOrUndefined;
 
-  store$.init(
-    data?.data ?? [],
-    data?.relationalData ?? {},
-    viewConfigManager,
-    views,
-    props.viewFieldsConfig
-  );
+  const [isInitialized, setIsInitialized] = React.useState(false);
+  React.useLayoutEffect(() => {
+    setIsInitialized(true);
+    if (data && props.viewFieldsConfig && viewConfigManager && views) {
+      store$.init(
+        data?.data ?? [],
+        data?.relationalData ?? {},
+        viewConfigManager,
+        views,
+        props.viewFieldsConfig
+      );
+    }
+  }, [data, props.viewFieldsConfig, viewConfigManager, views]);
 
+  if (!isInitialized) return null;
   return <Content>{props.children}</Content>;
 };
 
