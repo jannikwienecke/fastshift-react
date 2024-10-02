@@ -1,33 +1,18 @@
 'use client';
 
-import {
-  ComboboxPopoverProps,
-  ComboxboxItem,
-  DatePickerProps,
-  FilterItemType,
-  FilterProps,
-} from '@apps-next/core';
+import { FilterItemType, FilterProps } from '@apps-next/core';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { ListFilter } from 'lucide-react';
-import { ComboboxPopover } from '../combobox-popover';
 import React from 'react';
-import { DatePicker } from '../date-picker';
 
 export const FilterDefault = (props: FilterProps) => {
-  const { filters, onOpen, comboboxProps, datePickerProps } = props;
+  const { filters, onOpen } = props;
   return (
     <>
       <div className="flex flex-row gap-2 items-center">
         {filters.length > 0 && <FilterList {...props} />}
 
-        {datePickerProps ? <FilterDatePicker {...datePickerProps} /> : null}
-
-        <FilterButton
-          comboboxProps={comboboxProps}
-          datePickerIsOpen={datePickerProps?.open}
-          onOpen={onOpen}
-          hasFilter={filters.length > 0}
-        />
+        <FilterButton onOpen={onOpen} hasFilter={filters.length > 0} />
       </div>
     </>
   );
@@ -119,48 +104,27 @@ const FilterItem = (props: {
 };
 
 const FilterButton = (props: {
-  comboboxProps: ComboboxPopoverProps<ComboxboxItem>;
-  datePickerIsOpen?: boolean;
   onOpen: (rect: DOMRect) => void;
   hasFilter: boolean;
   label?: string;
 }) => {
-  const filterTriggerBtn = (
-    <button
-      data-testid="filter-button"
-      onClick={(e) => props.onOpen(e.currentTarget.getBoundingClientRect())}
-      className="flex flex-row text-xs items-center p-1 px-2 rounded-sm border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-    >
-      <ListFilter className="w-4 h-4" />
-
-      {props.hasFilter ? (
-        <></>
-      ) : (
-        <span className="pl-2">{props.label || 'Filter'}</span>
-      )}
-    </button>
-  );
-
   return (
     <>
-      {!props.datePickerIsOpen ? (
-        <ComboboxPopover
-          {...props.comboboxProps}
-          rect={props.hasFilter ? props.comboboxProps.rect : null}
-        >
-          {filterTriggerBtn}
-        </ComboboxPopover>
-      ) : null}
+      <button
+        data-testid="filter-button"
+        onClick={(e) => props.onOpen(e.currentTarget.getBoundingClientRect())}
+        className="flex flex-row text-xs items-center p-1 px-2 rounded-sm border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+      >
+        <ListFilter className="w-4 h-4" />
 
-      {(props.hasFilter && props.comboboxProps.rect) || props.datePickerIsOpen
-        ? filterTriggerBtn
-        : null}
+        {props.hasFilter ? (
+          <></>
+        ) : (
+          <span className="pl-2">{props.label || 'Filter'}</span>
+        )}
+      </button>
     </>
   );
-};
-
-const FilterDatePicker = (props: DatePickerProps) => {
-  return <DatePicker {...props} />;
 };
 
 export const Filter = {
@@ -168,5 +132,4 @@ export const Filter = {
   Button: FilterButton,
   Item: FilterItem,
   List: FilterList,
-  DatePicker: FilterDatePicker,
 };

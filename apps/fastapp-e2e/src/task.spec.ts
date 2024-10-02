@@ -102,7 +102,7 @@ test.describe('Task management', () => {
 
     await firstListItem.getByText('❌').click();
 
-    await taskPage.comboboxPopover.getByText('true').click();
+    await taskPage.comboboxPopover.getByText('✅').click();
 
     await expect(firstListItem.getByText('✅')).toBeVisible();
   });
@@ -160,13 +160,13 @@ test.describe('Task management', () => {
     await taskPage.filterButton.click();
 
     await taskPage.comboboxPopover.getByText(/completed/i).click();
-    await taskPage.comboboxPopover.getByText(/true/i).click();
+    await taskPage.comboboxPopover.getByText(/✅/i).click();
     await page.getByText('tasks').first().click({ force: true });
 
     await expect(page.getByTestId('list-item')).toHaveCount(1);
 
     await taskPage.filterList.getByText(/true/i).click();
-    await taskPage.comboboxPopover.getByText(/false/i).click();
+    await taskPage.comboboxPopover.getByText(/❌/i).click();
     await page.getByText('tasks').first().click({ force: true });
     await expect(page.getByTestId('list-item')).not.toHaveCount(1);
 
@@ -228,6 +228,9 @@ test.describe('Task management', () => {
 
     await testingQueryBehavior({ taskPage, page });
   });
+
+  // TODO: HIER WEITER MACHEN
+  // ADD TEST -> CHANGE DATE OF LIST ITEM
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {

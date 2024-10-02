@@ -46,11 +46,14 @@ export type ComboboxState = {
   open: boolean;
   field: FieldConfig | null;
   tableName: string;
-  row: Row | null;
+  row?: Row | null;
   rect: DOMRect | null;
   id: string | null;
   multiple: boolean;
   searchable: boolean;
+  datePickerProps?: DatePickerState | null;
+  name?: string;
+  placeholder?: string;
 };
 
 export type FilterStore = {
@@ -64,18 +67,22 @@ export type FilterStore = {
   rect: DOMRect | null;
   selectedOperatorField: FieldConfig | null;
   selectedDateField: FieldConfig | null;
-  showDatePicker: boolean;
   filters: FilterType[];
   selectedIds: string[];
 };
 
 export type ComboboxInitPayload = Pick<
   ComboboxState,
-  'field' | 'rect' | 'defaultData'
+  'field' | 'rect' | 'defaultData' | 'datePickerProps'
 > & {
   selected: Row | Row[] | string;
   multiple?: boolean;
   row?: Row<any> | null;
+};
+
+export type DatePickerState = {
+  open: boolean;
+  selected?: Date;
 };
 
 export type LegendStore = {
@@ -138,6 +145,7 @@ export type LegendStore = {
     selected: Row[];
     field: FieldConfig | null;
     multiple: boolean;
+    datePicker: DatePickerState | null;
   };
 
   comboboxInit: (payload: ComboboxInitPayload) => void;
@@ -146,7 +154,7 @@ export type LegendStore = {
   comboboxRunSelectMutation: (value: Row, selected: Row[] | Row) => void;
   comboboxUpdateQuery: (query: string) => void;
   comboboxHandleQueryData: (data: RecordType[]) => void;
-
+  comboboxSelectDate: (date: Date) => void;
   // filter state
   filter: FilterStore;
   filterOpen: (rect: DOMRect) => void;

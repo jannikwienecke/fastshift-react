@@ -77,6 +77,7 @@ export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> = {
   rect: DOMRect | null;
   searchable: boolean;
   name: string;
+  datePickerProps?: DatePickerProps;
 };
 
 export type ComboboxAdapterOptions<T extends ComboxboxItem> = {
@@ -105,8 +106,6 @@ export type FilterProps = {
   onRemove: (filter: FilterItemType) => void;
   onSelect: (filter: FilterItemType, rect: DOMRect) => void;
   onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
-  comboboxProps: ComboboxPopoverProps;
-  datePickerProps: DatePickerProps | null;
 };
 
 export type InputDialogProps = {

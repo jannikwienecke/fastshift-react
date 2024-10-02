@@ -3,10 +3,15 @@ import {
   FilterDateType,
   FilterOperatorType,
 } from '@apps-next/core';
-import { DEFAULT_DATE_OPTIONS, MONTHS, QUARTERS } from './filter.constants';
+import {
+  DEFAULT_DATE_OPTIONS,
+  DEFAULT_DATE_OPTIONS_FOR_EDIT,
+  MONTHS,
+  QUARTERS,
+} from './filter.constants';
 import { filterHelper, stringsToComboxboxItems } from './filter.utils';
 
-export const FILTER_SPECIFIC = 'Select specific date';
+export const SELECT_FILTER_DATE = 'Select specific date';
 
 class DateOptions {
   private value: string;
@@ -192,12 +197,24 @@ class DateOptions {
     return [...defaultOptions, ...options];
   }
 
+  public getOptionsForEdit(): ComboxboxItem[] {
+    return this.getDefaultOptionsForEdit();
+  }
+
   private getDefaultOptions(): ComboxboxItem[] {
     const allFiltered = DEFAULT_DATE_OPTIONS.filter((option) =>
       option.toLowerCase().includes(this.value)
     );
 
-    return stringsToComboxboxItems([FILTER_SPECIFIC, ...allFiltered]);
+    return stringsToComboxboxItems([SELECT_FILTER_DATE, ...allFiltered]);
+  }
+
+  private getDefaultOptionsForEdit(): ComboxboxItem[] {
+    const allFiltered = DEFAULT_DATE_OPTIONS_FOR_EDIT.filter((option) =>
+      option.toLowerCase().includes(this.value)
+    );
+
+    return stringsToComboxboxItems([SELECT_FILTER_DATE, ...allFiltered]);
   }
 
   private getWeekMonthDayOptions(): ComboxboxItem[] {
@@ -261,13 +278,17 @@ class DateOptionParser {
     option: string,
     operator: FilterOperatorType
   ): FilterDateType | null {
-    const lowerOption = option.toString().toLowerCase();
+    let lowerOption = option.toString().toLowerCase();
     let number = lowerOption.match(/\d+/)
       ? parseInt(lowerOption.match(/\d+/)?.[0] || '', 10)
       : null;
 
     if (lowerOption.includes('one')) {
       number = 1;
+    }
+    const asNumber = +lowerOption;
+    if (!isNaN(asNumber)) {
+      lowerOption = new Date(asNumber).toISOString();
     }
 
     const { year, month, quarter, isIsoDate } = filterHelper(lowerOption);
@@ -518,9 +539,13 @@ export function isValidISOString(str: string): boolean {
 }
 
 export const dateUtils = {
-  getOptions: (value: string): ComboxboxItem[] => {
+  getOptionsForFilter: (value: string): ComboxboxItem[] => {
     const dateOptions = new DateOptions(value);
     return dateOptions.getOptions();
+  },
+  getOptionsForEdit: (value: string): ComboxboxItem[] => {
+    const dateOptions = new DateOptions(value);
+    return dateOptions.getOptionsForEdit();
   },
   parseOption: (
     option: string,

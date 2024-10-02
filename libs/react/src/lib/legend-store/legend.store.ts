@@ -6,6 +6,7 @@ import {
   comboboxHandleQueryData,
   comboboxInit,
   comboboxRunSelectMutation,
+  comboboxSelectDate,
   comboboxSelectValue,
   comboboxUpdateQuery,
 } from './legend.store.fn.combobox';
@@ -65,6 +66,7 @@ export const store$ = observable<LegendStore>({
   comboboxUpdateQuery: (...props) => comboboxUpdateQuery(store$)(...props),
   comboboxHandleQueryData: (...props) =>
     comboboxHandleQueryData(store$)(...props),
+  comboboxSelectDate: (...props) => comboboxSelectDate(store$)(...props),
 
   // filter methods
   filterOpen: (...props) => filterOpen(store$)(...props),

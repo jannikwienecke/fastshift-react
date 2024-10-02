@@ -5,7 +5,12 @@ import {
   RelationalDataModel,
   ViewFieldsConfig,
 } from '@apps-next/core';
-import { ComboboxState, FilterStore, LegendStore } from './legend.store.types';
+import {
+  ComboboxState,
+  DatePickerState,
+  FilterStore,
+  LegendStore,
+} from './legend.store.types';
 
 export const DEFAULT_COMBOBOX_STATE: ComboboxState = {
   query: '',
@@ -33,11 +38,12 @@ export const DEFAULT_FILTER_STATE: FilterStore = {
   selectedField: null,
   rect: null,
   selectedOperatorField: null,
-  showDatePicker: false,
   selectedDateField: null,
   filters: [],
   selectedIds: [],
 };
+
+export const DEFAULT_DATE_PICKER_STATE: DatePickerState | null = null;
 
 export const DEFAULT_LEGEND_STORE: Pick<
   LegendStore,
@@ -68,6 +74,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
     selected: [],
     field: null,
     multiple: false,
+    datePicker: null,
   },
   filter: DEFAULT_FILTER_STATE,
   list: {

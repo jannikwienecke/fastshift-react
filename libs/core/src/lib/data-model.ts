@@ -109,6 +109,14 @@ export const makeRow = (
   };
 };
 
+export const makeRowFromValue = (
+  value: string | number | boolean,
+  field: FieldConfig
+): Row => {
+  const _value = typeof value === 'boolean' ? String(value) : value;
+  return makeRow(_value, _value.toString(), value, field);
+};
+
 export const getRelationTableName = (field?: FieldConfig | null) => {
   if (!field?.relation) return '';
 

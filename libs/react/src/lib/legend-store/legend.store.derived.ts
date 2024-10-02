@@ -5,10 +5,11 @@ import {
   Row,
   getRelationTableName,
   makeRow,
+  makeRowFromValue,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
-import { filterUtil } from '../ui-adapter/filter-adapter';
+import { dateUtils, filterUtil, operator } from '../ui-adapter/filter-adapter';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
 import { ComboboxState } from './legend.store.types';
@@ -32,15 +33,12 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const filter = store$.filter.filters.get().find((f) => f.field === field);
   const selectedOfFilter = filter ? filterUtil().getValues(filter) : null;
+  const operatorField = store$.filter.selectedOperatorField.get();
 
-  if (!field || !rect) return DEFAULT_COMBOBOX_STATE;
-  if (
-    field.type === 'String' ||
-    field.type === 'Number' ||
-    selectedFilterField?.enum ||
-    selectedFilterField?.type === 'Boolean'
-  )
-    return DEFAULT_COMBOBOX_STATE;
+  const filterIsOpen = store$.filter.open.get();
+
+  if ((!field && !filterIsOpen) || !rect) return DEFAULT_COMBOBOX_STATE;
+  if (field?.type === 'String') return DEFAULT_COMBOBOX_STATE;
 
   const tableName = getRelationTableName(field);
   const defaultData = store$.relationalDataModel[tableName]?.get();
@@ -55,7 +53,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
       : selectedOfFilter);
 
   const state = comboboInitialize({
-    field,
+    field: field ?? null,
     row,
     defaultData: defaultData ?? null,
     rect,
@@ -75,7 +73,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const theValues =
     // BOOLEAN
-    field.type === 'Boolean'
+    field?.type === 'Boolean'
       ? state.values ?? []
       : // FILTER
       filterValues.length
@@ -117,17 +115,59 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     noneOption = [makeRow(NONE_OPTION, label, label, {} as FieldConfig)];
   }
 
+  let dateValues: Row[] | null = null;
+  if (field?.type === 'Date' && store$.list.selectedRelationField.get()) {
+    dateValues = dateUtils
+      .getOptionsForEdit(store$.combobox.query.get())
+      .map((v) => makeRowFromValue(v.id.toString(), field));
+  }
+
+  if (field?.type === 'Date' && !store$.list.selectedRelationField.get()) {
+    dateValues = dateUtils
+      .getOptionsForFilter(store$.combobox.query.get())
+      .map((v) => makeRowFromValue(v.id.toString(), field));
+  }
+
+  let filterOptions: Row[] | null = null;
+  if (store$.filter.open.get() && !field) {
+    const viewFields = store$.viewConfigManager.get().getViewFieldList();
+    filterOptions = viewFields.map((field) => {
+      return makeRowFromValue(field.name, field);
+    });
+  }
+
+  let operatorValues: Row[] | null = null;
+  if (operatorField) {
+    const allFilters = store$.filter.filters.get();
+    const filter = allFilters.find((f) => f.field.name === operatorField.name);
+    operatorValues = filter
+      ? operator()
+          .makeOptionsFrom(filter.field, filter)
+          .map((v) => makeRowFromValue(v.id.toString(), filter.field))
+      : [];
+  }
+
   return {
     ...state,
-    rect: state.rect ?? store$.filter.rect.get(),
-    open: !store$.filter.showDatePicker.get() ? true : false,
-    field,
-    values: enumValues ?? [
-      ...(noneOption ?? []),
-      ...defaultDataSelected,
-      ...defaultDataNotSelected,
-    ],
+    row: state.row ?? (store$.list.selectedRelationField.row.get() as Row),
+    rect: state.rect ?? store$.filter.rect.get() ?? rect,
+    open: true,
+    field: field ?? null,
+    placeholder: filterIsOpen ? 'Filter...' : undefined,
+    values: operatorValues ??
+      filterOptions ??
+      dateValues ??
+      enumValues ?? [
+        ...(noneOption ?? []),
+        ...defaultDataSelected,
+        ...defaultDataNotSelected,
+      ],
     query: store$.combobox.query.get(),
     selected: selectedListField ? selectedOfList || [] : selectedOfFilter ?? [],
+    datePickerProps: {
+      selected: store$.combobox.datePicker.selected.get(),
+      open: store$.combobox.datePicker.open.get(),
+    },
+    name: field?.name ?? 'filter',
   } satisfies ComboboxState;
 });

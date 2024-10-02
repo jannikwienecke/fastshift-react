@@ -8,13 +8,14 @@ import {
   ClientViewProviderConvex,
   MakeComboboxPropsOptions,
   makeHooks,
-  QueryInput,
   MakeInputDialogPropsOptions,
   makeViewFieldsConfig,
+  QueryInput,
 } from '@apps-next/react';
 import { cn, ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { CalendarIcon } from 'lucide-react';
 import React from 'react';
 import { getQueryKey } from '../main';
 import {
@@ -27,7 +28,6 @@ import {
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
-import { CalendarIcon } from 'lucide-react';
 
 const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -93,6 +93,16 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
               <span className="text-xs text-foreground/80">
                 {formatter.format(date)}
               </span>
+            </div>
+          );
+        },
+        combobox: ({ data }) => {
+          return (
+            <div className="flex items-center gap-1">
+              <div>
+                <CalendarIcon className="w-4 h-4" />
+              </div>
+              <div>{data}</div>
             </div>
           );
         },

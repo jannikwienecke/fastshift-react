@@ -111,7 +111,7 @@ export const initDateOperator = (field: FieldConfig, value?: Row | null) => {
   if (!operator) return defaultOperator;
   if (!value) return operator;
 
-  const date = dateUtils.parseOption(value.raw, operator);
+  const date = dateUtils.parseOption(value.raw.toString(), operator);
 
   return dateOperator(value.raw.toString().toLowerCase(), date);
 };

@@ -9,7 +9,11 @@ export const useComboboxQuery = () => {
     relationQuery: {
       tableName: store.tableName ?? '',
     },
-    disabled: !store.field || !store.query || !!store.field.enum,
+    disabled:
+      !store.field ||
+      !store.query ||
+      !!store.field.enum ||
+      store.field.type === 'Date',
   });
 
   React.useEffect(() => {

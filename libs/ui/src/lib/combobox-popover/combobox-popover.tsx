@@ -13,6 +13,7 @@ import {
 } from '../components/command';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/popover';
 import { cn } from '../utils';
+import { DatePicker } from '../date-picker';
 
 export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
   props: ComboboxPopoverProps<T> & { children?: React.ReactNode }
@@ -20,6 +21,10 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
   const { input, rect, ...comboboxProps } = props || {};
 
   if (!props) return null;
+
+  if (props.datePickerProps?.open) {
+    return <DatePicker {...props.datePickerProps} />;
+  }
 
   return (
     <Popover

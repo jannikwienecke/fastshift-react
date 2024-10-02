@@ -1,20 +1,14 @@
 import {
-  ComboboxPopoverProps,
-  ComboxboxItem,
-  DatePickerProps,
   FilterProps,
   FilterType,
   MakeFilterPropsOptions,
   RecordType,
 } from '@apps-next/core';
-import { store$ } from '../../legend-store';
 import {
-  filterComboboxValues$,
   filterItems$,
   makeFilterPropsOptions,
-  selectedDateFilter$,
-} from '../../legend-store/legend.store.derived.filter.js';
-import { FilterValue } from '../../ui-components/render-filter-value.js';
+  store$,
+} from '../../legend-store';
 
 export const getFilterValue = (f: FilterType): string => {
   if (f.type === 'relation') {
@@ -37,50 +31,10 @@ export const makeFilterProps = <T extends RecordType>(
 ): FilterProps => {
   makeFilterPropsOptions.set(options);
 
-  const comboboxProps = {
-    ...store$.filter.get(),
-    values: filterComboboxValues$.get(),
-    name: 'filter',
-    searchable: true,
-    multiple: store$.filter.selectedField.enum.get() ? true : false,
-    input: {
-      onChange: store$.filterUpdateQuery,
-      query: store$.filter.query.get(),
-      placeholder: options?.placeholder ?? 'Filter...',
-    },
-    onChange: store$.filterSelectFilterType,
-    selected: store$.filter.selectedIds.get().map((v) => ({
-      id: v,
-      label: v,
-    })),
-    onOpenChange: (isOpen) => {
-      if (isOpen) return;
-      store$.filterCloseAll();
-    },
-    render: (value) => (
-      <FilterValue value={value} field={store$.filter.selectedField.get()} />
-    ),
-  } satisfies ComboboxPopoverProps<ComboxboxItem>;
-
-  const datePickerProps = {
-    selected: selectedDateFilter$.get(),
-    onSelect: store$.filterSelectFromDatePicker,
-    open: store$.filter.showDatePicker.get(),
-    rect: store$.filter.rect.get(),
-    onOpenChange: (open) => {
-      if (!open) {
-        store$.filterCloseAll();
-      }
-    },
-  } satisfies DatePickerProps;
-
   return {
     onOpen: store$.filterOpen,
     filters: filterItems$.get(),
-    datePickerProps: store$.filter.showDatePicker.get()
-      ? datePickerProps
-      : null,
-    comboboxProps: comboboxProps,
+
     onRemove: ({ name }) => store$.filterRemoveFilter(getFilter(name)),
     onSelect: (value, rect) => {
       const filter = getFilter(value.name);

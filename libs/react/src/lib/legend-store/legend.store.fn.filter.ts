@@ -2,11 +2,12 @@ import {
   FilterPrimitiveType,
   FilterRelationType,
   makeRow,
+  makeRowFromValue,
   Row,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import {
-  FILTER_SPECIFIC,
+  SELECT_FILTER_DATE,
   filterUtil,
   operator,
 } from '../ui-adapter/filter-adapter';
@@ -29,7 +30,6 @@ export const filterCloseAll: StoreFn<'filterCloseAll'> = (store$) => () => {
   store$.filter.selectedField.set(null);
   store$.filter.selectedOperatorField.set(null);
   store$.filter.selectedDateField.set(null);
-  store$.filter.showDatePicker.set(false);
 };
 
 export const filterUpdateQuery: StoreFn<'filterUpdateQuery'> =
@@ -48,12 +48,7 @@ export const filterSelectFilterType: StoreFn<'filterSelectFilterType'> =
     const selectedField = store$.filter.selectedField.get();
 
     if (selectedField?.type === 'Boolean' || selectedField?.enum) {
-      const row = makeRow(
-        selected.id.toString(),
-        selected.id.toString(),
-        selected.id,
-        selectedField
-      );
+      const row = makeRowFromValue(selected.id.toString(), selectedField);
 
       const thisId = selected.id.toString();
       const currentIds = store$.filter.selectedIds.get();
@@ -63,15 +58,8 @@ export const filterSelectFilterType: StoreFn<'filterSelectFilterType'> =
           : [...currentIds, thisId]
       );
       store$.filterSelectFilterValue(row);
-    } else if (selectedDateField && selected.id === FILTER_SPECIFIC) {
-      store$.filter.showDatePicker.set(true);
     } else if (selectedDateField) {
-      const row = makeRow(
-        selected.id.toString(),
-        selected.id.toString(),
-        selected.id,
-        selectedDateField
-      );
+      const row = makeRowFromValue(selected.id.toString(), selectedDateField);
 
       store$.filterSelectFilterValue(row);
     } else if (selectedOperatorField) {
@@ -91,10 +79,9 @@ export const filterSelectFilterType: StoreFn<'filterSelectFilterType'> =
       if (field.type === 'Boolean' || field.enum) {
         store$.filter.selectedField.set(field);
       } else if (field.type === 'Date') {
-        store$.filter.selectedDateField.set(field);
+        store$.filter.selectedField.set(field);
       } else {
         store$.filter.selectedField.set(field);
-        store$.filter.open.set(false);
         store$.filter.query.set('');
       }
     }
@@ -107,8 +94,7 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
       store$.filter.selectedDateField.get();
 
     if (!field) return;
-    if (field?.type === 'Date' && value.id === FILTER_SPECIFIC) {
-      store$.filter.showDatePicker.set(true);
+    if (field?.type === 'Date' && value.id === SELECT_FILTER_DATE) {
       store$.filter.open.set(false);
       store$.filter.selectedField.set(null);
       return;
@@ -160,7 +146,6 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
 
     const resetFilter = () => {
       if (field.type !== 'Date') return;
-      if (store$.filter.showDatePicker.get()) return;
 
       filterCloseAll(store$)();
     };
@@ -220,13 +205,9 @@ export const filterOpenExisting: StoreFn<'filterOpenExisting'> =
   (store$) => (filter, rect) => {
     store$.filter.rect.set(rect);
 
-    if (filter.field.type === 'Date') {
-      store$.filter.selectedDateField.set(filter.field);
-    } else {
-      store$.filter.selectedField.set(filter.field);
-    }
+    store$.filter.selectedField.set(filter.field);
 
-    if (!filter.field.relation && filter.field.type !== 'String') {
+    if (filter.field.type !== 'String') {
       store$.filter.open.set(true);
     }
   };

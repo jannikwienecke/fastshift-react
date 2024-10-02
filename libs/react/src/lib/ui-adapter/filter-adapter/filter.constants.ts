@@ -33,3 +33,12 @@ export const DEFAULT_DATE_OPTIONS = [
   'One month ago',
   'No date defined',
 ];
+
+export const DEFAULT_DATE_OPTIONS_FOR_EDIT = [
+  'Today',
+  'Tomorrow',
+  '3 days from now',
+  'One week from now',
+  'One month from now',
+  'No date',
+];

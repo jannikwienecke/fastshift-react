@@ -16,7 +16,7 @@ export type MakeComboboxPropsOptions<T extends RecordType = RecordType> = {
   onSelect?: (value: Row<T>) => void;
   renderValue?: (props: {
     value: Row<T>;
-    field: FieldConfig<keyof T>;
+    field?: FieldConfig<keyof T> | null;
   }) => React.ReactNode;
 };
 
@@ -41,11 +41,9 @@ export const makeComboboxProps = <T extends RecordType = RecordType>(
         : store$.comboboxSelectValue(value),
 
     render: (value) => {
-      if (!store.field) return null;
-
       const renderComboboxFieldValue = (props: {
         value: Row;
-        field: FieldConfig;
+        field?: FieldConfig | null;
       }) => <ComboboxFieldValue {...props} />;
       if (value.id === NONE_OPTION) {
         const view = getViewByName(
@@ -76,11 +74,20 @@ export const makeComboboxProps = <T extends RecordType = RecordType>(
     },
 
     input: {
-      placeholder: '',
+      placeholder: store.placeholder ?? '',
       query: store.query,
       onChange: store$.comboboxUpdateQuery,
     },
     multiple: store.multiple,
-    name: comboboxStore$.field.get()?.name ?? '',
+    name: store.name ?? '',
+    datePickerProps: {
+      open: store.datePickerProps?.open ?? false,
+      rect: store.rect,
+      onOpenChange: () => {
+        store$.comboboxClose();
+      },
+      onSelect: store$.comboboxSelectDate,
+      selected: comboboxStore$.datePickerProps.selected.get(),
+    },
   } satisfies ComboboxPopoverProps<Row>;
 };

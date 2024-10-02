@@ -1,9 +1,10 @@
-import { MutationPropsServer } from '@apps-next/core';
+import { FieldConfig, MutationPropsServer } from '@apps-next/core';
+import { dateUtils, operatorMap } from '@apps-next/react';
+import { deleteIds, insertIds } from './convex-mutation-helper';
 import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx } from './convex.server.types';
 import { ID } from './types.convex';
 import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
-import { deleteIds, insertIds } from './convex-mutation-helper';
 
 export const createMutation = async (
   ctx: ConvexContext,
@@ -48,7 +49,27 @@ export const updateMutation = async (
 
   console.log('updateMutation', mutation.payload);
 
-  await ctx.db.patch(mutation.payload.id, mutation.payload.record);
+  const record = Object.entries(mutation.payload.record).reduce(
+    (acc, [key, value]) => {
+      let field: FieldConfig | undefined = undefined;
+      try {
+        field = props.viewConfigManager.getFieldBy(key);
+      } catch (error) {
+        //
+      }
+      if (field?.type === 'Date' && typeof value === 'string') {
+        const date = dateUtils.parseOption(value as string, operatorMap.is);
+        const { start, end } = dateUtils.getStartAndEndDate(date);
+        acc[key] = start?.getTime() ?? end?.getTime();
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as Record<string, any>
+  );
+
+  await ctx.db.patch(mutation.payload.id, record);
 
   return {
     message: '200',

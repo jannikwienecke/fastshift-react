@@ -16,6 +16,7 @@ export const ComboboInitDict: ComboboxInitDict = {
 
 export const comboboInitialize = (action: ComboboxInitPayload) => {
   const type = action.field?.type;
+  if (!action.field) return DEFAULT_COMBOBOX_STATE;
   if (!type) throw new Error('Combobox type is required');
 
   const initialize = ComboboInitDict[type];

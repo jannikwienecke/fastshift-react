@@ -1,6 +1,7 @@
 import {
   getRelationTableName,
   makeData,
+  makeRow,
   Mutation,
   RecordType,
   Row,
@@ -8,6 +9,7 @@ import {
 import { Observable } from '@legendapp/state';
 import { comboboInitialize } from '../field-features/combobox';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
+import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
 import {
   comboboxStore$,
   initSelected$,
@@ -22,7 +24,7 @@ export const comboboxInit: StoreFn<'comboboxInit'> = (store$) => (payload) => {
   newSelected$.set([]);
   removedSelected$.set([]);
   initSelected$.set(null);
-  store$.combobox.set({ ...initState });
+  store$.combobox.set({ ...initState, datePicker: null });
 };
 
 export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
@@ -33,14 +35,42 @@ export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   newSelected$.set([]);
   removedSelected$.set([]);
   initSelected$.set(null);
+  store$.combobox.datePicker.set(null);
 };
+
+export const comboboxSelectDate: StoreFn<'comboboxSelectDate'> =
+  (store$) => (date) => {
+    const { field } = comboboxStore$.get();
+    if (!field) return;
+
+    store$.combobox.datePicker.selected.set(date);
+
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+    });
+
+    const dateString = formatter.format(date);
+    const dateAsNumber = date.getTime();
+
+    console.log({ dateString, dateAsNumber });
+    store$.comboboxSelectValue(
+      makeRow(dateAsNumber, dateString, date.toISOString(), field)
+    );
+  };
 
 export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
   (store$) => (value) => {
     const state = comboboxStore$.get();
 
-    if (store$.filter.selectedField.get()) {
-      store$.filterSelectFilterValue(value);
+    if (value.id === SELECT_FILTER_DATE) {
+      store$.combobox.datePicker.open.set(true);
+    } else if (store$.filter.open.get()) {
+      if (state.field) {
+        store$.filterSelectFilterValue(value);
+      } else {
+        store$.filterSelectFilterType(value);
+      }
     } else {
       if (!state.multiple) {
         store$.combobox.selected.set([value]);
