@@ -13,7 +13,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { addEffects } from './legend-store';
 import { store$ } from './legend-store/legend.store';
-import { useComboboxQuery } from './use-combobox-query';
 import { useMutation } from './use-mutation';
 import { useQuery } from './use-query';
 import { useQueryData } from './use-query-data';
@@ -71,7 +70,6 @@ export const ClientViewProviderConvex = (
 
 const Content = observer((props: { children: React.ReactNode }) => {
   useQuery();
-  useComboboxQuery();
   useQueryData();
   const { runMutate, runMutateAsync } = useMutation();
 

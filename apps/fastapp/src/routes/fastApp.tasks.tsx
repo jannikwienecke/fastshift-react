@@ -11,6 +11,7 @@ import {
   MakeInputDialogPropsOptions,
   makeViewFieldsConfig,
   QueryInput,
+  useComboboxQuery,
 } from '@apps-next/react';
 import { cn, ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
@@ -171,12 +172,16 @@ const RenderComboboxPopover = observer(
   ({ options }: { options?: MakeComboboxPropsOptions }) => {
     console.log('Render Combobox Popover');
     const { makeComboboxProps } = makeHooks<RecordType>();
+
     return (
-      <Memo>
-        {() => {
-          return <ComboboxPopover {...makeComboboxProps(options)} />;
-        }}
-      </Memo>
+      <>
+        <Memo>
+          {() => {
+            useComboboxQuery();
+            return <ComboboxPopover {...makeComboboxProps(options)} />;
+          }}
+        </Memo>
+      </>
     );
   }
 );

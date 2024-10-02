@@ -69,6 +69,7 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
       if (state.field) {
         store$.filterSelectFilterValue(value);
       } else {
+        store$.combobox.query.set('');
         store$.filterSelectFilterType(value);
       }
     } else {

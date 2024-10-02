@@ -13,11 +13,13 @@ export const useComboboxQuery = () => {
       !store.field ||
       !store.query ||
       !!store.field.enum ||
-      store.field.type === 'Date',
+      store.field.type === 'Date' ||
+      (store$.filter.open.get() && !store.field),
   });
 
   React.useEffect(() => {
     if (!data) return;
+
     store$.comboboxHandleQueryData(data ?? []);
   }, [data]);
 };

@@ -18,6 +18,7 @@ export * from './lib/ui-adapter/filter-adapter';
 export * from './lib/ui-adapter/input-dialog';
 export * from './lib/legend-store';
 export * from './lib/create-view-config';
+export * from './lib/use-combobox-query';
 
 export const makeViewFieldsConfig = <T extends RecordType>(
   table: keyof RegisteredRouter['config']['_datamodel'],

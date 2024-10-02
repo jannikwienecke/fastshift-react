@@ -134,6 +134,10 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     filterOptions = viewFields.map((field) => {
       return makeRowFromValue(field.name, field);
     });
+
+    filterOptions = filterOptions.filter((f) =>
+      f.label.toLowerCase().includes(store$.combobox.query.get().toLowerCase())
+    );
   }
 
   let operatorValues: Row[] | null = null;

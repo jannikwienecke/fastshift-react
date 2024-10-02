@@ -231,6 +231,7 @@ test.describe('Task management', () => {
 
   // TODO: HIER WEITER MACHEN
   // ADD TEST -> CHANGE DATE OF LIST ITEM
+  // add test for filtering to dueDate or name or projects in filter
   // clean up filter code / state -> remove not needed code
 });
 
