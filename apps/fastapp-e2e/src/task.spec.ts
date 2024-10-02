@@ -231,6 +231,7 @@ test.describe('Task management', () => {
 
   // TODO: HIER WEITER MACHEN
   // ADD TEST -> CHANGE DATE OF LIST ITEM
+  // clean up filter code / state -> remove not needed code
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {
