@@ -3,7 +3,7 @@ import {
   lldebug,
   makeQueryKey,
   Mutation,
-  MutationProps,
+  MutationDto,
   MutationReturnDto,
 } from '@apps-next/core';
 import {
@@ -16,6 +16,7 @@ import { useApi } from './use-api';
 
 export const useMutation = () => {
   const { viewConfigManager } = useView();
+
   const query = store$.globalQueryDebounced.get();
   const api = useApi();
   const queryClient = useQueryClient();
@@ -45,12 +46,9 @@ export const useMutation = () => {
   const lastViewName = React.useRef('');
 
   const { mutate, isPending, mutateAsync, error } = useMutationTanstack({
-    mutationFn: async (args: MutationProps) => {
+    mutationFn: async (args: MutationDto) => {
       return await api.mutationFn?.({
-        ...args,
-        viewName: viewConfigManager.viewConfig.viewName,
-        viewConfig: undefined,
-        registeredViews: undefined,
+        viewName: args.viewName,
         mutation: {
           ...args.mutation,
           handler: undefined,
@@ -67,34 +65,34 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      lastViewName.current = vars.viewConfig.viewName;
+      lastViewName.current = vars.viewName;
 
       // TODO: Fix This. getting and setting queryKey must happen in 1 location!
       const _queryKeyAll = api?.makeQueryOptions?.({
         ...queryPropsMerged,
         query: '',
-        viewName: vars.viewConfig.viewName,
+        viewName: vars.viewName,
         filters: '',
       }).queryKey;
 
       const _queryKey = api?.makeQueryOptions?.({
         ...queryPropsMerged,
         query: vars.query,
-        viewName: vars.viewConfig.viewName,
+        viewName: vars.viewName,
         filters: parsedFilters,
       }).queryKey;
 
       const queryKey =
         _queryKey ??
         makeQueryKey({
-          viewName: vars.viewConfig.viewName,
+          viewName: vars.viewName,
           query: vars.query,
         });
 
       const queryKeyAll =
         _queryKeyAll ??
         makeQueryKey({
-          viewName: vars.viewConfig.viewName,
+          viewName: vars.viewName,
         });
 
       await queryClient.cancelQueries({
@@ -132,38 +130,26 @@ export const useMutation = () => {
   });
 
   const runMutateAsync = React.useCallback(
-    async (args: { mutation: Mutation }): Promise<MutationReturnDto> => {
-      lldebug('DISPATCH MUTATION2', args.mutation);
+    async (args: MutationDto): Promise<MutationReturnDto> => {
       if (!mutateAsync) throw new Error('mutateAsync is not defined');
 
       try {
-        const res = await mutateAsync({
-          viewConfig: viewConfigManager.viewConfig,
-          registeredViews,
-          mutation: args.mutation,
-          query,
-        });
+        const res = await mutateAsync(args);
         if (!res) throw new Error('mutation failed');
         return res;
       } catch (error) {
-        // console.error('Error in runMutateAsync: ', error);
         return { error: (error as any)?.message };
       }
     },
-    [mutateAsync, query, viewConfigManager.viewConfig, registeredViews]
+    [mutateAsync]
   );
 
   const runMutate = React.useCallback(
-    (args: { mutation: Mutation }) => {
+    (args: MutationDto) => {
       lldebug('DISPATCH MUTATION: ', args.mutation);
-      return mutate({
-        mutation: args.mutation,
-        query,
-        viewConfig: viewConfigManager.viewConfig,
-        registeredViews,
-      });
+      return mutate(args);
     },
-    [mutate, query, viewConfigManager.viewConfig, registeredViews]
+    [mutate]
   );
 
   React.useEffect(() => {

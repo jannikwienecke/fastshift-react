@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MutationProps, QueryDto, RegisteredViews } from '@apps-next/core';
+import {
+  BaseViewConfigManager,
+  getViewByName,
+  MutationDto,
+  MutationPropsServer,
+  QueryDto,
+  RegisteredViews,
+} from '@apps-next/core';
 import { GenericQueryCtx } from './_internal/convex.server.types';
 import { viewLoaderHandler } from './convex-view-loader';
 import { viewMutationHandler } from './view-mutation';
-import { getViewByName } from '@apps-next/core';
 
 export const makeViewLoaderHandler =
   (views: RegisteredViews) => (ctx: GenericQueryCtx, args: any) => {
@@ -17,10 +23,14 @@ export const makeViewLoaderHandler =
   };
 
 export const makeViewMutationHandler =
-  (views: RegisteredViews) => (ctx: any, args: any) => {
+  (views: RegisteredViews) => (ctx: any, args: MutationDto) => {
+    const viewConfig = getViewByName(views, args.viewName);
+    const viewConfigManager = new BaseViewConfigManager(viewConfig);
+
     return viewMutationHandler(ctx, {
-      ...(args as MutationProps),
-      viewConfig: getViewByName(views, args['viewName']),
+      ...args,
+      mutation: args.mutation,
+      viewConfigManager,
       registeredViews: views,
-    } satisfies QueryDto);
+    } satisfies MutationPropsServer);
   };

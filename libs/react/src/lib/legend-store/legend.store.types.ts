@@ -4,7 +4,7 @@ import {
   DataModelNew,
   FieldConfig,
   FilterType,
-  Mutation,
+  MutationDto,
   MutationReturnDto,
   QueryRelationalData,
   RecordType,
@@ -89,8 +89,8 @@ export type LegendStore = {
   views: RegisteredViews;
 
   api?: {
-    mutate?: (props: { mutation: Mutation }) => void;
-    mutateAsync?: (args: { mutation: Mutation }) => Promise<MutationReturnDto>;
+    mutate?: (args: MutationDto) => void;
+    mutateAsync?: (args: MutationDto) => Promise<MutationReturnDto>;
   };
 
   globalQuery: string;

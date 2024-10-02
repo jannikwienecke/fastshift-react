@@ -150,6 +150,8 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
 
       runMutation({
         mutation: mutation,
+        viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+        query: store$.globalQuery.get(),
       });
       return;
     }
@@ -197,8 +199,11 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
         if (!mutation) return;
         try {
           runningMutation = true;
+
           const result = await runMutation({
             mutation: mutation,
+            viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+            query: store$.globalQuery.get(),
           });
 
           if (result.error) {

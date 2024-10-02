@@ -10,7 +10,6 @@ export * from './lib/use-view';
 export * from './lib/ui-adapter';
 export * from './lib/use-mutation';
 export * from './lib/make-hooks';
-export * from './lib/action-handler';
 export * from './lib/ui-components/render-combobox-field-value';
 export * from './lib/query-context';
 export * from './lib/client-view-provider-convex';

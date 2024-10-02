@@ -19,6 +19,7 @@ export const BooleanInitializer = (
   return {
     ...DEFAULT_COMBOBOX_STATE,
     ...payload,
+    values,
     id,
     open: true,
     fallbackData: values,

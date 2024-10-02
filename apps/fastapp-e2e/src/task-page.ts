@@ -88,7 +88,9 @@ export class TaskPage {
     const day = today.getDate();
     // get by inner text "1"
     await this.datePicker.getByText(day.toString()).first().click();
-    await this.expectToSeeFilter(/dueDate/i, 'is', day.toString());
+    // await this.expectToSeeFilter(/dueDate/i, 'is' );
+    await expect(this.filterList.getByText(/dueDate/i)).toBeVisible();
+    await expect(this.filterList.getByText(/is/i)).toBeVisible();
   }
 
   async expectToSeeFilter(

@@ -37,8 +37,8 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   if (
     field.type === 'String' ||
     field.type === 'Number' ||
-    field.type === 'Boolean' ||
-    selectedFilterField?.enum
+    selectedFilterField?.enum ||
+    selectedFilterField?.type === 'Boolean'
   )
     return DEFAULT_COMBOBOX_STATE;
 
@@ -73,11 +73,18 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
       .map((v) => makeRow(v.name, v.name, v.name, field));
   }
 
-  const theValues = filterValues.length
-    ? filterValues
-    : values !== null && comboboxDebouncedQuery$.get().length
-    ? values
-    : defaultData?.rows ?? values ?? [];
+  const theValues =
+    // BOOLEAN
+    field.type === 'Boolean'
+      ? state.values ?? []
+      : // FILTER
+      filterValues.length
+      ? filterValues
+      : // RELATION WHEN WE HABE A QUERY VALUE
+      values !== null && comboboxDebouncedQuery$.get().length
+      ? values
+      : // FALLBACK (defaultData are relational values)
+        defaultData?.rows ?? values ?? [];
 
   const defaultDataSelected = theValues.filter((row) =>
     defaultSelected?.find?.((s) => s['id'] === row['id'])

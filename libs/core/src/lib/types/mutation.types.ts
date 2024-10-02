@@ -55,11 +55,10 @@ export type Mutation =
   | SELECT_RECORDS
   | DELETE_RECORD;
 
-export type MutationProps = {
-  viewConfig: ViewConfigType;
+export type MutationDto = {
+  viewName: string;
   mutation: Mutation;
   query: string;
-  registeredViews: RegisteredViews;
 };
 
 export type MutationPropsServer = {
