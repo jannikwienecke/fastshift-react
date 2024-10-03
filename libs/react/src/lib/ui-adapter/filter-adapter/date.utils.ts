@@ -10,8 +10,17 @@ import {
   QUARTERS,
 } from './filter.constants';
 import { filterHelper, stringsToComboxboxItems } from './filter.utils';
+import Fuse from 'fuse.js';
 
 export const SELECT_FILTER_DATE = 'Select specific date';
+
+const search = (items: string[], value: string) => {
+  const fuse = new Fuse(items, {
+    keys: ['label'],
+  });
+
+  return fuse.search(value);
+};
 
 class DateOptions {
   private value: string;
@@ -31,7 +40,7 @@ class DateOptions {
         this.value.includes('in')) &&
       this.value.length > 0;
     this.hasAgo = this.value.includes('ago');
-    this.hasDays = this.value.includes('day');
+    this.hasDays = this.value.includes('day') && !this.value.includes('today');
     this.hasWeek = this.value.includes('we');
     this.hasMonth = this.value.includes('mon');
     this.hasNumber =
@@ -193,13 +202,24 @@ class DateOptions {
       options = this.getDefaultOptions();
     }
 
+    const fuse = new Fuse(options, {
+      keys: ['label'],
+    });
+
     const defaultOptions = stringsToComboxboxItems(
-      DEFAULT_DATE_OPTIONS.filter((option) =>
-        option.toLowerCase().includes(this.value)
+      DEFAULT_DATE_OPTIONS.filter(
+        (option) => fuse.search(option).length > 0
       ).filter((option) => !options.some((o) => o.id === option))
     );
 
-    return [...defaultOptions, ...options];
+    if (!this.value) return [...defaultOptions, ...options];
+
+    const values = search(
+      [...defaultOptions, ...options].map((o) => o.label),
+      this.value
+    );
+
+    return stringsToComboxboxItems(values.map((v) => v.item));
   }
 
   public getOptionsForEdit(): ComboxboxItem[] {
@@ -210,8 +230,7 @@ class DateOptions {
       const defaultOpts = this.getDefaultOptionsForEdit();
 
       return defaultOpts.sort((a, b) => {
-        if (a.label.toLowerCase().includes('no date')) return -1;
-
+        if (search([a.label], 'no date').length) return -1;
         return 0;
       });
     } else if (number && (this.hasDays || this.hasWeek || this.hasMonth)) {
@@ -253,7 +272,19 @@ class DateOptions {
       return res;
     }
 
-    return this.getDefaultOptionsForEdit();
+    const defaults = this.getDefaultOptionsForEdit();
+
+    const fuse = new Fuse(defaults, {
+      keys: ['label'],
+    });
+
+    const sorted = defaults.sort((a, b) => {
+      if (fuse.search(this.value).length > 0) return -1;
+
+      return 0;
+    });
+
+    return sorted;
   }
 
   private getDefaultOptions(): ComboxboxItem[] {
@@ -265,11 +296,21 @@ class DateOptions {
   }
 
   private getDefaultOptionsForEdit(): ComboxboxItem[] {
-    const allFiltered = DEFAULT_DATE_OPTIONS_FOR_EDIT.filter((option) =>
-      option.toLowerCase().includes(this.value)
-    );
+    const fuse = new Fuse(DEFAULT_DATE_OPTIONS_FOR_EDIT, {
+      keys: ['label'],
+    });
 
-    return stringsToComboxboxItems([SELECT_FILTER_DATE, ...allFiltered]);
+    const allFiltered = fuse
+      .search(this.value)
+      .sort((a, b) => (a.score || 0) - (b.score || 0))
+      .reverse();
+
+    return stringsToComboxboxItems([
+      SELECT_FILTER_DATE,
+      ...(allFiltered.length
+        ? allFiltered.map((o) => o.item)
+        : DEFAULT_DATE_OPTIONS_FOR_EDIT),
+    ]);
   }
 
   private getWeekMonthDayOptions(): ComboxboxItem[] {

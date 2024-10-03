@@ -19,6 +19,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       store$.combobox.values.set(null);
       store$.combobox.query.set('');
       store$.combobox.multiple.set(false);
+      store$.combobox.datePicker.set(null);
     }
 
     let timeout: NodeJS.Timeout;

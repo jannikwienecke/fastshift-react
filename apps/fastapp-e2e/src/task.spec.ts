@@ -251,7 +251,7 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText(day2DigitsToday)).toBeVisible();
   });
 
-  test('can search for the date filter in the list item combobox', async ({
+  test('can search for the date filter in the list item edit combobox', async ({
     taskPage,
     page,
   }) => {
@@ -265,7 +265,28 @@ test.describe('Task management', () => {
     const day2DigitsTommorow = day.toString().padStart(2, '0');
     await firstListItem.getByText(day2DigitsTommorow).click();
 
-    expect(1).toBe(1);
+    await taskPage.comboboxPopover.getByPlaceholder(/change/i).fill('3 day');
+    await expect(
+      taskPage.comboboxPopover.getByText(/3 days from now/i)
+    ).toBeVisible();
+    await expect(
+      taskPage.comboboxPopover.getByText(/select specific date/i)
+    ).toBeVisible();
+
+    await taskPage.comboboxPopover.getByPlaceholder(/change/i).fill('day');
+    await expect(taskPage.comboboxPopover.getByText(/one day/i)).toBeVisible();
+    await expect(taskPage.comboboxPopover.getByText(/2 days/i)).toBeVisible();
+    await expect(taskPage.comboboxPopover.getByText(/3 days/i)).toBeVisible();
+
+    await taskPage.comboboxPopover.getByPlaceholder(/change/i).fill('in 2');
+    await expect(taskPage.comboboxPopover.getByText(/2 days/i)).toBeVisible();
+    await expect(taskPage.comboboxPopover.getByText(/2 weeks/i)).toBeVisible();
+
+    await taskPage.comboboxPopover.getByPlaceholder(/change/i).fill('no');
+    await expect(taskPage.comboboxPopover.getByText(/no date/i)).toBeVisible();
+
+    await taskPage.comboboxPopover.getByPlaceholder(/change/i).fill('today');
+    await expect(taskPage.comboboxPopover.getByText(/one day/i)).toBeHidden();
   });
 });
 
