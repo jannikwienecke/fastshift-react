@@ -2,6 +2,7 @@ import { DataModelNew, RecordType } from '@apps-next/core';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
 import { useQuery } from './use-query';
+import { observable, observe } from '@legendapp/state';
 
 export type QueryStore<T extends RecordType> = {
   dataModel: DataModelNew<T>;
@@ -10,6 +11,8 @@ export type QueryStore<T extends RecordType> = {
     [key: string]: DataModelNew<T>;
   };
 };
+
+export const reset$ = observable({ value: 0 });
 
 export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   QueryStore<QueryReturnType>,
@@ -20,8 +23,10 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   const relationalDataModel = store$.relationalDataModel.get();
 
   React.useEffect(() => {
-    store$.createDataModel(data ?? []);
-    store$.createRelationalDataModel(relationalData ?? {});
+    observe(reset$, () => {
+      store$.createDataModel(data ?? []);
+      store$.createRelationalDataModel(relationalData ?? {});
+    });
   }, [data, relationalData]);
 
   return {

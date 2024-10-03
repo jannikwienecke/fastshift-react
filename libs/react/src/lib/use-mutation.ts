@@ -2,7 +2,6 @@ import {
   convertFiltersForBackend,
   lldebug,
   makeQueryKey,
-  Mutation,
   MutationDto,
   MutationReturnDto,
 } from '@apps-next/core';
@@ -13,7 +12,7 @@ import {
 import React from 'react';
 import { store$, useView } from '..';
 import { useApi } from './use-api';
-
+import { reset$ } from './use-query-data';
 export const useMutation = () => {
   const { viewConfigManager } = useView();
 
@@ -56,12 +55,16 @@ export const useMutation = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries();
+      setTimeout(() => {
+        reset$.set({ value: reset$.get().value + 1 });
+      }, 500);
     },
 
     onError: () => {
-      queryClient.invalidateQueries();
-      queryClient.resetQueries();
+      setTimeout(() => {
+        queryClient.invalidateQueries();
+        reset$.set({ value: reset$.get().value + 1 });
+      }, 500);
     },
 
     onMutate: async (vars) => {

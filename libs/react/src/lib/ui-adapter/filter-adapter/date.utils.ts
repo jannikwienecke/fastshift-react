@@ -21,12 +21,15 @@ class DateOptions {
   private hasWeek: boolean;
   private hasNumber: boolean;
   private hasMonth: boolean;
+  private hasNo: boolean;
   constructor(value: string) {
     this.value = value.toLowerCase();
     this.hasFromNow =
-      'from now'.includes(this.value) ||
-      this.value.includes('from') ||
-      this.value.includes('now');
+      ('from now'.includes(this.value) ||
+        this.value.includes('from') ||
+        this.value.includes('now') ||
+        this.value.includes('in')) &&
+      this.value.length > 0;
     this.hasAgo = this.value.includes('ago');
     this.hasDays = this.value.includes('day');
     this.hasWeek = this.value.includes('we');
@@ -35,6 +38,8 @@ class DateOptions {
       /\d/.test(this.value) ||
       this.value.includes('one') ||
       this.value.includes('two');
+
+    this.hasNo = this.value.toLowerCase() === 'no';
   }
 
   private getYearFromNumber(value: string): number | undefined {
@@ -198,6 +203,56 @@ class DateOptions {
   }
 
   public getOptionsForEdit(): ComboxboxItem[] {
+    const number = this.extractNumber(this.value);
+    let options: ComboxboxItem[] = [];
+    const daysOpts = [1, 2, 3, 7, 10, 14];
+    if (this.hasNo) {
+      const defaultOpts = this.getDefaultOptionsForEdit();
+
+      return defaultOpts.sort((a, b) => {
+        if (a.label.toLowerCase().includes('no date')) return -1;
+
+        return 0;
+      });
+    } else if (number && (this.hasDays || this.hasWeek || this.hasMonth)) {
+      const unit = this.hasDays
+        ? 'day'
+        : this.hasWeek
+        ? 'week'
+        : this.hasMonth
+        ? 'month'
+        : null;
+
+      if (unit) {
+        options = [this.generateFromNowOptions(number, unit)];
+      }
+    } else if (this.hasFromNow && !this.hasNumber) {
+      options = daysOpts.map((o) => this.generateFromNowOptions(o, 'day'));
+    } else if (this.hasDays || this.hasWeek || this.hasMonth) {
+      const unit = this.hasDays ? 'day' : this.hasWeek ? 'week' : 'month';
+
+      const opts = this.hasDays
+        ? daysOpts
+        : this.hasWeek
+        ? [1, 2, 4, 8]
+        : [1, 2, 3, 12];
+
+      options = opts.map((o) => this.generateFromNowOptions(o, unit));
+    } else if (number) {
+      const units = ['day', 'week', 'month'];
+      options = units.map((unit) => this.generateFromNowOptions(number, unit));
+    }
+
+    if (options.length > 0) {
+      const defaultOpts = this.getDefaultOptionsForEdit();
+      const defaultOptsWithoutSelected = defaultOpts.filter(
+        (o) => !options.some((option) => option.id === o.id)
+      );
+
+      const res = [...options, ...defaultOptsWithoutSelected];
+      return res;
+    }
+
     return this.getDefaultOptionsForEdit();
   }
 
@@ -340,7 +395,7 @@ class DateOptionParser {
         };
       }
 
-      if (lowerOption.includes('no date defined')) {
+      if (lowerOption.includes('no date')) {
         return null;
       }
 

@@ -146,15 +146,10 @@ export const comboboxHandleQueryData: StoreFn<'comboboxHandleQueryData'> =
 
 let timeout: NodeJS.Timeout | null = null;
 let runningMutation = false;
-let backupDataModelRows: RecordType[] | undefined = undefined;
 
 export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
   (store$) => (value, newSelected) => {
     const runMutation = store$.api?.mutateAsync;
-
-    if (!backupDataModelRows) {
-      storeBackupDataModel(store$);
-    }
 
     const selected = store$.combobox.selected.get();
     const { row, field } = comboboxStore$.get();
@@ -191,7 +186,7 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
     // TODO REFACTOR THIS -> GET VALUE PART
     const selectedRelationField = store$.list.selectedRelationField.get();
     if (!selectedRelationField) return;
-    let dateValueToUpdate: number | undefined = undefined;
+    let dateValueToUpdate: number | null | undefined = undefined;
     if (
       selectedRelationField.field.type === 'Date' &&
       !Array.isArray(newSelected)
@@ -200,13 +195,18 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       const { start } = dateUtils.getStartAndEndDate(parsed);
       start?.setHours(2, 0, 0, 0);
       dateValueToUpdate = start?.getTime();
+      if (newSelected.id === 'No date') {
+        dateValueToUpdate = null;
+      }
     }
 
     const valueToUpdate = Array.isArray(newSelected)
       ? newSelected
           .map((s) => s.raw)
           .sort((a, b) => b._creationTime - a._creationTime)
-      : dateValueToUpdate ?? newSelected.raw;
+      : dateValueToUpdate !== undefined
+      ? dateValueToUpdate
+      : newSelected.raw;
 
     if (!runningMutation) {
       // only run a optimisic update if we are not already running a mutation
@@ -222,11 +222,12 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       async () => {
         if (!field) return;
 
-        const valueToUpdate = dateValueToUpdate
-          ? dateValueToUpdate
-          : !field.relation && !field.enum
-          ? value.raw
-          : value.id;
+        const valueToUpdate =
+          dateValueToUpdate !== undefined
+            ? dateValueToUpdate
+            : !field.relation && !field.enum
+            ? value.raw
+            : value.id;
 
         let mutation: Mutation | undefined = undefined;
         if (isManyToManyRelation) {
@@ -262,13 +263,10 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
           });
 
           if (result.error) {
-            resetDataModel(store$);
             removedSelected$.set([]);
             newSelected$.set([]);
             initSelected$.set(null);
           }
-
-          backupDataModelRows = undefined;
 
           if (isManyToManyRelation) {
             const updatedRow = {
@@ -316,16 +314,6 @@ const updateDataModel = (store$: Observable<LegendStore>, value: any) => {
     });
 
   store$.createDataModel(rows);
-};
-
-export const storeBackupDataModel = (store$: Observable<LegendStore>) => {
-  backupDataModelRows = [...store$.dataModel.rows.get().map((r) => r.raw)];
-};
-
-export const resetDataModel = (store$: Observable<LegendStore>) => {
-  if (!backupDataModelRows) return;
-
-  store$.createDataModel(backupDataModelRows);
 };
 
 export const getIds = (

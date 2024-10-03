@@ -1,5 +1,4 @@
-import { FieldConfig, MutationPropsServer } from '@apps-next/core';
-import { dateUtils, operatorMap } from '@apps-next/react';
+import { MutationPropsServer } from '@apps-next/core';
 import { deleteIds, insertIds } from './convex-mutation-helper';
 import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx } from './convex.server.types';
@@ -49,7 +48,19 @@ export const updateMutation = async (
 
   console.log('updateMutation', mutation.payload);
 
-  await ctx.db.patch(mutation.payload.id, mutation.payload.record);
+  const record = Object.entries(mutation.payload.record).reduce(
+    (acc, [key, value]) => {
+      if (value === null) {
+        acc[key] = undefined;
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as Record<string, any>
+  );
+
+  await ctx.db.patch(mutation.payload.id, record);
 
   return {
     message: '200',
