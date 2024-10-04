@@ -266,6 +266,6 @@ export const getDefaultSelectedList = (): Row[] => {
   if (!Array.isArray(selected)) return [];
 
   return selected?.map((s) =>
-    makeRowFromValue(s.id, selectedRelationField.field)
+    makeRowFromValue(s['id'], selectedRelationField.field)
   );
 };
