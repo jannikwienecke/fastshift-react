@@ -300,6 +300,7 @@ class DateOptions {
       keys: ['label'],
     });
 
+    // TODO: FIX THIS
     const allFiltered = fuse
       .search(this.value)
       .sort((a, b) => (a.score || 0) - (b.score || 0))

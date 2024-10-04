@@ -38,22 +38,43 @@ export type InputDialogValueDict<T extends RecordType = RecordType> = Partial<
 >;
 
 export type ComboboxState = {
-  query: string;
   values: Row[] | null;
-  defaultData: DataModelNew | null;
-  fallbackData: Row[];
   selected: Row[];
   open: boolean;
-  field: FieldConfig | null;
   tableName: string;
-  row?: Row | null;
-  rect: DOMRect | null;
-  id: string | null;
   multiple: boolean;
+  rect: DOMRect | null;
   searchable: boolean;
-  datePickerProps?: DatePickerState | null;
-  name?: string;
+  name: string;
+  isNewState: boolean;
   placeholder?: string;
+  query: string;
+  datePickerProps?: DatePickerState | null;
+  field: FieldConfig | null;
+  row: Row | null;
+};
+
+export type ComboboxStateCommonType = Pick<
+  ComboboxState,
+  | 'rect'
+  | 'searchable'
+  | 'name'
+  | 'isNewState'
+  | 'open'
+  | 'placeholder'
+  | 'query'
+  | 'datePickerProps'
+  | 'field'
+  | 'selected'
+  | 'row'
+>;
+
+export type MakeComboboxStateProps = Pick<
+  ComboboxState,
+  'values' | 'tableName' | 'multiple'
+> & {
+  selected?: Row[];
+  datePickerProps?: DatePickerState;
 };
 
 export type FilterStore = {
@@ -69,15 +90,6 @@ export type FilterStore = {
   selectedDateField: FieldConfig | null;
   filters: FilterType[];
   selectedIds: string[];
-};
-
-export type ComboboxInitPayload = Pick<
-  ComboboxState,
-  'field' | 'rect' | 'defaultData' | 'datePickerProps'
-> & {
-  selected: Row | Row[] | string;
-  multiple?: boolean;
-  row?: Row<any> | null;
 };
 
 export type DatePickerState = {
@@ -148,7 +160,6 @@ export type LegendStore = {
     datePicker: DatePickerState | null;
   };
 
-  comboboxInit: (payload: ComboboxInitPayload) => void;
   comboboxSelectValue: (value: Row) => void;
   comboboxClose: () => void;
   comboboxRunSelectMutation: (value: Row, selected: Row[] | Row) => void;

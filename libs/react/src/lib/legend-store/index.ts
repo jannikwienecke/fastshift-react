@@ -1,4 +1,4 @@
-export { comboboxStore$ } from './legend.store.derived';
+export { comboboxStore$ } from './legend.store.derived.combobox';
 export * from './legend.store';
 export * from './legend.store.effects';
 export * from './legend.store.derived.filter';

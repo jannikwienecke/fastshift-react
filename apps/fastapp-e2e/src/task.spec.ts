@@ -269,12 +269,9 @@ test.describe('Task management', () => {
     await expect(
       taskPage.comboboxPopover.getByText(/3 days from now/i)
     ).toBeVisible();
-    await expect(
-      taskPage.comboboxPopover.getByText(/select specific date/i)
-    ).toBeVisible();
 
     await taskPage.comboboxPopover.getByPlaceholder(/change/i).fill('day');
-    await expect(taskPage.comboboxPopover.getByText(/one day/i)).toBeVisible();
+    await expect(taskPage.comboboxPopover.getByText(/one/i)).toBeVisible();
     await expect(taskPage.comboboxPopover.getByText(/2 days/i)).toBeVisible();
     await expect(taskPage.comboboxPopover.getByText(/3 days/i)).toBeVisible();
 

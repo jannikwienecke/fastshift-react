@@ -8,7 +8,6 @@ import {
   Row,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
-import { comboboInitialize } from '../field-features/combobox';
 import { handleSelectUpdate } from '../field-features/update-record-mutation';
 import {
   dateUtils,
@@ -20,17 +19,8 @@ import {
   initSelected$,
   newSelected$,
   removedSelected$,
-} from './legend.store.derived';
+} from './legend.store.derived.combobox';
 import { LegendStore, StoreFn } from './legend.store.types';
-
-export const comboboxInit: StoreFn<'comboboxInit'> = (store$) => (payload) => {
-  const initState = comboboInitialize(payload);
-
-  newSelected$.set([]);
-  removedSelected$.set([]);
-  initSelected$.set(null);
-  store$.combobox.set({ ...initState, datePicker: null });
-};
 
 export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   // TODO BUILD EVENT DRIVEN

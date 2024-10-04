@@ -4,7 +4,6 @@ import { LegendStore } from './legend.store.types';
 import {
   comboboxClose,
   comboboxHandleQueryData,
-  comboboxInit,
   comboboxRunSelectMutation,
   comboboxSelectDate,
   comboboxSelectValue,
@@ -57,7 +56,6 @@ export const store$ = observable<LegendStore>({
   selectListItem: (...props) => listSelect(store$)(...props),
   deselectRelationField: (...props) =>
     listDeselectRelationField(store$)(...props),
-  comboboxInit: (...props) => comboboxInit(store$)(...props),
   comboboxClose: (...props) => comboboxClose(store$)(...props),
   selectRelationField: (...props) => listSelectRelationField(store$)(...props),
   comboboxSelectValue: (...props) => comboboxSelectValue(store$)(...props),

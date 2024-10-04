@@ -6,26 +6,27 @@ import {
   ViewFieldsConfig,
 } from '@apps-next/core';
 import {
-  ComboboxState,
   DatePickerState,
   FilterStore,
   LegendStore,
+  ComboboxState,
 } from './legend.store.types';
 
 export const DEFAULT_COMBOBOX_STATE: ComboboxState = {
-  query: '',
   values: null,
   selected: [],
-  fallbackData: [],
   open: false,
-  field: null,
   tableName: '',
-  row: null,
-  rect: null,
-  id: null,
-  defaultData: null,
   multiple: false,
-  searchable: true,
+  rect: null,
+  searchable: false,
+  name: '',
+  isNewState: true,
+  placeholder: '',
+  query: '',
+  datePickerProps: null,
+  field: null,
+  row: null,
 };
 
 export const DEFAULT_FILTER_STATE: FilterStore = {
