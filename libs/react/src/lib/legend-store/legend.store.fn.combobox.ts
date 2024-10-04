@@ -15,12 +15,12 @@ import {
   SELECT_FILTER_DATE,
 } from '../ui-adapter/filter-adapter';
 import {
-  comboboxStore$,
   initSelected$,
   newSelected$,
   removedSelected$,
-} from './legend.store.derived.combobox';
+} from './legend.combobox.helper';
 import { LegendStore, StoreFn } from './legend.store.types';
+import { comboboxStore$ } from './legend.store.derived.combobox';
 
 export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   // TODO BUILD EVENT DRIVEN

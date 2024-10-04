@@ -1,6 +1,6 @@
 import { Observable, observable } from '@legendapp/state';
-import { comboboxDebouncedQuery$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
+import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   observable(function handleResetCombobox() {
