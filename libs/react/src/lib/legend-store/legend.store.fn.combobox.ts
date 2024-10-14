@@ -4,6 +4,7 @@ import {
   makeDayMonthString,
   makeRow,
   Mutation,
+  NONE_OPTION,
   RecordType,
   Row,
 } from '@apps-next/core';
@@ -212,12 +213,16 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       async () => {
         if (!field) return;
 
-        const valueToUpdate =
+        let valueToUpdate =
           dateValueToUpdate !== undefined
             ? dateValueToUpdate
             : !field.relation && !field.enum
             ? value.raw
             : value.id;
+
+        if (valueToUpdate === NONE_OPTION) {
+          valueToUpdate = null;
+        }
 
         let mutation: Mutation | undefined = undefined;
         if (isManyToManyRelation) {

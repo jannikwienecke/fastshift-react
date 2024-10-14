@@ -1,5 +1,6 @@
 import { BaseViewConfigManager } from './base-view-config';
 import { getViewByName } from './core-utils';
+import { NONE_OPTION } from './core.constants';
 import { RecordType, FieldConfig, RegisteredViews, ID } from './types';
 
 export type Row<T extends RecordType | string | number | undefined = any> = {
@@ -123,4 +124,8 @@ export const getRelationTableName = (field?: FieldConfig | null) => {
   return (
     (field.relation?.manyToManyRelation || field.relation?.tableName) ?? ''
   );
+};
+
+export const makeNoneOption = (field: FieldConfig) => {
+  return makeRow(NONE_OPTION, `No ${field.name}`, NONE_OPTION, field);
 };

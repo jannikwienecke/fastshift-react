@@ -4,9 +4,11 @@ import {
   RecordType,
   Row,
   getRelationTableName,
+  makeNoneOption,
   makeRow,
   makeRowFromValue,
 } from '@apps-next/core';
+import { observable } from '@legendapp/state';
 import Fuse from 'fuse.js';
 import { filterUtil, operator } from '../ui-adapter/filter-adapter';
 import { store$ } from './legend.store';
@@ -15,7 +17,6 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
-import { observable } from '@legendapp/state';
 
 export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed
@@ -48,9 +49,10 @@ export const makeComboboxStateFilterOptions =
     };
   };
 
-export const makeComboboxStateFilterValuesRelation = (
+export const handleRelationalField = (
   field: FieldConfig,
-  defaultSelectedProps: RecordType[] | null
+  defaultSelectedProps: RecordType[] | null,
+  isFilter: boolean
 ): MakeComboboxStateProps | null => {
   const debouncedQuery = comboboxDebouncedQuery$.get();
   const tableName = getRelationTableName(field);
@@ -58,9 +60,16 @@ export const makeComboboxStateFilterValuesRelation = (
 
   const valuesQuery = store$.combobox.values.get();
 
+  const isOptional = !field.isRequired;
+  const isManyToMany = field.relation?.manyToManyTable;
+  const noneOption = makeNoneOption(field);
   let valuesToUse = defaultData?.rows ?? [];
   if (valuesQuery !== null && debouncedQuery.length) {
     valuesToUse = valuesQuery ?? [];
+  }
+
+  if (isOptional && (!isManyToMany || isFilter)) {
+    valuesToUse = [noneOption, ...valuesToUse];
   }
 
   const removedSelectedIds = removedSelected$.get().map((r) => r.id);

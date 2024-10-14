@@ -1,7 +1,6 @@
 import {
   ComboboxPopoverProps,
   FieldConfig,
-  getViewByName,
   NONE_OPTION,
   RecordType,
   Row,
@@ -9,13 +8,16 @@ import {
 import React from 'react';
 import { comboboxStore$, store$ } from '../../legend-store';
 import { ComboboxFieldValue } from '../../ui-components/render-combobox-field-value';
-import { Icon } from '../../ui-components';
+import { ComboboxNoneValue } from '../../ui-components/render-combobox-none-value';
 
 export type MakeComboboxPropsOptions<T extends RecordType = RecordType> = {
   onClose?: () => void;
   onSelect?: (value: Row<T>) => void;
   renderValue?: (props: {
     value: Row<T>;
+    field?: FieldConfig<keyof T> | null;
+  }) => React.ReactNode;
+  renderNoneValue?: (props: {
     field?: FieldConfig<keyof T> | null;
   }) => React.ReactNode;
 };
@@ -45,23 +47,12 @@ export const makeComboboxProps = <T extends RecordType = RecordType>(
         value: Row;
         field?: FieldConfig | null;
       }) => <ComboboxFieldValue {...props} />;
-      if (value.id === NONE_OPTION) {
-        const view = getViewByName(
-          store$.views.get(),
-          store$.filter.selectedField.name.get() ?? ''
-        );
 
-        // TODO: HIER WEITER MACHEN
-        // hier weiter machen
-        // extract view
-        // also add a prop
-        // so the user can pass
-        // its own implementation
-        return (
-          <div className="flex gap-2 items-center w-full">
-            <Icon icon={view.icon} />
-            <div className="text-sm">{value.label}</div>
-          </div>
+      if (value.id === NONE_OPTION) {
+        return props?.renderNoneValue ? (
+          props.renderNoneValue({ field: store.field })
+        ) : (
+          <ComboboxNoneValue field={store.field} />
         );
       }
 

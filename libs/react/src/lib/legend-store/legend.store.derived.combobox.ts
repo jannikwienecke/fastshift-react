@@ -11,7 +11,7 @@ import {
   makeComboboxStateFilterValuesDatePicker,
   makeComboboxStateFilterValuesEnum,
   makeComboboxStateFilterValuesOperator,
-  makeComboboxStateFilterValuesRelation,
+  handleRelationalField,
 } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
@@ -58,7 +58,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   } else if (!field && isFilter) {
     options = makeComboboxStateFilterOptions();
   } else if (field?.relation) {
-    options = makeComboboxStateFilterValuesRelation(field, selected);
+    options = handleRelationalField(field, selected, isFilter);
   } else if (field?.enum) {
     options = makeComboboxStateFilterValuesEnum(field);
   } else if (field?.type === 'Boolean') {
@@ -78,7 +78,3 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     multiple: multiple === null ? options.multiple : multiple,
   } satisfies ComboboxState;
 });
-
-// TODO HIER WEITER MACHEN
-// fix when select "this week" -> wrong date. Add test after it is fixed
-// when change the date of a list to a specific date -> wrong date
