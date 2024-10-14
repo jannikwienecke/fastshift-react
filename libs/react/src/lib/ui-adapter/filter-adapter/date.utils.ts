@@ -428,6 +428,13 @@ class DateOptionParser {
         unit: unit as FilterDateType['unit'],
         value: -1,
       };
+    } else if (lowerOption.startsWith('next ')) {
+      const unit = lowerOption.split(' ')[1];
+      return {
+        operator: 'equal to',
+        unit: unit as FilterDateType['unit'],
+        value: 1,
+      };
     } else {
       const validOptions = ['today', 'tomorrow', 'yesterday'];
       if (validOptions.includes(lowerOption)) {
@@ -561,8 +568,6 @@ class DateCalculator {
     } else if (unit === 'weeks' || unit === 'week') {
       start = new Date();
       end = new Date();
-      //   if unit is "week" -> start should be the first of the week
-      if (unit === 'week') start.setDate(start.getDate() - start.getDay());
 
       end.setDate(start.getDate() + multiplier * (value || 1));
     } else if (unit === 'months' || unit === 'month') {

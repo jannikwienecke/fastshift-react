@@ -1,0 +1,60 @@
+export const cursorRules = {
+  expertFocus: 'React and TypeScript',
+  versions: {
+    typescript: 'latest stable',
+    javascript: 'latest stable',
+    react: '18.3.1',
+    nodejs: 'latest LTS',
+    tanstackRouter: 'latest stable',
+    shadcnUi: 'latest stable',
+    tailwindCss: '3.4.3',
+  },
+  bestPractices: [
+    'Latest features',
+    'TypeScript strict mode',
+    'React hooks',
+    'Functional components',
+    'Nx workspace conventions',
+  ],
+  codeStyle: {
+    clarity: 'high',
+    readability: 'high',
+    consistency: 'high',
+  },
+  namingConventions: {
+    components: 'PascalCase',
+    functions: 'camelCase',
+    variables: 'camelCase',
+    interfaces: "PascalCase with 'I' prefix",
+    types: 'PascalCase',
+    constants: 'UPPER_SNAKE_CASE',
+  },
+  typescriptUsage: {
+    strictNullChecks: true,
+    noImplicitAny: true,
+    useTypeInference: 'when appropriate',
+    explicitReturnTypes: 'for public APIs',
+  },
+  uiAndStyling: {
+    preferredLibrary: 'Tailwind CSS',
+    componentLibrary: 'shadcn/ui',
+    responsiveDesign: true,
+  },
+  performanceOptimization: [
+    'Use React.memo for expensive components',
+    'Implement code splitting with React.lazy',
+    'Optimize re-renders with useMemo and useCallback',
+    "Utilize Nx's build caching and affected commands",
+  ],
+  workspaceRules: {
+    monorepoTool: 'Nx',
+    projectStructure: 'follow Nx conventions',
+    sharedLibs: 'use Nx libraries for shared code',
+  },
+  additionalRules: [
+    'Implement all requested features completely',
+    'Provide explanations ONLY for complex logic',
+    'Use Tanstack Router for routing',
+    "Leverage Nx's powerful CLI commands for development tasks",
+  ],
+};

@@ -229,12 +229,6 @@ test.describe('Task management', () => {
     await testingQueryBehavior({ taskPage, page });
   });
 
-  // TODO: HIER WEITER MACHEN
-  // ADD TEST -> CHANGE DATE OF LIST ITEM -> check
-  // add test for filtering change date of list item
-  // add test for filtering to dueDate or name or projects in filter
-  // handle query for date list combobox
-  // clean up filter code / state -> remove not needed code
   test('can change the due date of the first task', async ({ taskPage }) => {
     const firstListItem = await taskPage.getListItem(0);
     const tommorow = new Date();
