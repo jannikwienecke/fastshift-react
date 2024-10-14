@@ -247,7 +247,6 @@ test.describe('Task management', () => {
 
   test('can search for the date filter in the list item edit combobox', async ({
     taskPage,
-    page,
   }) => {
     await taskPage.openFilter(/dueDate/i);
     await taskPage.comboboxPopover.getByText(/today/i).click();
@@ -278,6 +277,51 @@ test.describe('Task management', () => {
 
     await taskPage.comboboxPopover.getByPlaceholder(/change/i).fill('today');
     await expect(taskPage.comboboxPopover.getByText(/one day/i)).toBeHidden();
+  });
+
+  test("can filter project by 'no project and assign a task to 'no project'", async ({
+    taskPage,
+    page,
+  }) => {
+    await taskPage.openFilter(/projects/i);
+    await taskPage.comboboxPopover.getByText(/no project/i).click();
+    await expect(
+      taskPage.comboboxPopover.getByText(/no project/i)
+    ).toBeVisible();
+
+    // i can see two list items
+    await expect(page.getByTestId('list-item')).toHaveCount(2);
+
+    await taskPage.closePopover();
+    // click on the first list item "set project"
+    await page
+      .getByText(/set project/i)
+      .first()
+      .click();
+
+    await taskPage.comboboxPopover.getByText(/fitness plan/i).click();
+
+    // i can see only one list item
+    await expect(page.getByTestId('list-item')).toHaveCount(1);
+
+    await taskPage.removeFilter('projects');
+
+    await expect(page.getByText(/design mockups/i)).toBeVisible();
+
+    await page
+      .getByText(/website redesign/i)
+      .first()
+      .click({ force: true });
+
+    await taskPage.comboboxPopover.getByText(/no project/i).click();
+
+    await taskPage.openFilter(/projects/i);
+
+    await taskPage.comboboxPopover.getByText(/no project/i).click();
+
+    await taskPage.closePopover();
+
+    await expect(page.getByText(/design mockups/i)).toBeVisible();
   });
 });
 

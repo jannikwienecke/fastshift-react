@@ -665,13 +665,11 @@ const init = server.mutation({
       {
         name: 'Take online photography course',
         completed: false,
-        projectId: projects[19],
         priority: 'medium',
       },
       {
         name: 'Practice editing techniques',
         completed: false,
-        projectId: projects[19],
         priority: 'low',
       },
     ];
