@@ -30,6 +30,7 @@ import {
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
+import { useTranslation } from 'react-i18next';
 
 const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -110,7 +111,6 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
 });
 
 const Task = observer(() => {
-  console.log('Render Task View');
   const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
 
   return (

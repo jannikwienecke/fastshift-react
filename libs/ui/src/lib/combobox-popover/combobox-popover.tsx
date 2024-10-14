@@ -14,12 +14,13 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '../components/popover';
 import { cn } from '../utils';
 import { DatePicker } from '../date-picker';
+import { useTranslation } from 'react-i18next';
 
 export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
   props: ComboboxPopoverProps<T> & { children?: React.ReactNode }
 ) {
   const { input, rect, ...comboboxProps } = props || {};
-
+  const { t } = useTranslation();
   if (!props) return null;
 
   if (props.datePickerProps?.open) {
@@ -69,7 +70,8 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
                 <Input
                   value={input.query}
                   placeholder={
-                    input.placeholder || `Change ${comboboxProps.tableName}...`
+                    input.placeholder ||
+                    `${t('common.change')} ${comboboxProps.tableName}...`
                   }
                   onChange={(event) => input.onChange(event.target.value)}
                   className={cn(

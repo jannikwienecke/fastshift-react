@@ -9,6 +9,7 @@ import {
 
 import { convex, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
+import './i18n';
 
 // syncObservable(store$, {
 //   persist: {

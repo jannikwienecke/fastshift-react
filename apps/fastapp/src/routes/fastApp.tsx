@@ -1,4 +1,4 @@
-import { cn, Sidebar, SidebarBody, SidebarLink } from '@apps-next/ui';
+import { Button, cn, Sidebar, SidebarBody, SidebarLink } from '@apps-next/ui';
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -16,6 +16,8 @@ import {
   Link,
   Outlet,
 } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
+import { views } from '@apps-next/convex';
 
 export const Route = createFileRoute('/fastApp')({
   component: FastAppLayoutComponent,
@@ -33,30 +35,32 @@ function FastAppLayoutComponent() {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
+
   const links = [
     {
-      label: 'Projects',
+      label: t('navigation.projects'),
       href: '/fastApp/projects',
       icon: (
         <DotIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
-      label: 'Tasks',
+      label: t('navigation.tasks'),
       href: '/fastApp/tasks',
       icon: (
         <CircleIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
-      label: 'Settings',
+      label: t('navigation.settings'),
       href: '#',
       icon: (
         <MixIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
     },
     {
-      label: 'Logout',
+      label: t('navigation.logout'),
       href: '#',
       icon: (
         <SunIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
@@ -66,7 +70,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [_open, setOpen] = useState(false);
   const [pinned, setPinned] = useState(true);
 
+  const { i18n } = useTranslation();
+  const currentLanguage = i18n.language;
+  const allLanguages = ['de', 'en'];
+
   const open = pinned ? true : _open;
+
+  const handleLanguageChange = (lang: string) => {
+    i18n.changeLanguage(lang);
+  };
+
   return (
     <div
       className={cn(
@@ -97,7 +110,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="w-full">
+          <div className="w-full flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2 text-sm text-neutral-500">
+              {allLanguages.map((lang) => (
+                <Button
+                  key={lang}
+                  variant={i18n.language === lang ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleLanguageChange(lang)}
+                  className={cn(
+                    'px-2 py-1 text-xs',
+                    currentLanguage === lang
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-secondary'
+                  )}
+                >
+                  {lang.toUpperCase()}
+                </Button>
+              ))}
+            </div>
+
             <SidebarLink
               link={{
                 label: 'Manu Arora',
