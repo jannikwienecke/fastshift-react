@@ -1,18 +1,27 @@
 'use client';
 
-import { FilterItemType, FilterProps } from '@apps-next/core';
+import {
+  FilterItemType,
+  FilterProps,
+  TranslationKeys,
+  useTranslation,
+} from '@apps-next/core';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { ListFilter } from 'lucide-react';
 import React from 'react';
 
 export const FilterDefault = (props: FilterProps) => {
-  const { filters, onOpen } = props;
+  const { filters, onOpen, label } = props;
   return (
     <>
       <div className="flex flex-row gap-2 items-center">
         {filters.length > 0 && <FilterList {...props} />}
 
-        <FilterButton onOpen={onOpen} hasFilter={filters.length > 0} />
+        <FilterButton
+          label={label}
+          onOpen={onOpen}
+          hasFilter={filters.length > 0}
+        />
       </div>
     </>
   );
@@ -108,6 +117,8 @@ const FilterButton = (props: {
   hasFilter: boolean;
   label?: string;
 }) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <button
@@ -120,7 +131,11 @@ const FilterButton = (props: {
         {props.hasFilter ? (
           <></>
         ) : (
-          <span className="pl-2">{props.label || 'Filter'}</span>
+          <span className="pl-2">
+            {props.label
+              ? t(props.label as TranslationKeys)
+              : t('filter.button.label')}
+          </span>
         )}
       </button>
     </>

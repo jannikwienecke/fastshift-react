@@ -7,6 +7,7 @@ import {
   makeNoneOption,
   makeRow,
   makeRowFromValue,
+  t,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import Fuse from 'fuse.js';
@@ -17,6 +18,7 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
+import { makeFilterPropsOptions } from './legend.store.derived.filter';
 
 export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed
@@ -226,7 +228,9 @@ export const getSharedStateFilter = (): ComboboxStateCommonType => {
     field: selectedFilterField,
     selected: selectedOfFilter,
     row: null,
-    placeholder: 'Filter...',
+    placeholder:
+      makeFilterPropsOptions.placeholder.get() ??
+      t('filter.button.placeholder'),
   };
 
   return stateShared;

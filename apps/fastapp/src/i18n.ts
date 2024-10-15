@@ -1,10 +1,11 @@
-import i18n from 'i18next';
+import i18n, { t } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { i18nextPlugin } from 'translation-check';
 
 import enTranslations from './locales/en';
 import deTranslations from './locales/de';
+import { makeResources, baseResources } from '@apps-next/core';
 
 export const resources = {
   en: {
@@ -21,7 +22,12 @@ i18n
   .use(i18nextPlugin)
   .init({
     fallbackLng: 'en',
-    resources,
+    resources: makeResources(resources, {
+      'filter.button.label': {
+        en: 'Filter0',
+        de: 'Filter1',
+      },
+    }),
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
@@ -32,16 +38,19 @@ i18n
     debug: true,
   });
 
-// Add this type declaration
 declare module 'i18next' {
   interface CustomTypeOptions {
     resources: {
-      translation: typeof enTranslations;
+      translation: typeof enTranslations & typeof baseResources.en.translation;
     };
   }
 }
-
 export default i18n;
+
+t('common.delete');
+t('filter.button.label');
+// @ts-expect-error invalid key
+t('filter.invalid');
 
 // i18next.init({
 //     lng: 'de',

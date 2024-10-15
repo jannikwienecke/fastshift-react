@@ -34,7 +34,7 @@ export const makeFilterProps = <T extends RecordType>(
   return {
     onOpen: store$.filterOpen,
     filters: filterItems$.get(),
-
+    label: options?.label ?? 'filter.button.label',
     onRemove: ({ name }) => store$.filterRemoveFilter(getFilter(name)),
     onSelect: (value, rect) => {
       const filter = getFilter(value.name);
@@ -43,5 +43,5 @@ export const makeFilterProps = <T extends RecordType>(
     onOperatorClicked: (filter, rect) => {
       store$.filterOpenOperator(getFilter(filter.name), rect);
     },
-  };
+  } satisfies FilterProps;
 };
