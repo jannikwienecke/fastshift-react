@@ -9,6 +9,7 @@ import {
 
 import { convex, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
+import './i18n';
 
 // syncObservable(store$, {
 //   persist: {
@@ -21,6 +22,7 @@ const router = createRouter({
   routeTree,
   defaultPreload: 'viewport',
   defaultStaleTime: 5000,
+  // Wrap:
   context: {
     queryClient,
     preloadQuery: (viewConfig) =>

@@ -3,7 +3,7 @@ import { Id } from './_generated/dataModel';
 
 const init = server.mutation({
   handler: async (ctx) => {
-    console.log('🌱 Seeding Convex database...');
+    console.log('🌱 Seeding Convex database.....');
 
     // Clear existing data
     const tables = [

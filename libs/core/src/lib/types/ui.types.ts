@@ -98,9 +98,11 @@ export type ComboboAdapterProps = {
 export type MakeFilterPropsOptions<T extends RecordType = RecordType> = {
   hideFields: (keyof T)[];
   placeholder?: string;
+  label?: string;
 };
 
 export type FilterProps = {
+  label?: string;
   filters: FilterItemType[];
   onOpen: (rect: DOMRect) => void;
   onRemove: (filter: FilterItemType) => void;
