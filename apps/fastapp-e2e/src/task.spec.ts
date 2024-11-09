@@ -253,7 +253,7 @@ test.describe('Task management', () => {
 
     const firstListItem = await taskPage.getListItem(0);
     const tommorow = new Date();
-    tommorow.setDate(tommorow.getDate() + 1);
+    tommorow.setDate(tommorow.getDate());
     const day = tommorow.getDate();
     const day2DigitsTommorow = day.toString().padStart(2, '0');
     await firstListItem.getByText(day2DigitsTommorow).click();

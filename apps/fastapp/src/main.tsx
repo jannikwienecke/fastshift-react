@@ -22,6 +22,7 @@ const router = createRouter({
   routeTree,
   defaultPreload: 'viewport',
   defaultStaleTime: 5000,
+  // Wrap:
   context: {
     queryClient,
     preloadQuery: (viewConfig) =>
