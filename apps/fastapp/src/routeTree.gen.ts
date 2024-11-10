@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as LegendImport } from './routes/legend'
+import { Route as KanbanImport } from './routes/kanban'
 import { Route as FastAppImport } from './routes/fastApp'
 import { Route as IndexImport } from './routes/index'
 import { Route as FastAppTasksImport } from './routes/fastApp.tasks'
@@ -21,6 +22,11 @@ import { Route as FastAppProjectsImport } from './routes/fastApp.projects'
 
 const LegendRoute = LegendImport.update({
   path: '/legend',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const KanbanRoute = KanbanImport.update({
+  path: '/kanban',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -62,6 +68,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FastAppImport
       parentRoute: typeof rootRoute
     }
+    '/kanban': {
+      id: '/kanban'
+      path: '/kanban'
+      fullPath: '/kanban'
+      preLoaderRoute: typeof KanbanImport
+      parentRoute: typeof rootRoute
+    }
     '/legend': {
       id: '/legend'
       path: '/legend'
@@ -94,6 +107,7 @@ export const routeTree = rootRoute.addChildren({
     FastAppProjectsRoute,
     FastAppTasksRoute,
   }),
+  KanbanRoute,
   LegendRoute,
 })
 
@@ -107,6 +121,7 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/",
         "/fastApp",
+        "/kanban",
         "/legend"
       ]
     },
@@ -119,6 +134,9 @@ export const routeTree = rootRoute.addChildren({
         "/fastApp/projects",
         "/fastApp/tasks"
       ]
+    },
+    "/kanban": {
+      "filePath": "kanban.tsx"
     },
     "/legend": {
       "filePath": "legend.tsx"

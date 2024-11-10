@@ -50,3 +50,4 @@ Thumbs.db
 out
 
 convex-local-backend
+packages/convex/convex_local_storage/search
