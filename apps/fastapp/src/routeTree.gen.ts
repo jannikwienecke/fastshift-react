@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TodosImport } from './routes/todos'
 import { Route as LegendImport } from './routes/legend'
 import { Route as KanbanImport } from './routes/kanban'
 import { Route as FastAppImport } from './routes/fastApp'
@@ -19,6 +20,11 @@ import { Route as FastAppTasksImport } from './routes/fastApp.tasks'
 import { Route as FastAppProjectsImport } from './routes/fastApp.projects'
 
 // Create/Update Routes
+
+const TodosRoute = TodosImport.update({
+  path: '/todos',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LegendRoute = LegendImport.update({
   path: '/legend',
@@ -82,6 +88,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegendImport
       parentRoute: typeof rootRoute
     }
+    '/todos': {
+      id: '/todos'
+      path: '/todos'
+      fullPath: '/todos'
+      preLoaderRoute: typeof TodosImport
+      parentRoute: typeof rootRoute
+    }
     '/fastApp/projects': {
       id: '/fastApp/projects'
       path: '/projects'
@@ -109,6 +122,7 @@ export const routeTree = rootRoute.addChildren({
   }),
   KanbanRoute,
   LegendRoute,
+  TodosRoute,
 })
 
 /* prettier-ignore-end */
@@ -122,7 +136,8 @@ export const routeTree = rootRoute.addChildren({
         "/",
         "/fastApp",
         "/kanban",
-        "/legend"
+        "/legend",
+        "/todos"
       ]
     },
     "/": {
@@ -140,6 +155,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/legend": {
       "filePath": "legend.tsx"
+    },
+    "/todos": {
+      "filePath": "todos.tsx"
     },
     "/fastApp/projects": {
       "filePath": "fastApp.projects.tsx",

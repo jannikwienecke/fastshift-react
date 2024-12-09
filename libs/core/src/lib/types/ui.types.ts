@@ -29,6 +29,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
   items: TItem[];
   onSelect: (item: TItem) => void;
   selected: Record<string, any>[];
+  onReachEnd: () => void;
 };
 
 export type MakeListPropsOptions<T = RecordType> = {

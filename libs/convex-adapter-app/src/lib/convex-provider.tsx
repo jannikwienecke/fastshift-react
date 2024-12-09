@@ -3,7 +3,11 @@ import { QueryClientProvider, QueryOptions } from '@tanstack/react-query';
 import { ConvexProvider } from 'convex/react';
 import { ConvexQueryProviderProps, ViewLoader } from './_internal/types.convex';
 
-import { QueryProps, ViewConfigType } from '@apps-next/core';
+import {
+  DEFAULT_FETCH_LIMIT_QUERY,
+  QueryProps,
+  ViewConfigType,
+} from '@apps-next/core';
 import { QueryContext } from '@apps-next/react';
 import React from 'react';
 
@@ -51,23 +55,29 @@ const ProviderContent = (props: ConvexQueryProviderProps) => {
   );
 };
 
+const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
+  return convexQuery(viewLoader, {
+    viewName: viewConfig.viewName,
+    query: '',
+    filters: '',
+    paginateOptions: {
+      cursor: null,
+      numItems: DEFAULT_FETCH_LIMIT_QUERY,
+    },
+  });
+};
+
 export const preloadQuery = (
   viewLoader: ConvexContext['viewLoader'],
   viewConfig: ViewConfigType
-) =>
-  convexQuery(viewLoader, {
-    query: '',
-    viewName: viewConfig.viewName,
-    filters: '',
-  });
+) => makeQuery(viewLoader, viewConfig);
+
+// then -> we need to fetch data -> then add data to prev data
+// and then handle the same for id based queries
 
 export const getQueryKeyFn =
   (viewLoader: ViewLoader) => (viewConfig: ViewConfigType) =>
-    convexQuery(viewLoader, {
-      viewName: viewConfig.viewName,
-      query: '',
-      filters: '',
-    }).queryKey;
+    makeQuery(viewLoader, viewConfig).queryKey;
 
 export type ConvexContext = {
   viewLoader: ViewLoader;

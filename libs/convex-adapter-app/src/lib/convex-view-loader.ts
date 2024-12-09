@@ -24,6 +24,8 @@ export const viewLoaderHandler = async (
   if (args.relationQuery && !args.relationQuery.tableName) {
     return {
       data: [],
+      continueCursor: null,
+      isDone: true,
     };
   }
 
@@ -44,13 +46,21 @@ export const viewLoaderHandler = async (
   };
 
   if (args.relationQuery?.tableName) {
-    return handleRelationalTableQuery({ ctx, args: serverProps });
+    const { data } = await handleRelationalTableQuery({
+      ctx,
+      args: serverProps,
+    });
+    return { data, continueCursor: null, isDone: true };
   }
 
   invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
 
+  const { data, continueCursor, isDone } = await getData(ctx, serverProps);
+
   return {
-    data: await getData(ctx, serverProps),
+    continueCursor,
+    isDone,
+    data,
     relationalData: await getRelationalData(ctx, serverProps),
   };
 };

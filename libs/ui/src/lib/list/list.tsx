@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
 import { ListItem, ListProps, ListValueProps } from '@apps-next/core';
@@ -7,25 +7,52 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   items,
   onSelect,
   selected,
+  onReachEnd,
 }: ListProps<TItem>) {
-  return (
-    <List onSelect={onSelect} selected={selected}>
-      {items.map((item) => {
-        return (
-          <List.Item key={item.id} className="" item={item}>
-            <div className="flex gap-1 pr-2">
-              <List.Control />
-              <List.Icon icon={item?.icon} />
-            </div>
+  const observerTarget = useRef<HTMLDivElement>(null);
 
-            <List.Values>
-              <ListValues values={item.valuesLeft} />
-              <ListValues values={item.valuesRight} />
-            </List.Values>
-          </List.Item>
-        );
-      })}
-    </List>
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries?.[0]?.isIntersecting) {
+          onReachEnd?.();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [onReachEnd]);
+
+  return (
+    <>
+      <List onSelect={onSelect} selected={selected}>
+        {items.map((item) => {
+          return (
+            <List.Item key={item.id} className="" item={item}>
+              <div className="flex gap-1 pr-2">
+                <List.Control />
+                <List.Icon icon={item?.icon} />
+              </div>
+
+              <List.Values>
+                <ListValues values={item.valuesLeft} />
+                <ListValues values={item.valuesRight} />
+              </List.Values>
+            </List.Item>
+          );
+        })}
+      </List>
+
+      <div
+        ref={observerTarget}
+        className="h-10 flex items-center justify-center relative -top-[10rem]"
+      />
+    </>
   );
 }
 

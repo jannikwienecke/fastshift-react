@@ -1,3 +1,4 @@
+import { PaginationOptions } from 'convex/server';
 import {
   BaseViewConfigManagerInterface,
   ModelConfig,
@@ -10,6 +11,7 @@ import { RegisteredViews, ViewConfigType } from './view-config.types';
 export type QueryProps = {
   query?: string;
   filters?: string;
+  paginateOptions?: PaginationOptions;
   viewConfigManager?: BaseViewConfigManagerInterface;
   registeredViews: RegisteredViews;
   modelConfig?: ModelConfig;
@@ -39,6 +41,8 @@ export type QueryReturnDto<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   relationalData?: QueryRelationalData;
   error?: unknown;
+  continueCursor: string | null;
+  isDone: boolean;
 };
 
 export type QueryError = {
@@ -48,6 +52,8 @@ export type QueryError = {
 export type QueryReturnType<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   relationalData?: QueryRelationalData;
+  continueCursor: string | null;
+  isDone: boolean;
   isLoading: boolean;
   isError: boolean;
   error: QueryError | undefined;

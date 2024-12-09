@@ -36,6 +36,7 @@ import {
   inputDialogSave,
 } from './legend.store.fn.input-dialog';
 import {
+  globalFetchMore,
   globalQueryReset,
   globalQueryUpdate,
 } from './legend.store.fn.global-query';
@@ -51,7 +52,7 @@ export const store$ = observable<LegendStore>({
   // global query methods
   globalQueryUpdate: (...props) => globalQueryUpdate(store$)(...props),
   globalQueryReset: (...props) => globalQueryReset(store$)(...props),
-
+  globalFetchMore: (...props) => globalFetchMore(store$)(...props),
   //   list methods
   selectListItem: (...props) => listSelect(store$)(...props),
   deselectRelationField: (...props) =>

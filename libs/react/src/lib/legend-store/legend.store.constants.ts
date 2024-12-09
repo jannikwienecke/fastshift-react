@@ -1,6 +1,7 @@
 import {
   BaseViewConfigManagerInterface,
   DataModelNew,
+  DEFAULT_FETCH_LIMIT_QUERY,
   RegisteredViews,
   RelationalDataModel,
   ViewFieldsConfig,
@@ -11,6 +12,7 @@ import {
   LegendStore,
   ComboboxState,
 } from './legend.store.types';
+import { PaginationOptions } from 'convex/server';
 
 export const DEFAULT_COMBOBOX_STATE: ComboboxState = {
   values: null,
@@ -59,16 +61,27 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'inputDialog'
   | 'globalQuery'
   | 'globalQueryDebounced'
+  | 'paginateOptions'
+  | 'fetchMore'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
   viewConfigManager: {} as BaseViewConfigManagerInterface,
   relationalDataModel: {} as RelationalDataModel,
   viewFieldsConfig: {} as ViewFieldsConfig,
-
+  paginateOptions: {
+    cursor: null,
+    numItems: DEFAULT_FETCH_LIMIT_QUERY,
+  } as PaginationOptions,
+  fetchMore: {
+    currentCursor: null,
+    nextCursor: null,
+    isFetching: true,
+    isFetched: false,
+    isDone: false,
+  },
   globalQuery: '',
   globalQueryDebounced: '',
-
   combobox: {
     values: null,
     query: '',

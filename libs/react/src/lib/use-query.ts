@@ -1,10 +1,10 @@
-'use client';
-
 import {
   convertFiltersForBackend,
+  DEFAULT_FETCH_LIMIT_QUERY,
   makeQueryKey,
   QueryDto,
   QueryProps,
+  QueryReturnDto,
   QueryReturnOrUndefined,
   RecordType,
 } from '@apps-next/core';
@@ -79,6 +79,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const filters = store$.filter.filters.get();
   const parsedFilters = convertFiltersForBackend(filters);
 
+  const cursor = store$.fetchMore.currentCursor.get();
+
   const queryPropsMerged = React.useMemo(() => {
     return {
       ...queryProps,
@@ -91,7 +93,12 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
         queryProps?.viewConfigManager?.viewConfig ||
         viewConfigManager.viewConfig,
       filters: parsedFilters,
+      paginateOptions: {
+        cursor,
+        numItems: DEFAULT_FETCH_LIMIT_QUERY,
+      },
 
+      // paginateOptions,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       viewConfigManager: undefined,
@@ -103,13 +110,20 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     viewConfigManager.modelConfig,
     viewConfigManager.viewConfig,
     parsedFilters,
+    cursor,
+    // paginateOptions,
   ]);
 
-  const queryReturn = useStableQuery(prisma, queryPropsMerged);
+  const queryReturn: { data: QueryReturnDto } = useStableQuery(
+    prisma,
+    queryPropsMerged
+  );
 
   return {
     ...queryReturn,
-    data: queryReturn.data?.data,
-    relationalData: queryReturn.data?.relationalData,
+    data: queryReturn.data?.data ?? [],
+    relationalData: queryReturn.data?.relationalData ?? {},
+    continueCursor: queryReturn.data?.continueCursor,
+    isDone: queryReturn.data?.isDone,
   };
 };

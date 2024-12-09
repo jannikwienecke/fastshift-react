@@ -20,7 +20,7 @@ import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
-  const { viewConfigManager, filters, registeredViews } = args;
+  const { viewConfigManager, filters, registeredViews, paginateOptions } = args;
 
   const isTask = viewConfigManager?.getTableName() === 'tasks';
   const log = (...args: any[]) => {
@@ -32,6 +32,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const _searchFields = viewConfigManager.getSearchableFields();
 
   const displayField = viewConfigManager.getDisplayFieldLabel();
+
+  let isDone = false;
+  let continueCursor: null | string = null;
 
   const {
     filtersWithoutIndexOrSearchField,
@@ -136,15 +139,27 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
 
+    console.log('GET DATA', args.paginateOptions?.cursor);
     const rowsBeforeFilter =
       allIds !== null
         ? await getRecordsByIds(idsAfterRemove ?? [], dbQuery)
         : anyFilter
         ? await getAll()
-        : await dbQuery.take(DEFAULT_FETCH_LIMIT_QUERY);
+        : await dbQuery.paginate({
+            cursor: args.paginateOptions?.cursor ?? null,
+            numItems: DEFAULT_FETCH_LIMIT_QUERY,
+          });
+
+    const rows =
+      'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
+
+    if ('continueCursor' in rowsBeforeFilter) {
+      continueCursor = rowsBeforeFilter.continueCursor;
+      isDone = rowsBeforeFilter.isDone;
+    }
 
     const r = await filterResults(
-      rowsBeforeFilter,
+      rows,
       displayField,
       args.query,
       filtersWithoutIndexOrSearchField,
@@ -171,5 +186,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     args
   );
 
-  return parseConvexData(rawData);
+  const data = parseConvexData(rawData);
+
+  return { data, continueCursor, isDone };
 };

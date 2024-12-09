@@ -16,6 +16,7 @@ import type {
 } from "convex/server";
 import type * as init from "../init.js";
 import type * as query from "../query.js";
+import type * as todos from "../todos.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -28,6 +29,7 @@ import type * as query from "../query.js";
 declare const fullApi: ApiFromModules<{
   init: typeof init;
   query: typeof query;
+  todos: typeof todos;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

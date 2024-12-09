@@ -3,6 +3,10 @@ import { v } from 'convex/values';
 import { Doc, TableNames } from './_generated/dataModel';
 
 const _schema = defineSchema({
+  todos: defineTable({
+    name: v.string(),
+  }),
+
   users: defineTable({
     email: v.string(),
     password: v.string(),

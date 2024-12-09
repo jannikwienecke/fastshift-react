@@ -12,6 +12,8 @@ import {
 } from './convex.server.types';
 import { QueryClient } from '@tanstack/react-query';
 import { ConvexReactClient } from 'convex/react';
+import { PaginationResult } from 'convex/server';
+import { PaginationOptions } from 'convex/server';
 
 export type ConvexServer = {
   query: (options: {
@@ -118,6 +120,9 @@ export type ConvexClient = {
     filter: (query: (q: SearchFilterBuilder) => any) => ConvexClient[string];
 
     insert: (tableName: string, data: RecordType) => Promise<void>;
+    paginate: (
+      paginationOpts: PaginationOptions
+    ) => Promise<PaginationResult<any>>;
   };
 };
 

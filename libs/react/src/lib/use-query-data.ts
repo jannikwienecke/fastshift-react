@@ -18,16 +18,32 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   QueryStore<QueryReturnType>,
   'dataModel' | 'relationalDataModel'
 > => {
-  const { data, relationalData } = useQuery();
+  const { data, relationalData, continueCursor, isDone } = useQuery();
   const dataModel = store$.dataModel.get() as DataModelNew<QueryReturnType>;
   const relationalDataModel = store$.relationalDataModel.get();
 
+  const prevDataRef = React.useRef<RecordType[] | null>(null);
+
   React.useEffect(() => {
     observe(reset$, () => {
-      store$.createDataModel(data ?? []);
+      if (data === undefined) return;
+
+      const allData = [...(prevDataRef.current ?? []), ...(data ?? [])];
+      store$.createDataModel(allData);
+
       store$.createRelationalDataModel(relationalData ?? {});
+
+      store$.fetchMore.assign({
+        currentCursor: store$.fetchMore.nextCursor.get(),
+        nextCursor: continueCursor,
+        isFetching: false,
+        isFetched: true,
+        isDone: isDone,
+      });
+
+      prevDataRef.current = allData;
     });
-  }, [data, relationalData]);
+  }, [continueCursor, data, relationalData, isDone]);
 
   return {
     dataModel,

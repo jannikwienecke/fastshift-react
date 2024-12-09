@@ -14,6 +14,7 @@ import {
   ViewFieldsConfig,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
+import { PaginationOptions } from 'convex/server';
 
 export type InputDialogState = {
   open: boolean;
@@ -97,11 +98,24 @@ export type DatePickerState = {
   selected?: Date;
 };
 
+export type FetchMoreOptions = {
+  currentCursor: string | null;
+  nextCursor: string | null;
+  isFetching: boolean;
+  isFetched: boolean;
+  isDone: boolean;
+};
+
 export type LegendStore = {
   // MAIN DATA MODEL
   dataModel: DataModelNew;
   relationalDataModel: RelationalDataModel;
   viewFieldsConfig: ViewFieldsConfig;
+
+  // pagination options
+  paginateOptions: PaginationOptions;
+
+  fetchMore: FetchMoreOptions;
 
   //   VIEW STATE
   viewConfigManager: BaseViewConfigManagerInterface;
@@ -140,6 +154,7 @@ export type LegendStore = {
   // global query
   globalQueryUpdate: (query: string) => void;
   globalQueryReset: () => void;
+  globalFetchMore: () => void;
 
   //   list methods
   selectListItem: (record: RecordType) => void;
