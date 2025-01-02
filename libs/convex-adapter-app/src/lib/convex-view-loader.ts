@@ -24,7 +24,7 @@ export const viewLoaderHandler = async (
   if (args.relationQuery && !args.relationQuery.tableName) {
     return {
       data: [],
-      continueCursor: null,
+      continueCursor: { position: null, cursor: null },
       isDone: true,
     };
   }
@@ -50,7 +50,11 @@ export const viewLoaderHandler = async (
       ctx,
       args: serverProps,
     });
-    return { data, continueCursor: null, isDone: true };
+    return {
+      data,
+      continueCursor: { position: null, cursor: null },
+      isDone: true,
+    };
   }
 
   invarant(Boolean(viewConfigManager), 'viewConfig is not defined');

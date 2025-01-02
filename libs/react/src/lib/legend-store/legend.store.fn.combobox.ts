@@ -45,7 +45,6 @@ export const comboboxSelectDate: StoreFn<'comboboxSelectDate'> =
 
     const dateAsNumber = date.getTime();
 
-    console.log({ dateString, dateAsNumber });
     store$.comboboxSelectValue(
       makeRow(dateAsNumber, dateString, date.toISOString(), field)
     );
@@ -165,6 +164,8 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
         value,
         selected: selected ?? [],
       });
+
+      console.log(mutation);
 
       runMutation({
         mutation: mutation,

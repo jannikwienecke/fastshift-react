@@ -27,7 +27,7 @@ export const getRecordsByIds = async (
   ids: ID[],
   dbQuery: ConvexClient[string]
 ) => {
-  return await asyncMap(ids.slice(0, DEFAULT_FETCH_LIMIT_QUERY), async (id) => {
+  return await asyncMap(ids, async (id) => {
     return await dbQuery.withIndex('by_id', (q) => q.eq('_id', id)).first();
   });
 };
@@ -236,11 +236,6 @@ export const getIdsFromIndexFilters = async (
           const { start, end } = dateUtils.getStartAndEndDate(
             currentIndexFilter.date
           );
-
-          console.log({
-            start: start?.toLocaleDateString(),
-            end: end?.toLocaleDateString(),
-          });
 
           if (!start && !end) {
             rows = await dbQuery

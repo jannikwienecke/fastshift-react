@@ -8,7 +8,10 @@ import {
   QueryReturnOrUndefined,
   RecordType,
 } from '@apps-next/core';
-import { useQuery as useTanstackQuery } from '@tanstack/react-query';
+import {
+  DefinedUseQueryResult,
+  useQuery as useTanstackQuery,
+} from '@tanstack/react-query';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
 import { PrismaContextType } from './query-context';
@@ -44,7 +47,12 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
 
   const result = useTanstackQuery({
     ...queryOptions,
-    enabled: args.disabled === true ? false : true,
+    // @ts-expect-error ---
+    enabled: args.paginateOptions?.isDone
+      ? false
+      : args.disabled === true
+      ? false
+      : true,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     retry: import.meta.env.DEV ? 0 : 3,
@@ -66,6 +74,15 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
     };
   }
 
+  // if (args.viewConfig?.viewName === 'task' && !args.relationQuery) {
+  //   //   console.log({
+  //   //     // cursor: args.paginateOptions?.cursor.cursor?.slice(0, 10),
+  //   //     filters: args.filters?.length,
+  //   //   });
+
+  //   console.log(stored.current.data.data.length);
+  // }
+
   return stored.current;
 };
 
@@ -80,6 +97,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const parsedFilters = convertFiltersForBackend(filters);
 
   const cursor = store$.fetchMore.currentCursor.get();
+  const isDone = store$.fetchMore.isDone.get();
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -94,11 +112,11 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
         viewConfigManager.viewConfig,
       filters: parsedFilters,
       paginateOptions: {
-        cursor,
+        cursor: cursor,
         numItems: DEFAULT_FETCH_LIMIT_QUERY,
+        // isDone: isDone,
       },
 
-      // paginateOptions,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       viewConfigManager: undefined,
@@ -111,14 +129,13 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     viewConfigManager.viewConfig,
     parsedFilters,
     cursor,
-    // paginateOptions,
+    // isDone,
   ]);
 
-  const queryReturn: { data: QueryReturnDto } = useStableQuery(
-    prisma,
-    queryPropsMerged
-  );
+  const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
+    useStableQuery(prisma, queryPropsMerged);
 
+  // console.log(queryReturn?.data?.data?.length);
   return {
     ...queryReturn,
     data: queryReturn.data?.data ?? [],

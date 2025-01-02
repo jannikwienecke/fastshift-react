@@ -1,5 +1,6 @@
 import { getViewByName, makeData, RelationalDataModel } from '@apps-next/core';
 import { StoreFn } from './legend.store.types';
+import { batch } from '@legendapp/state';
 
 export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
   (store$) => (data) => {
@@ -33,9 +34,25 @@ export const createDataModel: StoreFn<'createDataModel'> =
 export const init: StoreFn<'init'> =
   (store$) =>
   (data, relationalData, viewConfigManager, views, viewFieldsConfig) => {
-    store$.views.set(views);
-    store$.viewConfigManager.set(viewConfigManager);
-    store$.viewFieldsConfig.set(viewFieldsConfig);
+    batch(() => {
+      store$.fetchMore.assign({
+        isDone: false,
+        currentCursor: {
+          position: null,
+          cursor: null,
+        },
+        nextCursor: {
+          position: null,
+          cursor: null,
+        },
+        isFetched: false,
+        isFetching: true,
+      });
+      store$.views.set(views);
+      store$.viewConfigManager.set(viewConfigManager);
+      store$.viewFieldsConfig.set(viewFieldsConfig);
+      store$.filter.filters.set([]);
+    });
 
     createDataModel(store$)(data);
     createRelationalDataModel(store$)(relationalData);

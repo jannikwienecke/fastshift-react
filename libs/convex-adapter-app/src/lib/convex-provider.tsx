@@ -61,8 +61,9 @@ const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
     query: '',
     filters: '',
     paginateOptions: {
-      cursor: null,
+      cursor: { position: null, cursor: null },
       numItems: DEFAULT_FETCH_LIMIT_QUERY,
+      // isDone: false,
     },
   });
 };

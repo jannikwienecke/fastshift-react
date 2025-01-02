@@ -11,8 +11,6 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TodosImport } from './routes/todos'
-import { Route as LegendImport } from './routes/legend'
 import { Route as KanbanImport } from './routes/kanban'
 import { Route as FastAppImport } from './routes/fastApp'
 import { Route as IndexImport } from './routes/index'
@@ -20,16 +18,6 @@ import { Route as FastAppTasksImport } from './routes/fastApp.tasks'
 import { Route as FastAppProjectsImport } from './routes/fastApp.projects'
 
 // Create/Update Routes
-
-const TodosRoute = TodosImport.update({
-  path: '/todos',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const LegendRoute = LegendImport.update({
-  path: '/legend',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const KanbanRoute = KanbanImport.update({
   path: '/kanban',
@@ -81,20 +69,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KanbanImport
       parentRoute: typeof rootRoute
     }
-    '/legend': {
-      id: '/legend'
-      path: '/legend'
-      fullPath: '/legend'
-      preLoaderRoute: typeof LegendImport
-      parentRoute: typeof rootRoute
-    }
-    '/todos': {
-      id: '/todos'
-      path: '/todos'
-      fullPath: '/todos'
-      preLoaderRoute: typeof TodosImport
-      parentRoute: typeof rootRoute
-    }
     '/fastApp/projects': {
       id: '/fastApp/projects'
       path: '/projects'
@@ -121,8 +95,6 @@ export const routeTree = rootRoute.addChildren({
     FastAppTasksRoute,
   }),
   KanbanRoute,
-  LegendRoute,
-  TodosRoute,
 })
 
 /* prettier-ignore-end */
@@ -135,9 +107,7 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/",
         "/fastApp",
-        "/kanban",
-        "/legend",
-        "/todos"
+        "/kanban"
       ]
     },
     "/": {
@@ -152,12 +122,6 @@ export const routeTree = rootRoute.addChildren({
     },
     "/kanban": {
       "filePath": "kanban.tsx"
-    },
-    "/legend": {
-      "filePath": "legend.tsx"
-    },
-    "/todos": {
-      "filePath": "todos.tsx"
     },
     "/fastApp/projects": {
       "filePath": "fastApp.projects.tsx",

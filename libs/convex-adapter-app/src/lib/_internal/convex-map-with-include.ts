@@ -46,7 +46,7 @@ export const mapWithInclude = async (
           [key ?? '']: await fn(),
         };
       } catch (error) {
-        console.log('error', error);
+        console.error('error', error);
         const invalidIndex = String(error).toLowerCase().includes('index');
         if (invalidIndex) {
           throw new Error(

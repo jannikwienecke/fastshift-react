@@ -43,4 +43,17 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       store$.combobox.values.set(null);
     }
   }).onChange(() => null);
+
+  observable(function handleFilterChange() {
+    const filters = store$.filter.filters.get();
+
+    store$.fetchMore.assign({
+      reset: true,
+      isFetching: true,
+      isFetched: false,
+      isDone: false,
+      currentCursor: { cursor: null, position: null },
+      nextCursor: { cursor: null, position: null },
+    });
+  }).onChange(() => null);
 };

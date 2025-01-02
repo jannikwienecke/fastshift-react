@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
 import { ListItem, ListProps, ListValueProps } from '@apps-next/core';
+// import { store$ } from '@apps-next/react';
 
 export function ListDefault<TItem extends ListItem = ListItem>({
   items,
@@ -11,7 +12,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
 }: ListProps<TItem>) {
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  const addObserver = React.useCallback(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries?.[0]?.isIntersecting) {
@@ -24,9 +25,11 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     if (observerTarget.current) {
       observer.observe(observerTarget.current);
     }
-
-    return () => observer.disconnect();
   }, [onReachEnd]);
+
+  React.useEffect(() => {
+    addObserver();
+  }, [addObserver]);
 
   return (
     <>
@@ -50,7 +53,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
 
       <div
         ref={observerTarget}
-        className="h-10 flex items-center justify-center relative -top-[10rem]"
+        className="h-[1px] flex items-center justify-center relative -top-[5rem] -z-10"
       />
     </>
   );

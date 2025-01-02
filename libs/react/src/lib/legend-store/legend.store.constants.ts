@@ -74,8 +74,14 @@ export const DEFAULT_LEGEND_STORE: Pick<
     numItems: DEFAULT_FETCH_LIMIT_QUERY,
   } as PaginationOptions,
   fetchMore: {
-    currentCursor: null,
-    nextCursor: null,
+    currentCursor: {
+      position: null,
+      cursor: null,
+    },
+    nextCursor: {
+      position: null,
+      cursor: null,
+    },
     isFetching: true,
     isFetched: false,
     isDone: false,

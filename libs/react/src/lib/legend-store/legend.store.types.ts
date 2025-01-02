@@ -1,6 +1,7 @@
 import {
   BaseViewConfigManagerInterface,
   ComboxboxItem,
+  ContinueCursor,
   DataModelNew,
   FieldConfig,
   FilterType,
@@ -99,11 +100,12 @@ export type DatePickerState = {
 };
 
 export type FetchMoreOptions = {
-  currentCursor: string | null;
-  nextCursor: string | null;
+  currentCursor: ContinueCursor;
+  nextCursor: ContinueCursor;
   isFetching: boolean;
   isFetched: boolean;
   isDone: boolean;
+  reset?: boolean;
 };
 
 export type LegendStore = {

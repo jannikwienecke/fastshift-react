@@ -68,8 +68,11 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      lastViewName.current = vars.viewName;
+      store$.fetchMore.isFetching.set(true);
+      store$.fetchMore.reset.set(true);
+      store$.fetchMore.isDone.set(false);
 
+      lastViewName.current = vars.viewName;
       // TODO: Fix This. getting and setting queryKey must happen in 1 location!
       const _queryKeyAll = api?.makeQueryOptions?.({
         ...queryPropsMerged,
@@ -77,51 +80,44 @@ export const useMutation = () => {
         viewName: vars.viewName,
         filters: '',
       }).queryKey;
-
       const _queryKey = api?.makeQueryOptions?.({
         ...queryPropsMerged,
         query: vars.query,
         viewName: vars.viewName,
         filters: parsedFilters,
       }).queryKey;
-
       const queryKey =
         _queryKey ??
         makeQueryKey({
           viewName: vars.viewName,
           query: vars.query,
         });
-
       const queryKeyAll =
         _queryKeyAll ??
         makeQueryKey({
           viewName: vars.viewName,
         });
-
       await queryClient.cancelQueries({
         queryKey: queryKey,
       });
-
       await queryClient.cancelQueries({
         queryKey: queryKeyAll,
       });
 
       const previousState = queryClient.getQueryData(queryKey);
       const previousStateAll = queryClient.getQueryData(queryKeyAll);
-
       if ('handler' in vars.mutation && previousState) {
+        console.log('HANDLER IS IN MUTATION');
         const newState = vars.mutation.handler?.(
           (previousState as any).data || []
         );
-
+        console.log('SET NEW STATE -> ', newState);
         queryClient.setQueryData(queryKey, {
           data: newState,
         });
-
         queryClient.setQueryData(queryKeyAll, {
           data: newState,
         });
-
         return {
           previousState,
           previousStateAll,

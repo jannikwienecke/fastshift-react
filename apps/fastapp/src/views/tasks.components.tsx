@@ -66,8 +66,6 @@ export const CompletedComponent = (props: { data: TaskViewDataType }) => {
 export const CompletedComponentCombobox = (props: {
   data: TaskViewDataType['completed'];
 }) => {
-  console.log('CompletedComponentCombobox', props.data);
-
   const completed = props.data;
 
   return <div>{completed ? '✅ Completed' : '❌ Not Completed'}</div>;

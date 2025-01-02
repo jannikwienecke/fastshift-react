@@ -69,18 +69,18 @@ export const ClientViewProviderConvex = (
 };
 
 const Content = observer((props: { children: React.ReactNode }) => {
-  useQuery();
+  // useQuery();
   useQueryData();
   const { runMutate, runMutateAsync } = useMutation();
 
   React.useLayoutEffect(() => {
+    addEffects(store$);
+
     store$.api.assign({
       mutate: runMutate,
       mutateAsync: runMutateAsync,
     });
   }, [runMutate, runMutateAsync]);
-
-  addEffects(store$);
 
   return <> {props.children}</>;
 });

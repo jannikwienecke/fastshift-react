@@ -14,13 +14,11 @@ export const generateTodos = server.mutation({
 export const todos = server.query({
   args: { paginationOpts: paginationOptsValidator },
   async handler(ctx, args) {
-    console.log('todos...', args.paginationOpts.numItems);
     const result = await ctx.db
       .query('todos')
       .order('asc')
       .paginate(args.paginationOpts);
 
-    console.log('result: ', result.page.length);
     return result;
   },
 });

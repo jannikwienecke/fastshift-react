@@ -20,8 +20,6 @@ export const viewMutation = server.mutation({
 
 export const testQuery = server.query({
   async handler(ctx, args_0) {
-    console.log('testQuery...');
-
     const now = new Date().getTime();
     const query = ctx.db
       .query('tasks')
@@ -36,8 +34,6 @@ export const testQuery = server.query({
 export const deleteMutation = server.mutation({
   handler: async (ctx, args) => {
     // ctx.db.patch('' as Id<'tasks'>, {projectId: '123'})
-
-    console.log('deleteMutation');
 
     const projectIds = ['123', '456'];
     const tagIds = ['123', '456'];
@@ -124,14 +120,6 @@ export const deleteMutation = server.mutation({
 
 export const deleteMutesttation = server.query({
   handler: async (ctx, args) => {
-    console.log('deleteMutation');
-    // ctx.db.
-    // ctx.db
-    //   .query('tags')
-    //   .
-
-    // ctx.db.query("categories").
-
     const posts = await asyncMap(
       // one-to-many
       ctx.db.query('projects').take(10),

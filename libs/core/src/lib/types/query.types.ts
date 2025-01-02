@@ -11,7 +11,11 @@ import { RegisteredViews, ViewConfigType } from './view-config.types';
 export type QueryProps = {
   query?: string;
   filters?: string;
-  paginateOptions?: PaginationOptions;
+  paginateOptions?: {
+    cursor: ContinueCursor;
+    numItems: number;
+    // isDone: boolean;
+  };
   viewConfigManager?: BaseViewConfigManagerInterface;
   registeredViews: RegisteredViews;
   modelConfig?: ModelConfig;
@@ -37,11 +41,16 @@ export type QueryRelationalData = {
   [key: string]: RecordType[];
 };
 
+export type ContinueCursor = {
+  position: number | null;
+  cursor: string | null;
+};
+
 export type QueryReturnDto<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   relationalData?: QueryRelationalData;
   error?: unknown;
-  continueCursor: string | null;
+  continueCursor: ContinueCursor;
   isDone: boolean;
 };
 
@@ -52,11 +61,11 @@ export type QueryError = {
 export type QueryReturnType<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   relationalData?: QueryRelationalData;
-  continueCursor: string | null;
+  continueCursor: ContinueCursor;
   isDone: boolean;
   isLoading: boolean;
   isError: boolean;
-  error: QueryError | undefined;
+  error: QueryError | undefined | null;
   isFetching: boolean;
   isFetched: boolean;
   refetch: () => void;

@@ -91,7 +91,7 @@ const viewFieldsConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
 });
 
 const Project = observer(() => {
-  console.log('Render Project View');
+  console.warn('Render Project View');
 
   return (
     <DefaultTemplate<ProjectViewDataType>
@@ -141,7 +141,7 @@ const DefaultTemplate = observer(
 
 const RenderComboboxPopover = observer(
   ({ options }: { options?: MakeComboboxPropsOptions }) => {
-    console.log('Render Combobox Popover');
+    console.warn('Render Combobox Popover');
     const { makeComboboxProps } = makeHooks<RecordType>();
     return (
       <Memo>
@@ -155,7 +155,7 @@ const RenderComboboxPopover = observer(
 
 const RenderFilter = observer(
   ({ options }: { options?: MakeFilterPropsOptions }) => {
-    console.log('Render Filter');
+    console.warn('Render Filter');
     const { makeFilterProps } = makeHooks<ProjectViewDataType>();
     return (
       <Memo>
@@ -169,7 +169,7 @@ const RenderFilter = observer(
 
 const RenderInputDialog = observer(
   (props: { options?: MakeInputDialogPropsOptions }) => {
-    console.log('Render Input Dialog');
+    console.warn('Render Input Dialog');
     const { makeInputDialogProps } = makeHooks<ProjectViewDataType>();
     return (
       <Memo>
@@ -184,13 +184,13 @@ const RenderInputDialog = observer(
 );
 
 const RenderQueryInput = observer(() => {
-  console.log('Render Query Input');
+  console.warn('Render Query Input');
   return <QueryInput />;
 });
 
 const RenderList = observer((props: { options?: MakeListPropsOptions }) => {
   const { makeListProps } = makeHooks<ProjectViewDataType>();
-  console.log('Render List');
+  console.warn('Render List');
 
   return (
     <Memo>

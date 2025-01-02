@@ -25,7 +25,7 @@ i18n
     resources: makeResources(resources, {
       'filter.button.label': {
         en: 'Filter0',
-        de: 'Filter1',
+        de: 'Filter.',
       },
     }),
     detection: {
@@ -35,7 +35,7 @@ i18n
     interpolation: {
       escapeValue: false,
     },
-    debug: true,
+    debug: false,
   });
 
 declare module 'i18next' {
@@ -78,11 +78,11 @@ t('filter.invalid');
 //     },
 //   });
 
-//   console.log(i18next.t('welcome.title'));
-//   console.log(i18next.t('welcome.test', { count: 1000000.2 }));
-//   console.log(i18next.t('project_one'));
-//   console.log(i18next.t('project_other', { count: 10 }));
+//   console.warn(i18next.t('welcome.title'));
+//   console.warn(i18next.t('welcome.test', { count: 1000000.2 }));
+//   console.warn(i18next.t('project_one'));
+//   console.warn(i18next.t('project_other', { count: 10 }));
 //   // CONTEXT AWARE
-//   console.log(i18next.t('dessert', { context: 'chocolate' }));
-//   console.log(i18next.t('dessert', { context: 'icecream' }));
-//   console.log(i18next.t('dessert'));
+//   console.warn(i18next.t('dessert', { context: 'chocolate' }));
+//   console.warn(i18next.t('dessert', { context: 'icecream' }));
+//   console.warn(i18next.t('dessert'));

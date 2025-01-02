@@ -46,7 +46,7 @@ export const updateMutation = async (
 
   if (mutation.type !== 'UPDATE_RECORD') throw new Error('INVALID MUTATION-3');
 
-  console.log('updateMutation', mutation.payload);
+  console.warn('updateMutation', mutation.payload);
 
   const record = Object.entries(mutation.payload.record).reduce(
     (acc, [key, value]) => {
@@ -75,8 +75,6 @@ export const selectRecordsMutation = async (
   const { mutation, viewConfigManager } = props;
 
   if (mutation.type !== 'SELECT_RECORDS') throw new Error('INVALID MUTATION-4');
-
-  console.log('selectRecordsMutation', mutation.payload);
 
   const { idsToDelete, newIds, table } = mutation.payload;
 

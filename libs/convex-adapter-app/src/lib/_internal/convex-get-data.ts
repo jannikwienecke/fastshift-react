@@ -1,5 +1,6 @@
 import {
   arrayIntersection,
+  ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
   QueryServerProps,
 } from '@apps-next/core';
@@ -20,10 +21,11 @@ import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
-  const { viewConfigManager, filters, registeredViews, paginateOptions } = args;
+  const { viewConfigManager, filters, registeredViews } = args;
 
   const isTask = viewConfigManager?.getTableName() === 'tasks';
-  const log = (...args: any[]) => {
+
+  const logTask = (...args: any[]) => {
     if (!isTask) return;
     console.log('___: ', ...args);
   };
@@ -34,7 +36,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   let isDone = false;
-  let continueCursor: null | string = null;
+  let isGetAll = false;
+  const continueCursor: ContinueCursor = {
+    position: null,
+    cursor: null,
+  };
 
   const {
     filtersWithoutIndexOrSearchField,
@@ -125,12 +131,16 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     ])
   );
 
+  const position = args.paginateOptions?.cursor?.position ?? 0;
+  const nextPosition = position + DEFAULT_FETCH_LIMIT_QUERY;
+
   const fetch = async (multiple?: number) => {
     const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
 
     const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
 
     const getAll = () => {
+      isGetAll = true;
       console.warn(
         'Querying complete table. Use Index or search index if possible.'
       );
@@ -139,22 +149,24 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
 
-    console.log('GET DATA', args.paginateOptions?.cursor);
     const rowsBeforeFilter =
       allIds !== null
-        ? await getRecordsByIds(idsAfterRemove ?? [], dbQuery)
+        ? await getRecordsByIds(
+            idsAfterRemove?.slice(position, nextPosition) ?? [],
+            dbQuery
+          )
         : anyFilter
         ? await getAll()
         : await dbQuery.paginate({
-            cursor: args.paginateOptions?.cursor ?? null,
-            numItems: DEFAULT_FETCH_LIMIT_QUERY,
+            cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+            numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),
           });
 
     const rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
 
     if ('continueCursor' in rowsBeforeFilter) {
-      continueCursor = rowsBeforeFilter.continueCursor;
+      continueCursor.cursor = rowsBeforeFilter.continueCursor;
       isDone = rowsBeforeFilter.isDone;
     }
 
@@ -181,12 +193,21 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   rows.push(...filtered);
 
   const rawData = await mapWithInclude(
-    rows.slice(0, DEFAULT_FETCH_LIMIT_QUERY),
+    allIds !== null ? rows : rows.slice(position, nextPosition),
     ctx,
     args
   );
 
+  if (allIds !== null || isGetAll) {
+    const newItemsLength = allIds !== null ? allIds.length : newRows.length;
+
+    isDone = nextPosition >= newItemsLength;
+    continueCursor.position = isDone ? position : nextPosition;
+  }
+
   const data = parseConvexData(rawData);
+
+  // logTask({ filters: filters?.length, dat: data?.length });
 
   return { data, continueCursor, isDone };
 };

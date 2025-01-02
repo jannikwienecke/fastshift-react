@@ -36,12 +36,15 @@ export const getFiltersWithIndexOrSearchField = (
 export const getEnumFilters = (filters: FilterType[]) =>
   filters.filter((f) => f.type === 'relation' && f.field.enum);
 
-export const getHasOneToManyFilter = (filters: FilterType[]) =>
-  getRelationalFilters(filters).find(
+export const getHasOneToManyFilter = (filters: FilterType[]) => {
+  const xx = getRelationalFilters(filters).find(
     (f) => f.operator.label === 'is' || f.operator.label === 'is any of'
   )
     ? true
     : false;
+
+  return xx;
+};
 
 export const getHasManyToManyFilter = (filters: FilterType[]) =>
   getManyToManyFilters(filters).find(
@@ -116,7 +119,9 @@ export const getFilterTypes = (
   );
 
   return {
-    filtersWithoutIndexOrSearchField: _filters,
+    filtersWithoutIndexOrSearchField: _filters.filter(
+      (f) => !indexFields?.find((i) => i.field === f.field.relation?.fieldName)
+    ),
     filtersWithIndexField,
     filtersWithSearchField,
     indexFields,
