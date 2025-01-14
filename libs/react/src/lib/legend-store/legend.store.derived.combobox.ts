@@ -12,6 +12,8 @@ import {
   makeComboboxStateFilterValuesEnum,
   makeComboboxStateFilterValuesOperator,
   handleRelationalField,
+  makeComboboxStateSortingOptions,
+  getSharedStateSorting,
 } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
@@ -19,6 +21,10 @@ import { ComboboxState, MakeComboboxStateProps } from './legend.store.types';
 
 export const comboboxStore$ = observable<ComboboxState>(() => {
   const filterIsOpen = store$.filter.open.get();
+
+  const displayOptions = store$.displayOptions.get();
+  const displayOptionsSortingIsOpen = displayOptions.sorting.isOpen;
+
   const operatorField = store$.filter.selectedOperatorField.get();
   const selectedFilterField = filterIsOpen
     ? store$.filter.selectedField.get()
@@ -28,12 +34,14 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const isList = !!store$.list.selectedRelationField.get();
   const isFilter = filterIsOpen;
 
-  if (!isList && !isFilter) return DEFAULT_COMBOBOX_STATE;
+  if (!isList && !isFilter && !displayOptionsSortingIsOpen)
+    return DEFAULT_COMBOBOX_STATE;
 
   const field = isList ? selectedListField : selectedFilterField ?? null;
 
   const stateSharedFilter = getSharedStateFilter();
   const stateSharedList = getSharedStateList();
+  const stateSharedSorting = getSharedStateSorting();
 
   const selectedOfFilter = getDefaultSelectedFilter();
   const selectedOfList = getDefaultSelectedList();
@@ -44,7 +52,12 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const multipleFilter = null;
   const multipleList = field?.relation?.manyToManyTable ? true : false;
 
-  const stateShared = isList ? stateSharedList : stateSharedFilter;
+  const stateShared = isList
+    ? stateSharedList
+    : displayOptionsSortingIsOpen
+    ? stateSharedSorting
+    : stateSharedFilter;
+
   const selected = isList ? selectedOfList : selectedOfFilter;
   const multiple = isList ? multipleList : multipleFilter;
   const getDateOptions = isList ? getDateOptionsList : getDateOptionsFilter;
@@ -57,6 +70,8 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     options = makeComboboxStateFilterValuesDatePicker(field);
   } else if (!field && isFilter) {
     options = makeComboboxStateFilterOptions();
+  } else if (!field && displayOptionsSortingIsOpen) {
+    options = makeComboboxStateSortingOptions();
   } else if (field?.relation) {
     options = handleRelationalField(field, selected, isFilter);
   } else if (field?.enum) {

@@ -1,5 +1,5 @@
 import { RecordType } from './base.types';
-import { FilterItemType } from './filter.types';
+import { DisplayOptionsUiType, FilterItemType } from './filter.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
@@ -101,6 +101,27 @@ export type MakeFilterPropsOptions<T extends RecordType = RecordType> = {
   placeholder?: string;
   label?: string;
 };
+
+export type MakeDisplayOptionsPropsOptions<T extends RecordType = RecordType> =
+  {
+    placeholder?: string;
+    label?: string;
+    sorting: {
+      defaultSortingField: keyof T;
+    };
+  };
+
+export type DisplayOptionsProps = {
+  label: string;
+  onOpen: (rect: DOMRect) => void;
+  onClose: () => void;
+
+  sorting: {
+    onOpen: (rect: DOMRect) => void;
+    onClose: () => void;
+  } & DisplayOptionsUiType['sorting'];
+  // onSelect: (filter: FilterItemType, rect: DOMRect) => void;
+} & Omit<DisplayOptionsUiType, 'sorting'>;
 
 export type FilterProps = {
   label?: string;

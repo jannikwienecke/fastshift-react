@@ -40,6 +40,11 @@ import {
   globalQueryReset,
   globalQueryUpdate,
 } from './legend.store.fn.global-query';
+import {
+  displayOptionsOpen,
+  displayOptionsOpenSorting,
+  displayOptionsSelectField,
+} from './legend-store.fn.displayOptions';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -85,4 +90,11 @@ export const store$ = observable<LegendStore>({
   // input dialog methods
   inputDialogSave: (...props) => inputDialogSave(store$)(...props),
   inputDialogClose: (...props) => inputDialogClose(store$)(...props),
+
+  // display options
+  displayOptionsOpen: (...props) => displayOptionsOpen(store$)(...props),
+  displayOptionsOpenSorting: (...props) =>
+    displayOptionsOpenSorting(store$)(...props),
+  displayOptionsSelectField: (...props) =>
+    displayOptionsSelectField(store$)(...props),
 });

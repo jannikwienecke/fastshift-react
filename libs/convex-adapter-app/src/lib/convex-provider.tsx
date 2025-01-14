@@ -60,6 +60,7 @@ const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
     viewName: viewConfig.viewName,
     query: '',
     filters: '',
+    displayOptions: '',
     paginateOptions: {
       cursor: { position: null, cursor: null },
       numItems: DEFAULT_FETCH_LIMIT_QUERY,

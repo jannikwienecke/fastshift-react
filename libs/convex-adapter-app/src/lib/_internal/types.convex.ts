@@ -114,7 +114,7 @@ export type ConvexClient = {
     ) => ConvexClient[string];
     withIndex: (
       indexName: string,
-      query: (q: SearchFilterBuilder) => any
+      query?: (q: SearchFilterBuilder) => any
     ) => ConvexClient[string];
     delete: (id: ID) => Promise<void>;
     filter: (query: (q: SearchFilterBuilder) => any) => ConvexClient[string];

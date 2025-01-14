@@ -7,10 +7,12 @@ import { RecordType } from './base.types';
 import { FilterType } from './filter.types';
 import { MutationDto, MutationReturnDto } from './mutation.types';
 import { RegisteredViews, ViewConfigType } from './view-config.types';
+import { DisplayOptionsType } from './displayOptions.types';
 
 export type QueryProps = {
   query?: string;
   filters?: string;
+  displayOptions?: string;
   paginateOptions?: {
     cursor: ContinueCursor;
     numItems: number;
@@ -30,12 +32,14 @@ export type QueryProps = {
 export type QueryDto = {
   viewConfig?: ViewConfigType;
   filters?: string;
+  displayOptions?: string;
 } & Omit<QueryProps, 'viewConfigManager'>;
 
 export type QueryServerProps = {
   filters?: FilterType[];
+  displayOptions?: DisplayOptionsType;
   viewConfigManager: BaseViewConfigManagerInterface;
-} & Omit<QueryProps, 'filters'>;
+} & Omit<QueryProps, 'filters' | 'displayOptions'>;
 
 export type QueryRelationalData = {
   [key: string]: RecordType[];

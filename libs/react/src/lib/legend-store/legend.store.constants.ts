@@ -63,6 +63,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'globalQueryDebounced'
   | 'paginateOptions'
   | 'fetchMore'
+  | 'displayOptions'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -102,5 +103,12 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
   inputDialog: {
     valueDict: {},
+  },
+  displayOptions: {
+    isOpen: false,
+    sorting: {
+      isOpen: false,
+      rect: null,
+    },
   },
 };

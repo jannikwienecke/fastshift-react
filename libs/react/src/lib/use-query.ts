@@ -1,4 +1,5 @@
 import {
+  convertDisplayOptionsForBackend,
   convertFiltersForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
   makeQueryKey,
@@ -94,7 +95,9 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const query = store$.globalQueryDebounced.get();
   const filters = store$.filter.filters.get();
+  const displayOptions = store$.displayOptions.get();
   const parsedFilters = convertFiltersForBackend(filters);
+  const parsedDisplayOptions = convertDisplayOptionsForBackend(displayOptions);
 
   const cursor = store$.fetchMore.currentCursor.get();
   const isDone = store$.fetchMore.isDone.get();
@@ -111,6 +114,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
         queryProps?.viewConfigManager?.viewConfig ||
         viewConfigManager.viewConfig,
       filters: parsedFilters,
+      displayOptions: parsedDisplayOptions,
       paginateOptions: {
         cursor: cursor,
         numItems: DEFAULT_FETCH_LIMIT_QUERY,
@@ -129,6 +133,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     viewConfigManager.viewConfig,
     parsedFilters,
     cursor,
+    parsedDisplayOptions,
     // isDone,
   ]);
 

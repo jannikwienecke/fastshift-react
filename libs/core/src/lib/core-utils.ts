@@ -1,7 +1,12 @@
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
 import { ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
-import { FilterOperatorType, FilterType } from './types/filter.types';
+import { DisplayOptionsType } from './types/displayOptions.types';
+import {
+  DisplayOptionsUiType,
+  FilterOperatorType,
+  FilterType,
+} from './types/filter.types';
 
 export const invarant = (condition: boolean, message: string) => {
   const prefix = 'Invariant failed';
@@ -28,11 +33,13 @@ export const makeQueryKey = ({
   query,
   relation,
   filters,
+  displayOptions,
 }: {
   viewName: string | undefined;
   query?: string | undefined;
   relation?: string | undefined;
   filters?: string | undefined;
+  displayOptions?: string | undefined;
 }) => {
   return [
     QUERY_KEY_PREFIX,
@@ -40,6 +47,7 @@ export const makeQueryKey = ({
     query ?? '',
     relation ? '_relational_' + relation : '',
     filters ?? '',
+    displayOptions ?? '',
   ];
 };
 
@@ -132,6 +140,47 @@ export const parseFilterStringForServer = (
       }
     })
     .filter(Boolean) as FilterType[];
+};
+
+export const convertDisplayOptionsForBackend = (
+  displayOptions: DisplayOptionsUiType
+): string => {
+  if (!displayOptions.sorting.field) return '';
+
+  return `sorting=${displayOptions.sorting.field?.name}:${displayOptions.sorting.order}`;
+};
+
+export const parseDisplayOptionsStringForServer = (
+  displayOptionsString: string,
+  viewConfigManager: BaseViewConfigManagerInterface
+): DisplayOptionsType => {
+  const options: DisplayOptionsType = {};
+
+  if (displayOptionsString === '') return options;
+
+  const pairs = displayOptionsString.split(';');
+
+  pairs.forEach((pair) => {
+    const [key, value] = pair.split('=');
+    if (!key || !value) {
+      return;
+    }
+    const [field, order] = value.split(':');
+
+    if (key === 'sorting' && field) {
+      const fieldConfig = viewConfigManager.getFieldBy(field);
+
+      options.sorting = {
+        ...options.sorting,
+        field: fieldConfig,
+        order: order as 'asc' | 'desc',
+      };
+    } else {
+      //
+    }
+  });
+
+  return options;
 };
 
 export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] | null {

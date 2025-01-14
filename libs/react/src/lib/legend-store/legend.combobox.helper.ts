@@ -28,27 +28,36 @@ export const removedSelected$ = observable<Row[]>([]);
 // so that we can track which items are shown on the top (when adding a new item it should not move to the top. it should stay where it is)
 export const initSelected$ = observable<Row[] | null>(null);
 
+export const getViewFieldsOptions = (): MakeComboboxStateProps | null => {
+  let filterOptions: Row[] | null = null;
+  const query = store$.combobox.query.get();
+
+  const viewFields = store$.viewConfigManager.get().getViewFieldList();
+  filterOptions = viewFields.map((field) => {
+    return makeRowFromValue(field.name, field);
+  });
+
+  const fuse = new Fuse(filterOptions, {
+    keys: ['label'],
+  });
+
+  const result = fuse.search(store$.combobox.query.get());
+
+  return {
+    values: query.length ? result.map((r) => r.item) : filterOptions,
+    tableName: '',
+    multiple: false,
+  };
+};
+
+export const makeComboboxStateSortingOptions =
+  (): MakeComboboxStateProps | null => {
+    return getViewFieldsOptions();
+  };
+
 export const makeComboboxStateFilterOptions =
   (): MakeComboboxStateProps | null => {
-    let filterOptions: Row[] | null = null;
-    const query = store$.combobox.query.get();
-
-    const viewFields = store$.viewConfigManager.get().getViewFieldList();
-    filterOptions = viewFields.map((field) => {
-      return makeRowFromValue(field.name, field);
-    });
-
-    const fuse = new Fuse(filterOptions, {
-      keys: ['label'],
-    });
-
-    const result = fuse.search(store$.combobox.query.get());
-
-    return {
-      values: query.length ? result.map((r) => r.item) : filterOptions,
-      tableName: '',
-      multiple: false,
-    };
+    return getViewFieldsOptions();
   };
 
 export const handleRelationalField = (
@@ -211,6 +220,29 @@ export const makeComboboxStateFilterValuesOperator = (
     tableName: '',
     multiple: false,
   };
+};
+
+export const getSharedStateSorting = (): ComboboxStateCommonType => {
+  // const selectedFilterField = store$.filter.selectedField.get();
+
+  // const selectedOfFilter = getDefaultSelectedFilter();
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: store$.displayOptions.sorting.rect.get(),
+    searchable: true,
+    name: 'sorting',
+    isNewState: true,
+    open: true,
+    query: store$.combobox.query.get(),
+    field: null,
+    selected: [],
+    row: null,
+    placeholder:
+      makeFilterPropsOptions.placeholder.get() ??
+      t('filter.button.placeholder'),
+  };
+
+  return stateShared;
 };
 
 export const getSharedStateFilter = (): ComboboxStateCommonType => {

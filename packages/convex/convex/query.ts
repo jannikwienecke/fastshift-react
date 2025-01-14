@@ -31,78 +31,82 @@ export const testQuery = server.query({
   },
 });
 
-export const deleteMutation = server.mutation({
-  handler: async (ctx, args) => {
-    // ctx.db.patch('' as Id<'tasks'>, {projectId: '123'})
+export const displayOptions = server.query({
+  handler: async (ctx) => {
+    const all = await ctx.db.query('tasks').withIndex('priority').collect();
+    console.log({ all });
 
-    const projectIds = ['123', '456'];
-    const tagIds = ['123', '456'];
-    // ctx.db.query('tasks_tags').withIndex('taskId', (q) => q.eq('taskId', '123')).order('asc')
-    const tasks = await ctx.db
-      .query('tasks')
-      // .withIndex('description', q => q.eq('description', '123'))
-      // .withSearchIndex('name_search', (q) => q.search('name', '123'))
-
-      .filter((q) =>
-        q.and(
-          q.or(
-            ...projectIds.map((projectId) =>
-              q.eq(q.field('projectId'), projectId)
-            )
-          )
-        )
-      )
-      .collect();
-
-    const taskIds = [] as Id<'tasks'>[];
-
-    // ctx.db.query('tasks').filter((q) => q.neq(q.field('priority'), 'medium'))
-    // ctx.db
+    // await ctx.db
     //   .query('tasks')
-    //   .paginate({ cursor: '', numItems: 1 })
+    //   .withSearchIndex('name_search', (q) => q.search('name', 'a'))
+    //   .paginate();
+
+    // // ctx.db.query('tasks_tags').withIndex('taskId', (q) => q.eq('taskId', '123')).order('asc')
+    // const tasks = await ctx.db
+    //   .query('tasks')
+    //   // .withIndex('description', q => q.eq('description', '123'))
+    //   // .withSearchIndex('name_search', (q) => q.search('name', '123'))
+
     //   .filter((q) =>
-    //     q.or(
-    //       ...['low', 'medium'].map((priority) =>
-    //         q.eq(q.field('priority'), priority)
+    //     q.and(
+    //       q.or(
+    //         ...projectIds.map((projectId) =>
+    //           q.eq(q.field('projectId'), projectId)
+    //         )
     //       )
     //     )
-    //   );
-
-    // ctx.db.query("tasks").withSearchIndex('name_search', (q) => q.search('name', '123')).
-
-    // const tasks = ctx.db
-    //   .query('tasks')
-    //   .filter((q) =>
-    //     q.or(...taskIds.map((taskId) => q.eq(q.field('_id'), taskId)))
     //   )
     //   .collect();
 
-    const res = ctx.db
-      .query('tasks')
-      //   .withSearchIndex('name_search', (q) => q.search('name', '123'))
+    // const taskIds = [] as Id<'tasks'>[];
 
-      //  filter by completed
-      .filter((q) => q.eq(q.field('completed'), true));
+    // // ctx.db.query('tasks').filter((q) => q.neq(q.field('priority'), 'medium'))
+    // // ctx.db
+    // //   .query('tasks')
+    // //   .paginate({ cursor: '', numItems: 1 })
+    // //   .filter((q) =>
+    // //     q.or(
+    // //       ...['low', 'medium'].map((priority) =>
+    // //         q.eq(q.field('priority'), priority)
+    // //       )
+    // //     )
+    // //   );
 
-    // asyncMap([] as ID<"tasks">[], async (taskId) => {
-    //   const task = await ctx.db.query('tasks').withIndex('by_id', (q) => q.eq(q.field('_id'), taskId)).first();
-    //   return task;
-    // });
+    // // ctx.db.query("tasks").withSearchIndex('name_search', (q) => q.search('name', '123')).
 
-    // const taskIds: Id<'tasks'>[] = [];
-    // const taskTags = await ctx.db
-    // .query("tasks_tags")
-    // .withIndex("taskId", (q) =>
-    //   q.eq("taskId", taskIds)
-    // )
-    // .collect();
+    // // const tasks = ctx.db
+    // //   .query('tasks')
+    // //   .filter((q) =>
+    // //     q.or(...taskIds.map((taskId) => q.eq(q.field('_id'), taskId)))
+    // //   )
+    // //   .collect();
 
-    const tags = await ctx.db
-      .query('tags')
-      .filter((q) =>
-        q.or(...tagIds.map((tagId) => q.eq(q.field('_id'), tagId)))
-      )
-      .collect();
+    // const res = ctx.db
+    //   .query('tasks')
+    //   //   .withSearchIndex('name_search', (q) => q.search('name', '123'))
+
+    //   //  filter by completed
+    //   .filter((q) => q.eq(q.field('completed'), true));
+
+    // // asyncMap([] as ID<"tasks">[], async (taskId) => {
+    // //   const task = await ctx.db.query('tasks').withIndex('by_id', (q) => q.eq(q.field('_id'), taskId)).first();
+    // //   return task;
+    // // });
+
+    // // const taskIds: Id<'tasks'>[] = [];
+    // // const taskTags = await ctx.db
+    // // .query("tasks_tags")
+    // // .withIndex("taskId", (q) =>
+    // //   q.eq("taskId", taskIds)
+    // // )
+    // // .collect();
+
+    // const tags = await ctx.db
+    //   .query('tags')
+    //   .filter((q) =>
+    //     q.or(...tagIds.map((tagId) => q.eq(q.field('_id'), tagId)))
+    //   )
+    //   .collect();
 
     // const taskTags = await ctx.db
     //   .query('tasks_tags')

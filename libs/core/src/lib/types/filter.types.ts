@@ -34,6 +34,18 @@ export type FilterRelationType = {
 
 export type FilterType = FilterRelationType | FilterPrimitiveType;
 
+// export type
+export type DisplayOptionsUiType = {
+  isOpen: boolean;
+  sorting: {
+    isOpen: boolean;
+    field?: FieldConfig;
+    order?: 'asc' | 'desc';
+    rect: DOMRect | null;
+    label?: string;
+  };
+};
+
 export type FilterItemType = {
   label: string;
   icon?: Icon;

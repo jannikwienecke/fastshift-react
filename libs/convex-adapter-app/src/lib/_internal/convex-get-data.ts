@@ -21,7 +21,12 @@ import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
-  const { viewConfigManager, filters, registeredViews } = args;
+  const { viewConfigManager, filters, registeredViews, displayOptions } = args;
+
+  console.log(
+    'displayOptions: sorting by: ',
+    displayOptions?.sorting?.field.name
+  );
 
   const isTask = viewConfigManager?.getTableName() === 'tasks';
 
@@ -149,6 +154,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
 
+    // TODO: HIER WEITER MACHEN.
+    // We must check if there is an index for this sorting field
+    // if not -> we must sort fetch all and sort manually after
+    // add warning that this search might be expensive
+
     const rowsBeforeFilter =
       allIds !== null
         ? await getRecordsByIds(
@@ -157,6 +167,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
           )
         : anyFilter
         ? await getAll()
+        : displayOptions?.sorting?.field.name
+        ? await dbQuery.withIndex(displayOptions.sorting.field.name).paginate({
+            cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+            numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),
+          })
         : await dbQuery.paginate({
             cursor: args?.paginateOptions?.cursor?.cursor ?? null,
             numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),

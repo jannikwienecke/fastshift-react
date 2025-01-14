@@ -5,6 +5,14 @@ export const en = {
       placeholder: 'Filter by...',
     },
   },
+  displayOptions: {
+    button: {
+      label: 'Display',
+    },
+    sorting: {
+      label: 'Ordering',
+    },
+  },
   search: {
     placeholder: 'Search',
   },

@@ -6,6 +6,11 @@ export const de = {
       placeholder: 'Filtern nach...',
     },
   },
+  displayOptions: {
+    button: {
+      label: 'Anzeige',
+    },
+  },
   search: {
     placeholder: 'Suchen',
   },

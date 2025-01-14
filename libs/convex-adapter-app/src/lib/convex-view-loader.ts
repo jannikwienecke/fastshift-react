@@ -1,6 +1,7 @@
 import {
   BaseViewConfigManager,
   invarant,
+  parseDisplayOptionsStringForServer,
   parseFilterStringForServer,
   QueryDto,
   QueryReturnDto,
@@ -39,10 +40,16 @@ export const viewLoaderHandler = async (
     viewConfigManager
   );
 
+  const parsedDisplayOptions = parseDisplayOptionsStringForServer(
+    args.displayOptions ?? '',
+    viewConfigManager
+  );
+
   const serverProps: QueryServerProps = {
     ...args,
     viewConfigManager,
     filters: parsedFilters,
+    displayOptions: parsedDisplayOptions,
   };
 
   if (args.relationQuery?.tableName) {

@@ -28,6 +28,10 @@ export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   // add events and attach function that reacts to the events
   store$.deselectRelationField();
   store$.filterCloseAll();
+
+  // displayOptions
+  store$.displayOptions.sorting.isOpen.set(false);
+
   newSelected$.set([]);
   removedSelected$.set([]);
   initSelected$.set(null);
@@ -56,6 +60,14 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
 
     if (value.id === SELECT_FILTER_DATE) {
       store$.combobox.datePicker.open.set(true);
+    } else if (store$.displayOptions.isOpen.get()) {
+      const displayOptions = store$.displayOptions.get();
+      const sortingOpen = displayOptions.sorting.isOpen;
+      if (sortingOpen) {
+        store$.displayOptionsSelectField(value);
+      } else {
+        //
+      }
     } else if (store$.filter.open.get()) {
       if (state.field) {
         store$.filterSelectFilterValue(value);

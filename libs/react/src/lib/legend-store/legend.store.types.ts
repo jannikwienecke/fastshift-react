@@ -3,6 +3,7 @@ import {
   ComboxboxItem,
   ContinueCursor,
   DataModelNew,
+  DisplayOptionsUiType,
   FieldConfig,
   FilterType,
   MutationDto,
@@ -202,6 +203,12 @@ export type LegendStore = {
   };
   inputDialogSave: () => void;
   inputDialogClose: () => void;
+
+  //   display options state
+  displayOptions: DisplayOptionsUiType;
+  displayOptionsOpen: () => void;
+  displayOptionsOpenSorting: (rect: DOMRect) => void;
+  displayOptionsSelectField: (selected: ComboxboxItem) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (
