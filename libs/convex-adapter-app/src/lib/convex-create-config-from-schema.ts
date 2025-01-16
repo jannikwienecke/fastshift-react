@@ -1,6 +1,7 @@
 import {
   BaseConfig,
   BaseConfigInterface,
+  FieldConfig,
   generateIncludeFields,
   generateViewFields,
   getTableNamesFromSchema,
@@ -26,9 +27,45 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
     schema.tables
   );
 
-  const indexFields = generateIndexFieldsFromConvexSchema(schema.tables);
+  let indexFields = generateIndexFieldsFromConvexSchema(schema.tables);
 
-  const viewFields = generateViewFields(normalizedSchema);
+  indexFields = Object.keys(indexFields).reduce((acc, key) => {
+    const fields = indexFields[key];
+    if (!fields) return acc;
+    return {
+      ...acc,
+      [key]: [
+        ...fields,
+        {
+          fields: ['_creationTime'],
+          name: 'by_creation_time',
+        },
+      ],
+    };
+  }, indexFields);
+
+  let viewFields = generateViewFields(normalizedSchema);
+
+  viewFields = Object.keys(viewFields).reduce((acc, key) => {
+    const fields = viewFields[key];
+    return {
+      ...acc,
+      [key]: {
+        ...fields,
+        _creationTime: {
+          isId: false,
+          isRelationalIdField: false,
+          isRequired: false,
+          enum: undefined,
+          relation: undefined,
+          isList: false,
+          name: '_creationTime',
+          type: 'Date',
+        } satisfies FieldConfig,
+      },
+    };
+  }, viewFields);
+
   const includeFields = generateIncludeFields(normalizedSchema);
   type ConfigType = BaseConfigInterface<
     ModelSchema,

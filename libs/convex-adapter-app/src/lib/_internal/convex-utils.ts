@@ -6,6 +6,7 @@ export const parseConvexData = (
 ): RecordType[] => {
   return data?.map((r: ConvexRecordType) => ({
     id: r._id,
+
     ...r,
   })) as RecordType[];
 };

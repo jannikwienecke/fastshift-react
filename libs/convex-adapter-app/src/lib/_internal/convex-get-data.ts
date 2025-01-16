@@ -2,6 +2,7 @@ import {
   arrayIntersection,
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
+  IndexField,
   QueryServerProps,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
@@ -16,17 +17,13 @@ import {
   getRecordsByIds,
 } from './convex-get-ids-from';
 import { mapWithInclude } from './convex-map-with-include';
+import { convexSortRows } from './convex-sort-rows';
 import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
-import { ConvexRecord } from './types.convex';
+import { ConvexRecordType } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { viewConfigManager, filters, registeredViews, displayOptions } = args;
-
-  console.log(
-    'displayOptions: sorting by: ',
-    displayOptions?.sorting?.field.name
-  );
 
   const isTask = viewConfigManager?.getTableName() === 'tasks';
 
@@ -36,9 +33,27 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   };
 
   const _indexFields = viewConfigManager.getIndexFields();
+
   const _searchFields = viewConfigManager.getSearchableFields();
 
   const displayField = viewConfigManager.getDisplayFieldLabel();
+
+  const hasSortingField = !!displayOptions?.sorting?.field.name;
+
+  // TODO HIER WEITER MACHEN
+  // Refactor this into its own function (getting of the display sorting index field)
+  // Fix: Filtering of a Date field that has no index set...
+  // adjust the displaying of the _creationTime -> "Creation Time"
+  const indexFields_ = _indexFields
+    .filter((f) => f.fields.length === 1)
+    .map((f) => ({
+      name: f.name,
+      field: f.fields[0],
+    }));
+
+  const displaySortingIndexField = indexFields_.find(
+    (f) => f.field === displayOptions?.sorting?.field.name
+  );
 
   let isDone = false;
   let isGetAll = false;
@@ -154,24 +169,21 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
 
-    // TODO: HIER WEITER MACHEN.
-    // We must check if there is an index for this sorting field
-    // if not -> we must sort fetch all and sort manually after
-    // add warning that this search might be expensive
-
     const rowsBeforeFilter =
       allIds !== null
         ? await getRecordsByIds(
             idsAfterRemove?.slice(position, nextPosition) ?? [],
             dbQuery
           )
-        : anyFilter
+        : anyFilter || (hasSortingField && !displaySortingIndexField)
         ? await getAll()
-        : displayOptions?.sorting?.field.name
-        ? await dbQuery.withIndex(displayOptions.sorting.field.name).paginate({
-            cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-            numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),
-          })
+        : displaySortingIndexField
+        ? await dbQuery
+            .withIndex(displaySortingIndexField.name?.toString())
+            .paginate({
+              cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+              numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),
+            })
         : await dbQuery.paginate({
             cursor: args?.paginateOptions?.cursor?.cursor ?? null,
             numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),
@@ -196,7 +208,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     return r;
   };
 
-  const rows: ConvexRecord[] = [];
+  const rows: ConvexRecordType[] = [];
 
   const newRows = await fetch();
 
@@ -207,8 +219,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   rows.push(...filtered);
 
+  const sortedRows = convexSortRows(rows, displayOptions);
+
   const rawData = await mapWithInclude(
-    allIds !== null ? rows : rows.slice(position, nextPosition),
+    allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition),
     ctx,
     args
   );
@@ -221,8 +235,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   }
 
   const data = parseConvexData(rawData);
-
-  // logTask({ filters: filters?.length, dat: data?.length });
 
   return { data, continueCursor, isDone };
 };

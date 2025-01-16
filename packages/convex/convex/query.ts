@@ -36,6 +36,8 @@ export const displayOptions = server.query({
     const all = await ctx.db.query('tasks').withIndex('priority').collect();
     console.log({ all });
 
+    // ctx.db.query('tasks').withIndex('by_creation_time', q => q.eq('_creationTime'))
+
     // await ctx.db
     //   .query('tasks')
     //   .withSearchIndex('name_search', (q) => q.search('name', 'a'))

@@ -32,13 +32,15 @@ const DisplayOptionsButton = (props: {
     <Button
       variant={'outline'}
       className="py-0 h-7 flex flex-row items-center gap-2 text-xs"
-      onClick={(e) => props.onOpen(e.currentTarget.getBoundingClientRect())}
+      onClick={(e) => {
+        props.onOpen(e.currentTarget.getBoundingClientRect());
+      }}
     >
       <div>
         <SlidersHorizontalIcon className="w-4 h-4" />
       </div>
 
-      <div>{t(props.label as TranslationKeys)}</div>
+      <div>{t(props.label as TranslationKeys)}1</div>
     </Button>
   );
 };
@@ -76,10 +78,10 @@ const DisplayOptionsOrderingButtonCombobox = (props: {
 
       <div className="flex flex-row gap-2 items-center">
         <DisplayOptionsSelectButton
-          label={props.sorting.field?.name.firstUpper()}
-          onClick={(e) =>
-            props.sorting.onOpen(e.currentTarget.getBoundingClientRect())
-          }
+          label={props.sorting.field?.name.firstUpper() ?? ''}
+          onClick={(e) => {
+            props.sorting.onOpen(e.currentTarget.getBoundingClientRect());
+          }}
         />
       </div>
     </div>

@@ -2,33 +2,19 @@ import {
   DisplayOptionsProps,
   MakeDisplayOptionsPropsOptions,
   RecordType,
-  TranslationKeys,
 } from '@apps-next/core';
-import { store$ } from '../../legend-store';
+import {
+  derviedDisplayOptions,
+  displayOptionsProps,
+} from '../../legend-store/legend.store.derived.displayOptions';
 
 export const makeDisplayOptionsProps = <T extends RecordType>(
   options?: MakeDisplayOptionsPropsOptions<T>
 ): DisplayOptionsProps => {
-  const { sorting, ...props } = store$.displayOptions.get();
-  const sortingDefaultField = store$.viewConfigManager.getFieldBy(
-    options?.sorting.defaultSortingField.toString() ?? ''
-  );
+  // TODO HIER WEITER MACHEN
+  // if sorting field is passed -> this must be used - currently only used for showing in ui but not actully used for sorting
+  // if no sorting default field is passed -> its always sorted by creation date -> show in ui (By Creation Date)
 
-  return {
-    ...props,
-
-    onOpen: () => store$.displayOptionsOpen(),
-    onClose: () => null,
-
-    label:
-      options?.label ??
-      ('displayOptions.button.label' satisfies TranslationKeys),
-
-    sorting: {
-      ...sorting,
-      field: sorting.field ?? sortingDefaultField,
-      onOpen: store$.displayOptionsOpenSorting,
-      onClose: () => null,
-    },
-  } satisfies DisplayOptionsProps;
+  displayOptionsProps.set(options);
+  return derviedDisplayOptions.get();
 };

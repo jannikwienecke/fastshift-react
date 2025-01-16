@@ -56,4 +56,21 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       nextCursor: { cursor: null, position: null },
     });
   }).onChange(() => null);
+
+  observable(function handleDisplayOptionsChange() {
+    const field = store$.displayOptions.sorting.field.get();
+    const order = store$.displayOptions.sorting.order.get();
+
+    field?.name &&
+      console.log('handleDisplayOptionsChange: ', field?.name, order);
+
+    store$.fetchMore.assign({
+      reset: true,
+      isFetching: true,
+      isFetched: false,
+      isDone: false,
+      currentCursor: { cursor: null, position: null },
+      nextCursor: { cursor: null, position: null },
+    });
+  }).onChange(() => null);
 };

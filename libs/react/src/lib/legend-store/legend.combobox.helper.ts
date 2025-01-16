@@ -1,6 +1,7 @@
 import {
   ComboxboxItem,
   FieldConfig,
+  NONE_OPTION,
   RecordType,
   Row,
   getRelationTableName,
@@ -52,7 +53,17 @@ export const getViewFieldsOptions = (): MakeComboboxStateProps | null => {
 
 export const makeComboboxStateSortingOptions =
   (): MakeComboboxStateProps | null => {
-    return getViewFieldsOptions();
+    const props = getViewFieldsOptions();
+    if (!props) return null;
+
+    // const noneOption = makeRow(NONE_OPTION, 'By Creation', NONE_OPTION, null);
+
+    // console.log({ values: props.values });
+    const values = [...(props.values || [])];
+    return {
+      ...props,
+      values,
+    };
   };
 
 export const makeComboboxStateFilterOptions =

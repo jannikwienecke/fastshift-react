@@ -12,6 +12,8 @@ export const filterResults = (
 ) => {
   const enumFilters = filters?.filter((f) => f.field.enum) ?? [];
   const stringFilters = filters?.filter((f) => f.field.type === 'String') ?? [];
+  // const dateFilters = filters?.filter((f) => f.field.type === 'Date') ?? [];
+
   const equalityFilters =
     filters?.filter(
       (f) => f.field.type === 'Boolean' || f.field.type === 'Number'

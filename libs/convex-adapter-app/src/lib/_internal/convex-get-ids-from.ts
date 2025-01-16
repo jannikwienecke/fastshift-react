@@ -237,27 +237,27 @@ export const getIdsFromIndexFilters = async (
             currentIndexFilter.date
           );
 
+          const indexName = indexField.name;
+
+          const fieldName = indexField.field.toString();
+
           if (!start && !end) {
             rows = await dbQuery
-              .withIndex(indexField.name, (q) =>
-                q.eq(indexField.field.toString(), undefined)
-              )
+              .withIndex(indexName, (q) => q.eq(fieldName, undefined))
               .collect();
           } else if (start || end) {
             rows = await dbQuery
-              .withIndex(indexField.name, (q) => {
+              .withIndex(indexName, (q) => {
                 if (start && end) {
                   return q
-                    .gt(indexField.field.toString(), start.getTime())
-                    .lt(indexField.field.toString(), end.getTime());
+                    .gt(fieldName, start.getTime())
+                    .lt(fieldName, end.getTime());
                 }
                 if (start) {
-                  return q.gt(indexField.field.toString(), start.getTime());
+                  return q.gt(fieldName, start.getTime());
                 }
                 if (end) {
-                  return q
-                    .lt(indexField.field.toString(), end.getTime())
-                    .gt(indexField.field.toString(), 0);
+                  return q.lt(fieldName, end.getTime()).gt(fieldName, 0);
                 }
 
                 return q;
