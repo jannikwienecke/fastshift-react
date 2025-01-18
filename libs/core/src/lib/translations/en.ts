@@ -16,4 +16,9 @@ export const en = {
   search: {
     placeholder: 'Search',
   },
+  viewFields: {
+    _creationTime: {
+      label: 'Created At',
+    },
+  },
 };

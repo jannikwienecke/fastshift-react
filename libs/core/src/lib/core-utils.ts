@@ -1,3 +1,4 @@
+import { TFunction } from 'i18next';
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
 import { ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
@@ -223,4 +224,11 @@ export const makeDayMonthString = (date: Date) => {
   });
 
   return formatter.format(date);
+};
+
+export const renderField = (field: string, t: TFunction) => {
+  let nameToRender = t(`viewFields.${field}.label`);
+  nameToRender = nameToRender.includes('viewFields.') ? field : nameToRender;
+
+  return nameToRender;
 };

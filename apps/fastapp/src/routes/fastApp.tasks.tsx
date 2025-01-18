@@ -130,9 +130,6 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
 const Task = observer(() => {
   const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
 
-  const { viewConfigManager } = useView();
-  console.log(viewConfigManager);
-
   return (
     <DefaultTemplate<TaskViewDataType>
       listOptions={{

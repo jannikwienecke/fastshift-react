@@ -21,6 +21,7 @@ import { convexSortRows } from './convex-sort-rows';
 import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
+import { getDisplayOptionsInfo } from './convex-display-options';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { viewConfigManager, filters, registeredViews, displayOptions } = args;
@@ -38,22 +39,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
-  const hasSortingField = !!displayOptions?.sorting?.field.name;
-
-  // TODO HIER WEITER MACHEN
-  // Refactor this into its own function (getting of the display sorting index field)
-  // Fix: Filtering of a Date field that has no index set...
-  // adjust the displaying of the _creationTime -> "Creation Time"
-  const indexFields_ = _indexFields
-    .filter((f) => f.fields.length === 1)
-    .map((f) => ({
-      name: f.name,
-      field: f.fields[0],
-    }));
-
-  const displaySortingIndexField = indexFields_.find(
-    (f) => f.field === displayOptions?.sorting?.field.name
-  );
+  const displayOptionsInfo = getDisplayOptionsInfo(args);
 
   let isDone = false;
   let isGetAll = false;
@@ -175,11 +161,15 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
             idsAfterRemove?.slice(position, nextPosition) ?? [],
             dbQuery
           )
-        : anyFilter || (hasSortingField && !displaySortingIndexField)
+        : anyFilter ||
+          (displayOptionsInfo.hasSortingField &&
+            !displayOptionsInfo.displaySortingIndexField)
         ? await getAll()
-        : displaySortingIndexField
+        : displayOptionsInfo.displaySortingIndexField
         ? await dbQuery
-            .withIndex(displaySortingIndexField.name?.toString())
+            .withIndex(
+              displayOptionsInfo.displaySortingIndexField.name?.toString()
+            )
             .paginate({
               cursor: args?.paginateOptions?.cursor?.cursor ?? null,
               numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),
@@ -219,7 +209,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   rows.push(...filtered);
 
-  const sortedRows = convexSortRows(rows, displayOptions);
+  const sortedRows = convexSortRows(rows, displayOptionsInfo);
 
   const rawData = await mapWithInclude(
     allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition),

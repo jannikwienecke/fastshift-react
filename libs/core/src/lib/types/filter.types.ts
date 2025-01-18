@@ -37,6 +37,9 @@ export type FilterType = FilterRelationType | FilterPrimitiveType;
 // export type
 export type DisplayOptionsUiType = {
   isOpen: boolean;
+  viewType: {
+    type: 'list' | 'board';
+  };
   sorting: {
     isOpen: boolean;
     field?: FieldConfig;

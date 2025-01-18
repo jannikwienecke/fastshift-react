@@ -56,9 +56,6 @@ export const makeComboboxStateSortingOptions =
     const props = getViewFieldsOptions();
     if (!props) return null;
 
-    // const noneOption = makeRow(NONE_OPTION, 'By Creation', NONE_OPTION, null);
-
-    // console.log({ values: props.values });
     const values = [...(props.values || [])];
     return {
       ...props,

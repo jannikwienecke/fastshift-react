@@ -106,6 +106,9 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
   displayOptions: {
     isOpen: false,
+    viewType: {
+      type: 'list',
+    },
     sorting: {
       isOpen: false,
       rect: null,

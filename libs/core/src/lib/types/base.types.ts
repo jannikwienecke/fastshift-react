@@ -47,6 +47,8 @@ export type FieldConfig<TName = string> = {
   isRelationalIdField?: boolean;
   type: FieldType;
   name: TName;
+  label?: string;
+  description?: string;
   isList: boolean;
   isRequired?: boolean;
   relation?: FieldRelationType;

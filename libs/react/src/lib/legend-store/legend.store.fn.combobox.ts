@@ -177,8 +177,6 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
         selected: selected ?? [],
       });
 
-      console.log(mutation);
-
       runMutation({
         mutation: mutation,
         viewName: store$.viewConfigManager.viewConfig.viewName.get(),

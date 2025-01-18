@@ -107,11 +107,9 @@ export const useMutation = () => {
       const previousState = queryClient.getQueryData(queryKey);
       const previousStateAll = queryClient.getQueryData(queryKeyAll);
       if ('handler' in vars.mutation && previousState) {
-        console.log('HANDLER IS IN MUTATION');
         const newState = vars.mutation.handler?.(
           (previousState as any).data || []
         );
-        console.log('SET NEW STATE -> ', newState);
         queryClient.setQueryData(queryKey, {
           data: newState,
         });

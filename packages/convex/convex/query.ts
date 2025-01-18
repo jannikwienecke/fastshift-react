@@ -36,7 +36,14 @@ export const displayOptions = server.query({
     const all = await ctx.db.query('tasks').withIndex('priority').collect();
     console.log({ all });
 
-    // ctx.db.query('tasks').withIndex('by_creation_time', q => q.eq('_creationTime'))
+    const tasks = await ctx.db.query('tasks').collect();
+
+    const start = new Date().getTime();
+    const end = start + 1000 * 60 * 60 * 24;
+
+    const filter = tasks.filter(
+      (t) => t.dueDate && t.dueDate >= start && t.dueDate <= end
+    );
 
     // await ctx.db
     //   .query('tasks')

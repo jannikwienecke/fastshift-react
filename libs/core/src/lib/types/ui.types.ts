@@ -116,12 +116,16 @@ export type DisplayOptionsProps = {
   onOpen: (rect: DOMRect) => void;
   onClose: () => void;
 
+  viewType: {
+    //
+  } & DisplayOptionsUiType['viewType'];
+
   sorting: {
     onOpen: (rect: DOMRect) => void;
     onClose: () => void;
   } & DisplayOptionsUiType['sorting'];
   // onSelect: (filter: FilterItemType, rect: DOMRect) => void;
-} & Omit<DisplayOptionsUiType, 'sorting'>;
+} & Omit<DisplayOptionsUiType, 'sorting' | 'viewType'>;
 
 export type FilterProps = {
   label?: string;

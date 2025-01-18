@@ -14,4 +14,10 @@ export const de = {
   search: {
     placeholder: 'Suchen',
   },
+
+  viewFields: {
+    _creationTime: {
+      label: 'Erstellt am',
+    },
+  },
 } satisfies typeof en;
