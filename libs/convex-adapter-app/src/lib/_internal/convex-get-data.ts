@@ -2,6 +2,7 @@ import {
   arrayIntersection,
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
+  DEFAULT_MAX_ITEMS_GROUPING,
   IndexField,
   QueryServerProps,
 } from '@apps-next/core';
@@ -137,8 +138,12 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     ])
   );
 
+  const fetchLimit = args.displayOptions?.grouping?.field.name
+    ? DEFAULT_MAX_ITEMS_GROUPING
+    : DEFAULT_FETCH_LIMIT_QUERY;
+
   const position = args.paginateOptions?.cursor?.position ?? 0;
-  const nextPosition = position + DEFAULT_FETCH_LIMIT_QUERY;
+  const nextPosition = position + fetchLimit;
 
   const fetch = async (multiple?: number) => {
     const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
@@ -172,11 +177,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
             )
             .paginate({
               cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-              numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),
+              numItems: fetchLimit + (idsToRemove.length ?? 0),
             })
         : await dbQuery.paginate({
             cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-            numItems: DEFAULT_FETCH_LIMIT_QUERY + (idsToRemove.length ?? 0),
+            numItems: fetchLimit + (idsToRemove.length ?? 0),
           });
 
     const rows =

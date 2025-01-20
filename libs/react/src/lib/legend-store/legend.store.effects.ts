@@ -60,9 +60,15 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   observable(function handleDisplayOptionsChange() {
     const field = store$.displayOptions.sorting.field.get();
     const order = store$.displayOptions.sorting.order.get();
+    const grouping = store$.displayOptions.grouping.field.get();
 
-    field?.name &&
-      console.log('handleDisplayOptionsChange: ', field?.name, order);
+    (field?.name || grouping?.name) &&
+      console.log(
+        'handleDisplayOptionsChange: ',
+        field?.name,
+        order,
+        grouping?.name
+      );
 
     store$.fetchMore.assign({
       reset: true,

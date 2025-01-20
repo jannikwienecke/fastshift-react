@@ -91,6 +91,31 @@ const DisplayOptionsOrderingButtonCombobox = (props: {
   );
 };
 
+const DisplayOptionsGroupingButtonCombobox = (props: {
+  grouping: DisplayOptionsProps['grouping'];
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-row gap-2 items-center justify-between">
+      <div className="flex flex-row gap-2 items-center">
+        <ArrowUpDownIcon className="w-3 h-3" strokeWidth={3} />
+        <span>
+          {props.grouping.label || t('displayOptions.grouping.label')}
+        </span>
+      </div>
+
+      <div className="flex flex-row gap-2 items-center">
+        <DisplayOptionsSelectButton
+          label={props.grouping.field?.name.firstUpper() ?? ''}
+          onClick={(e) => {
+            props.grouping.onOpen(e.currentTarget.getBoundingClientRect());
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 function DisplayOptionsViewType({
   viewType,
 }: {
@@ -132,6 +157,7 @@ function DisplayOptionsPopover(props: {
   onClose: DisplayOptionsProps['onClose'];
   children: React.ReactNode;
   sorting: DisplayOptionsProps['sorting'];
+  grouping: DisplayOptionsProps['grouping'];
   viewType: DisplayOptionsProps['viewType'];
 }) {
   return (
@@ -148,7 +174,8 @@ function DisplayOptionsPopover(props: {
         <DisplayOptionsViewType {...props} />
 
         <DisplayOptionsOrderingButtonCombobox {...props} />
-
+        <DisplayOptionsGroupingButtonCombobox {...props} />
+        {/* 
         <div className="flex flex-row gap-2 items-center justify-between">
           <div className="flex flex-row gap-2 items-center">
             <MenuIcon className="w-3 h-3 font-bold" strokeWidth={3} />
@@ -163,7 +190,7 @@ function DisplayOptionsPopover(props: {
               }}
             />
           </div>
-        </div>
+        </div> */}
       </PopoverContent>
     </Popover>
   );

@@ -41,7 +41,9 @@ import {
   globalQueryUpdate,
 } from './legend.store.fn.global-query';
 import {
+  displayOptionsCloseCombobox,
   displayOptionsOpen,
+  displayOptionsOpenGrouping,
   displayOptionsOpenSorting,
   displayOptionsSelectField,
 } from './legend-store.fn.displayOptions';
@@ -97,4 +99,8 @@ export const store$ = observable<LegendStore>({
     displayOptionsOpenSorting(store$)(...props),
   displayOptionsSelectField: (...props) =>
     displayOptionsSelectField(store$)(...props),
+  displayOptionsOpenGrouping: (...props) =>
+    displayOptionsOpenGrouping(store$)(...props),
+  displayOptionsCloseCombobox: (...props) =>
+    displayOptionsCloseCombobox(store$)(...props),
 });

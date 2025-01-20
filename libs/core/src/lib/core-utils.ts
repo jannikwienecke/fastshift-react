@@ -146,9 +146,17 @@ export const parseFilterStringForServer = (
 export const convertDisplayOptionsForBackend = (
   displayOptions: DisplayOptionsUiType
 ): string => {
-  if (!displayOptions.sorting.field) return '';
+  if (!displayOptions.sorting.field && !displayOptions.grouping) return '';
 
-  return `sorting=${displayOptions.sorting.field?.name}:${displayOptions.sorting.order}`;
+  const sortingString = displayOptions.sorting.field
+    ? `sorting=${displayOptions.sorting.field.name}:${displayOptions.sorting.order}`
+    : '';
+
+  const groupingString = displayOptions.grouping.field
+    ? `grouping=${displayOptions.grouping.field.name}`
+    : '';
+
+  return [sortingString, groupingString].filter(Boolean).join(';');
 };
 
 export const parseDisplayOptionsStringForServer = (
@@ -175,6 +183,13 @@ export const parseDisplayOptionsStringForServer = (
         ...options.sorting,
         field: fieldConfig,
         order: order as 'asc' | 'desc',
+      };
+    } else if (key === 'grouping' && field) {
+      const fieldConfig = viewConfigManager.getFieldBy(field);
+
+      options.grouping = {
+        ...options.grouping,
+        field: fieldConfig,
       };
     } else {
       //

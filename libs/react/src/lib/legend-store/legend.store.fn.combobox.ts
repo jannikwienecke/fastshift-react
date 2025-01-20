@@ -30,7 +30,7 @@ export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   store$.filterCloseAll();
 
   // displayOptions
-  store$.displayOptions.sorting.isOpen.set(false);
+  store$.displayOptionsCloseCombobox();
 
   newSelected$.set([]);
   removedSelected$.set([]);
@@ -63,7 +63,8 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
     } else if (store$.displayOptions.isOpen.get()) {
       const displayOptions = store$.displayOptions.get();
       const sortingOpen = displayOptions.sorting.isOpen;
-      if (sortingOpen) {
+      const groupingOpen = displayOptions.grouping.isOpen;
+      if (sortingOpen || groupingOpen) {
         store$.displayOptionsSelectField(value);
       } else {
         //

@@ -7,8 +7,7 @@ export const getDisplayOptionsInfo = (props: QueryServerProps) => {
   const hasSortingField = !!displayOptions?.sorting?.field.name;
 
   // TODO HIER WEITER MACHEN
-  // adjust the displaying of the _creationTime -> "Creation Time"
-  //   use CONSTANT CREATION_TIME_FIELD or something like this and relace everywhere
+  // add grouping to the list view
   const indexFields_ = _indexFields
     .filter((f) => f.fields.length === 1)
     .map((f) => ({

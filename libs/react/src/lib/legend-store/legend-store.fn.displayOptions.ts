@@ -13,14 +13,41 @@ export const displayOptionsOpenSorting: StoreFn<'displayOptionsOpenSorting'> =
     store$.displayOptions.sorting.rect.set(rect);
   };
 
+export const displayOptionsOpenGrouping: StoreFn<
+  'displayOptionsOpenGrouping'
+> = (store$) => (rect) => {
+  store$.displayOptions.grouping.isOpen.set(true);
+  store$.displayOptions.grouping.rect.set(rect);
+};
+
+export const displayOptionsCloseCombobox: StoreFn<
+  'displayOptionsCloseCombobox'
+> = (store$) => () => {
+  store$.displayOptions.sorting.isOpen.set(false);
+  store$.displayOptions.grouping.isOpen.set(false);
+
+  store$.displayOptions.sorting.rect.set(null);
+  store$.displayOptions.grouping.rect.set(null);
+};
+
 export const displayOptionsSelectField: StoreFn<'displayOptionsSelectField'> =
   (store$) => (selected) => {
     const field = store$.viewConfigManager.getFieldBy(selected.id.toString());
 
+    const sorting = store$.displayOptions.sorting;
+    const grouping = store$.displayOptions.grouping;
+
     batch(() => {
-      store$.displayOptions.sorting.field.set(field);
-      store$.displayOptions.sorting.order.set('asc');
-      store$.displayOptions.sorting.isOpen.set(false);
-      store$.displayOptions.sorting.rect.set(null);
+      if (sorting.isOpen.get()) {
+        sorting.field.set(field);
+        sorting.order.set('asc');
+      } else if (grouping.isOpen.get()) {
+        grouping.field.set(field);
+      }
+
+      sorting.isOpen.set(false);
+      sorting.rect.set(null);
+      grouping.isOpen.set(false);
+      grouping.rect.set(null);
     });
   };

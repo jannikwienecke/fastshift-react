@@ -5,4 +5,7 @@ export type DisplayOptionsType = {
     field: FieldConfig;
     order: 'asc' | 'desc';
   };
+  grouping?: {
+    field: FieldConfig;
+  };
 };

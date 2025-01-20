@@ -47,6 +47,12 @@ export type DisplayOptionsUiType = {
     rect: DOMRect | null;
     label?: string;
   };
+  grouping: {
+    isOpen: boolean;
+    field?: FieldConfig;
+    rect: DOMRect | null;
+    label?: string;
+  };
 };
 
 export type FilterItemType = {

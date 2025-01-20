@@ -103,8 +103,8 @@ export const makeRow = (
     getValue: (key: keyof any) => raw[key],
     getValueLabel: (key: keyof any) => raw[key],
     getField: (key: keyof any) => ({
-      id: raw[key].id,
-      label: raw[key].label,
+      id: raw[key]?.id,
+      label: raw[key]?.label,
       field,
     }),
   };

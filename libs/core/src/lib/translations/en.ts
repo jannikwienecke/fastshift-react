@@ -12,6 +12,9 @@ export const en = {
     sorting: {
       label: 'Ordering',
     },
+    grouping: {
+      label: 'Grouping',
+    },
   },
   search: {
     placeholder: 'Search',

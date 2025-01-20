@@ -14,6 +14,8 @@ import {
   handleRelationalField,
   makeComboboxStateSortingOptions,
   getSharedStateSorting,
+  makeComboboxStateGroupingOptions,
+  getSharedStateGrouping,
 } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
@@ -24,6 +26,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const displayOptions = store$.displayOptions.get();
   const displayOptionsSortingIsOpen = displayOptions.sorting.isOpen;
+  const displayOptionsGroupingIsOpen = displayOptions.grouping.isOpen;
 
   const operatorField = store$.filter.selectedOperatorField.get();
   const selectedFilterField = filterIsOpen
@@ -34,7 +37,12 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const isList = !!store$.list.selectedRelationField.get();
   const isFilter = filterIsOpen;
 
-  if (!isList && !isFilter && !displayOptionsSortingIsOpen)
+  if (
+    !isList &&
+    !isFilter &&
+    !displayOptionsSortingIsOpen &&
+    !displayOptionsGroupingIsOpen
+  )
     return DEFAULT_COMBOBOX_STATE;
 
   const field = isList ? selectedListField : selectedFilterField ?? null;
@@ -42,6 +50,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const stateSharedFilter = getSharedStateFilter();
   const stateSharedList = getSharedStateList();
   const stateSharedSorting = getSharedStateSorting();
+  const stateSharedGrouping = getSharedStateGrouping();
 
   const selectedOfFilter = getDefaultSelectedFilter();
   const selectedOfList = getDefaultSelectedList();
@@ -56,6 +65,8 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     ? stateSharedList
     : displayOptionsSortingIsOpen
     ? stateSharedSorting
+    : displayOptionsGroupingIsOpen
+    ? stateSharedGrouping
     : stateSharedFilter;
 
   const selected = isList ? selectedOfList : selectedOfFilter;
@@ -72,6 +83,8 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     options = makeComboboxStateFilterOptions();
   } else if (!field && displayOptionsSortingIsOpen) {
     options = makeComboboxStateSortingOptions();
+  } else if (!field && displayOptionsGroupingIsOpen) {
+    options = makeComboboxStateGroupingOptions();
   } else if (field?.relation) {
     options = handleRelationalField(field, selected, isFilter);
   } else if (field?.enum) {

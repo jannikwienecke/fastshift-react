@@ -33,7 +33,6 @@ export const makeComboboxProps = <T extends RecordType = RecordType>(
     onOpenChange: (open) => {
       if (open) return;
 
-      console.log('close..');
       const fn = props?.onClose ? props.onClose : store$.comboboxClose;
 
       fn();

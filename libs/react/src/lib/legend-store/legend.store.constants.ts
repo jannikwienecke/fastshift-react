@@ -113,5 +113,9 @@ export const DEFAULT_LEGEND_STORE: Pick<
       isOpen: false,
       rect: null,
     },
+    grouping: {
+      isOpen: false,
+      rect: null,
+    },
   },
 };

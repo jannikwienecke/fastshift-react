@@ -1,3 +1,4 @@
+import { Row } from '../data-model';
 import { RecordType } from './base.types';
 import { DisplayOptionsUiType, FilterItemType } from './filter.types';
 
@@ -29,6 +30,11 @@ export type ListProps<TItem extends ListItem = ListItem> = {
   items: TItem[];
   onSelect: (item: TItem) => void;
   selected: Record<string, any>[];
+  groups: {
+    groupByField: string;
+    groupById: string | number;
+    groupByLabel: string;
+  }[];
   onReachEnd: () => void;
 };
 
@@ -124,6 +130,11 @@ export type DisplayOptionsProps = {
     onOpen: (rect: DOMRect) => void;
     onClose: () => void;
   } & DisplayOptionsUiType['sorting'];
+
+  grouping: {
+    onOpen: (rect: DOMRect) => void;
+    onClose: () => void;
+  } & DisplayOptionsUiType['grouping'];
   // onSelect: (filter: FilterItemType, rect: DOMRect) => void;
 } & Omit<DisplayOptionsUiType, 'sorting' | 'viewType'>;
 

@@ -35,7 +35,14 @@ export const getRelationalData = async (
       );
     }
 
-    return dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+    const groupingField = args.displayOptions?.grouping?.field.name;
+
+    const isGroupByField = groupingField === field.name;
+
+    // if its the group by field, we need to query the complete table
+    return isGroupByField
+      ? dbQuery.collect()
+      : dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
   });
 
   const resultList = await Promise.all(relationalDataPromises);

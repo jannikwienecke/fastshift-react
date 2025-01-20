@@ -5,6 +5,8 @@ import {
   ListProps,
   RecordType,
   Row,
+  makeRowFromValue,
+  FieldConfig,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from '../../legend-store/legend.store.js';
@@ -24,6 +26,34 @@ export const makeListProps = <T extends RecordType = RecordType>(
   const fieldsRight = options?.fieldsRight ?? list?.fieldsRight ?? [];
   const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
   const dataModel = store$.dataModel.get() as DataModelNew<T>;
+
+  const grouping = store$.displayOptions.grouping.get();
+  const groupingIsRelationalField = grouping.field?.relation;
+
+  let groups: ListProps['groups'] = [];
+
+  if (groupingIsRelationalField && grouping.field?.name) {
+    groups =
+      store$.relationalDataModel[grouping.field.name]
+        ?.get()
+        .rows.map((row) => ({
+          groupByField: grouping.field?.relation?.fieldName ?? '',
+          groupById: row.id,
+          groupByLabel: row.label,
+        })) ?? [];
+  } else if (grouping.field?.type === 'Boolean' && grouping.field) {
+    groups =
+      [true, false]
+        .map((value) => ({
+          ...makeRowFromValue(value.toString(), grouping.field as FieldConfig),
+          value,
+        }))
+        .map((row) => ({
+          groupByField: grouping.field?.name ?? '',
+          groupById: row.id,
+          groupByLabel: row.label,
+        })) ?? [];
+  }
 
   const renderFields = (
     row: Row<T>,
@@ -90,5 +120,6 @@ export const makeListProps = <T extends RecordType = RecordType>(
     selected,
     items,
     onReachEnd: store$.globalFetchMore,
+    groups: groups ?? [],
   };
 };

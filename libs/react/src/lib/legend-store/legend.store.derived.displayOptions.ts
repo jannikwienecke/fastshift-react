@@ -1,5 +1,6 @@
 import {
   DisplayOptionsProps,
+  FieldConfig,
   MakeDisplayOptionsPropsOptions,
   TranslationKeys,
 } from '@apps-next/core';
@@ -13,17 +14,25 @@ export const displayOptionsProps = observable<
 export const derviedDisplayOptions = observable(() => {
   const options = displayOptionsProps.get();
 
-  const { sorting, ...props } = store$.displayOptions.get();
+  const { sorting, grouping, ...props } = store$.displayOptions.get();
 
-  const sortingDefaultField = store$.viewConfigManager.getFieldBy(
-    options?.sorting.defaultSortingField.toString() ?? ''
-  );
+  let sortingDefaultField: FieldConfig | undefined = undefined;
+
+  try {
+    sortingDefaultField = store$.viewConfigManager.getFieldBy(
+      options?.sorting.defaultSortingField.toString() ?? ''
+    );
+  } catch (e) {
+    //
+  }
 
   return {
     ...props,
 
     onOpen: () => store$.displayOptionsOpen(),
-    onClose: () => null,
+    onClose: () => {
+      //
+    },
 
     label:
       options?.label ??
@@ -33,7 +42,17 @@ export const derviedDisplayOptions = observable(() => {
       ...sorting,
       field: sorting.field ?? sortingDefaultField,
       onOpen: (...props) => store$.displayOptionsOpenSorting(...props),
-      onClose: () => null,
+      onClose: (...props) => {
+        store$.displayOptionsCloseCombobox(...props);
+      },
+    },
+    grouping: {
+      ...grouping,
+      field: grouping.field ?? sortingDefaultField,
+      onOpen: (...props) => store$.displayOptionsOpenGrouping(...props),
+      onClose: (...props) => {
+        store$.displayOptionsCloseCombobox(...props);
+      },
     },
   } satisfies DisplayOptionsProps;
 });

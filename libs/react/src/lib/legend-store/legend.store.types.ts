@@ -208,7 +208,9 @@ export type LegendStore = {
   displayOptions: DisplayOptionsUiType;
   displayOptionsOpen: () => void;
   displayOptionsOpenSorting: (rect: DOMRect) => void;
+  displayOptionsOpenGrouping: (rect: DOMRect) => void;
   displayOptionsSelectField: (selected: ComboxboxItem) => void;
+  displayOptionsCloseCombobox: () => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

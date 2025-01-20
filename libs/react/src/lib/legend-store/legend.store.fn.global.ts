@@ -1,6 +1,7 @@
 import { getViewByName, makeData, RelationalDataModel } from '@apps-next/core';
 import { StoreFn } from './legend.store.types';
 import { batch } from '@legendapp/state';
+import { displayOptionsProps } from './legend.store.derived.displayOptions';
 
 export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
   (store$) => (data) => {
@@ -52,6 +53,20 @@ export const init: StoreFn<'init'> =
       store$.viewConfigManager.set(viewConfigManager);
       store$.viewFieldsConfig.set(viewFieldsConfig);
       store$.filter.filters.set([]);
+
+      displayOptionsProps.set(undefined);
+
+      store$.displayOptions.sorting.assign({
+        isOpen: false,
+        rect: null,
+        field: undefined,
+        order: 'asc',
+      });
+      store$.displayOptions.grouping.assign({
+        isOpen: false,
+        rect: null,
+        field: undefined,
+      });
     });
 
     createDataModel(store$)(data);

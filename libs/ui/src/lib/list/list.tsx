@@ -9,6 +9,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   onSelect,
   selected,
   onReachEnd,
+  groups,
 }: ListProps<TItem>) {
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -31,8 +32,8 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     addObserver();
   }, [addObserver]);
 
-  return (
-    <>
+  const renderList = (items: TItem[]) => {
+    return (
       <List onSelect={onSelect} selected={selected}>
         {items.map((item) => {
           return (
@@ -50,6 +51,33 @@ export function ListDefault<TItem extends ListItem = ListItem>({
           );
         })}
       </List>
+    );
+  };
+
+  return (
+    <>
+      {groups.length ? (
+        <>
+          {/* TODO HIER WEITER MACHEN */}
+          {/* Style the groups ui part */}
+          {/* make it work for enum and boolean fields */}
+          {groups.map((group) => {
+            const itemsOfGroup = items.filter(
+              (item) =>
+                item[group.groupByField as keyof TItem] === group.groupById
+            );
+
+            return (
+              <div key={group.groupById}>
+                <div>{group.groupByLabel}</div>
+                {renderList(itemsOfGroup)}
+              </div>
+            );
+          })}
+        </>
+      ) : (
+        renderList(items)
+      )}
 
       <div
         ref={observerTarget}

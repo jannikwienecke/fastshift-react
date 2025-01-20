@@ -63,6 +63,31 @@ export const makeComboboxStateSortingOptions =
     };
   };
 
+export const makeComboboxStateGroupingOptions =
+  (): MakeComboboxStateProps | null => {
+    const props = getViewFieldsOptions();
+    if (!props) return null;
+
+    const fieldTypesToIgnore = ['Date', 'String'];
+
+    const values = [...(props.values || [])]
+      .filter((v) => v.id !== '_creationTime')
+      .filter((v) => {
+        const field = store$.viewConfigManager
+          .get()
+          .getFieldBy(v.id.toString());
+        if (!field) return true;
+        if (fieldTypesToIgnore.includes(field.type)) return false;
+
+        return true;
+      });
+
+    return {
+      ...props,
+      values,
+    };
+  };
+
 export const makeComboboxStateFilterOptions =
   (): MakeComboboxStateProps | null => {
     return getViewFieldsOptions();
@@ -239,6 +264,29 @@ export const getSharedStateSorting = (): ComboboxStateCommonType => {
     rect: store$.displayOptions.sorting.rect.get(),
     searchable: true,
     name: 'sorting',
+    isNewState: true,
+    open: true,
+    query: store$.combobox.query.get(),
+    field: null,
+    selected: [],
+    row: null,
+    placeholder:
+      makeFilterPropsOptions.placeholder.get() ??
+      t('filter.button.placeholder'),
+  };
+
+  return stateShared;
+};
+
+export const getSharedStateGrouping = (): ComboboxStateCommonType => {
+  // const selectedFilterField = store$.filter.selectedField.get();
+
+  // const selectedOfFilter = getDefaultSelectedFilter();
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: store$.displayOptions.grouping.rect.get(),
+    searchable: true,
+    name: 'grouping',
     isNewState: true,
     open: true,
     query: store$.combobox.query.get(),
