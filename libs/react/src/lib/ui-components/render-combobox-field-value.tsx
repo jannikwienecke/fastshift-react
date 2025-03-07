@@ -1,4 +1,4 @@
-import { FieldConfig, Row } from '@apps-next/core';
+import { FieldConfig, Row, useTranslation } from '@apps-next/core';
 import { getComponent } from './ui-components.helper';
 import { FilterValue } from './render-filter-value';
 
@@ -9,10 +9,13 @@ export const ComboboxFieldValue = ({
   field?: FieldConfig | null;
   value: Row;
 }) => {
+  const { t } = useTranslation();
+
   const fieldName = field?.name;
 
   const componentType = 'combobox';
   let ComponentToRender: React.ComponentType<any> | undefined = undefined;
+
   if (fieldName) {
     ComponentToRender = getComponent({
       componentType,
@@ -38,7 +41,7 @@ export const ComboboxFieldValue = ({
           <ComponentToRender data={raw} />
         </>
       ) : (
-        <>{value.label}</>
+        <>{t(value.label as any)}</>
       )}
     </>
   );

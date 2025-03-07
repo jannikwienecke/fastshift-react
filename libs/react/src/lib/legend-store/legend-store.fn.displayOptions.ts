@@ -1,4 +1,9 @@
-import { makeRow, Row } from '@apps-next/core';
+import {
+  makeRow,
+  NO_GROUPING_FIELD,
+  NO_SORTING_FIELD,
+  Row,
+} from '@apps-next/core';
 import { StoreFn } from './legend.store.types';
 import { batch } from '@legendapp/state';
 
@@ -38,7 +43,28 @@ export const displayOptionsCloseCombobox: StoreFn<
 
 export const displayOptionsSelectField: StoreFn<'displayOptionsSelectField'> =
   (store$) => (selected) => {
-    const field = store$.viewConfigManager.getFieldBy(selected.id.toString());
+    const isNoGrouping = selected.id === NO_GROUPING_FIELD.name;
+    const isNoSorting = selected.id === NO_SORTING_FIELD.name;
+
+    if (isNoGrouping) {
+      batch(() => {
+        store$.displayOptions.grouping.isOpen.set(false);
+        store$.displayOptions.grouping.rect.set(null);
+        store$.displayOptions.grouping.field.set(undefined);
+      });
+    } else if (isNoSorting) {
+      batch(() => {
+        store$.displayOptions.sorting.isOpen.set(false);
+        store$.displayOptions.sorting.rect.set(null);
+        store$.displayOptions.sorting.field.set(undefined);
+      });
+    }
+
+    const field = isNoGrouping
+      ? NO_GROUPING_FIELD
+      : isNoSorting
+      ? NO_SORTING_FIELD
+      : store$.viewConfigManager.getFieldBy(selected.id.toString());
 
     const sorting = store$.displayOptions.sorting;
     const grouping = store$.displayOptions.grouping;
@@ -61,8 +87,6 @@ export const displayOptionsSelectField: StoreFn<'displayOptionsSelectField'> =
 export const displayOptionsSelectViewField: StoreFn<
   'displayOptionsSelectViewField'
 > = (store$) => (field) => {
-  console.log('displayOptionsSelectViewField', field);
-
   const prevSelectedViewFields = store$.displayOptions.viewField.selected.get();
 
   const selected = prevSelectedViewFields.includes(field.id)
@@ -71,3 +95,8 @@ export const displayOptionsSelectViewField: StoreFn<
 
   store$.displayOptions.viewField.selected.set(selected);
 };
+
+// TODO
+// SHOW EMPTY GROUPS TOGGLE?
+// RESET -> CLEAR ALL
+// RENDER MODE (get all or just limit of X)

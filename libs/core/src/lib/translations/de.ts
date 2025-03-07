@@ -7,6 +7,14 @@ export const de = {
     },
   },
   displayOptions: {
+    sorting: {
+      label: 'Sortierung',
+      noSorting: 'Keine Sortierung',
+    },
+    grouping: {
+      label: 'Gruppierung',
+      noGrouping: 'Keine Gruppierung',
+    },
     button: {
       label: 'Anzeige',
     },

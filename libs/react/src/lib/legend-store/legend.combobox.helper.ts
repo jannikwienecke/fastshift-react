@@ -1,12 +1,17 @@
 import {
   ComboxboxItem,
   FieldConfig,
+  FieldType,
   NONE_OPTION,
+  NO_GROUPING_FIELD,
+  NO_SORTING_FIELD,
   RecordType,
   Row,
+  en,
   getRelationTableName,
   makeNoneOption,
   makeRow,
+  makeRowFromField,
   makeRowFromValue,
   t,
 } from '@apps-next/core';
@@ -56,7 +61,9 @@ export const makeComboboxStateSortingOptions =
     const props = getViewFieldsOptions();
     if (!props) return null;
 
-    const values = [...(props.values || [])];
+    let values = [...(props.values || [])];
+    values = [...values, makeRowFromField(NO_SORTING_FIELD)];
+
     return {
       ...props,
       values,
@@ -70,7 +77,7 @@ export const makeComboboxStateGroupingOptions =
 
     const fieldTypesToIgnore = ['Date', 'String'];
 
-    const values = [...(props.values || [])]
+    let values = [...(props.values || [])]
       .filter((v) => v.id !== '_creationTime')
       .filter((v) => {
         const field = store$.viewConfigManager
@@ -81,6 +88,8 @@ export const makeComboboxStateGroupingOptions =
 
         return true;
       });
+
+    values = [...values, makeRowFromField(NO_GROUPING_FIELD)];
 
     return {
       ...props,

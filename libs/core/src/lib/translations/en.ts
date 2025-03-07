@@ -11,9 +11,11 @@ export const en = {
     },
     sorting: {
       label: 'Ordering',
+      noSorting: 'No sorting',
     },
     grouping: {
       label: 'Grouping',
+      noGrouping: 'No grouping',
     },
   },
   search: {

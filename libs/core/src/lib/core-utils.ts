@@ -243,7 +243,7 @@ export const makeDayMonthString = (date: Date) => {
 
 export const renderField = (field: string, t: TFunction) => {
   let nameToRender = t(`viewFields.${field}.label`);
-  nameToRender = nameToRender.includes('viewFields.') ? field : nameToRender;
+  nameToRender = nameToRender.includes('viewFields.') ? t(field) : nameToRender;
 
   return nameToRender;
 };

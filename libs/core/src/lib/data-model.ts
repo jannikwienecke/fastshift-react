@@ -129,3 +129,7 @@ export const getRelationTableName = (field?: FieldConfig | null) => {
 export const makeNoneOption = (field: FieldConfig) => {
   return makeRow(NONE_OPTION, `No ${field.name}`, NONE_OPTION, field);
 };
+
+export const makeRowFromField = (field: FieldConfig): Row => {
+  return makeRow(field.name, field.name, field, field);
+};

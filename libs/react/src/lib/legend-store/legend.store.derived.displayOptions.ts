@@ -5,28 +5,27 @@ import {
   MakeDisplayOptionsPropsOptions,
   TranslationKeys,
   INTERNAL_FIELDS,
+  makeRow,
+  en,
+  NO_SORTING_FIELD,
+  NO_GROUPING_FIELD,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
 
 export const displayOptionsProps = observable<
-  MakeDisplayOptionsPropsOptions | undefined
->(undefined);
+  Partial<MakeDisplayOptionsPropsOptions>
+>({
+  displayFieldsToShow: [],
+});
 
 export const derviedDisplayOptions = observable(() => {
   const options = displayOptionsProps.get();
 
   const { sorting, grouping, ...props } = store$.displayOptions.get();
 
-  let sortingDefaultField: FieldConfig | undefined = undefined;
-
-  try {
-    sortingDefaultField = store$.viewConfigManager.getFieldBy(
-      options?.sorting.defaultSortingField.toString() ?? ''
-    );
-  } catch (e) {
-    //
-  }
+  const sortingDefaultField: FieldConfig = NO_SORTING_FIELD;
+  const groupingDefaultField: FieldConfig = NO_GROUPING_FIELD;
 
   return {
     ...props,
@@ -46,8 +45,8 @@ export const derviedDisplayOptions = observable(() => {
       .filter((field) => {
         return (
           field.name !== INTERNAL_FIELDS.creationTime.fieldName &&
-          displayOptionsProps.displayFieldsToShow.length &&
-          displayOptionsProps.displayFieldsToShow?.includes(field.name)
+          displayOptionsProps.displayFieldsToShow.get()?.length &&
+          displayOptionsProps.displayFieldsToShow.get()?.includes(field.name)
         );
       })
       .map((field) => ({
@@ -70,7 +69,7 @@ export const derviedDisplayOptions = observable(() => {
     },
     grouping: {
       ...grouping,
-      field: grouping.field ?? sortingDefaultField,
+      field: grouping.field ?? groupingDefaultField,
       onOpen: (...props) => store$.displayOptionsOpenGrouping(...props),
       onClose: (...props) => {
         store$.displayOptionsCloseCombobox(...props);

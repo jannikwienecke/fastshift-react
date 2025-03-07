@@ -57,10 +57,10 @@ const DisplayOptionsSelectButton = (props: {
   return (
     <Button
       variant={'outline'}
-      className="py-0 h-7 max-w-fit flex flex-row items-center gap-2 text-xs"
+      className="py-0 h-7 flex flex-row items-center gap-2 text-xs w-36 justify-between"
       onClick={props.onClick}
     >
-      <div>{t(props.label as TranslationKeys)}</div>
+      <div>{t(props.label as TranslationKeys).firstUpper()}</div>
 
       <div>
         <ChevronDownIcon className="w-4 h-4" />
@@ -73,18 +73,21 @@ const DisplayOptionsOrderingButtonCombobox = (props: {
   sorting: DisplayOptionsProps['sorting'];
 }) => {
   const { t } = useTranslation();
+
   return (
-    <div className="flex flex-row gap-2 items-center justify-between">
+    <div className="flex flex-row gap-2 items-center justify-between w-full">
       <div className="flex flex-row gap-2 items-center">
         <ArrowUpDownIcon className="w-3 h-3" strokeWidth={3} />
         <span className="text-foreground/70">
-          {props.sorting.label || t('displayOptions.sorting.label')}
+          {props.sorting.label
+            ? t(props.sorting.label as any)
+            : t('displayOptions.sorting.label')}
         </span>
       </div>
 
-      <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-row gap-2 justify-end w-full ">
         <DisplayOptionsSelectButton
-          label={props.sorting.field?.name.firstUpper() ?? ''}
+          label={props.sorting.field?.name ?? ''}
           onClick={(e) => {
             props.sorting.onOpen(e.currentTarget.getBoundingClientRect());
           }}
@@ -99,7 +102,7 @@ const DisplayOptionsGroupingButtonCombobox = (props: {
 }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-row gap-2 items-center justify-between">
+    <div className="flex flex-row gap-2 items-center justify-between w-full">
       <div className="flex flex-row gap-2 items-center">
         <StretchHorizontalIcon className="w-3 h-3" strokeWidth={3} />
 
@@ -110,7 +113,7 @@ const DisplayOptionsGroupingButtonCombobox = (props: {
 
       <div className="flex flex-row gap-2 items-center">
         <DisplayOptionsSelectButton
-          label={props.grouping.field?.name.firstUpper() ?? ''}
+          label={props.grouping.field?.name ?? ''}
           onClick={(e) => {
             props.grouping.onOpen(e.currentTarget.getBoundingClientRect());
           }}
@@ -166,8 +169,9 @@ function DisplayOptionsRenderFields(props: {
       <div className="flex flex-row flex-wrap gap-2 pt-2">
         {props.viewFields.map((field) => (
           <div
+            role="button"
             key={field.id.toString()}
-            className="flex flex-row items-center justify-between"
+            className="flex flex-row items-center justify-between cursor-pointer"
             onClick={() => props.onSelectViewField(field)}
           >
             <div

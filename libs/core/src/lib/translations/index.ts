@@ -4,6 +4,9 @@ import { t as tI18n } from 'i18next';
 import { useTranslation as useTranslationReact } from 'react-i18next';
 import React from 'react';
 
+export * from './en';
+export * from './de';
+
 export const baseResources = {
   en: {
     translation: en,

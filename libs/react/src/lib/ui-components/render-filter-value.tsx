@@ -55,7 +55,6 @@ export const FilterValue = (props: {
   return (
     <div className="flex flex-row gap-2 items-center">
       <span>{Icon && <Icon className="w-4 h-4" />}</span>
-
       <span>{renderField(name, t)}</span>
     </div>
   );
