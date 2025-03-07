@@ -1,4 +1,3 @@
-import { Row } from '../data-model';
 import { RecordType } from './base.types';
 import { DisplayOptionsUiType, FilterItemType } from './filter.types';
 
@@ -6,6 +5,12 @@ export type ComboxboxItem = {
   id: string | number | (string | number)[];
   label: string;
   icon?: React.FC<any>;
+};
+
+export type DisplayOptionsViewField = {
+  id: string;
+  label: string;
+  selected: boolean;
 };
 
 export type ListValueProps = {
@@ -30,11 +35,15 @@ export type ListProps<TItem extends ListItem = ListItem> = {
   items: TItem[];
   onSelect: (item: TItem) => void;
   selected: Record<string, any>[];
-  groups: {
+
+  grouping: {
     groupByField: string;
-    groupById: string | number;
-    groupByLabel: string;
-  }[];
+    groupLabel: string;
+    groups: {
+      groupById: string | number;
+      groupByLabel: string;
+    }[];
+  };
   onReachEnd: () => void;
 };
 
@@ -115,6 +124,7 @@ export type MakeDisplayOptionsPropsOptions<T extends RecordType = RecordType> =
     sorting: {
       defaultSortingField: keyof T;
     };
+    displayFieldsToShow?: (keyof T)[];
   };
 
 export type DisplayOptionsProps = {
@@ -125,6 +135,9 @@ export type DisplayOptionsProps = {
   viewType: {
     //
   } & DisplayOptionsUiType['viewType'];
+
+  viewFields: DisplayOptionsViewField[];
+  onSelectViewField: (field: DisplayOptionsViewField) => void;
 
   sorting: {
     onOpen: (rect: DOMRect) => void;

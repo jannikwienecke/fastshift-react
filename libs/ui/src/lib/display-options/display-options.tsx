@@ -8,13 +8,14 @@ import {
   ChevronDownIcon,
   GridIcon,
   ListIcon,
-  MenuIcon,
   SlidersHorizontalIcon,
+  StretchHorizontalIcon,
 } from 'lucide-react';
 import { Button } from '../components';
 
 import { Popover, PopoverContent, PopoverTrigger } from '../components';
 import { cn } from '../utils';
+import { Bubble } from '../bubble';
 
 const DisplayOptionsDefault = (props: DisplayOptionsProps) => {
   return (
@@ -76,7 +77,9 @@ const DisplayOptionsOrderingButtonCombobox = (props: {
     <div className="flex flex-row gap-2 items-center justify-between">
       <div className="flex flex-row gap-2 items-center">
         <ArrowUpDownIcon className="w-3 h-3" strokeWidth={3} />
-        <span>{props.sorting.label || t('displayOptions.sorting.label')}</span>
+        <span className="text-foreground/70">
+          {props.sorting.label || t('displayOptions.sorting.label')}
+        </span>
       </div>
 
       <div className="flex flex-row gap-2 items-center">
@@ -98,8 +101,9 @@ const DisplayOptionsGroupingButtonCombobox = (props: {
   return (
     <div className="flex flex-row gap-2 items-center justify-between">
       <div className="flex flex-row gap-2 items-center">
-        <ArrowUpDownIcon className="w-3 h-3" strokeWidth={3} />
-        <span>
+        <StretchHorizontalIcon className="w-3 h-3" strokeWidth={3} />
+
+        <span className="text-foreground/70">
           {props.grouping.label || t('displayOptions.grouping.label')}
         </span>
       </div>
@@ -152,6 +156,37 @@ function DisplayOptionsViewType({
   );
 }
 
+function DisplayOptionsRenderFields(props: {
+  viewFields: DisplayOptionsProps['viewFields'];
+  onSelectViewField: DisplayOptionsProps['onSelectViewField'];
+}) {
+  return (
+    <div>
+      <div className="text-foreground/70">Display Properties</div>
+      <div className="flex flex-row flex-wrap gap-2 pt-2">
+        {props.viewFields.map((field) => (
+          <div
+            key={field.id.toString()}
+            className="flex flex-row items-center justify-between"
+            onClick={() => props.onSelectViewField(field)}
+          >
+            <div
+              className={cn(
+                'rounded-lg border px-2',
+                field.selected
+                  ? 'border'
+                  : 'border-transparent text-foreground/70'
+              )}
+            >
+              {field.label.firstUpper()}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function DisplayOptionsPopover(props: {
   isOpen: DisplayOptionsProps['isOpen'];
   onClose: DisplayOptionsProps['onClose'];
@@ -159,9 +194,11 @@ function DisplayOptionsPopover(props: {
   sorting: DisplayOptionsProps['sorting'];
   grouping: DisplayOptionsProps['grouping'];
   viewType: DisplayOptionsProps['viewType'];
+  viewFields: DisplayOptionsProps['viewFields'];
+  onSelectViewField: DisplayOptionsProps['onSelectViewField'];
 }) {
   return (
-    <Popover modal>
+    <Popover modal onOpenChange={(open) => !open && props.onClose()}>
       <PopoverTrigger asChild>
         <button className="h-7">{props.children}</button>
       </PopoverTrigger>
@@ -175,22 +212,8 @@ function DisplayOptionsPopover(props: {
 
         <DisplayOptionsOrderingButtonCombobox {...props} />
         <DisplayOptionsGroupingButtonCombobox {...props} />
-        {/* 
-        <div className="flex flex-row gap-2 items-center justify-between">
-          <div className="flex flex-row gap-2 items-center">
-            <MenuIcon className="w-3 h-3 font-bold" strokeWidth={3} />
-            <span>Grouping</span>
-          </div>
 
-          <div className="flex flex-row gap-2 items-center">
-            <DisplayOptionsSelectButton
-              label="No Grouping"
-              onClick={() => {
-                //
-              }}
-            />
-          </div>
-        </div> */}
+        <DisplayOptionsRenderFields {...props} />
       </PopoverContent>
     </Popover>
   );

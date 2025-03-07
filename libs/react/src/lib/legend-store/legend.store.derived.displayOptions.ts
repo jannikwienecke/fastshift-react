@@ -1,8 +1,10 @@
 import {
+  DisplayOptionsViewField,
   DisplayOptionsProps,
   FieldConfig,
   MakeDisplayOptionsPropsOptions,
   TranslationKeys,
+  INTERNAL_FIELDS,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
@@ -31,12 +33,32 @@ export const derviedDisplayOptions = observable(() => {
 
     onOpen: () => store$.displayOptionsOpen(),
     onClose: () => {
-      //
+      console.log('onClose');
+      store$.displayOptionsClose();
     },
 
     label:
       options?.label ??
       ('displayOptions.button.label' satisfies TranslationKeys),
+
+    viewFields: store$.viewConfigManager
+      .getViewFieldList()
+      .filter((field) => {
+        return (
+          field.name !== INTERNAL_FIELDS.creationTime.fieldName &&
+          displayOptionsProps.displayFieldsToShow.length &&
+          displayOptionsProps.displayFieldsToShow?.includes(field.name)
+        );
+      })
+      .map((field) => ({
+        ...field,
+        id: field.name,
+        label: field.label ?? field.name,
+        selected: store$.displayOptions.viewField.selected.includes(field.name),
+      })),
+
+    onSelectViewField: (...props) =>
+      store$.displayOptionsSelectViewField(...props),
 
     sorting: {
       ...sorting,

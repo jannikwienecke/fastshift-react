@@ -7,6 +7,12 @@ export const displayOptionsOpen: StoreFn<'displayOptionsOpen'> =
     store$.displayOptions.isOpen.set(true);
   };
 
+export const displayOptionsClose: StoreFn<'displayOptionsClose'> =
+  (store$) => () => {
+    store$.displayOptions.isOpen.set(false);
+    store$.displayOptionsCloseCombobox();
+  };
+
 export const displayOptionsOpenSorting: StoreFn<'displayOptionsOpenSorting'> =
   (store$) => (rect) => {
     store$.displayOptions.sorting.isOpen.set(true);
@@ -51,3 +57,17 @@ export const displayOptionsSelectField: StoreFn<'displayOptionsSelectField'> =
       grouping.rect.set(null);
     });
   };
+
+export const displayOptionsSelectViewField: StoreFn<
+  'displayOptionsSelectViewField'
+> = (store$) => (field) => {
+  console.log('displayOptionsSelectViewField', field);
+
+  const prevSelectedViewFields = store$.displayOptions.viewField.selected.get();
+
+  const selected = prevSelectedViewFields.includes(field.id)
+    ? prevSelectedViewFields.filter((id) => id !== field.id)
+    : [...prevSelectedViewFields, field.id];
+
+  store$.displayOptions.viewField.selected.set(selected);
+};

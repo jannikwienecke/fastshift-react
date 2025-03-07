@@ -30,29 +30,45 @@ export const makeListProps = <T extends RecordType = RecordType>(
   const grouping = store$.displayOptions.grouping.get();
   const groupingIsRelationalField = grouping.field?.relation;
 
-  let groups: ListProps['groups'] = [];
+  const listGrouping: ListProps['grouping'] = {
+    groupByField: '',
+    groupLabel: '',
+    groups: [],
+  };
 
   if (groupingIsRelationalField && grouping.field?.name) {
-    groups =
+    listGrouping.groupByField = grouping.field?.relation?.fieldName ?? '';
+    listGrouping.groupLabel =
+      grouping.field?.relation?.tableName.firstUpper().slice(0, -1) ?? '';
+
+    listGrouping.groups =
       store$.relationalDataModel[grouping.field.name]
         ?.get()
         .rows.map((row) => ({
-          groupByField: grouping.field?.relation?.fieldName ?? '',
           groupById: row.id,
           groupByLabel: row.label,
         })) ?? [];
   } else if (grouping.field?.type === 'Boolean' && grouping.field) {
-    groups =
+    listGrouping.groupByField = grouping.field?.name ?? '';
+    listGrouping.groupLabel =
+      grouping.field?.name.firstUpper().slice(0, -1) ?? '';
+
+    listGrouping.groups =
       [true, false]
         .map((value) => ({
           ...makeRowFromValue(value.toString(), grouping.field as FieldConfig),
           value,
         }))
         .map((row) => ({
-          groupByField: grouping.field?.name ?? '',
           groupById: row.id,
-          groupByLabel: row.label,
+          groupByLabel:
+            row.id === 'true'
+              ? grouping.field?.name.firstUpper() ?? ''
+              : `Not ${grouping.field?.name.firstUpper()}`,
         })) ?? [];
+  } else if (grouping.field?.enum) {
+    // TODO: Implement grouping by enum
+    console.warn('Grouping by enum is not implemented yet');
   }
 
   const renderFields = (
@@ -60,35 +76,45 @@ export const makeListProps = <T extends RecordType = RecordType>(
     fields: (keyof T)[]
   ): ListProps['items'][0]['valuesLeft'] => {
     return (
-      fields?.map((fieldName) => {
-        let item;
-        let label;
-        let id;
-        let field;
+      fields
+        ?.filter((fieldName) => {
+          const viewFieldDisplayOptions = store$.displayOptions.viewField.get();
 
-        try {
-          item = row.getField(fieldName);
-          label = item.label;
-          id = item.id;
-          field = item.field;
-          field = item.field;
-        } catch (error) {
-          throw new Error(
-            `Field ${field?.name} not found in row ${
-              row.id
-            } of view ${viewConfigManager.getViewName()}`
+          const shouldDisplay = viewFieldDisplayOptions.selected.includes(
+            fieldName.toString()
           );
-        }
 
-        return {
-          id,
-          label,
-          relation: field.relation && {
-            ...field.relation,
-          },
-          render: () => <ListFieldValue field={field} row={row} />,
-        };
-      }) ?? []
+          return shouldDisplay;
+        })
+        .map((fieldName) => {
+          let item;
+          let label;
+          let id;
+          let field;
+
+          try {
+            item = row.getField(fieldName);
+            label = item.label;
+            id = item.id;
+            field = item.field;
+            field = item.field;
+          } catch (error) {
+            throw new Error(
+              `Field ${field?.name} not found in row ${
+                row.id
+              } of view ${viewConfigManager.getViewName()}`
+            );
+          }
+
+          return {
+            id,
+            label,
+            relation: field.relation && {
+              ...field.relation,
+            },
+            render: () => <ListFieldValue field={field} row={row} />,
+          };
+        }) ?? []
     );
   };
 
@@ -120,6 +146,6 @@ export const makeListProps = <T extends RecordType = RecordType>(
     selected,
     items,
     onReachEnd: store$.globalFetchMore,
-    groups: groups ?? [],
+    grouping: listGrouping,
   };
 };

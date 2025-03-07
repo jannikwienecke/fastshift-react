@@ -1,12 +1,10 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
 import {
   makeDayMonthString,
+  MakeDisplayOptionsPropsOptions,
   MakeFilterPropsOptions,
   MakeListPropsOptions,
-  makeRowFromValue,
-  MakeDisplayOptionsPropsOptions,
   RecordType,
-  TranslationKeys,
 } from '@apps-next/core';
 import {
   ClientViewProviderConvex,
@@ -15,12 +13,9 @@ import {
   MakeInputDialogPropsOptions,
   makeViewFieldsConfig,
   QueryInput,
-  store$,
   useComboboxQuery,
-  useView,
 } from '@apps-next/react';
 import {
-  Button,
   cn,
   ComboboxPopover,
   DisplayOptions,
@@ -30,11 +25,7 @@ import {
 } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import {
-  CalendarIcon,
-  ChevronDownIcon,
-  SlidersHorizontalIcon,
-} from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import React from 'react';
 import { getQueryKey } from '../query-client';
 import {
@@ -47,7 +38,6 @@ import {
   TagsComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
-import { useTranslation } from 'react-i18next';
 
 const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -170,11 +160,20 @@ const DefaultTemplate = observer(
         )}
 
         <div className="flex flex-col w-full ">
-          <div className="flex flex-row gap-2">
-            <RenderQueryInput />
-
+          <div className="flex flex-row gap-2 justify-end">
             <RenderDisplayOptions
-              options={{ sorting: { defaultSortingField: 'name' } }}
+              options={{
+                sorting: { defaultSortingField: 'name' },
+                displayFieldsToShow: [
+                  'name',
+                  'completed',
+                  'description',
+                  'name',
+                  'priority',
+                  'projects',
+                  'tags',
+                ],
+              }}
             />
           </div>
 

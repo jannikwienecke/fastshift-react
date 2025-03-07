@@ -54,6 +54,10 @@ export const init: StoreFn<'init'> =
       store$.viewFieldsConfig.set(viewFieldsConfig);
       store$.filter.filters.set([]);
 
+      store$.displayOptions.viewField.selected.set(
+        store$.viewConfigManager.getViewFieldList().map((field) => field.name)
+      );
+
       displayOptionsProps.set(undefined);
 
       store$.displayOptions.sorting.assign({

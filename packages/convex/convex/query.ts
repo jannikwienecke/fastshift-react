@@ -6,9 +6,6 @@ import * as server from './_generated/server';
 
 import { asyncMap } from 'convex-helpers';
 import { views } from '../src/index';
-import { Id } from './_generated/dataModel';
-import { getManyVia } from 'convex-helpers/server/relationships';
-import { ID } from '@apps-next/core';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -27,7 +24,7 @@ export const testQuery = server.query({
         q.gt('dueDate', now).lt('dueDate', now + 1000 * 60 * 60 * 24)
       );
 
-    return query.collect();
+    return (await query.collect()).slice(0, 1);
   },
 });
 

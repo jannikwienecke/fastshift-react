@@ -113,6 +113,9 @@ export const DEFAULT_LEGEND_STORE: Pick<
       isOpen: false,
       rect: null,
     },
+    viewField: {
+      selected: [],
+    },
     grouping: {
       isOpen: false,
       rect: null,

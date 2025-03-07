@@ -53,6 +53,9 @@ export type DisplayOptionsUiType = {
     rect: DOMRect | null;
     label?: string;
   };
+  viewField: {
+    selected: string[];
+  };
 };
 
 export type FilterItemType = {

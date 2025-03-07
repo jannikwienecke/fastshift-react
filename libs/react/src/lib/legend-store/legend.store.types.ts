@@ -4,6 +4,7 @@ import {
   ContinueCursor,
   DataModelNew,
   DisplayOptionsUiType,
+  DisplayOptionsViewField,
   FieldConfig,
   FilterType,
   MutationDto,
@@ -207,10 +208,12 @@ export type LegendStore = {
   //   display options state
   displayOptions: DisplayOptionsUiType;
   displayOptionsOpen: () => void;
+  displayOptionsClose: () => void;
   displayOptionsOpenSorting: (rect: DOMRect) => void;
   displayOptionsOpenGrouping: (rect: DOMRect) => void;
   displayOptionsSelectField: (selected: ComboxboxItem) => void;
   displayOptionsCloseCombobox: () => void;
+  displayOptionsSelectViewField: (field: DisplayOptionsViewField) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

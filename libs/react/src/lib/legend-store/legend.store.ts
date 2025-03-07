@@ -41,11 +41,13 @@ import {
   globalQueryUpdate,
 } from './legend.store.fn.global-query';
 import {
+  displayOptionsClose,
   displayOptionsCloseCombobox,
   displayOptionsOpen,
   displayOptionsOpenGrouping,
   displayOptionsOpenSorting,
   displayOptionsSelectField,
+  displayOptionsSelectViewField,
 } from './legend-store.fn.displayOptions';
 
 export const store$ = observable<LegendStore>({
@@ -95,6 +97,7 @@ export const store$ = observable<LegendStore>({
 
   // display options
   displayOptionsOpen: (...props) => displayOptionsOpen(store$)(...props),
+  displayOptionsClose: (...props) => displayOptionsClose(store$)(...props),
   displayOptionsOpenSorting: (...props) =>
     displayOptionsOpenSorting(store$)(...props),
   displayOptionsSelectField: (...props) =>
@@ -103,4 +106,6 @@ export const store$ = observable<LegendStore>({
     displayOptionsOpenGrouping(store$)(...props),
   displayOptionsCloseCombobox: (...props) =>
     displayOptionsCloseCombobox(store$)(...props),
+  displayOptionsSelectViewField: (...props) =>
+    displayOptionsSelectViewField(store$)(...props),
 });

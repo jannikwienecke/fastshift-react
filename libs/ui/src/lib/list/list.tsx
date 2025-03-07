@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
 import { ListItem, ListProps, ListValueProps } from '@apps-next/core';
+import { PlusIcon } from 'lucide-react';
 // import { store$ } from '@apps-next/react';
 
 export function ListDefault<TItem extends ListItem = ListItem>({
@@ -9,7 +10,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   onSelect,
   selected,
   onReachEnd,
-  groups,
+  grouping,
 }: ListProps<TItem>) {
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -56,20 +57,42 @@ export function ListDefault<TItem extends ListItem = ListItem>({
 
   return (
     <>
-      {groups.length ? (
+      {grouping.groups.length ? (
         <>
           {/* TODO HIER WEITER MACHEN */}
-          {/* Style the groups ui part */}
           {/* make it work for enum and boolean fields */}
-          {groups.map((group) => {
-            const itemsOfGroup = items.filter(
-              (item) =>
-                item[group.groupByField as keyof TItem] === group.groupById
-            );
+          {[
+            ...grouping.groups,
+            {
+              groupById: undefined,
+              groupByLabel: `No ${grouping.groupLabel}`,
+            },
+          ].map((group) => {
+            const itemsOfGroup = items.filter((item) => {
+              const value = item[grouping.groupByField as keyof TItem];
+
+              const s = Array.isArray(value)
+                ? value.some(
+                    (v) => v?.id?.toString() === group.groupById?.toString()
+                  )
+                : value?.toString() === group.groupById?.toString();
+
+              return s;
+            });
 
             return (
               <div key={group.groupById}>
-                <div>{group.groupByLabel}</div>
+                <div className="bg-muted/70 border-y border-foreground/5 text-sm pr-6">
+                  <div className="py-[8px] pl-9 flex justify-between items-center">
+                    <div className="flex gap-2 items-center">
+                      <div>{group.groupByLabel}</div>
+                      <div>{itemsOfGroup.length}</div>
+                    </div>
+                    <div className="">
+                      <PlusIcon className="w-3 h-3" />
+                    </div>
+                  </div>
+                </div>
                 {renderList(itemsOfGroup)}
               </div>
             );
