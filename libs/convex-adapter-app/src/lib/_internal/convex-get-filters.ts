@@ -105,7 +105,10 @@ export const getFilterTypes = (
     searchFields
   );
   const filtersWithIndexField = getFiltersWithIndexOrSearchField(
-    filters,
+    filters.filter(
+      (f) =>
+        !filtersWithSearchField.map((f) => f.field.name).includes(f.field.name)
+    ),
     indexFields
   );
 

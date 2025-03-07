@@ -96,7 +96,7 @@ export const displayOptionsSelectViewField: StoreFn<
   store$.displayOptions.viewField.selected.set(selected);
 };
 
-// TODO
+// TODO - HIER WEITER MACHEN
 // SHOW EMPTY GROUPS TOGGLE?
 // RESET -> CLEAR ALL
 // RENDER MODE (get all or just limit of X)

@@ -31,7 +31,6 @@ export const testQuery = server.query({
 export const displayOptions = server.query({
   handler: async (ctx) => {
     const all = await ctx.db.query('tasks').withIndex('priority').collect();
-    console.log({ all });
 
     const tasks = await ctx.db.query('tasks').collect();
 

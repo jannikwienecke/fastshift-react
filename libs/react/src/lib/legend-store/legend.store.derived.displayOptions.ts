@@ -32,7 +32,6 @@ export const derviedDisplayOptions = observable(() => {
 
     onOpen: () => store$.displayOptionsOpen(),
     onClose: () => {
-      console.log('onClose');
       store$.displayOptionsClose();
     },
 
