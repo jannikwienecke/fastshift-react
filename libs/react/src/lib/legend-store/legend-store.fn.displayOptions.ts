@@ -115,6 +115,4 @@ export const displayOptionsReset: StoreFn<'displayOptionsReset'> =
     store$.displayOptions.showEmptyGroups.set(true);
   };
 
-// TODO - HIER WEITER MACHEN
-// RESET -> CLEAR ALL
-// RENDER MODE (get all or just limit of X)
+// TODO RENDER MODE (get all or just limit of X)

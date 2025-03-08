@@ -1,4 +1,29 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "deno.enable": false
+  "deno.enable": false,
+  "todo-tree.general.tags": [
+    "BUG",
+    "HACK",
+    "FIXME",
+    "TODO",
+    "XXX",
+    "[ ]",
+    "[x]",
+    "IMPROVEMENT",
+    "FEATURE"
+  ],
+  "todo-tree.highlights.customHighlight": {
+    "IMPROVEMENT": {
+      "icon": "lightbulb",
+      "foreground": "#FFD700",
+      "iconColour": "#FFD700",
+      "gutterIcon": true
+    },
+    "FEATURE": {
+      "icon": "star",
+      "foreground": "#3498DB",
+      "iconColour": "#3498DB",
+      "gutterIcon": true
+    }
+  }
 }

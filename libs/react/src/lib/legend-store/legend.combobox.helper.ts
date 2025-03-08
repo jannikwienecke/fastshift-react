@@ -217,7 +217,7 @@ export const makeComboboxStateFilterValuesNumber = (
 ): MakeComboboxStateProps | null => {
   if (field?.type !== 'Number') return null;
 
-  // TODO Similiar to how we handle dates, we should have a way to get the options for numbers
+  // FEATURE Similiar to how we handle dates, we should have a way to get the options for numbers
   const values = getOptions(store$.combobox.query.get()).map((v) =>
     makeRowFromValue(v.id.toString(), field)
   );
