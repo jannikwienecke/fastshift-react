@@ -4,6 +4,9 @@ import { Projects, Tags } from '@apps-next/convex';
 import { DataType, GetTableName } from '@apps-next/core';
 import { useViewOf } from '@apps-next/react';
 import { Bubble, Icon } from '@apps-next/ui';
+import { CustomTypeOptions } from 'i18next';
+import { useTranslation } from 'react-i18next';
+import { TranslationType } from '../i18n';
 
 export type TaskViewDataType = DataType<
   'tasks',
@@ -32,36 +35,33 @@ export const ViewBubble = (props: {
 // TODO: Have a default component library export for fields
 // like: CheckboxField, TextField, Completed, Priority, Tags...
 const PRIORITY_COLORS = {
-  low: '🟢',
-  medium: '🟡',
-  high: '🔴',
+  1: '🟢',
+  2: '🟡',
+  3: '🔴',
 };
+
+const PRIORITY_LABEL = {
+  1: 'priority.low',
+  2: 'priority.medium',
+  3: 'priority.high',
+} satisfies { [key: number]: TranslationType };
 
 export const PriorityComponent = (props: { data: TaskViewDataType }) => {
   const priority = props.data.priority;
 
-  let priorityLevel: keyof typeof PRIORITY_COLORS;
-
-  if (priority < 4) {
-    priorityLevel = 'low';
-  } else if (priority < 7) {
-    priorityLevel = 'medium';
-  } else {
-    priorityLevel = 'high';
-  }
-
-  return <div data-testid="priority">{PRIORITY_COLORS[priorityLevel]}</div>;
+  return <div data-testid="priority">{PRIORITY_COLORS[priority]}</div>;
 };
 
 export const PriorityComponentCombobox = (props: {
   data: TaskViewDataType['priority'];
 }) => {
+  const { t } = useTranslation();
   const priority = props.data;
 
   return (
     <div className="flex items-center gap-2">
       <div>{PRIORITY_COLORS[priority]}</div>
-      <div>{priority}</div>
+      <div>{t(PRIORITY_LABEL[priority])}</div>
     </div>
   );
 };

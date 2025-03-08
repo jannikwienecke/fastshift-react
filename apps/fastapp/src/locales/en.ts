@@ -27,6 +27,11 @@ export const en = {
     edit: 'Edit',
     change: 'Change',
   },
+  priority: {
+    low: 'Low',
+    medium: 'Medium',
+    high: 'High',
+  },
 };
 
 export default en;

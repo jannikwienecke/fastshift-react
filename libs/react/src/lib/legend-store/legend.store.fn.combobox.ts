@@ -228,7 +228,7 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
         let valueToUpdate =
           dateValueToUpdate !== undefined
             ? dateValueToUpdate
-            : !field.relation && !field.enum
+            : !field.relation
             ? value.raw
             : value.id;
 

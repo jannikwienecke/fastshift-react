@@ -29,4 +29,9 @@ export default {
     edit: 'Bearbeiten',
     change: 'Ändern',
   },
+  priority: {
+    low: 'Niedrig',
+    medium: 'Mittel',
+    high: 'Hoch',
+  },
 } satisfies typeof en;

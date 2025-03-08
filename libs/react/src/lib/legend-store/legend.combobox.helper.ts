@@ -357,7 +357,7 @@ export const getSharedStateList = (): ComboboxStateCommonType => {
 
   const stateShared: ComboboxStateCommonType = {
     rect: selectedRelationField.rect,
-    searchable: true,
+    searchable: selectedRelationField.field.enum ? false : true,
     name: selectedRelationField?.field?.name ?? 'list-edit',
     isNewState: true,
     open: true,

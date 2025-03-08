@@ -5,7 +5,11 @@ import { i18nextPlugin } from 'translation-check';
 
 import enTranslations from './locales/en';
 import deTranslations from './locales/de';
-import { makeResources, baseResources } from '@apps-next/core';
+import {
+  makeResources,
+  baseResources,
+  InferTranslationKeys,
+} from '@apps-next/core';
 
 export const resources = {
   en: {
@@ -46,6 +50,8 @@ declare module 'i18next' {
   }
 }
 export default i18n;
+
+export type TranslationType = InferTranslationKeys<typeof enTranslations>;
 
 t('common.delete');
 t('filter.button.label');
