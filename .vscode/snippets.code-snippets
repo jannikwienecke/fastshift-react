@@ -1,0 +1,23 @@
+{
+  "Console Log": {
+    "prefix": "ll",
+    "body": ["console.log($1)$0"],
+    "description": "Log output to console"
+  },
+
+  "Console Log with Variable Name": {
+    "prefix": "lll",
+    "body": ["console.log({$CLIPBOARD$1})$0"],
+    "description": "Log variable with its name"
+  },
+  "Add Feature Comment": {
+    "prefix": "_feature",
+    "body": "// FEATURE: $1",
+    "description": "Add a feature comment"
+  },
+  "Add Improvement Comment": {
+    "prefix": "_improvement",
+    "body": "// IMPROVEMENT: $1",
+    "description": "Add an improvement comment"
+  }
+}
