@@ -215,6 +215,7 @@ export type LegendStore = {
   displayOptionsCloseCombobox: () => void;
   displayOptionsSelectViewField: (field: DisplayOptionsViewField) => void;
   displayOptionsToggleShowEmptyGroups: (checked: boolean) => void;
+  displayOptionsReset: () => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

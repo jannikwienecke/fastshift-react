@@ -70,6 +70,14 @@ export const derviedDisplayOptions = observable(() => {
 
     showEmptyGroups,
 
+    onReset: () => store$.displayOptionsReset(),
+
+    showResetButton:
+      !!sorting.field ||
+      !!grouping.field ||
+      store$.displayOptions.viewField.selected.length !==
+        store$.displayOptions.viewField.allFields.length,
+
     sorting: {
       ...sorting,
       field: sorting.field ?? sortingDefaultField,

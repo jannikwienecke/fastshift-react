@@ -232,6 +232,23 @@ function DisplayOptionsPopover(
         ) : null}
 
         <DisplayOptionsRenderFields {...props} />
+
+        {props.showResetButton ? (
+          <>
+            <SelectSeparator className="mb-0 pb-0" />
+
+            <div className="flex flex-row justify-end text-xs">
+              <Button
+                onClick={props.onReset}
+                variant={'ghost'}
+                size={'sm'}
+                className="text-xs"
+              >
+                {t('displayOptions.clearAll')}
+              </Button>
+            </div>
+          </>
+        ) : null}
       </PopoverContent>
     </Popover>
   );

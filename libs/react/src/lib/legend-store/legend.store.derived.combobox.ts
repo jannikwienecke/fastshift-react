@@ -16,6 +16,7 @@ import {
   getSharedStateSorting,
   makeComboboxStateGroupingOptions,
   getSharedStateGrouping,
+  makeComboboxStateFilterValuesNumber,
 } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
@@ -93,6 +94,8 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     options = makeComboboxStateFilterValuesBoolean(field);
   } else if (field?.type === 'Date') {
     options = makeComboboxStateFilterValuesDate(field, getDateOptions);
+  } else if (field?.type === 'Number') {
+    options = makeComboboxStateFilterValuesNumber(field, getDateOptions);
   }
 
   if (!options) return DEFAULT_COMBOBOX_STATE;

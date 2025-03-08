@@ -6,8 +6,6 @@ export const getDisplayOptionsInfo = (props: QueryServerProps) => {
 
   const hasSortingField = !!displayOptions?.sorting?.field.name;
 
-  // TODO HIER WEITER MACHEN
-  // add grouping to the list view
   const indexFields_ = _indexFields
     .filter((f) => f.fields.length === 1)
     .map((f) => ({

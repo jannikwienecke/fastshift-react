@@ -56,6 +56,7 @@ export type DisplayOptionsUiType = {
   };
   viewField: {
     selected: string[];
+    allFields: string[];
   };
 };
 

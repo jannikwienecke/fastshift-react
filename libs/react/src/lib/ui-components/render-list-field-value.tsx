@@ -22,7 +22,7 @@ export const ListFieldValue = ({
           field.type !== 'Boolean' &&
           field.type !== 'Date'
         )
-          return;
+          return null;
 
         const rect = e.currentTarget.getBoundingClientRect();
 

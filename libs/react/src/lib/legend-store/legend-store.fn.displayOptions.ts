@@ -103,7 +103,18 @@ export const displayOptionsToggleShowEmptyGroups: StoreFn<
   store$.displayOptions.showEmptyGroups.set(checked);
 };
 
+export const displayOptionsReset: StoreFn<'displayOptionsReset'> =
+  (store$) => () => {
+    console.log('displayOptionsReset');
+
+    store$.displayOptions.grouping.field.set(undefined);
+    store$.displayOptions.sorting.field.set(undefined);
+    store$.displayOptions.viewField.selected.set(
+      store$.viewConfigManager.getViewFieldList().map((field) => field.name)
+    );
+    store$.displayOptions.showEmptyGroups.set(true);
+  };
+
 // TODO - HIER WEITER MACHEN
-// SHOW EMPTY GROUPS TOGGLE?
 // RESET -> CLEAR ALL
 // RENDER MODE (get all or just limit of X)

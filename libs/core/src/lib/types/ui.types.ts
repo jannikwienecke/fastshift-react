@@ -143,6 +143,9 @@ export type DisplayOptionsProps = {
   showEmptyGroupsToggle: boolean;
   showEmptyGroups: boolean;
 
+  onReset: () => void;
+  showResetButton: boolean;
+
   sorting: {
     onOpen: (rect: DOMRect) => void;
     onClose: () => void;

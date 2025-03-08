@@ -4,7 +4,6 @@ import {
   NONE_OPTION,
   RecordType,
   Row,
-  useTranslation,
 } from '@apps-next/core';
 import React from 'react';
 import { comboboxStore$, store$ } from '../../legend-store';

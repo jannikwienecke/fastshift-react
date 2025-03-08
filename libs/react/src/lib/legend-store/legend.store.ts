@@ -46,6 +46,7 @@ import {
   displayOptionsOpen,
   displayOptionsOpenGrouping,
   displayOptionsOpenSorting,
+  displayOptionsReset,
   displayOptionsSelectField,
   displayOptionsSelectViewField,
   displayOptionsToggleShowEmptyGroups,
@@ -111,4 +112,5 @@ export const store$ = observable<LegendStore>({
     displayOptionsSelectViewField(store$)(...props),
   displayOptionsToggleShowEmptyGroups: (...props) =>
     displayOptionsToggleShowEmptyGroups(store$)(...props),
+  displayOptionsReset: (...props) => displayOptionsReset(store$)(...props),
 });

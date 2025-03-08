@@ -12,7 +12,7 @@ export const en = {
     // Show empty groups
     listOptions: 'List Options',
     showEmptyGroups: 'Show empty groups',
-
+    clearAll: 'Clear all',
     sorting: {
       label: 'Ordering',
       noSorting: 'No sorting',
