@@ -58,7 +58,7 @@ export const init: StoreFn<'init'> =
         store$.viewConfigManager.getViewFieldList().map((field) => field.name)
       );
 
-      displayOptionsProps.set(undefined);
+      displayOptionsProps.set({});
 
       store$.displayOptions.sorting.assign({
         isOpen: false,

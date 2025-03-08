@@ -9,6 +9,10 @@ export const en = {
     button: {
       label: 'Display',
     },
+    // Show empty groups
+    listOptions: 'List Options',
+    showEmptyGroups: 'Show empty groups',
+
     sorting: {
       label: 'Ordering',
       noSorting: 'No sorting',

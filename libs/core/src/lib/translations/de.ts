@@ -15,6 +15,8 @@ export const de = {
       label: 'Gruppierung',
       noGrouping: 'Keine Gruppierung',
     },
+    listOptions: 'Optionen',
+    showEmptyGroups: 'Leere Gruppen anzeigen',
     button: {
       label: 'Anzeige',
     },

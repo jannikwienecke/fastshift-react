@@ -48,6 +48,7 @@ import {
   displayOptionsOpenSorting,
   displayOptionsSelectField,
   displayOptionsSelectViewField,
+  displayOptionsToggleShowEmptyGroups,
 } from './legend-store.fn.displayOptions';
 
 export const store$ = observable<LegendStore>({
@@ -108,4 +109,6 @@ export const store$ = observable<LegendStore>({
     displayOptionsCloseCombobox(store$)(...props),
   displayOptionsSelectViewField: (...props) =>
     displayOptionsSelectViewField(store$)(...props),
+  displayOptionsToggleShowEmptyGroups: (...props) =>
+    displayOptionsToggleShowEmptyGroups(store$)(...props),
 });

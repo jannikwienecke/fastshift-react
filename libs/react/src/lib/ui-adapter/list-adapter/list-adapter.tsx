@@ -12,6 +12,7 @@ import { observable } from '@legendapp/state';
 import { store$ } from '../../legend-store/legend.store.js';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
+import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
 
 export const listItems$ = observable<ListProps['items']>([]);
 
@@ -69,6 +70,17 @@ export const makeListProps = <T extends RecordType = RecordType>(
   } else if (grouping.field?.enum) {
     // TODO: Implement grouping by enum
     console.warn('Grouping by enum is not implemented yet');
+    alert('Grouping by enum is not implemented yet');
+  }
+
+  if (
+    listGrouping.groups.length &&
+    derviedDisplayOptions.showEmptyGroups.get()
+  ) {
+    listGrouping.groups.push({
+      groupById: undefined,
+      groupByLabel: `No ${listGrouping.groupLabel}`,
+    });
   }
 
   const renderFields = (

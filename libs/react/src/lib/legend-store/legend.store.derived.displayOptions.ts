@@ -1,14 +1,11 @@
 import {
-  DisplayOptionsViewField,
   DisplayOptionsProps,
   FieldConfig,
-  MakeDisplayOptionsPropsOptions,
-  TranslationKeys,
   INTERNAL_FIELDS,
-  makeRow,
-  en,
-  NO_SORTING_FIELD,
+  MakeDisplayOptionsPropsOptions,
   NO_GROUPING_FIELD,
+  NO_SORTING_FIELD,
+  TranslationKeys,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
@@ -26,6 +23,12 @@ export const derviedDisplayOptions = observable(() => {
 
   const sortingDefaultField: FieldConfig = NO_SORTING_FIELD;
   const groupingDefaultField: FieldConfig = NO_GROUPING_FIELD;
+
+  const groupingFieldIsBoolean =
+    store$.displayOptions.grouping.field.type.get() === 'Boolean';
+
+  const showEmptyGroups =
+    store$.displayOptions.showEmptyGroups.get() && !groupingFieldIsBoolean;
 
   return {
     ...props,
@@ -57,6 +60,15 @@ export const derviedDisplayOptions = observable(() => {
 
     onSelectViewField: (...props) =>
       store$.displayOptionsSelectViewField(...props),
+
+    onToggleShowEmptyGroups: (...props) =>
+      store$.displayOptionsToggleShowEmptyGroups(...props),
+
+    showEmptyGroupsToggle:
+      !!store$.displayOptions.grouping.field.name.get() &&
+      !groupingFieldIsBoolean,
+
+    showEmptyGroups,
 
     sorting: {
       ...sorting,

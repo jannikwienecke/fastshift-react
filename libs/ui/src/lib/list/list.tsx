@@ -59,15 +59,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     <>
       {grouping.groups.length ? (
         <>
-          {/* TODO HIER WEITER MACHEN */}
-          {/* make it work for enum and boolean fields */}
-          {[
-            ...grouping.groups,
-            {
-              groupById: undefined,
-              groupByLabel: `No ${grouping.groupLabel}`,
-            },
-          ].map((group) => {
+          {grouping.groups.map((group) => {
             const itemsOfGroup = items.filter((item) => {
               const value = item[grouping.groupByField as keyof TItem];
 

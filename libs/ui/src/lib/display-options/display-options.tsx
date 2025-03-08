@@ -11,11 +11,12 @@ import {
   SlidersHorizontalIcon,
   StretchHorizontalIcon,
 } from 'lucide-react';
-import { Button } from '../components';
+import { Button, Switch } from '../components';
 
 import { Popover, PopoverContent, PopoverTrigger } from '../components';
 import { cn } from '../utils';
 import { Bubble } from '../bubble';
+import { SelectSeparator } from '../components/select';
 
 const DisplayOptionsDefault = (props: DisplayOptionsProps) => {
   return (
@@ -191,16 +192,12 @@ function DisplayOptionsRenderFields(props: {
   );
 }
 
-function DisplayOptionsPopover(props: {
-  isOpen: DisplayOptionsProps['isOpen'];
-  onClose: DisplayOptionsProps['onClose'];
-  children: React.ReactNode;
-  sorting: DisplayOptionsProps['sorting'];
-  grouping: DisplayOptionsProps['grouping'];
-  viewType: DisplayOptionsProps['viewType'];
-  viewFields: DisplayOptionsProps['viewFields'];
-  onSelectViewField: DisplayOptionsProps['onSelectViewField'];
-}) {
+function DisplayOptionsPopover(
+  props: DisplayOptionsProps & {
+    children: React.ReactNode;
+  }
+) {
+  const { t } = useTranslation();
   return (
     <Popover modal onOpenChange={(open) => !open && props.onClose()}>
       <PopoverTrigger asChild>
@@ -216,6 +213,23 @@ function DisplayOptionsPopover(props: {
 
         <DisplayOptionsOrderingButtonCombobox {...props} />
         <DisplayOptionsGroupingButtonCombobox {...props} />
+
+        <SelectSeparator />
+
+        <div>{t('displayOptions.listOptions')}</div>
+
+        {props.showEmptyGroupsToggle ? (
+          <div className="flex flex-row items-center justify-between">
+            <div className="text-foreground/70 flex items-center">
+              {t('displayOptions.showEmptyGroups')}
+            </div>
+
+            <Switch
+              onCheckedChange={props.onToggleShowEmptyGroups}
+              checked={props.showEmptyGroups}
+            />
+          </div>
+        ) : null}
 
         <DisplayOptionsRenderFields {...props} />
       </PopoverContent>

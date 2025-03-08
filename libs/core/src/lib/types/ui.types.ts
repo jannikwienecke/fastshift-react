@@ -40,7 +40,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
     groupByField: string;
     groupLabel: string;
     groups: {
-      groupById: string | number;
+      groupById: string | number | undefined;
       groupByLabel: string;
     }[];
   };
@@ -138,6 +138,10 @@ export type DisplayOptionsProps = {
 
   viewFields: DisplayOptionsViewField[];
   onSelectViewField: (field: DisplayOptionsViewField) => void;
+
+  onToggleShowEmptyGroups: (checked: boolean) => void;
+  showEmptyGroupsToggle: boolean;
+  showEmptyGroups: boolean;
 
   sorting: {
     onOpen: (rect: DOMRect) => void;

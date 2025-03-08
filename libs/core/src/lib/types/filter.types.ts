@@ -37,6 +37,7 @@ export type FilterType = FilterRelationType | FilterPrimitiveType;
 // export type
 export type DisplayOptionsUiType = {
   isOpen: boolean;
+  showEmptyGroups: boolean;
   viewType: {
     type: 'list' | 'board';
   };

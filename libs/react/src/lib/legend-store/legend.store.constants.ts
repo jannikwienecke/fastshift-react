@@ -105,6 +105,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
     valueDict: {},
   },
   displayOptions: {
+    showEmptyGroups: true,
     isOpen: false,
     viewType: {
       type: 'list',

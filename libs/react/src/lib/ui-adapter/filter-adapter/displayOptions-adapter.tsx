@@ -11,6 +11,7 @@ import {
 export const makeDisplayOptionsProps = <T extends RecordType>(
   options?: MakeDisplayOptionsPropsOptions<T>
 ): DisplayOptionsProps => {
-  displayOptionsProps.set(options);
+  displayOptionsProps.set(options ?? {});
+
   return derviedDisplayOptions.get();
 };

@@ -96,6 +96,13 @@ export const displayOptionsSelectViewField: StoreFn<
   store$.displayOptions.viewField.selected.set(selected);
 };
 
+export const displayOptionsToggleShowEmptyGroups: StoreFn<
+  'displayOptionsToggleShowEmptyGroups'
+> = (store$) => (checked) => {
+  // const showEmptyGroups = store$.displayOptions.showEmptyGroups.get();
+  store$.displayOptions.showEmptyGroups.set(checked);
+};
+
 // TODO - HIER WEITER MACHEN
 // SHOW EMPTY GROUPS TOGGLE?
 // RESET -> CLEAR ALL
