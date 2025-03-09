@@ -5,6 +5,8 @@ dist
 tmp
 /out-tsc
 
+convex_local_backend.sqlite3
+
 # dependencies
 node_modules
 
