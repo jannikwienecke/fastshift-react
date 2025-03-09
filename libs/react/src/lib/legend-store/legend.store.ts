@@ -27,6 +27,7 @@ import {
   init,
 } from './legend.store.fn.global';
 import {
+  listContextMenuItem,
   listDeselectRelationField,
   listSelect,
   listSelectRelationField,
@@ -51,6 +52,7 @@ import {
   displayOptionsSelectViewField,
   displayOptionsToggleShowEmptyGroups,
 } from './legend-store.fn.displayOptions';
+import { contextMenuClose, contextMenuOpen } from './legend.contextmenu.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -66,6 +68,7 @@ export const store$ = observable<LegendStore>({
   globalFetchMore: (...props) => globalFetchMore(store$)(...props),
   //   list methods
   selectListItem: (...props) => listSelect(store$)(...props),
+  onContextMenuListItem: (...props) => listContextMenuItem(store$)(...props),
   deselectRelationField: (...props) =>
     listDeselectRelationField(store$)(...props),
   comboboxClose: (...props) => comboboxClose(store$)(...props),
@@ -113,4 +116,7 @@ export const store$ = observable<LegendStore>({
   displayOptionsToggleShowEmptyGroups: (...props) =>
     displayOptionsToggleShowEmptyGroups(store$)(...props),
   displayOptionsReset: (...props) => displayOptionsReset(store$)(...props),
+
+  contextMenuOpen: (...props) => contextMenuOpen(store$)(...props),
+  contextMenuClose: (...props) => contextMenuClose(store$)(...props),
 });

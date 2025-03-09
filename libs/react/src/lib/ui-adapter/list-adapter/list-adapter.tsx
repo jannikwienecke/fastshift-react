@@ -159,5 +159,6 @@ export const makeListProps = <T extends RecordType = RecordType>(
     items,
     onReachEnd: store$.globalFetchMore,
     grouping: listGrouping,
+    onContextMenu: store$.onContextMenuListItem,
   };
 };

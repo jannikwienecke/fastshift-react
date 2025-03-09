@@ -23,3 +23,10 @@ export const listDeselectRelationField: StoreFn<'deselectRelationField'> =
   (store$) => () => {
     store$.list.selectedRelationField.set(undefined);
   };
+
+export const listContextMenuItem: StoreFn<'onContextMenuListItem'> =
+  (store$) => (record: RecordType, rect: DOMRect) => {
+    console.log('listContextMenuItem', record, rect);
+
+    store$.contextMenuOpen(rect);
+  };

@@ -34,6 +34,21 @@ export type FilterRelationType = {
 
 export type FilterType = FilterRelationType | FilterPrimitiveType;
 
+export type ContextMenuState = {
+  rect: DOMRect | null;
+};
+
+export type ContextMenuFieldItem = {
+  options: Row[];
+  value: Row;
+} & FieldConfig;
+
+export type ContextMenuUiOptions = {
+  isOpen?: boolean;
+  onClose: () => void;
+  fields: ContextMenuFieldItem[] | null;
+} & ContextMenuState;
+
 // export type
 export type DisplayOptionsUiType = {
   isOpen: boolean;

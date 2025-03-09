@@ -1,5 +1,6 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
 import {
+  ContextMenuUiOptions,
   makeDayMonthString,
   MakeDisplayOptionsPropsOptions,
   MakeFilterPropsOptions,
@@ -18,6 +19,19 @@ import {
 import {
   cn,
   ComboboxPopover,
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
   DisplayOptions,
   Filter,
   InputDialog,
@@ -119,6 +133,26 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
 
 const Task = observer(() => {
   const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
+  const [rect, setRect] = React.useState<DOMRect | null>(null);
+
+  // return (
+  //   <div className="relative">
+  //     <div className="h-32 w-32"></div>
+  //     <div
+  //       className="h-32 left-32 relative"
+  //       onContextMenu={(e) => {
+  //         console.log('click');
+  //         e.preventDefault();
+  //         e.stopPropagation();
+  //         setRect(e.currentTarget.getBoundingClientRect());
+  //       }}
+  //     >
+  //       RIGHT CLICK FOR CONTEXT MENU
+  //     </div>
+
+  //     <ContextMenuDemo rect={rect} />
+  //   </div>
+  // );
 
   return (
     <DefaultTemplate<TaskViewDataType>
@@ -158,6 +192,8 @@ const DefaultTemplate = observer(
         ) : (
           <RenderInputDialog />
         )}
+
+        <RenderContextmenu />
 
         <div className="flex flex-col w-full ">
           <div className="flex flex-row gap-2 justify-end">
@@ -225,8 +261,8 @@ const RenderDisplayOptions = observer(
   }: {
     options: MakeDisplayOptionsPropsOptions<TaskViewDataType>;
   }) => {
-    const { makeDisplayOptionsProps } = makeHooks<TaskViewDataType>();
-
+    const { makeDisplayOptionsProps, makeContextmenuProps } =
+      makeHooks<TaskViewDataType>();
     const props = makeDisplayOptionsProps(options);
 
     return (
@@ -241,6 +277,7 @@ const RenderInputDialog = observer(
   (props: { options?: MakeInputDialogPropsOptions }) => {
     console.warn('Render Input Dialog');
     const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
+
     return (
       <Memo>
         {() => {
@@ -270,6 +307,121 @@ const RenderList = observer((props: { options?: MakeListPropsOptions }) => {
     </Memo>
   );
 });
+
+const RenderContextmenu = observer(() => {
+  const { makeContextmenuProps } = makeHooks<TaskViewDataType>();
+
+  return (
+    <Memo>
+      {() => {
+        return <ContextMenuDefault {...makeContextmenuProps({})} />;
+      }}
+    </Memo>
+  );
+});
+
+const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+  console.log(props.fields);
+
+  React.useLayoutEffect(() => {
+    if (!rect) return;
+    //   manually fire a right click event
+    const event = new MouseEvent('contextmenu', {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      clientX: rect.left + 108,
+      clientY: rect.top + 25,
+    });
+    ref.current?.dispatchEvent(event);
+  }, [rect]);
+
+  console.log('rect', rect);
+
+  return (
+    <ContextMenu modal={true} onOpenChange={(open) => !open && props.onClose()}>
+      <ContextMenuTrigger
+        ref={ref}
+        className="w-0 h-0 invisible"
+      ></ContextMenuTrigger>
+
+      <ContextMenuContent className="w-56">
+        <ContextMenuSeparator />
+
+        {props.fields?.map((field) => {
+          // const icon = viewConfigManager.viewConfig.icon;
+          // const relationalData = relationalDataModel[field.name];
+
+          return (
+            <ContextMenuSub key={field.name}>
+              <ContextMenuSubTrigger className="w-full">
+                <div className="w-full flex flex-row items-center">
+                  <div className="pr-2">{/* <Icon icon={icon} /> */}</div>
+
+                  {field.name.firstUpper()}
+
+                  <ContextMenuShortcut>
+                    ⌘{field.name.slice(0, 1).firstUpper()}
+                  </ContextMenuShortcut>
+                </div>
+              </ContextMenuSubTrigger>
+
+              <ContextMenuSubContent className="w-48">
+                <>
+                  <input
+                    type="text"
+                    placeholder="Filter..."
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-sm px-2 outline-none border-none w-full py-1"
+                  />
+                  <ContextMenuSeparator />
+
+                  {field.options.map((row) => {
+                    return (
+                      <ContextMenuItem key={row.id}>
+                        {row.label}
+                      </ContextMenuItem>
+                    );
+                  })}
+                </>
+              </ContextMenuSubContent>
+            </ContextMenuSub>
+          );
+        })}
+
+        <ContextMenuSub>
+          <ContextMenuSubTrigger inset>More Tools</ContextMenuSubTrigger>
+          <ContextMenuSubContent className="w-48">
+            <ContextMenuItem>
+              Save Page As...
+              <ContextMenuShortcut>⇧⌘S</ContextMenuShortcut>
+            </ContextMenuItem>
+            <ContextMenuItem>Create Shortcut...</ContextMenuItem>
+            <ContextMenuItem>Name Window...</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem>Developer Tools</ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSeparator />
+        <ContextMenuCheckboxItem checked>
+          Show Bookmarks Bar
+          <ContextMenuShortcut>⌘⇧B</ContextMenuShortcut>
+        </ContextMenuCheckboxItem>
+        <ContextMenuCheckboxItem>Show Full URLs</ContextMenuCheckboxItem>
+        <ContextMenuSeparator />
+        <ContextMenuRadioGroup value="pedro">
+          <ContextMenuLabel inset>People</ContextMenuLabel>
+          <ContextMenuSeparator />
+          <ContextMenuRadioItem value="pedro">
+            Pedro Duarte
+          </ContextMenuRadioItem>
+          <ContextMenuRadioItem value="colm">Colm Tuite</ContextMenuRadioItem>
+        </ContextMenuRadioGroup>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+};
 
 export const Route = createFileRoute('/fastApp/tasks')({
   loader: async ({ context }) => context.preloadQuery(tasksConfig),

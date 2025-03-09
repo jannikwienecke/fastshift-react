@@ -10,6 +10,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   onSelect,
   selected,
   onReachEnd,
+  onContextMenu,
   grouping,
 }: ListProps<TItem>) {
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -35,7 +36,11 @@ export function ListDefault<TItem extends ListItem = ListItem>({
 
   const renderList = (items: TItem[]) => {
     return (
-      <List onSelect={onSelect} selected={selected}>
+      <List
+        onSelect={onSelect}
+        selected={selected}
+        onContextMenu={onContextMenu}
+      >
         {items.map((item) => {
           return (
             <List.Item key={item.id} className="" item={item}>
@@ -103,20 +108,22 @@ export function ListDefault<TItem extends ListItem = ListItem>({
 }
 
 const ListContext = React.createContext<
-  Pick<ListProps<any>, 'onSelect' | 'selected'>
->({} as Pick<ListProps<any>, 'onSelect' | 'selected'>);
+  Pick<ListProps<any>, 'onSelect' | 'selected' | 'onContextMenu'>
+>({} as Pick<ListProps<any>, 'onSelect' | 'selected' | 'onContextMenu'>);
 const ListProvider = ListContext.Provider;
 
 export function List<TItem extends ListItem = ListItem>({
   children,
   onSelect,
   selected,
+  onContextMenu,
 }: { children: React.ReactNode } & {
   onSelect: ListProps<TItem>['onSelect'];
   selected: ListProps<TItem>['selected'];
+  onContextMenu: ListProps<TItem>['onContextMenu'];
 }) {
   return (
-    <ListProvider value={{ onSelect, selected }}>
+    <ListProvider value={{ onSelect, selected, onContextMenu }}>
       <div className="flex flex-col w-full border-collapse overflow-scroll grow">
         {children}
       </div>
@@ -162,13 +169,18 @@ function Item(
   }
 ) {
   const { children, className, item, ...restProps } = props;
-  const { selected } = React.useContext(ListContext);
+  const { selected, onContextMenu } = React.useContext(ListContext);
 
   const isSelected = selected?.map((i) => i['id']).includes(item.id);
 
   return (
     <ItemProvider value={{ item }}>
       <li
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onContextMenu?.(item, e.currentTarget.getBoundingClientRect());
+        }}
         data-testid="list-item"
         className={cn(
           'flex flex-row py-[10px] pl-2 pr-4 w-full gap-2 border-b border-collapse border-[#f7f7f7]',
@@ -219,6 +231,7 @@ function ValuesWrapper({
 function Value({
   className,
   children,
+
   ...props
 }: React.ComponentPropsWithoutRef<'div'> & { children: React.ReactNode }) {
   const { item } = React.useContext(ItemContext);

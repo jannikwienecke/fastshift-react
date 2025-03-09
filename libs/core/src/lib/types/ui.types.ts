@@ -45,6 +45,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
     }[];
   };
   onReachEnd: () => void;
+  onContextMenu: (item: TItem, rect: DOMRect) => void;
 };
 
 export type MakeListPropsOptions<T = RecordType> = {
@@ -126,6 +127,10 @@ export type MakeDisplayOptionsPropsOptions<T extends RecordType = RecordType> =
     };
     displayFieldsToShow?: (keyof T)[];
   };
+
+export type MakeContextMenuPropsOptions<T extends RecordType = RecordType> = {
+  //
+};
 
 export type DisplayOptionsProps = {
   label: string;

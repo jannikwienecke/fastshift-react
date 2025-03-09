@@ -1,6 +1,7 @@
 import {
   BaseViewConfigManagerInterface,
   ComboxboxItem,
+  ContextMenuState,
   ContinueCursor,
   DataModelNew,
   DisplayOptionsUiType,
@@ -162,6 +163,7 @@ export type LegendStore = {
 
   //   list methods
   selectListItem: (record: RecordType) => void;
+  onContextMenuListItem: (record: RecordType, rect: DOMRect) => void;
   selectRelationField: (props: {
     field: FieldConfig;
     row: Row;
@@ -216,6 +218,10 @@ export type LegendStore = {
   displayOptionsSelectViewField: (field: DisplayOptionsViewField) => void;
   displayOptionsToggleShowEmptyGroups: (checked: boolean) => void;
   displayOptionsReset: () => void;
+
+  contextMenuState: ContextMenuState;
+  contextMenuOpen: (rect: DOMRect) => void;
+  contextMenuClose: () => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (
