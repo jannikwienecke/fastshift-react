@@ -39,14 +39,16 @@ export type ContextMenuState = {
 };
 
 export type ContextMenuFieldItem = {
-  options: Row[];
+  options: Row[] | null;
   value: Row;
+  Icon?: Icon;
 } & FieldConfig;
 
 export type ContextMenuUiOptions = {
   isOpen?: boolean;
   onClose: () => void;
   fields: ContextMenuFieldItem[] | null;
+  renderOption: (row: Row, field: ContextMenuFieldItem) => JSX.Element;
 } & ContextMenuState;
 
 // export type

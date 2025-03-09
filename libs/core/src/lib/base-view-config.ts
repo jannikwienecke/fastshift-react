@@ -25,7 +25,7 @@ export interface BaseViewConfigManagerInterface<
   getPrimarySearchField(): string | undefined;
   getTableName(): string;
   getViewName(): string;
-  getViewFieldList(): FieldConfig[];
+  getViewFieldList(options: { includeSystemFields?: boolean }): FieldConfig[];
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
   getIndexFields(): IndexField[];
@@ -74,9 +74,11 @@ export class BaseViewConfigManager<
 
   // getPrimarySearchField add
 
-  getViewFieldList(): FieldConfig[] {
+  getViewFieldList(options: { includeSystemFields?: boolean }): FieldConfig[] {
     // return Object.values(this.modelConfig?.viewFields ?? {});
-    return Object.values(this.viewConfig?.viewFields ?? {});
+    return Object.values(this.viewConfig?.viewFields ?? {}).filter((f) => {
+      return options?.includeSystemFields ? true : !f.isSystemField;
+    });
   }
 
   getRelationalFieldList(): FieldConfig[] {

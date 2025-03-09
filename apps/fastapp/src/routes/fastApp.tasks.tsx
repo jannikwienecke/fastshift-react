@@ -39,7 +39,12 @@ import {
 } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { CalendarIcon } from 'lucide-react';
+import {
+  BarChartHorizontal,
+  CalendarIcon,
+  Pencil,
+  PencilIcon,
+} from 'lucide-react';
 import React from 'react';
 import { getQueryKey } from '../query-client';
 import {
@@ -58,6 +63,7 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
     tags: {
       component: {
         list: TagsComponent,
+        // contextmenu: TagsComponent,
       },
     },
     completed: {
@@ -69,8 +75,10 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
 
     priority: {
       component: {
+        icon: BarChartHorizontal,
         list: PriorityComponent,
         combobox: PriorityComponentCombobox,
+        contextmenu: PriorityComponentCombobox,
       },
     },
 
@@ -78,6 +86,7 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
       component: {
         list: ProjectComponent,
         combobox: ProjectComponentCombobox,
+        contextmenu: ProjectComponentCombobox,
       },
     },
     dueDate: {
@@ -337,10 +346,26 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
     ref.current?.dispatchEvent(event);
   }, [rect]);
 
-  console.log('rect', rect);
+  const [canBeClosed, setCanBeClosed] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!props.isOpen) {
+      setCanBeClosed(false);
+      return;
+    }
+
+    setTimeout(() => {
+      setCanBeClosed(true);
+    }, 300);
+  }, [props.isOpen]);
 
   return (
-    <ContextMenu modal={true} onOpenChange={(open) => !open && props.onClose()}>
+    <ContextMenu
+      modal={true}
+      onOpenChange={(open) => {
+        !open && canBeClosed && props.onClose();
+      }}
+    >
       <ContextMenuTrigger
         ref={ref}
         className="w-0 h-0 invisible"
@@ -352,15 +377,43 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
         {props.fields?.map((field) => {
           // const icon = viewConfigManager.viewConfig.icon;
           // const relationalData = relationalDataModel[field.name];
+          const isEnumOrRelationalField = field.enum || field.relation;
+
+          if (!isEnumOrRelationalField) {
+            return (
+              <ContextMenuItem key={field.name}>
+                <div className="w-full flex flex-row items-center">
+                  <div className="pr-2">
+                    {field.Icon ? (
+                      <field.Icon className="w-4 h-4" />
+                    ) : (
+                      // <div className="w-4 h-4"></div>
+                      <PencilIcon className="w-3 h-3" />
+                    )}
+                  </div>
+                  {field.name.firstUpper()}
+                  <ContextMenuShortcut>
+                    ⌘{field.name.slice(0, 1).firstUpper()}
+                  </ContextMenuShortcut>
+                </div>
+              </ContextMenuItem>
+            );
+          }
 
           return (
             <ContextMenuSub key={field.name}>
               <ContextMenuSubTrigger className="w-full">
                 <div className="w-full flex flex-row items-center">
-                  <div className="pr-2">{/* <Icon icon={icon} /> */}</div>
-
+                  <div className="pr-2">
+                    {field.Icon ? (
+                      <field.Icon className="w-4 h-4" />
+                    ) : (
+                      // <div className="w-4 h-4"></div>
+                      <PencilIcon className="w-3 h-3" />
+                    )}
+                  </div>
+                  {/* {!isEnumOrRelationalField ? 'Edit' : ''}{' '} */}
                   {field.name.firstUpper()}
-
                   <ContextMenuShortcut>
                     ⌘{field.name.slice(0, 1).firstUpper()}
                   </ContextMenuShortcut>
@@ -375,15 +428,20 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
                     onClick={(e) => e.stopPropagation()}
                     className="text-sm px-2 outline-none border-none w-full py-1"
                   />
+
                   <ContextMenuSeparator />
 
-                  {field.options.map((row) => {
+                  {field.options?.map((row) => {
                     return (
                       <ContextMenuItem key={row.id}>
-                        {row.label}
+                        {props.renderOption(row, field)}
                       </ContextMenuItem>
                     );
                   })}
+
+                  {field.relation ? (
+                    <ContextMenuItem>{'12 more items...'}</ContextMenuItem>
+                  ) : null}
                 </>
               </ContextMenuSubContent>
             </ContextMenuSub>
