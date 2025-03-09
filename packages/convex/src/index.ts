@@ -27,7 +27,7 @@ export const tasksConfig = createViewConfig(
       field: 'name',
     },
     fields: {
-      // TODO: add smart feature..
+      // IMPROVEMENT: add smart feature..
       // dueDate (date in the name -> date field)
       // dueDate (date with upper case D -> Due Date)
       dueDate: { isDateField: true },

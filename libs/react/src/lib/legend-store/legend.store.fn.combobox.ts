@@ -24,7 +24,7 @@ import { LegendStore, StoreFn } from './legend.store.types';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 
 export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
-  // TODO BUILD EVENT DRIVEN
+  // IDEA BUILD EVENT DRIVEN
   // add events and attach function that reacts to the events
   store$.deselectRelationField();
   store$.filterCloseAll();
@@ -186,7 +186,7 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       return;
     }
 
-    // TODO REFACTOR THIS -> GET VALUE PART
+    // REFACTOR THIS -> GET VALUE PART
     const selectedRelationField = store$.list.selectedRelationField.get();
     if (!selectedRelationField) return;
     let dateValueToUpdate: number | null | undefined = undefined;

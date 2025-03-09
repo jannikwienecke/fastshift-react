@@ -68,7 +68,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
               : `Not ${grouping.field?.name.firstUpper()}`,
         })) ?? [];
   } else if (grouping.field?.enum) {
-    // TODO: Implement grouping by enum
+    // IMPROVEMENT: Implement grouping by enum
     console.warn('Grouping by enum is not implemented yet');
     alert('Grouping by enum is not implemented yet');
   }

@@ -34,17 +34,6 @@ export const deleteIds = async (
         (r: ConvexRecordType) => r[tableFieldName] === mutation?.payload.id
       )?._id;
 
-      // TODO:
-      // RUN TESTS -> check
-      // BUILD SUCCESS -> check
-      // COMMIT AND PUSH -> check
-      // HANDLE CASE: Mutation does not work (comment out next line) -> check
-      // and make sure the client reflects the changes -> check
-      // update the list.selectedRelationField.row.raw for non many to many relations -> check
-      // handle case project filter in task view -> no project assigned
-
-      // TODO ADD TEST FOR BOOLEAN COMBOBOX LIST
-      // and BOOLEAN FILTER -> currently we are select true and false -> only one
       if (_id) await mutationClient(ctx).delete(_id);
     }
   });

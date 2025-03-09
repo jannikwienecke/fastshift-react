@@ -10,11 +10,13 @@
     "[ ]",
     "[x]",
     "IMPROVEMENT",
-    "FEATURE"
+    "FEATURE",
+    "IDEA",
+    "REFACTOR",
   ],
   "todo-tree.highlights.customHighlight": {
     "IMPROVEMENT": {
-      "icon": "lightbulb",
+      "icon": "zap",
       "foreground": "#FFD700",
       "iconColour": "#FFD700",
       "gutterIcon": true
@@ -24,6 +26,18 @@
       "foreground": "#3498DB",
       "iconColour": "#3498DB",
       "gutterIcon": true
-    }
+    },
+    "IDEA": {
+      "icon": "light-bulb",
+      "foreground": "#FFD700",
+      "iconColour": "#FFD700",
+      "gutterIcon": true
+    },
+    "REFACTOR": {
+      "icon": "tools",
+      "foreground": "#FFA500",
+      "iconColour": "#FFA500",
+      "gutterIcon": true
+    },
   }
 }

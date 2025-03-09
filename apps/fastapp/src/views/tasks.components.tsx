@@ -32,7 +32,7 @@ export const ViewBubble = (props: {
   );
 };
 
-// TODO: Have a default component library export for fields
+// FEATURE: Have a default component library export for fields
 // like: CheckboxField, TextField, Completed, Priority, Tags...
 const PRIORITY_COLORS = {
   1: '🟢',

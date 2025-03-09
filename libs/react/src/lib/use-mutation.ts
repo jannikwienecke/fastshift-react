@@ -73,7 +73,7 @@ export const useMutation = () => {
       store$.fetchMore.isDone.set(false);
 
       lastViewName.current = vars.viewName;
-      // TODO: Fix This. getting and setting queryKey must happen in 1 location!
+      // IMPROVEMENT: Fix This. getting and setting queryKey must happen in 1 location!
       const _queryKeyAll = api?.makeQueryOptions?.({
         ...queryPropsMerged,
         query: '',
