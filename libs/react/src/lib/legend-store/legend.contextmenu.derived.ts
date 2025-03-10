@@ -4,6 +4,7 @@ import {
   getRelationTableName,
   MakeContextMenuPropsOptions,
   makeData,
+  makeNoneOption,
   makeRow,
   makeRowFromValue,
   Mutation,
@@ -62,6 +63,8 @@ export const derviedContextMenuOptions = observable(() => {
 
       const valueOrValues = row?.getValue(f.name);
 
+      console.log('valueOrValues', valueOrValues);
+
       const values = !valueOrValues
         ? null
         : Array.isArray(valueOrValues)
@@ -75,7 +78,7 @@ export const derviedContextMenuOptions = observable(() => {
 
       const allOptions = enumOptions
         ? enumOptions
-        : relationalValuesForField?.rows ?? null;
+        : [...(relationalValuesForField?.rows ?? [])];
 
       const optionsToRender = allOptions?.filter((option) => {
         return !selectedRows?.map((v) => v.id).includes(option.id);
@@ -85,8 +88,9 @@ export const derviedContextMenuOptions = observable(() => {
         ...f,
         Icon,
         options: optionsToRender ?? [],
+        noneOptionRow: makeNoneOption(f),
         value: row,
-        selected: selectedRows,
+        selected: [...selectedRows].filter((v) => !!v.id),
         onCheckOption: async (checkedRow) => {
           store$.selectRowsMutation({
             row,

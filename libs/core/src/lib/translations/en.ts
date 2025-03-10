@@ -1,7 +1,11 @@
 export const en = {
+  common1: {
+    none: 'None',
+  },
   filter: {
+    none: 'None',
     button: {
-      label: 'Filter',
+      label: 'FilterCool',
       placeholder: 'Filter by...',
     },
   },
@@ -29,5 +33,15 @@ export const en = {
     _creationTime: {
       label: 'Created At',
     },
+  },
+  common: {
+    save: 'Save',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    edit: 'Edit',
+    change: 'Change',
+    no: 'No',
+    yes: 'Yes',
+    none: 'No',
   },
 };

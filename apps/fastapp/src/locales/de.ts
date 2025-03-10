@@ -22,13 +22,6 @@ export default {
     edit: 'Aufgabe bearbeiten',
     delete: 'Aufgabe löschen',
   },
-  common: {
-    save: 'Speichern',
-    cancel: 'Abbrechen',
-    delete: 'Löschen',
-    edit: 'Bearbeiten',
-    change: 'Ändern',
-  },
   priority: {
     low: 'Niedrig',
     medium: 'Mittel',

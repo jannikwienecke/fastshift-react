@@ -20,13 +20,6 @@ export const en = {
     edit: 'Edit Task',
     delete: 'Delete Task',
   },
-  common: {
-    save: 'Save',
-    cancel: 'Cancel',
-    delete: 'Delete',
-    edit: 'Edit',
-    change: 'Change',
-  },
   priority: {
     low: 'Low',
     medium: 'Medium',

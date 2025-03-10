@@ -1,6 +1,5 @@
 import {
   BaseViewConfigManagerInterface,
-  DEFAULT_FETCH_LIMIT_QUERY,
   FilterType,
   ID,
   NONE_OPTION,

@@ -1,7 +1,9 @@
 import {
   getRelationTableName,
+  ifNoneNullElseValue,
   makeData,
   Mutation,
+  NONE_OPTION,
   RecordType,
   Row,
   waitFor,
@@ -90,19 +92,22 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
   (store$) =>
   async ({ field, valueRow, row }) => {
     console.warn('Starting updateRecordMutation');
+    const patchValue = field.relation
+      ? ifNoneNullElseValue(valueRow.id)
+      : ifNoneNullElseValue(valueRow.raw);
+
     const record = {
-      [field.relation?.fieldName ?? field.name]: field.relation
-        ? valueRow.id
-        : valueRow.raw,
+      [field.relation?.fieldName ?? field.name]: patchValue,
     };
     console.warn('Record to update:', record);
 
     const rollback = optimisticUpdateStore({
       store$,
       row,
-      record: { [field.name]: valueRow.raw },
-      sortedRecord: { [field.name]: valueRow.raw },
+      record: { [field.name]: patchValue },
     });
+
+    console.log('NONE OPTION', NONE_OPTION);
 
     const mutation: Mutation = {
       type: 'UPDATE_RECORD',
@@ -136,7 +141,7 @@ export const optimisticUpdateStore = ({
 }: {
   row: Row;
   record: RecordType;
-  sortedRecord: RecordType;
+  sortedRecord?: RecordType;
   store$: Observable<LegendStore>;
   updateGlobalDataModel?: boolean;
 }): (() => void) => {
@@ -149,7 +154,7 @@ export const optimisticUpdateStore = ({
 
   // Generate updated data rows
   const updatedRawRows = originalRows.map((r) =>
-    r.id === row.id ? { ...r.raw, ...sortedRecord } : r.raw
+    r.id === row.id ? { ...r.raw, ...(sortedRecord ?? record) } : r.raw
   );
   const viewName = store$.viewConfigManager.get().getViewName();
   const updatedRows = makeData(

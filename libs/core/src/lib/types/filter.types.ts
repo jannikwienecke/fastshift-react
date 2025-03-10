@@ -42,6 +42,7 @@ export type ContextMenuState = {
 export type ContextMenuFieldItem = {
   options: Row[] | null;
   selected: Row[] | null;
+  noneOptionRow: Row | null;
   value: Row;
   Icon?: Icon;
   onSelectOption: (row: Row) => Promise<void>;

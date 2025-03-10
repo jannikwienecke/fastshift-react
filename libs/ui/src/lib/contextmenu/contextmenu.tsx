@@ -61,6 +61,23 @@ const SubMenuContent: React.FC<{
         </>
       )}
 
+      {field.relation && field.noneOptionRow ? (
+        <ContextMenuItem
+          key={`noneoption-${field.noneOptionRow.id}`}
+          className="group items-center flex flex-row"
+          onClick={() =>
+            field.noneOptionRow && field.onSelectOption?.(field.noneOptionRow)
+          }
+        >
+          {field.selected?.length === 0 ? (
+            <CheckIcon className="w-4 h-4 mr-1" />
+          ) : (
+            <div className="h-4 w-4 mr-1" />
+          )}
+          <div>{renderOption(field.noneOptionRow, field)}</div>
+        </ContextMenuItem>
+      ) : null}
+
       {field.selected?.map((row) => (
         <ContextMenuItem
           key={`selected-${row.id}`}

@@ -7,6 +7,7 @@ export const de = {
     },
   },
   displayOptions: {
+    clearAll: 'Zurücksetzen',
     sorting: {
       label: 'Sortierung',
       noSorting: 'Keine Sortierung',
@@ -29,5 +30,15 @@ export const de = {
     _creationTime: {
       label: 'Erstellt am',
     },
+  },
+  common: {
+    save: 'Speichern',
+    cancel: 'Abbrechen',
+    delete: 'Löschen',
+    edit: 'Bearbeiten',
+    change: 'Ändern',
+    none: 'Kein',
+    yes: 'Ja',
+    no: 'Nein',
   },
 } satisfies typeof en;

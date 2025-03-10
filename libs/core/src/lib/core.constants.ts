@@ -25,3 +25,6 @@ export const NO_SORTING_FIELD: FieldConfig = {
   name: 'displayOptions.sorting.noSorting',
   type: 'String',
 };
+
+export const ifNoneNullElseValue = (value: string) =>
+  value === NONE_OPTION ? null : value;
