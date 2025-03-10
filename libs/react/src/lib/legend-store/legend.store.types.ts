@@ -220,7 +220,7 @@ export type LegendStore = {
   displayOptionsReset: () => void;
 
   contextMenuState: ContextMenuState;
-  contextMenuOpen: (rect: DOMRect) => void;
+  contextMenuOpen: (rect: DOMRect, row: RecordType) => void;
   contextMenuClose: () => void;
 };
 

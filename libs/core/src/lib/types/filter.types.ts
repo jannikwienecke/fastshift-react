@@ -1,5 +1,5 @@
 import { Row } from '../data-model';
-import { FieldConfig } from './base.types';
+import { FieldConfig, RecordType } from './base.types';
 
 type Icon = React.FC<any>;
 export type FilterOperatorType = {
@@ -36,12 +36,17 @@ export type FilterType = FilterRelationType | FilterPrimitiveType;
 
 export type ContextMenuState = {
   rect: DOMRect | null;
+  row: Row | null;
+  mutating: boolean;
 };
 
 export type ContextMenuFieldItem = {
   options: Row[] | null;
+  selected: Row[] | null;
   value: Row;
   Icon?: Icon;
+  onSelectOption: (row: Row) => Promise<void>;
+  onCheckOption: (row: Row) => Promise<void>;
 } & FieldConfig;
 
 export type ContextMenuUiOptions = {
@@ -49,6 +54,7 @@ export type ContextMenuUiOptions = {
   onClose: () => void;
   fields: ContextMenuFieldItem[] | null;
   renderOption: (row: Row, field: ContextMenuFieldItem) => JSX.Element;
+  renderField: (field: ContextMenuFieldItem) => JSX.Element;
 } & ContextMenuState;
 
 // export type

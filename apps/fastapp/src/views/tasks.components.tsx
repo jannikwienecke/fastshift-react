@@ -58,6 +58,7 @@ export const PriorityComponentCombobox = (props: {
   const { t } = useTranslation();
   const priority = props.data;
 
+  console.log('PriorityComponentCombobox', props);
   return (
     <div className="flex items-center gap-2">
       <div>{PRIORITY_COLORS[priority]}</div>
@@ -96,12 +97,7 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
             key={tag.id + props.data.id}
             className={index !== 0 ? '-ml-2' : ''}
           >
-            <ViewBubble
-              tableName="tags"
-              value={tag.name}
-              color={tag.color}
-              showIcon={false}
-            />
+            <RenderTag tag={tag} />
           </div>
         ))}
 
@@ -116,6 +112,27 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
         )}
       </>
     </div>
+  );
+};
+
+export const TagsDefaultComponent = (props: {
+  data: NonNullable<TaskViewDataType['tags']>[number] | undefined;
+}) => {
+  const tag = props.data;
+
+  if (!tag) return null;
+
+  return <RenderTag tag={tag} />;
+};
+
+export const RenderTag = (props: { tag: Tags }) => {
+  return (
+    <ViewBubble
+      tableName="tags"
+      value={props.tag.name}
+      color={props.tag.color}
+      showIcon={false}
+    />
   );
 };
 

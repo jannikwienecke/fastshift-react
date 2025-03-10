@@ -179,7 +179,10 @@ function Item(
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          onContextMenu?.(item, e.currentTarget.getBoundingClientRect());
+
+          // Create a DOMRect from the cursor position
+          const rect = new DOMRect(e.clientX, e.clientY, 0, 0);
+          onContextMenu?.(item, rect);
         }}
         data-testid="list-item"
         className={cn(

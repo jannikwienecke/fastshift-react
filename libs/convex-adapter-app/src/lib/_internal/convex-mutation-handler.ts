@@ -74,6 +74,8 @@ export const selectRecordsMutation = async (
 ) => {
   const { mutation, viewConfigManager } = props;
 
+  console.warn('selectRecordsMutation', mutation.payload);
+
   if (mutation.type !== 'SELECT_RECORDS') throw new Error('INVALID MUTATION-4');
 
   const { idsToDelete, newIds, table } = mutation.payload;

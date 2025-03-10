@@ -1,14 +1,27 @@
+import { batch } from '@legendapp/state';
 import { StoreFn } from './legend.store.types';
+import { makeData } from '@apps-next/core';
 
 export const contextMenuOpen: StoreFn<'contextMenuOpen'> =
-  (store$) => (rect) => {
-    console.log('TEST open', rect);
+  (store$) => (rect, record) => {
+    const row = makeData(
+      store$.views.get(),
+      store$.viewConfigManager.getViewName()
+    )([record]).rows?.[0];
 
-    store$.contextMenuState.rect.set(rect);
+    if (!row) {
+      console.error('Row not found for context menu');
+      return;
+    }
+
+    batch(() => {
+      store$.contextMenuState.rect.set(rect);
+      store$.contextMenuState.row.set(row);
+    });
   };
 
 export const contextMenuClose: StoreFn<'contextMenuClose'> = (store$) => () => {
-  console.log('TEST close');
-
+  console.log('CLOSE!');
   store$.contextMenuState.rect.set(null);
+  store$.contextMenuState.row.set(null);
 };

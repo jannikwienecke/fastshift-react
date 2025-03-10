@@ -1,5 +1,5 @@
-import { FieldConfig, Row, useTranslation } from '@apps-next/core';
-import { getComponent } from './ui-components.helper';
+import { FieldConfig, Row } from '@apps-next/core';
+import { RenderComponent } from './render-component';
 import { FilterValue } from './render-filter-value';
 
 export const ContextmenuFieldOption = ({
@@ -9,40 +9,36 @@ export const ContextmenuFieldOption = ({
   field?: FieldConfig | null;
   value: Row;
 }) => {
-  const { t } = useTranslation();
-
-  const fieldName = field?.name;
-
-  const componentType = 'contextmenu';
-  let ComponentToRender: React.ComponentType<any> | undefined = undefined;
-
-  if (fieldName) {
-    ComponentToRender = getComponent({
-      componentType,
-      fieldName,
-    });
-  }
+  const componentType = 'contextmenuFieldOption';
 
   if (!field) {
     return <FilterValue field={null} value={value} />;
   }
 
-  const raw =
-    field?.type === 'Boolean' && typeof value.raw === 'string'
-      ? value.raw === 'true'
-        ? true
-        : false
-      : value.raw;
-
   return (
-    <>
-      {ComponentToRender ? (
-        <>
-          <ComponentToRender data={raw} />
-        </>
-      ) : (
-        <>{t(value.label as any)}</>
-      )}
-    </>
+    <RenderComponent
+      value={value}
+      field={field}
+      componentType={componentType}
+    />
   );
+
+  // const raw =
+  //   field?.type === 'Boolean' && typeof value.raw === 'string'
+  //     ? value.raw === 'true'
+  //       ? true
+  //       : false
+  //     : value.raw;
+
+  // return (
+  //   <>
+  //     {ComponentToRender ? (
+  //       <>
+  //         <ComponentToRender data={raw} />
+  //       </>
+  //     ) : (
+  //       <>{t(value.label as any)}</>
+  //     )}
+  //   </>
+  // );
 };

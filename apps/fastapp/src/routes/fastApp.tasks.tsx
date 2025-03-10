@@ -17,6 +17,7 @@ import {
   useComboboxQuery,
 } from '@apps-next/react';
 import {
+  Checkbox,
   cn,
   ComboboxPopover,
   ContextMenu,
@@ -42,8 +43,12 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import {
   BarChartHorizontal,
   CalendarIcon,
+  CheckIcon,
+  CopyIcon,
   Pencil,
   PencilIcon,
+  PencilLineIcon,
+  TrashIcon,
 } from 'lucide-react';
 import React from 'react';
 import { getQueryKey } from '../query-client';
@@ -55,6 +60,7 @@ import {
   ProjectComponent,
   ProjectComponentCombobox,
   TagsComponent,
+  TagsDefaultComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
 
@@ -63,7 +69,7 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
     tags: {
       component: {
         list: TagsComponent,
-        // contextmenu: TagsComponent,
+        contextmenuFieldOption: TagsDefaultComponent,
       },
     },
     completed: {
@@ -78,7 +84,16 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
         icon: BarChartHorizontal,
         list: PriorityComponent,
         combobox: PriorityComponentCombobox,
-        contextmenu: PriorityComponentCombobox,
+        contextmenuFieldOption: PriorityComponentCombobox,
+      },
+    },
+
+    name: {
+      component: {
+        icon: PencilLineIcon,
+        contextmenuFieldItem({ field }) {
+          return <>Rename Task</>;
+        },
       },
     },
 
@@ -86,7 +101,7 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
       component: {
         list: ProjectComponent,
         combobox: ProjectComponentCombobox,
-        contextmenu: ProjectComponentCombobox,
+        contextmenuFieldOption: ProjectComponentCombobox,
       },
     },
     dueDate: {
@@ -331,7 +346,6 @@ const RenderContextmenu = observer(() => {
 
 const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
   const ref = React.useRef<HTMLDivElement>(null);
-  console.log(props.fields);
 
   React.useLayoutEffect(() => {
     if (!rect) return;
@@ -340,8 +354,8 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
       bubbles: true,
       cancelable: true,
       view: window,
-      clientX: rect.left + 108,
-      clientY: rect.top + 25,
+      clientX: rect.left,
+      clientY: rect.y,
     });
     ref.current?.dispatchEvent(event);
   }, [rect]);
@@ -356,7 +370,7 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
 
     setTimeout(() => {
       setCanBeClosed(true);
-    }, 300);
+    }, 700);
   }, [props.isOpen]);
 
   return (
@@ -372,13 +386,11 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
       ></ContextMenuTrigger>
 
       <ContextMenuContent className="w-56">
-        <ContextMenuSeparator />
+        {/* <ContextMenuSeparator /> */}
 
         {props.fields?.map((field) => {
-          // const icon = viewConfigManager.viewConfig.icon;
-          // const relationalData = relationalDataModel[field.name];
           const isEnumOrRelationalField = field.enum || field.relation;
-
+          const isManyToMany = field.relation?.manyToManyTable;
           if (!isEnumOrRelationalField) {
             return (
               <ContextMenuItem key={field.name}>
@@ -391,7 +403,10 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
                       <PencilIcon className="w-3 h-3" />
                     )}
                   </div>
-                  {field.name.firstUpper()}
+
+                  {/* TODO  HIER WEITER MACHEN */}
+                  {props.renderField(field)}
+
                   <ContextMenuShortcut>
                     ⌘{field.name.slice(0, 1).firstUpper()}
                   </ContextMenuShortcut>
@@ -408,12 +423,12 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
                     {field.Icon ? (
                       <field.Icon className="w-4 h-4" />
                     ) : (
-                      // <div className="w-4 h-4"></div>
                       <PencilIcon className="w-3 h-3" />
                     )}
                   </div>
-                  {/* {!isEnumOrRelationalField ? 'Edit' : ''}{' '} */}
-                  {field.name.firstUpper()}
+
+                  {props.renderField(field)}
+
                   <ContextMenuShortcut>
                     ⌘{field.name.slice(0, 1).firstUpper()}
                   </ContextMenuShortcut>
@@ -422,25 +437,76 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
 
               <ContextMenuSubContent className="w-48">
                 <>
-                  <input
-                    type="text"
-                    placeholder="Filter..."
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-sm px-2 outline-none border-none w-full py-1"
-                  />
+                  {field.relation ? (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Filter..."
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-sm px-2 outline-none border-none w-full py-1"
+                      />
+                      <ContextMenuSeparator />
+                    </>
+                  ) : null}
 
-                  <ContextMenuSeparator />
+                  {field.selected?.map((row) => {
+                    return (
+                      <ContextMenuItem
+                        key={`selected-${row.id}`}
+                        className="group"
+                      >
+                        {isManyToMany ? (
+                          <div className="pr-2">
+                            <Checkbox
+                              onClick={(e) => e.stopPropagation()}
+                              onCheckedChange={(e) => {
+                                field.onCheckOption(row);
+                              }}
+                              checked
+                              className="h-4 w-4"
+                            />
+                          </div>
+                        ) : (
+                          <CheckIcon className="w-4 h-4 mr-1" />
+                        )}
+                        <div>{props.renderOption(row, field)}</div>
+                      </ContextMenuItem>
+                    );
+                  })}
 
                   {field.options?.map((row) => {
                     return (
-                      <ContextMenuItem key={row.id}>
-                        {props.renderOption(row, field)}
+                      <ContextMenuItem
+                        key={`option-${row.id}`}
+                        className="group"
+                        onClick={() => field.onSelectOption(row)}
+                      >
+                        {isManyToMany ? (
+                          <div className="invisible group-hover:visible pr-2">
+                            <Checkbox
+                              onClick={(e) => e.stopPropagation()}
+                              onCheckedChange={() => {
+                                field.onCheckOption(row);
+                              }}
+                              className="h-4 w-4"
+                            />
+                          </div>
+                        ) : (
+                          <div className="h-4 w-4 mr-1"></div>
+                        )}
+                        <div>{props.renderOption(row, field)}</div>
                       </ContextMenuItem>
                     );
                   })}
 
                   {field.relation ? (
-                    <ContextMenuItem>{'12 more items...'}</ContextMenuItem>
+                    <>
+                      <ContextMenuSeparator />
+                      <ContextMenuItem className="flex flex-row items-center">
+                        <div className="h-4 w-4 mr-1" />
+                        <div className="flex-1">{'12 more items...'}</div>
+                      </ContextMenuItem>
+                    </>
                   ) : null}
                 </>
               </ContextMenuSubContent>
@@ -448,34 +514,36 @@ const ContextMenuDefault = ({ rect, ...props }: ContextMenuUiOptions) => {
           );
         })}
 
+        <ContextMenuSeparator />
+
         <ContextMenuSub>
-          <ContextMenuSubTrigger inset>More Tools</ContextMenuSubTrigger>
+          <ContextMenuSubTrigger>
+            <div className="flex flex-row items-center">
+              <div className="pr-2">
+                <CopyIcon className="w-3 h-3" />
+              </div>
+              <div>Copy</div>
+            </div>
+          </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
             <ContextMenuItem>
-              Save Page As...
-              <ContextMenuShortcut>⇧⌘S</ContextMenuShortcut>
+              Copy ID
+              <ContextMenuShortcut>⌘.</ContextMenuShortcut>
             </ContextMenuItem>
-            <ContextMenuItem>Create Shortcut...</ContextMenuItem>
-            <ContextMenuItem>Name Window...</ContextMenuItem>
-            <ContextMenuSeparator />
-            <ContextMenuItem>Developer Tools</ContextMenuItem>
+            <ContextMenuItem>Copy URL</ContextMenuItem>
+            <ContextMenuItem>Copy as JSON</ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
-        <ContextMenuSeparator />
-        <ContextMenuCheckboxItem checked>
-          Show Bookmarks Bar
-          <ContextMenuShortcut>⌘⇧B</ContextMenuShortcut>
-        </ContextMenuCheckboxItem>
-        <ContextMenuCheckboxItem>Show Full URLs</ContextMenuCheckboxItem>
-        <ContextMenuSeparator />
-        <ContextMenuRadioGroup value="pedro">
-          <ContextMenuLabel inset>People</ContextMenuLabel>
-          <ContextMenuSeparator />
-          <ContextMenuRadioItem value="pedro">
-            Pedro Duarte
-          </ContextMenuRadioItem>
-          <ContextMenuRadioItem value="colm">Colm Tuite</ContextMenuRadioItem>
-        </ContextMenuRadioGroup>
+
+        <ContextMenuItem>
+          <div className="flex flex-row items-center">
+            <div className="pr-2">
+              <TrashIcon className="w-3 h-3" />
+            </div>
+            <div>Delete Task</div>
+          </div>
+          <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );

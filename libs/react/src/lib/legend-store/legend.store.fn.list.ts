@@ -26,7 +26,5 @@ export const listDeselectRelationField: StoreFn<'deselectRelationField'> =
 
 export const listContextMenuItem: StoreFn<'onContextMenuListItem'> =
   (store$) => (record: RecordType, rect: DOMRect) => {
-    console.log('listContextMenuItem', record, rect);
-
-    store$.contextMenuOpen(rect);
+    store$.contextMenuOpen(rect, record);
   };

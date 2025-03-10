@@ -58,6 +58,8 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
   (store$) => (value) => {
     const state = comboboxStore$.get();
 
+    console.log('comboboxSelectValue', value);
+
     if (value.id === SELECT_FILTER_DATE) {
       store$.combobox.datePicker.open.set(true);
     } else if (store$.displayOptions.isOpen.get()) {
@@ -77,6 +79,7 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
         store$.filterSelectFilterType(value);
       }
     } else {
+      console.log('HIER');
       if (!state.multiple) {
         store$.combobox.selected.set([value]);
 
@@ -152,10 +155,13 @@ let runningMutation = false;
 
 export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
   (store$) => (value, newSelected) => {
+    console.log('comboboxRunSelectMutation', value, newSelected);
+
     const runMutation = store$.api?.mutateAsync;
 
     const selected = store$.combobox.selected.get();
     const { row, field } = comboboxStore$.get();
+    const { row: row1 } = store$.contextMenuState.get();
 
     if (!row) return;
     if (!field) throw new Error('no field');

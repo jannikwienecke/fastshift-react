@@ -1,6 +1,12 @@
-import { GetTableName, RecordType } from './types';
+import { FieldConfig, GetTableName, RecordType } from './types';
 
-export type ComponentType = 'list' | 'combobox' | 'contextmenu' | 'icon';
+export type ComponentType =
+  | 'default'
+  | 'list'
+  | 'combobox'
+  | 'contextmenuFieldItem'
+  | 'contextmenuFieldOption'
+  | 'icon';
 
 export type ViewFieldsConfig<
   T extends GetTableName = any,
@@ -21,7 +27,18 @@ export type ViewFieldsConfig<
             data: U[key] extends Array<unknown> ? U[key][0] : U[key];
           }) => React.ReactNode;
 
-          contextmenu: (props: {
+          contextmenuFieldItem: (props: {
+            field: FieldConfig;
+          }) => React.ReactNode;
+
+          contextmenuFieldOption: (props: {
+            // data: U[key] extends Array<unknown> ? U[key][0] : U[key];
+            data: NonNullable<U[key]> extends Array<any>
+              ? NonNullable<U[key]>[0]
+              : U[key];
+          }) => React.ReactNode;
+
+          default: (props: {
             data: U[key] extends Array<unknown> ? U[key][0] : U[key];
           }) => React.ReactNode;
         }>;
