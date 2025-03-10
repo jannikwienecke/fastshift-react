@@ -1,13 +1,10 @@
 import {
   ComboxboxItem,
   FieldConfig,
-  FieldType,
-  NONE_OPTION,
   NO_GROUPING_FIELD,
   NO_SORTING_FIELD,
   RecordType,
   Row,
-  en,
   getRelationTableName,
   makeNoneOption,
   makeRow,
@@ -20,11 +17,11 @@ import Fuse from 'fuse.js';
 import { filterUtil, operator } from '../ui-adapter/filter-adapter';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
+import { makeFilterPropsOptions } from './legend.store.derived.filter';
 import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
-import { makeFilterPropsOptions } from './legend.store.derived.filter';
 
 export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed

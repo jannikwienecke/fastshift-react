@@ -127,6 +127,5 @@ export const DEFAULT_LEGEND_STORE: Pick<
   contextMenuState: {
     rect: null,
     row: null,
-    mutating: false,
   },
 };

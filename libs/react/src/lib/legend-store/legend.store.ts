@@ -1,6 +1,18 @@
 import { observable } from '@legendapp/state';
+import {
+  displayOptionsClose,
+  displayOptionsCloseCombobox,
+  displayOptionsOpen,
+  displayOptionsOpenGrouping,
+  displayOptionsOpenSorting,
+  displayOptionsReset,
+  displayOptionsSelectField,
+  displayOptionsSelectViewField,
+  displayOptionsToggleShowEmptyGroups,
+} from './legend-store.fn.displayOptions';
+import { contextMenuClose, contextMenuOpen } from './legend.contextmenu.fn';
+import { selectRowsMutation, updateRecordMutation } from './legend.mutationts';
 import { DEFAULT_LEGEND_STORE } from './legend.store.constants';
-import { LegendStore } from './legend.store.types';
 import {
   comboboxClose,
   comboboxHandleQueryData,
@@ -27,32 +39,21 @@ import {
   init,
 } from './legend.store.fn.global';
 import {
-  listContextMenuItem,
-  listDeselectRelationField,
-  listSelect,
-  listSelectRelationField,
-} from './legend.store.fn.list';
-import {
-  inputDialogClose,
-  inputDialogSave,
-} from './legend.store.fn.input-dialog';
-import {
   globalFetchMore,
   globalQueryReset,
   globalQueryUpdate,
 } from './legend.store.fn.global-query';
 import {
-  displayOptionsClose,
-  displayOptionsCloseCombobox,
-  displayOptionsOpen,
-  displayOptionsOpenGrouping,
-  displayOptionsOpenSorting,
-  displayOptionsReset,
-  displayOptionsSelectField,
-  displayOptionsSelectViewField,
-  displayOptionsToggleShowEmptyGroups,
-} from './legend-store.fn.displayOptions';
-import { contextMenuClose, contextMenuOpen } from './legend.contextmenu.fn';
+  inputDialogClose,
+  inputDialogSave,
+} from './legend.store.fn.input-dialog';
+import {
+  listContextMenuItem,
+  listDeselectRelationField,
+  listSelect,
+  listSelectRelationField,
+} from './legend.store.fn.list';
+import { LegendStore } from './legend.store.types';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -119,4 +120,7 @@ export const store$ = observable<LegendStore>({
 
   contextMenuOpen: (...props) => contextMenuOpen(store$)(...props),
   contextMenuClose: (...props) => contextMenuClose(store$)(...props),
+
+  selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
+  updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
 });

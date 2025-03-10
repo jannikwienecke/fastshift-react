@@ -62,12 +62,11 @@ export const derviedContextMenuOptions = observable(() => {
 
       const valueOrValues = row?.getValue(f.name);
 
-      const values =
-        valueOrValues === undefined || valueOrValues === null
-          ? null
-          : Array.isArray(valueOrValues)
-          ? valueOrValues
-          : [valueOrValues];
+      const values = !valueOrValues
+        ? null
+        : Array.isArray(valueOrValues)
+        ? valueOrValues
+        : [valueOrValues];
 
       const selectedRows =
         values?.map((v) => {
@@ -89,73 +88,16 @@ export const derviedContextMenuOptions = observable(() => {
         value: row,
         selected: selectedRows,
         onCheckOption: async (checkedRow) => {
-          store$.contextMenuState.mutating.set(true);
-
-          const runMutation = store$.api?.mutateAsync;
-          const selectedIds = values?.map((v) => v.id) ?? [];
-          const checkedId = checkedRow.id;
-          const idsToDelete =
-            selectedIds.filter((id) => id === checkedId) ?? [];
-
-          const newRows = values?.length
-            ? idsToDelete.length
-              ? values.filter((v) => v.id !== checkedId)
-              : [...values, checkedRow]
-            : [checkedRow];
-
-          const originalRawRow = { ...store$.contextMenuState.row.raw.get() };
-          const updatedRowData = {
-            ...originalRawRow,
-            [f.name]: newRows.map((r) => r.raw),
-          };
-
-          const updatedRow = makeData(
-            store$.views.get(),
-            store$.viewConfigManager.get().getViewName()
-          )([updatedRowData]).rows[0];
-
-          updatedRow && store$.contextMenuState.row.set(updatedRow);
-
-          const mutation: Mutation = {
-            type: 'SELECT_RECORDS',
-            payload: {
-              id: row.id,
-              table: getRelationTableName(f),
-              idsToDelete: idsToDelete,
-              newIds: idsToDelete.length ? [] : [checkedId],
-            },
-          };
-
-          const { error } = await runMutation({
-            mutation: mutation,
-            viewName: store$.viewConfigManager.viewConfig.viewName.get(),
-            query: store$.globalQuery.get(),
+          store$.selectRowsMutation({
+            row,
+            field: f,
+            existingRows: selectedRows,
+            checkedRow,
+            // deleteIds: idsToDelete,
           });
-
-          if (error) {
-            store$.contextMenuState.row.set(row);
-          }
         },
-        onSelectOption: async (option: Row) => {
-          const runMutation = store$.api?.mutateAsync;
-
-          const mutation: Mutation = {
-            type: 'UPDATE_RECORD',
-            payload: {
-              id: row.id,
-              record: {
-                [f.relation?.fieldName ?? f.name]: f.relation
-                  ? option.id
-                  : option.raw,
-              },
-            },
-          };
-
-          await runMutation({
-            mutation: mutation,
-            viewName: store$.viewConfigManager.viewConfig.viewName.get(),
-            query: store$.globalQuery.get(),
-          });
+        onSelectOption: async (option) => {
+          store$.updateRecordMutation({ field: f, row, valueRow: option });
         },
       } satisfies ContextMenuFieldItem;
     });

@@ -222,6 +222,18 @@ export type LegendStore = {
   contextMenuState: ContextMenuState;
   contextMenuOpen: (rect: DOMRect, row: RecordType) => void;
   contextMenuClose: () => void;
+
+  selectRowsMutation: (props: {
+    field: FieldConfig;
+    row: Row;
+    existingRows: Row[];
+    checkedRow: Row;
+  }) => void;
+  updateRecordMutation: (props: {
+    field: FieldConfig;
+    row: Row;
+    valueRow: Row;
+  }) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

@@ -37,7 +37,6 @@ export type FilterType = FilterRelationType | FilterPrimitiveType;
 export type ContextMenuState = {
   rect: DOMRect | null;
   row: Row | null;
-  mutating: boolean;
 };
 
 export type ContextMenuFieldItem = {
