@@ -17,3 +17,4 @@ export * from './lib/filter';
 export * from './lib/input-dialog';
 export * from './lib/date-picker';
 export * from './lib/display-options';
+export * from './lib/contextmenu';
