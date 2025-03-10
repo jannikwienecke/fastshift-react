@@ -3,7 +3,13 @@ import {
   ContextMenuUiOptions,
   Row,
 } from '@apps-next/core';
-import { CheckIcon, CopyIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import {
+  CheckIcon,
+  CopyIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+} from 'lucide-react';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   ContextMenu,
@@ -61,7 +67,9 @@ const SubMenuContent: React.FC<{
         </>
       )}
 
-      {field.relation && field.noneOptionRow ? (
+      {field.relation &&
+      !field.relation.manyToManyTable &&
+      field.noneOptionRow ? (
         <ContextMenuItem
           key={`noneoption-${field.noneOptionRow.id}`}
           className="group items-center flex flex-row"
@@ -123,9 +131,14 @@ const SubMenuContent: React.FC<{
       {field.relation && (
         <>
           <ContextMenuSeparator />
-          <ContextMenuItem className="flex flex-row items-center">
+
+          <ContextMenuItem className="">
             <div className="h-4 w-4 mr-1" />
-            <div className="flex-1">{'12 more items...'}</div>
+            <div className="flex flex-row items-center gap-2">
+              <PlusIcon className="w-3 h-3 mr-1" />
+
+              <div className="flex-1">Create new {field.name}</div>
+            </div>
           </ContextMenuItem>
         </>
       )}

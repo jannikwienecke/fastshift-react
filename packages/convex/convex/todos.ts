@@ -1,5 +1,6 @@
 import { paginationOptsValidator } from 'convex/server';
 import * as server from './_generated/server';
+import { Aggregate } from '@convex-dev/aggregate';
 
 export const generateTodos = server.mutation({
   async handler(ctx, args) {
