@@ -42,6 +42,12 @@ export function createViewConfig<T extends GetTableName>(
     { ...viewFields }
   );
 
+  if (config.mutation?.softDelete && !config.mutation?.softDeleteField) {
+    console.error(
+      "'softDelete' is set to true but 'softDeleteField' is not set. To enable soft delete, please set 'softDeleteField' to the field name that will be used for soft delete."
+    );
+  }
+
   const viewConfig: ViewConfigType<T> = {
     ...config,
     displayField: {
@@ -52,7 +58,14 @@ export function createViewConfig<T extends GetTableName>(
     includeFields,
     tableName,
     viewName,
+    mutation: {
+      ...config.mutation,
+      softDelete: !!(
+        config.mutation?.softDelete && config.mutation?.softDeleteField
+      ),
+    },
     query: {
+      showDeleted: config.query?.showDeleted && !!config.mutation?.softDelete,
       searchableFields: searchableFields,
       indexFields: indexFields,
       ...config.query,

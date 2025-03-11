@@ -20,6 +20,10 @@ export const todos = server.query({
       .order('asc')
       .paginate(args.paginationOpts);
 
+    const resultTasks = await ctx.db
+      .query('tasks')
+      .withIndex('deleted', (q) => q.eq('deleted', false));
+
     return result;
   },
 });

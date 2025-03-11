@@ -143,6 +143,11 @@ export const makeListProps = <T extends RecordType = RecordType>(
   const items =
     dataModel?.rows?.map((item) => ({
       ...item.raw,
+      deleted: viewConfigManager.viewConfig.mutation?.softDeleteField
+        ? item.raw[
+            viewConfigManager.viewConfig.mutation.softDeleteField.toString()
+          ]
+        : false,
       id: item.id,
       icon: Icon,
       valuesLeft: _renderLabel

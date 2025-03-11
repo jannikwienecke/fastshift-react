@@ -3,10 +3,10 @@ import {
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
   DEFAULT_MAX_ITEMS_GROUPING,
-  IndexField,
   QueryServerProps,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
+import { getDisplayOptionsInfo } from './convex-display-options';
 import { filterResults } from './convex-filter-results';
 import { getFilterTypes } from './convex-get-filters';
 import {
@@ -22,10 +22,9 @@ import { convexSortRows } from './convex-sort-rows';
 import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
-import { getDisplayOptionsInfo } from './convex-display-options';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
-  const { viewConfigManager, filters, registeredViews, displayOptions } = args;
+  const { viewConfigManager, filters, registeredViews } = args;
 
   const isTask = viewConfigManager?.getTableName() === 'tasks';
 
@@ -34,6 +33,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     console.log('___: ', ...args);
   };
 
+  const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
+
   const _indexFields = viewConfigManager.getIndexFields();
 
   const _searchFields = viewConfigManager.getSearchableFields();
@@ -41,6 +42,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   const displayOptionsInfo = getDisplayOptionsInfo(args);
+  const showDeleted = displayOptionsInfo.showDeleted;
 
   let isDone = false;
   let isGetAll = false;
@@ -121,12 +123,19 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
+  const query = queryClient(ctx, viewConfigManager.getTableName());
+  const rowsNotDeleted = await query
+    .withIndex('deleted', (q) => q.eq('deleted', false))
+    .collect();
+  const idsNotDeleted = rowsNotDeleted.map((row) => row._id);
+
   const allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
     hasOneToManyFilter ? idsOneToManyFilters : null,
     isIndexSearch ? idsIndexField : null,
     isSearchFieldSearch ? idsSearchField : null,
-    args.query ? idsQuerySearch : null
+    args.query ? idsQuerySearch : null,
+    softDeleteEnabled && !showDeleted ? idsNotDeleted : null
   );
 
   const idsToRemove = Array.from(

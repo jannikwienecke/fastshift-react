@@ -52,10 +52,12 @@ export type ContextMenuFieldItem = {
 export type ContextMenuUiOptions = {
   isOpen?: boolean;
   onClose: () => void;
+  onDelete: () => void;
   fields: ContextMenuFieldItem[] | null;
   renderOption: (row: Row, field: ContextMenuFieldItem) => JSX.Element;
   renderField: (field: ContextMenuFieldItem) => JSX.Element;
   modelName: string;
+  isDeleted?: boolean;
 } & ContextMenuState;
 
 // export type
@@ -65,6 +67,8 @@ export type DisplayOptionsUiType = {
   viewType: {
     type: 'list' | 'board';
   };
+  showDeleted: boolean;
+  softDeleteEnabled: boolean;
   sorting: {
     isOpen: boolean;
     field?: FieldConfig;

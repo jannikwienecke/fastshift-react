@@ -107,6 +107,8 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
   displayOptions: {
     showEmptyGroups: true,
+    softDeleteEnabled: false,
+    showDeleted: false,
     isOpen: false,
     viewType: {
       type: 'list',

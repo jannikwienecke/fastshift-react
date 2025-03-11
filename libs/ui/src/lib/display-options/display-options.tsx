@@ -14,9 +14,8 @@ import {
 import { Button, Switch } from '../components';
 
 import { Popover, PopoverContent, PopoverTrigger } from '../components';
-import { cn } from '../utils';
-import { Bubble } from '../bubble';
 import { SelectSeparator } from '../components/select';
+import { cn } from '../utils';
 
 const DisplayOptionsDefault = (props: DisplayOptionsProps) => {
   return (
@@ -58,7 +57,7 @@ const DisplayOptionsSelectButton = (props: {
   return (
     <Button
       variant={'outline'}
-      className="py-0 h-7 flex flex-row items-center gap-2 text-xs w-36 justify-between"
+      className="py-0 h-7 flex flex-row items-center gap-2 text-xs w-40 justify-between"
       onClick={props.onClick}
     >
       <div>{t(props.label as TranslationKeys).firstUpper()}</div>
@@ -205,7 +204,7 @@ function DisplayOptionsPopover(
       </PopoverTrigger>
 
       <PopoverContent
-        className="max-w-72 w-72 min-w-72 flex flex-col gap-2 p-4 mr-8 text-[12px]"
+        className="max-w-80 w-80 min-w-80 flex flex-col gap-2 p-4 mr-8 text-[12px]"
         sideOffset={15}
         side="bottom"
       >
@@ -227,6 +226,19 @@ function DisplayOptionsPopover(
             <Switch
               onCheckedChange={props.onToggleShowEmptyGroups}
               checked={props.showEmptyGroups}
+            />
+          </div>
+        ) : null}
+
+        {props.softDeleteEnabled ? (
+          <div className="flex flex-row items-center justify-between">
+            <div className="text-foreground/70 flex items-center">
+              {t('displayOptions.showDeleted')}
+            </div>
+
+            <Switch
+              onCheckedChange={props.onToggleShowDeleted}
+              checked={props.showDeleted}
             />
           </div>
         ) : null}

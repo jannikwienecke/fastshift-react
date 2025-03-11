@@ -10,4 +10,6 @@ created: 1723444498044
 
 - [x] translations models
 - [x] translations for create new and delete in contextmenui
-- [ ] handle Delete in contextmenu
+- [x] handle Delete in contextmenu
+- [ ] add direction of sorting do display options
+- [ ] display options (hide deleted field from grouping sorting if showDeleted = false)

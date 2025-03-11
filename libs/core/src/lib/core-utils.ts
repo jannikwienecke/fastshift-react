@@ -157,7 +157,13 @@ export const convertDisplayOptionsForBackend = (
     ? `grouping=${displayOptions.grouping.field.name}`
     : '';
 
-  return [sortingString, groupingString].filter(Boolean).join(';');
+  const deletedString = displayOptions.showDeleted
+    ? `showDeleted=${displayOptions.showDeleted}`
+    : '';
+
+  return [sortingString, groupingString, deletedString]
+    .filter(Boolean)
+    .join(';');
 };
 
 export const parseDisplayOptionsStringForServer = (
@@ -192,6 +198,8 @@ export const parseDisplayOptionsStringForServer = (
         ...options.grouping,
         field: fieldConfig,
       };
+    } else if (key === 'showDeleted') {
+      options.showDeleted = value === 'true';
     } else {
       //
     }

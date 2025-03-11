@@ -64,6 +64,9 @@ export const derviedDisplayOptions = observable(() => {
     onToggleShowEmptyGroups: (...props) =>
       store$.displayOptionsToggleShowEmptyGroups(...props),
 
+    onToggleShowDeleted: (...props) =>
+      store$.displayOptionsToggleShowDeleted(...props),
+
     showEmptyGroupsToggle:
       !!store$.displayOptions.grouping.field.name.get() &&
       !groupingFieldIsBoolean,

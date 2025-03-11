@@ -8,10 +8,19 @@ import {
   displayOptionsReset,
   displayOptionsSelectField,
   displayOptionsSelectViewField,
+  displayOptionsToggleShowDeleted,
   displayOptionsToggleShowEmptyGroups,
 } from './legend-store.fn.displayOptions';
-import { contextMenuClose, contextMenuOpen } from './legend.contextmenu.fn';
-import { selectRowsMutation, updateRecordMutation } from './legend.mutationts';
+import {
+  contextMenuClose,
+  contextmenuDeleteRow,
+  contextMenuOpen,
+} from './legend.contextmenu.fn';
+import {
+  deleteRecordMutation,
+  selectRowsMutation,
+  updateRecordMutation,
+} from './legend.mutationts';
 import { DEFAULT_LEGEND_STORE } from './legend.store.constants';
 import {
   comboboxClose,
@@ -116,11 +125,15 @@ export const store$ = observable<LegendStore>({
     displayOptionsSelectViewField(store$)(...props),
   displayOptionsToggleShowEmptyGroups: (...props) =>
     displayOptionsToggleShowEmptyGroups(store$)(...props),
+  displayOptionsToggleShowDeleted: (...props) =>
+    displayOptionsToggleShowDeleted(store$)(...props),
   displayOptionsReset: (...props) => displayOptionsReset(store$)(...props),
 
   contextMenuOpen: (...props) => contextMenuOpen(store$)(...props),
   contextMenuClose: (...props) => contextMenuClose(store$)(...props),
+  contextmenuDeleteRow: (...props) => contextmenuDeleteRow(store$)(...props),
 
   selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
   updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
+  deleteRecordMutation: (...props) => deleteRecordMutation(store$)(...props),
 });

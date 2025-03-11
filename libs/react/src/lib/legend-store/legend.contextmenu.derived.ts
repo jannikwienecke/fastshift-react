@@ -1,13 +1,9 @@
 import {
   ContextMenuFieldItem,
   ContextMenuUiOptions,
-  getRelationTableName,
   MakeContextMenuPropsOptions,
-  makeData,
   makeNoneOption,
-  makeRow,
   makeRowFromValue,
-  Mutation,
   Row,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
@@ -24,6 +20,12 @@ export const derviedContextMenuOptions = observable(() => {
   const relationalValues = store$.relationalDataModel;
   const row = contextmenuState.row;
 
+  const { softDelete, softDeleteField } =
+    viewConfigManager.viewConfig.mutation ?? {};
+
+  const isDeleted =
+    softDelete && softDeleteField ? row?.getValue(softDeleteField) : false;
+
   if (!row || !contextmenuState.rect) {
     return {
       ...contextmenuState,
@@ -31,6 +33,8 @@ export const derviedContextMenuOptions = observable(() => {
       onClose: () => store$.contextMenuClose(),
       fields: null,
       modelName: viewConfigManager.viewConfig.tableName,
+      onDelete: () => null,
+      isDeleted: false,
     } satisfies Omit<ContextMenuUiOptions, 'renderOption' | 'renderField'>;
   }
 
@@ -63,8 +67,6 @@ export const derviedContextMenuOptions = observable(() => {
       const relationalValuesForField = relationalValues[f.name]?.get();
 
       const valueOrValues = row?.getValue(f.name);
-
-      console.log('valueOrValues', valueOrValues);
 
       const values = !valueOrValues
         ? null
@@ -113,5 +115,7 @@ export const derviedContextMenuOptions = observable(() => {
     onClose: () => store$.contextMenuClose(),
     fields: fieldsToRender,
     modelName: viewConfigManager.viewConfig.tableName,
+    onDelete: () => store$.contextmenuDeleteRow(row),
+    isDeleted,
   } satisfies Omit<ContextMenuUiOptions, 'renderOption' | 'renderField'>;
 });

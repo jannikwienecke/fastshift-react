@@ -107,8 +107,6 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
       record: { [field.name]: patchValue },
     });
 
-    console.log('NONE OPTION', NONE_OPTION);
-
     const mutation: Mutation = {
       type: 'UPDATE_RECORD',
       payload: {
@@ -129,6 +127,31 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
       rollback();
     } else {
       console.warn('Record updated successfully');
+    }
+  };
+
+export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
+  (store$) =>
+  async ({ row }, cb) => {
+    const mutation: Mutation = {
+      type: 'DELETE_RECORD',
+      payload: {
+        id: row.id,
+      },
+    };
+    console.warn('Mutation payload:', mutation);
+
+    const { error } = await store$.api.mutateAsync({
+      mutation,
+      viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+      query: store$.globalQuery.get(),
+    });
+
+    if (error) {
+      console.error('Error deleting record:', error);
+    } else {
+      console.warn('Record deleted successfully');
+      cb?.();
     }
   };
 

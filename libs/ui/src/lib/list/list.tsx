@@ -1,8 +1,13 @@
+import {
+  ListItem,
+  ListProps,
+  ListValueProps,
+  useTranslation,
+} from '@apps-next/core';
+import { PlusIcon } from 'lucide-react';
 import React, { useRef } from 'react';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
-import { ListItem, ListProps, ListValueProps } from '@apps-next/core';
-import { PlusIcon } from 'lucide-react';
 // import { store$ } from '@apps-next/react';
 
 export function ListDefault<TItem extends ListItem = ListItem>({
@@ -13,6 +18,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   onContextMenu,
   grouping,
 }: ListProps<TItem>) {
+  const { t } = useTranslation();
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const addObserver = React.useCallback(() => {
@@ -50,7 +56,18 @@ export function ListDefault<TItem extends ListItem = ListItem>({
               </div>
 
               <List.Values>
-                <ListValues values={item.valuesLeft} />
+                <div className="flex flex-row gap-2 items-center">
+                  <ListValues values={item.valuesLeft} />
+                  {item.deleted ? (
+                    <div className="text-sm text-red-400 flex flex-row gap-1 items-center">
+                      <div>{t('common.deleted')}</div>
+                      {/* <div>
+                        <RotateCcwIcon className="h-4 w-4" />
+                      </div> */}
+                    </div>
+                  ) : null}
+                </div>
+
                 <ListValues values={item.valuesRight} />
               </List.Values>
             </List.Item>
@@ -124,7 +141,7 @@ export function List<TItem extends ListItem = ListItem>({
 }) {
   return (
     <ListProvider value={{ onSelect, selected, onContextMenu }}>
-      <div className="flex flex-col w-full border-collapse overflow-scroll grow">
+      <div className="flex flex-col w-full border-collapse overflow-scroll grow ">
         {children}
       </div>
     </ListProvider>
@@ -188,6 +205,7 @@ function Item(
         className={cn(
           'flex flex-row py-[10px] pl-2 pr-4 w-full gap-2 border-b border-collapse border-[#f7f7f7]',
           isSelected ? 'bg-foreground/5  text-foreground' : 'hover:bg-slate-50',
+          item.deleted ? 'opacity-80' : '',
           className
         )}
         {...restProps}

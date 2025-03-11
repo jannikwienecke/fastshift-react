@@ -29,6 +29,7 @@ export type ListItem = {
   icon?: (props: any) => React.ReactNode;
   valuesLeft: ListValueProps[];
   valuesRight: ListValueProps[];
+  deleted: boolean;
 };
 
 export type ListProps<TItem extends ListItem = ListItem> = {
@@ -145,6 +146,7 @@ export type DisplayOptionsProps = {
   onSelectViewField: (field: DisplayOptionsViewField) => void;
 
   onToggleShowEmptyGroups: (checked: boolean) => void;
+  onToggleShowDeleted: (checked: boolean) => void;
   showEmptyGroupsToggle: boolean;
   showEmptyGroups: boolean;
 

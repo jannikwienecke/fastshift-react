@@ -34,9 +34,15 @@ export const tasksConfig = createViewConfig(
     },
     includeFields: ['tags'],
     query: {
+      showDeleted: false,
       primarySearchField: 'name',
     },
+    mutation: {
+      softDelete: true,
+      softDeleteField: 'deleted',
+    },
   },
+
   config.config
 );
 

@@ -21,5 +21,6 @@ export const getDisplayOptionsInfo = (props: QueryServerProps) => {
     sorting: displayOptions?.sorting,
     hasSortingField,
     displaySortingIndexField,
+    showDeleted: !!displayOptions?.showDeleted,
   };
 };

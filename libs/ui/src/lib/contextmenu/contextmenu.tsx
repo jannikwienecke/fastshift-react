@@ -165,6 +165,7 @@ export const ContextMenuDefault = ({
   renderField,
   renderOption,
   modelName,
+  ...props
 }: ContextMenuUiOptions) => {
   const ref = useRef<HTMLDivElement>(null);
   const [canBeClosed, setCanBeClosed] = useState(false);
@@ -193,6 +194,7 @@ export const ContextMenuDefault = ({
     return () => clearTimeout(timer);
   }, [isOpen]);
 
+  if (!isOpen) return null;
   return (
     <ContextMenu
       modal={true}
@@ -200,7 +202,7 @@ export const ContextMenuDefault = ({
         !open && canBeClosed && onClose();
       }}
     >
-      <ContextMenuTrigger ref={ref} className="w-0 h-0 invisible" />
+      <ContextMenuTrigger ref={ref} className="w-0 h-0 invisible sr-only" />
 
       <ContextMenuContent className="w-56">
         {fields?.map((field) => {
@@ -246,17 +248,24 @@ export const ContextMenuDefault = ({
           </ContextMenuSubContent>
         </ContextMenuSub>
 
-        <ContextMenuItem>
-          <div className="flex flex-row items-center">
-            <div className="pr-2">
-              <TrashIcon className="w-3 h-3" />
+        {!props.isDeleted ? (
+          <ContextMenuItem>
+            <div className="flex flex-row items-center">
+              <div className="pr-2">
+                <TrashIcon className="w-3 h-3" />
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.onDelete();
+                }}
+              >
+                {t('common.delete', { name: renderModelName(modelName, t) })}
+              </button>
             </div>
-            <div>
-              {t('common.delete', { name: renderModelName(modelName, t) })}
-            </div>
-          </div>
-          <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
-        </ContextMenuItem>
+            <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
+          </ContextMenuItem>
+        ) : null}
       </ContextMenuContent>
     </ContextMenu>
   );

@@ -16,6 +16,7 @@ export const en = {
     // Show empty groups
     listOptions: 'List Options',
     showEmptyGroups: 'Show empty groups',
+    showDeleted: 'Show deleted',
     clearAll: 'Clear all',
     sorting: {
       label: 'Ordering',
@@ -45,5 +46,6 @@ export const en = {
     none: 'No',
     createNew: 'Create new {{name}}',
     copy: 'Copy {{name}}',
+    deleted: 'Deleted',
   },
 };

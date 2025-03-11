@@ -25,3 +25,12 @@ export const contextMenuClose: StoreFn<'contextMenuClose'> = (store$) => () => {
   store$.contextMenuState.rect.set(null);
   store$.contextMenuState.row.set(null);
 };
+
+export const contextmenuDeleteRow: StoreFn<'contextmenuDeleteRow'> =
+  (store$) => (row) => {
+    console.log('Delete Row from contextmenu');
+    store$.deleteRecordMutation({ row }, () => {
+      console.log('Row deleted successfully');
+      store$.contextMenuClose();
+    });
+  };

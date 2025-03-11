@@ -28,11 +28,13 @@ const _schema = defineSchema({
     projectId: v.optional(v.id('projects')),
     // priority: v.number(),
     priority: v.union(v.literal(1), v.literal(2), v.literal(3)),
+    deleted: v.optional(v.boolean()),
     dueDate: v.optional(v.number()),
   })
     .index('projectId', ['projectId'])
     .index('dueDate', ['dueDate'])
     .index('name', ['name'])
+    .index('deleted', ['deleted'])
     .searchIndex('name_search', {
       searchField: 'name',
     })

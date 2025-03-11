@@ -217,11 +217,13 @@ export type LegendStore = {
   displayOptionsCloseCombobox: () => void;
   displayOptionsSelectViewField: (field: DisplayOptionsViewField) => void;
   displayOptionsToggleShowEmptyGroups: (checked: boolean) => void;
+  displayOptionsToggleShowDeleted: (checked: boolean) => void;
   displayOptionsReset: () => void;
 
   contextMenuState: ContextMenuState;
   contextMenuOpen: (rect: DOMRect, row: RecordType) => void;
   contextMenuClose: () => void;
+  contextmenuDeleteRow: (row: Row) => void;
 
   selectRowsMutation: (props: {
     field: FieldConfig;
@@ -234,6 +236,7 @@ export type LegendStore = {
     row: Row;
     valueRow: Row;
   }) => void;
+  deleteRecordMutation: (props: { row: Row }, cb?: () => void) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

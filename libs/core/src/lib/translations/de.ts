@@ -42,5 +42,6 @@ export const de = {
     no: 'Nein',
     createNew: 'Neues {{name}}',
     copy: 'Kopieren',
+    deleted: 'Gelöscht',
   },
 } satisfies typeof en;
