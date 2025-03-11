@@ -8,6 +8,7 @@ import {
   FilterOperatorType,
   FilterType,
 } from './types/filter.types';
+import { TranslationKeys } from './translations';
 
 export const invarant = (condition: boolean, message: string) => {
   const prefix = 'Invariant failed';
@@ -246,4 +247,19 @@ export const renderField = (field: string, t: TFunction) => {
   nameToRender = nameToRender.includes('viewFields.') ? t(field) : nameToRender;
 
   return nameToRender;
+};
+
+export const renderModelName = (
+  modelName: string,
+  t: (key: any, options?: Record<string, unknown>) => string,
+  plural?: boolean
+) => {
+  const translated = plural ? t(`${modelName}.other`) : t(`${modelName}.one`);
+
+  const test =
+    translated.includes(`.other`) || translated.includes('.one')
+      ? modelName
+      : translated;
+
+  return test;
 };

@@ -1,7 +1,9 @@
 import {
   ContextMenuFieldItem,
   ContextMenuUiOptions,
+  renderModelName,
   Row,
+  useTranslation,
 } from '@apps-next/core';
 import {
   CheckIcon,
@@ -51,6 +53,7 @@ const SubMenuContent: React.FC<{
   field: ContextMenuFieldItem;
   renderOption: (row: Row, field: ContextMenuFieldItem) => React.ReactNode;
 }> = ({ field, renderOption }) => {
+  const { t } = useTranslation();
   const isManyToMany = field.relation?.manyToManyTable;
 
   return (
@@ -135,9 +138,17 @@ const SubMenuContent: React.FC<{
           <ContextMenuItem className="">
             <div className="h-4 w-4 mr-1" />
             <div className="flex flex-row items-center gap-2">
-              <PlusIcon className="w-3 h-3 mr-1" />
+              <PlusIcon
+                className="text-foreground/50 w-4 h-4 mr-0"
+                strokeWidth={3}
+              />
 
-              <div className="flex-1">Create new {field.name}</div>
+              {/* <div className="flex-1">Create new {field.name}</div> */}
+              <div className="flex-1">
+                {t('common.createNew', {
+                  name: renderModelName(field.name, t),
+                })}
+              </div>
             </div>
           </ContextMenuItem>
         </>
@@ -153,9 +164,12 @@ export const ContextMenuDefault = ({
   fields,
   renderField,
   renderOption,
+  modelName,
 }: ContextMenuUiOptions) => {
   const ref = useRef<HTMLDivElement>(null);
   const [canBeClosed, setCanBeClosed] = useState(false);
+
+  const { t } = useTranslation();
 
   useLayoutEffect(() => {
     if (!rect) return;
@@ -219,7 +233,7 @@ export const ContextMenuDefault = ({
               <div className="pr-2">
                 <CopyIcon className="w-3 h-3" />
               </div>
-              <div>Copy</div>
+              <div>{t('common.copy')}</div>
             </div>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
@@ -237,7 +251,9 @@ export const ContextMenuDefault = ({
             <div className="pr-2">
               <TrashIcon className="w-3 h-3" />
             </div>
-            <div>Delete Task</div>
+            <div>
+              {t('common.delete', { name: renderModelName(modelName, t) })}
+            </div>
           </div>
           <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
         </ContextMenuItem>

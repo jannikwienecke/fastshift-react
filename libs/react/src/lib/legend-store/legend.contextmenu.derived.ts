@@ -30,6 +30,7 @@ export const derviedContextMenuOptions = observable(() => {
       isOpen: false,
       onClose: () => store$.contextMenuClose(),
       fields: null,
+      modelName: viewConfigManager.viewConfig.tableName,
     } satisfies Omit<ContextMenuUiOptions, 'renderOption' | 'renderField'>;
   }
 
@@ -111,5 +112,6 @@ export const derviedContextMenuOptions = observable(() => {
     isOpen: !!contextmenuState.rect,
     onClose: () => store$.contextMenuClose(),
     fields: fieldsToRender,
+    modelName: viewConfigManager.viewConfig.tableName,
   } satisfies Omit<ContextMenuUiOptions, 'renderOption' | 'renderField'>;
 });

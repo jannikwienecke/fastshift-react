@@ -36,10 +36,12 @@ import {
   PriorityComponentCombobox,
   ProjectComponent,
   ProjectComponentCombobox,
+  ProjectNameFieldItem,
   TagsComponent,
   TagsDefaultComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
+import { useTranslation } from 'react-i18next';
 
 const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
@@ -61,16 +63,18 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
         icon: BarChartHorizontal,
         list: PriorityComponent,
         combobox: PriorityComponentCombobox,
-        contextmenuFieldOption: PriorityComponentCombobox,
+        // contextmenuFieldOption: PriorityComponentCombobox,
       },
     },
 
     name: {
       component: {
         icon: PencilLineIcon,
-        contextmenuFieldItem({ field }) {
-          return <>Rename Task</>;
-        },
+        contextmenuFieldItem: ProjectNameFieldItem,
+        // contextmenuFieldItem({ field }) {
+
+        //   return <>Rename Task</>;
+        // },
       },
     },
 

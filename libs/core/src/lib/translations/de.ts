@@ -34,11 +34,13 @@ export const de = {
   common: {
     save: 'Speichern',
     cancel: 'Abbrechen',
-    delete: 'Löschen',
+    delete: '{{name}} löschen',
     edit: 'Bearbeiten',
     change: 'Ändern',
     none: 'Kein',
     yes: 'Ja',
     no: 'Nein',
+    createNew: 'Neues {{name}}',
+    copy: 'Kopieren',
   },
 } satisfies typeof en;

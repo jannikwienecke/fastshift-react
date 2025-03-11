@@ -1,7 +1,12 @@
 'use client';
 
 import { Projects, Tags } from '@apps-next/convex';
-import { DataType, GetTableName } from '@apps-next/core';
+import {
+  DataType,
+  FieldConfig,
+  GetTableName,
+  renderModelName,
+} from '@apps-next/core';
 import { useViewOf } from '@apps-next/react';
 import { Bubble, Icon } from '@apps-next/ui';
 import { CustomTypeOptions } from 'i18next';
@@ -58,7 +63,6 @@ export const PriorityComponentCombobox = (props: {
   const { t } = useTranslation();
   const priority = props.data;
 
-  console.log('PriorityComponentCombobox', props);
   return (
     <div className="flex items-center gap-2">
       <div>{PRIORITY_COLORS[priority]}</div>
@@ -173,6 +177,17 @@ export const ProjectComponentCombobox = (props: {
     <div className="flex gap-2 items-center w-full">
       <Icon icon={view.icon} />
       <div className="text-sm">{project?.label}</div>
+    </div>
+  );
+};
+
+export const ProjectNameFieldItem = (props: { field: FieldConfig }) => {
+  const { t } = useTranslation();
+
+  console.log('ProjectNameFieldItem', props.field);
+  return (
+    <div className="flex gap-2 items-center w-full">
+      {t('shared.rename', { model: renderModelName('tasks', t) })}
     </div>
   );
 };

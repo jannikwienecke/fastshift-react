@@ -11,11 +11,12 @@ export default {
     settings: 'Einstellungen',
     logout: 'Abmelden',
   },
-  project: {
+  projects: {
     one: 'Projekt',
     other: 'Projekte',
   },
-  task: {
+
+  tasks: {
     one: 'Aufgabe',
     other: 'Aufgaben',
     create: 'Aufgabe erstellen',
@@ -23,8 +24,33 @@ export default {
     delete: 'Aufgabe löschen',
   },
   priority: {
+    one: 'Priorität',
+    other: 'Prioritäten',
     low: 'Niedrig',
     medium: 'Mittel',
     high: 'Hoch',
+  },
+  completed: {
+    one: 'Erledigt',
+    other: 'Erledigt',
+  },
+  description: {
+    one: 'Beschreibung',
+    other: 'Beschreibungen',
+  },
+  subtitle: {
+    one: 'Untertitel',
+    other: 'Untertitel',
+  },
+  dueDate: {
+    one: 'Fälligkeitsdatum',
+    other: 'Fälligkeitsdaten',
+  },
+  shared: {
+    rename: '{{model}} umbenennen',
+  },
+  errors: {
+    notFound: 'Nicht gefunden',
+    unauthorized: 'Nicht autorisiert',
   },
 } satisfies typeof en;

@@ -18,7 +18,7 @@ export const ContextmenuFieldLabel = ({
       fieldName: field.name,
     });
 
-  if (!field || !ComponentToRender) return <>{t(value.label as any)}</>;
+  if (!field || !ComponentToRender) return <>{value.label.firstUpper()}</>;
 
   return (
     <>

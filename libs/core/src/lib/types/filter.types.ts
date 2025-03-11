@@ -55,6 +55,7 @@ export type ContextMenuUiOptions = {
   fields: ContextMenuFieldItem[] | null;
   renderOption: (row: Row, field: ContextMenuFieldItem) => JSX.Element;
   renderField: (field: ContextMenuFieldItem) => JSX.Element;
+  modelName: string;
 } & ContextMenuState;
 
 // export type

@@ -9,11 +9,11 @@ export const en = {
     settings: 'Settings',
     logout: 'Logout',
   },
-  project: {
+  projects: {
     one: 'Project',
     other: 'Projects',
   },
-  task: {
+  tasks: {
     one: 'Task',
     other: 'Tasks',
     create: 'Create Task',
@@ -21,9 +21,35 @@ export const en = {
     delete: 'Delete Task',
   },
   priority: {
+    one: 'Priority',
+    other: 'Priorities',
     low: 'Low',
     medium: 'Medium',
     high: 'High',
+  },
+  description: {
+    one: 'Description',
+    other: 'Descriptions',
+  },
+  completed: {
+    one: 'Completed',
+    other: 'Completed',
+  },
+  subtitle: {
+    one: 'Subtitle',
+    other: 'Subtitles',
+  },
+  dueDate: {
+    one: 'Due Date',
+    other: 'Due Dates',
+  },
+
+  shared: {
+    rename: 'Rename {{model}}',
+  },
+  errors: {
+    notFound: 'Not found',
+    unauthorized: 'Unauthorized',
   },
 };
 

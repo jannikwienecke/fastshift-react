@@ -37,11 +37,13 @@ export const en = {
   common: {
     save: 'Save',
     cancel: 'Cancel',
-    delete: 'Delete',
+    delete: 'Delete {{name}}',
     edit: 'Edit',
     change: 'Change',
     no: 'No',
     yes: 'Yes',
     none: 'No',
+    createNew: 'Create new {{name}}',
+    copy: 'Copy {{name}}',
   },
 };

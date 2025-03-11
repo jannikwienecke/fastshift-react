@@ -1,4 +1,9 @@
-import { FieldConfig, getViewByName, useTranslation } from '@apps-next/core';
+import {
+  FieldConfig,
+  getViewByName,
+  renderModelName,
+  useTranslation,
+} from '@apps-next/core';
 import { CircleDashedIcon } from 'lucide-react';
 import { store$ } from '../legend-store';
 
@@ -14,7 +19,7 @@ export const ComboboxNoneValue = ({ field }: { field: FieldConfig | null }) => {
       <CircleDashedIcon className="text-foreground/60 h-4 w-4" />
 
       <div className="text-sm">
-        {t('common.none')} {view.tableName}
+        {t('common.none')} {renderModelName(view.tableName, t)}
       </div>
     </div>
   );

@@ -8,5 +8,6 @@ created: 1723444498044
 
 # Outline
 
-- [ ] translations for create new and delete in contextmenui
+- [x] translations models
+- [x] translations for create new and delete in contextmenui
 - [ ] handle Delete in contextmenu
