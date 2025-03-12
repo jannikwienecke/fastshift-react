@@ -5,7 +5,7 @@ import {
   DEFAULT_MAX_ITEMS_GROUPING,
   QueryServerProps,
 } from '@apps-next/core';
-import { queryClient } from './convex-client';
+import { filterByNotDeleted, queryClient } from './convex-client';
 import { getDisplayOptionsInfo } from './convex-display-options';
 import { filterResults } from './convex-filter-results';
 import { getFilterTypes } from './convex-get-filters';
@@ -26,10 +26,10 @@ import { ConvexRecordType } from './types.convex';
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { viewConfigManager, filters, registeredViews } = args;
 
-  const isTask = viewConfigManager?.getTableName() === 'tasks';
+  const isProject = viewConfigManager?.getTableName() === 'projects';
 
-  const logTask = (...args: any[]) => {
-    if (!isTask) return;
+  const log = (...args: any[]) => {
+    if (!isProject) return;
     console.log('___: ', ...args);
   };
 
@@ -123,10 +123,14 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
+  const deletedIndexField = viewConfigManager.getSoftDeleteIndexField();
+
   const query = queryClient(ctx, viewConfigManager.getTableName());
-  const rowsNotDeleted = await query
-    .withIndex('deleted', (q) => q.eq('deleted', false))
-    .collect();
+  const rowsNotDeleted =
+    softDeleteEnabled && !showDeleted && deletedIndexField
+      ? await filterByNotDeleted(query, deletedIndexField).collect()
+      : [];
+
   const idsNotDeleted = rowsNotDeleted.map((row) => row._id);
 
   const allIds = arrayIntersection(
@@ -184,6 +188,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
             .withIndex(
               displayOptionsInfo.displaySortingIndexField.name?.toString()
             )
+            .order(displayOptionsInfo.sorting?.order ?? 'asc')
             .paginate({
               cursor: args?.paginateOptions?.cursor?.cursor ?? null,
               numItems: fetchLimit + (idsToRemove.length ?? 0),
@@ -223,13 +228,17 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   rows.push(...filtered);
 
-  const sortedRows = convexSortRows(rows, displayOptionsInfo);
-
   const rawData = await mapWithInclude(
-    allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition),
+    // allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition),
+    rows,
     ctx,
     args
   );
+
+  let sortedRows = convexSortRows(rawData, args, displayOptionsInfo);
+
+  sortedRows =
+    allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition);
 
   if (allIds !== null || isGetAll) {
     const newItemsLength = allIds !== null ? allIds.length : newRows.length;
@@ -238,7 +247,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     continueCursor.position = isDone ? position : nextPosition;
   }
 
-  const data = parseConvexData(rawData);
+  const data = parseConvexData(sortedRows);
 
   return { data, continueCursor, isDone };
 };

@@ -121,4 +121,16 @@ export const displayOptionsReset: StoreFn<'displayOptionsReset'> =
     store$.displayOptions.showEmptyGroups.set(true);
   };
 
-// TODO RENDER MODE (get all or just limit of X)
+export const displayOptionsToggleSorting: StoreFn<
+  'displayOptionsToggleSorting'
+> = (store$) => () => {
+  const sorting = store$.displayOptions.sorting;
+  const field = sorting.field.get();
+
+  if (field) {
+    const order = sorting.order.get() === 'asc' ? 'desc' : 'asc';
+    sorting.order.set(order);
+  } else {
+    //
+  }
+};

@@ -29,9 +29,14 @@ export interface BaseViewConfigManagerInterface<
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
   getIndexFields(): IndexField[];
+  getSoftDeleteIndexField(): SearchableField | undefined;
   getRelationFieldByTableName(tableName: string): FieldConfig;
   getIncludeFields(): IncludeConfig[string];
   getManyToManyField(key: string): FieldConfig | undefined;
+  getViewByFieldName(
+    fieldName: string,
+    registeredViews: RegisteredViews
+  ): ViewConfigType | undefined;
 
   modelConfig?: ModelConfig;
 }
@@ -66,6 +71,37 @@ export class BaseViewConfigManager<
 
   getIndexFields(): IndexField[] {
     return this.viewConfig.query?.indexFields ?? [];
+  }
+
+  getSoftDeleteField(): string | undefined {
+    return this.viewConfig.mutation?.softDeleteField as string | undefined;
+  }
+
+  getSoftDeleteIndexField(): SearchableField | undefined {
+    const softDeleteField = this.getSoftDeleteField();
+    if (!softDeleteField && this.viewConfig.mutation?.softDelete) {
+      throw new Error(
+        'Soft delete field is not set. Please set the soft delete field in the view config.'
+      );
+    }
+
+    if (!softDeleteField) return undefined;
+
+    const field = this.viewConfig.query?.indexFields?.find((f) =>
+      f.fields.find((f) => f === softDeleteField)
+    );
+
+    if (!field) {
+      throw new Error(
+        `Soft delete field ${softDeleteField} is not found in index fields.`
+      );
+    }
+
+    return {
+      name: field.name,
+      field: field.fields?.[0] as string,
+      filterFields: field.fields ?? [],
+    };
   }
 
   getPrimarySearchField() {
@@ -141,5 +177,19 @@ export class BaseViewConfigManager<
 
       return true;
     });
+  }
+
+  getViewByFieldName(
+    fieldName: string,
+    registeredViews: RegisteredViews
+  ): ViewConfigType | undefined {
+    // const field = this.getFieldBy(fieldName);
+    // if (!field.relation) return undefined;
+
+    const view = Object.values(registeredViews).find(
+      (view) => view?.tableName === fieldName
+    );
+
+    return view;
   }
 }

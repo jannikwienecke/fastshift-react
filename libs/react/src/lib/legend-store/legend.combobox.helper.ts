@@ -22,6 +22,7 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
+import { v } from 'convex/values';
 
 export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed
@@ -32,12 +33,14 @@ export const removedSelected$ = observable<Row[]>([]);
 export const initSelected$ = observable<Row[] | null>(null);
 
 export const getViewFieldsOptions = (): MakeComboboxStateProps | null => {
+  console.log('getViewFieldsOptions');
   let filterOptions: Row[] | null = null;
   const query = store$.combobox.query.get();
 
   const viewFields = store$.viewConfigManager.get().getViewFieldList();
+
   filterOptions = viewFields.map((field) => {
-    return makeRowFromValue(field.name, field);
+    return makeRow(field.name, field.label ?? field.name, field.name, field);
   });
 
   const fuse = new Fuse(filterOptions, {
@@ -60,6 +63,18 @@ export const makeComboboxStateSortingOptions =
 
     let values = [...(props.values || [])];
     values = [...values, makeRowFromField(NO_SORTING_FIELD)];
+
+    const showDeleted = store$.displayOptions.showDeleted.get();
+
+    const softDeleteField =
+      store$.viewConfigManager.viewConfig.mutation.softDeleteField.get();
+
+    values = values.filter((v) => {
+      if (showDeleted) return true;
+      if (v.id === softDeleteField) return false;
+
+      return true;
+    });
 
     return {
       ...props,
@@ -87,6 +102,18 @@ export const makeComboboxStateGroupingOptions =
       });
 
     values = [...values, makeRowFromField(NO_GROUPING_FIELD)];
+
+    const showDeleted = store$.displayOptions.showDeleted.get();
+
+    const softDeleteField =
+      store$.viewConfigManager.viewConfig.mutation.softDeleteField.get();
+
+    values = values.filter((v) => {
+      if (showDeleted) return true;
+      if (v.id === softDeleteField) return false;
+
+      return true;
+    });
 
     return {
       ...props,

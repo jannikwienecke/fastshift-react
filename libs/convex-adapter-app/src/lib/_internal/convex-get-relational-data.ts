@@ -1,10 +1,11 @@
 import {
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   getRelationTableName,
+  getViewByName,
   QueryRelationalData,
   QueryServerProps,
 } from '@apps-next/core';
-import { queryClient } from './convex-client';
+import { filterByNotDeleted, queryClient } from './convex-client';
 import { queryHelper } from './convex-query-helper';
 import { GenericQueryCtx } from './convex.server.types';
 
@@ -27,6 +28,12 @@ export const getRelationalData = async (
 
     const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
 
+    const view = getViewByName(args.registeredViews, field.name);
+    const viewHasSoftDelete = view.mutation?.softDelete;
+    const deletedIndexField = viewHasSoftDelete
+      ? viewConfigManager.getSoftDeleteIndexField()
+      : undefined;
+
     let dbQuery = queryClient(ctx, key);
     if (field.relation) {
       dbQuery = queryClient(
@@ -40,13 +47,20 @@ export const getRelationalData = async (
     const isGroupByField = groupingField === field.name;
 
     // if its the group by field, we need to query the complete table
-    return isGroupByField
+    return isGroupByField && deletedIndexField
+      ? filterByNotDeleted(dbQuery, deletedIndexField).collect()
+      : isGroupByField
       ? dbQuery.collect()
+      : deletedIndexField
+      ? filterByNotDeleted(dbQuery, deletedIndexField).take(
+          DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY
+        )
       : dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
   });
 
   const resultList = await Promise.all(relationalDataPromises);
 
+  // console.log(resultList);
   const relationalData = Object.keys(include).reduce((acc, key, index) => {
     const manyToManyField = viewConfigManager.getManyToManyField(key);
     const field = manyToManyField ?? viewConfigManager.getFieldBy(key);

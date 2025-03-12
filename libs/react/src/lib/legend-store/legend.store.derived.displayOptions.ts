@@ -30,6 +30,11 @@ export const derviedDisplayOptions = observable(() => {
   const showEmptyGroups =
     store$.displayOptions.showEmptyGroups.get() && !groupingFieldIsBoolean;
 
+  const showDeleted = store$.displayOptions.showDeleted.get();
+
+  const softDeleteField =
+    store$.viewConfigManager.viewConfig.mutation.softDeleteField.get();
+
   return {
     ...props,
 
@@ -50,6 +55,15 @@ export const derviedDisplayOptions = observable(() => {
           displayOptionsProps.displayFieldsToShow.get()?.length &&
           displayOptionsProps.displayFieldsToShow.get()?.includes(field.name)
         );
+      })
+      .filter((field) => {
+        const show = showDeleted
+          ? true
+          : field.name === softDeleteField
+          ? false
+          : true;
+
+        return show;
       })
       .map((field) => ({
         ...field,
@@ -87,6 +101,9 @@ export const derviedDisplayOptions = observable(() => {
       onOpen: (...props) => store$.displayOptionsOpenSorting(...props),
       onClose: (...props) => {
         store$.displayOptionsCloseCombobox(...props);
+      },
+      toggleSorting: (...props) => {
+        store$.displayOptionsToggleSorting(...props);
       },
     },
     grouping: {

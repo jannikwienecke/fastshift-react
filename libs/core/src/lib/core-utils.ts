@@ -271,3 +271,20 @@ export const renderModelName = (
 
   return test;
 };
+
+export const patchDict = <T extends Record<string, any>>(
+  dict: T,
+  fn: (entry: T[keyof T]) => T[keyof T]
+) => {
+  return Object.entries(dict ?? {}).reduce((acc, [dictKey, entry]) => {
+    // const xx = fn(fieldName, field)
+    const updatedEntry = fn(entry);
+    return {
+      ...acc,
+      [dictKey]: {
+        ...entry,
+        ...updatedEntry,
+      },
+    };
+  }, dict);
+};

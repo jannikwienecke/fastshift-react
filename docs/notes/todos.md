@@ -11,5 +11,18 @@ created: 1723444498044
 - [x] translations models
 - [x] translations for create new and delete in contextmenui
 - [x] handle Delete in contextmenu
-- [ ] add direction of sorting do display options
-- [ ] display options (hide deleted field from grouping sorting if showDeleted = false)
+- [x] add direction of sorting do display options
+- [x] display options (hide deleted field from grouping sorting if showDeleted = false)
+- [x] sort by deleted -> asc/desc not working
+- [x] refactor the add label translation to view fields
+- [x] soft delete project -> remove project from task -> by ignoring all with deleted = true
+- [x] remove deleted from relational query
+- [x] refactor the usage of all the index deleted filter usages
+- [ ] make tests pass
+
+## How we handle Deletes with soft delete
+
+- project has many tasks, task has one project
+- we "delete" a project, the task has still the reference but does not show it
+- when we undelete the project, the task will show the project again
+- same for projects when we "delete" a task (just filters out all the tasks that were deleted)

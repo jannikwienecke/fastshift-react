@@ -10,6 +10,7 @@ import {
   displayOptionsSelectViewField,
   displayOptionsToggleShowDeleted,
   displayOptionsToggleShowEmptyGroups,
+  displayOptionsToggleSorting,
 } from './legend-store.fn.displayOptions';
 import {
   contextMenuClose,
@@ -115,6 +116,8 @@ export const store$ = observable<LegendStore>({
   displayOptionsClose: (...props) => displayOptionsClose(store$)(...props),
   displayOptionsOpenSorting: (...props) =>
     displayOptionsOpenSorting(store$)(...props),
+  displayOptionsToggleSorting: (...props) =>
+    displayOptionsToggleSorting(store$)(...props),
   displayOptionsSelectField: (...props) =>
     displayOptionsSelectField(store$)(...props),
   displayOptionsOpenGrouping: (...props) =>

@@ -65,11 +65,14 @@ const _schema = defineSchema({
     ownerId: v.id('owner'),
     dueDate: v.number(),
     description: v.string(),
+    deleted: v.optional(v.boolean()),
     categoryId: v.id('categories'),
     tasks: v.optional(v.array(v.id('tasks'))),
-  }).searchIndex('label', {
-    searchField: 'label',
-  }),
+  })
+    .searchIndex('label', {
+      searchField: 'label',
+    })
+    .index('deleted', ['deleted']),
 
   categories: defineTable({
     label: v.string(),

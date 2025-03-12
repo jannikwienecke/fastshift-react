@@ -212,6 +212,7 @@ export type LegendStore = {
   displayOptionsOpen: () => void;
   displayOptionsClose: () => void;
   displayOptionsOpenSorting: (rect: DOMRect) => void;
+  displayOptionsToggleSorting: () => void;
   displayOptionsOpenGrouping: (rect: DOMRect) => void;
   displayOptionsSelectField: (selected: ComboxboxItem) => void;
   displayOptionsCloseCombobox: () => void;

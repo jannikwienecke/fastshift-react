@@ -39,6 +39,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
 
   grouping: {
     groupByField: string;
+    groupByTableName: string;
     groupLabel: string;
     groups: {
       groupById: string | number | undefined;
@@ -156,6 +157,7 @@ export type DisplayOptionsProps = {
   sorting: {
     onOpen: (rect: DOMRect) => void;
     onClose: () => void;
+    toggleSorting: () => void;
   } & DisplayOptionsUiType['sorting'];
 
   grouping: {

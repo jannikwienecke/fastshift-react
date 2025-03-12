@@ -98,7 +98,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const displayOptions = store$.displayOptions.get();
   const parsedFilters = convertFiltersForBackend(filters);
   const parsedDisplayOptions = convertDisplayOptionsForBackend(displayOptions);
-  console.log('useQuery', parsedDisplayOptions);
 
   const cursor = store$.fetchMore.currentCursor.get();
   const isDone = store$.fetchMore.isDone.get();

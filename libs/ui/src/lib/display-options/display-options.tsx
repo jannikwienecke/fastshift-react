@@ -1,10 +1,15 @@
 import {
   DisplayOptionsProps,
+  NO_SORTING_FIELD,
+  renderModelName,
   TranslationKeys,
   useTranslation,
 } from '@apps-next/core';
 import {
+  ArrowDownWideNarrowIcon,
+  ArrowUp01Icon,
   ArrowUpDownIcon,
+  ArrowUpWideNarrowIcon,
   ChevronDownIcon,
   GridIcon,
   ListIcon,
@@ -57,10 +62,14 @@ const DisplayOptionsSelectButton = (props: {
   return (
     <Button
       variant={'outline'}
-      className="py-0 h-7 flex flex-row items-center gap-2 text-xs w-40 justify-between"
+      className="py-0 h-7 px-1 flex flex-row items-center gap-1 text-xs flex-grow justify-between"
       onClick={props.onClick}
     >
-      <div>{t(props.label as TranslationKeys).firstUpper()}</div>
+      <div>
+        {props.label.includes('displayOptions.')
+          ? t(props.label as TranslationKeys)
+          : renderModelName(props.label, t).firstUpper()}
+      </div>
 
       <div>
         <ChevronDownIcon className="w-4 h-4" />
@@ -74,6 +83,11 @@ const DisplayOptionsOrderingButtonCombobox = (props: {
 }) => {
   const { t } = useTranslation();
 
+  const SortingIcon =
+    props.sorting.order === 'asc'
+      ? ArrowUpWideNarrowIcon
+      : ArrowDownWideNarrowIcon;
+
   return (
     <div className="flex flex-row gap-2 items-center justify-between w-full">
       <div className="flex flex-row gap-2 items-center">
@@ -85,13 +99,23 @@ const DisplayOptionsOrderingButtonCombobox = (props: {
         </span>
       </div>
 
-      <div className="flex flex-row gap-2 justify-end w-full ">
+      <div className="flex flex-row gap-2 justify-end items-center w-44 overflow-hidden">
         <DisplayOptionsSelectButton
           label={props.sorting.field?.name ?? ''}
           onClick={(e) => {
             props.sorting.onOpen(e.currentTarget.getBoundingClientRect());
           }}
         />
+
+        {props.sorting.field?.name !== NO_SORTING_FIELD.name ? (
+          <Button
+            onClick={() => props.sorting.toggleSorting()}
+            variant={'outline'}
+            className="h-7 w-7 p-0"
+          >
+            <SortingIcon className="min-w-5 h-[17px]" strokeWidth={2} />
+          </Button>
+        ) : null}
       </div>
     </div>
   );
@@ -111,7 +135,7 @@ const DisplayOptionsGroupingButtonCombobox = (props: {
         </span>
       </div>
 
-      <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-row items-center w-44 overflow-hidden">
         <DisplayOptionsSelectButton
           label={props.grouping.field?.name ?? ''}
           onClick={(e) => {
@@ -167,25 +191,27 @@ function DisplayOptionsRenderFields(props: {
     <div>
       <div className="text-foreground/70">Display Properties</div>
       <div className="flex flex-row flex-wrap gap-2 pt-2">
-        {props.viewFields.map((field) => (
-          <div
-            role="button"
-            key={field.id.toString()}
-            className="flex flex-row items-center justify-between cursor-pointer"
-            onClick={() => props.onSelectViewField(field)}
-          >
+        {props.viewFields.map((field) => {
+          return (
             <div
-              className={cn(
-                'rounded-lg border px-2',
-                field.selected
-                  ? 'border'
-                  : 'border-transparent text-foreground/70'
-              )}
+              role="button"
+              key={field.id.toString()}
+              className="flex flex-row items-center justify-between cursor-pointer"
+              onClick={() => props.onSelectViewField(field)}
             >
-              {field.label.firstUpper()}
+              <div
+                className={cn(
+                  'rounded-lg border px-2',
+                  field.selected
+                    ? 'border'
+                    : 'border-transparent text-foreground/70'
+                )}
+              >
+                {field.label.firstUpper()}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -209,14 +235,10 @@ function DisplayOptionsPopover(
         side="bottom"
       >
         <DisplayOptionsViewType {...props} />
-
         <DisplayOptionsOrderingButtonCombobox {...props} />
         <DisplayOptionsGroupingButtonCombobox {...props} />
-
         <SelectSeparator />
-
         <div>{t('displayOptions.listOptions')}</div>
-
         {props.showEmptyGroupsToggle ? (
           <div className="flex flex-row items-center justify-between">
             <div className="text-foreground/70 flex items-center">
@@ -229,7 +251,6 @@ function DisplayOptionsPopover(
             />
           </div>
         ) : null}
-
         {props.softDeleteEnabled ? (
           <div className="flex flex-row items-center justify-between">
             <div className="text-foreground/70 flex items-center">
@@ -242,9 +263,7 @@ function DisplayOptionsPopover(
             />
           </div>
         ) : null}
-
         <DisplayOptionsRenderFields {...props} />
-
         {props.showResetButton ? (
           <>
             <SelectSeparator className="mb-0 pb-0" />

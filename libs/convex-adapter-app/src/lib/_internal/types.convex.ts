@@ -2,6 +2,7 @@
 
 import {
   GlobalConfig,
+  IndexField,
   MutationReturnDto,
   QueryReturnDto,
 } from '@apps-next/core';
@@ -120,6 +121,7 @@ export type ConvexClient = {
       indexName: string,
       query?: (q: SearchFilterBuilder) => any
     ) => ConvexClient[string];
+    byIndexField: (indexField: IndexField) => ConvexClient[string];
     delete: (id: ID) => Promise<void>;
     filter: (query: (q: SearchFilterBuilder) => any) => ConvexClient[string];
 

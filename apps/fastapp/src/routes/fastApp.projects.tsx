@@ -21,8 +21,15 @@ import {
   MakeInputDialogPropsOptions,
   makeViewFieldsConfig,
   QueryInput,
+  useComboboxQuery,
 } from '@apps-next/react';
-import { ComboboxPopover, Filter, InputDialog, List } from '@apps-next/ui';
+import {
+  ComboboxPopover,
+  ContextMenuDefault,
+  Filter,
+  InputDialog,
+  List,
+} from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
@@ -92,6 +99,8 @@ const viewFieldsConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
 
 const Project = observer(() => {
   console.warn('Render Project View');
+  const { useQueryData } = makeHooks();
+  const data = useQueryData();
 
   return (
     <DefaultTemplate<ProjectViewDataType>
@@ -126,8 +135,10 @@ const DefaultTemplate = observer(
           <RenderInputDialog />
         )}
 
+        <RenderContextmenu />
+
         <div className="flex flex-col w-full ">
-          <RenderQueryInput />
+          {/* <RenderQueryInput /> */}
 
           <RenderList options={props.listOptions} />
         </div>
@@ -146,6 +157,7 @@ const RenderComboboxPopover = observer(
     return (
       <Memo>
         {() => {
+          useComboboxQuery();
           return <ComboboxPopover {...makeComboboxProps(options)} />;
         }}
       </Memo>
@@ -216,4 +228,16 @@ export const Route = createFileRoute('/fastApp/projects')({
       </ClientViewProviderConvex>
     );
   },
+});
+
+const RenderContextmenu = observer(() => {
+  const { makeContextmenuProps } = makeHooks<ProjectViewDataType>();
+
+  return (
+    <Memo>
+      {() => {
+        return <ContextMenuDefault {...makeContextmenuProps({})} />;
+      }}
+    </Memo>
+  );
 });

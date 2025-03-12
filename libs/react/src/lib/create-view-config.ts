@@ -3,6 +3,10 @@ import {
   ViewConfigType,
   ViewConfigBaseInfo,
   GlobalConfig,
+  t,
+  ViewFieldConfig,
+  renderModelName,
+  BaseViewConfigManager,
 } from '@apps-next/core';
 
 export function createViewConfig<T extends GetTableName>(
@@ -29,7 +33,9 @@ export function createViewConfig<T extends GetTableName>(
     (acc, [field, fieldConfig]) => {
       const override = config.fields?.[field as keyof typeof config.fields];
       if (!override) {
-        acc[field] = fieldConfig;
+        acc[field] = {
+          ...fieldConfig,
+        };
       } else {
         acc[field] = {
           ...fieldConfig,
@@ -48,6 +54,19 @@ export function createViewConfig<T extends GetTableName>(
     );
   }
 
+  const softDeleteEnabled =
+    config.mutation?.softDelete && config.mutation?.softDeleteField;
+
+  const indexFieldSoftDelete = indexFields?.find((f) =>
+    f.fields.find((f) => f === config.mutation?.softDeleteField)
+  );
+
+  if (softDeleteEnabled && !indexFieldSoftDelete) {
+    throw new Error(
+      `Soft delete field ${config.mutation?.softDeleteField?.toString()} is not found in index fields. Please add the soft delete field to the index fields.`
+    );
+  }
+
   const viewConfig: ViewConfigType<T> = {
     ...config,
     displayField: {
@@ -60,9 +79,7 @@ export function createViewConfig<T extends GetTableName>(
     viewName,
     mutation: {
       ...config.mutation,
-      softDelete: !!(
-        config.mutation?.softDelete && config.mutation?.softDeleteField
-      ),
+      softDelete: !!softDeleteEnabled,
     },
     query: {
       showDeleted: config.query?.showDeleted && !!config.mutation?.softDelete,

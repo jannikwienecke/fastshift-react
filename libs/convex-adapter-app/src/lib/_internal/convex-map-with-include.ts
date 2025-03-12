@@ -1,6 +1,7 @@
 import {
   BaseViewConfigManagerInterface,
   FieldConfig,
+  getViewByName,
   QueryServerProps,
   RegisteredViews,
 } from '@apps-next/core';
@@ -22,6 +23,8 @@ export const mapWithInclude = async (
     const extendedRecord = await include.reduce(async (acc, key) => {
       const field = viewConfigManager.getFieldBy(key);
 
+      const view = getViewByName(registeredViews, field.name);
+
       if (!field.relation) {
         return acc;
       }
@@ -38,9 +41,22 @@ export const mapWithInclude = async (
 
       try {
         const { fn, key } = await handleIncludeField(props);
+        let include: ConvexRecord | ConvexRecord[] | null = await fn();
+
+        //
+        if (view.mutation?.softDelete) {
+          include = Array.isArray(include)
+            ? include.filter(
+                (i) => !i[view.mutation?.softDeleteField as keyof ConvexRecord]
+              )
+            : include?.[view.mutation?.softDeleteField as any] === true
+            ? null
+            : include;
+        }
+
         return {
           ...accResolved,
-          [key ?? '']: await fn(),
+          [key ?? '']: include,
         };
       } catch (error) {
         console.error('error', error);
@@ -108,6 +124,7 @@ export const getOneToManyRecords = async (props: HelperProps) => {
 
   if (!field.relation) return [];
 
+  // REFACTOR This is duplicated code
   const fieldNameOfTable = field.relation.manyToManyModelFields?.find(
     (f) => f.name === viewConfigManager.getTableName()
   )?.relation?.fieldName;
@@ -128,7 +145,7 @@ export const getOneToManyRecords = async (props: HelperProps) => {
     return {
       id: record._id,
       ...record,
-    };
+    } as ConvexRecord;
   });
 };
 
@@ -144,6 +161,7 @@ export const getManyToManyRecords = async (props: HelperProps) => {
   // like: Tasks has Many tags <-> Tags has Many Tasks
   // we have a tasks_tags table
   // query the table with the task id
+
   if (!field.relation?.manyToManyTable) return [];
 
   const fieldNameManyToMany = field.relation.manyToManyModelFields?.find(
@@ -178,7 +196,7 @@ export const getManyToManyRecords = async (props: HelperProps) => {
         id: value?._id,
         ...manyToManyValue,
         ...value,
-      };
+      } as ConvexRecord;
     });
   }
 
@@ -187,6 +205,7 @@ export const getManyToManyRecords = async (props: HelperProps) => {
 
 export const getOneToOneRecords = async (props: HelperProps) => {
   const { field, ctx, recordWithoutRelations } = props;
+
   if (!field.relation) return [];
 
   const client = queryClient(ctx, field.relation.tableName);
@@ -200,5 +219,5 @@ export const getOneToOneRecords = async (props: HelperProps) => {
   return {
     id: record?._id,
     ...record,
-  };
+  } as ConvexRecord;
 };

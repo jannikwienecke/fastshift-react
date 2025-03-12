@@ -45,8 +45,6 @@ export const viewLoaderHandler = async (
     viewConfigManager
   );
 
-  console.log(parsedDisplayOptions);
-
   const serverProps: QueryServerProps = {
     ...args,
     viewConfigManager,

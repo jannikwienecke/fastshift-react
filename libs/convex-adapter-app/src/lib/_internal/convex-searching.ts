@@ -14,9 +14,11 @@ export const withSearch = async (
   {
     searchFields,
     query,
+    rowIdsNotDeleted,
   }: {
     searchFields: SearchField[];
     query: string;
+    rowIdsNotDeleted: string[];
   }
 ): Promise<ConvexRecord[]> => {
   const rowsList = await asyncMap(searchFields, async (searchField) => {
@@ -30,7 +32,9 @@ export const withSearch = async (
   });
 
   const rows = rowsList.flat();
-  const uniqueIds = [...new Set(rows.map((r) => r._id))];
+  const uniqueIds = [...new Set(rows.map((r) => r._id))].filter((id) =>
+    rowIdsNotDeleted.includes(id)
+  );
 
   return uniqueIds
     .map((id) => rows.find((r) => r._id === id))

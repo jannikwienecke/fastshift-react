@@ -55,6 +55,13 @@ export const projectsConfig = createViewConfig(
     displayField: {
       field: 'label',
     },
+    query: {
+      showDeleted: false,
+    },
+    mutation: {
+      softDelete: true,
+      softDeleteField: 'deleted',
+    },
   },
   config.config
 );

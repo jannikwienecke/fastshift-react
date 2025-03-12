@@ -4,8 +4,13 @@ import {
   BaseConfigInterface,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  FieldConfig,
+  patchDict,
   QueryReturnOrUndefined,
   RegisteredViews,
+  renderModelName,
+  t,
+  ViewFieldConfig,
   ViewFieldsConfig,
 } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
@@ -14,7 +19,6 @@ import React from 'react';
 import { addEffects } from './legend-store';
 import { store$ } from './legend-store/legend.store';
 import { useMutation } from './use-mutation';
-import { useQuery } from './use-query';
 import { useQueryData } from './use-query-data';
 
 export type QueryProviderConvexProps = {
@@ -31,18 +35,39 @@ type QueryProviderPropsWithViewFieldsConfig = QueryProviderConvexProps & {
 export const ClientViewProviderConvex = (
   props: QueryProviderPropsWithViewFieldsConfig
 ) => {
+  const patechedViewFields = patchDict(props.viewConfig.viewFields, (f) => ({
+    ...f,
+    label: f.label || renderModelName(f.name, t),
+  }));
+
   const viewConfigManager = React.useMemo(
-    () => new BaseViewConfigManager(props.viewConfig),
-    [props.viewConfig]
+    () =>
+      new BaseViewConfigManager({
+        ...props.viewConfig,
+        viewFields: patechedViewFields,
+      }),
+    [props.viewConfig, patechedViewFields]
   );
 
-  const views = React.useMemo(
+  let views = React.useMemo(
     () => ({
       ...props.globalConfig.defaultViewConfigs,
       ...props.views,
     }),
     [props.globalConfig.defaultViewConfigs, props.views]
   );
+
+  views = patchDict(views ?? {}, (view) => {
+    if (!view) return view;
+
+    return {
+      ...view,
+      viewFields: patchDict(view.viewFields, (f) => ({
+        ...f,
+        label: f.label || renderModelName(f.name, t),
+      })),
+    };
+  });
 
   const queryClient = useQueryClient();
 

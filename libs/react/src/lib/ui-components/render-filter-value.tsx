@@ -45,7 +45,8 @@ export const FilterValue = (props: {
     view = field.relation
       ? getViewByName(registeredViews, field.name)
       : undefined;
-    name = field.name.firstUpper();
+
+    name = field.label?.firstUpper() ?? field.name.firstUpper();
     Icon = view?.icon;
   } catch (error) {
     name = props.value.label;
