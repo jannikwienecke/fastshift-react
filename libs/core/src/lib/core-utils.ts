@@ -1,14 +1,12 @@
-import { TFunction } from 'i18next';
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
-import { FieldConfig, ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
+import { ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
 import { DisplayOptionsType } from './types/displayOptions.types';
 import {
   DisplayOptionsUiType,
   FilterOperatorType,
   FilterType,
 } from './types/filter.types';
-import { TranslationKeys } from './translations';
 
 export const invarant = (condition: boolean, message: string) => {
   const prefix = 'Invariant failed';
@@ -68,7 +66,6 @@ String.prototype.firstUpper = function (this: string) {
   return firstUpper(this);
 };
 
-// TODO: EXTREAC INTO OWN FILE
 export const convertFiltersForBackend = (filters: FilterType[]): string => {
   return filters
     .map((filter) => {

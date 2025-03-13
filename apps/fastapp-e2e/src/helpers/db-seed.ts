@@ -13,7 +13,6 @@ export async function seedDatabase() {
 
   const convex = new ConvexHttpClient(CONVEX_URL);
 
-  console.log('Seeding database...', CONVEX_URL);
   try {
     await convex.mutation(api.init.default);
     console.log('Database seeded successfully');

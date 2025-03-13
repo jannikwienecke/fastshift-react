@@ -20,6 +20,8 @@ created: 1723444498044
 - [x] refactor the usage of all the index deleted filter usages
 - [x] make tests pass
 - [x] tests contextmenu
+- [x] fix all build errors
+- [ ] fix github actions: all e2e run
 - [ ] implement default / fallback component
 
 ## How we handle Deletes with soft delete

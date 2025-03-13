@@ -78,8 +78,6 @@ export const convexSortRows = (
       return ascending ? 1 : -1;
     }
 
-    // FEATURE: Add support for sorting by Project of Task if Grouping by Project is set
-
     return 0;
   });
 
