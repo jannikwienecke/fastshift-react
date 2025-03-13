@@ -10,6 +10,7 @@ export type ComboxboxItem = {
 export type DisplayOptionsViewField = {
   id: string;
   label: string;
+  name: string;
   selected: boolean;
 };
 
@@ -174,6 +175,7 @@ export type FilterProps = {
   onRemove: (filter: FilterItemType) => void;
   onSelect: (filter: FilterItemType, rect: DOMRect) => void;
   onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
+  renderFilterValue: (filterValue: FilterItemType) => React.ReactNode;
 };
 
 export type InputDialogProps = {

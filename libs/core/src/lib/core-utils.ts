@@ -1,7 +1,7 @@
 import { TFunction } from 'i18next';
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
-import { ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
+import { FieldConfig, ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
 import { DisplayOptionsType } from './types/displayOptions.types';
 import {
   DisplayOptionsUiType,
@@ -76,13 +76,21 @@ export const convertFiltersForBackend = (filters: FilterType[]): string => {
       const operator = encodeURIComponent(filter.operator.label);
 
       if (filter.type === 'relation') {
+        let isNumberValue = false;
+
         const values = filter.values
-          .map((row) => encodeURIComponent(row.id))
+          .map((row) => {
+            if (typeof row.raw === 'number') {
+              isNumberValue = true;
+            }
+            return encodeURIComponent(filter.field.enum ? row.raw : row.id);
+          })
           .join(',');
-        return `filter[]=${fieldId}:${operator}:${values}:${filter.type}`;
+
+        return `filter[]=${fieldId}:${operator}:${values}:${filter.type};${isNumberValue}`;
       } else {
-        const value = encodeURIComponent(filter.value.id);
-        return `filter[]=${fieldId}:${operator}:${value}:${filter.type}`;
+        const value = encodeURIComponent(filter.value.raw);
+        return `filter[]=${fieldId}:${operator}:${value}:${filter.type};false`;
       }
     })
     .join('&');
@@ -99,8 +107,13 @@ export const parseFilterStringForServer = (
   const filters = filterString.split('&');
   return filters
     .map((filter) => {
-      const [, fieldIdWithPrefix, operator, value, type] =
-        filter.match(/filter\[\]=([^:]+):([^:]+):([^:]+):([^:]+)/) || [];
+      // Updated regex to capture isNumber separately.
+      const match = filter.match(
+        /filter\[\]=([^:]+):([^:]+):([^:]+):([^;]+);(true|false)/
+      );
+      const [, fieldIdWithPrefix, operator, value, type, isNumber] =
+        match || [];
+
       if (!fieldIdWithPrefix) {
         console.warn(`Invalid filter format: ${filter}`);
         return null;
@@ -119,9 +132,11 @@ export const parseFilterStringForServer = (
       const decodedType = decodeURIComponent(type ?? '');
 
       if (decodedType === 'relation') {
-        const values = decodedValue
-          .split(',')
-          .map((v) => makeRow(v, v, v, field));
+        const values = decodedValue.split(',').map((value) => {
+          const v = isNumber === 'true' ? Number(value) : value;
+
+          return makeRow(v, value, v, field);
+        });
         return {
           field,
           operator: {
@@ -250,12 +265,13 @@ export const makeDayMonthString = (date: Date) => {
   return formatter.format(date);
 };
 
-export const renderField = (field: string, t: TFunction) => {
-  let nameToRender = t(`viewFields.${field}.label`);
-  nameToRender = nameToRender.includes('viewFields.') ? t(field) : nameToRender;
+// export const renderField = (field: string, t: TFunction) => {
+//   console.log(field);
+//   let nameToRender = t(`viewFields.${field}.label`);
+//   nameToRender = nameToRender.includes('viewFields.') ? t(field) : nameToRender;
 
-  return nameToRender;
-};
+//   return nameToRender;
+// };
 
 export const renderModelName = (
   modelName: string,
@@ -270,6 +286,17 @@ export const renderModelName = (
       : translated;
 
   return test;
+};
+
+export const translateField = (
+  t: (key: any, options?: Record<string, unknown>) => string,
+  field: { name: string; label?: string }
+) => {
+  const translated = t(field.label ?? field.name);
+
+  return translated.includes(field.label ?? '')
+    ? field.name.firstUpper()
+    : translated;
 };
 
 export const patchDict = <T extends Record<string, any>>(

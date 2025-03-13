@@ -96,7 +96,7 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
   return (
     <div className="flex items-center">
       <>
-        {visibleTags.map((tag, index) => (
+        {visibleTags?.map?.((tag, index) => (
           <div
             key={tag.id + props.data.id}
             className={index !== 0 ? '-ml-2' : ''}

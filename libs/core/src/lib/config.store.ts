@@ -6,6 +6,7 @@ export type ComponentType =
   | 'combobox'
   | 'contextmenuFieldItem'
   | 'contextmenuFieldOption'
+  // | 'filterValue'
   | 'icon';
 
 export type ViewFieldsConfig<

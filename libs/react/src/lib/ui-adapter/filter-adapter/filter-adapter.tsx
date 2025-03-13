@@ -1,20 +1,25 @@
 import {
+  FilterItemType,
   FilterProps,
   FilterType,
   MakeFilterPropsOptions,
+  makeRowFromValue,
   RecordType,
+  renderModelName,
+  t,
 } from '@apps-next/core';
 import {
   filterItems$,
   makeFilterPropsOptions,
   store$,
 } from '../../legend-store';
+import { RenderComponent } from '../../ui-components/render-component';
 
 export const getFilterValue = (f: FilterType): string => {
   if (f.type === 'relation') {
     return f.values.length === 1
       ? f.values[0]?.label ?? ''
-      : `${f.values.length} ${f.field.name}`;
+      : `${f.values.length} ${renderModelName(f.field.name, t, true)}`;
   }
 
   return f.value?.label ?? '';
@@ -31,6 +36,7 @@ export const makeFilterProps = <T extends RecordType>(
 ): FilterProps => {
   makeFilterPropsOptions.set(options);
 
+  // console.log(store$.get());
   return {
     onOpen: store$.filterOpen,
     filters: filterItems$.get(),
@@ -42,6 +48,17 @@ export const makeFilterProps = <T extends RecordType>(
     },
     onOperatorClicked: (filter, rect) => {
       store$.filterOpenOperator(getFilter(filter.name), rect);
+    },
+    renderFilterValue: (filterValue: FilterItemType) => {
+      const field = getFilter(filterValue.name).field;
+
+      return (
+        <RenderComponent
+          componentType="default"
+          field={field}
+          value={makeRowFromValue(filterValue.value, field)}
+        />
+      );
     },
   } satisfies FilterProps;
 };

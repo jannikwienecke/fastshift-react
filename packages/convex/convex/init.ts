@@ -257,7 +257,6 @@ const init = server.mutation({
     const projects: Id<'projects'>[] = [];
     for (const project of projectData) {
       if (project && project.ownerId && project.categoryId) {
-        console.log(project.label);
         const projectId = await ctx.db.insert('projects', {
           ownerId: project.ownerId,
           categoryId: project.categoryId,
@@ -282,8 +281,7 @@ const init = server.mutation({
       {
         name: 'Design mockups',
         completed: false,
-        // projectId: projects[0],
-        projectId: undefined,
+        projectId: projects[0],
         priority: 1,
         description: 'Design mockups for the website redesign',
         dueDate: tommorow,

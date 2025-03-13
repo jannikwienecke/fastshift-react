@@ -38,6 +38,7 @@ const FilterList = (props: FilterProps) => {
         return (
           <span key={`filter-${f.name}-${f.operator}`} ref={ref}>
             <FilterItem
+              renderFilterItem={props.renderFilterValue}
               filter={f}
               onRemove={() => {
                 props.onRemove(f);
@@ -65,8 +66,12 @@ const FilterItem = (props: {
   onRemove: () => void;
   onSelect: () => void;
   onOperatorClicked: () => void;
+  renderFilterItem: (filter: FilterItemType) => React.ReactNode;
 }) => {
   const { filter, onRemove } = props;
+  const { t } = useTranslation();
+  const translatedOperator = t(`filter.operator.${filter.operator}` as any);
+
   return (
     <div
       data-testid={`filter-item-${filter.name}`}
@@ -87,7 +92,9 @@ const FilterItem = (props: {
           onClick={props.onOperatorClicked}
           className="border-r-[1px] py-1 border-r-input/30 px-3 hover:bg-accent"
         >
-          {filter.operator}
+          {translatedOperator.includes('filter.operator.')
+            ? filter.operator
+            : translatedOperator}
         </button>
 
         <button className="flex items-center px-1 gap-[1px] border-r-[1px] border-r-input/30 pr-2 py-1 hover:bg-accent">
@@ -97,7 +104,11 @@ const FilterItem = (props: {
             </div>
           ) : null}
 
-          <div onClick={props.onSelect}>{filter.value}</div>
+          <div onClick={props.onSelect}>
+            {filter.moreThanOneSelected
+              ? filter.value
+              : props.renderFilterItem(filter)}
+          </div>
         </button>
 
         <button

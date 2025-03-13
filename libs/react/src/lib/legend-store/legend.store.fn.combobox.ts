@@ -58,8 +58,6 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
   (store$) => (value) => {
     const state = comboboxStore$.get();
 
-    console.log('comboboxSelectValue', value);
-
     if (value.id === SELECT_FILTER_DATE) {
       store$.combobox.datePicker.open.set(true);
     } else if (store$.displayOptions.isOpen.get()) {
@@ -79,7 +77,6 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
         store$.filterSelectFilterType(value);
       }
     } else {
-      console.log('HIER');
       if (!state.multiple) {
         store$.combobox.selected.set([value]);
 

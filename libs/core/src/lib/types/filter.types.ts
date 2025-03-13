@@ -94,6 +94,7 @@ export type FilterItemType = {
   operator: string;
   value: string;
   name: string;
+  moreThanOneSelected: boolean;
 };
 // format to send the filters to the backend
 // i need to send the FilterType[] to the backend. Pls suggest a format and a function to convert the FilterType[] to the format

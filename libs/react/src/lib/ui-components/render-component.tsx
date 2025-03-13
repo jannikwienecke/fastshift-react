@@ -6,6 +6,7 @@ import {
 } from '@apps-next/core';
 import { getComponent } from './ui-components.helper';
 import { FilterValue } from './render-filter-value';
+import { store$ } from '../legend-store';
 
 export const RenderComponent = ({
   value,

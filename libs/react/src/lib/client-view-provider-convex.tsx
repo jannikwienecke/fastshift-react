@@ -37,7 +37,7 @@ export const ClientViewProviderConvex = (
 ) => {
   const patechedViewFields = patchDict(props.viewConfig.viewFields, (f) => ({
     ...f,
-    label: f.label || renderModelName(f.name, t),
+    label: f.label || `${f.name}.one`,
   }));
 
   const viewConfigManager = React.useMemo(

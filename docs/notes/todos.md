@@ -18,7 +18,9 @@ created: 1723444498044
 - [x] soft delete project -> remove project from task -> by ignoring all with deleted = true
 - [x] remove deleted from relational query
 - [x] refactor the usage of all the index deleted filter usages
-- [ ] make tests pass
+- [x] make tests pass
+- [x] tests contextmenu
+- [ ] implement default / fallback component
 
 ## How we handle Deletes with soft delete
 

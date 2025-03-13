@@ -1,12 +1,22 @@
+import { operatorLabels } from '../filters';
+
 export const en = {
-  common1: {
-    none: 'None',
-  },
   filter: {
     none: 'None',
     button: {
       label: 'FilterCool',
       placeholder: 'Filter by...',
+    },
+    operator: {
+      [operatorLabels.IS]: 'Is',
+      [operatorLabels.IS_NOT]: 'Is Not',
+      [operatorLabels.CONTAINS]: 'Contains',
+      [operatorLabels.DOES_NOT_CONTAIN]: 'Does Not Contain',
+      [operatorLabels.IS_ANY_OF]: 'Is Any Of',
+      [operatorLabels.IS_NOT_ANY_OF]: 'Is Not Any Of',
+      [operatorLabels.BEFORE]: 'Before',
+      [operatorLabels.AFTER]: 'After',
+      [operatorLabels.WITHIN]: 'Within',
     },
   },
   displayOptions: {

@@ -114,7 +114,13 @@ const SubMenuContent: React.FC<{
         <ContextMenuItem
           key={`option-${row.id}`}
           className="group"
-          onClick={() => field.onSelectOption?.(row)}
+          onClick={() => {
+            if (isManyToMany) {
+              field.onCheckOption?.(row);
+            } else {
+              field.onSelectOption?.(row);
+            }
+          }}
         >
           {isManyToMany ? (
             <div className="invisible group-hover:visible pr-2">
@@ -204,7 +210,7 @@ export const ContextMenuDefault = ({
     >
       <ContextMenuTrigger ref={ref} className="w-0 h-0 invisible sr-only" />
 
-      <ContextMenuContent className="w-56">
+      <ContextMenuContent data-testid="contextmenu" className="w-56">
         {fields?.map((field) => {
           const isEnumOrRelationalField = field.enum || field.relation;
 
@@ -235,7 +241,7 @@ export const ContextMenuDefault = ({
               <div className="pr-2">
                 <CopyIcon className="w-3 h-3" />
               </div>
-              <div>{t('common.copy')}</div>
+              <div>{t('common.copy', { name: '' })}</div>
             </div>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">

@@ -26,7 +26,7 @@ import { ConvexRecordType } from './types.convex';
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { viewConfigManager, filters, registeredViews } = args;
 
-  const isProject = viewConfigManager?.getTableName() === 'projects';
+  const isProject = viewConfigManager?.getTableName() === 'tasks';
 
   const log = (...args: any[]) => {
     if (!isProject) return;

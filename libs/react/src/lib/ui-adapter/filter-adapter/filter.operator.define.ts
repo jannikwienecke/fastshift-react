@@ -1,4 +1,4 @@
-import { FieldType, FilterOperatorType } from '@apps-next/core';
+import { FieldType, FilterOperatorType, operatorLabels } from '@apps-next/core';
 import {
   CalendarArrowDown,
   CalendarArrowUp,
@@ -9,48 +9,48 @@ import {
 } from 'lucide-react';
 
 const IS_OPERATOR: FilterOperatorType = {
-  label: 'is',
+  label: operatorLabels.IS,
   icon: EqualIcon,
 };
 
 const BEFORE_OPERATOR: FilterOperatorType = {
-  label: 'before',
+  label: operatorLabels.BEFORE,
   icon: CalendarArrowUp,
 };
 
 const WITHIN_OPERATOR: FilterOperatorType = {
-  label: 'within',
+  label: operatorLabels.WITHIN,
   icon: CalendarArrowUp,
 };
 
 const AFTER_OPERATOR: FilterOperatorType = {
-  label: 'after',
+  label: operatorLabels.AFTER,
   icon: CalendarArrowDown,
 };
 
 const IS_NOT_OPERATOR: FilterOperatorType = {
-  label: 'is not',
+  label: operatorLabels.IS_NOT,
   icon: EqualNotIcon,
 };
 
 const IS_NOT_ANY_OF_OPERATOR: FilterOperatorType = {
-  label: 'is not any of',
+  label: operatorLabels.IS_NOT_ANY_OF,
   icon: EqualNotIcon,
   many: true,
 };
 
 const CONTAINS_OPERATOR: FilterOperatorType = {
-  label: 'contains',
+  label: operatorLabels.CONTAINS,
   icon: PlusIcon,
 };
 
 const DOES_NOT_CONTAIN_OPERATOR: FilterOperatorType = {
-  label: 'does not contain',
+  label: operatorLabels.DOES_NOT_CONTAIN,
   icon: CircleAlert,
 };
 
 const IS_ANY_OF_OPERATOR: FilterOperatorType = {
-  label: 'is any of',
+  label: operatorLabels.IS_ANY_OF,
   icon: PlusIcon,
   many: true,
 };

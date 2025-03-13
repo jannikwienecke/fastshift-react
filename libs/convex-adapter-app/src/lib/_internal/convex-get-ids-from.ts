@@ -216,7 +216,6 @@ export const getIdsFromIndexFilters = async (
         (f) => f.field === currentIndexFilter.field.name
       );
 
-      // currentIndexFilter.
       if (!indexField) return [];
 
       const value = filterUtil().getValue(currentIndexFilter);

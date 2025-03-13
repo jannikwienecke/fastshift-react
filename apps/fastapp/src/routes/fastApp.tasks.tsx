@@ -63,7 +63,9 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
         icon: BarChartHorizontal,
         list: PriorityComponent,
         combobox: PriorityComponentCombobox,
-        // contextmenuFieldOption: PriorityComponentCombobox,
+
+        default: PriorityComponentCombobox,
+        contextmenuFieldOption: PriorityComponentCombobox,
       },
     },
 

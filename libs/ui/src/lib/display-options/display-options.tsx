@@ -2,6 +2,8 @@ import {
   DisplayOptionsProps,
   NO_SORTING_FIELD,
   renderModelName,
+  translate,
+  translateField,
   TranslationKeys,
   useTranslation,
 } from '@apps-next/core';
@@ -187,6 +189,7 @@ function DisplayOptionsRenderFields(props: {
   viewFields: DisplayOptionsProps['viewFields'];
   onSelectViewField: DisplayOptionsProps['onSelectViewField'];
 }) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="text-foreground/70">Display Properties</div>
@@ -207,7 +210,7 @@ function DisplayOptionsRenderFields(props: {
                     : 'border-transparent text-foreground/70'
                 )}
               >
-                {field.label.firstUpper()}
+                {translateField(t, field)}
               </div>
             </div>
           );

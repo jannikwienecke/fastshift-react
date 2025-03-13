@@ -11,6 +11,7 @@ import {
   makeRowFromField,
   makeRowFromValue,
   t,
+  translateField,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import Fuse from 'fuse.js';
@@ -22,7 +23,6 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
-import { v } from 'convex/values';
 
 export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed
@@ -33,14 +33,13 @@ export const removedSelected$ = observable<Row[]>([]);
 export const initSelected$ = observable<Row[] | null>(null);
 
 export const getViewFieldsOptions = (): MakeComboboxStateProps | null => {
-  console.log('getViewFieldsOptions');
   let filterOptions: Row[] | null = null;
   const query = store$.combobox.query.get();
 
   const viewFields = store$.viewConfigManager.get().getViewFieldList();
 
   filterOptions = viewFields.map((field) => {
-    return makeRow(field.name, field.label ?? field.name, field.name, field);
+    return makeRow(field.name, translateField(t, field), field.name, field);
   });
 
   const fuse = new Fuse(filterOptions, {
@@ -198,7 +197,6 @@ export const makeComboboxStateFilterValuesEnum = (
   });
 
   const filteredValues = fuse.search(query).map((r) => r.item);
-
   const values = query.length ? filteredValues : field.enum.values;
   const enumValues = values.map((v) => makeRowFromValue(v.name, field));
 
