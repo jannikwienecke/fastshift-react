@@ -3,6 +3,7 @@
 import {
   FilterItemType,
   FilterProps,
+  translateField,
   TranslationKeys,
   useTranslation,
 } from '@apps-next/core';
@@ -85,7 +86,7 @@ const FilterItem = (props: {
             </div>
           ) : null}
 
-          <div>{filter.label}</div>
+          <div>{translateField(t, filter)}</div>
         </div>
 
         <button
