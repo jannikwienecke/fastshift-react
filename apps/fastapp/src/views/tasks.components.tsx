@@ -184,7 +184,6 @@ export const ProjectComponentCombobox = (props: {
 export const ProjectNameFieldItem = (props: { field: FieldConfig }) => {
   const { t } = useTranslation();
 
-  console.log('ProjectNameFieldItem', props.field);
   return (
     <div className="flex gap-2 items-center w-full">
       {t('shared.rename', { model: renderModelName('tasks', t) })}

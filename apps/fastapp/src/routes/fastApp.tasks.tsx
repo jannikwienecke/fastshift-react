@@ -73,10 +73,6 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
       component: {
         icon: PencilLineIcon,
         contextmenuFieldItem: ProjectNameFieldItem,
-        // contextmenuFieldItem({ field }) {
-
-        //   return <>Rename Task</>;
-        // },
       },
     },
 

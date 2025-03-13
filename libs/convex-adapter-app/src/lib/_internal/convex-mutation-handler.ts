@@ -1,4 +1,4 @@
-import { MutationPropsServer, waitFor } from '@apps-next/core';
+import { MutationPropsServer } from '@apps-next/core';
 import { deleteIds, insertIds } from './convex-mutation-helper';
 import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx } from './convex.server.types';

@@ -21,14 +21,14 @@ export const invarant = (condition: boolean, message: string) => {
   throw new Error(label);
 };
 
-export const waitFor = (ms: number) => {
-  const env = import.meta.env.MODE;
-  if (!env || env === 'development') {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+// export const waitFor = (ms: number) => {
+//   const env = import.meta.env.MODE;
+//   if (!env || env === 'development') {
+//     return new Promise((resolve) => setTimeout(resolve, ms));
+//   }
 
-  return Promise.resolve();
-};
+//   return Promise.resolve();
+// };
 
 export const makeQueryKey = ({
   viewName,

@@ -3,13 +3,11 @@ import {
   ifNoneNullElseValue,
   makeData,
   Mutation,
-  NONE_OPTION,
   RecordType,
   Row,
-  waitFor,
 } from '@apps-next/core';
-import { LegendStore, StoreFn } from './legend.store.types';
 import { observable, Observable } from '@legendapp/state';
+import { LegendStore, StoreFn } from './legend.store.types';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
@@ -66,8 +64,6 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
       },
     };
     console.warn('Mutation payload:', mutation);
-
-    await waitFor(150);
 
     const { error } = await store$.api.mutateAsync({
       mutation,

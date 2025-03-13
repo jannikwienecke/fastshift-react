@@ -2,14 +2,12 @@ import {
   DisplayOptionsProps,
   NO_SORTING_FIELD,
   renderModelName,
-  translate,
   translateField,
   TranslationKeys,
   useTranslation,
 } from '@apps-next/core';
 import {
   ArrowDownWideNarrowIcon,
-  ArrowUp01Icon,
   ArrowUpDownIcon,
   ArrowUpWideNarrowIcon,
   ChevronDownIcon,
