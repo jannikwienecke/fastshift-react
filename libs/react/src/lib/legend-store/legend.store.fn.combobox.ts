@@ -150,13 +150,10 @@ let runningMutation = false;
 
 export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
   (store$) => (value, newSelected) => {
-    console.log('comboboxRunSelectMutation', value, newSelected);
-
     const runMutation = store$.api?.mutateAsync;
 
     const selected = store$.combobox.selected.get();
     const { row, field } = comboboxStore$.get();
-    const { row: row1 } = store$.contextMenuState.get();
 
     if (!row) return;
     if (!field) throw new Error('no field');

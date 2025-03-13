@@ -34,7 +34,9 @@ export const deleteIds = async (
         (r: ConvexRecordType) => r[tableFieldName] === mutation?.payload.id
       )?._id;
 
-      if (_id) await mutationClient(ctx).delete(_id);
+      if (_id) {
+        await mutationClient(ctx).delete(_id);
+      }
     }
   });
 };
