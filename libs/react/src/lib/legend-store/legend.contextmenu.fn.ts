@@ -21,7 +21,6 @@ export const contextMenuOpen: StoreFn<'contextMenuOpen'> =
   };
 
 export const contextMenuClose: StoreFn<'contextMenuClose'> = (store$) => () => {
-  console.log('CLOSE!');
   store$.contextMenuState.rect.set(null);
   store$.contextMenuState.row.set(null);
 };

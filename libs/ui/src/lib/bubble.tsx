@@ -17,7 +17,7 @@ export const Bubble = ({
       ) : null}
 
       {icon}
-      {label}
+      <span className="whitespace-nowrap"> {label}</span>
     </div>
   );
 };

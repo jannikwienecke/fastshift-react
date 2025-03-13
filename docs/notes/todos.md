@@ -23,7 +23,7 @@ created: 1723444498044
 - [x] fix all build errors
 - [x] fix github actions: all e2e run
 - [x] handling mutation return types
-- [ ] add sonner for alerts
+- [x] add sonner for alerts
 - [ ] implement default / fallback component
 
 ## How we handle Deletes with soft delete

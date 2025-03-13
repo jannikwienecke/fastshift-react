@@ -12,7 +12,6 @@ import {
   makeHooks,
   MakeInputDialogPropsOptions,
   makeViewFieldsConfig,
-  QueryInput,
   useComboboxQuery,
 } from '@apps-next/react';
 import {
@@ -32,7 +31,7 @@ import { getQueryKey } from '../query-client';
 import {
   CompletedComponent,
   CompletedComponentCombobox,
-  PriorityComponent,
+  PriorityListItemComponent as PriorityComponent,
   PriorityComponentCombobox,
   ProjectComponent,
   ProjectComponentCombobox,
@@ -85,6 +84,7 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
     },
     dueDate: {
       component: {
+        // TODO: HIER WEITER MACHEN
         list: ({ data }) => {
           if (!data.dueDate) return null;
 
