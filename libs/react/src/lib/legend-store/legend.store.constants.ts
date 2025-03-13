@@ -65,6 +65,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'fetchMore'
   | 'displayOptions'
   | 'contextMenuState'
+  | 'errorDialog'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -75,6 +76,9 @@ export const DEFAULT_LEGEND_STORE: Pick<
     cursor: null,
     numItems: DEFAULT_FETCH_LIMIT_QUERY,
   } as PaginationOptions,
+  errorDialog: {
+    error: null,
+  },
   fetchMore: {
     currentCursor: {
       position: null,

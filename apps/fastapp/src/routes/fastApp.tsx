@@ -1,8 +1,10 @@
 import { Button, cn, Sidebar, SidebarBody, SidebarLink } from '@apps-next/ui';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
+import { ErrorDetailsDialog } from '@apps-next/react';
+import { observer } from '@legendapp/state/react';
 import {
   CircleIcon,
   DotIcon,
@@ -17,22 +19,27 @@ import {
   Outlet,
 } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { views } from '@apps-next/convex';
+import { Toaster } from 'sonner';
 
 export const Route = createFileRoute('/fastApp')({
-  component: FastAppLayoutComponent,
+  component: () => <FastAppLayoutComponent />,
   errorComponent: (props) => {
     return <ErrorComponent {...props} />;
   },
 });
 
-function FastAppLayoutComponent() {
+const FastAppLayoutComponent = observer(() => {
   return (
-    <Layout>
-      <Outlet />
-    </Layout>
+    <>
+      <Layout>
+        <Outlet />
+      </Layout>
+
+      <ErrorDetailsDialog />
+      <Toaster richColors duration={2000} />
+    </>
   );
-}
+});
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();

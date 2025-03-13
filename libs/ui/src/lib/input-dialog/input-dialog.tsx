@@ -8,6 +8,7 @@ import {
   DialogTitle,
   Input,
 } from '../components';
+
 import { cn } from '../utils';
 
 export function InputDialogDefault(props: InputDialogProps) {

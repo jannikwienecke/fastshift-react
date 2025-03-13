@@ -255,19 +255,21 @@ export const ContextMenuDefault = ({
         </ContextMenuSub>
 
         {!props.isDeleted ? (
-          <ContextMenuItem>
+          <ContextMenuItem
+            className="cursor-pointer"
+            role="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onDelete();
+            }}
+          >
             <div className="flex flex-row items-center">
               <div className="pr-2">
                 <TrashIcon className="w-3 h-3" />
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  props.onDelete();
-                }}
-              >
+              <div>
                 {t('common.delete', { name: renderModelName(modelName, t) })}
-              </button>
+              </div>
             </div>
             <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
           </ContextMenuItem>

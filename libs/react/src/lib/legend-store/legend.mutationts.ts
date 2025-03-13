@@ -7,6 +7,7 @@ import {
   Row,
 } from '@apps-next/core';
 import { observable, Observable } from '@legendapp/state';
+import { renderErrorToast } from '../toast';
 import { LegendStore, StoreFn } from './legend.store.types';
 
 // Temporary states
@@ -128,14 +129,13 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
 
 export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
   (store$) =>
-  async ({ row }, cb) => {
+  async ({ row }, onSuccess, onError) => {
     const mutation: Mutation = {
       type: 'DELETE_RECORD',
       payload: {
         id: row.id,
       },
     };
-    console.warn('Mutation payload:', mutation);
 
     const { error } = await store$.api.mutateAsync({
       mutation,
@@ -144,10 +144,16 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
     });
 
     if (error) {
-      console.error('Error deleting record:', error);
+      onError?.(error.message);
+
+      renderErrorToast('error.deleteRecord', () => {
+        console.log('Undo action triggered');
+        console.log(error);
+        store$.errorDialog.error.set(error);
+      });
     } else {
       console.warn('Record deleted successfully');
-      cb?.();
+      onSuccess?.();
     }
   };
 

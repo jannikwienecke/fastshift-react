@@ -13,6 +13,7 @@ import React from 'react';
 import { store$, useView } from '..';
 import { useApi } from './use-api';
 import { reset$ } from './use-query-data';
+import { toast } from 'sonner';
 export const useMutation = () => {
   const { viewConfigManager } = useView();
 
@@ -132,10 +133,20 @@ export const useMutation = () => {
 
       try {
         const res = await mutateAsync(args);
+
         if (!res) throw new Error('mutation failed');
+
+        if (res.error) {
+          console.error('Error in mutation: ', res.error);
+        }
+
         return res;
       } catch (error) {
-        return { error: (error as any)?.message };
+        toast.error(
+          (error as Error | undefined)?.message || 'Unexpected error'
+        );
+
+        throw error;
       }
     },
     [mutateAsync]

@@ -21,8 +21,8 @@ created: 1723444498044
 - [x] make tests pass
 - [x] tests contextmenu
 - [x] fix all build errors
-- [ ] fix github actions: all e2e run
-- [ ] handling mutation return types
+- [x] fix github actions: all e2e run
+- [x] handling mutation return types
 - [ ] add sonner for alerts
 - [ ] implement default / fallback component
 

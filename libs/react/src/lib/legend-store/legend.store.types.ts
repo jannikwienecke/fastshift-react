@@ -9,6 +9,7 @@ import {
   FieldConfig,
   FilterType,
   MutationDto,
+  MutationHandlerErrorType,
   MutationReturnDto,
   QueryRelationalData,
   RecordType,
@@ -134,6 +135,10 @@ export type LegendStore = {
   globalQuery: string;
   globalQueryDebounced: string;
 
+  errorDialog: {
+    error: MutationHandlerErrorType | null;
+  };
+
   //   list state
   list: {
     selected: RecordType[];
@@ -237,7 +242,11 @@ export type LegendStore = {
     row: Row;
     valueRow: Row;
   }) => void;
-  deleteRecordMutation: (props: { row: Row }, cb?: () => void) => void;
+  deleteRecordMutation: (
+    props: { row: Row },
+    onSuccess?: () => void,
+    onError?: (message: string) => void
+  ) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (
