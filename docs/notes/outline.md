@@ -9,3 +9,4 @@ created: 1723444498044
 # Outline
 
 - Pre MVP Steps [[outline.pre-mvp-steps]]
+- Current Todos [[todos]]

@@ -8,4 +8,6 @@ export type DisplayOptionsType = {
   grouping?: {
     field: FieldConfig;
   };
+
+  showDeleted?: boolean;
 };

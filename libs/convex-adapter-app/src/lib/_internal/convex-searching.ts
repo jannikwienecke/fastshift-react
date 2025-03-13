@@ -1,4 +1,4 @@
-import { FilterType } from '@apps-next/core';
+import { FilterType, ID } from '@apps-next/core';
 import { isEnumNegateOperator } from '@apps-next/react';
 import { asyncMap } from 'convex-helpers';
 import { SearchField } from './convex-get-filters';
@@ -14,9 +14,11 @@ export const withSearch = async (
   {
     searchFields,
     query,
+    rowIdsNotDeleted,
   }: {
     searchFields: SearchField[];
     query: string;
+    rowIdsNotDeleted: ID[] | null;
   }
 ): Promise<ConvexRecord[]> => {
   const rowsList = await asyncMap(searchFields, async (searchField) => {
@@ -30,7 +32,9 @@ export const withSearch = async (
   });
 
   const rows = rowsList.flat();
-  const uniqueIds = [...new Set(rows.map((r) => r._id))];
+  const uniqueIds = [...new Set(rows.map((r) => r._id))].filter(
+    (id) => !rowIdsNotDeleted || rowIdsNotDeleted.includes(id)
+  );
 
   return uniqueIds
     .map((id) => rows.find((r) => r._id === id))

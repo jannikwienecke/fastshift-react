@@ -3,10 +3,10 @@ import {
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
   DEFAULT_MAX_ITEMS_GROUPING,
-  IndexField,
   QueryServerProps,
 } from '@apps-next/core';
-import { queryClient } from './convex-client';
+import { filterByNotDeleted, queryClient } from './convex-client';
+import { getDisplayOptionsInfo } from './convex-display-options';
 import { filterResults } from './convex-filter-results';
 import { getFilterTypes } from './convex-get-filters';
 import {
@@ -22,17 +22,18 @@ import { convexSortRows } from './convex-sort-rows';
 import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
-import { getDisplayOptionsInfo } from './convex-display-options';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
-  const { viewConfigManager, filters, registeredViews, displayOptions } = args;
+  const { viewConfigManager, filters, registeredViews } = args;
 
-  const isTask = viewConfigManager?.getTableName() === 'tasks';
+  const isProject = viewConfigManager?.getTableName() === 'tasks';
 
-  const logTask = (...args: any[]) => {
-    if (!isTask) return;
+  const log = (...args: any[]) => {
+    if (!isProject) return;
     console.log('___: ', ...args);
   };
+
+  const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
 
   const _indexFields = viewConfigManager.getIndexFields();
 
@@ -41,6 +42,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   const displayOptionsInfo = getDisplayOptionsInfo(args);
+  const showDeleted = displayOptionsInfo.showDeleted;
 
   let isDone = false;
   let isGetAll = false;
@@ -121,12 +123,23 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
+  const deletedIndexField = viewConfigManager.getSoftDeleteIndexField();
+
+  const query = queryClient(ctx, viewConfigManager.getTableName());
+  const rowsNotDeleted =
+    softDeleteEnabled && !showDeleted && deletedIndexField
+      ? await filterByNotDeleted(query, deletedIndexField).collect()
+      : [];
+
+  const idsNotDeleted = rowsNotDeleted.map((row) => row._id);
+
   const allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
     hasOneToManyFilter ? idsOneToManyFilters : null,
     isIndexSearch ? idsIndexField : null,
     isSearchFieldSearch ? idsSearchField : null,
-    args.query ? idsQuerySearch : null
+    args.query ? idsQuerySearch : null,
+    softDeleteEnabled && !showDeleted ? idsNotDeleted : null
   );
 
   const idsToRemove = Array.from(
@@ -175,6 +188,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
             .withIndex(
               displayOptionsInfo.displaySortingIndexField.name?.toString()
             )
+            .order(displayOptionsInfo.sorting?.order ?? 'asc')
             .paginate({
               cursor: args?.paginateOptions?.cursor?.cursor ?? null,
               numItems: fetchLimit + (idsToRemove.length ?? 0),
@@ -214,13 +228,17 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   rows.push(...filtered);
 
-  const sortedRows = convexSortRows(rows, displayOptionsInfo);
-
   const rawData = await mapWithInclude(
-    allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition),
+    // allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition),
+    rows,
     ctx,
     args
   );
+
+  let sortedRows = convexSortRows(rawData, args, displayOptionsInfo);
+
+  sortedRows =
+    allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition);
 
   if (allIds !== null || isGetAll) {
     const newItemsLength = allIds !== null ? allIds.length : newRows.length;
@@ -229,7 +247,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     continueCursor.position = isDone ? position : nextPosition;
   }
 
-  const data = parseConvexData(rawData);
+  const data = parseConvexData(sortedRows);
 
   return { data, continueCursor, isDone };
 };

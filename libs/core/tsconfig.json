@@ -4,6 +4,8 @@
     "allowJs": false,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
+    "module": "esnext",
+    "target": "ESNext",
     "strict": true,
     "types": ["vite/client", "vitest"],
     "noPropertyAccessFromIndexSignature": false

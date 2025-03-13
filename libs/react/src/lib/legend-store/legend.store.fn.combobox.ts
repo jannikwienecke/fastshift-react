@@ -24,8 +24,6 @@ import { LegendStore, StoreFn } from './legend.store.types';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 
 export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
-  // IDEA BUILD EVENT DRIVEN
-  // add events and attach function that reacts to the events
   store$.deselectRelationField();
   store$.filterCloseAll();
 
@@ -152,10 +150,13 @@ let runningMutation = false;
 
 export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
   (store$) => (value, newSelected) => {
+    console.log('comboboxRunSelectMutation', value, newSelected);
+
     const runMutation = store$.api?.mutateAsync;
 
     const selected = store$.combobox.selected.get();
     const { row, field } = comboboxStore$.get();
+    const { row: row1 } = store$.contextMenuState.get();
 
     if (!row) return;
     if (!field) throw new Error('no field');
@@ -186,7 +187,6 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       return;
     }
 
-    // REFACTOR THIS -> GET VALUE PART
     const selectedRelationField = store$.list.selectedRelationField.get();
     if (!selectedRelationField) return;
     let dateValueToUpdate: number | null | undefined = undefined;

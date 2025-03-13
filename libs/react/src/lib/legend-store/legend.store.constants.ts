@@ -64,6 +64,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'paginateOptions'
   | 'fetchMore'
   | 'displayOptions'
+  | 'contextMenuState'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -106,6 +107,8 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
   displayOptions: {
     showEmptyGroups: true,
+    softDeleteEnabled: false,
+    showDeleted: false,
     isOpen: false,
     viewType: {
       type: 'list',
@@ -116,10 +119,15 @@ export const DEFAULT_LEGEND_STORE: Pick<
     },
     viewField: {
       selected: [],
+      allFields: [],
     },
     grouping: {
       isOpen: false,
       rect: null,
     },
+  },
+  contextMenuState: {
+    rect: null,
+    row: null,
   },
 };

@@ -27,16 +27,22 @@ export const tasksConfig = createViewConfig(
       field: 'name',
     },
     fields: {
-      // IMPROVEMENT: add smart feature..
+      // IMPROVEMENT: [LATER] add smart feature..
       // dueDate (date in the name -> date field)
       // dueDate (date with upper case D -> Due Date)
       dueDate: { isDateField: true },
     },
     includeFields: ['tags'],
     query: {
+      showDeleted: false,
       primarySearchField: 'name',
     },
+    mutation: {
+      softDelete: true,
+      softDeleteField: 'deleted',
+    },
   },
+
   config.config
 );
 
@@ -48,6 +54,13 @@ export const projectsConfig = createViewConfig(
     includeFields: ['tasks'],
     displayField: {
       field: 'label',
+    },
+    query: {
+      showDeleted: false,
+    },
+    mutation: {
+      softDelete: true,
+      softDeleteField: 'deleted',
     },
   },
   config.config

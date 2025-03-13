@@ -1,4 +1,3 @@
-import { TFunction } from 'i18next';
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
 import { ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
@@ -20,14 +19,14 @@ export const invarant = (condition: boolean, message: string) => {
   throw new Error(label);
 };
 
-export const waitFor = (ms: number) => {
-  const env = process.env['NODE_ENV'];
-  if (!env || env === 'development') {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+// export const waitFor = (ms: number) => {
+//   const env = import.meta.env.MODE;
+//   if (!env || env === 'development') {
+//     return new Promise((resolve) => setTimeout(resolve, ms));
+//   }
 
-  return Promise.resolve();
-};
+//   return Promise.resolve();
+// };
 
 export const makeQueryKey = ({
   viewName,
@@ -67,7 +66,6 @@ String.prototype.firstUpper = function (this: string) {
   return firstUpper(this);
 };
 
-// TODO: EXTREAC INTO OWN FILE
 export const convertFiltersForBackend = (filters: FilterType[]): string => {
   return filters
     .map((filter) => {
@@ -75,13 +73,21 @@ export const convertFiltersForBackend = (filters: FilterType[]): string => {
       const operator = encodeURIComponent(filter.operator.label);
 
       if (filter.type === 'relation') {
+        let isNumberValue = false;
+
         const values = filter.values
-          .map((row) => encodeURIComponent(row.id))
+          .map((row) => {
+            if (typeof row.raw === 'number') {
+              isNumberValue = true;
+            }
+            return encodeURIComponent(filter.field.enum ? row.raw : row.id);
+          })
           .join(',');
-        return `filter[]=${fieldId}:${operator}:${values}:${filter.type}`;
+
+        return `filter[]=${fieldId}:${operator}:${values}:${filter.type};${isNumberValue}`;
       } else {
-        const value = encodeURIComponent(filter.value.id);
-        return `filter[]=${fieldId}:${operator}:${value}:${filter.type}`;
+        const value = encodeURIComponent(filter.value.raw);
+        return `filter[]=${fieldId}:${operator}:${value}:${filter.type};false`;
       }
     })
     .join('&');
@@ -98,8 +104,13 @@ export const parseFilterStringForServer = (
   const filters = filterString.split('&');
   return filters
     .map((filter) => {
-      const [, fieldIdWithPrefix, operator, value, type] =
-        filter.match(/filter\[\]=([^:]+):([^:]+):([^:]+):([^:]+)/) || [];
+      // Updated regex to capture isNumber separately.
+      const match = filter.match(
+        /filter\[\]=([^:]+):([^:]+):([^:]+):([^;]+);(true|false)/
+      );
+      const [, fieldIdWithPrefix, operator, value, type, isNumber] =
+        match || [];
+
       if (!fieldIdWithPrefix) {
         console.warn(`Invalid filter format: ${filter}`);
         return null;
@@ -118,9 +129,11 @@ export const parseFilterStringForServer = (
       const decodedType = decodeURIComponent(type ?? '');
 
       if (decodedType === 'relation') {
-        const values = decodedValue
-          .split(',')
-          .map((v) => makeRow(v, v, v, field));
+        const values = decodedValue.split(',').map((value) => {
+          const v = isNumber === 'true' ? Number(value) : value;
+
+          return makeRow(v, value, v, field);
+        });
         return {
           field,
           operator: {
@@ -156,7 +169,13 @@ export const convertDisplayOptionsForBackend = (
     ? `grouping=${displayOptions.grouping.field.name}`
     : '';
 
-  return [sortingString, groupingString].filter(Boolean).join(';');
+  const deletedString = displayOptions.showDeleted
+    ? `showDeleted=${displayOptions.showDeleted}`
+    : '';
+
+  return [sortingString, groupingString, deletedString]
+    .filter(Boolean)
+    .join(';');
 };
 
 export const parseDisplayOptionsStringForServer = (
@@ -191,6 +210,8 @@ export const parseDisplayOptionsStringForServer = (
         ...options.grouping,
         field: fieldConfig,
       };
+    } else if (key === 'showDeleted') {
+      options.showDeleted = value === 'true';
     } else {
       //
     }
@@ -241,9 +262,53 @@ export const makeDayMonthString = (date: Date) => {
   return formatter.format(date);
 };
 
-export const renderField = (field: string, t: TFunction) => {
-  let nameToRender = t(`viewFields.${field}.label`);
-  nameToRender = nameToRender.includes('viewFields.') ? t(field) : nameToRender;
+// export const renderField = (field: string, t: TFunction) => {
+//   console.log(field);
+//   let nameToRender = t(`viewFields.${field}.label`);
+//   nameToRender = nameToRender.includes('viewFields.') ? t(field) : nameToRender;
 
-  return nameToRender;
+//   return nameToRender;
+// };
+
+export const renderModelName = (
+  modelName: string,
+  t: (key: any, options?: Record<string, unknown>) => string,
+  plural?: boolean
+) => {
+  const translated = plural ? t(`${modelName}.other`) : t(`${modelName}.one`);
+
+  const test =
+    translated.includes(`.other`) || translated.includes('.one')
+      ? modelName
+      : translated;
+
+  return test;
+};
+
+export const translateField = (
+  t: (key: any, options?: Record<string, unknown>) => string,
+  field: { name: string; label?: string }
+) => {
+  const translated = t(field.label ?? field.name);
+
+  return translated.includes(field.label ?? '')
+    ? field.name.firstUpper()
+    : translated;
+};
+
+export const patchDict = <T extends Record<string, any>>(
+  dict: T,
+  fn: (entry: T[keyof T]) => T[keyof T]
+) => {
+  return Object.entries(dict ?? {}).reduce((acc, [dictKey, entry]) => {
+    // const xx = fn(fieldName, field)
+    const updatedEntry = fn(entry);
+    return {
+      ...acc,
+      [dictKey]: {
+        ...entry,
+        ...updatedEntry,
+      },
+    };
+  }, dict);
 };

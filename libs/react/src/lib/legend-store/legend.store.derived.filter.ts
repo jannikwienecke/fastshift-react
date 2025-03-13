@@ -10,10 +10,12 @@ export const makeFilterPropsOptions = observable(
 export const filterItems$ = observable(() =>
   store$.filter.filters.get().map((f) => {
     return {
-      label: f.field.name,
+      label: f.field.label ?? f.field.name,
       name: f.field.name,
       operator: f.operator.label,
       value: getFilterValue(f),
+
+      moreThanOneSelected: f.type === 'relation' ? f.values.length > 1 : false,
     } satisfies FilterItemType;
   })
 );

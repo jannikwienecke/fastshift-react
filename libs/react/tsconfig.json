@@ -9,7 +9,8 @@
     "declaration": true,
     "declarationMap": true,
     "noPropertyAccessFromIndexSignature": false,
-    "module": "esnext" // Add this line
+    "module": "esnext",
+    "noImplicitReturns": false
   },
   "files": [],
   "include": [],

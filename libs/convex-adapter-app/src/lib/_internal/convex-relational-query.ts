@@ -1,9 +1,10 @@
 import {
+  BaseViewConfigManager,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   QueryServerProps,
   relationalViewHelper,
 } from '@apps-next/core';
-import { queryClient } from './convex-client';
+import { filterByNotDeleted, queryClient } from './convex-client';
 import { filterResults } from './convex-filter-results';
 import { mapWithInclude } from './convex-map-with-include';
 import { withSearch } from './convex-searching';
@@ -25,23 +26,44 @@ export const handleRelationalTableQuery = async ({
     relationQuery.tableName
   );
 
+  console.log('field', field.name);
+
   const dbQuery = queryClient(ctx, field.name);
   const { relationalViewManager } = relationalViewHelper(
     field.name,
     args.registeredViews
   );
 
+  console.log('HIER1');
+  const indexFieldDeleted = relationalViewManager.getSoftDeleteIndexField();
+  console.log(indexFieldDeleted);
+
   const searchFields = relationalViewManager.getSearchableFields() || [];
 
+  const query = queryClient(ctx, field.name);
+
+  const rowsNotDeleted = indexFieldDeleted
+    ? await filterByNotDeleted(query, indexFieldDeleted).collect()
+    : null;
+
+  const rowIdsNotDeleted = rowsNotDeleted?.map((row) => row._id) ?? null;
+
+  console.log({ searchFields });
   const fetch = async () => {
     if (!args.query) {
-      return await dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+      return indexFieldDeleted
+        ? await filterByNotDeleted(dbQuery, indexFieldDeleted).take(
+            DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY
+          )
+        : await dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
     }
 
     if (searchFields.length && args.query) {
+      console.log('WITH SEARCH', rowIdsNotDeleted);
       return await withSearch(dbQuery, {
         searchFields,
         query: args.query,
+        rowIdsNotDeleted,
       });
     } else {
       // if we dont have a search field, we need to query the complete table
@@ -49,7 +71,10 @@ export const handleRelationalTableQuery = async ({
       console.warn(
         'Slow Query. No search field provided. Querying the complete table.'
       );
-      const rows = await dbQuery.collect();
+      const rows = indexFieldDeleted
+        ? await filterByNotDeleted(dbQuery, indexFieldDeleted).collect()
+        : await dbQuery.collect();
+
       return filterResults(
         rows,
         relationalViewManager.getDisplayFieldLabel(),

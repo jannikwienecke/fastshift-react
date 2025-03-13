@@ -31,13 +31,17 @@ export const makeListProps = <T extends RecordType = RecordType>(
   const grouping = store$.displayOptions.grouping.get();
   const groupingIsRelationalField = grouping.field?.relation;
 
+  const sorting = store$.displayOptions.sorting.get();
+
   const listGrouping: ListProps['grouping'] = {
+    groupByTableName: '',
     groupByField: '',
     groupLabel: '',
     groups: [],
   };
 
   if (groupingIsRelationalField && grouping.field?.name) {
+    listGrouping.groupByTableName = grouping.field.relation?.tableName ?? '';
     listGrouping.groupByField = grouping.field?.relation?.fieldName ?? '';
     listGrouping.groupLabel =
       grouping.field?.relation?.tableName.firstUpper().slice(0, -1) ?? '';
@@ -68,9 +72,19 @@ export const makeListProps = <T extends RecordType = RecordType>(
               : `Not ${grouping.field?.name.firstUpper()}`,
         })) ?? [];
   } else if (grouping.field?.enum) {
-    // IMPROVEMENT: Implement grouping by enum
+    // IMPROVEMENT: [LATER] Implement grouping by enum
     console.warn('Grouping by enum is not implemented yet');
     alert('Grouping by enum is not implemented yet');
+  }
+
+  // if we are grouped by a relation field like "projects", when sorting, we want to sort the groups
+  if (sorting.field?.name === listGrouping.groupByTableName) {
+    listGrouping.groups = listGrouping.groups.sort((a, b) => {
+      const x = a.groupByLabel.toLowerCase();
+      const y = b.groupByLabel.toLowerCase();
+
+      return sorting.order === 'asc' ? x.localeCompare(y) : y.localeCompare(x);
+    });
   }
 
   if (
@@ -143,6 +157,11 @@ export const makeListProps = <T extends RecordType = RecordType>(
   const items =
     dataModel?.rows?.map((item) => ({
       ...item.raw,
+      deleted: viewConfigManager.viewConfig.mutation?.softDeleteField
+        ? item.raw[
+            viewConfigManager.viewConfig.mutation.softDeleteField.toString()
+          ]
+        : false,
       id: item.id,
       icon: Icon,
       valuesLeft: _renderLabel
@@ -159,5 +178,6 @@ export const makeListProps = <T extends RecordType = RecordType>(
     items,
     onReachEnd: store$.globalFetchMore,
     grouping: listGrouping,
+    onContextMenu: store$.onContextMenuListItem,
   };
 };

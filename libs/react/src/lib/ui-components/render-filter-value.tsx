@@ -3,12 +3,11 @@ import {
   FieldConfig,
   getViewByName,
   makeRow,
-  renderField,
+  useTranslation,
   ViewConfigType,
 } from '@apps-next/core';
 import { useView } from '../use-view';
 import { ComboboxFieldValue } from './render-combobox-field-value';
-import { useTranslation } from 'react-i18next';
 
 export const FilterValue = (props: {
   value: ComboxboxItem;
@@ -38,6 +37,7 @@ export const FilterValue = (props: {
     );
   }
 
+  let fallback = '';
   try {
     const field =
       selectedField ?? viewConfigManager.getFieldBy(props.value.id.toString());
@@ -45,17 +45,23 @@ export const FilterValue = (props: {
     view = field.relation
       ? getViewByName(registeredViews, field.name)
       : undefined;
-    name = field.name.firstUpper();
+
+    name = field.label ?? field.name;
     Icon = view?.icon;
+    fallback = field.name.firstUpper();
   } catch (error) {
     name = props.value.label;
+    fallback = props.value.label;
     Icon = props.value.icon;
   }
+
+  const translated = t(name as any);
+  const toDisplay = translated === name ? fallback : translated;
 
   return (
     <div className="flex flex-row gap-2 items-center">
       <span>{Icon && <Icon className="w-4 h-4" />}</span>
-      <span>{renderField(name, t)}</span>
+      <span>{toDisplay}</span>
     </div>
   );
 };

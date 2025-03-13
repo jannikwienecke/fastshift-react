@@ -112,7 +112,7 @@ test.describe('Task management', () => {
     await taskPage.filterButton.click();
 
     // filter by project
-    await taskPage.comboboxPopover.getByText('Projects').click();
+    await taskPage.comboboxPopover.getByText('Project').click();
     await taskPage.comboboxPopover.getByText('fitness plan').click();
     await page.getByText('tasks').first().click({ force: true });
     await expect(
@@ -189,9 +189,9 @@ test.describe('Task management', () => {
     // before filter -> this is our first list item
     await expect(listItem.getByText(/design mockups/i)).toBeVisible();
 
-    await taskPage.openFilter(/dueDate/i);
+    await taskPage.openFilter(/due date/i);
     await taskPage.comboboxPopover.getByText(/today/i).click();
-    await taskPage.expectToSeeFilter(/dueDate/i, 'is', 'today');
+    await taskPage.expectToSeeFilter(/due Date/i, 'is', 'today');
 
     // after filter -> this is our first list item
     await expect(listItem.getByText(/develop frontend/i)).toBeVisible();
@@ -202,23 +202,23 @@ test.describe('Task management', () => {
     // now we change the filter from is -> is not
     await taskPage.filterList.getByText(/is/i).click();
     await taskPage.comboboxPopover.getByText(/is not/i).click();
-    await taskPage.expectToSeeFilter(/dueDate/i, 'is not', 'today');
+    await taskPage.expectToSeeFilter(/due Date/i, 'is not', 'today');
     await expect(listItem.getByText(/design mockups/i)).toBeVisible();
 
     // after remove filter -> this is our first list item again
     await expect(listItem.getByText(/design mockups/i)).toBeVisible();
 
-    await taskPage.openFilter(/dueDate/i);
+    await taskPage.openFilter(/due date/i);
     await taskPage.comboboxPopover.getByText(/this month/i).click();
-    await taskPage.expectToSeeFilter(/dueDate/i, 'within', 'this month');
+    await taskPage.expectToSeeFilter(/due date/i, 'within', 'this month');
 
     await page.getByText(/this month/i).click();
     await taskPage.filterAndSelect('3 week', /3 weeks from now/i);
-    await taskPage.expectToSeeFilter(/dueDate/i, 'before', '3 weeks from now');
+    await taskPage.expectToSeeFilter(/due date/i, 'before', '3 weeks from now');
 
-    await taskPage.openFilter(/dueDate/i);
+    await taskPage.openFilter(/due date/i);
     await taskPage.filterAndSelect('no date', /no date defined/i);
-    await taskPage.expectToSeeFilter(/dueDate/i, 'is', /no date defined/i);
+    await taskPage.expectToSeeFilter(/due date/i, 'is', /no date defined/i);
 
     await taskPage.filterBySpecificDate(new Date().getDate().toString());
 
@@ -248,7 +248,7 @@ test.describe('Task management', () => {
   test('can search for the date filter in the list item edit combobox', async ({
     taskPage,
   }) => {
-    await taskPage.openFilter(/dueDate/i);
+    await taskPage.openFilter(/due Date/i);
     await taskPage.comboboxPopover.getByText(/today/i).click();
 
     const firstListItem = await taskPage.getListItem(0);
@@ -283,7 +283,7 @@ test.describe('Task management', () => {
     taskPage,
     page,
   }) => {
-    await taskPage.openFilter(/projects/i);
+    await taskPage.openFilter(/project/i);
     await taskPage.comboboxPopover.getByText(/no project/i).click();
     await expect(
       taskPage.comboboxPopover.getByText(/no project/i)
@@ -315,7 +315,7 @@ test.describe('Task management', () => {
 
     await taskPage.comboboxPopover.getByText(/no project/i).click();
 
-    await taskPage.openFilter(/projects/i);
+    await taskPage.openFilter(/project/i);
 
     await taskPage.comboboxPopover.getByText(/no project/i).click();
 
@@ -323,10 +323,60 @@ test.describe('Task management', () => {
 
     await expect(page.getByText(/design mockups/i)).toBeVisible();
   });
+
+  test('can right click on a task and open the context menu', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await firstListItem.locator('div').first().click({ force: true });
+    await expect(firstListItem.getByText(/website redesign/i)).toBeVisible();
+    await expect(firstListItem.getByText(/important/i)).toBeHidden();
+    // 🟡
+    // 🟢
+    await expect(firstListItem.getByText(/🟡/i)).toBeHidden();
+
+    // right click on the first list item
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    // check if the context menu is visible
+    await expect(taskPage.contextmenu).toBeVisible();
+
+    await expect(taskPage.contextmenu.getByText(/rename task/i)).toBeVisible();
+    await expect(taskPage.contextmenu.getByText(/copy/i)).toBeVisible();
+
+    await taskPage.contextmenu.getByText(/Project/i).click();
+    await expect(taskPage.contextmenu.getByText(/no project/i)).toBeVisible();
+    await taskPage.contextmenu.getByText(/fitness plan/i).click();
+
+    await expect(firstListItem.getByText(/fitness plan/i)).toBeVisible();
+
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+    await expect(taskPage.contextmenu).toBeVisible();
+
+    await taskPage.contextmenu.getByText(/tags/i).click();
+    await taskPage.contextmenu.getByText(/important/i).click();
+    await expect(firstListItem.getByText(/important/i)).toBeVisible();
+
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+    await expect(taskPage.contextmenu).toBeVisible();
+    await taskPage.contextmenu.getByText(/priority/i).click();
+    await taskPage.contextmenu.getByText(/🟡/i).click();
+    await expect(firstListItem.getByText(/🟡/i)).toBeVisible();
+  });
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {
-  await taskPage.openFilter(/dueDate/i);
+  await taskPage.openFilter(/due Date/i);
   const input = page.getByPlaceholder(/filter/i);
 
   const getByText = (l: RegExp) => taskPage.comboboxPopover.getByText(l);

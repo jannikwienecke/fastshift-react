@@ -18,6 +18,7 @@ import {
 import {
   cn,
   ComboboxPopover,
+  ContextMenuDefault,
   DisplayOptions,
   Filter,
   InputDialog,
@@ -25,7 +26,7 @@ import {
 } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { CalendarIcon } from 'lucide-react';
+import { BarChartHorizontal, CalendarIcon, PencilLineIcon } from 'lucide-react';
 import React from 'react';
 import { getQueryKey } from '../query-client';
 import {
@@ -35,15 +36,19 @@ import {
   PriorityComponentCombobox,
   ProjectComponent,
   ProjectComponentCombobox,
+  ProjectNameFieldItem,
   TagsComponent,
+  TagsDefaultComponent,
   TaskViewDataType,
 } from '../views/tasks.components';
+import { useTranslation } from 'react-i18next';
 
 const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   fields: {
     tags: {
       component: {
         list: TagsComponent,
+        contextmenuFieldOption: TagsDefaultComponent,
       },
     },
     completed: {
@@ -55,8 +60,19 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
 
     priority: {
       component: {
+        icon: BarChartHorizontal,
         list: PriorityComponent,
         combobox: PriorityComponentCombobox,
+
+        default: PriorityComponentCombobox,
+        contextmenuFieldOption: PriorityComponentCombobox,
+      },
+    },
+
+    name: {
+      component: {
+        icon: PencilLineIcon,
+        contextmenuFieldItem: ProjectNameFieldItem,
       },
     },
 
@@ -64,6 +80,7 @@ const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
       component: {
         list: ProjectComponent,
         combobox: ProjectComponentCombobox,
+        contextmenuFieldOption: ProjectComponentCombobox,
       },
     },
     dueDate: {
@@ -159,6 +176,8 @@ const DefaultTemplate = observer(
           <RenderInputDialog />
         )}
 
+        <RenderContextmenu />
+
         <div className="flex flex-col w-full ">
           <div className="flex flex-row gap-2 justify-end">
             <RenderDisplayOptions
@@ -225,8 +244,8 @@ const RenderDisplayOptions = observer(
   }: {
     options: MakeDisplayOptionsPropsOptions<TaskViewDataType>;
   }) => {
-    const { makeDisplayOptionsProps } = makeHooks<TaskViewDataType>();
-
+    const { makeDisplayOptionsProps, makeContextmenuProps } =
+      makeHooks<TaskViewDataType>();
     const props = makeDisplayOptionsProps(options);
 
     return (
@@ -241,6 +260,7 @@ const RenderInputDialog = observer(
   (props: { options?: MakeInputDialogPropsOptions }) => {
     console.warn('Render Input Dialog');
     const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
+
     return (
       <Memo>
         {() => {
@@ -253,11 +273,6 @@ const RenderInputDialog = observer(
   }
 );
 
-const RenderQueryInput = observer(() => {
-  console.warn('Render Query Input');
-  return <QueryInput />;
-});
-
 const RenderList = observer((props: { options?: MakeListPropsOptions }) => {
   const { makeListProps } = makeHooks<TaskViewDataType>();
   console.warn('Render List');
@@ -266,6 +281,18 @@ const RenderList = observer((props: { options?: MakeListPropsOptions }) => {
     <Memo>
       {() => {
         return <List.Default {...makeListProps(props.options)} />;
+      }}
+    </Memo>
+  );
+});
+
+const RenderContextmenu = observer(() => {
+  const { makeContextmenuProps } = makeHooks<TaskViewDataType>();
+
+  return (
+    <Memo>
+      {() => {
+        return <ContextMenuDefault {...makeContextmenuProps({})} />;
       }}
     </Memo>
   );

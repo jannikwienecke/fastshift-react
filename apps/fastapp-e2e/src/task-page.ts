@@ -7,12 +7,14 @@ export class TaskPage {
   readonly comboboxPopover: Locator;
   readonly filterList: Locator;
   readonly datePicker: Locator;
+  readonly contextmenu: Locator;
   constructor(page: Page) {
     this.page = page;
     this.filterButton = page.getByTestId('filter-button');
     this.comboboxPopover = page.getByTestId('combobox-popover');
     this.filterList = page.getByTestId('filter-list');
     this.datePicker = page.getByTestId('date-picker');
+    this.contextmenu = page.getByTestId('contextmenu');
   }
 
   async goto() {
@@ -77,7 +79,7 @@ export class TaskPage {
   }
 
   async filterBySpecificDate(date: string) {
-    await this.openFilter(/dueDate/i);
+    await this.openFilter(/due Date/i);
     await this.filterAndSelect('select', /select specific date/i);
 
     await expect(this.datePicker.getByText('Su')).toBeVisible();
@@ -89,7 +91,7 @@ export class TaskPage {
     // get by inner text "1"
     await this.datePicker.getByText(day.toString()).first().click();
     // await this.expectToSeeFilter(/dueDate/i, 'is' );
-    await expect(this.filterList.getByText(/dueDate/i)).toBeVisible();
+    await expect(this.filterList.getByText(/due Date/i)).toBeVisible();
     await expect(this.filterList.getByText(/is/i)).toBeVisible();
   }
 

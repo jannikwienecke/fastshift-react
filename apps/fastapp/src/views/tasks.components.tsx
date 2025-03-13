@@ -1,7 +1,12 @@
 'use client';
 
 import { Projects, Tags } from '@apps-next/convex';
-import { DataType, GetTableName } from '@apps-next/core';
+import {
+  DataType,
+  FieldConfig,
+  GetTableName,
+  renderModelName,
+} from '@apps-next/core';
 import { useViewOf } from '@apps-next/react';
 import { Bubble, Icon } from '@apps-next/ui';
 import { CustomTypeOptions } from 'i18next';
@@ -91,17 +96,12 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
   return (
     <div className="flex items-center">
       <>
-        {visibleTags.map((tag, index) => (
+        {visibleTags?.map?.((tag, index) => (
           <div
             key={tag.id + props.data.id}
             className={index !== 0 ? '-ml-2' : ''}
           >
-            <ViewBubble
-              tableName="tags"
-              value={tag.name}
-              color={tag.color}
-              showIcon={false}
-            />
+            <RenderTag tag={tag} />
           </div>
         ))}
 
@@ -116,6 +116,27 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
         )}
       </>
     </div>
+  );
+};
+
+export const TagsDefaultComponent = (props: {
+  data: NonNullable<TaskViewDataType['tags']>[number] | undefined;
+}) => {
+  const tag = props.data;
+
+  if (!tag) return null;
+
+  return <RenderTag tag={tag} />;
+};
+
+export const RenderTag = (props: { tag: Tags }) => {
+  return (
+    <ViewBubble
+      tableName="tags"
+      value={props.tag.name}
+      color={props.tag.color}
+      showIcon={false}
+    />
   );
 };
 
@@ -156,6 +177,16 @@ export const ProjectComponentCombobox = (props: {
     <div className="flex gap-2 items-center w-full">
       <Icon icon={view.icon} />
       <div className="text-sm">{project?.label}</div>
+    </div>
+  );
+};
+
+export const ProjectNameFieldItem = (props: { field: FieldConfig }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex gap-2 items-center w-full">
+      {t('shared.rename', { model: renderModelName('tasks', t) })}
     </div>
   );
 };

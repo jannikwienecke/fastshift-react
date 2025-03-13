@@ -9,28 +9,47 @@ export const en = {
     settings: 'Settings',
     logout: 'Logout',
   },
-  project: {
+  projects: {
     one: 'Project',
     other: 'Projects',
   },
-  task: {
+  tasks: {
     one: 'Task',
     other: 'Tasks',
     create: 'Create Task',
     edit: 'Edit Task',
     delete: 'Delete Task',
   },
-  common: {
-    save: 'Save',
-    cancel: 'Cancel',
-    delete: 'Delete',
-    edit: 'Edit',
-    change: 'Change',
-  },
   priority: {
+    one: 'Priority',
+    other: 'Priorities',
     low: 'Low',
     medium: 'Medium',
     high: 'High',
+  },
+  description: {
+    one: 'Description',
+    other: 'Descriptions',
+  },
+  completed: {
+    one: 'Completed',
+    other: 'Completed',
+  },
+  subtitle: {
+    one: 'Subtitle',
+    other: 'Subtitles',
+  },
+  dueDate: {
+    one: 'Due Date',
+    other: 'Due Dates',
+  },
+
+  shared: {
+    rename: 'Rename {{model}}',
+  },
+  errors: {
+    notFound: 'Not found',
+    unauthorized: 'Unauthorized',
   },
 };
 

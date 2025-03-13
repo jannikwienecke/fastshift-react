@@ -11,27 +11,46 @@ export default {
     settings: 'Einstellungen',
     logout: 'Abmelden',
   },
-  project: {
+  projects: {
     one: 'Projekt',
     other: 'Projekte',
   },
-  task: {
+
+  tasks: {
     one: 'Aufgabe',
     other: 'Aufgaben',
     create: 'Aufgabe erstellen',
     edit: 'Aufgabe bearbeiten',
     delete: 'Aufgabe löschen',
   },
-  common: {
-    save: 'Speichern',
-    cancel: 'Abbrechen',
-    delete: 'Löschen',
-    edit: 'Bearbeiten',
-    change: 'Ändern',
-  },
   priority: {
+    one: 'Priorität',
+    other: 'Prioritäten',
     low: 'Niedrig',
     medium: 'Mittel',
     high: 'Hoch',
+  },
+  completed: {
+    one: 'Erledigt',
+    other: 'Erledigt',
+  },
+  description: {
+    one: 'Beschreibung',
+    other: 'Beschreibungen',
+  },
+  subtitle: {
+    one: 'Untertitel',
+    other: 'Untertitel',
+  },
+  dueDate: {
+    one: 'Fälligkeitsdatum',
+    other: 'Fälligkeitsdaten',
+  },
+  shared: {
+    rename: '{{model}} umbenennen',
+  },
+  errors: {
+    notFound: 'Nicht gefunden',
+    unauthorized: 'Nicht autorisiert',
   },
 } satisfies typeof en;

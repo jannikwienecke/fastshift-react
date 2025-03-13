@@ -1,5 +1,6 @@
 import { paginationOptsValidator } from 'convex/server';
 import * as server from './_generated/server';
+import { Aggregate } from '@convex-dev/aggregate';
 
 export const generateTodos = server.mutation({
   async handler(ctx, args) {
@@ -18,6 +19,10 @@ export const todos = server.query({
       .query('todos')
       .order('asc')
       .paginate(args.paginationOpts);
+
+    const resultTasks = await ctx.db
+      .query('tasks')
+      .withIndex('deleted', (q) => q.eq('deleted', false));
 
     return result;
   },

@@ -10,6 +10,7 @@ export type ComboxboxItem = {
 export type DisplayOptionsViewField = {
   id: string;
   label: string;
+  name: string;
   selected: boolean;
 };
 
@@ -29,6 +30,7 @@ export type ListItem = {
   icon?: (props: any) => React.ReactNode;
   valuesLeft: ListValueProps[];
   valuesRight: ListValueProps[];
+  deleted: boolean;
 };
 
 export type ListProps<TItem extends ListItem = ListItem> = {
@@ -38,6 +40,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
 
   grouping: {
     groupByField: string;
+    groupByTableName: string;
     groupLabel: string;
     groups: {
       groupById: string | number | undefined;
@@ -45,6 +48,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
     }[];
   };
   onReachEnd: () => void;
+  onContextMenu: (item: TItem, rect: DOMRect) => void;
 };
 
 export type MakeListPropsOptions<T = RecordType> = {
@@ -127,6 +131,10 @@ export type MakeDisplayOptionsPropsOptions<T extends RecordType = RecordType> =
     displayFieldsToShow?: (keyof T)[];
   };
 
+export type MakeContextMenuPropsOptions<T extends RecordType = RecordType> = {
+  //
+};
+
 export type DisplayOptionsProps = {
   label: string;
   onOpen: (rect: DOMRect) => void;
@@ -140,6 +148,7 @@ export type DisplayOptionsProps = {
   onSelectViewField: (field: DisplayOptionsViewField) => void;
 
   onToggleShowEmptyGroups: (checked: boolean) => void;
+  onToggleShowDeleted: (checked: boolean) => void;
   showEmptyGroupsToggle: boolean;
   showEmptyGroups: boolean;
 
@@ -149,6 +158,7 @@ export type DisplayOptionsProps = {
   sorting: {
     onOpen: (rect: DOMRect) => void;
     onClose: () => void;
+    toggleSorting: () => void;
   } & DisplayOptionsUiType['sorting'];
 
   grouping: {
@@ -165,6 +175,7 @@ export type FilterProps = {
   onRemove: (filter: FilterItemType) => void;
   onSelect: (filter: FilterItemType, rect: DOMRect) => void;
   onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
+  renderFilterValue: (filterValue: FilterItemType) => React.ReactNode;
 };
 
 export type InputDialogProps = {

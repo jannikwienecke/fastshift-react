@@ -6,6 +6,7 @@ import { useQueryData } from './use-query-data';
 import { makeFilterProps } from './ui-adapter/filter-adapter';
 import { makeInputDialogProps } from './ui-adapter/input-dialog';
 import { makeDisplayOptionsProps } from './ui-adapter/filter-adapter/displayOptions-adapter';
+import { makeContextMenuProps } from './ui-adapter/filter-adapter/contextmenu-adapter';
 
 export const makeHooks = <T extends DataType | ViewConfigType>(
   viewConfig?: T
@@ -18,5 +19,6 @@ export const makeHooks = <T extends DataType | ViewConfigType>(
     makeInputDialogProps: makeInputDialogProps<DataTypeToUse<T>>,
     makeComboboxProps: makeComboboxProps<DataTypeToUse<T>>,
     makeListProps: makeListProps<DataTypeToUse<T>>,
+    makeContextmenuProps: makeContextMenuProps<DataTypeToUse<T>>,
   };
 };

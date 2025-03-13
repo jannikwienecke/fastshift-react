@@ -3,6 +3,7 @@ import React from 'react';
 import { store$ } from './legend-store/legend.store';
 import { useQuery } from './use-query';
 import { observable, observe } from '@legendapp/state';
+import { ignoreNewData$ } from './legend-store/legend.mutationts';
 
 export type QueryStore<T extends RecordType> = {
   dataModel: DataModelNew<T>;
@@ -41,37 +42,42 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   }, [reset]);
 
   React.useEffect(() => {
-    observe(reset$, () => {
-      const { isFetching, reset } = store$.fetchMore.get();
+    // observe(reset$, () => {
+    const { isFetching, reset } = store$.fetchMore.get();
 
-      if (data === undefined) return;
+    if (data === undefined) return;
 
-      if (store$.fetchMore.isDone.get()) return;
-      if (isDoneRef.current) return;
+    if (store$.fetchMore.isDone.get()) return;
+    if (isDoneRef.current) return;
 
-      const allData =
-        isFetching && !reset
-          ? [...(prevDataRef.current ?? []), ...(data ?? [])]
-          : data;
+    if (ignoreNewData$.get()) {
+      ignoreNewData$.set(false);
+      return;
+    }
 
-      store$.createDataModel(allData);
+    const allData =
+      isFetching && !reset
+        ? [...(prevDataRef.current ?? []), ...(data ?? [])]
+        : data;
 
-      store$.createRelationalDataModel(relationalData ?? {});
+    store$.createDataModel(allData);
 
-      store$.fetchMore.assign({
-        currentCursor: store$.fetchMore.currentCursor.get(),
+    store$.createRelationalDataModel(relationalData ?? {});
 
-        nextCursor: continueCursor,
-        isFetching: false,
-        isFetched: true,
-        reset: false,
-        isDone: isDone,
-      });
+    store$.fetchMore.assign({
+      currentCursor: store$.fetchMore.currentCursor.get(),
 
-      isDoneRef.current = isDone;
-
-      prevDataRef.current = allData;
+      nextCursor: continueCursor,
+      isFetching: false,
+      isFetched: true,
+      reset: false,
+      isDone: isDone,
     });
+
+    isDoneRef.current = isDone;
+
+    prevDataRef.current = allData;
+    // });
   }, [continueCursor, data, relationalData, isDone]);
 
   return {

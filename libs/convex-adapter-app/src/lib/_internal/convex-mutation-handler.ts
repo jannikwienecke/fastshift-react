@@ -23,13 +23,22 @@ export const createMutation = async (
 
 export const deleteMutation = async (
   ctx: ConvexContext,
-  { mutation }: MutationPropsServer
+  { mutation, viewConfigManager }: MutationPropsServer
 ) => {
   if (mutation.type !== 'DELETE_RECORD') throw new Error('INVALID MUTATION-2');
 
   const { id } = mutation.payload;
 
-  await ctx.db.delete(id);
+  const { softDelete, softDeleteField } =
+    viewConfigManager.viewConfig.mutation ?? {};
+
+  if (softDelete && softDeleteField) {
+    await ctx.db.patch(mutation.payload.id, {
+      [softDeleteField]: true,
+    });
+  } else {
+    await ctx.db.delete(id);
+  }
 
   return {
     // TODO: FIX THIS
@@ -73,6 +82,8 @@ export const selectRecordsMutation = async (
   props: MutationPropsServer
 ) => {
   const { mutation, viewConfigManager } = props;
+
+  console.warn('selectRecordsMutation', mutation.payload);
 
   if (mutation.type !== 'SELECT_RECORDS') throw new Error('INVALID MUTATION-4');
 

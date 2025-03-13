@@ -16,6 +16,7 @@ export const ListFieldValue = ({
       }}
       onClick={(e) => {
         if (!field) return;
+
         if (
           !field.relation &&
           !field.enum &&
@@ -31,6 +32,8 @@ export const ListFieldValue = ({
           row,
           rect,
         });
+
+        return;
       }}
     >
       {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}

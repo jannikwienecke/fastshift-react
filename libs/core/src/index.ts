@@ -11,3 +11,4 @@ export * from './lib/data-model';
 export * from './lib/schema';
 export * from './lib/types/filter.types';
 export * from './lib/translations';
+export * from './lib/filters';

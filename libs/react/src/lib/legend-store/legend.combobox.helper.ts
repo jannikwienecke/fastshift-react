@@ -1,30 +1,28 @@
 import {
   ComboxboxItem,
   FieldConfig,
-  FieldType,
-  NONE_OPTION,
   NO_GROUPING_FIELD,
   NO_SORTING_FIELD,
   RecordType,
   Row,
-  en,
   getRelationTableName,
   makeNoneOption,
   makeRow,
   makeRowFromField,
   makeRowFromValue,
   t,
+  translateField,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import Fuse from 'fuse.js';
 import { filterUtil, operator } from '../ui-adapter/filter-adapter';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
+import { makeFilterPropsOptions } from './legend.store.derived.filter';
 import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
-import { makeFilterPropsOptions } from './legend.store.derived.filter';
 
 export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed
@@ -39,8 +37,9 @@ export const getViewFieldsOptions = (): MakeComboboxStateProps | null => {
   const query = store$.combobox.query.get();
 
   const viewFields = store$.viewConfigManager.get().getViewFieldList();
+
   filterOptions = viewFields.map((field) => {
-    return makeRowFromValue(field.name, field);
+    return makeRow(field.name, translateField(t, field), field.name, field);
   });
 
   const fuse = new Fuse(filterOptions, {
@@ -63,6 +62,18 @@ export const makeComboboxStateSortingOptions =
 
     let values = [...(props.values || [])];
     values = [...values, makeRowFromField(NO_SORTING_FIELD)];
+
+    const showDeleted = store$.displayOptions.showDeleted.get();
+
+    const softDeleteField =
+      store$.viewConfigManager.viewConfig.mutation.softDeleteField.get();
+
+    values = values.filter((v) => {
+      if (showDeleted) return true;
+      if (v.id === softDeleteField) return false;
+
+      return true;
+    });
 
     return {
       ...props,
@@ -90,6 +101,18 @@ export const makeComboboxStateGroupingOptions =
       });
 
     values = [...values, makeRowFromField(NO_GROUPING_FIELD)];
+
+    const showDeleted = store$.displayOptions.showDeleted.get();
+
+    const softDeleteField =
+      store$.viewConfigManager.viewConfig.mutation.softDeleteField.get();
+
+    values = values.filter((v) => {
+      if (showDeleted) return true;
+      if (v.id === softDeleteField) return false;
+
+      return true;
+    });
 
     return {
       ...props,
@@ -174,7 +197,6 @@ export const makeComboboxStateFilterValuesEnum = (
   });
 
   const filteredValues = fuse.search(query).map((r) => r.item);
-
   const values = query.length ? filteredValues : field.enum.values;
   const enumValues = values.map((v) => makeRowFromValue(v.name, field));
 
@@ -217,7 +239,7 @@ export const makeComboboxStateFilterValuesNumber = (
 ): MakeComboboxStateProps | null => {
   if (field?.type !== 'Number') return null;
 
-  // FEATURE Similiar to how we handle dates, we should have a way to get the options for numbers
+  // FEATURE [LATER] Similiar to how we handle dates, we should have a way to get the options for numbers
   const values = getOptions(store$.combobox.query.get()).map((v) =>
     makeRowFromValue(v.id.toString(), field)
   );

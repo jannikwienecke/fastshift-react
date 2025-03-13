@@ -49,6 +49,7 @@ export const init: StoreFn<'init'> =
         isFetched: false,
         isFetching: true,
       });
+
       store$.views.set(views);
       store$.viewConfigManager.set(viewConfigManager);
       store$.viewFieldsConfig.set(viewFieldsConfig);
@@ -59,6 +60,14 @@ export const init: StoreFn<'init'> =
         .map((field) => field.name);
       store$.displayOptions.viewField.selected.set(viewFields);
       store$.displayOptions.viewField.allFields.set(viewFields);
+
+      store$.displayOptions.showDeleted.set(
+        !!viewConfigManager.viewConfig.query?.showDeleted
+      );
+
+      store$.displayOptions.softDeleteEnabled.set(
+        !!viewConfigManager.viewConfig.mutation?.softDelete
+      );
 
       displayOptionsProps.set({});
 

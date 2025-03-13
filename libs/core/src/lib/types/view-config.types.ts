@@ -34,12 +34,17 @@ export type ViewConfigType<T extends GetTableName = any> =
       };
     };
     query?: {
+      showDeleted?: boolean;
       searchableFields?: SearchableField[];
       indexFields?: IndexField[];
       primarySearchField?: keyof GetTableDataType<T>;
     };
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;
+    };
+    mutation?: {
+      softDelete?: boolean;
+      softDeleteField?: keyof GetTableDataType<T>;
     };
     ui?: {
       list?: {

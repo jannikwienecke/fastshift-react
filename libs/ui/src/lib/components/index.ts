@@ -5,3 +5,4 @@ export * from './dialog';
 export * from './popover';
 export * from './calendar';
 export * from './switch';
+export * from './context-menu';

@@ -1,6 +1,28 @@
 import { observable } from '@legendapp/state';
+import {
+  displayOptionsClose,
+  displayOptionsCloseCombobox,
+  displayOptionsOpen,
+  displayOptionsOpenGrouping,
+  displayOptionsOpenSorting,
+  displayOptionsReset,
+  displayOptionsSelectField,
+  displayOptionsSelectViewField,
+  displayOptionsToggleShowDeleted,
+  displayOptionsToggleShowEmptyGroups,
+  displayOptionsToggleSorting,
+} from './legend-store.fn.displayOptions';
+import {
+  contextMenuClose,
+  contextmenuDeleteRow,
+  contextMenuOpen,
+} from './legend.contextmenu.fn';
+import {
+  deleteRecordMutation,
+  selectRowsMutation,
+  updateRecordMutation,
+} from './legend.mutationts';
 import { DEFAULT_LEGEND_STORE } from './legend.store.constants';
-import { LegendStore } from './legend.store.types';
 import {
   comboboxClose,
   comboboxHandleQueryData,
@@ -27,30 +49,21 @@ import {
   init,
 } from './legend.store.fn.global';
 import {
-  listDeselectRelationField,
-  listSelect,
-  listSelectRelationField,
-} from './legend.store.fn.list';
-import {
-  inputDialogClose,
-  inputDialogSave,
-} from './legend.store.fn.input-dialog';
-import {
   globalFetchMore,
   globalQueryReset,
   globalQueryUpdate,
 } from './legend.store.fn.global-query';
 import {
-  displayOptionsClose,
-  displayOptionsCloseCombobox,
-  displayOptionsOpen,
-  displayOptionsOpenGrouping,
-  displayOptionsOpenSorting,
-  displayOptionsReset,
-  displayOptionsSelectField,
-  displayOptionsSelectViewField,
-  displayOptionsToggleShowEmptyGroups,
-} from './legend-store.fn.displayOptions';
+  inputDialogClose,
+  inputDialogSave,
+} from './legend.store.fn.input-dialog';
+import {
+  listContextMenuItem,
+  listDeselectRelationField,
+  listSelect,
+  listSelectRelationField,
+} from './legend.store.fn.list';
+import { LegendStore } from './legend.store.types';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -66,6 +79,7 @@ export const store$ = observable<LegendStore>({
   globalFetchMore: (...props) => globalFetchMore(store$)(...props),
   //   list methods
   selectListItem: (...props) => listSelect(store$)(...props),
+  onContextMenuListItem: (...props) => listContextMenuItem(store$)(...props),
   deselectRelationField: (...props) =>
     listDeselectRelationField(store$)(...props),
   comboboxClose: (...props) => comboboxClose(store$)(...props),
@@ -102,6 +116,8 @@ export const store$ = observable<LegendStore>({
   displayOptionsClose: (...props) => displayOptionsClose(store$)(...props),
   displayOptionsOpenSorting: (...props) =>
     displayOptionsOpenSorting(store$)(...props),
+  displayOptionsToggleSorting: (...props) =>
+    displayOptionsToggleSorting(store$)(...props),
   displayOptionsSelectField: (...props) =>
     displayOptionsSelectField(store$)(...props),
   displayOptionsOpenGrouping: (...props) =>
@@ -112,5 +128,15 @@ export const store$ = observable<LegendStore>({
     displayOptionsSelectViewField(store$)(...props),
   displayOptionsToggleShowEmptyGroups: (...props) =>
     displayOptionsToggleShowEmptyGroups(store$)(...props),
+  displayOptionsToggleShowDeleted: (...props) =>
+    displayOptionsToggleShowDeleted(store$)(...props),
   displayOptionsReset: (...props) => displayOptionsReset(store$)(...props),
+
+  contextMenuOpen: (...props) => contextMenuOpen(store$)(...props),
+  contextMenuClose: (...props) => contextMenuClose(store$)(...props),
+  contextmenuDeleteRow: (...props) => contextmenuDeleteRow(store$)(...props),
+
+  selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
+  updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
+  deleteRecordMutation: (...props) => deleteRecordMutation(store$)(...props),
 });

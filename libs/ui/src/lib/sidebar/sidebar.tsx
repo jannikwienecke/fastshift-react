@@ -1,4 +1,3 @@
-'use client';
 import { Link } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { createContext, useContext, useState } from 'react';
@@ -177,8 +176,6 @@ export const SidebarLink = ({
 }) => {
   const { open, animate } = useSidebar();
   return (
-    // BUG: FIX ME: Must support any kind of link
-    // e.g. Next.js Link, React Router Link, etc.
     <Link
       to={link.href ?? ''}
       className={cn(

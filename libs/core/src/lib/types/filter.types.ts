@@ -1,5 +1,5 @@
 import { Row } from '../data-model';
-import { FieldConfig } from './base.types';
+import { FieldConfig, RecordType } from './base.types';
 
 type Icon = React.FC<any>;
 export type FilterOperatorType = {
@@ -34,6 +34,32 @@ export type FilterRelationType = {
 
 export type FilterType = FilterRelationType | FilterPrimitiveType;
 
+export type ContextMenuState = {
+  rect: DOMRect | null;
+  row: Row | null;
+};
+
+export type ContextMenuFieldItem = {
+  options: Row[] | null;
+  selected: Row[] | null;
+  noneOptionRow: Row | null;
+  value: Row;
+  Icon?: Icon;
+  onSelectOption: (row: Row) => Promise<void>;
+  onCheckOption: (row: Row) => Promise<void>;
+} & FieldConfig;
+
+export type ContextMenuUiOptions = {
+  isOpen?: boolean;
+  onClose: () => void;
+  onDelete: () => void;
+  fields: ContextMenuFieldItem[] | null;
+  renderOption: (row: Row, field: ContextMenuFieldItem) => JSX.Element;
+  renderField: (field: ContextMenuFieldItem) => JSX.Element;
+  modelName: string;
+  isDeleted?: boolean;
+} & ContextMenuState;
+
 // export type
 export type DisplayOptionsUiType = {
   isOpen: boolean;
@@ -41,6 +67,8 @@ export type DisplayOptionsUiType = {
   viewType: {
     type: 'list' | 'board';
   };
+  showDeleted: boolean;
+  softDeleteEnabled: boolean;
   sorting: {
     isOpen: boolean;
     field?: FieldConfig;
@@ -66,6 +94,7 @@ export type FilterItemType = {
   operator: string;
   value: string;
   name: string;
+  moreThanOneSelected: boolean;
 };
 // format to send the filters to the backend
 // i need to send the FilterType[] to the backend. Pls suggest a format and a function to convert the FilterType[] to the format
