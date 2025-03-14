@@ -25,8 +25,6 @@ export const convexSortRows = (
     field.name
   ).displayField.field;
 
-  console.log('sorting', field.name, order);
-
   rows.sort((a, b) => {
     const aField = a[field?.name];
     const bField = b[field?.name];

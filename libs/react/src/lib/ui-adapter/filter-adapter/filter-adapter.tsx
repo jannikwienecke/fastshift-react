@@ -36,7 +36,6 @@ export const makeFilterProps = <T extends RecordType>(
 ): FilterProps => {
   makeFilterPropsOptions.set(options);
 
-  // console.log(store$.get());
   return {
     onOpen: store$.filterOpen,
     filters: filterItems$.get(),

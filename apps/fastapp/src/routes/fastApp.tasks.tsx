@@ -7,6 +7,7 @@ import { getQueryKey } from '../query-client';
 import { DefaultViewTemplate } from '../views/default-view-template';
 import { TaskViewDataType } from '../views/tasks.components';
 import { viewFieldsConfig } from '../views/tasks.viewfieldsConfig';
+import React from 'react';
 
 const Task = observer(() => {
   const { makeInputDialogProps } = makeHooks<TaskViewDataType>();

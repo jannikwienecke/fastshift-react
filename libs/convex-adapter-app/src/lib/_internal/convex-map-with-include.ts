@@ -43,7 +43,6 @@ export const mapWithInclude = async (
         const { fn, key } = await handleIncludeField(props);
         let include: ConvexRecord | ConvexRecord[] | null = await fn();
 
-        //
         if (view.mutation?.softDelete) {
           include = Array.isArray(include)
             ? include.filter(
@@ -174,6 +173,27 @@ export const getManyToManyRecords = async (props: HelperProps) => {
 
   if (!fieldNameManyToMany || !fieldNameRelation) {
     throw new Error('Many to many field name not found');
+  }
+
+  const recursive = field.name === fieldNameManyToMany;
+
+  if (recursive && recordWithoutRelations[field.name]) {
+    const ids = recordWithoutRelations[field.name] ?? [];
+
+    const relationalRecords = await asyncMap(ids, async (id) => {
+      const value = await queryClient(ctx, field.name)
+        .withIndex('by_id', (q) => q.eq('_id', id))
+        .first();
+
+      return {
+        id: value?._id,
+        ...value,
+      } as ConvexRecord;
+    });
+
+    return relationalRecords;
+  } else if (recursive) {
+    return null;
   }
 
   let records = await getRelationTableRecords({

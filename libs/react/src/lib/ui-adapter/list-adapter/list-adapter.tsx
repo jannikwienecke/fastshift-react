@@ -138,7 +138,9 @@ export const makeListProps = <T extends RecordType = RecordType>(
             relation: field.relation && {
               ...field.relation,
             },
-            render: () => <ListFieldValue field={field} row={row} />,
+            render: () => {
+              return <ListFieldValue field={field} row={row} />;
+            },
           };
         }) ?? []
     );

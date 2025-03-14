@@ -147,8 +147,6 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
       onError?.(error.message);
 
       renderErrorToast('error.deleteRecord', () => {
-        console.log('Undo action triggered');
-        console.log(error);
         store$.errorDialog.error.set(error);
       });
     } else {

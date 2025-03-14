@@ -24,6 +24,10 @@ export const todos = server.query({
       .query('tasks')
       .withIndex('deleted', (q) => q.eq('deleted', false));
 
+    // const res = await ctx.db.query('tasks').withIndex("by_id")
+
+    // await ctx.db.query('tasks').withIndex('tasks', q => q.eq('tasks', ''))
+
     return result;
   },
 });

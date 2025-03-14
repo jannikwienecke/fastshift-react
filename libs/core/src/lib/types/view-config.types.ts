@@ -1,6 +1,5 @@
 import {
   FieldConfig,
-  FieldType,
   GetTableDataType,
   GetTableName,
   IndexField,
@@ -23,7 +22,7 @@ export type ViewConfigType<T extends GetTableName = any> =
   ViewConfigBaseInfo<T> & {
     _generated?: boolean;
     viewFields: ViewFieldConfig;
-    includeFields: IncludeConfig[string];
+    includeFields: IncludeConfig<keyof GetTableDataType<T>>[string];
     displayField: {
       field: keyof GetTableDataType<T>;
       cell?: (value: GetTableDataType<T>) => React.ReactNode;

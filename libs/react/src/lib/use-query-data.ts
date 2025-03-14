@@ -20,7 +20,6 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   'dataModel' | 'relationalDataModel'
 > => {
   const { data, relationalData, continueCursor, isDone } = useQuery();
-
   const dataModel = store$.dataModel.get() as DataModelNew<QueryReturnType>;
   const relationalDataModel = store$.relationalDataModel.get();
 
@@ -42,7 +41,6 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   }, [reset]);
 
   React.useEffect(() => {
-    // observe(reset$, () => {
     const { isFetching, reset } = store$.fetchMore.get();
 
     if (data === undefined) return;

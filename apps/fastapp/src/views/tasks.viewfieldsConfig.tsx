@@ -18,6 +18,23 @@ export const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>(
   'tasks',
   {
     fields: {
+      tasks: {
+        component: {
+          list: (props) => {
+            const tasks = props.data.tasks;
+
+            return (
+              <div>
+                {tasks?.map((task, index) => (
+                  <div key={index}>
+                    <span>{task.name}</span>
+                  </div>
+                ))}
+              </div>
+            );
+          },
+        },
+      },
       tags: {
         component: {
           list: TagsComponent,

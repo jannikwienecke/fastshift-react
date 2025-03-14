@@ -1,12 +1,8 @@
 import {
   GetTableName,
-  ViewConfigType,
-  ViewConfigBaseInfo,
   GlobalConfig,
-  t,
-  ViewFieldConfig,
-  renderModelName,
-  BaseViewConfigManager,
+  ViewConfigBaseInfo,
+  ViewConfigType,
 } from '@apps-next/core';
 
 export function createViewConfig<T extends GetTableName>(

@@ -53,7 +53,7 @@ export const deleteMutation = async (
     errorMsg = `Error soft deleting record. softDeleteField=${softDeleteField.toString()} ID="${id}:`;
     mutationFn = () =>
       ctx.db.patch(mutation.payload.id, {
-        [softDeleteField]: true + '12',
+        [softDeleteField]: true,
       });
   } else {
     errorMsg = `Error deleting record. ID="${id}:`;

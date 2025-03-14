@@ -26,13 +26,6 @@ import { ConvexRecordType } from './types.convex';
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { viewConfigManager, filters, registeredViews } = args;
 
-  const isProject = viewConfigManager?.getTableName() === 'tasks';
-
-  const log = (...args: any[]) => {
-    if (!isProject) return;
-    console.log('___: ', ...args);
-  };
-
   const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
 
   const _indexFields = viewConfigManager.getIndexFields();
@@ -228,12 +221,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   rows.push(...filtered);
 
-  const rawData = await mapWithInclude(
-    // allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition),
-    rows,
-    ctx,
-    args
-  );
+  const rawData = await mapWithInclude(rows, ctx, args);
 
   let sortedRows = convexSortRows(rawData, args, displayOptionsInfo);
 

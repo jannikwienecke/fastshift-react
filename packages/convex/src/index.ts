@@ -32,7 +32,7 @@ export const tasksConfig = createViewConfig(
       // dueDate (date with upper case D -> Due Date)
       dueDate: { isDateField: true },
     },
-    includeFields: ['tags'],
+    includeFields: ['tags', 'tasks'],
     query: {
       showDeleted: false,
       primarySearchField: 'name',

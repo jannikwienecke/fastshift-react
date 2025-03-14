@@ -17,6 +17,6 @@ export const useViewOf = (tableName: GetTableName) => {
     (v) => v?.tableName === tableName
   );
 
-  if (!view) throw new Error(`No View For ${tableName.toString()} found`);
+  if (!view) throw new Error(`No View For "${tableName.toString()}" found`);
   return view as ViewConfigType;
 };

@@ -24,7 +24,10 @@ created: 1723444498044
 - [x] fix github actions: all e2e run
 - [x] handling mutation return types
 - [x] add sonner for alerts
-- [ ] implement default / fallback component
+- [x] implement default / fallback component
+- [ ] add test for deleting a task
+- [ ] task has sub-tasks
+- [ ] task has sub-tasks-filtering
 
 ## How we handle Deletes with soft delete
 

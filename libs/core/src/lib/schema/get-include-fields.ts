@@ -8,8 +8,9 @@ export const generateIncludeFields = (modelSchema: ModelSchema) => {
         const { isIdField, relation, isManyToManyRelation, isList } =
           schemaHelper(fieldData, model, modelSchema);
 
-        if (isIdField || !relation || isManyToManyRelation || isList)
+        if (isIdField || !relation || isManyToManyRelation || isList) {
           return null;
+        }
 
         return relation.tableName;
       })

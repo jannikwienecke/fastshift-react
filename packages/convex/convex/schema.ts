@@ -36,10 +36,12 @@ const _schema = defineSchema({
     ),
     deleted: v.optional(v.boolean()),
     dueDate: v.optional(v.number()),
+    tasks: v.optional(v.union(v.array(v.id('tasks')), v.null())),
   })
     .index('projectId', ['projectId'])
     .index('dueDate', ['dueDate'])
     .index('name', ['name'])
+    .index('tasks', ['tasks'])
     .index('deleted', ['deleted'])
     .searchIndex('name_search', {
       searchField: 'name',

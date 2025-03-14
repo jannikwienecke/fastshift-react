@@ -1,4 +1,4 @@
-import { Projects, Tags } from '@apps-next/convex';
+import { Projects, Tags, Tasks } from '@apps-next/convex';
 import {
   DataType,
   FieldConfig,
@@ -14,6 +14,7 @@ export type TaskViewDataType = DataType<
   {
     projects: Projects;
     tags?: Tags[];
+    tasks?: Tasks[];
   }
 >;
 

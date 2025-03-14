@@ -676,9 +676,18 @@ const init = server.mutation({
       },
     ];
 
+    let firstTaskId: Id<'tasks'> | undefined;
+    let hasSetSubTask = false;
     let taskId: Id<'tasks'> | undefined;
     for (let i = 0; i < taskData.length; i++) {
       const task = taskData[i];
+
+      let tasks: Id<'tasks'>[] | null = null;
+
+      if (firstTaskId && !hasSetSubTask) {
+        console.log({ firstTaskId });
+        tasks = [firstTaskId];
+      }
 
       if (task) {
         taskId = await ctx.db.insert('tasks', {
@@ -690,7 +699,16 @@ const init = server.mutation({
           dueDate: task.dueDate,
           subtitle: task.subtitle,
           deleted: false,
+          tasks,
         });
+
+        if (!hasSetSubTask && firstTaskId) {
+          hasSetSubTask = true;
+        }
+
+        if (!firstTaskId) {
+          firstTaskId = taskId;
+        }
       }
 
       // Add tags to each task (0 to 4 tags)

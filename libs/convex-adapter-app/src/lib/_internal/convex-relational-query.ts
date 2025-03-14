@@ -54,7 +54,6 @@ export const handleRelationalTableQuery = async ({
     }
 
     if (searchFields.length && args.query) {
-      console.log('WITH SEARCH', rowIdsNotDeleted);
       return await withSearch(dbQuery, {
         searchFields,
         query: args.query,

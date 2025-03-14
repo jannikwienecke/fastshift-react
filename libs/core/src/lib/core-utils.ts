@@ -35,11 +35,11 @@ export const makeQueryKey = ({
   filters,
   displayOptions,
 }: {
-  viewName: string | undefined;
-  query?: string | undefined;
-  relation?: string | undefined;
-  filters?: string | undefined;
-  displayOptions?: string | undefined;
+  viewName: string;
+  query: string | null;
+  relation: string | null;
+  filters: string | null;
+  displayOptions: string | null;
 }) => {
   return [
     QUERY_KEY_PREFIX,
@@ -247,7 +247,7 @@ export const getViewByName = (views: RegisteredViews, name: string) => {
 
   if (!viewConfigByTableName) {
     console.error(views, name);
-    throw new Error(`No View For ${name} found`);
+    throw new Error(`No View For "${name}" found`);
   }
 
   return viewConfigByTableName;
@@ -261,14 +261,6 @@ export const makeDayMonthString = (date: Date) => {
 
   return formatter.format(date);
 };
-
-// export const renderField = (field: string, t: TFunction) => {
-//   console.log(field);
-//   let nameToRender = t(`viewFields.${field}.label`);
-//   nameToRender = nameToRender.includes('viewFields.') ? t(field) : nameToRender;
-
-//   return nameToRender;
-// };
 
 export const renderModelName = (
   modelName: string,
