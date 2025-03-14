@@ -677,15 +677,14 @@ const init = server.mutation({
     ];
 
     let firstTaskId: Id<'tasks'> | undefined;
-    let hasSetSubTask = false;
+    let count = 0;
     let taskId: Id<'tasks'> | undefined;
     for (let i = 0; i < taskData.length; i++) {
       const task = taskData[i];
 
       let tasks: Id<'tasks'>[] | null = null;
 
-      if (firstTaskId && !hasSetSubTask) {
-        console.log({ firstTaskId });
+      if (firstTaskId && count <= 1) {
         tasks = [firstTaskId];
       }
 
@@ -702,8 +701,8 @@ const init = server.mutation({
           tasks,
         });
 
-        if (!hasSetSubTask && firstTaskId) {
-          hasSetSubTask = true;
+        if (count <= 1 && firstTaskId) {
+          count++;
         }
 
         if (!firstTaskId) {

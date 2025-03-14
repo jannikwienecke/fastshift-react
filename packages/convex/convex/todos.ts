@@ -1,14 +1,22 @@
 import { paginationOptsValidator } from 'convex/server';
 import * as server from './_generated/server';
 import { Aggregate } from '@convex-dev/aggregate';
+import { Id } from './_generated/dataModel';
 
-export const generateTodos = server.mutation({
+export const test = server.mutation({
   async handler(ctx, args) {
-    for (let i = 0; i < 1000; i++) {
-      await ctx.db.insert('todos', {
-        name: `Todo ${i + 1}`,
-      });
-    }
+    // [CONVEX M(query:viewMutation)] [LOG] {
+    //   tableFieldName: 'projectId',
+    //   fieldNameRelationTable: 'tasks',
+    //   manyToManyTable: 'tasks',
+    //   newIds: [ 'jh78cgz4xwtkxrthtm485df5f17c3999' ]
+    // }
+
+    // ctx.db.query("tasks").withIndex('by_id', q => q.eq('_id'))
+
+    await ctx.db.patch('jh78cgz4xwtkxrthtm485df5f17c3999' as Id<'tasks'>, {
+      tasks: ['jh78cgz4xwtkxrthtm485df5f17c3999' as Id<'tasks'>],
+    });
   },
 });
 

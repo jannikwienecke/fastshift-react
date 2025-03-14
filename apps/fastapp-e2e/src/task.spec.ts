@@ -305,7 +305,7 @@ test.describe('Task management', () => {
 
     await taskPage.removeFilter('projects');
 
-    await expect(page.getByText(/design mockups/i)).toBeVisible();
+    await expect(page.getByText(/design mockups/i).first()).toBeVisible();
 
     await page
       .getByText(/website redesign/i)

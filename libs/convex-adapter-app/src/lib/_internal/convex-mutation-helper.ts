@@ -4,7 +4,7 @@ import {
   MutationPropsServer,
 } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
-import { mutationClient } from './convex-client';
+import { mutationClient, queryClient } from './convex-client';
 import { getRelationTableRecords } from './convex-get-relation-table-records';
 import { GenericMutationCtx } from './convex.server.types';
 import { ConvexRecordType, ID } from './types.convex';
@@ -15,11 +15,33 @@ export const deleteIds = async (
   ctx: GenericMutationCtx,
   field: FieldConfig
 ) => {
+  if (!ids || ids.length === 0) return;
+
   const tableFieldName = getTableFieldName(viewConfigManager, field);
   const fieldNameRelationTable = getRelationTableFieldName(field);
 
+  if (field.isRecursive && tableFieldName) {
+    const client = queryClient(ctx, field.name);
+
+    const record = await client
+      .withIndex('by_id', (q) => q.eq('_id', mutation.payload.id))
+      .first();
+
+    const existingIds = record[tableFieldName] as ID[];
+    const after = existingIds.filter(
+      (existingId: ID) => !ids.includes(existingId)
+    );
+
+    await ctx.db.patch(mutation.payload.id, {
+      [tableFieldName]: after,
+    });
+
+    return;
+  }
+
   await asyncMap(ids, async (id) => {
-    if (!fieldNameRelationTable && tableFieldName) {
+    if (field.relation?.type === 'oneToMany' && tableFieldName) {
+      console.log('ONE TO MANY');
       await ctx.db.patch(id, { [tableFieldName]: undefined });
     } else if (fieldNameRelationTable && tableFieldName) {
       const records = await getRelationTableRecords({
@@ -48,10 +70,26 @@ export const insertIds = async (
   field: FieldConfig
 ) => {
   const tableFieldName = getTableFieldName(viewConfigManager, field);
-  const fieldNameRelationTable = getRelationTableFieldName(field);
+  if (!ids || ids.length === 0) return;
+
+  if (field.isRecursive && tableFieldName) {
+    const client = queryClient(ctx, field.name);
+
+    const record = await client
+      .withIndex('by_id', (q) => q.eq('_id', mutation.payload.id))
+      .first();
+
+    const existingIds = record[tableFieldName] as ID[];
+
+    await ctx.db.patch(mutation.payload.id, {
+      [tableFieldName]: [...existingIds, ...ids],
+    });
+
+    return;
+  }
 
   await asyncMap(ids, async (value) => {
-    if (!fieldNameRelationTable && tableFieldName) {
+    if (field.relation?.type === 'oneToMany' && tableFieldName) {
       await ctx.db.patch(value, { [tableFieldName]: mutation.payload.id });
     } else if (field.relation?.manyToManyTable) {
       await mutationClient(ctx).insert(

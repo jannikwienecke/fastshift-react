@@ -16,7 +16,7 @@ const Task = observer(() => {
     <DefaultViewTemplate<TaskViewDataType>
       listOptions={{
         fieldsLeft: ['name', 'projects', 'dueDate'],
-        fieldsRight: ['tags', 'completed', 'priority'],
+        fieldsRight: ['tags', 'completed', 'priority', 'tasks'],
       }}
       filterOptions={{
         hideFields: ['subtitle'],

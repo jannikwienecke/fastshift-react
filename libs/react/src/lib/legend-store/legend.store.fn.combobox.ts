@@ -20,8 +20,9 @@ import {
   newSelected$,
   removedSelected$,
 } from './legend.combobox.helper';
-import { LegendStore, StoreFn } from './legend.store.types';
+import { ignoreNewData$ } from './legend.mutationts';
 import { comboboxStore$ } from './legend.store.derived.combobox';
+import { LegendStore, StoreFn } from './legend.store.types';
 
 export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   store$.deselectRelationField();
@@ -145,11 +146,10 @@ export const comboboxHandleQueryData: StoreFn<'comboboxHandleQueryData'> =
     store$.combobox.values.set(dataModel.rows);
   };
 
-let timeout: NodeJS.Timeout | null = null;
 let runningMutation = false;
 
 export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
-  (store$) => (value, newSelected) => {
+  (store$) => async (value, newSelected) => {
     const runMutation = store$.api?.mutateAsync;
 
     const selected = store$.combobox.selected.get();
@@ -208,87 +208,79 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
       ? dateValueToUpdate
       : newSelected.raw;
 
-    if (!runningMutation) {
-      // only run a optimisic update if we are not already running a mutation
-      updateDataModel(store$, valueToUpdate);
+    updateDataModel(store$, valueToUpdate);
+
+    if (!field) return;
+
+    let _valueToUpdate =
+      dateValueToUpdate !== undefined
+        ? dateValueToUpdate
+        : !field.relation
+        ? value.raw
+        : value.id;
+
+    if (_valueToUpdate === NONE_OPTION) {
+      _valueToUpdate = null;
     }
 
-    if (timeout) {
-      clearTimeout(timeout);
-      timeout = null;
+    let mutation: Mutation | undefined = undefined;
+    if (isManyToManyRelation) {
+      const { idsToDelete, newIds } = getIds(store$, selected);
+
+      if (isManyToManyRelation) {
+        const updatedRow = {
+          ...store$.list.selectedRelationField.row.raw.get(),
+          [field.name]: store$.dataModel.rows
+            .get()
+            ?.find((r) => r.id === row.id)?.raw?.[field.name],
+        };
+
+        // also update for non many to many relations
+        store$.list.selectedRelationField.row.raw.set(updatedRow);
+      }
+
+      mutation = {
+        type: 'SELECT_RECORDS',
+        payload: {
+          id: row.id,
+          table: getRelationTableName(field),
+          idsToDelete,
+          newIds,
+        },
+      };
+    } else {
+      mutation = {
+        type: 'UPDATE_RECORD',
+        payload: {
+          id: row.id,
+          record: {
+            [field.relation?.fieldName ?? field.name]: _valueToUpdate,
+          },
+        },
+      };
     }
+    if (!mutation) return;
+    try {
+      if (runningMutation) {
+        ignoreNewData$.set((prev) => prev + 1);
+      }
 
-    timeout = setTimeout(
-      async () => {
-        if (!field) return;
+      runningMutation = true;
 
-        let valueToUpdate =
-          dateValueToUpdate !== undefined
-            ? dateValueToUpdate
-            : !field.relation
-            ? value.raw
-            : value.id;
+      const result = await runMutation({
+        mutation: mutation,
+        viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+        query: store$.globalQuery.get(),
+      });
 
-        if (valueToUpdate === NONE_OPTION) {
-          valueToUpdate = null;
-        }
-
-        let mutation: Mutation | undefined = undefined;
-        if (isManyToManyRelation) {
-          const { idsToDelete, newIds } = getIds(store$, selected);
-          mutation = {
-            type: 'SELECT_RECORDS',
-            payload: {
-              id: row.id,
-              table: getRelationTableName(field),
-              idsToDelete,
-              newIds,
-            },
-          };
-        } else {
-          mutation = {
-            type: 'UPDATE_RECORD',
-            payload: {
-              id: row.id,
-              record: {
-                [field.relation?.fieldName ?? field.name]: valueToUpdate,
-              },
-            },
-          };
-        }
-        if (!mutation) return;
-        try {
-          runningMutation = true;
-
-          const result = await runMutation({
-            mutation: mutation,
-            viewName: store$.viewConfigManager.viewConfig.viewName.get(),
-            query: store$.globalQuery.get(),
-          });
-
-          if (result.error) {
-            removedSelected$.set([]);
-            newSelected$.set([]);
-            initSelected$.set(null);
-          }
-
-          if (isManyToManyRelation) {
-            const updatedRow = {
-              ...store$.list.selectedRelationField.row.raw.get(),
-              [field.name]: store$.dataModel.rows
-                .get()
-                ?.find((r) => r.id === row.id)?.raw?.[field.name],
-            };
-
-            // also update for non many to many relations
-            store$.list.selectedRelationField.row.raw.set(updatedRow);
-          }
-        } finally {
-          runningMutation = false;
-        }
-      },
-      isManyToManyRelation ? 1000 : 0
-    );
+      if (result.error) {
+        removedSelected$.set([]);
+        newSelected$.set([]);
+        initSelected$.set(null);
+      }
+    } finally {
+      runningMutation = false;
+    }
   };
 
 export const getSelectedId = (selected: Row | Row[]) => {

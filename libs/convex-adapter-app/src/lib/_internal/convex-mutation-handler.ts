@@ -125,11 +125,9 @@ export const selectRecordsMutation = async (
 
   const field = viewConfigManager.getFieldBy(table);
 
-  const promiseDeleteIds = deleteIds(idsToDelete as ID[], props, ctx, field);
-  const promiseInsertIds = insertIds(newIds as ID[], props, ctx, field);
-
   try {
-    await Promise.all([promiseDeleteIds, promiseInsertIds]);
+    await insertIds(newIds as ID[], props, ctx, field);
+    await deleteIds(idsToDelete as ID[], props, ctx, field);
   } catch (error) {
     return {
       status: ERROR_STATUS.INTERNAL_SERVER_ERROR,

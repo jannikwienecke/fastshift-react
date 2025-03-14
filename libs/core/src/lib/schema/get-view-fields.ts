@@ -69,6 +69,7 @@ const parseFields = (
             }
           : undefined,
         isList,
+        isRecursive: fieldData.isRecursive,
       } satisfies FieldConfig,
     ];
   });

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { store$ } from '..';
 import { useApi } from './use-api';
 import { reset$ } from './use-query-data';
+
 export const useMutation = () => {
   const api = useApi();
   const queryClient = useQueryClient();
@@ -25,16 +26,18 @@ export const useMutation = () => {
       });
     },
     onSuccess: () => {
+      store$.fetchMore.reset.set(true);
+
       setTimeout(() => {
         reset$.set({ value: reset$.get().value + 1 });
-      }, 500);
+      }, 300);
     },
 
     onError: () => {
       setTimeout(() => {
         queryClient.invalidateQueries();
         reset$.set({ value: reset$.get().value + 1 });
-      }, 500);
+      }, 300);
     },
 
     onMutate: async (vars) => {

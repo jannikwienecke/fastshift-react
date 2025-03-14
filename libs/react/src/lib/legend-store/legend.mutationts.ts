@@ -14,7 +14,7 @@ import { LegendStore, StoreFn } from './legend.store.types';
 const checkedRows$ = observable<Row[]>([]);
 const idsToDelete$ = observable<string[]>([]);
 const isRunning$ = observable(false);
-export const ignoreNewData$ = observable(false);
+export const ignoreNewData$ = observable(0);
 
 export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   (store$) =>
@@ -51,8 +51,10 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
     });
 
     if (isRunning$.get()) {
-      ignoreNewData$.set(true);
+      ignoreNewData$.set((prev) => prev + 1);
+      return;
     }
+
     isRunning$.set(true);
 
     const mutation: Mutation = {
@@ -64,7 +66,6 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
         newIds: checkedRows$.get().map((r) => r.id),
       },
     };
-    console.warn('Mutation payload:', mutation);
 
     const { error } = await store$.api.mutateAsync({
       mutation,
