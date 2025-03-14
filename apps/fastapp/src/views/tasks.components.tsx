@@ -1,5 +1,3 @@
-'use client';
-
 import { Projects, Tags } from '@apps-next/convex';
 import {
   DataType,
@@ -51,11 +49,9 @@ export const PriorityListItemComponent = (props: {
   return <PriorityComponent priority={priority} />;
 };
 
-export const PriorityComponentCombobox = (props: {
-  data: TaskViewDataType['priority'];
-}) => {
-  const priority = priorityMap[props.data];
-
+export const PriorityComponentCombobox = (props: { data: string }) => {
+  const priority =
+    priorityMap[String(props.data) as unknown as TaskViewDataType['priority']];
   return <PriorityComponent priority={priority} showLabel={true} />;
 };
 

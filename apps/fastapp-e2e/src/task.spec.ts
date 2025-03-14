@@ -79,13 +79,11 @@ test.describe('Task management', () => {
   });
 
   test('can change the priority of a task', async ({ taskPage, page }) => {
-    const firstListItem = await taskPage.getListItem(5);
+    const firstListItem = await taskPage.getListItem(0);
 
-    await firstListItem.getByText('🟢').click();
+    await firstListItem.getByTestId('priority-none').click();
 
-    await expect(taskPage.comboboxPopover.getByText('🟡')).toBeVisible();
-
-    await taskPage.comboboxPopover.getByText('🟡').click();
+    await taskPage.comboboxPopover.getByTestId('priority-urgent').click();
 
     // close popover by clicking /assign launch/i
     await page
@@ -93,8 +91,8 @@ test.describe('Task management', () => {
       .first()
       .click({ force: true });
 
-    await expect(firstListItem.getByText('🟡')).toBeVisible();
-    await expect(firstListItem.getByText('🟢')).toBeHidden();
+    await expect(firstListItem.getByTestId('priority-urgent')).toBeVisible();
+    await expect(firstListItem.getByTestId('priority-none')).toBeHidden();
   });
 
   test('can change the completed status of a task', async ({ taskPage }) => {
@@ -172,15 +170,16 @@ test.describe('Task management', () => {
 
     await taskPage.filterButton.click();
     await taskPage.comboboxPopover.getByText(/priority/i).click();
-    await taskPage.comboboxPopover.getByText(/🟡/i).click();
+    await taskPage.comboboxPopover.getByTestId(/priority-low/i).click();
     await page.getByText('tasks').first().click({ force: true });
 
-    await expect(page.getByText(/🟢/i).first()).toBeHidden();
+    await expect(page.getByTestId('priority-high').first()).toBeHidden();
 
-    await taskPage.filterList.getByText(/medium/i).click();
-    await taskPage.comboboxPopover.getByText(/🟢/i).click();
+    await taskPage.filterList.getByText(/low/i).click();
+    await taskPage.comboboxPopover.getByTestId(/priority-low/i).click();
+    await taskPage.comboboxPopover.getByTestId(/priority-high/i).click();
     await page.getByText('tasks').first().click({ force: true });
-    await expect(page.getByText(/🟢/i).first()).toBeVisible();
+    await expect(page.getByTestId('priority-high').first()).toBeVisible();
   });
 
   test('can filter tasks by due date', async ({ taskPage, page }) => {
@@ -332,9 +331,8 @@ test.describe('Task management', () => {
     await firstListItem.locator('div').first().click({ force: true });
     await expect(firstListItem.getByText(/website redesign/i)).toBeVisible();
     await expect(firstListItem.getByText(/important/i)).toBeHidden();
-    // 🟡
-    // 🟢
-    await expect(firstListItem.getByText(/🟡/i)).toBeHidden();
+
+    await expect(firstListItem.getByTestId('priority-none')).toBeVisible();
 
     // right click on the first list item
     await firstListItem
@@ -370,8 +368,8 @@ test.describe('Task management', () => {
       .click({ force: true, button: 'right' });
     await expect(taskPage.contextmenu).toBeVisible();
     await taskPage.contextmenu.getByText(/priority/i).click();
-    await taskPage.contextmenu.getByText(/🟡/i).click();
-    await expect(firstListItem.getByText(/🟡/i)).toBeVisible();
+    await taskPage.contextmenu.getByTestId('priority-urgent').click();
+    await expect(firstListItem.getByTestId('priority-urgent')).toBeVisible();
   });
 });
 

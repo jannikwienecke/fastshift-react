@@ -64,7 +64,7 @@ const viewFieldsConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
     },
     owner: {
       component: {
-        combobox: ({ data }) => {
+        comboboxListValue: ({ data }) => {
           return <>{data?.firstname + ' ' + data.lastname}</>;
         },
         list: ({ data }) => {

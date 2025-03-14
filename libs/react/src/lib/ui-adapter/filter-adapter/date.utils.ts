@@ -655,7 +655,6 @@ export const dateUtils = {
   ): FilterDateType | null => {
     return DateOptionParser.parse(option, operator);
   },
-
   getStartAndEndDate: (dateFilter: FilterDateType | null | undefined) => {
     return DateCalculator.getStartAndEndDate(dateFilter);
   },

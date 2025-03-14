@@ -13,7 +13,7 @@ export const ComboboxFieldValue = ({
 
   const fieldName = field?.name;
 
-  const componentType = 'combobox';
+  const componentType = 'comboboxListValue';
   let ComponentToRender: React.ComponentType<any> | undefined = undefined;
 
   if (fieldName) {

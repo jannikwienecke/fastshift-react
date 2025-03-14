@@ -3,7 +3,7 @@ import { FieldConfig, GetTableName, RecordType } from './types';
 export type ComponentType =
   | 'default'
   | 'list'
-  | 'combobox'
+  | 'comboboxListValue'
   | 'contextmenuFieldItem'
   | 'contextmenuFieldOption'
   // | 'filterValue'
@@ -24,8 +24,14 @@ export type ViewFieldsConfig<
 
           list: (props: { data: U }) => React.ReactNode;
 
-          combobox: (props: {
-            data: U[key] extends Array<unknown> ? U[key][0] : U[key];
+          comboboxListValue: (props: {
+            data: U[key] extends Array<unknown>
+              ? U[key][0]
+              : U[key] extends RecordType
+              ? U[key]
+              : U[key] extends boolean
+              ? boolean
+              : string;
           }) => React.ReactNode;
 
           contextmenuFieldItem: (props: {
@@ -36,11 +42,21 @@ export type ViewFieldsConfig<
             // data: U[key] extends Array<unknown> ? U[key][0] : U[key];
             data: NonNullable<U[key]> extends Array<any>
               ? NonNullable<U[key]>[0]
-              : U[key];
+              : U[key] extends RecordType
+              ? U[key]
+              : U[key] extends boolean
+              ? boolean
+              : string;
           }) => React.ReactNode;
 
           default: (props: {
-            data: U[key] extends Array<unknown> ? U[key][0] : U[key];
+            data: NonNullable<U[key]> extends Array<any>
+              ? NonNullable<U[key]>[0]
+              : U[key] extends RecordType
+              ? U[key]
+              : U[key] extends boolean
+              ? boolean
+              : string;
           }) => React.ReactNode;
         }>;
       };

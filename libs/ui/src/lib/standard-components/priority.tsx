@@ -46,7 +46,10 @@ export const PriorityComponent = (props: PriorityProps) => {
   const label = PRIORITY_LABEL[priority as keyof typeof PRIORITY_LABEL];
 
   return (
-    <div className="flex items-center gap-3">
+    <div
+      className="flex items-center gap-3"
+      data-testid={`priority-${priority}`}
+    >
       {priority === 'urgent' ? (
         <div className="bg-foreground/80 w-4 text-background grid place-items-center text-xs rounded-sm hover:bg-foreground">
           !
