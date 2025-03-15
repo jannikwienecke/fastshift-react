@@ -54,6 +54,8 @@ export const schemaHelper = (
     );
 
     if (relationName) return model;
+
+    return null;
   };
 
   const isManyToManyRelation = () => {
