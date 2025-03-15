@@ -188,7 +188,7 @@ export type LegendStore = {
 
   comboboxSelectValue: (value: Row) => void;
   comboboxClose: () => void;
-  comboboxRunSelectMutation: (value: Row, selected: Row[] | Row) => void;
+  comboboxRunSelectMutation: (value: Row, selected: Row[] | null) => void;
   comboboxUpdateQuery: (query: string) => void;
   comboboxHandleQueryData: (data: RecordType[]) => void;
   comboboxSelectDate: (date: Date) => void;

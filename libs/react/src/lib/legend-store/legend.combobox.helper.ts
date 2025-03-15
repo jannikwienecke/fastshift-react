@@ -413,6 +413,8 @@ export const getDefaultSelectedList = (): Row[] => {
   if (!tableName || !selectedRelationField?.row) return [];
 
   const selected = selectedRelationField?.row?.raw?.[tableName] as RecordType[];
+  console.log('Selected:', selected);
+
   if (!Array.isArray(selected)) return [];
 
   return selected?.map((s) =>

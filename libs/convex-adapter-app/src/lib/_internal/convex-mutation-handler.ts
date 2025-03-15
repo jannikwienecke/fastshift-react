@@ -97,6 +97,7 @@ export const updateMutation = async (
   );
 
   try {
+    console.log('updateMutation record', record);
     await ctx.db.patch(mutation.payload.id, record);
     return {
       message: 'Record updated successfully',

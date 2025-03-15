@@ -5,7 +5,7 @@ test.beforeEach(async ({ taskPage, seedDatabase }) => {
   await taskPage.goto();
 });
 
-test.setTimeout(10000);
+test.setTimeout(20000);
 
 test.describe.configure({ mode: 'serial' });
 

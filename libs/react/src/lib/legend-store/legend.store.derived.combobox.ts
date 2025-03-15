@@ -50,6 +50,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const stateSharedFilter = getSharedStateFilter();
   const stateSharedList = getSharedStateList();
+
   const stateSharedSorting = getSharedStateSorting();
   const stateSharedGrouping = getSharedStateGrouping();
 
@@ -100,6 +101,15 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   if (!options) return DEFAULT_COMBOBOX_STATE;
 
+  console.log({ options, stateShared });
+  console.log({
+    ...stateShared,
+    ...options,
+    selected: options.selected?.length
+      ? options.selected
+      : stateShared.selected,
+    multiple: multiple === null ? options.multiple : multiple,
+  });
   return {
     ...stateShared,
     ...options,

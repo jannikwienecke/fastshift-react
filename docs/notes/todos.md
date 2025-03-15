@@ -25,8 +25,11 @@ created: 1723444498044
 - [x] handling mutation return types
 - [x] add sonner for alerts
 - [x] implement default / fallback component
+- [x] task has sub-tasks
+- [ ] tasks has todos (model with only a label, status)
+
 - [ ] add test for deleting a task
-- [ ] task has sub-tasks
+- [ ] add tests for grouping / sorting
 - [ ] task has sub-tasks-filtering
 
 ## How we handle Deletes with soft delete

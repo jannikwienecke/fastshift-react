@@ -36,6 +36,8 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
       ? existingRows.filter((r) => r.id !== checkedRow.id)
       : [...existingRows, checkedRow];
 
+    console.log('New rows:', newRows);
+
     // Perform optimistic update
     const rollback = optimisticUpdateStore({
       store$,
@@ -99,10 +101,13 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
     };
     console.warn('Record to update:', record);
 
+    const fieldName =
+      store$.viewConfigManager.getFieldBy(field.name).relation?.fieldName ?? '';
+
     const rollback = optimisticUpdateStore({
       store$,
       row,
-      record: { [field.name]: patchValue },
+      record: { [field.name]: valueRow.raw, [fieldName]: patchValue },
     });
 
     const mutation: Mutation = {
@@ -189,9 +194,15 @@ export const optimisticUpdateStore = ({
   // Update context menu
   const updatedRow = makeData(store$.views.get(), viewName)([updatedRowData])
     .rows?.[0];
+
   if (updatedRow) {
+    console.log(store$.list.selectedRelationField.row.get());
+    console.log(store$.contextMenuState.row.get());
+
+    store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
     store$.contextMenuState.row.set(updatedRow);
     if (updateGlobalDataModel) {
+      console.log({ updatedRows });
       store$.dataModel.rows.set(updatedRows);
     }
   }
