@@ -6,12 +6,12 @@ import {
 import { CubeIcon, TokensIcon } from '@radix-ui/react-icons';
 import schema from '../convex/schema';
 import { createViewConfig } from '@apps-next/react';
+import { CheckCheckIcon } from 'lucide-react';
 
 export * from '../convex/_generated/api';
 export * from '../convex/schema';
 
 export const config = createConfigFromConvexSchema(schema);
-// console.log(config);
 declare module '@apps-next/core' {
   interface Register {
     config: typeof config;
@@ -32,7 +32,7 @@ export const tasksConfig = createViewConfig(
       // dueDate (date with upper case D -> Due Date)
       dueDate: { isDateField: true },
     },
-    includeFields: ['tags', 'tasks'],
+    includeFields: ['tags', 'tasks', 'todos'],
     query: {
       showDeleted: false,
       primarySearchField: 'name',
@@ -66,4 +66,17 @@ export const projectsConfig = createViewConfig(
   config.config
 );
 
-export const views = makeViews(config.config, [tasksConfig, projectsConfig]);
+export const todosConfig = createViewConfig(
+  'todos',
+  {
+    icon: CheckCheckIcon,
+    displayField: { field: 'name' },
+  },
+  config.config
+);
+
+export const views = makeViews(config.config, [
+  tasksConfig,
+  projectsConfig,
+  todosConfig,
+]);

@@ -23,11 +23,6 @@ export const schemaHelper = (
   tableData: ModelSchema['models'][number],
   Prisma: ModelSchema
 ) => {
-  const log = (...args: any[]) => {
-    if (tableData.name !== 'tasks') return;
-    console.log(...args);
-  };
-
   const {
     relationName,
     relationFromFields,

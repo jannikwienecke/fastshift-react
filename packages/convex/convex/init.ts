@@ -14,6 +14,7 @@ const init = server.mutation({
       'owner',
       'users',
       'categories',
+      'todos',
     ];
     for (const table of tables) {
       const ids = await ctx.db.query(table as any).collect();
@@ -718,6 +719,16 @@ const init = server.mutation({
           taskId: taskId as any,
         });
       }
+    }
+
+    if (firstTaskId) {
+      const todo = {
+        name: 'Todo 1',
+        completed: false,
+        taskId: firstTaskId,
+      };
+
+      await ctx.db.insert('todos', todo);
     }
 
     console.log('Seed data created successfully');

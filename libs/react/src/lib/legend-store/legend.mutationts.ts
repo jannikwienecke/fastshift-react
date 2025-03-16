@@ -36,8 +36,6 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
       ? existingRows.filter((r) => r.id !== checkedRow.id)
       : [...existingRows, checkedRow];
 
-    console.log('New rows:', newRows);
-
     // Perform optimistic update
     const rollback = optimisticUpdateStore({
       store$,
@@ -196,13 +194,9 @@ export const optimisticUpdateStore = ({
     .rows?.[0];
 
   if (updatedRow) {
-    console.log(store$.list.selectedRelationField.row.get());
-    console.log(store$.contextMenuState.row.get());
-
     store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
     store$.contextMenuState.row.set(updatedRow);
     if (updateGlobalDataModel) {
-      console.log({ updatedRows });
       store$.dataModel.rows.set(updatedRows);
     }
   }

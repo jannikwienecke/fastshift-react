@@ -26,8 +26,8 @@ created: 1723444498044
 - [x] add sonner for alerts
 - [x] implement default / fallback component
 - [x] task has sub-tasks
-- [ ] tasks has todos (model with only a label, status)
-
+- [x] tasks has todos (model with only a label, status)
+- [ ] add test for one-to-many: tasks has many todos
 - [ ] add test for deleting a task
 - [ ] add tests for grouping / sorting
 - [ ] task has sub-tasks-filtering

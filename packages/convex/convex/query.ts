@@ -18,8 +18,6 @@ export const viewMutation = server.mutation({
 
 export const testQuery = server.mutation({
   async handler(ctx, args_0) {
-    console.log('testQuery', { args_0 });
-
     try {
       const res = await ctx.db.patch(
         'jh71s0zc8vdtxrtppctrjkjdg97c24qs' as Id<'tasks'>,
@@ -27,8 +25,6 @@ export const testQuery = server.mutation({
           tasks: ['jh78cgz4xwtkxrthtm485df5f17c3999' as Id<'tasks'>],
         }
       );
-
-      console.log('testQuery res', { res });
     } catch (error) {
       console.error('testQuery error', { error });
     }

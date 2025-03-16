@@ -7,7 +7,6 @@ import { getQueryKey } from '../query-client';
 import { DefaultViewTemplate } from '../views/default-view-template';
 import { TaskViewDataType } from '../views/tasks.components';
 import { viewFieldsConfig } from '../views/tasks.viewfieldsConfig';
-import React from 'react';
 
 const Task = observer(() => {
   const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
@@ -16,7 +15,7 @@ const Task = observer(() => {
     <DefaultViewTemplate<TaskViewDataType>
       listOptions={{
         fieldsLeft: ['name', 'projects', 'dueDate'],
-        fieldsRight: ['tags', 'completed', 'priority', 'tasks'],
+        fieldsRight: ['tags', 'completed', 'priority', 'todos'],
       }}
       filterOptions={{
         hideFields: ['subtitle'],

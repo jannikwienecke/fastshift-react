@@ -149,7 +149,7 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
     if (!field) throw new Error('no field');
 
     // close if not is manyToManyField
-    if (field.relation?.type !== 'manyToMany') {
+    if (!field.relation?.manyToManyRelation) {
       setTimeout(() => {
         store$.deselectRelationField();
         store$.comboboxClose();

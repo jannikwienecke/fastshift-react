@@ -41,7 +41,6 @@ export const deleteIds = async (
 
   await asyncMap(ids, async (id) => {
     if (field.relation?.type === 'oneToMany' && tableFieldName) {
-      console.log('ONE TO MANY');
       await ctx.db.patch(id, { [tableFieldName]: undefined });
     } else if (fieldNameRelationTable && tableFieldName) {
       const records = await getRelationTableRecords({

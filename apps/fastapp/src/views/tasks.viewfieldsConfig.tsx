@@ -14,22 +14,24 @@ import {
   TaskViewDataType,
 } from './tasks.components';
 
+import { todosConfig } from '@apps-next/convex';
+
 export const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>(
   'tasks',
   {
     fields: {
-      tasks: {
+      todos: {
         component: {
-          list: (props) => {
-            const tasks = props.data.tasks;
+          list: ({ data }) => {
+            const todos = data.todos?.filter?.((t) => t.completed)?.length || 0;
+            const totalTodos = data.todos?.length || 0;
+
+            const label = totalTodos === 0 ? '0' : `${todos} / ${totalTodos}`;
 
             return (
-              <div>
-                {tasks?.map((task, index) => (
-                  <div key={index}>
-                    <span>{task.name}</span>
-                  </div>
-                ))}
+              <div className="w-[4.5rem] flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
+                <span className="">{label}</span>
+                <todosConfig.icon className="w-4 h-4" />
               </div>
             );
           },

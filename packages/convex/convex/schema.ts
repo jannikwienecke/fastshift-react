@@ -3,10 +3,6 @@ import { v } from 'convex/values';
 import { Doc, TableNames } from './_generated/dataModel';
 
 const _schema = defineSchema({
-  todos: defineTable({
-    name: v.string(),
-  }),
-
   users: defineTable({
     email: v.string(),
     password: v.string(),
@@ -37,6 +33,7 @@ const _schema = defineSchema({
     deleted: v.optional(v.boolean()),
     dueDate: v.optional(v.number()),
     tasks: v.optional(v.union(v.array(v.id('tasks')), v.null())),
+    todos: v.optional(v.array(v.id('todos'))),
   })
     .index('projectId', ['projectId'])
     .index('dueDate', ['dueDate'])
@@ -88,6 +85,12 @@ const _schema = defineSchema({
   }).searchIndex('label', {
     searchField: 'label',
   }),
+
+  todos: defineTable({
+    name: v.string(),
+    completed: v.boolean(),
+    taskId: v.id('tasks'),
+  }),
 });
 
 export default _schema;
@@ -105,4 +108,5 @@ export type Owner = MyDoc<'owner'> & {
 };
 export type Tags = MyDoc<'tags'>;
 export type Tasks = MyDoc<'tasks'>;
+export type Todos = MyDoc<'todos'>;
 export type Projects = MyDoc<'projects'>;
