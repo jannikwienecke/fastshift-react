@@ -724,11 +724,18 @@ const init = server.mutation({
     if (firstTaskId) {
       const todo = {
         name: 'Todo 1',
+        completed: true,
+        taskId: firstTaskId,
+      };
+
+      const todo2 = {
+        name: 'Todo 2',
         completed: false,
         taskId: firstTaskId,
       };
 
       await ctx.db.insert('todos', todo);
+      await ctx.db.insert('todos', todo2);
     }
 
     console.log('Seed data created successfully');

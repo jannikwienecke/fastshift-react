@@ -5,9 +5,11 @@ import { FilterValue } from './render-filter-value';
 export const ComboboxFieldValue = ({
   value,
   field,
+  row,
 }: {
   field?: FieldConfig | null;
   value: Row;
+  row: Row | null;
 }) => {
   const { t } = useTranslation();
 
@@ -38,7 +40,7 @@ export const ComboboxFieldValue = ({
     <>
       {ComponentToRender ? (
         <>
-          <ComponentToRender data={raw} />
+          <ComponentToRender data={raw} row={row?.raw ?? {}} />
         </>
       ) : (
         <>{t(value.label as any)}</>

@@ -46,7 +46,9 @@ export const makeComboboxProps = <T extends RecordType = RecordType>(
       const renderComboboxFieldValue = (props: {
         value: Row;
         field?: FieldConfig | null;
-      }) => <ComboboxFieldValue {...props} />;
+      }) => {
+        return <ComboboxFieldValue {...props} row={store.row} />;
+      };
 
       if (value.id === NONE_OPTION) {
         return props?.renderNoneValue ? (

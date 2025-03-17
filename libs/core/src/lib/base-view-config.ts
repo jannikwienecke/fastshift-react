@@ -9,8 +9,6 @@ import {
   ViewFieldConfig,
 } from './types';
 
-import { FormManager, FormManagerInterface } from './form-manager';
-
 export type ModelConfig = {
   searchableFields?: SearchableField;
   viewFields: ViewFieldConfig;

@@ -98,6 +98,7 @@ export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> = {
   searchable: boolean;
   name: string;
   datePickerProps?: DatePickerProps;
+  showCheckboxInList?: boolean;
 };
 
 export type ComboboxAdapterOptions<T extends ComboxboxItem> = {

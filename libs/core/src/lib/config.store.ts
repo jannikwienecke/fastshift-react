@@ -25,13 +25,14 @@ export type ViewFieldsConfig<
           list: (props: { data: U }) => React.ReactNode;
 
           comboboxListValue: (props: {
-            data: U[key] extends Array<unknown>
-              ? U[key][0]
+            data: NonNullable<U[key]> extends Array<unknown>
+              ? NonNullable<U[key]>[0]
               : U[key] extends RecordType
               ? U[key]
               : U[key] extends boolean
               ? boolean
               : string;
+            row: U;
           }) => React.ReactNode;
 
           contextmenuFieldItem: (props: {

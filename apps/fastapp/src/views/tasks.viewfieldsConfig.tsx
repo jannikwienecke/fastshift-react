@@ -31,7 +31,15 @@ export const viewFieldsConfig = makeViewFieldsConfig<TaskViewDataType>(
             return (
               <div className="w-[4.5rem] flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
                 <span className="">{label}</span>
+
                 <todosConfig.icon className="w-4 h-4" />
+              </div>
+            );
+          },
+          comboboxListValue: ({ data, row }) => {
+            return (
+              <div className="flex flex-row items-center gap-1">
+                <div>{data.name}</div>
               </div>
             );
           },

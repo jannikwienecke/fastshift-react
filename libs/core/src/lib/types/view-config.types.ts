@@ -30,6 +30,7 @@ export type ViewConfigType<T extends GetTableName = any> =
     fields?: {
       [field in keyof GetTableDataType<T>]?: {
         isDateField?: boolean;
+        showCheckboxInList?: boolean;
       };
     };
     query?: {

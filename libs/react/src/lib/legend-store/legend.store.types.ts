@@ -58,6 +58,7 @@ export type ComboboxState = {
   datePickerProps?: DatePickerState | null;
   field: FieldConfig | null;
   row: Row | null;
+  showCheckboxInList: boolean;
 };
 
 export type ComboboxStateCommonType = Pick<

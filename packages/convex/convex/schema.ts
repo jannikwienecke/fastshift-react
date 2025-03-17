@@ -89,8 +89,13 @@ const _schema = defineSchema({
   todos: defineTable({
     name: v.string(),
     completed: v.boolean(),
-    taskId: v.id('tasks'),
-  }),
+    taskId: v.optional(v.id('tasks')),
+  })
+    .index('taskId', ['taskId'])
+    .index('completed', ['completed'])
+    .searchIndex('name', {
+      searchField: 'name',
+    }),
 });
 
 export default _schema;

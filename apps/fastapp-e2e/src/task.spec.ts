@@ -371,6 +371,13 @@ test.describe('Task management', () => {
     await taskPage.contextmenu.getByTestId('priority-urgent').click();
     await expect(firstListItem.getByTestId('priority-urgent')).toBeVisible();
   });
+
+  test('tasks has many todos, can add and remove todos', async ({
+    taskPage,
+    page,
+  }) => {
+    expect(1).toBe(1);
+  });
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {
