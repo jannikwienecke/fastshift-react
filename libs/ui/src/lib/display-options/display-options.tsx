@@ -44,6 +44,7 @@ const DisplayOptionsButton = (props: {
       onClick={(e) => {
         props.onOpen(e.currentTarget.getBoundingClientRect());
       }}
+      data-testid="display-options-button"
     >
       <div>
         <SlidersHorizontalIcon className="w-4 h-4" />
@@ -112,6 +113,7 @@ const DisplayOptionsOrderingButtonCombobox = (props: {
             onClick={() => props.sorting.toggleSorting()}
             variant={'outline'}
             className="h-7 w-7 p-0"
+            aria-label="toggle-sorting-direction"
           >
             <SortingIcon className="min-w-5 h-[17px]" strokeWidth={2} />
           </Button>
@@ -234,6 +236,7 @@ function DisplayOptionsPopover(
         className="max-w-80 w-80 min-w-80 flex flex-col gap-2 p-4 mr-8 text-[12px]"
         sideOffset={15}
         side="bottom"
+        data-testid="display-options"
       >
         <DisplayOptionsViewType {...props} />
         <DisplayOptionsOrderingButtonCombobox {...props} />

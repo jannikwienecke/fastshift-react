@@ -20,10 +20,9 @@ export const convexSortRows = (
   if (!field) return rows;
   if (!order) return rows;
 
-  const displayFieldName = getViewByName(
-    serverProps.registeredViews,
-    field.name
-  ).displayField.field;
+  const displayFieldName = field.relation
+    ? getViewByName(serverProps.registeredViews, field.name).displayField.field
+    : null;
 
   rows.sort((a, b) => {
     const aField = a[field?.name];
