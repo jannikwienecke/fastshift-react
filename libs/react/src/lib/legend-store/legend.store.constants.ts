@@ -29,6 +29,7 @@ export const DEFAULT_COMBOBOX_STATE: ComboboxState = {
   datePickerProps: null,
   field: null,
   row: null,
+  showCheckboxInList: false,
 };
 
 export const DEFAULT_FILTER_STATE: FilterStore = {

@@ -3,6 +3,7 @@ import {
   FieldConfig,
   getViewByName,
   makeRow,
+  makeRowFromValue,
   useTranslation,
   ViewConfigType,
 } from '@apps-next/core';
@@ -26,6 +27,7 @@ export const FilterValue = (props: {
   if (selectedField) {
     return (
       <ComboboxFieldValue
+        row={makeRowFromValue(props.value.id.toString(), selectedField)}
         field={selectedField}
         value={makeRow(
           props.value.id.toString(),

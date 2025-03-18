@@ -56,7 +56,11 @@ export const convexSortRows = (
         : bField.length - aField.length;
     }
 
-    if (typeof aField === 'object' && typeof bField === 'object') {
+    if (
+      typeof aField === 'object' &&
+      typeof bField === 'object' &&
+      displayFieldName
+    ) {
       const nameA = aField[displayFieldName];
       const nameB = bField[displayFieldName];
 
