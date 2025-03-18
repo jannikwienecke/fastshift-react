@@ -30,7 +30,7 @@ created: 1723444498044
 - [x] add test for one-to-many: tasks has many todos
 - [x] add test for deleting a task
 - [x] add tests for grouping / sorting
-- [ ] default sorting / default grouping
+- [x] default sorting / default grouping
 - [ ] add confirmation dialog (framework approach, to be enabled by field and action?)
 - [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
 

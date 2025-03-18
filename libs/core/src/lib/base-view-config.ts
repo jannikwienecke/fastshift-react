@@ -26,6 +26,7 @@ export interface BaseViewConfigManagerInterface<
   getViewFieldList(options?: { includeSystemFields?: boolean }): FieldConfig[];
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
+  getFieldByRelationFieldName(relationFieldName: string): FieldConfig;
   getIndexFields(): IndexField[];
   getSoftDeleteIndexField(): SearchableField | undefined;
   getRelationFieldByTableName(tableName: string): FieldConfig;
@@ -127,6 +128,16 @@ export class BaseViewConfigManager<
     );
 
     invarant(!!field, `Field ${fieldName} not found`);
+
+    return field as FieldConfig;
+  }
+
+  getFieldByRelationFieldName(relationFieldName: string): FieldConfig {
+    const field = Object.values(this.viewConfig.viewFields).find(
+      (field) =>
+        field.relation?.fieldName.toLowerCase() ===
+        relationFieldName.toLowerCase()
+    );
 
     return field as FieldConfig;
   }

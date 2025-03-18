@@ -38,6 +38,13 @@ export type ViewConfigType<T extends GetTableName = any> =
       searchableFields?: SearchableField[];
       indexFields?: IndexField[];
       primarySearchField?: keyof GetTableDataType<T>;
+      sorting?: {
+        field: keyof GetTableDataType<T>;
+        direction: 'asc' | 'desc';
+      };
+      grouping?: {
+        field: keyof GetTableDataType<T>;
+      };
     };
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;

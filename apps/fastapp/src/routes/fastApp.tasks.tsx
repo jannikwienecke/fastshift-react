@@ -21,7 +21,6 @@ const Task = observer(() => {
         hideFields: ['subtitle'],
       }}
       displayOptions={{
-        sorting: { defaultSortingField: 'name' },
         displayFieldsToShow: [
           'name',
           'completed',

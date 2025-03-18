@@ -126,9 +126,6 @@ export type MakeDisplayOptionsPropsOptions<T extends RecordType = RecordType> =
   {
     placeholder?: string;
     label?: string;
-    sorting: {
-      defaultSortingField: keyof T;
-    };
     displayFieldsToShow?: (keyof T)[];
   };
 

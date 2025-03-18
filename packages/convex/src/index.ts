@@ -40,6 +40,9 @@ export const tasksConfig = createViewConfig(
     query: {
       showDeleted: false,
       primarySearchField: 'name',
+      // default sorting
+      // sorting: { field: 'projectId', direction: 'asc' },
+      // grouping: { field: 'projectId' },
     },
     mutation: {
       softDelete: true,
