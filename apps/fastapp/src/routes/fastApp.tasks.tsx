@@ -6,7 +6,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getQueryKey } from '../query-client';
 import { DefaultViewTemplate } from '../views/default-view-template';
 import { TaskViewDataType } from '../views/tasks.components';
-import { viewFieldsConfig } from '../views/tasks.config';
+import { uiViewConfig } from '../views/tasks.config';
 
 const Task = observer(() => {
   const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
@@ -46,7 +46,7 @@ export const Route = createFileRoute('/fastApp/tasks')({
         views={views}
         viewConfig={tasksConfig}
         globalConfig={config.config}
-        viewFieldsConfig={viewFieldsConfig}
+        uiViewConfig={uiViewConfig}
         queryKey={getQueryKey(tasksConfig)}
       >
         <Task />

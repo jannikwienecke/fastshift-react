@@ -2,7 +2,7 @@ import {
   RecordType,
   RegisteredRouter,
   ViewConfig,
-  ViewFieldsConfig,
+  UiViewConfig,
 } from '@apps-next/core';
 
 export * from './lib/ui-components';
@@ -24,7 +24,7 @@ export * from './lib/toast';
 
 export const makeViewFieldsConfig = <T extends RecordType>(
   table: keyof RegisteredRouter['config']['_datamodel'],
-  data: ViewFieldsConfig<
+  data: UiViewConfig<
     keyof RegisteredRouter['config']['_datamodel'],
     T
   >[keyof RegisteredRouter['config']['_datamodel']]

@@ -40,7 +40,7 @@ type ProjectViewDataType = DataType<
   { categories: Categories; owner: Owner; tasks: Tasks }
 >;
 
-const viewFieldsConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
+const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
   fields: {
     categories: {
       component: {
@@ -221,7 +221,7 @@ export const Route = createFileRoute('/fastApp/projects')({
         viewConfig={projectsConfig}
         globalConfig={config.config}
         views={views}
-        viewFieldsConfig={viewFieldsConfig}
+        uiViewConfig={uiViewConfig}
         queryKey={getQueryKey(projectsConfig)}
       >
         <Project />

@@ -41,7 +41,7 @@ function ConfirmationDialogDefault(props: ConfirmationDialogProps) {
 
           <ConfirmationDialogDescription>
             {props.description
-              ? props.description
+              ? t(props.description)
               : t('confirmationAlert.description')}
           </ConfirmationDialogDescription>
         </AlertDialogHeader>

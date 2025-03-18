@@ -9,7 +9,7 @@ import {
   RegisteredViews,
   renderModelName,
   t,
-  ViewFieldsConfig,
+  UiViewConfig,
 } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -27,7 +27,7 @@ export type QueryProviderConvexProps = {
 } & { children: React.ReactNode };
 
 type QueryProviderPropsWithViewFieldsConfig = QueryProviderConvexProps & {
-  viewFieldsConfig: ViewFieldsConfig;
+  uiViewConfig: UiViewConfig;
 };
 
 export const ClientViewProviderConvex = (
@@ -41,11 +41,14 @@ export const ClientViewProviderConvex = (
   console.log(props);
   const viewConfigManager = React.useMemo(
     () =>
-      new BaseViewConfigManager({
-        ...props.viewConfig,
-        viewFields: patechedViewFields,
-      }),
-    [props.viewConfig, patechedViewFields]
+      new BaseViewConfigManager(
+        {
+          ...props.viewConfig,
+          viewFields: patechedViewFields,
+        },
+        props.uiViewConfig
+      ),
+    [props.viewConfig, patechedViewFields, props.uiViewConfig]
   );
 
   let views = React.useMemo(
@@ -78,16 +81,16 @@ export const ClientViewProviderConvex = (
 
   React.useLayoutEffect(() => {
     setIsInitialized(true);
-    if (data && props.viewFieldsConfig && viewConfigManager && views) {
+    if (data && props.uiViewConfig && viewConfigManager && views) {
       store$.init(
         data?.data ?? [],
         data?.relationalData ?? {},
         viewConfigManager,
         views,
-        props.viewFieldsConfig
+        props.uiViewConfig
       );
     }
-  }, [data, props.viewFieldsConfig, viewConfigManager, views]);
+  }, [data, props.uiViewConfig, viewConfigManager, views]);
 
   if (!isInitialized) return null;
   return <Content>{props.children}</Content>;

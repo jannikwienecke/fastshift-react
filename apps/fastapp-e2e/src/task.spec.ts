@@ -411,6 +411,10 @@ test.describe('Task management', () => {
 
     await taskPage.contextmenu.getByText(/delete task/i).click();
 
+    // see /are you sure/i
+    await expect(page.getByText(/are you sure/i)).toBeVisible();
+    await page.getByRole('button', { name: 'confirm' }).click();
+
     await expect(firstListItem.getByText(/design mockups/i)).toBeHidden();
   });
 

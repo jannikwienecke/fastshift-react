@@ -9,7 +9,7 @@ export type ComponentType =
   // | 'filterValue'
   | 'icon';
 
-export type ViewFieldsConfig<
+export type UiViewConfig<
   T extends GetTableName = any,
   U extends RecordType = any
 > = {

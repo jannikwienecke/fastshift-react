@@ -135,41 +135,43 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
 export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
   (store$) =>
   async ({ row }, onSuccess, onError) => {
-    const mutation: Mutation = {
-      type: 'DELETE_RECORD',
-      payload: {
-        id: row.id,
-      },
+    const runMutation = async () => {
+      const mutation: Mutation = {
+        type: 'DELETE_RECORD',
+        payload: {
+          id: row.id,
+        },
+      };
+      const { error } = await store$.api.mutateAsync({
+        mutation,
+        viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+        query: store$.globalQuery.get(),
+      });
+
+      if (error) {
+        onError?.(error.message);
+
+        renderErrorToast('error.deleteRecord', () => {
+          store$.errorDialog.error.set(error);
+        });
+      } else {
+        console.warn('Record deleted successfully');
+        onSuccess?.();
+      }
     };
 
-    store$.confirmationAlert.title.set('confirmationAlert.delete.title');
-
-    store$.confirmationAlert.description.set(
-      'confirmationAlert.delete.description'
-    );
-
-    store$.confirmationAlert.open.set(true);
-
-    store$.confirmationAlert.onConfirm.set({
-      cb: async () => {
-        const { error } = await store$.api.mutateAsync({
-          mutation,
-          viewName: store$.viewConfigManager.viewConfig.viewName.get(),
-          query: store$.globalQuery.get(),
-        });
-
-        if (error) {
-          onError?.(error.message);
-
-          renderErrorToast('error.deleteRecord', () => {
-            store$.errorDialog.error.set(error);
-          });
-        } else {
-          console.warn('Record deleted successfully');
-          onSuccess?.();
-        }
-      },
-    });
+    if (store$.viewConfigManager.getUiViewConfig().onDelete?.showConfirmation) {
+      store$.confirmationAlert.open.set(true);
+      store$.confirmationAlert.title.set('confirmationAlert.delete.title');
+      store$.confirmationAlert.description.set(
+        'confirmationAlert.delete.description'
+      );
+      store$.confirmationAlert.onConfirm.set({
+        cb: runMutation,
+      });
+    } else {
+      runMutation();
+    }
   };
 
 export const optimisticUpdateStore = ({

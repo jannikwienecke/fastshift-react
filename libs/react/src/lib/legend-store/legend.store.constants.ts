@@ -4,7 +4,7 @@ import {
   DEFAULT_FETCH_LIMIT_QUERY,
   RegisteredViews,
   RelationalDataModel,
-  ViewFieldsConfig,
+  UiViewConfig,
 } from '@apps-next/core';
 import {
   DatePickerState,
@@ -53,7 +53,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   LegendStore,
   | 'dataModel'
   | 'views'
-  | 'viewFieldsConfig'
+  | 'uiViewConfig'
   | 'viewConfigManager'
   | 'list'
   | 'relationalDataModel'
@@ -72,7 +72,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   views: {} as RegisteredViews,
   viewConfigManager: {} as BaseViewConfigManagerInterface,
   relationalDataModel: {} as RelationalDataModel,
-  viewFieldsConfig: {} as ViewFieldsConfig,
+  uiViewConfig: {} as UiViewConfig,
   paginateOptions: {
     cursor: null,
     numItems: DEFAULT_FETCH_LIMIT_QUERY,
