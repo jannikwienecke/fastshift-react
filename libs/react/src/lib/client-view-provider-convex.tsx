@@ -4,13 +4,11 @@ import {
   BaseConfigInterface,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
-  FieldConfig,
   patchDict,
   QueryReturnOrUndefined,
   RegisteredViews,
   renderModelName,
   t,
-  ViewFieldConfig,
   ViewFieldsConfig,
 } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
@@ -76,6 +74,7 @@ export const ClientViewProviderConvex = (
   ) as QueryReturnOrUndefined;
 
   const [isInitialized, setIsInitialized] = React.useState(false);
+
   React.useLayoutEffect(() => {
     setIsInitialized(true);
     if (data && props.viewFieldsConfig && viewConfigManager && views) {

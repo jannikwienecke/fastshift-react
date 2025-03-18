@@ -3,7 +3,7 @@
 import { IndexField, SearchableField } from './base.types';
 import { ViewConfigType, ViewFieldConfig } from './view-config.types';
 
-export type IncludeConfig = Record<string, string[]>;
+export type IncludeConfig<T = any> = Record<string, T[]>;
 
 export type ModelField = {
   name: string;
@@ -21,6 +21,7 @@ export type ModelField = {
   relationName?: string;
   relationFromFields?: string[];
   relationToFields?: string[];
+  isRecursive?: boolean;
 };
 
 export type EnumType = {

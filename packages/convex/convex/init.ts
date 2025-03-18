@@ -14,6 +14,7 @@ const init = server.mutation({
       'owner',
       'users',
       'categories',
+      'todos',
     ];
     for (const table of tables) {
       const ids = await ctx.db.query(table as any).collect();
@@ -299,7 +300,7 @@ const init = server.mutation({
         name: 'Implement responsive design',
         completed: false,
         projectId: projects[0],
-        priority: 1,
+        priority: 3,
         dueDate: today,
         description: 'Implement responsive design for the website redesign',
       },
@@ -308,7 +309,7 @@ const init = server.mutation({
         name: 'Create workout schedule',
         completed: true,
         projectId: projects[1],
-        priority: 1,
+        priority: 4,
         dueDate: yesterday,
         description: 'Create a workout schedule for weight loss',
       },
@@ -316,7 +317,7 @@ const init = server.mutation({
         name: 'Research healthy recipes',
         completed: false,
         projectId: projects[1],
-        priority: 2,
+        priority: 5,
         dueDate: yesterday,
         description: 'Research healthy recipes for weight loss',
       },
@@ -676,9 +677,17 @@ const init = server.mutation({
       },
     ];
 
+    let firstTaskId: Id<'tasks'> | undefined;
+    let count = 0;
     let taskId: Id<'tasks'> | undefined;
     for (let i = 0; i < taskData.length; i++) {
       const task = taskData[i];
+
+      let tasks: Id<'tasks'>[] | null = null;
+
+      if (firstTaskId && count <= 1) {
+        tasks = [firstTaskId];
+      }
 
       if (task) {
         taskId = await ctx.db.insert('tasks', {
@@ -690,7 +699,16 @@ const init = server.mutation({
           dueDate: task.dueDate,
           subtitle: task.subtitle,
           deleted: false,
+          tasks,
         });
+
+        if (count <= 1 && firstTaskId) {
+          count++;
+        }
+
+        if (!firstTaskId) {
+          firstTaskId = taskId;
+        }
       }
 
       // Add tags to each task (0 to 4 tags)
@@ -701,6 +719,23 @@ const init = server.mutation({
           taskId: taskId as any,
         });
       }
+    }
+
+    if (firstTaskId) {
+      const todo = {
+        name: 'Todo 1',
+        completed: true,
+        taskId: firstTaskId,
+      };
+
+      const todo2 = {
+        name: 'Todo 2',
+        completed: false,
+        taskId: firstTaskId,
+      };
+
+      await ctx.db.insert('todos', todo);
+      await ctx.db.insert('todos', todo2);
     }
 
     console.log('Seed data created successfully');

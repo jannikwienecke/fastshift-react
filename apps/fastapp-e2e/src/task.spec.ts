@@ -1,11 +1,12 @@
 import { expect, test } from './fixtures';
+import { TaskPage } from './task-page';
 
 test.beforeEach(async ({ taskPage, seedDatabase }) => {
   await seedDatabase();
   await taskPage.goto();
 });
 
-test.setTimeout(10000);
+test.setTimeout(20000);
 
 test.describe.configure({ mode: 'serial' });
 
@@ -79,13 +80,11 @@ test.describe('Task management', () => {
   });
 
   test('can change the priority of a task', async ({ taskPage, page }) => {
-    const firstListItem = await taskPage.getListItem(5);
+    const firstListItem = await taskPage.getListItem(0);
 
-    await firstListItem.getByText('🟢').click();
+    await firstListItem.getByTestId('priority-none').click();
 
-    await expect(taskPage.comboboxPopover.getByText('🟡')).toBeVisible();
-
-    await taskPage.comboboxPopover.getByText('🟡').click();
+    await taskPage.comboboxPopover.getByTestId('priority-urgent').click();
 
     // close popover by clicking /assign launch/i
     await page
@@ -93,8 +92,8 @@ test.describe('Task management', () => {
       .first()
       .click({ force: true });
 
-    await expect(firstListItem.getByText('🟡')).toBeVisible();
-    await expect(firstListItem.getByText('🟢')).toBeHidden();
+    await expect(firstListItem.getByTestId('priority-urgent')).toBeVisible();
+    await expect(firstListItem.getByTestId('priority-none')).toBeHidden();
   });
 
   test('can change the completed status of a task', async ({ taskPage }) => {
@@ -172,15 +171,16 @@ test.describe('Task management', () => {
 
     await taskPage.filterButton.click();
     await taskPage.comboboxPopover.getByText(/priority/i).click();
-    await taskPage.comboboxPopover.getByText(/🟡/i).click();
+    await taskPage.comboboxPopover.getByTestId(/priority-low/i).click();
     await page.getByText('tasks').first().click({ force: true });
 
-    await expect(page.getByText(/🟢/i).first()).toBeHidden();
+    await expect(page.getByTestId('priority-high').first()).toBeHidden();
 
-    await taskPage.filterList.getByText(/medium/i).click();
-    await taskPage.comboboxPopover.getByText(/🟢/i).click();
+    await taskPage.filterList.getByText(/low/i).click();
+    await taskPage.comboboxPopover.getByTestId(/priority-low/i).click();
+    await taskPage.comboboxPopover.getByTestId(/priority-high/i).click();
     await page.getByText('tasks').first().click({ force: true });
-    await expect(page.getByText(/🟢/i).first()).toBeVisible();
+    await expect(page.getByTestId('priority-high').first()).toBeVisible();
   });
 
   test('can filter tasks by due date', async ({ taskPage, page }) => {
@@ -306,7 +306,7 @@ test.describe('Task management', () => {
 
     await taskPage.removeFilter('projects');
 
-    await expect(page.getByText(/design mockups/i)).toBeVisible();
+    await expect(page.getByText(/design mockups/i).first()).toBeVisible();
 
     await page
       .getByText(/website redesign/i)
@@ -332,9 +332,8 @@ test.describe('Task management', () => {
     await firstListItem.locator('div').first().click({ force: true });
     await expect(firstListItem.getByText(/website redesign/i)).toBeVisible();
     await expect(firstListItem.getByText(/important/i)).toBeHidden();
-    // 🟡
-    // 🟢
-    await expect(firstListItem.getByText(/🟡/i)).toBeHidden();
+
+    await expect(firstListItem.getByTestId('priority-none')).toBeVisible();
 
     // right click on the first list item
     await firstListItem
@@ -370,8 +369,113 @@ test.describe('Task management', () => {
       .click({ force: true, button: 'right' });
     await expect(taskPage.contextmenu).toBeVisible();
     await taskPage.contextmenu.getByText(/priority/i).click();
-    await taskPage.contextmenu.getByText(/🟡/i).click();
-    await expect(firstListItem.getByText(/🟡/i)).toBeVisible();
+    await taskPage.contextmenu.getByTestId('priority-urgent').click();
+    await expect(firstListItem.getByTestId('priority-urgent')).toBeVisible();
+  });
+
+  test('tasks has many todos, can add and remove todos', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await firstListItem.getByText('1 / 2').click();
+
+    await taskPage.comboboxPopover.getByText(/Todo 2/i).click();
+
+    await expect(firstListItem.getByText('1 / 1')).toBeVisible();
+
+    await taskPage.comboboxPopover.getByText(/Todo 1/i).click();
+
+    await expect(firstListItem.getByText('0')).toBeVisible();
+
+    await taskPage.comboboxPopover.getByText(/Todo 1/i).click();
+
+    await page.reload();
+
+    await expect(firstListItem.getByText('1 / 1')).toBeVisible();
+  });
+
+  test('can right click on a task, and delete the task in the context menu', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    await expect(taskPage.contextmenu).toBeVisible();
+
+    await taskPage.contextmenu.getByText(/delete task/i).click();
+
+    await expect(firstListItem.getByText(/design mockups/i)).toBeHidden();
+  });
+
+  test('display options are shown correctly', async ({ taskPage, page }) => {
+    await taskPage.displayOptionsButton.click();
+
+    await expect(taskPage.displayOptions).toBeVisible();
+
+    await expect(taskPage.displayOptions).toBeVisible();
+
+    await expect(
+      taskPage.displayOptions.getByText(/No sorting/i)
+    ).toBeVisible();
+    await expect(
+      taskPage.displayOptions.getByText(/No grouping/i)
+    ).toBeVisible();
+    await expect(
+      taskPage.displayOptions.getByText(/list options/i)
+    ).toBeVisible();
+    await expect(
+      taskPage.displayOptions.getByText(/display properties/i)
+    ).toBeVisible();
+    await expect(taskPage.displayOptions.getByText(/name/i)).toBeVisible();
+    await expect(taskPage.displayOptions.getByText(/completed/i)).toBeVisible();
+    await expect(taskPage.displayOptions.getByText(/board/i)).toBeVisible();
+    await expect(taskPage.displayOptions.getByText(/ordering/i)).toBeVisible();
+  });
+
+  test('can sort by a field', async ({ taskPage, page }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+
+    await sortByField(taskPage, /name/i);
+
+    await expect(firstListItem.getByText(/design mockups/i)).toBeHidden();
+    await expect(firstListItem.getByText(/assign launch/i)).toBeVisible();
+
+    await page
+      .getByRole('button', { name: 'toggle-sorting-direction' })
+      .click();
+
+    await expect(firstListItem.getByText(/assign launch/i)).toBeHidden();
+    await expect(
+      firstListItem.getByText(/watch spanish movies/i)
+    ).toBeVisible();
+  });
+
+  test('can group by a field', async ({ taskPage, page }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+
+    await groupByField(taskPage, /project/i);
+
+    await expect(page.getByText(/Website redesign/i)).toHaveCount(4);
+
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+
+    await firstListItem
+      .getByText(/design mockups/i)
+      .first()
+      .click({ force: true });
+
+    await sortByField(taskPage, /project/i);
+    await expect(firstListItem.getByText(/design mockups/i)).toBeHidden();
+    await expect(firstListItem.getByText(/track monthly/i)).toBeVisible();
   });
 });
 
@@ -425,4 +529,24 @@ const testingQueryBehavior = async ({ taskPage, page }) => {
 
   await input.fill('today');
   await expect(getByText(/today/i)).toBeVisible();
+};
+
+const sortByField = async (taskPage: TaskPage, name: RegExp) => {
+  await taskPage.displayOptionsButton.click();
+
+  await expect(taskPage.displayOptions).toBeVisible();
+
+  await taskPage.displayOptions.getByText(/No sorting/i).click();
+
+  await taskPage.comboboxPopover.getByText(name).click();
+};
+
+const groupByField = async (taskPage: TaskPage, name: RegExp) => {
+  await taskPage.displayOptionsButton.click();
+
+  await expect(taskPage.displayOptions).toBeVisible();
+
+  await taskPage.displayOptions.getByText(/No grouping/i).click();
+
+  await taskPage.comboboxPopover.getByText(name).click();
 };

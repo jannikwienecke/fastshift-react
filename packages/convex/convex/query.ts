@@ -6,6 +6,7 @@ import * as server from './_generated/server';
 
 import { asyncMap } from 'convex-helpers';
 import { views } from '../src/index';
+import { Id } from './_generated/dataModel';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -15,16 +16,18 @@ export const viewMutation = server.mutation({
   handler: makeViewMutationHandler(views),
 });
 
-export const testQuery = server.query({
+export const testQuery = server.mutation({
   async handler(ctx, args_0) {
-    const now = new Date().getTime();
-    const query = ctx.db
-      .query('tasks')
-      .withIndex('dueDate', (q) =>
-        q.gt('dueDate', now).lt('dueDate', now + 1000 * 60 * 60 * 24)
+    try {
+      const res = await ctx.db.patch(
+        'jh71s0zc8vdtxrtppctrjkjdg97c24qs' as Id<'tasks'>,
+        {
+          tasks: ['jh78cgz4xwtkxrthtm485df5f17c3999' as Id<'tasks'>],
+        }
       );
-
-    return (await query.collect()).slice(0, 1);
+    } catch (error) {
+      console.error('testQuery error', { error });
+    }
   },
 });
 

@@ -379,7 +379,7 @@ export const getSharedStateList = (): ComboboxStateCommonType => {
 
   const stateShared: ComboboxStateCommonType = {
     rect: selectedRelationField.rect,
-    searchable: selectedRelationField.field.enum ? false : true,
+    searchable: selectedRelationField?.field?.enum ? false : true,
     name: selectedRelationField?.field?.name ?? 'list-edit',
     isNewState: true,
     open: true,
@@ -413,6 +413,7 @@ export const getDefaultSelectedList = (): Row[] => {
   if (!tableName || !selectedRelationField?.row) return [];
 
   const selected = selectedRelationField?.row?.raw?.[tableName] as RecordType[];
+
   if (!Array.isArray(selected)) return [];
 
   return selected?.map((s) =>

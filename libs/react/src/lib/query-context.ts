@@ -13,7 +13,7 @@ export type MakeQueryOptions = (args: QueryProps) => QueryOptions;
 
 export type PrismaContextType = {
   prisma?: ApiClientType;
-  makeQueryOptions?: MakeQueryOptions;
+  makeQueryOptions: MakeQueryOptions;
   mutationFn?: (...args: any) => Promise<MutationReturnDto>;
 } & GlobalConfig;
 

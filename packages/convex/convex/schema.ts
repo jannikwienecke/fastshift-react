@@ -3,10 +3,6 @@ import { v } from 'convex/values';
 import { Doc, TableNames } from './_generated/dataModel';
 
 const _schema = defineSchema({
-  todos: defineTable({
-    name: v.string(),
-  }),
-
   users: defineTable({
     email: v.string(),
     password: v.string(),
@@ -27,13 +23,22 @@ const _schema = defineSchema({
     tags: v.optional(v.array(v.id('tags'))),
     projectId: v.optional(v.id('projects')),
     // priority: v.number(),
-    priority: v.union(v.literal(1), v.literal(2), v.literal(3)),
+    priority: v.union(
+      v.literal(1),
+      v.literal(2),
+      v.literal(3),
+      v.literal(4),
+      v.literal(5)
+    ),
     deleted: v.optional(v.boolean()),
     dueDate: v.optional(v.number()),
+    tasks: v.optional(v.union(v.array(v.id('tasks')), v.null())),
+    todos: v.optional(v.array(v.id('todos'))),
   })
     .index('projectId', ['projectId'])
     .index('dueDate', ['dueDate'])
     .index('name', ['name'])
+    .index('tasks', ['tasks'])
     .index('deleted', ['deleted'])
     .searchIndex('name_search', {
       searchField: 'name',
@@ -80,6 +85,17 @@ const _schema = defineSchema({
   }).searchIndex('label', {
     searchField: 'label',
   }),
+
+  todos: defineTable({
+    name: v.string(),
+    completed: v.boolean(),
+    taskId: v.optional(v.id('tasks')),
+  })
+    .index('taskId', ['taskId'])
+    .index('completed', ['completed'])
+    .searchIndex('name', {
+      searchField: 'name',
+    }),
 });
 
 export default _schema;
@@ -97,4 +113,5 @@ export type Owner = MyDoc<'owner'> & {
 };
 export type Tags = MyDoc<'tags'>;
 export type Tasks = MyDoc<'tasks'>;
+export type Todos = MyDoc<'todos'>;
 export type Projects = MyDoc<'projects'>;

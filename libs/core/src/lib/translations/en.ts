@@ -58,4 +58,10 @@ export const en = {
     copy: 'Copy {{name}}',
     deleted: 'Deleted',
   },
+
+  error: {
+    title: '⚠️ ️️Oops! Something went wrong',
+    showDetails: 'Show details',
+    deleteRecord: 'Could not delete entry. Please try again',
+  },
 };

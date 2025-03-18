@@ -23,13 +23,11 @@ export function ContextMenuDemo({ rect }: { rect: DOMRect | null }) {
   const { useQueryData } = makeHooks<RecordType>();
 
   const { relationalDataModel } = useQueryData();
-  console.log('relationalDataModel', relationalDataModel);
 
   const fields = viewConfigManager
     .getViewFieldList()
     .filter((f) => f.relation || f.enum);
   const [query, setQuery] = React.useState('');
-  console.log('fields', fields);
 
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -45,8 +43,6 @@ export function ContextMenuDemo({ rect }: { rect: DOMRect | null }) {
     const result = fuse.search(query);
     return result.map((r) => r.item);
   }, [query, fields, fuse]);
-
-  console.log('results', results);
 
   const inptutRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
@@ -68,7 +64,6 @@ export function ContextMenuDemo({ rect }: { rect: DOMRect | null }) {
     ref.current?.dispatchEvent(event);
   }, [rect]);
 
-  if (rect) console.log(rect?.top + rect.height);
   return (
     <ContextMenu modal={true}>
       <ContextMenuTrigger
@@ -97,8 +92,6 @@ export function ContextMenuDemo({ rect }: { rect: DOMRect | null }) {
         {results.map((field) => {
           const icon = viewConfigManager.viewConfig.icon;
           const relationalData = relationalDataModel[field.name];
-          console.log(field.enum?.values);
-          console.log('relationalData', relationalData);
 
           return (
             <ContextMenuSub key={field.name}>

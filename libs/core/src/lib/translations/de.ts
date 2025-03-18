@@ -58,4 +58,11 @@ export const de = {
     copy: 'Kopieren',
     deleted: 'Gelöscht',
   },
+
+  error: {
+    title: '⚠️ ️️Oops! Etwas ist schiefgelaufen',
+    showDetails: 'Details anzeigen',
+    deleteRecord:
+      'Eintrag konnte nicht gelöscht werden. Bitte versuchen Sie es erneut',
+  },
 } satisfies typeof en;

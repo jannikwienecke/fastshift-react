@@ -9,8 +9,6 @@ import {
   ViewFieldConfig,
 } from './types';
 
-import { FormManager, FormManagerInterface } from './form-manager';
-
 export type ModelConfig = {
   searchableFields?: SearchableField;
   viewFields: ViewFieldConfig;
@@ -28,6 +26,7 @@ export interface BaseViewConfigManagerInterface<
   getViewFieldList(options?: { includeSystemFields?: boolean }): FieldConfig[];
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
+  getFieldByRelationFieldName(relationFieldName: string): FieldConfig;
   getIndexFields(): IndexField[];
   getSoftDeleteIndexField(): SearchableField | undefined;
   getRelationFieldByTableName(tableName: string): FieldConfig;
@@ -133,6 +132,16 @@ export class BaseViewConfigManager<
     return field as FieldConfig;
   }
 
+  getFieldByRelationFieldName(relationFieldName: string): FieldConfig {
+    const field = Object.values(this.viewConfig.viewFields).find(
+      (field) =>
+        field.relation?.fieldName.toLowerCase() ===
+        relationFieldName.toLowerCase()
+    );
+
+    return field as FieldConfig;
+  }
+
   getRelationFieldByTableName(tableName: string): FieldConfig {
     const field = this.getViewFieldList().find(
       (f) =>
@@ -170,7 +179,7 @@ export class BaseViewConfigManager<
     }
 
     return view.includeFields.filter((field) => {
-      const isList = view.viewFields[field]?.isList;
+      const isList = view.viewFields[field.toString()]?.isList;
       if (isList) {
         return false;
       }

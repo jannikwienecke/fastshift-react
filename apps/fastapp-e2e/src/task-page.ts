@@ -8,6 +8,8 @@ export class TaskPage {
   readonly filterList: Locator;
   readonly datePicker: Locator;
   readonly contextmenu: Locator;
+  readonly displayOptions: Locator;
+  readonly displayOptionsButton: Locator;
   constructor(page: Page) {
     this.page = page;
     this.filterButton = page.getByTestId('filter-button');
@@ -15,6 +17,8 @@ export class TaskPage {
     this.filterList = page.getByTestId('filter-list');
     this.datePicker = page.getByTestId('date-picker');
     this.contextmenu = page.getByTestId('contextmenu');
+    this.displayOptions = page.getByTestId('display-options');
+    this.displayOptionsButton = page.getByTestId('display-options-button');
   }
 
   async goto() {

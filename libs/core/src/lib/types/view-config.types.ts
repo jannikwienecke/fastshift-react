@@ -1,6 +1,5 @@
 import {
   FieldConfig,
-  FieldType,
   GetTableDataType,
   GetTableName,
   IndexField,
@@ -23,7 +22,7 @@ export type ViewConfigType<T extends GetTableName = any> =
   ViewConfigBaseInfo<T> & {
     _generated?: boolean;
     viewFields: ViewFieldConfig;
-    includeFields: IncludeConfig[string];
+    includeFields: IncludeConfig<keyof GetTableDataType<T>>[string];
     displayField: {
       field: keyof GetTableDataType<T>;
       cell?: (value: GetTableDataType<T>) => React.ReactNode;
@@ -31,6 +30,7 @@ export type ViewConfigType<T extends GetTableName = any> =
     fields?: {
       [field in keyof GetTableDataType<T>]?: {
         isDateField?: boolean;
+        showCheckboxInList?: boolean;
       };
     };
     query?: {
@@ -38,6 +38,13 @@ export type ViewConfigType<T extends GetTableName = any> =
       searchableFields?: SearchableField[];
       indexFields?: IndexField[];
       primarySearchField?: keyof GetTableDataType<T>;
+      sorting?: {
+        field: keyof GetTableDataType<T>;
+        direction: 'asc' | 'desc';
+      };
+      grouping?: {
+        field: keyof GetTableDataType<T>;
+      };
     };
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;

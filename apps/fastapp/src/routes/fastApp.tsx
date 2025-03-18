@@ -1,8 +1,10 @@
 import { Button, cn, Sidebar, SidebarBody, SidebarLink } from '@apps-next/ui';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
+import { ErrorDetailsDialog } from '@apps-next/react';
+import { observer } from '@legendapp/state/react';
 import {
   CircleIcon,
   DotIcon,
@@ -17,22 +19,41 @@ import {
   Outlet,
 } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { views } from '@apps-next/convex';
+import { Toaster } from 'sonner';
+import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query';
+import { api } from '@apps-next/convex';
 
 export const Route = createFileRoute('/fastApp')({
-  component: FastAppLayoutComponent,
+  component: () => <FastAppLayoutComponent />,
   errorComponent: (props) => {
     return <ErrorComponent {...props} />;
   },
 });
 
-function FastAppLayoutComponent() {
+const FastAppLayoutComponent = observer(() => {
+  const mutation = useConvexMutation(api.query.testQuery);
+
+  const handleTestQuery = async () => {
+    try {
+      await mutation({});
+    } catch (error) {
+      //
+    }
+  };
+
+  // return <button onClick={handleTestQuery}>Test Query</button>;
+
   return (
-    <Layout>
-      <Outlet />
-    </Layout>
+    <>
+      <Layout>
+        <Outlet />
+      </Layout>
+
+      <ErrorDetailsDialog />
+      <Toaster richColors duration={2000} />
+    </>
   );
-}
+});
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();

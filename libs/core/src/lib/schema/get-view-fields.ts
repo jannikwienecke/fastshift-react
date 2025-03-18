@@ -18,7 +18,8 @@ export const generateViewFields = (_prisma: Record<string, any>) => {
 
 const parseFields = (
   tableData: ModelSchema['models'][0],
-  Prisma: ModelSchema
+  Prisma: ModelSchema,
+  prevTableName?: string
 ) => {
   return Object.entries(tableData.fields).map(([index, fieldData]) => {
     const {
@@ -35,14 +36,17 @@ const parseFields = (
 
     if (
       (relation?.type === 'manyToMany' || relation?.type === 'oneToMany') &&
-      relation?.manyToManyTable
+      relation?.manyToManyTable &&
+      prevTableName !== tableData.name
     ) {
       // if this is a many to many relation, we need to get the fields of the many to many table
       const model = Prisma.models.find(
         (m) => m.name === relation?.manyToManyTable
       );
 
-      const parsed = model ? parseFields(model, Prisma) : undefined;
+      const parsed = model
+        ? parseFields(model, Prisma, tableData.name)
+        : undefined;
 
       const fields = parsed?.map((value) => value[1]) as FieldConfig[];
 
@@ -65,6 +69,7 @@ const parseFields = (
             }
           : undefined,
         isList,
+        isRecursive: fieldData.isRecursive,
       } satisfies FieldConfig,
     ];
   });

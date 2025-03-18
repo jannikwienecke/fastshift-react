@@ -26,17 +26,13 @@ export const handleRelationalTableQuery = async ({
     relationQuery.tableName
   );
 
-  console.log('field', field.name);
-
   const dbQuery = queryClient(ctx, field.name);
   const { relationalViewManager } = relationalViewHelper(
     field.name,
     args.registeredViews
   );
 
-  console.log('HIER1');
   const indexFieldDeleted = relationalViewManager.getSoftDeleteIndexField();
-  console.log(indexFieldDeleted);
 
   const searchFields = relationalViewManager.getSearchableFields() || [];
 
@@ -48,7 +44,6 @@ export const handleRelationalTableQuery = async ({
 
   const rowIdsNotDeleted = rowsNotDeleted?.map((row) => row._id) ?? null;
 
-  console.log({ searchFields });
   const fetch = async () => {
     if (!args.query) {
       return indexFieldDeleted
@@ -59,7 +54,6 @@ export const handleRelationalTableQuery = async ({
     }
 
     if (searchFields.length && args.query) {
-      console.log('WITH SEARCH', rowIdsNotDeleted);
       return await withSearch(dbQuery, {
         searchFields,
         query: args.query,

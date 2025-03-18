@@ -39,12 +39,18 @@ export const schemaHelper = (
 
     const modelOfRelationType =
       includes &&
-      fieldData.type.toLowerCase().replace(tableData.name.toLowerCase(), '');
+      fieldData.type
+        .replace('_', '')
+        .toLowerCase()
+        .replace(tableData.name.toLowerCase(), '');
 
     const model = Prisma.models.find(
       (m) => m.name.toLowerCase() === modelOfRelationType
     );
-    return model;
+
+    if (relationName) return model;
+
+    return null;
   };
 
   const isManyToManyRelation = () => {
@@ -184,7 +190,7 @@ export const schemaHelper = (
     return true;
   };
 
-  return {
+  const x = {
     isManyToManyRelation: isManyToManyRelation(),
     isOneToOneRelation: getIsOneToOneRelation(),
     relationType: getRelationType(),
@@ -198,6 +204,8 @@ export const schemaHelper = (
     isOptionForDisplayField: isOptionForDisplayField(),
     isList: isList,
   };
+
+  return x;
 };
 
 export const getPrefferedDisplayField = (fieldNames: string[]) => {

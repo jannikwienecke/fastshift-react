@@ -103,7 +103,7 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
                         }}
                       >
                         <div className="flex items-center gap-4">
-                          {comboboxProps.multiple ? (
+                          {comboboxProps.showCheckboxInList ? (
                             <Checkbox checked={isSelected ? true : false} />
                           ) : null}
 

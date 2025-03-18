@@ -29,6 +29,7 @@ export const DEFAULT_COMBOBOX_STATE: ComboboxState = {
   datePickerProps: null,
   field: null,
   row: null,
+  showCheckboxInList: false,
 };
 
 export const DEFAULT_FILTER_STATE: FilterStore = {
@@ -65,6 +66,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'fetchMore'
   | 'displayOptions'
   | 'contextMenuState'
+  | 'errorDialog'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -75,6 +77,9 @@ export const DEFAULT_LEGEND_STORE: Pick<
     cursor: null,
     numItems: DEFAULT_FETCH_LIMIT_QUERY,
   } as PaginationOptions,
+  errorDialog: {
+    error: null,
+  },
   fetchMore: {
     currentCursor: {
       position: null,

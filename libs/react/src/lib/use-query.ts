@@ -36,10 +36,11 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
       })
     : {
         queryKey: makeQueryKey({
-          viewName: args.viewConfig?.viewName,
-          query: args.query,
-          relation: args.relationQuery?.tableName,
-          filters: args.filters,
+          viewName: args.viewConfig?.viewName ?? '',
+          query: args.query ?? null,
+          relation: args.relationQuery?.tableName ?? null,
+          filters: args.filters ?? null,
+          displayOptions: args.displayOptions ?? null,
         }),
         queryFn: () => {
           return api.prisma?.viewLoader(args);
@@ -74,15 +75,6 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
       data: stored.current?.data,
     };
   }
-
-  // if (args.viewConfig?.viewName === 'task' && !args.relationQuery) {
-  //   //   console.log({
-  //   //     // cursor: args.paginateOptions?.cursor.cursor?.slice(0, 10),
-  //   //     filters: args.filters?.length,
-  //   //   });
-
-  //   console.log(stored.current.data.data.length);
-  // }
 
   return stored.current;
 };
@@ -140,7 +132,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
     useStableQuery(prisma, queryPropsMerged);
 
-  // console.log(queryReturn?.data?.data?.length);
   return {
     ...queryReturn,
     data: queryReturn.data?.data ?? [],

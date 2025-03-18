@@ -6,6 +6,7 @@ import {
 import { CubeIcon, TokensIcon } from '@radix-ui/react-icons';
 import schema from '../convex/schema';
 import { createViewConfig } from '@apps-next/react';
+import { CheckCheckIcon } from 'lucide-react';
 
 export * from '../convex/_generated/api';
 export * from '../convex/schema';
@@ -31,11 +32,17 @@ export const tasksConfig = createViewConfig(
       // dueDate (date in the name -> date field)
       // dueDate (date with upper case D -> Due Date)
       dueDate: { isDateField: true },
+      todos: {
+        // showCheckboxInList: false,
+      },
     },
-    includeFields: ['tags'],
+    includeFields: ['tags', 'tasks', 'todos'],
     query: {
       showDeleted: false,
       primarySearchField: 'name',
+      // default sorting
+      // sorting: { field: 'projectId', direction: 'asc' },
+      // grouping: { field: 'projectId' },
     },
     mutation: {
       softDelete: true,
@@ -66,4 +73,17 @@ export const projectsConfig = createViewConfig(
   config.config
 );
 
-export const views = makeViews(config.config, [tasksConfig, projectsConfig]);
+export const todosConfig = createViewConfig(
+  'todos',
+  {
+    icon: CheckCheckIcon,
+    displayField: { field: 'name' },
+  },
+  config.config
+);
+
+export const views = makeViews(config.config, [
+  tasksConfig,
+  projectsConfig,
+  todosConfig,
+]);

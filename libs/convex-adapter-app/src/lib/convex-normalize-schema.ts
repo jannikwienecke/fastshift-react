@@ -1,4 +1,4 @@
-import { ModelSchema, ModelField, EnumType } from '@apps-next/core';
+import { EnumType, ModelField, ModelSchema } from '@apps-next/core';
 import { ConvexSchema } from './_internal/convex-schema.types';
 
 const typeMapping: Record<string, string> = {
@@ -23,6 +23,8 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
   for (const [tableName, tableSchema] of Object.entries(convexSchema)) {
     const fields: ModelField[] = [];
 
+    // log(tableSchema.validator.fields);
+
     for (const [fieldName, fieldSchema] of Object.entries(
       tableSchema.validator.fields
     )) {
@@ -30,6 +32,7 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
       let relationName = '';
       let manyToManyModelName: string | undefined = undefined;
       let isList = false;
+      let isRecursive = false;
       // hasManyTableName: Project has Many Tasks
       let hasManyTableName = '';
 
@@ -60,13 +63,24 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
         hasManyTableName = fieldSchema.element.tableName;
       }
 
-      const type = manyToManyModelName
+      let type = manyToManyModelName
         ? manyToManyModelName
         : fieldSchema.kind === 'id' && fieldSchema.tableName
         ? fieldSchema.tableName
         : isList && hasManyTableName
         ? hasManyTableName
         : typeMapping[fieldSchema.kind as string] ?? 'String';
+
+      if (fieldSchema.kind === 'union') {
+        const member = fieldSchema.members?.find(
+          (m) => (m as any)?.element?.tableName === tableName
+        );
+        if (member) {
+          isRecursive = true;
+          type = tableName;
+          isList = member.kind === ('array' as any);
+        }
+      }
 
       const field: ModelField = {
         name: isManyToManyField
@@ -77,24 +91,31 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
           : fieldSchema.tableName
           ? [fieldName]
           : [],
-        relationName: relationName || fieldSchema.tableName,
+        relationName: isRecursive
+          ? 'tasks'
+          : relationName || fieldSchema.tableName,
         relationToFields: isManyToManyField
           ? []
           : fieldSchema.tableName
           ? [fieldName]
           : [],
         // kind: isManyToManyField ? 'object' : fieldSchema.kind,
-        kind: hasManyTableName ? hasManyTableName : fieldSchema.kind,
-        isList: fieldSchema.kind === 'array',
+        kind: isRecursive
+          ? tableName
+          : hasManyTableName
+          ? hasManyTableName
+          : fieldSchema.kind,
+        isList: isList ?? fieldSchema.kind === 'array',
         isRequired: fieldSchema.isOptional === 'required',
         isUnique: false, // Convex doesn't have a direct 'unique' property
         isId: false,
         isReadOnly: false, // Convex doesn't have a direct 'readOnly' property
         hasDefaultValue: false, // Convex doesn't have a direct 'default' property
         type,
+        isRecursive,
       };
 
-      if (fieldSchema.kind === 'union' && fieldSchema.members) {
+      if (!isRecursive && fieldSchema.kind === 'union' && fieldSchema.members) {
         field.type = 'enum';
         field.kind = 'enum';
         const enumName = `${tableName}_${fieldName}`;

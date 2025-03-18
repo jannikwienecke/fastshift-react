@@ -1,46 +1,17 @@
-import {
-  convertFiltersForBackend,
-  lldebug,
-  makeQueryKey,
-  MutationDto,
-  MutationReturnDto,
-} from '@apps-next/core';
+import { lldebug, MutationDto, MutationReturnDto } from '@apps-next/core';
 import {
   useMutation as useMutationTanstack,
   useQueryClient,
 } from '@tanstack/react-query';
 import React from 'react';
-import { store$, useView } from '..';
+import { toast } from 'sonner';
+import { store$ } from '..';
 import { useApi } from './use-api';
 import { reset$ } from './use-query-data';
-export const useMutation = () => {
-  const { viewConfigManager } = useView();
 
-  const query = store$.globalQueryDebounced.get();
+export const useMutation = () => {
   const api = useApi();
   const queryClient = useQueryClient();
-
-  const { registeredViews } = useView();
-  const filters = store$.filter.filters.get();
-  const parsedFilters = convertFiltersForBackend(filters);
-
-  const queryPropsMerged = React.useMemo(() => {
-    return {
-      query,
-      registeredViews,
-      modelConfig: viewConfigManager.modelConfig,
-      viewConfig: viewConfigManager.viewConfig,
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      viewConfigManager: undefined,
-    };
-  }, [
-    query,
-    registeredViews,
-    viewConfigManager.modelConfig,
-    viewConfigManager.viewConfig,
-  ]);
 
   const lastViewName = React.useRef('');
 
@@ -55,16 +26,18 @@ export const useMutation = () => {
       });
     },
     onSuccess: () => {
+      store$.fetchMore.reset.set(true);
+
       setTimeout(() => {
         reset$.set({ value: reset$.get().value + 1 });
-      }, 500);
+      }, 300);
     },
 
     onError: () => {
       setTimeout(() => {
         queryClient.invalidateQueries();
         reset$.set({ value: reset$.get().value + 1 });
-      }, 500);
+      }, 300);
     },
 
     onMutate: async (vars) => {
@@ -73,56 +46,6 @@ export const useMutation = () => {
       store$.fetchMore.isDone.set(false);
 
       lastViewName.current = vars.viewName;
-      // IMPROVEMENT: Fix This. getting and setting queryKey must happen in 1 location!
-      const _queryKeyAll = api?.makeQueryOptions?.({
-        ...queryPropsMerged,
-        query: '',
-        viewName: vars.viewName,
-        filters: '',
-      }).queryKey;
-      const _queryKey = api?.makeQueryOptions?.({
-        ...queryPropsMerged,
-        query: vars.query,
-        viewName: vars.viewName,
-        filters: parsedFilters,
-      }).queryKey;
-      const queryKey =
-        _queryKey ??
-        makeQueryKey({
-          viewName: vars.viewName,
-          query: vars.query,
-        });
-      const queryKeyAll =
-        _queryKeyAll ??
-        makeQueryKey({
-          viewName: vars.viewName,
-        });
-      await queryClient.cancelQueries({
-        queryKey: queryKey,
-      });
-      await queryClient.cancelQueries({
-        queryKey: queryKeyAll,
-      });
-
-      const previousState = queryClient.getQueryData(queryKey);
-      const previousStateAll = queryClient.getQueryData(queryKeyAll);
-      if ('handler' in vars.mutation && previousState) {
-        const newState = vars.mutation.handler?.(
-          (previousState as any).data || []
-        );
-        queryClient.setQueryData(queryKey, {
-          data: newState,
-        });
-        queryClient.setQueryData(queryKeyAll, {
-          data: newState,
-        });
-        return {
-          previousState,
-          previousStateAll,
-        };
-      } else {
-        return previousState;
-      }
     },
   });
 
@@ -132,10 +55,20 @@ export const useMutation = () => {
 
       try {
         const res = await mutateAsync(args);
+
         if (!res) throw new Error('mutation failed');
+
+        if (res.error) {
+          console.error('Error in mutation: ', res.error);
+        }
+
         return res;
       } catch (error) {
-        return { error: (error as any)?.message };
+        toast.error(
+          (error as Error | undefined)?.message || 'Unexpected error'
+        );
+
+        throw error;
       }
     },
     [mutateAsync]

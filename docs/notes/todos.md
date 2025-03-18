@@ -21,8 +21,18 @@ created: 1723444498044
 - [x] make tests pass
 - [x] tests contextmenu
 - [x] fix all build errors
-- [ ] fix github actions: all e2e run
-- [ ] implement default / fallback component
+- [x] fix github actions: all e2e run
+- [x] handling mutation return types
+- [x] add sonner for alerts
+- [x] implement default / fallback component
+- [x] task has sub-tasks
+- [x] tasks has todos (model with only a label, status)
+- [x] add test for one-to-many: tasks has many todos
+- [x] add test for deleting a task
+- [x] add tests for grouping / sorting
+- [x] default sorting / default grouping
+- [ ] add confirmation dialog (framework approach, to be enabled by field and action?)
+- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
 
 ## How we handle Deletes with soft delete
 

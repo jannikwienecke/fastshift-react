@@ -7,13 +7,14 @@ import {
   Row,
 } from '@apps-next/core';
 import { observable, Observable } from '@legendapp/state';
+import { renderErrorToast } from '../toast';
 import { LegendStore, StoreFn } from './legend.store.types';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
 const idsToDelete$ = observable<string[]>([]);
 const isRunning$ = observable(false);
-export const ignoreNewData$ = observable(false);
+export const ignoreNewData$ = observable(0);
 
 export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   (store$) =>
@@ -50,8 +51,10 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
     });
 
     if (isRunning$.get()) {
-      ignoreNewData$.set(true);
+      ignoreNewData$.set((prev) => prev + 1);
+      return;
     }
+
     isRunning$.set(true);
 
     const mutation: Mutation = {
@@ -63,7 +66,6 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
         newIds: checkedRows$.get().map((r) => r.id),
       },
     };
-    console.warn('Mutation payload:', mutation);
 
     const { error } = await store$.api.mutateAsync({
       mutation,
@@ -97,10 +99,13 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
     };
     console.warn('Record to update:', record);
 
+    const fieldName =
+      store$.viewConfigManager.getFieldBy(field.name).relation?.fieldName ?? '';
+
     const rollback = optimisticUpdateStore({
       store$,
       row,
-      record: { [field.name]: patchValue },
+      record: { [field.name]: valueRow.raw, [fieldName]: patchValue },
     });
 
     const mutation: Mutation = {
@@ -128,14 +133,13 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
 
 export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
   (store$) =>
-  async ({ row }, cb) => {
+  async ({ row }, onSuccess, onError) => {
     const mutation: Mutation = {
       type: 'DELETE_RECORD',
       payload: {
         id: row.id,
       },
     };
-    console.warn('Mutation payload:', mutation);
 
     const { error } = await store$.api.mutateAsync({
       mutation,
@@ -144,10 +148,14 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
     });
 
     if (error) {
-      console.error('Error deleting record:', error);
+      onError?.(error.message);
+
+      renderErrorToast('error.deleteRecord', () => {
+        store$.errorDialog.error.set(error);
+      });
     } else {
       console.warn('Record deleted successfully');
-      cb?.();
+      onSuccess?.();
     }
   };
 
@@ -184,7 +192,9 @@ export const optimisticUpdateStore = ({
   // Update context menu
   const updatedRow = makeData(store$.views.get(), viewName)([updatedRowData])
     .rows?.[0];
+
   if (updatedRow) {
+    store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
     store$.contextMenuState.row.set(updatedRow);
     if (updateGlobalDataModel) {
       store$.dataModel.rows.set(updatedRows);

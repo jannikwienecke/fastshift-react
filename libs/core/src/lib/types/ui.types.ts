@@ -98,6 +98,7 @@ export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> = {
   searchable: boolean;
   name: string;
   datePickerProps?: DatePickerProps;
+  showCheckboxInList?: boolean;
 };
 
 export type ComboboxAdapterOptions<T extends ComboxboxItem> = {
@@ -125,9 +126,6 @@ export type MakeDisplayOptionsPropsOptions<T extends RecordType = RecordType> =
   {
     placeholder?: string;
     label?: string;
-    sorting: {
-      defaultSortingField: keyof T;
-    };
     displayFieldsToShow?: (keyof T)[];
   };
 

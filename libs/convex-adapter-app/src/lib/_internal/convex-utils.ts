@@ -10,3 +10,11 @@ export const parseConvexData = (
     ...r,
   })) as RecordType[];
 };
+
+export const getErrorMessage = (error: unknown): string => {
+  return (
+    (error as Error | undefined)?.message ??
+    JSON.stringify(error) ??
+    'UNKNOWN ERROR'
+  );
+};

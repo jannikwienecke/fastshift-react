@@ -3,13 +3,9 @@ import {
   makeData,
   makeDayMonthString,
   makeRow,
-  Mutation,
-  NONE_OPTION,
-  RecordType,
+  makeRowFromValue,
   Row,
 } from '@apps-next/core';
-import { Observable } from '@legendapp/state';
-import { handleSelectUpdate } from '../field-features/update-record-mutation';
 import {
   dateUtils,
   operatorMap,
@@ -20,8 +16,8 @@ import {
   newSelected$,
   removedSelected$,
 } from './legend.combobox.helper';
-import { LegendStore, StoreFn } from './legend.store.types';
 import { comboboxStore$ } from './legend.store.derived.combobox';
+import { StoreFn } from './legend.store.types';
 
 export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   store$.deselectRelationField();
@@ -78,7 +74,7 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
       if (!state.multiple) {
         store$.combobox.selected.set([value]);
 
-        store$.comboboxRunSelectMutation(value, value);
+        store$.comboboxRunSelectMutation(value, null);
       } else {
         const selected = state.selected.some((s) => s.id === value.id)
           ? state.selected.filter((s) => s.id !== value.id)
@@ -97,7 +93,7 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
           newSelected$.set(newSelected$.get().filter((s) => s.id !== value.id));
         }
 
-        store$.comboboxRunSelectMutation(value, selected);
+        store$.comboboxRunSelectMutation(value, state.selected);
       }
     }
   };
@@ -145,211 +141,39 @@ export const comboboxHandleQueryData: StoreFn<'comboboxHandleQueryData'> =
     store$.combobox.values.set(dataModel.rows);
   };
 
-let timeout: NodeJS.Timeout | null = null;
-let runningMutation = false;
-
 export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
-  (store$) => (value, newSelected) => {
-    console.log('comboboxRunSelectMutation', value, newSelected);
-
-    const runMutation = store$.api?.mutateAsync;
-
-    const selected = store$.combobox.selected.get();
+  (store$) => async (value, existingRows) => {
     const { row, field } = comboboxStore$.get();
-    const { row: row1 } = store$.contextMenuState.get();
 
     if (!row) return;
     if (!field) throw new Error('no field');
 
-    const isManyToManyRelation = field?.relation?.manyToManyRelation;
-
     // close if not is manyToManyField
-    if (!isManyToManyRelation) {
+    if (!field.relation?.manyToManyRelation) {
       setTimeout(() => {
         store$.deselectRelationField();
         store$.comboboxClose();
       }, 100);
-    }
 
-    if (field.type === 'Boolean' && row) {
-      const mutation = handleSelectUpdate({
+      let valueToUse = value;
+      if (field.type === 'Date' && row) {
+        const parsed = dateUtils.parseOption(value.id, operatorMap.is);
+        const { start } = dateUtils.getStartAndEndDate(parsed);
+        start?.setHours(2, 0, 0, 0);
+        valueToUse = makeRowFromValue(start?.getTime() ?? 0, field);
+      }
+
+      store$.updateRecordMutation({
         field,
+        valueRow: valueToUse,
         row,
-        value,
-        selected: selected ?? [],
       });
-
-      runMutation({
-        mutation: mutation,
-        viewName: store$.viewConfigManager.viewConfig.viewName.get(),
-        query: store$.globalQuery.get(),
+    } else {
+      store$.selectRowsMutation({
+        field,
+        existingRows: existingRows ?? [],
+        checkedRow: value,
+        row,
       });
-      return;
     }
-
-    const selectedRelationField = store$.list.selectedRelationField.get();
-    if (!selectedRelationField) return;
-    let dateValueToUpdate: number | null | undefined = undefined;
-    if (
-      selectedRelationField.field.type === 'Date' &&
-      !Array.isArray(newSelected)
-    ) {
-      const parsed = dateUtils.parseOption(newSelected.id, operatorMap.is);
-      const { start } = dateUtils.getStartAndEndDate(parsed);
-      start?.setHours(2, 0, 0, 0);
-      dateValueToUpdate = start?.getTime();
-      if (newSelected.id === 'No date') {
-        dateValueToUpdate = null;
-      }
-    }
-
-    const valueToUpdate = Array.isArray(newSelected)
-      ? newSelected
-          .map((s) => s.raw)
-          .sort((a, b) => b._creationTime - a._creationTime)
-      : dateValueToUpdate !== undefined
-      ? dateValueToUpdate
-      : newSelected.raw;
-
-    if (!runningMutation) {
-      // only run a optimisic update if we are not already running a mutation
-      updateDataModel(store$, valueToUpdate);
-    }
-
-    if (timeout) {
-      clearTimeout(timeout);
-      timeout = null;
-    }
-
-    timeout = setTimeout(
-      async () => {
-        if (!field) return;
-
-        let valueToUpdate =
-          dateValueToUpdate !== undefined
-            ? dateValueToUpdate
-            : !field.relation
-            ? value.raw
-            : value.id;
-
-        if (valueToUpdate === NONE_OPTION) {
-          valueToUpdate = null;
-        }
-
-        let mutation: Mutation | undefined = undefined;
-        if (isManyToManyRelation) {
-          const { idsToDelete, newIds } = getIds(store$, selected);
-          mutation = {
-            type: 'SELECT_RECORDS',
-            payload: {
-              id: row.id,
-              table: getRelationTableName(field),
-              idsToDelete,
-              newIds,
-            },
-          };
-        } else {
-          mutation = {
-            type: 'UPDATE_RECORD',
-            payload: {
-              id: row.id,
-              record: {
-                [field.relation?.fieldName ?? field.name]: valueToUpdate,
-              },
-            },
-          };
-        }
-        if (!mutation) return;
-        try {
-          runningMutation = true;
-
-          const result = await runMutation({
-            mutation: mutation,
-            viewName: store$.viewConfigManager.viewConfig.viewName.get(),
-            query: store$.globalQuery.get(),
-          });
-
-          if (result.error) {
-            removedSelected$.set([]);
-            newSelected$.set([]);
-            initSelected$.set(null);
-          }
-
-          if (isManyToManyRelation) {
-            const updatedRow = {
-              ...store$.list.selectedRelationField.row.raw.get(),
-              [field.name]: store$.dataModel.rows
-                .get()
-                ?.find((r) => r.id === row.id)?.raw?.[field.name],
-            };
-
-            // also update for non many to many relations
-            store$.list.selectedRelationField.row.raw.set(updatedRow);
-          }
-        } finally {
-          runningMutation = false;
-        }
-      },
-      isManyToManyRelation ? 1000 : 0
-    );
   };
-
-export const getSelectedId = (selected: Row | Row[]) => {
-  return typeof selected === 'string'
-    ? selected
-    : Array.isArray(selected)
-    ? selected.map((v) => v.id)
-    : (selected as Row)?.id;
-};
-
-const updateDataModel = (store$: Observable<LegendStore>, value: any) => {
-  const selectedRelationField = store$.list.selectedRelationField.get();
-  if (!selectedRelationField) return;
-
-  const rows = store$.dataModel
-    .get()
-    ?.rows.map((row) => row.raw)
-    .map((row) => {
-      if (row['id'] === selectedRelationField?.row?.id) {
-        return {
-          ...row,
-          [selectedRelationField?.field?.name]: value,
-        };
-      }
-
-      return row;
-    });
-
-  store$.createDataModel(rows);
-};
-
-export const getIds = (
-  store$: Observable<LegendStore>,
-  selected: Row[] | Row
-) => {
-  if (!Array.isArray(selected)) return { idsToDelete: [], newIds: [] };
-
-  const row = store$.list.selectedRelationField.row.get();
-  const field = store$.list.selectedRelationField.field.get();
-
-  if (!row || !field) return { idsToDelete: [], newIds: [] };
-
-  const data = store$.dataModel.rows.get().find((r) => r.id === row.id);
-  const valueIdsAfter: string[] = data?.raw?.[field.name]?.map(
-    (v: RecordType) => v['id']
-  );
-
-  const existingIds: string[] = row.raw?.[field.name]?.map(
-    (v: RecordType) => v['id']
-  );
-  const newIds_ = selected
-    .map((s) => s.id)
-    .filter((id) => !existingIds.includes(id));
-
-  const idsToDelete = existingIds.filter((id) => !valueIdsAfter.includes(id));
-
-  return {
-    idsToDelete,
-    newIds: newIds_,
-  };
-};

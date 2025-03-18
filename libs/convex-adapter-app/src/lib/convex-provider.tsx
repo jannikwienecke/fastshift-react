@@ -4,6 +4,8 @@ import { ConvexProvider } from 'convex/react';
 import { ConvexQueryProviderProps, ViewLoader } from './_internal/types.convex';
 
 import {
+  BaseViewConfigManager,
+  convertDisplayOptionsForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
   QueryProps,
   ViewConfigType,
@@ -56,11 +58,39 @@ const ProviderContent = (props: ConvexQueryProviderProps) => {
 };
 
 const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
+  const sortingFieldName = viewConfig.query?.sorting?.field;
+  const groupingFieldName = viewConfig.query?.grouping?.field;
+
+  const viewConfigManager = new BaseViewConfigManager(viewConfig);
+
+  const sortingField = sortingFieldName
+    ? viewConfigManager.getFieldByRelationFieldName(
+        sortingFieldName?.toString()
+      )
+    : undefined;
+
+  const groupingField = groupingFieldName
+    ? viewConfigManager.getFieldByRelationFieldName(
+        groupingFieldName?.toString()
+      )
+    : undefined;
+
+  const parsedDisplayOptions = convertDisplayOptionsForBackend({
+    sorting: { isOpen: false, rect: null, field: sortingField, order: 'asc' },
+    grouping: { isOpen: false, rect: null, field: groupingField },
+    isOpen: false,
+    showEmptyGroups: false,
+    showDeleted: false,
+    softDeleteEnabled: false,
+    viewField: { allFields: [], selected: [] },
+    viewType: { type: 'list' },
+  });
+
   return convexQuery(viewLoader, {
     viewName: viewConfig.viewName,
     query: '',
     filters: '',
-    displayOptions: '',
+    displayOptions: parsedDisplayOptions ?? null,
     paginateOptions: {
       cursor: { position: null, cursor: null },
       numItems: DEFAULT_FETCH_LIMIT_QUERY,

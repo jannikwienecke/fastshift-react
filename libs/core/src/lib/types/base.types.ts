@@ -53,6 +53,7 @@ export type FieldConfig<TName = string> = {
   isRequired?: boolean;
   relation?: FieldRelationType;
   isSystemField?: boolean;
+  isRecursive?: boolean;
   enum?: {
     name: string;
     values: Enum[];

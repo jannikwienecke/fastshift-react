@@ -44,7 +44,7 @@ export const makeData = (registeredViews: RegisteredViews, name: string) => {
     return {
       rows: data.map((item) => {
         return {
-          raw: item,
+          raw: { ...item },
           id: item ? (item['id'] as string) : '',
           label: item ? item[label] : '',
           getValue: <K extends keyof T>(key: K) => {

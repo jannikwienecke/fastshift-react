@@ -1,9 +1,9 @@
 import { DataModelNew, RecordType } from '@apps-next/core';
+import { observable } from '@legendapp/state';
 import React from 'react';
+import { ignoreNewData$ } from './legend-store/legend.mutationts';
 import { store$ } from './legend-store/legend.store';
 import { useQuery } from './use-query';
-import { observable, observe } from '@legendapp/state';
-import { ignoreNewData$ } from './legend-store/legend.mutationts';
 
 export type QueryStore<T extends RecordType> = {
   dataModel: DataModelNew<T>;
@@ -20,7 +20,6 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   'dataModel' | 'relationalDataModel'
 > => {
   const { data, relationalData, continueCursor, isDone } = useQuery();
-
   const dataModel = store$.dataModel.get() as DataModelNew<QueryReturnType>;
   const relationalDataModel = store$.relationalDataModel.get();
 
@@ -29,29 +28,38 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   const isDoneRef = React.useRef(false);
 
   const reset = store$.fetchMore.reset.get();
+  // let timeout: NodeJS.Timeout | null = null;
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   React.useEffect(() => {
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       isDoneRef.current = isDone;
-    }, 100);
+    }, 300);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [isDone]);
 
   React.useEffect(() => {
     if (reset) {
       isDoneRef.current = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     }
   }, [reset]);
 
   React.useEffect(() => {
-    // observe(reset$, () => {
     const { isFetching, reset } = store$.fetchMore.get();
 
     if (data === undefined) return;
 
-    if (store$.fetchMore.isDone.get()) return;
     if (isDoneRef.current) return;
 
-    if (ignoreNewData$.get()) {
-      ignoreNewData$.set(false);
+    if (ignoreNewData$.get() > 0) {
+      ignoreNewData$.set((prev) => prev - 1);
       return;
     }
 
@@ -77,7 +85,6 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
     isDoneRef.current = isDone;
 
     prevDataRef.current = allData;
-    // });
   }, [continueCursor, data, relationalData, isDone]);
 
   return {

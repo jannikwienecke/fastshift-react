@@ -69,18 +69,36 @@ export const init: StoreFn<'init'> =
         !!viewConfigManager.viewConfig.mutation?.softDelete
       );
 
+      const defaultSorting =
+        store$.viewConfigManager.viewConfig.query.sorting.get();
+
+      const defaultGrouping =
+        store$.viewConfigManager.viewConfig.query.grouping.get();
+
+      const sortingField = defaultSorting?.field
+        ? viewConfigManager.getFieldByRelationFieldName(
+            defaultSorting.field.toString()
+          )
+        : undefined;
+
+      const groupByField = defaultGrouping?.field
+        ? viewConfigManager.getFieldByRelationFieldName(
+            defaultGrouping.field.toString()
+          )
+        : undefined;
+
       displayOptionsProps.set({});
 
       store$.displayOptions.sorting.assign({
         isOpen: false,
         rect: null,
-        field: undefined,
-        order: 'asc',
+        field: sortingField,
+        order: defaultSorting?.direction || 'asc',
       });
       store$.displayOptions.grouping.assign({
         isOpen: false,
         rect: null,
-        field: undefined,
+        field: groupByField,
       });
     });
 

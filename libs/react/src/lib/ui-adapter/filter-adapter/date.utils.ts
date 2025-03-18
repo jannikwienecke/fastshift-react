@@ -300,7 +300,6 @@ class DateOptions {
       keys: ['label'],
     });
 
-    // TODO: FIX THIS
     const allFiltered = fuse
       .search(this.value)
       .sort((a, b) => (a.score || 0) - (b.score || 0))
@@ -655,7 +654,6 @@ export const dateUtils = {
   ): FilterDateType | null => {
     return DateOptionParser.parse(option, operator);
   },
-
   getStartAndEndDate: (dateFilter: FilterDateType | null | undefined) => {
     return DateCalculator.getStartAndEndDate(dateFilter);
   },

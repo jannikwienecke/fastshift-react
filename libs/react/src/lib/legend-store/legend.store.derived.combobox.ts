@@ -48,8 +48,12 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const field = isList ? selectedListField : selectedFilterField ?? null;
 
+  const { showCheckboxInList } =
+    store$.viewConfigManager.viewConfig.fields.get()?.[field?.name ?? ''] ?? {};
+
   const stateSharedFilter = getSharedStateFilter();
   const stateSharedList = getSharedStateList();
+
   const stateSharedSorting = getSharedStateSorting();
   const stateSharedGrouping = getSharedStateGrouping();
 
@@ -107,5 +111,6 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
       ? options.selected
       : stateShared.selected,
     multiple: multiple === null ? options.multiple : multiple,
+    showCheckboxInList: showCheckboxInList === false ? false : !!multiple,
   } satisfies ComboboxState;
 });

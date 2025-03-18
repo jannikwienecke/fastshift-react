@@ -60,7 +60,6 @@ export const getRelationalData = async (
 
   const resultList = await Promise.all(relationalDataPromises);
 
-  // console.log(resultList);
   const relationalData = Object.keys(include).reduce((acc, key, index) => {
     const manyToManyField = viewConfigManager.getManyToManyField(key);
     const field = manyToManyField ?? viewConfigManager.getFieldBy(key);

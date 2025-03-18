@@ -18,3 +18,5 @@ export * from './lib/input-dialog';
 export * from './lib/date-picker';
 export * from './lib/display-options';
 export * from './lib/contextmenu';
+
+export * from './lib/standard-components';

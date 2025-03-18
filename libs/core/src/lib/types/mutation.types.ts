@@ -86,12 +86,14 @@ export const STATUS = {
   ...ERROR_STATUS,
 };
 
-type SuccessStatusType = (typeof SUCCESS_STATUS)[keyof typeof SUCCESS_STATUS];
-type ErrorStatusType = (typeof ERROR_STATUS)[keyof typeof ERROR_STATUS];
+export type SuccessStatusType =
+  (typeof SUCCESS_STATUS)[keyof typeof SUCCESS_STATUS];
+export type ErrorStatusType = (typeof ERROR_STATUS)[keyof typeof ERROR_STATUS];
 
 export type MutationHandlerReturnType = {
   message: string;
-  status: SuccessStatusType;
+  status: SuccessStatusType | ErrorStatusType;
+  error?: string;
 };
 
 export type MutationHandlerSuccessType = {

@@ -23,9 +23,11 @@ export const en = {
   priority: {
     one: 'Priority',
     other: 'Priorities',
+    none: 'No Priority',
     low: 'Low',
     medium: 'Medium',
     high: 'High',
+    urgent: 'Urgent',
   },
   description: {
     one: 'Description',
