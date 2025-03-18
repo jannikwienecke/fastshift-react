@@ -1,3 +1,4 @@
+import { TranslationKeys } from '../translations';
 import { RecordType } from './base.types';
 import { DisplayOptionsUiType, FilterItemType } from './filter.types';
 
@@ -133,6 +134,12 @@ export type MakeContextMenuPropsOptions<T extends RecordType = RecordType> = {
   //
 };
 
+export type MakeConfirmationAlertPropsOption<
+  T extends RecordType = RecordType
+> = {
+  //
+};
+
 export type DisplayOptionsProps = {
   label: string;
   onOpen: (rect: DOMRect) => void;
@@ -174,6 +181,17 @@ export type FilterProps = {
   onSelect: (filter: FilterItemType, rect: DOMRect) => void;
   onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
   renderFilterValue: (filterValue: FilterItemType) => React.ReactNode;
+};
+
+export type ConfirmationDialogProps = {
+  open: boolean;
+  title?: TranslationKeys;
+  description?: TranslationKeys;
+  onSubmit?: () => void;
+  onCancel: () => void;
+  onClose: () => void;
+  submitLabel?: string;
+  cancelLabel?: string;
 };
 
 export type InputDialogProps = {

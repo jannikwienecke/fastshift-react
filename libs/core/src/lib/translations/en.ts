@@ -47,6 +47,8 @@ export const en = {
   },
   common: {
     save: 'Save',
+    submit: 'Submit',
+    confirm: 'Confirm',
     cancel: 'Cancel',
     delete: 'Delete {{name}}',
     edit: 'Edit',
@@ -63,5 +65,15 @@ export const en = {
     title: '⚠️ ️️Oops! Something went wrong',
     showDetails: 'Show details',
     deleteRecord: 'Could not delete entry. Please try again',
+  },
+
+  confirmationAlert: {
+    title: 'Are you sure?',
+    description: 'Are you sure you want to proceed?',
+    delete: {
+      title: 'Are you sure you want to delete this record?',
+      description:
+        'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
+    },
   },
 };

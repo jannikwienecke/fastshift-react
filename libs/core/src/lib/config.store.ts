@@ -9,13 +9,14 @@ export type ComponentType =
   // | 'filterValue'
   | 'icon';
 
-export type ViewFieldsConfig<
+export type UiViewConfig<
   T extends GetTableName = any,
   U extends RecordType = any
 > = {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   [key in T]: {
+    onDelete?: {
+      showConfirmation: boolean;
+    };
     fields: Partial<{
       [key in keyof U]: {
         component?: Partial<{
@@ -63,4 +64,17 @@ export type ViewFieldsConfig<
       };
     }>;
   };
+};
+
+export type ViewConfig<U extends RecordType = any> = {
+  onDelete: {
+    showConfirmation: boolean;
+  };
+  fields?: Partial<{
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    [key in keyof U]: {
+      //
+    };
+  }>;
 };

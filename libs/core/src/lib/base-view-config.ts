@@ -1,3 +1,4 @@
+import { UiViewConfig } from './config.store';
 import { invarant } from './core-utils';
 import {
   FieldConfig,
@@ -36,18 +37,26 @@ export interface BaseViewConfigManagerInterface<
     fieldName: string,
     registeredViews: RegisteredViews
   ): ViewConfigType | undefined;
+  getUiViewConfig: () => UiViewConfig[string];
 
   modelConfig?: ModelConfig;
 }
 
 export class BaseViewConfigManager<
-  TViewConfig extends ViewConfigType = ViewConfigType<any>
+  TViewConfig extends ViewConfigType = ViewConfigType<any>,
+  KUiViewConfig extends UiViewConfig = UiViewConfig
 > implements BaseViewConfigManagerInterface<any>
 {
   viewConfig: TViewConfig;
+  uiViewConfig: KUiViewConfig;
 
-  constructor(viewConfig: TViewConfig, public modelConfig?: ModelConfig) {
+  constructor(
+    viewConfig: TViewConfig,
+    uiViewConfig: KUiViewConfig,
+    public modelConfig?: ModelConfig
+  ) {
     this.viewConfig = viewConfig;
+    this.uiViewConfig = uiViewConfig;
     this.modelConfig = modelConfig;
   }
 
@@ -57,6 +66,12 @@ export class BaseViewConfigManager<
 
   getViewName(): string {
     return this.viewConfig.viewName as string;
+  }
+
+  getUiViewConfig(): KUiViewConfig[string] {
+    return this.uiViewConfig[
+      this.getTableName() as string
+    ] as KUiViewConfig[string];
   }
 
   getDisplayFieldLabel(): string {

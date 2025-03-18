@@ -16,7 +16,8 @@ import {
   RegisteredViews,
   RelationalDataModel,
   Row,
-  ViewFieldsConfig,
+  TranslationKeys,
+  UiViewConfig,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { PaginationOptions } from 'convex/server';
@@ -117,7 +118,7 @@ export type LegendStore = {
   // MAIN DATA MODEL
   dataModel: DataModelNew;
   relationalDataModel: RelationalDataModel;
-  viewFieldsConfig: ViewFieldsConfig;
+  uiViewConfig: UiViewConfig;
 
   // pagination options
   paginateOptions: PaginationOptions;
@@ -150,13 +151,20 @@ export type LegendStore = {
     };
   };
 
+  confirmationAlert?: {
+    open: true;
+    title: TranslationKeys;
+    description: TranslationKeys;
+    onConfirm: { cb: () => void };
+  };
+
   //   METHODS
   init: (
     data: RecordType[],
     relationalData: QueryRelationalData,
     viewConfigManager: BaseViewConfigManagerInterface,
     views: RegisteredViews,
-    viewFieldsConfig: ViewFieldsConfig
+    uiViewConfig: UiViewConfig
   ) => void;
 
   createDataModel: (data: RecordType[]) => void;
