@@ -1,6 +1,7 @@
 import {
   RecordType,
   RegisteredRouter,
+  ViewConfig,
   ViewFieldsConfig,
 } from '@apps-next/core';
 
@@ -32,6 +33,15 @@ export const makeViewFieldsConfig = <T extends RecordType>(
   //   ...prev,
   //   [table]: data,
   // }));
+  return {
+    [table]: data,
+  };
+};
+
+export const makeViewConfig = <T extends RecordType>(
+  table: keyof RegisteredRouter['config']['_datamodel'],
+  data: ViewConfig<T>
+) => {
   return {
     [table]: data,
   };

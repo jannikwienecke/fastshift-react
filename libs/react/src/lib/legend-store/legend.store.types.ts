@@ -16,6 +16,7 @@ import {
   RegisteredViews,
   RelationalDataModel,
   Row,
+  TranslationKeys,
   ViewFieldsConfig,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
@@ -148,6 +149,13 @@ export type LegendStore = {
       row?: Row | null;
       rect: DOMRect;
     };
+  };
+
+  confirmationAlert?: {
+    open: true;
+    title: TranslationKeys;
+    description: TranslationKeys;
+    onConfirm: { cb: () => void };
   };
 
   //   METHODS

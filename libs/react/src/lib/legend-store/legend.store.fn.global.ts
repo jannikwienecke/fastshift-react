@@ -55,6 +55,8 @@ export const init: StoreFn<'init'> =
       store$.viewFieldsConfig.set(viewFieldsConfig);
       store$.filter.filters.set([]);
 
+      if (!store$.viewConfigManager) return;
+
       const viewFields = store$.viewConfigManager
         .getViewFieldList()
         .map((field) => field.name);

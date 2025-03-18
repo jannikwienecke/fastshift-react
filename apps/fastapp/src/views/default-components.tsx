@@ -1,4 +1,5 @@
 import {
+  MakeConfirmationAlertPropsOption,
   MakeDisplayOptionsPropsOptions,
   MakeFilterPropsOptions,
   MakeListPropsOptions,
@@ -12,6 +13,7 @@ import {
 } from '@apps-next/react';
 import {
   ComboboxPopover,
+  ConfirmationDialog,
   ContextMenuDefault,
   DisplayOptions,
   Filter,
@@ -109,3 +111,21 @@ export const RenderContextmenu = observer(() => {
     </Memo>
   );
 });
+
+export const RenderConfirmationAlert = observer(
+  (props: { options?: MakeConfirmationAlertPropsOption }) => {
+    const { makeConfirmationAlertProps } = makeHooks<TaskViewDataType>();
+
+    return (
+      <Memo>
+        {() => {
+          return (
+            <ConfirmationDialog.Default
+              {...makeConfirmationAlertProps(props.options)}
+            />
+          );
+        }}
+      </Memo>
+    );
+  }
+);

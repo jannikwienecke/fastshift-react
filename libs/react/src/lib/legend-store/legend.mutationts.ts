@@ -5,6 +5,7 @@ import {
   Mutation,
   RecordType,
   Row,
+  TranslationKeys,
 } from '@apps-next/core';
 import { observable, Observable } from '@legendapp/state';
 import { renderErrorToast } from '../toast';
@@ -141,22 +142,34 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
       },
     };
 
-    const { error } = await store$.api.mutateAsync({
-      mutation,
-      viewName: store$.viewConfigManager.viewConfig.viewName.get(),
-      query: store$.globalQuery.get(),
+    store$.confirmationAlert.title.set('confirmationAlert.delete.title');
+
+    store$.confirmationAlert.description.set(
+      'confirmationAlert.delete.description'
+    );
+
+    store$.confirmationAlert.open.set(true);
+
+    store$.confirmationAlert.onConfirm.set({
+      cb: async () => {
+        const { error } = await store$.api.mutateAsync({
+          mutation,
+          viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+          query: store$.globalQuery.get(),
+        });
+
+        if (error) {
+          onError?.(error.message);
+
+          renderErrorToast('error.deleteRecord', () => {
+            store$.errorDialog.error.set(error);
+          });
+        } else {
+          console.warn('Record deleted successfully');
+          onSuccess?.();
+        }
+      },
     });
-
-    if (error) {
-      onError?.(error.message);
-
-      renderErrorToast('error.deleteRecord', () => {
-        store$.errorDialog.error.set(error);
-      });
-    } else {
-      console.warn('Record deleted successfully');
-      onSuccess?.();
-    }
   };
 
 export const optimisticUpdateStore = ({

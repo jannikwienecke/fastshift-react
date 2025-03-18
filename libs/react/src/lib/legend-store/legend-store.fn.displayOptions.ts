@@ -114,7 +114,7 @@ export const displayOptionsReset: StoreFn<'displayOptionsReset'> =
     store$.displayOptions.grouping.field.set(undefined);
     store$.displayOptions.sorting.field.set(undefined);
     store$.displayOptions.viewField.selected.set(
-      store$.viewConfigManager.getViewFieldList().map((field) => field.name)
+      store$.viewConfigManager.getViewFieldList?.().map((field) => field.name)
     );
     store$.displayOptions.showEmptyGroups.set(true);
   };

@@ -38,6 +38,7 @@ export const ClientViewProviderConvex = (
     label: f.label || `${f.name}.one`,
   }));
 
+  console.log(props);
   const viewConfigManager = React.useMemo(
     () =>
       new BaseViewConfigManager({

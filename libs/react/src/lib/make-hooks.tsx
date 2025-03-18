@@ -7,6 +7,7 @@ import { makeFilterProps } from './ui-adapter/filter-adapter';
 import { makeInputDialogProps } from './ui-adapter/input-dialog';
 import { makeDisplayOptionsProps } from './ui-adapter/filter-adapter/displayOptions-adapter';
 import { makeContextMenuProps } from './ui-adapter/filter-adapter/contextmenu-adapter';
+import { makeConfirmationAlertProps } from './ui-adapter/confirmation-alert-adapter/confirmation-alert-adapter';
 
 export const makeHooks = <T extends DataType | ViewConfigType>(
   viewConfig?: T
@@ -20,5 +21,6 @@ export const makeHooks = <T extends DataType | ViewConfigType>(
     makeComboboxProps: makeComboboxProps<DataTypeToUse<T>>,
     makeListProps: makeListProps<DataTypeToUse<T>>,
     makeContextmenuProps: makeContextMenuProps<DataTypeToUse<T>>,
+    makeConfirmationAlertProps: makeConfirmationAlertProps<DataTypeToUse<T>>,
   };
 };

@@ -6,7 +6,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getQueryKey } from '../query-client';
 import { DefaultViewTemplate } from '../views/default-view-template';
 import { TaskViewDataType } from '../views/tasks.components';
-import { viewFieldsConfig } from '../views/tasks.viewfieldsConfig';
+import { viewFieldsConfig } from '../views/tasks.config';
 
 const Task = observer(() => {
   const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
