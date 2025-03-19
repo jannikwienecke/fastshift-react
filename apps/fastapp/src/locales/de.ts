@@ -38,10 +38,7 @@ export default {
     one: 'Beschreibung',
     other: 'Beschreibungen',
   },
-  subtitle: {
-    one: 'Untertitel',
-    other: 'Untertitel',
-  },
+
   dueDate: {
     one: 'Fälligkeitsdatum',
     other: 'Fälligkeitsdaten',

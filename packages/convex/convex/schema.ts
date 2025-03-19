@@ -19,7 +19,6 @@ const _schema = defineSchema({
     name: v.string(),
     completed: v.boolean(),
     description: v.optional(v.string()),
-    subtitle: v.optional(v.string()),
     tags: v.optional(v.array(v.id('tags'))),
     projectId: v.optional(v.id('projects')),
     // priority: v.number(),
@@ -43,8 +42,6 @@ const _schema = defineSchema({
     .searchIndex('name_search', {
       searchField: 'name',
     })
-    // .index('description', ['description'])
-    // .index('subtitle', ['subtitle'])
     .index('priority', ['priority'])
 
     .searchIndex('description_search', {

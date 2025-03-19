@@ -106,8 +106,6 @@ export const displayOptionsToggleShowDeleted: StoreFn<
 
 export const displayOptionsReset: StoreFn<'displayOptionsReset'> =
   (store$) => () => {
-    console.log('displayOptionsReset...');
-    console.trace();
     store$.displayOptions.grouping.field.set(undefined);
     store$.displayOptions.sorting.field.set(undefined);
     store$.displayOptions.viewField.selected.set(

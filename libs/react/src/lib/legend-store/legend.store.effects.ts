@@ -1,6 +1,7 @@
 import { Observable, observable } from '@legendapp/state';
 import { LegendStore } from './legend.store.types';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
+import { comboboxStore$ } from './legend.store.derived.combobox';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   observable(function handleResetCombobox() {
@@ -36,12 +37,14 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     });
   }).onChange(() => null);
 
-  observable(function handleQueryChange() {
-    const query = store$.combobox.query.get();
+  observable(function handleQueryCommandbarChange() {
+    const query = store$.commandbar.query.get();
+    const fieldCommandbar = store$.commandbar.selectedViewField.get();
+    const tableName = comboboxStore$.get().tableName;
+    if (!tableName) return;
+    if (fieldCommandbar?.name !== tableName) return;
 
-    if (query === '') {
-      store$.combobox.values.set(null);
-    }
+    comboboxDebouncedQuery$.set(query ?? '');
   }).onChange(() => null);
 
   observable(function handleFilterChange() {

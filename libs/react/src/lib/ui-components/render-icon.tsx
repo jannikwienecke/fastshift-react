@@ -1,17 +1,16 @@
 import { store$ } from '../legend-store';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function Icon(props: { icon?: React.FC<any> }) {
+export function Icon(props: { icon?: React.FC<any>; color?: string }) {
   const iconColor = store$.viewConfigManager.viewConfig.iconColor.get();
 
   const Icon = props.icon || store$.viewConfigManager.viewConfig.get()?.icon;
 
   if (!Icon) return null;
-  console.log('RENDER ICON', Icon);
   return (
     <Icon
       style={{
-        color: iconColor,
+        color: props.color || iconColor,
         height: '0,75rem!important',
         width: '0,75rem!important',
       }}

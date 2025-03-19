@@ -286,7 +286,6 @@ const init = server.mutation({
         priority: 1,
         description: 'Design mockups for the website redesign',
         dueDate: tommorow,
-        subtitle: 'test',
       },
       {
         name: 'Develop frontend',
@@ -697,7 +696,6 @@ const init = server.mutation({
           priority: task.priority as any,
           description: task.description,
           dueDate: task.dueDate,
-          subtitle: task.subtitle,
           deleted: false,
           tasks,
         });

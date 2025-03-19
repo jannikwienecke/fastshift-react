@@ -17,6 +17,7 @@ import {
   makeComboboxStateGroupingOptions,
   getSharedStateGrouping,
   makeComboboxStateFilterValuesNumber,
+  getSharedStateCommandbar,
 } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
@@ -24,6 +25,7 @@ import { ComboboxState, MakeComboboxStateProps } from './legend.store.types';
 
 export const comboboxStore$ = observable<ComboboxState>(() => {
   const filterIsOpen = store$.filter.open.get();
+  const commandbarIsOpen = store$.commandbar.open.get();
 
   const displayOptions = store$.displayOptions.get();
   const displayOptionsSortingIsOpen = displayOptions.sorting.isOpen;
@@ -33,20 +35,30 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const selectedFilterField = filterIsOpen
     ? store$.filter.selectedField.get()
     : null;
+  const selectedCommandbarField = commandbarIsOpen
+    ? store$.commandbar.selectedViewField.get()
+    : null;
+
   const selectedListField = store$.list.selectedRelationField.get()?.field;
 
   const isList = !!store$.list.selectedRelationField.get();
   const isFilter = filterIsOpen;
+  const isCommandbar = !!commandbarIsOpen;
 
   if (
     !isList &&
     !isFilter &&
     !displayOptionsSortingIsOpen &&
-    !displayOptionsGroupingIsOpen
+    !displayOptionsGroupingIsOpen &&
+    !isCommandbar
   )
     return DEFAULT_COMBOBOX_STATE;
 
-  const field = isList ? selectedListField : selectedFilterField ?? null;
+  const field = isCommandbar
+    ? selectedCommandbarField
+    : isList
+    ? selectedListField
+    : selectedFilterField ?? null;
 
   const { showCheckboxInList } =
     store$.viewConfigManager.viewConfig.fields.get()?.[field?.name ?? ''] ?? {};
@@ -66,7 +78,9 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
   const multipleFilter = null;
   const multipleList = field?.relation?.manyToManyTable ? true : false;
 
-  const stateShared = isList
+  const stateShared = isCommandbar
+    ? getSharedStateCommandbar()
+    : isList
     ? stateSharedList
     : displayOptionsSortingIsOpen
     ? stateSharedSorting

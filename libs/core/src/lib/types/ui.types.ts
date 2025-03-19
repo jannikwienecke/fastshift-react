@@ -206,13 +206,18 @@ export type ConfirmationDialogProps = {
 export type CommandbarProps = {
   open?: boolean;
   itemGroups?: Array<ComboxboxItem[]>;
+  groupLabels?: string[];
   headerLabel: string;
   inputPlaceholder: string;
   query?: string;
   debouncedQuery?: string;
   debouncedBy?: number;
 
-  renderItem: (item: ComboxboxItem) => React.ReactNode;
+  renderItem: (
+    item: ComboxboxItem,
+    active: boolean,
+    index: number
+  ) => React.ReactNode;
 
   onClose: () => void;
   onOpen: () => void;

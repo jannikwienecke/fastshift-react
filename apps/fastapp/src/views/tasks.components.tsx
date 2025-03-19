@@ -55,6 +55,7 @@ export const PriorityListItemComponent = (props: {
 export const PriorityComponentCombobox = (props: { data: string }) => {
   const priority =
     priorityMap[String(props.data) as unknown as TaskViewDataType['priority']];
+
   return <PriorityComponent priority={priority} showLabel={true} />;
 };
 

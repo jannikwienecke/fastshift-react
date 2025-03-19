@@ -385,6 +385,27 @@ export const getSharedStateFilter = (): ComboboxStateCommonType => {
   return stateShared;
 };
 
+export const getSharedStateCommandbar = (): ComboboxStateCommonType => {
+  const selectedCommandbarField = store$.commandbar.selectedViewField.get();
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: null,
+    searchable: true,
+    name: 'commandbar',
+    isNewState: true,
+    open: true,
+    query: store$.commandbar.query.get() ?? '',
+    field: selectedCommandbarField ?? null,
+    selected: [],
+    row: null,
+    placeholder:
+      makeFilterPropsOptions.placeholder.get() ??
+      t('filter.button.placeholder'),
+  };
+
+  return stateShared;
+};
+
 export const getSharedStateList = (): ComboboxStateCommonType => {
   const selectedRelationField = store$.list.selectedRelationField.get();
   if (!selectedRelationField?.row) return DEFAULT_COMBOBOX_STATE;

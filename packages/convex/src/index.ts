@@ -6,7 +6,7 @@ import {
 import { CubeIcon, TokensIcon } from '@radix-ui/react-icons';
 import schema from '../convex/schema';
 import { createViewConfig } from '@apps-next/react';
-import { CheckCheckIcon } from 'lucide-react';
+import { CheckCheckIcon, TagIcon } from 'lucide-react';
 
 export * from '../convex/_generated/api';
 export * from '../convex/schema';
@@ -73,6 +73,16 @@ export const projectsConfig = createViewConfig(
   config.config
 );
 
+export const tagsConfig = createViewConfig(
+  'tags',
+  {
+    icon: TagIcon,
+    displayField: { field: 'name' },
+    colorField: { field: 'color' },
+  },
+  config.config
+);
+
 export const todosConfig = createViewConfig(
   'todos',
   {
@@ -86,4 +96,5 @@ export const views = makeViews(config.config, [
   tasksConfig,
   projectsConfig,
   todosConfig,
+  tagsConfig,
 ]);

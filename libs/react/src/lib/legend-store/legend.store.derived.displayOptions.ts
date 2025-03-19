@@ -88,7 +88,6 @@ export const derviedDisplayOptions = observable(() => {
     showEmptyGroups,
 
     onReset: () => {
-      console.log('reset');
       store$.displayOptionsReset();
     },
 

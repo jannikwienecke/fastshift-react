@@ -177,7 +177,7 @@ export type LegendStore = {
   // onInputChange: (query: string) => void;
 
   commandbar?: {
-    //
+    selectedViewField?: FieldConfig;
   } & Omit<
     CommandbarProps,
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'

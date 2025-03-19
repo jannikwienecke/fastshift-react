@@ -27,6 +27,9 @@ export type ViewConfigType<T extends GetTableName = any> =
       field: keyof GetTableDataType<T>;
       cell?: (value: GetTableDataType<T>) => React.ReactNode;
     };
+    colorField?: {
+      field: keyof GetTableDataType<T>;
+    };
     fields?: {
       [field in keyof GetTableDataType<T>]?: {
         isDateField?: boolean;

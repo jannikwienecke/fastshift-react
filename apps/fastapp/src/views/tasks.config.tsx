@@ -1,6 +1,6 @@
 import { makeViewFieldsConfig } from '@apps-next/react';
 import { DateItem, DateListItem } from '@apps-next/ui';
-import { BarChartHorizontal, PencilLineIcon } from 'lucide-react';
+import { BarChartHorizontal, PencilLineIcon, TagIcon } from 'lucide-react';
 import {
   CompletedComponent,
   CompletedComponentCombobox,

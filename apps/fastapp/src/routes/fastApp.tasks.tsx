@@ -18,7 +18,7 @@ const Task = observer(() => {
         fieldsRight: ['tags', 'completed', 'priority', 'todos'],
       }}
       filterOptions={{
-        hideFields: ['subtitle'],
+        hideFields: [],
       }}
       displayOptions={{
         displayFieldsToShow: [

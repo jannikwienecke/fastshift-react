@@ -16,6 +16,10 @@ export const en = {
   name: {
     edit: 'Rename Task',
   },
+  tags: {
+    one: 'Tag',
+    other: 'Tags',
+  },
   tasks: {
     one: 'Task',
     other: 'Tasks',
@@ -40,10 +44,7 @@ export const en = {
     one: 'Completed',
     other: 'Completed',
   },
-  subtitle: {
-    one: 'Subtitle',
-    other: 'Subtitles',
-  },
+
   dueDate: {
     one: 'Due Date',
     other: 'Due Dates',

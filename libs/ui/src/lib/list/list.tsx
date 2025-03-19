@@ -153,6 +153,7 @@ export function List<TItem extends ListItem = ListItem>({
   onKeyPress: ListProps<TItem>['onKeyPress'];
 }) {
   const onKeyPressRef = React.useRef(onKeyPress);
+
   React.useEffect(() => {
     const controller = new AbortController();
     const { signal } = controller;
