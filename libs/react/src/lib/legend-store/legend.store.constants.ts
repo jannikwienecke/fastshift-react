@@ -67,6 +67,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'displayOptions'
   | 'contextMenuState'
   | 'errorDialog'
+  | 'commandbar'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -135,4 +136,6 @@ export const DEFAULT_LEGEND_STORE: Pick<
     rect: null,
     row: null,
   },
+
+  commandbar: undefined,
 };

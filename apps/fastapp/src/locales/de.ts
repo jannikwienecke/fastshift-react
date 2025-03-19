@@ -46,6 +46,10 @@ export default {
     one: 'Fälligkeitsdatum',
     other: 'Fälligkeitsdaten',
   },
+  todos: {
+    one: 'Todo',
+    other: 'Todos',
+  },
   shared: {
     rename: '{{model}} umbenennen',
   },

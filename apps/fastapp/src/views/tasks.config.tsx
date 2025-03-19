@@ -1,20 +1,22 @@
-import { makeViewConfig, makeViewFieldsConfig } from '@apps-next/react';
+import { makeViewFieldsConfig } from '@apps-next/react';
 import { DateItem, DateListItem } from '@apps-next/ui';
 import { BarChartHorizontal, PencilLineIcon } from 'lucide-react';
 import {
   CompletedComponent,
   CompletedComponentCombobox,
+  NameFieldItem,
+  NameFieldItemCommandbar,
   PriorityListItemComponent as PriorityComponent,
   PriorityComponentCombobox,
   ProjectComponent,
   ProjectComponentCombobox,
-  ProjectNameFieldItem,
   TagsComponent,
   TagsDefaultComponent,
   TaskViewDataType,
 } from './tasks.components';
 
 import { todosConfig } from '@apps-next/convex';
+import { t } from 'i18next';
 
 export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   onDelete: {
@@ -70,9 +72,11 @@ export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
     },
 
     name: {
+      fieldLabel: () => t('tasks.edit'),
       component: {
         icon: PencilLineIcon,
-        contextmenuFieldItem: ProjectNameFieldItem,
+        contextmenuFieldItem: NameFieldItem,
+        commandbarFieldItem: NameFieldItemCommandbar,
       },
     },
 

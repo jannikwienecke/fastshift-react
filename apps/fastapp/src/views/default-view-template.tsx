@@ -1,22 +1,11 @@
 import {
-  RecordType,
-  MakeListPropsOptions,
-  MakeFilterPropsOptions,
-  MakeDisplayOptionsPropsOptions,
   MakeConfirmationAlertPropsOption,
+  MakeDisplayOptionsPropsOptions,
+  MakeFilterPropsOptions,
+  MakeListPropsOptions,
+  RecordType,
 } from '@apps-next/core';
 import { MakeComboboxPropsOptions, store$ } from '@apps-next/react';
-import { observer } from '@legendapp/state/react';
-import { Outlet } from '@tanstack/react-router';
-import {
-  RenderComboboxPopover,
-  RenderConfirmationAlert,
-  RenderContextmenu,
-  RenderDisplayOptions,
-  RenderFilter,
-  RenderInputDialog,
-  RenderList,
-} from './default-components';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,10 +15,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
-  Button,
 } from '@apps-next/ui';
+import { observer } from '@legendapp/state/react';
+import { Outlet } from '@tanstack/react-router';
 import React from 'react';
+import {
+  RenderComboboxPopover,
+  RenderCommandbar,
+  RenderConfirmationAlert,
+  RenderContextmenu,
+  RenderDisplayOptions,
+  RenderFilter,
+  RenderInputDialog,
+  RenderList,
+} from './default-components';
 
 export const DefaultViewTemplate = observer(
   <T extends RecordType>(props: {
@@ -70,6 +69,8 @@ export const DefaultViewTemplate = observer(
         </div>
 
         <RenderConfirmationAlert options={props.confirmationAlertOptions} />
+
+        <RenderCommandbar />
         {/* <AlertDialogDemo /> */}
       </>
     );

@@ -59,6 +59,9 @@ export const en = {
     createNew: 'Create new {{name}}',
     copy: 'Copy {{name}}',
     deleted: 'Deleted',
+    changeField: 'Change {{field}}...',
+    setField: 'Add to {{field}}...',
+    changeOrAdd: 'Change or add {{field}}...',
   },
 
   error: {

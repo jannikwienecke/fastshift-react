@@ -64,6 +64,12 @@ import {
   listSelectRelationField,
 } from './legend.store.fn.list';
 import { LegendStore } from './legend.store.types';
+import {
+  commandbarClose,
+  commandbarOpen,
+  commandbarSelectItem,
+  commandbarUpdateQuery,
+} from './legend.commandbar.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -139,4 +145,8 @@ export const store$ = observable<LegendStore>({
   selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
   updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
   deleteRecordMutation: (...props) => deleteRecordMutation(store$)(...props),
+  commandbarOpen: (...props) => commandbarOpen(store$)(...props),
+  commandbarClose: (...props) => commandbarClose(store$)(...props),
+  commandbarSelectItem: (...props) => commandbarSelectItem(store$)(...props),
+  commandbarUpdateQuery: (...props) => commandbarUpdateQuery(store$)(...props),
 });

@@ -13,11 +13,14 @@ export const en = {
     one: 'Project',
     other: 'Projects',
   },
+  name: {
+    edit: 'Rename Task',
+  },
   tasks: {
     one: 'Task',
     other: 'Tasks',
     create: 'Create Task',
-    edit: 'Edit Task',
+    // edit: 'Rename Task',
     delete: 'Delete Task',
   },
   priority: {
@@ -44,6 +47,10 @@ export const en = {
   dueDate: {
     one: 'Due Date',
     other: 'Due Dates',
+  },
+  todos: {
+    one: 'Todo',
+    other: 'Todos',
   },
 
   shared: {

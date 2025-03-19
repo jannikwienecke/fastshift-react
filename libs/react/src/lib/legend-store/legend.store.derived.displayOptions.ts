@@ -87,7 +87,10 @@ export const derviedDisplayOptions = observable(() => {
 
     showEmptyGroups,
 
-    onReset: () => store$.displayOptionsReset(),
+    onReset: () => {
+      console.log('reset');
+      store$.displayOptionsReset();
+    },
 
     showResetButton:
       !!sorting.field ||

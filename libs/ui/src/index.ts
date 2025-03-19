@@ -21,3 +21,4 @@ export * from './lib/contextmenu';
 
 export * from './lib/standard-components';
 export * from './lib/confirmation-alert';
+export * from './lib/commandbar';

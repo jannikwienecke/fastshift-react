@@ -48,6 +48,8 @@ export type FieldConfig<TName = string> = {
   type: FieldType;
   name: TName;
   label?: string;
+  editLabel?: string;
+  editSearchString: string;
   description?: string;
   isList: boolean;
   isRequired?: boolean;

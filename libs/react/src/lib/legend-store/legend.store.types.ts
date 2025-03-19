@@ -1,6 +1,7 @@
 import {
   BaseViewConfigManagerInterface,
   ComboxboxItem,
+  CommandbarProps,
   ContextMenuState,
   ContinueCursor,
   DataModelNew,
@@ -143,6 +144,11 @@ export type LegendStore = {
 
   //   list state
   list: {
+    rowInFocus?: {
+      row: Row | null;
+      hover: boolean;
+      focus: boolean;
+    };
     selected: RecordType[];
     selectedRelationField?: {
       field: FieldConfig;
@@ -157,6 +163,25 @@ export type LegendStore = {
     description: TranslationKeys;
     onConfirm: { cb: () => void };
   };
+
+  // open: boolean;
+  // items: ComboxboxItem[];
+  // onSelect: (item: ComboxboxItem) => void;
+  // headerLabel: string;
+  // inputPlaceholder: string;
+  // query: string;
+  // debouncedQuery: string;
+  // debouncedBy: number;
+  // onOpen: () => void;
+  // onClose: () => void;
+  // onInputChange: (query: string) => void;
+
+  commandbar?: {
+    //
+  } & Omit<
+    CommandbarProps,
+    'onClose' | 'onSelect' | 'onClose' | 'onInputChange'
+  >;
 
   //   METHODS
   init: (
@@ -256,6 +281,12 @@ export type LegendStore = {
     onSuccess?: () => void,
     onError?: (message: string) => void
   ) => void;
+
+  // commandbar
+  commandbarOpen: () => void;
+  commandbarClose: () => void;
+  commandbarUpdateQuery: (query: string) => void;
+  commandbarSelectItem: (item: ComboxboxItem) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

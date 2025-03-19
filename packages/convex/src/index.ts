@@ -22,7 +22,7 @@ declare module '@apps-next/core' {
 export const tasksConfig = createViewConfig(
   'tasks',
   {
-    viewName: 'task',
+    viewName: 'Task',
     icon: CubeIcon,
     displayField: {
       field: 'name',

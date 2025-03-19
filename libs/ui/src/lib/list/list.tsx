@@ -17,6 +17,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   onReachEnd,
   onContextMenu,
   grouping,
+  onKeyPress,
 }: ListProps<TItem>) {
   const { t } = useTranslation();
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -46,10 +47,18 @@ export function ListDefault<TItem extends ListItem = ListItem>({
         onSelect={onSelect}
         selected={selected}
         onContextMenu={onContextMenu}
+        onKeyPress={onKeyPress}
       >
-        {items.map((item) => {
+        {items.map((item, itemIndex) => {
           return (
-            <List.Item key={item.id} className="" item={item}>
+            <List.Item
+              anyItemInFocus={
+                !!items.find((i) => i.inFocus && i.focusType === 'focus')
+              }
+              key={item.id}
+              className=""
+              item={item}
+            >
               <div className="flex gap-1 pr-2">
                 <List.Control />
                 <List.Icon icon={item?.icon} />
@@ -81,7 +90,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     <>
       {grouping.groups.length ? (
         <>
-          {grouping.groups.map((group) => {
+          {grouping.groups.map((group, index) => {
             const itemsOfGroup = items.filter((item) => {
               const value = item[grouping.groupByField as keyof TItem];
 
@@ -100,6 +109,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
                   <div className="py-[8px] pl-9 flex justify-between items-center">
                     <div className="flex gap-2 items-center">
                       <div>{group.groupByLabel}</div>
+
                       <div>{itemsOfGroup.length}</div>
                     </div>
                     <div className="">
@@ -107,6 +117,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
                     </div>
                   </div>
                 </div>
+
                 {renderList(itemsOfGroup)}
               </div>
             );
@@ -134,11 +145,35 @@ export function List<TItem extends ListItem = ListItem>({
   onSelect,
   selected,
   onContextMenu,
+  onKeyPress,
 }: { children: React.ReactNode } & {
   onSelect: ListProps<TItem>['onSelect'];
   selected: ListProps<TItem>['selected'];
   onContextMenu: ListProps<TItem>['onContextMenu'];
+  onKeyPress: ListProps<TItem>['onKeyPress'];
 }) {
+  const onKeyPressRef = React.useRef(onKeyPress);
+  React.useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        const up = e.key === 'ArrowUp';
+        const down = e.key === 'ArrowDown';
+        if (!up && !down) return;
+
+        onKeyPressRef.current?.(e.key === 'ArrowDown' ? 'down' : 'up');
+      },
+      { signal }
+    );
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
   return (
     <ListProvider value={{ onSelect, selected, onContextMenu }}>
       <div className="flex flex-col w-full border-collapse overflow-scroll grow ">
@@ -183,9 +218,10 @@ function Item(
   props: React.ComponentPropsWithoutRef<'li'> & {
     children: React.ReactNode;
     item: ListItem;
+    anyItemInFocus: boolean;
   }
 ) {
-  const { children, className, item, ...restProps } = props;
+  const { children, className, item, anyItemInFocus, ...restProps } = props;
   const { selected, onContextMenu } = React.useContext(ListContext);
 
   const isSelected = selected?.map((i) => i['id']).includes(item.id);
@@ -193,6 +229,7 @@ function Item(
   return (
     <ItemProvider value={{ item }}>
       <li
+        onMouseEnter={item.onHover}
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -204,8 +241,14 @@ function Item(
         data-testid="list-item"
         className={cn(
           'flex flex-row py-[10px] pl-2 pr-4 w-full gap-2 border-b border-collapse border-[#f7f7f7]',
-          isSelected ? 'bg-foreground/5  text-foreground' : 'hover:bg-slate-50',
+          isSelected
+            ? 'bg-foreground/5  text-foreground'
+            : props.anyItemInFocus
+            ? ''
+            : 'hover:bg-slate-50',
           item.deleted ? 'opacity-80' : '',
+          item.focusType === 'focus' ? 'bg-slate-100' : '',
+
           className
         )}
         {...restProps}
@@ -290,7 +333,7 @@ function ListValues({
         )}
         {...props}
       >
-        {values.map((value, index) => {
+        {values.map((value) => {
           return (
             <List.Value
               key={

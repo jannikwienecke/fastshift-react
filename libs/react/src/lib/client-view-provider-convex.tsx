@@ -8,7 +8,6 @@ import {
   QueryReturnOrUndefined,
   RegisteredViews,
   renderModelName,
-  t,
   UiViewConfig,
 } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
@@ -18,6 +17,7 @@ import { addEffects } from './legend-store';
 import { store$ } from './legend-store/legend.store';
 import { useMutation } from './use-mutation';
 import { useQueryData } from './use-query-data';
+import { t } from 'i18next';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
@@ -33,12 +33,39 @@ type QueryProviderPropsWithViewFieldsConfig = QueryProviderConvexProps & {
 export const ClientViewProviderConvex = (
   props: QueryProviderPropsWithViewFieldsConfig
 ) => {
-  const patechedViewFields = patchDict(props.viewConfig.viewFields, (f) => ({
-    ...f,
-    label: f.label || `${f.name}.one`,
-  }));
+  const patechedViewFields = patchDict(props.viewConfig.viewFields, (f) => {
+    const translated = t(`${f.name}.edit`);
+    const noTranslation = translated === `${f.name}.edit`;
 
-  console.log(props);
+    const isMany = f.relation?.type === 'manyToMany';
+    const translatedName = t(`${f.name}.${isMany ? 'other' : 'one'}`);
+    const noTranslationName =
+      translatedName === `${f.name}.${isMany ? 'other' : 'one'}`;
+
+    const fieldLabelToUse = noTranslationName
+      ? f.name.firstUpper()
+      : translatedName;
+
+    const fallbackKey =
+      f.relation?.type === 'manyToMany'
+        ? 'changeOrAdd'
+        : f.relation
+        ? 'setField'
+        : 'changeField';
+
+    const toUse = noTranslation
+      ? t(`common.${fallbackKey}`, { field: fieldLabelToUse })
+      : translated;
+
+    return {
+      ...f,
+      label: f.label || `${f.name}.one`,
+      // editLabel: f.editLabel || `${f.name}.edit`,
+      editLabel: `${f.name}.edit`,
+      // editSearchString: toUse
+    };
+  });
+
   const viewConfigManager = React.useMemo(
     () =>
       new BaseViewConfigManager(

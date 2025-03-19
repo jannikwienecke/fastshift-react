@@ -1,3 +1,4 @@
+import { Row } from '../data-model';
 import { TranslationKeys } from '../translations';
 import { RecordType } from './base.types';
 import { DisplayOptionsUiType, FilterItemType } from './filter.types';
@@ -32,13 +33,17 @@ export type ListItem = {
   valuesLeft: ListValueProps[];
   valuesRight: ListValueProps[];
   deleted: boolean;
+  inFocus: boolean;
+  onHover: () => void;
+  focusType: 'focus' | 'hover' | 'none';
 };
 
 export type ListProps<TItem extends ListItem = ListItem> = {
+  // rowInFocus: Row | null;
   items: TItem[];
   onSelect: (item: TItem) => void;
   selected: Record<string, any>[];
-
+  onKeyPress: (type: 'up' | 'down') => void;
   grouping: {
     groupByField: string;
     groupByTableName: string;
@@ -140,6 +145,10 @@ export type MakeConfirmationAlertPropsOption<
   //
 };
 
+export type MakeCommandbarPropsOption<T extends RecordType = RecordType> = {
+  //
+};
+
 export type DisplayOptionsProps = {
   label: string;
   onOpen: (rect: DOMRect) => void;
@@ -192,6 +201,23 @@ export type ConfirmationDialogProps = {
   onClose: () => void;
   submitLabel?: string;
   cancelLabel?: string;
+};
+
+export type CommandbarProps = {
+  open?: boolean;
+  itemGroups?: Array<ComboxboxItem[]>;
+  headerLabel: string;
+  inputPlaceholder: string;
+  query?: string;
+  debouncedQuery?: string;
+  debouncedBy?: number;
+
+  renderItem: (item: ComboxboxItem) => React.ReactNode;
+
+  onClose: () => void;
+  onOpen: () => void;
+  onSelect: (item: ComboxboxItem) => void;
+  onInputChange: (query: string) => void;
 };
 
 export type InputDialogProps = {

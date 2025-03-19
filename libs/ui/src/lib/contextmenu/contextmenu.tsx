@@ -42,6 +42,7 @@ const MenuItemContent: React.FC<{
     <div className="pr-2">
       <FieldIcon field={field} />
     </div>
+
     {renderField(field)}
     <ContextMenuShortcut>
       ⌘{field.name.slice(0, 1).toUpperCase()}

@@ -1,11 +1,6 @@
-import {
-  makeRow,
-  NO_GROUPING_FIELD,
-  NO_SORTING_FIELD,
-  Row,
-} from '@apps-next/core';
-import { StoreFn } from './legend.store.types';
+import { NO_GROUPING_FIELD, NO_SORTING_FIELD } from '@apps-next/core';
 import { batch } from '@legendapp/state';
+import { StoreFn } from './legend.store.types';
 
 export const displayOptionsOpen: StoreFn<'displayOptionsOpen'> =
   (store$) => () => {
@@ -111,6 +106,8 @@ export const displayOptionsToggleShowDeleted: StoreFn<
 
 export const displayOptionsReset: StoreFn<'displayOptionsReset'> =
   (store$) => () => {
+    console.log('displayOptionsReset...');
+    console.trace();
     store$.displayOptions.grouping.field.set(undefined);
     store$.displayOptions.sorting.field.set(undefined);
     store$.displayOptions.viewField.selected.set(

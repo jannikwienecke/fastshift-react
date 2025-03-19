@@ -5,6 +5,9 @@ import {
   NO_SORTING_FIELD,
   RecordType,
   Row,
+  TranslationKeys,
+  getEditLabel,
+  getFieldLabel,
   getRelationTableName,
   makeNoneOption,
   makeRow,
@@ -23,6 +26,7 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
+import { t as translate } from 'i18next';
 
 export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed
@@ -32,21 +36,29 @@ export const removedSelected$ = observable<Row[]>([]);
 // so that we can track which items are shown on the top (when adding a new item it should not move to the top. it should stay where it is)
 export const initSelected$ = observable<Row[] | null>(null);
 
-export const getViewFieldsOptions = (): MakeComboboxStateProps | null => {
+export const getViewFieldsOptions = (options?: {
+  useEditLabel?: boolean;
+}): MakeComboboxStateProps | null => {
   let filterOptions: Row[] | null = null;
-  const query = store$.combobox.query.get();
+
+  const query =
+    (store$.combobox.query.get() || store$.commandbar.query.get()) ?? '';
 
   const viewFields = store$.viewConfigManager.get().getViewFieldList();
 
   filterOptions = viewFields.map((field) => {
-    return makeRow(field.name, translateField(t, field), field.name, field);
+    const label = options ? getEditLabel(field) : getFieldLabel(field);
+
+    return makeRow(field.name, label || field.name, field, field);
   });
 
   const fuse = new Fuse(filterOptions, {
     keys: ['label'],
+    distance: 700,
+    threshold: 0.6,
   });
 
-  const result = fuse.search(store$.combobox.query.get());
+  const result = fuse.search(query);
 
   return {
     values: query.length ? result.map((r) => r.item) : filterOptions,

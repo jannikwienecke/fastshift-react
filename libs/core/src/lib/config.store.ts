@@ -6,6 +6,7 @@ export type ComponentType =
   | 'comboboxListValue'
   | 'contextmenuFieldItem'
   | 'contextmenuFieldOption'
+  | 'commandbarFieldItem'
   // | 'filterValue'
   | 'icon';
 
@@ -19,6 +20,7 @@ export type UiViewConfig<
     };
     fields: Partial<{
       [key in keyof U]: {
+        fieldLabel?: () => string | React.ReactNode;
         component?: Partial<{
           // [key in ComponentType]: (props: { data: Row<U> }) => React.ReactNode;
           icon: React.FC<any>;
@@ -49,6 +51,10 @@ export type UiViewConfig<
               : U[key] extends boolean
               ? boolean
               : string;
+          }) => React.ReactNode;
+
+          commandbarFieldItem: (props: {
+            field: FieldConfig;
           }) => React.ReactNode;
 
           default: (props: {

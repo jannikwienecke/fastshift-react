@@ -1,6 +1,7 @@
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { makeRow } from './data-model';
-import { ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
+import { t, TranslationKeys } from './translations';
+import { FieldConfig, ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
 import { DisplayOptionsType } from './types/displayOptions.types';
 import {
   DisplayOptionsUiType,
@@ -303,4 +304,43 @@ export const patchDict = <T extends Record<string, any>>(
       },
     };
   }, dict);
+};
+
+export const getFieldLabel = (field: FieldConfig) => {
+  const isMany =
+    field.relation?.type === 'manyToMany' || field.relation?.manyToManyRelation;
+
+  const translatedName = t(`${field.name}.${isMany ? 'other' : 'one'}`);
+  const noTranslationName =
+    translatedName === `${field.name}.${isMany ? 'other' : 'one'}`;
+
+  const fieldLabelToUse = noTranslationName
+    ? field.name.firstUpper()
+    : translatedName;
+
+  return fieldLabelToUse;
+};
+
+export const getEditLabel = (field: FieldConfig) => {
+  const label = field.editLabel;
+
+  const isMany =
+    field.relation?.type === 'manyToMany' || field.relation?.manyToManyRelation;
+
+  let translated = t(label || field.name);
+  const noTranslation = translated === label;
+
+  if (noTranslation) {
+    const fallbackKey = isMany
+      ? 'changeOrAdd'
+      : field.relation
+      ? 'setField'
+      : 'changeField';
+
+    translated = t(`common.${fallbackKey}` satisfies TranslationKeys, {
+      field: getFieldLabel(field),
+    });
+  }
+
+  return translated;
 };

@@ -13,6 +13,7 @@ import {
 } from '@apps-next/react';
 import {
   ComboboxPopover,
+  commandbar,
   ConfirmationDialog,
   ContextMenuDefault,
   DisplayOptions,
@@ -124,6 +125,20 @@ export const RenderConfirmationAlert = observer(
               {...makeConfirmationAlertProps(props.options)}
             />
           );
+        }}
+      </Memo>
+    );
+  }
+);
+
+export const RenderCommandbar = observer(
+  (props: { options?: MakeConfirmationAlertPropsOption }) => {
+    const { makeCommandbarProps } = makeHooks<TaskViewDataType>();
+
+    return (
+      <Memo>
+        {() => {
+          return <commandbar.default {...makeCommandbarProps({})} />;
         }}
       </Memo>
     );

@@ -16,6 +16,45 @@ import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.d
 
 export const listItems$ = observable<ListProps['items']>([]);
 
+const focusedRow$ = observable({
+  row: null as Row | null,
+  hover: false,
+  focus: false,
+});
+
+const timeout$ = observable<number | null>(null);
+
+focusedRow$.onChange((state) => {
+  const timeout = timeout$.get();
+
+  if (state.value.row && !store$.list.rowInFocus.hover.get()) {
+    store$.list.rowInFocus.set({
+      row: state.value.row,
+      hover: true,
+      focus: false,
+    });
+
+    return;
+  }
+
+  if (timeout) {
+    clearTimeout(timeout);
+    timeout$.set(null);
+  }
+
+  if (state.value.row) {
+    const timeout = window.setTimeout(() => {
+      store$.list.rowInFocus.set({
+        row: state.value.row,
+        hover: true,
+        focus: false,
+      });
+    }, 300);
+
+    timeout$.set(timeout);
+  }
+});
+
 export const makeListProps = <T extends RecordType = RecordType>(
   options?: MakeListPropsOptions<T>
 ): ListProps<T & ListItem> => {
@@ -157,22 +196,51 @@ export const makeListProps = <T extends RecordType = RecordType>(
   };
 
   const items =
-    dataModel?.rows?.map((item) => ({
-      ...item.raw,
-      deleted: viewConfigManager.viewConfig.mutation?.softDeleteField
-        ? item.raw[
-            viewConfigManager.viewConfig.mutation.softDeleteField.toString()
-          ]
-        : false,
-      id: item.id,
-      icon: Icon,
-      valuesLeft: _renderLabel
-        ? renderLabel(item)
-        : renderFields(item, fieldsLeft),
-      valuesRight: renderFields(item, fieldsRight),
-    })) ?? [];
+    dataModel?.rows?.map((item) => {
+      const rowInFocus = store$.list.rowInFocus.get();
+
+      const isInFocus =
+        item.id === (rowInFocus?.row?.id ?? dataModel.rows?.[0]?.id);
+
+      const focusType =
+        isInFocus && rowInFocus && rowInFocus.focus
+          ? 'focus'
+          : isInFocus
+          ? 'hover'
+          : 'none';
+
+      return {
+        ...item.raw,
+        deleted: viewConfigManager.viewConfig.mutation?.softDeleteField
+          ? item.raw[
+              viewConfigManager.viewConfig.mutation.softDeleteField.toString()
+            ]
+          : false,
+        id: item.id,
+        icon: Icon,
+        valuesLeft: _renderLabel
+          ? renderLabel(item)
+          : renderFields(item, fieldsLeft),
+        valuesRight: renderFields(item, fieldsRight),
+        inFocus: isInFocus,
+
+        focusType,
+        onHover: () => {
+          // store$.list.rowInFocus.set({ row: item, hover: true, focus: false });
+          focusedRow$.set({ row: item, hover: true, focus: false });
+        },
+      } satisfies ListItem;
+    }) ?? [];
 
   listItems$.set(items);
+
+  if (!store$.list.rowInFocus.get()) {
+    store$.list.rowInFocus.set({
+      row: dataModel.rows?.[0] ?? null,
+      hover: false,
+      focus: false,
+    });
+  }
 
   return {
     onSelect: (item) => store$.selectListItem(item),
@@ -181,5 +249,24 @@ export const makeListProps = <T extends RecordType = RecordType>(
     onReachEnd: store$.globalFetchMore,
     grouping: listGrouping,
     onContextMenu: store$.onContextMenuListItem,
+    onKeyPress: (type) => {
+      const indexOfRowInFocus = dataModel.rows?.findIndex(
+        (row) => row.id === store$.list.rowInFocus.get()?.row?.id
+      );
+
+      const newIndex =
+        type === 'down'
+          ? Math.min(indexOfRowInFocus + 1, dataModel.rows.length - 1)
+          : Math.max(indexOfRowInFocus - 1, 0);
+
+      const newRow = dataModel.rows[newIndex];
+
+      newRow &&
+        store$.list.rowInFocus.set({
+          row: newRow,
+          hover: false,
+          focus: true,
+        });
+    },
   };
 };

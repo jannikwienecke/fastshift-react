@@ -7,6 +7,7 @@ import {
 } from '@apps-next/core';
 import { useViewOf } from '@apps-next/react';
 import { BubbleItem, BubbleList, Icon, PriorityComponent } from '@apps-next/ui';
+import { PencilLine } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export type TaskViewDataType = DataType<
@@ -123,12 +124,25 @@ export const ProjectComponentCombobox = (props: {
   );
 };
 
-export const ProjectNameFieldItem = (props: { field: FieldConfig }) => {
+export const NameFieldItem = (props: { field: FieldConfig }) => {
   const { t } = useTranslation();
 
   return (
     <div className="flex gap-2 items-center w-full">
       {t('shared.rename', { model: renderModelName('tasks', t) })}
+    </div>
+  );
+};
+
+export const NameFieldItemCommandbar = (props: { field: FieldConfig }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex gap-4 items-center w-full">
+      <div>
+        <PencilLine className="text-foreground/50 w-4 h-4 mr-0" />
+      </div>
+      <div>{t('shared.rename', { model: renderModelName('tasks', t) })}</div>
     </div>
   );
 };

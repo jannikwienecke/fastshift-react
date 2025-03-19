@@ -55,11 +55,13 @@ export const init: StoreFn<'init'> =
       store$.uiViewConfig.set(uiViewConfig);
       store$.filter.filters.set([]);
 
-      if (!store$.viewConfigManager) return;
+      if (!store$.viewConfigManager.get()) return;
 
       const viewFields = store$.viewConfigManager
+        .get()
         .getViewFieldList()
         .map((field) => field.name);
+
       store$.displayOptions.viewField.selected.set(viewFields);
       store$.displayOptions.viewField.allFields.set(viewFields);
 
