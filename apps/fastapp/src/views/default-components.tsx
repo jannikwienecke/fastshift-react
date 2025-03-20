@@ -16,6 +16,7 @@ import {
   commandbar,
   ConfirmationDialog,
   ContextMenuDefault,
+  datePickerModal,
   DisplayOptions,
   Filter,
   InputDialog,
@@ -139,6 +140,22 @@ export const RenderCommandbar = observer(
       <Memo>
         {() => {
           return <commandbar.default {...makeCommandbarProps({})} />;
+        }}
+      </Memo>
+    );
+  }
+);
+
+export const RenderDatePickerDialog = observer(
+  (props: {
+    //
+  }) => {
+    const { makeDatePickerDialogProps } = makeHooks<TaskViewDataType>();
+
+    return (
+      <Memo>
+        {() => {
+          return <datePickerModal.default {...makeDatePickerDialogProps({})} />;
         }}
       </Memo>
     );

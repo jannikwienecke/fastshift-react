@@ -164,20 +164,9 @@ export type LegendStore = {
     onConfirm: { cb: () => void };
   };
 
-  // open: boolean;
-  // items: ComboxboxItem[];
-  // onSelect: (item: ComboxboxItem) => void;
-  // headerLabel: string;
-  // inputPlaceholder: string;
-  // query: string;
-  // debouncedQuery: string;
-  // debouncedBy: number;
-  // onOpen: () => void;
-  // onClose: () => void;
-  // onInputChange: (query: string) => void;
-
   commandbar?: {
     selectedViewField?: FieldConfig;
+    activeItem: ComboxboxItem | null;
   } & Omit<
     CommandbarProps,
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'
@@ -287,6 +276,18 @@ export type LegendStore = {
   commandbarClose: () => void;
   commandbarUpdateQuery: (query: string) => void;
   commandbarSelectItem: (item: ComboxboxItem) => void;
+  commandbarSetValue: (value: ComboxboxItem) => void;
+
+  // date picker dialog
+  datePickerDialogState: {
+    open: boolean;
+    selected: Date | null;
+    onSubmit?: { fn: (date: Date) => void };
+  };
+  datePickerDialogOpen: (date?: Date, onSubmit?: (date: Date) => void) => void;
+  datePickerDialogClose: () => void;
+  datePickerDialogSelectDate: (date: Date) => void;
+  datePickerDialogSubmit: () => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

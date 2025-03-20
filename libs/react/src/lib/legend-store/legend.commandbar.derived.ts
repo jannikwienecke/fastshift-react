@@ -34,5 +34,6 @@ export const derivedCommandbarState$ = observable(() => {
     onOpen: () => store$.commandbarOpen(),
     onInputChange: (...props) => store$.commandbarUpdateQuery(...props),
     onSelect: (...props) => store$.commandbarSelectItem(...props),
+    onValueChange: (...props) => store$.commandbarSetValue(...props),
   } satisfies Omit<CommandbarProps, 'renderItem'>;
 });

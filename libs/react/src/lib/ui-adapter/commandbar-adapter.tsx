@@ -1,7 +1,9 @@
 import {
   CommandbarProps,
   CREATE_NEW_OPTION,
+  DELETE_OPTION,
   MakeCommandbarPropsOption,
+  makeDayMonthString,
   makeRow,
   makeRowFromValue,
   NONE_OPTION,
@@ -10,6 +12,7 @@ import {
 } from '@apps-next/core';
 
 import {
+  CalendarOffIcon,
   CarIcon,
   CheckIcon,
   PencilIcon,
@@ -29,6 +32,7 @@ import {
 } from '../ui-components/render-combobox-field-value';
 import { ComboboxNoneValue } from '../ui-components/render-combobox-none-value';
 import { Checkbox, cn } from '@apps-next/ui';
+import { getDaysInMonth } from 'date-fns';
 
 export const makeCommandbarProps = <T extends RecordType>(
   options?: MakeCommandbarPropsOption<T>
@@ -60,6 +64,29 @@ export const makeCommandbarProps = <T extends RecordType>(
                 "{store$.commandbar.query.get()}"
               </span>
             </div>
+          </div>
+        );
+      } else if (viewField && viewField.type === 'Date') {
+        if (!activeRow) return null;
+        const currentRowValue = activeRow.getValue(viewField.name);
+
+        return (
+          <div className="flex flex-row gap-2 items-center">
+            <DefaultComboboxFieldValue
+              row={item as Row}
+              fieldName={viewField.name}
+              icon={
+                item.id === DELETE_OPTION
+                  ? () => <CalendarOffIcon className="text-red-300" />
+                  : undefined
+              }
+            />
+
+            {item.id === DELETE_OPTION && currentRowValue ? (
+              <div className="text-foreground/70 whitespace-nowrap">
+                {makeDayMonthString(new Date(currentRowValue))}
+              </div>
+            ) : null}
           </div>
         );
       } else if (viewField && viewField.type === 'Enum' && activeRow) {
@@ -127,17 +154,17 @@ export const makeCommandbarProps = <T extends RecordType>(
         );
       } else if (viewField && viewField.relation) {
         const rowValue = item as Row;
-        const idCurrentRow = activeRow?.getValue(viewField.name)?.id;
+        const currentValue = activeRow?.getValue(viewField.name) as
+          | Row[]
+          | undefined;
         const rowValueId = rowValue?.id ?? '';
-
-        const isSelected =
-          idCurrentRow === rowValueId ||
-          (!idCurrentRow && rowValue.id === NONE_OPTION);
 
         const Component =
           rowValueId === NONE_OPTION ? ComboboxNoneValue : ComboboxFieldValue;
 
         const createNewOption = rowValue.id === CREATE_NEW_OPTION;
+
+        const isChecked = currentValue?.some((v) => v.id === rowValue.id);
 
         return (
           <div className="flex flex-row items-center justify-between w-full">
@@ -154,13 +181,15 @@ export const makeCommandbarProps = <T extends RecordType>(
               />
             ) : (
               <div className="flex flex-row gap-2 items-center">
-                <Checkbox className={cn(active ? 'visible' : 'invisible')} />
+                <Checkbox
+                  checked={isChecked}
+                  className={cn(active || isChecked ? 'visible' : 'invisible')}
+                />
                 <Component field={viewField} value={rowValue} row={activeRow} />
               </div>
             )}
 
             <div className="flex flex-row gap-2 items-center">
-              {isSelected ? <CheckIcon className="text-foreground/80" /> : null}
               <div className="grid place-items-center text-[11px] h-6 border border-foreground/10 rounded-sm px-2">
                 {index}
               </div>

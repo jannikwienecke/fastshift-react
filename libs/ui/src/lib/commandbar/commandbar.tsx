@@ -27,23 +27,24 @@ export const CommandDialogInput = (props: {
   );
 };
 
-export const CommandDialogItem = (props: ComboxboxItem) => {
-  return (
-    <CommandItem onSelect={() => console.log('onSelect')}>
-      {props.icon && <props.icon />}
-      <span>{props.label}</span>
-    </CommandItem>
-  );
-};
-
 export const CommandDialogList = (props: {
   itemGroups?: CommandbarProps['itemGroups'];
   groupLabels?: CommandbarProps['groupLabels'];
   renderItem: CommandbarProps['renderItem'];
   onSelect: CommandbarProps['onSelect'];
+  onValueChange: CommandbarProps['onValueChange'];
 }) => {
   const { groupLabels } = props;
-  const value = useCommandState((state) => state.value);
+  const value: string | undefined = useCommandState((state) => state.value);
+
+  React.useEffect(() => {
+    if (!value) return;
+
+    const item = props.itemGroups
+      ?.flat()
+      .find((item) => value.includes(item.label));
+    item && props.onValueChange(item);
+  }, [props, props.itemGroups, value]);
 
   return (
     <CommandList className="px-3 pb-3 flex flex-col pt-2">
@@ -60,7 +61,7 @@ export const CommandDialogList = (props: {
             ) : null}
 
             {group.map((item, index) => {
-              const active = value.includes(item.label.toString());
+              const active = value?.includes(item.label.toString());
               if (!item) return null;
               return (
                 <CommandItem
@@ -111,11 +112,13 @@ const CommandbarContainer = (
   React.useEffect(() => {
     const up = (e: KeyboardEvent) => {
       const key = e.key;
-      const isNumber = key.length === 1 && !isNaN(Number(key));
-      if (isNumber) {
+      const isSpace = key === ' ';
+      const isNumber = key.length === 1 && !isNaN(Number(key)) && !isSpace;
+
+      if (isNumber || isSpace) {
         e.preventDefault();
         e.stopPropagation();
-        onSelectRef.current?.({ id: 'key-press', label: key } as ComboxboxItem);
+        onSelectRef.current?.({ id: 'key-press', label: key });
       }
     };
 
@@ -167,5 +170,4 @@ export function CommandDialogDefault(props: CommandbarProps | undefined) {
 
 export const commandbar = {
   default: CommandDialogDefault,
-  item: CommandDialogItem,
 };

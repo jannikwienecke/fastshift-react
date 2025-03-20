@@ -210,8 +210,6 @@ export type CommandbarProps = {
   headerLabel: string;
   inputPlaceholder: string;
   query?: string;
-  debouncedQuery?: string;
-  debouncedBy?: number;
 
   renderItem: (
     item: ComboxboxItem,
@@ -222,7 +220,20 @@ export type CommandbarProps = {
   onClose: () => void;
   onOpen: () => void;
   onSelect: (item: ComboxboxItem) => void;
+  onValueChange: (item: ComboxboxItem) => void;
   onInputChange: (query: string) => void;
+};
+
+export type DatePickerDialogProps = {
+  title: string;
+  description: string;
+  open: boolean;
+  selectedDate: Date | null;
+  defaultDate?: Date | undefined;
+  submitBtnLabel?: string;
+  onSelectDate: (date: Date) => void;
+  onClose: () => void;
+  onSubmit: () => void;
 };
 
 export type InputDialogProps = {

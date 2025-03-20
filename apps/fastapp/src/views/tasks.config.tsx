@@ -1,6 +1,11 @@
 import { makeViewFieldsConfig } from '@apps-next/react';
 import { DateItem, DateListItem } from '@apps-next/ui';
-import { BarChartHorizontal, PencilLineIcon, TagIcon } from 'lucide-react';
+import {
+  BarChartHorizontal,
+  CalendarIcon,
+  PencilLineIcon,
+  TagIcon,
+} from 'lucide-react';
 import {
   CompletedComponent,
   CompletedComponentCombobox,
@@ -89,6 +94,7 @@ export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
     },
     dueDate: {
       component: {
+        icon: CalendarIcon,
         list: (props) => <DateItem value={props.data.dueDate} />,
         comboboxListValue: DateListItem,
       },

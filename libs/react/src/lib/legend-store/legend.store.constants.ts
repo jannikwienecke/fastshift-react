@@ -68,6 +68,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'contextMenuState'
   | 'errorDialog'
   | 'commandbar'
+  | 'datePickerDialogState'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -138,4 +139,9 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
 
   commandbar: undefined,
+
+  datePickerDialogState: {
+    open: false,
+    selected: null,
+  },
 };

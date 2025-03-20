@@ -2,8 +2,10 @@ import {
   ComboxboxItem,
   CommandbarProps,
   CREATE_NEW_OPTION,
+  DELETE_OPTION,
   getEditLabel,
   getFieldLabel,
+  makeDayMonthString,
   NONE_OPTION,
   Row,
   t,
@@ -12,6 +14,7 @@ import {
 import { getViewFieldsOptions } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { comboboxStore$ } from './legend.store.derived.combobox';
+import Fuse from 'fuse.js';
 
 export const getCommandbarDefaultListProps = () => {
   const viewConfigManager = store$.viewConfigManager.get();
@@ -33,6 +36,7 @@ export const getCommandbarDefaultListProps = () => {
 type PropsType = Partial<CommandbarProps>;
 export const getCommandbarSelectedViewField = () => {
   const viewField = store$.commandbar.selectedViewField.get();
+
   if (!viewField) return {};
 
   if (viewField.type === 'String') {
@@ -45,6 +49,26 @@ export const getCommandbarSelectedViewField = () => {
           },
         ],
       ],
+    } satisfies PropsType;
+  } else if (viewField.type === 'Date') {
+    const currentRow = store$.list.rowInFocus.row.get();
+    const value = currentRow?.getValue?.(viewField.name);
+
+    const options = comboboxStore$.values.get() ?? [];
+
+    const commands = value
+      ? [
+          {
+            id: DELETE_OPTION,
+            label: t('common.remove' satisfies TranslationKeys, {
+              name: getFieldLabel(viewField),
+            }),
+          },
+        ]
+      : [];
+
+    return {
+      itemGroups: [[...commands, ...options]],
     } satisfies PropsType;
   } else if (viewField.type === 'Enum') {
     return {
@@ -104,47 +128,56 @@ export const getCommandbarSelectedViewField = () => {
   } else if (viewField.relation?.manyToManyRelation) {
     const selectedOption = store$.list.rowInFocus.row.get();
 
-    let relationalRow: Row | undefined = selectedOption?.getValue?.(
+    const existingRows: Row[] | undefined = selectedOption?.getValue?.(
       viewField.name
     );
 
-    relationalRow = (relationalRow as Row | undefined)?.id
-      ? relationalRow
-      : undefined;
+    const options = comboboxStore$.values.get();
+    const optionsWithoutExistingRows =
+      options?.filter(
+        (option) => !existingRows?.some((row) => row.id === option.id)
+      ) ?? [];
 
-    const combobox = comboboxStore$.get();
+    // const existingRowsFiltered =
+    const fuse = new Fuse(existingRows ?? [], {
+      keys: ['label'],
+      threshold: 0.3,
+    });
 
-    const hasRelationalRowInValues = !!combobox.values?.find(
-      (v) => v.id === relationalRow?.id
-    );
+    const query = store$.commandbar.query.get();
+    const filteredExistingRows = query
+      ? fuse.search(query).map((result) => result.item)
+      : existingRows ?? [];
 
-    const all = hasRelationalRowInValues
-      ? [...(combobox.values ?? [])]
-      : [relationalRow as Row, ...(combobox.values ?? [])];
+    const commands = [
+      {
+        id: CREATE_NEW_OPTION,
+        label: t('common.createNew' satisfies TranslationKeys, {
+          name: getFieldLabel(viewField, true),
+        }),
+      },
+    ];
 
-    all
-      .sort((a, b) => {
-        if (a.id === NONE_OPTION) return -1;
-        if (b.id === NONE_OPTION) return 1;
-        if (a.id === relationalRow?.id) return -1;
-        if (b.id === relationalRow?.id) return 1;
-        return 0;
-      })
-      .filter(Boolean);
+    const fuseCommands = new Fuse(commands, {
+      keys: ['label'],
+      threshold: 0.3,
+    });
+
+    const filteredCommands = query
+      ? fuseCommands.search(query).map((result) => result.item)
+      : commands;
 
     return {
       itemGroups: [
-        [
-          {
-            id: CREATE_NEW_OPTION,
-            label: t('common.createNew' satisfies TranslationKeys, {
-              name: getFieldLabel(viewField, true),
-            }),
-          },
-        ],
-        all.slice(0, 10),
+        filteredCommands,
+        filteredExistingRows,
+        optionsWithoutExistingRows,
       ],
-      groupLabels: ['New Project', 'Projects'],
+      groupLabels: [
+        filteredCommands.length ? 'New Tag' : '',
+        filteredExistingRows.length ? 'Existing Tags' : '',
+        optionsWithoutExistingRows.length ? 'Tags' : '',
+      ].filter(Boolean),
     } satisfies PropsType;
   }
 

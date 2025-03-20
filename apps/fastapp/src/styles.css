@@ -95,3 +95,31 @@
   width: 1rem !important;
   height: 1rem !important;
 }
+
+.rdp-root {
+  --rdp-accent-color: indigo !important; /* Change the accent color to indigo. */
+  --rdp-accent-background-color: red; /* Change the accent background color. */
+  /* Add more CSS variables here. */
+}
+
+.clean-input[type='date'][type='date']::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* Hide the calendar icon in Firefox */
+.clean-input[type='date'] {
+  -moz-appearance: textfield;
+}
+
+/* Remove default styling in all browsers */
+.clean-input[type='date'] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  /* 80% of the foreground color */
+  color: hsl(var(--foreground) / 0.9);
+}

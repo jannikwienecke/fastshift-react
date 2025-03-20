@@ -68,8 +68,15 @@ import {
   commandbarClose,
   commandbarOpen,
   commandbarSelectItem,
+  commandbarSetValue,
   commandbarUpdateQuery,
 } from './legend.commandbar.fn';
+import {
+  datePickerDialogClose,
+  datePickerDialogOpen,
+  datePickerDialogSelectDate,
+  datePickerDialogSubmit,
+} from './legend.datepickerdialog.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -149,4 +156,13 @@ export const store$ = observable<LegendStore>({
   commandbarClose: (...props) => commandbarClose(store$)(...props),
   commandbarSelectItem: (...props) => commandbarSelectItem(store$)(...props),
   commandbarUpdateQuery: (...props) => commandbarUpdateQuery(store$)(...props),
+  commandbarSetValue: (...props) => commandbarSetValue(store$)(...props),
+
+  // date picker dialog
+  datePickerDialogOpen: (...props) => datePickerDialogOpen(store$)(...props),
+  datePickerDialogClose: (...props) => datePickerDialogClose(store$)(...props),
+  datePickerDialogSelectDate: (...props) =>
+    datePickerDialogSelectDate(store$)(...props),
+  datePickerDialogSubmit: (...props) =>
+    datePickerDialogSubmit(store$)(...props),
 });

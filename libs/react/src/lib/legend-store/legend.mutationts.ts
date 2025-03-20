@@ -210,6 +210,9 @@ export const optimisticUpdateStore = ({
 
   if (updatedRow) {
     store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
+    // const selectedOption = store$.list.rowInFocus.row.get();
+    store$.list.rowInFocus.row.set(updatedRow);
+
     store$.contextMenuState.row.set(updatedRow);
     if (updateGlobalDataModel) {
       store$.dataModel.rows.set(updatedRows);

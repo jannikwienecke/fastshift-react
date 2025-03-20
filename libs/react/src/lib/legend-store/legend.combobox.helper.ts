@@ -269,7 +269,10 @@ export const makeComboboxStateFilterValuesDate = (
 ): MakeComboboxStateProps | null => {
   if (field?.type !== 'Date') return null;
 
-  const values = getOptions(store$.combobox.query.get()).map((v) =>
+  const query =
+    (store$.combobox.query.get() || store$.commandbar.query.get()) ?? '';
+
+  const values = getOptions(query).map((v) =>
     makeRowFromValue(v.id.toString(), field)
   );
 

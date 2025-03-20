@@ -57,6 +57,7 @@ export const en = {
     yes: 'Yes',
     none: 'No',
     createNew: 'Create new {{name}}',
+    remove: 'Remove {{name}}',
     copy: 'Copy {{name}}',
     deleted: 'Deleted',
     changeField: 'Change {{field}}...',
