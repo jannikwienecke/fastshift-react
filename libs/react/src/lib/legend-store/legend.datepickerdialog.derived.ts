@@ -5,6 +5,7 @@ import { store$ } from './legend.store';
 export const derviedDatePickerDialogState$ = observable(() => {
   return {
     ...store$.datePickerDialogState.get(),
+    // TODO: HIER WEITER MACHEN -> UPDATE$ TITLE ETC...
     title: 'Select Date',
     description: 'Please select a date from the calendar.',
     submitBtnLabel: 'Select due date',
