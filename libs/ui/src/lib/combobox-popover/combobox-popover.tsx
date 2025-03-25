@@ -30,7 +30,11 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
   return (
     <Popover
       modal={true}
-      open={comboboxProps.open && Boolean(comboboxProps.name)}
+      open={
+        comboboxProps.open &&
+        Boolean(comboboxProps.name) &&
+        comboboxProps.name !== 'commandbar'
+      }
       onOpenChange={(open) => {
         comboboxProps.onOpenChange?.(open);
       }}

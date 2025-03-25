@@ -226,6 +226,7 @@ export type CommandbarProps = {
 
 export type DatePickerDialogProps = {
   title: string;
+  fieldLabel: string;
   description: string;
   open: boolean;
   selectedDate: Date | null;

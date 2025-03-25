@@ -5,23 +5,25 @@ import {
   DELETE_OPTION,
   getEditLabel,
   getFieldLabel,
-  makeDayMonthString,
   NONE_OPTION,
   Row,
   t,
   TranslationKeys,
 } from '@apps-next/core';
+import Fuse from 'fuse.js';
 import { getViewFieldsOptions } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { comboboxStore$ } from './legend.store.derived.combobox';
-import Fuse from 'fuse.js';
 
 export const getCommandbarDefaultListProps = () => {
   const viewConfigManager = store$.viewConfigManager.get();
   const viewName = viewConfigManager.getViewName();
-  const rowInFocus = store$.list.rowInFocus.row.get();
+  const rowInFocus = store$.list.rowInFocus.row.get() as Row | null;
 
-  const viewgetViewFieldsOptions = getViewFieldsOptions({ useEditLabel: true });
+  const viewgetViewFieldsOptions = getViewFieldsOptions({
+    useEditLabel: true,
+    row: rowInFocus,
+  });
 
   const items: ComboxboxItem[] =
     viewgetViewFieldsOptions?.values?.map((item) => item) ?? [];

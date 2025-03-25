@@ -1,5 +1,6 @@
 import { BaseViewConfigManagerInterface } from './base-view-config';
-import { makeRow } from './data-model';
+import { TOGGLE_FIELD_LABEL } from './core.constants';
+import { makeRow, Row } from './data-model';
 import { t, TranslationKeys } from './translations';
 import { FieldConfig, ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
 import { DisplayOptionsType } from './types/displayOptions.types';
@@ -324,26 +325,77 @@ export const getFieldLabel = (field: FieldConfig, singular?: true) => {
   return fieldLabelToUse;
 };
 
-export const getEditLabel = (field: FieldConfig) => {
+export const getEditLabel = (field: FieldConfig, row?: Row | null) => {
   const label = field.editLabel;
 
   const isMany =
     field.relation?.type === 'manyToMany' || field.relation?.manyToManyRelation;
 
   let translated = t(label || field.name);
+  let customTranslationToUse: null | string = null;
   const noTranslation = translated === label;
 
+  let customToggleField = '';
+  let toggleTranslationString = '';
+
   if (noTranslation) {
-    const fallbackKey = isMany
+    const valueOfField = row ? row.getValue(field.name) : null;
+
+    let booleanLabel = '';
+    if (field.type === 'Boolean') {
+      toggleTranslationString =
+        valueOfField === true
+          ? `${field.name}.unMarkAs`
+          : `${field.name}.markAs`;
+
+      customToggleField = t(toggleTranslationString);
+
+      booleanLabel =
+        (valueOfField as boolean) === true
+          ? t('unmarkAs', {
+              field: getFieldLabel(field),
+            })
+          : t('markAs', {
+              field: getFieldLabel(field),
+            });
+    }
+
+    const customChangeField = t(`${field.name}.changeField`);
+    const customSetField = t(`${field.name}.setField`);
+    const customChangeOrAdd = t(`${field.name}.changeOrAdd`);
+
+    customTranslationToUse =
+      customToggleField && customToggleField !== toggleTranslationString
+        ? customToggleField
+        : customChangeField !== `${field.name}.changeField`
+        ? customChangeField
+        : customSetField !== `${field.name}.setField`
+        ? customSetField
+        : customChangeOrAdd !== `${field.name}.changeOrAdd`
+        ? customChangeOrAdd
+        : null;
+
+    // if (customTranslationToUse) {
+    //   console.log({
+    //     customTranslationToUse,
+    //     customChangeField,
+    //     customSetField,
+    //     customChangeOrAdd,
+    //   });
+    // }
+
+    const fallbackKey = booleanLabel
+      ? booleanLabel
+      : isMany
       ? 'changeOrAdd'
       : field.relation
       ? 'setField'
       : 'changeField';
 
-    translated = t(`common.${fallbackKey}` satisfies TranslationKeys, {
+    translated = t(`common.${fallbackKey}` as TranslationKeys, {
       field: getFieldLabel(field),
     });
   }
 
-  return translated;
+  return customTranslationToUse || translated;
 };

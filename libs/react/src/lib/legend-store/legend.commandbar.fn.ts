@@ -1,4 +1,4 @@
-import { makeRowFromValue, Row } from '@apps-next/core';
+import { makeRowFromValue, Row, TOGGLE_FIELD_LABEL } from '@apps-next/core';
 import { StoreFn } from './legend.store.types';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import {
@@ -93,6 +93,15 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
       const row = store$.list.rowInFocus.get();
       const value = row?.row?.getValue(field.name);
 
+      console.log({
+        SELECTITEM: '',
+        item,
+        field,
+        row,
+        value,
+        selectedViewField,
+      });
+
       if (selectedViewField && row?.row) {
         if (selectedViewField.type === 'String' && query?.length) {
           store$.updateRecordMutation({
@@ -122,6 +131,7 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
               store$.commandbarClose();
               store$.datePickerDialogClose();
             });
+            return;
           } else {
             const parsed = dateUtils.parseOption(
               item.id.toString(),
@@ -181,6 +191,15 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         } else {
           throw new Error('Field type not supported1');
         }
+      } else if (field.type === 'Boolean' && row?.row) {
+        store$.updateRecordMutation({
+          field,
+          row: row.row,
+          valueRow: makeRowFromValue(!value, field),
+        });
+
+        store$.commandbarClose();
+        return;
       } else {
         store$.commandbar.selectedViewField.set(field);
       }

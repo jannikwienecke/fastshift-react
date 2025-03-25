@@ -43,7 +43,7 @@ function Default({ open, ...props }: DatePickerDialogProps) {
     <Dialog open={open} onOpenChange={(open) => !open && props.onClose()}>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>{props.title ?? 'Select a date'}</DialogTitle>
+          <DialogTitle>{props.title || 'Select a date'}</DialogTitle>
 
           <DialogDescription>{props.description ?? ''}</DialogDescription>
         </DialogHeader>

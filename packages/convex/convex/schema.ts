@@ -21,7 +21,6 @@ const _schema = defineSchema({
     description: v.optional(v.string()),
     tags: v.optional(v.array(v.id('tags'))),
     projectId: v.optional(v.id('projects')),
-    // priority: v.number(),
     priority: v.union(
       v.literal(1),
       v.literal(2),
@@ -29,6 +28,7 @@ const _schema = defineSchema({
       v.literal(4),
       v.literal(5)
     ),
+
     deleted: v.optional(v.boolean()),
     dueDate: v.optional(v.number()),
     tasks: v.optional(v.union(v.array(v.id('tasks')), v.null())),

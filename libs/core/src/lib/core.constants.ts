@@ -5,6 +5,8 @@ export const DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY = 10;
 
 export const NONE_OPTION = 'none-option';
 export const CREATE_NEW_OPTION = 'create-new-option';
+export const TOGGLE_FIELD_LABEL = 'toggle-field-label';
+
 export const DELETE_OPTION = 'delete-option';
 
 export const DEFAULT_MAX_ITEMS_GROUPING = 500;

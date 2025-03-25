@@ -1,3 +1,4 @@
+import { TOGGLE_FIELD_LABEL } from '../core.constants';
 import { operatorLabels } from '../filters';
 
 export const en = {
@@ -52,6 +53,8 @@ export const en = {
     cancel: 'Cancel',
     delete: 'Delete {{name}}',
     edit: 'Edit',
+    editField: 'Edit {{name}}',
+    saveField: 'Save {{name}}',
     change: 'Change',
     no: 'No',
     yes: 'Yes',
@@ -63,6 +66,13 @@ export const en = {
     changeField: 'Change {{field}}...',
     setField: 'Add to {{field}}...',
     changeOrAdd: 'Change or add {{field}}...',
+    // [TOGGLE_FIELD_LABEL]: TOGGLE_FIELD_LABEL,
+    markAs: 'Mark as {{field}}',
+    unmarkAs: 'Unmark as {{field}}',
+  },
+
+  datePicker: {
+    description: 'Please select a date from the calendar.',
   },
 
   error: {

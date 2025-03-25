@@ -13,9 +13,9 @@ export const en = {
     one: 'Project',
     other: 'Projects',
   },
-  name: {
-    edit: 'Rename Task',
-  },
+  // nme: {
+  //   edit: 'Rename Task!!',
+  // },
   tags: {
     one: 'Tag',
     other: 'Tags',
@@ -24,7 +24,6 @@ export const en = {
     one: 'Task',
     other: 'Tasks',
     create: 'Create Task',
-    // edit: 'Rename Task',
     delete: 'Delete Task',
   },
   priority: {
@@ -39,10 +38,13 @@ export const en = {
   description: {
     one: 'Description',
     other: 'Descriptions',
+    changeField: 'Update description',
   },
   completed: {
     one: 'Completed',
     other: 'Completed',
+    markAs: 'Mark as completed ✅',
+    unMarkAs: 'Mark task as not completed',
   },
 
   dueDate: {

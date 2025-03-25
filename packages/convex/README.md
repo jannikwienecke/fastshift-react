@@ -14,3 +14,4 @@ just convex logs - Streams out log lines to the terminal (it includes all succes
 just convex import - Allows you to import tables
 just convex export - Allows you to export tables
 just convex data projects | less -S
+just convex run init - Run "init" function, replace with any fn name

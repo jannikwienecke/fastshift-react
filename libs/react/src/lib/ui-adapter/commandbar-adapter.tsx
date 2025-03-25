@@ -9,13 +9,14 @@ import {
   NONE_OPTION,
   RecordType,
   Row,
+  t,
+  TranslationKeys,
 } from '@apps-next/core';
 
+import { Checkbox, cn } from '@apps-next/ui';
 import {
   CalendarOffIcon,
-  CarIcon,
   CheckIcon,
-  PencilIcon,
   PencilLineIcon,
   PlusIcon,
 } from 'lucide-react';
@@ -24,15 +25,13 @@ import {
   commandbarProps$,
   derivedCommandbarState$,
 } from '../legend-store/legend.commandbar.derived';
-import { getComponent } from '../ui-components/ui-components.helper';
 import { Icon } from '../ui-components';
 import {
   ComboboxFieldValue,
   DefaultComboboxFieldValue,
 } from '../ui-components/render-combobox-field-value';
 import { ComboboxNoneValue } from '../ui-components/render-combobox-none-value';
-import { Checkbox, cn } from '@apps-next/ui';
-import { getDaysInMonth } from 'date-fns';
+import { getComponent } from '../ui-components/ui-components.helper';
 
 export const makeCommandbarProps = <T extends RecordType>(
   options?: MakeCommandbarPropsOption<T>
@@ -213,6 +212,8 @@ export const makeCommandbarProps = <T extends RecordType>(
             componentType: 'icon',
           });
 
+          const label = item.label ?? '';
+
           return (
             <div className="flex flex-row gap-4 items-center">
               <div className=" text-foreground/50">
@@ -223,7 +224,7 @@ export const makeCommandbarProps = <T extends RecordType>(
                 )}
               </div>
 
-              <div>{row.label}</div>
+              <div>{label}</div>
             </div>
           );
         }

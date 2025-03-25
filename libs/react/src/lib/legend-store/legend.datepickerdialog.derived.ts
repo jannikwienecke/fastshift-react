@@ -1,14 +1,33 @@
-import { DatePickerDialogProps } from '@apps-next/core';
+import {
+  DatePickerDialogProps,
+  getFieldLabel,
+  t,
+  TranslationKeys,
+} from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
 
 export const derviedDatePickerDialogState$ = observable(() => {
+  const field = store$.commandbar.selectedViewField.get();
+
+  const title = field
+    ? t('common.editField' satisfies TranslationKeys, {
+        name: getFieldLabel(field, true),
+      })
+    : '';
+
+  const submitBtnLabel = field
+    ? t('common.saveField' satisfies TranslationKeys, {
+        name: getFieldLabel(field, true),
+      })
+    : '';
+
   return {
     ...store$.datePickerDialogState.get(),
-    // TODO: HIER WEITER MACHEN -> UPDATE$ TITLE ETC...
-    title: 'Select Date',
-    description: 'Please select a date from the calendar.',
-    submitBtnLabel: 'Select due date',
+    title,
+    description: t('datePicker.description' satisfies TranslationKeys),
+    fieldLabel: field ? getFieldLabel(field, true) : '',
+    submitBtnLabel,
     selectedDate: store$.datePickerDialogState.selected.get(),
     onClose: () => store$.datePickerDialogClose(),
     onSelectDate: (date) => store$.datePickerDialogSelectDate(date),

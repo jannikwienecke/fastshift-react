@@ -60,6 +60,8 @@ export const de = {
     changeField: 'Ändern {{field}}...',
     setField: '{{field}} setzen zu...',
     changeOrAdd: 'Ändern oder hinzufügen {{field}}...',
+    markAs: 'Als {{field}} makieren',
+    unmarkAs: 'Als nicht {{field}} makieren',
   },
 
   error: {

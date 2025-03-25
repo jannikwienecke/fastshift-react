@@ -5,7 +5,6 @@ import {
   NO_SORTING_FIELD,
   RecordType,
   Row,
-  TranslationKeys,
   getEditLabel,
   getFieldLabel,
   getRelationTableName,
@@ -14,7 +13,6 @@ import {
   makeRowFromField,
   makeRowFromValue,
   t,
-  translateField,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import Fuse from 'fuse.js';
@@ -26,7 +24,6 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
-import { t as translate } from 'i18next';
 
 export const comboboxDebouncedQuery$ = observable('');
 // items that were selected/deselected in a "session" -> session ends when combobox is closed
@@ -38,6 +35,7 @@ export const initSelected$ = observable<Row[] | null>(null);
 
 export const getViewFieldsOptions = (options?: {
   useEditLabel?: boolean;
+  row?: Row | null;
 }): MakeComboboxStateProps | null => {
   let filterOptions: Row[] | null = null;
 
@@ -47,7 +45,9 @@ export const getViewFieldsOptions = (options?: {
   const viewFields = store$.viewConfigManager.get().getViewFieldList();
 
   filterOptions = viewFields.map((field) => {
-    const label = options ? getEditLabel(field) : getFieldLabel(field);
+    const label = options?.useEditLabel
+      ? getEditLabel(field, options.row)
+      : getFieldLabel(field);
 
     return makeRow(field.name, label || field.name, field, field);
   });
