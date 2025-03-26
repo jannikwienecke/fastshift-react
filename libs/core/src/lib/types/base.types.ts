@@ -56,6 +56,9 @@ export type FieldConfig<TName = string> = {
   relation?: FieldRelationType;
   isSystemField?: boolean;
   isRecursive?: boolean;
+  defaultValue?: unknown;
+  hideFromForm?: boolean;
+  isDisplayField?: true;
   enum?: {
     name: string;
     values: Enum[];

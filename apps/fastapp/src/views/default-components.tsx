@@ -1,4 +1,6 @@
 import {
+  MakeCommandbarPropsOption,
+  MakeCommandformPropsOption,
   MakeConfirmationAlertPropsOption,
   MakeDisplayOptionsPropsOptions,
   MakeFilterPropsOptions,
@@ -14,6 +16,8 @@ import {
 import {
   ComboboxPopover,
   commandbar,
+  Commandform,
+  // commandform,
   ConfirmationDialog,
   ContextMenuDefault,
   datePickerModal,
@@ -133,13 +137,27 @@ export const RenderConfirmationAlert = observer(
 );
 
 export const RenderCommandbar = observer(
-  (props: { options?: MakeConfirmationAlertPropsOption }) => {
+  (props: { options?: MakeCommandbarPropsOption }) => {
     const { makeCommandbarProps } = makeHooks<TaskViewDataType>();
 
     return (
       <Memo>
         {() => {
           return <commandbar.default {...makeCommandbarProps({})} />;
+        }}
+      </Memo>
+    );
+  }
+);
+
+export const RenderCommandform = observer(
+  (props: { options?: MakeCommandformPropsOption }) => {
+    const { makeCommandformProps } = makeHooks<TaskViewDataType>();
+
+    return (
+      <Memo>
+        {() => {
+          return <Commandform {...makeCommandformProps({})} />;
         }}
       </Memo>
     );

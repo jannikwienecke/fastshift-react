@@ -4,6 +4,7 @@ import {
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import {
+  getCommandbarCommandGroups,
   getCommandbarDefaultListProps,
   getCommandbarSelectedViewField,
 } from './legend.commandbar.helper';
@@ -24,8 +25,9 @@ export const derivedCommandbarState$ = observable(() => {
 
   const defaultCommandbarProps = getCommandbarDefaultListProps();
   const commandbarPropsSelectedViewField = getCommandbarSelectedViewField();
+  const commandsGroups = getCommandbarCommandGroups();
 
-  return {
+  const props = {
     ...store$.commandbar.get(),
     ...defaultCommandbarProps,
     ...commandbarPropsSelectedViewField,
@@ -36,4 +38,9 @@ export const derivedCommandbarState$ = observable(() => {
     onSelect: (...props) => store$.commandbarSelectItem(...props),
     onValueChange: (...props) => store$.commandbarSetValue(...props),
   } satisfies Omit<CommandbarProps, 'renderItem'>;
+
+  return {
+    ...props,
+    itemGroups: [...props.itemGroups, ...(commandsGroups ?? [])],
+  };
 });

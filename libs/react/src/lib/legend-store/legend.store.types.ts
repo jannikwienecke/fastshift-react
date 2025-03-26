@@ -2,6 +2,8 @@ import {
   BaseViewConfigManagerInterface,
   ComboxboxItem,
   CommandbarProps,
+  CommandformItem,
+  CommandformProps,
   ContextMenuState,
   ContinueCursor,
   DataModelNew,
@@ -19,6 +21,7 @@ import {
   Row,
   TranslationKeys,
   UiViewConfig,
+  ViewConfigType,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { PaginationOptions } from 'convex/server';
@@ -260,11 +263,20 @@ export type LegendStore = {
     existingRows: Row[];
     checkedRow: Row;
   }) => void;
-  updateRecordMutation: (props: {
-    field: FieldConfig;
-    row: Row;
-    valueRow: Row;
-  }) => void;
+  updateRecordMutation: (
+    props: {
+      field: FieldConfig;
+      row: Row;
+      valueRow: Row;
+    },
+    onSuccess?: () => void,
+    onError?: (message: string) => void
+  ) => void;
+  createRecordMutation: (
+    props: { view: ViewConfigType; record: RecordType; toast?: boolean },
+    onSuccess?: () => void,
+    onError?: (message: string) => void
+  ) => void;
   deleteRecordMutation: (
     props: { row: Row },
     onSuccess?: () => void,
@@ -277,6 +289,26 @@ export type LegendStore = {
   commandbarUpdateQuery: (query: string) => void;
   commandbarSelectItem: (item: ComboxboxItem) => void;
   commandbarSetValue: (value: ComboxboxItem) => void;
+
+  // commandform
+  commandformOpen: (viewName: string) => void;
+  commandformClose: () => void;
+  commanformSelectRelationalValue: (row: Row) => void;
+  commandformChangeInput: (
+    field: CommandformItem,
+    value: string | boolean
+  ) => void;
+  commandformSubmit: () => void;
+
+  commandform?: {
+    open: false;
+    view?: ViewConfigType<any>;
+    rect?: DOMRect;
+    field?: FieldConfig;
+    row?: Row;
+    // selectedViewField?: FieldConfig;
+    // activeItem: ComboxboxItem | null;
+  };
 
   // date picker dialog
   datePickerDialogState: {

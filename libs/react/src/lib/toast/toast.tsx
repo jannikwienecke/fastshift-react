@@ -28,3 +28,12 @@ export const renderErrorToast = (message: string, cb: () => void) => {
     },
   });
 };
+
+export const renderSuccessToast = (message: string) => {
+  toast({
+    title: 'success.createRecord.title',
+    duration: 3000,
+    variant: 'default',
+    description: message,
+  });
+};

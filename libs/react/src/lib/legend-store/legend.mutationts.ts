@@ -8,7 +8,7 @@ import {
   TranslationKeys,
 } from '@apps-next/core';
 import { observable, Observable } from '@legendapp/state';
-import { renderErrorToast } from '../toast';
+import { renderErrorToast, renderSuccessToast } from '../toast';
 import { LegendStore, StoreFn } from './legend.store.types';
 
 // Temporary states
@@ -172,6 +172,43 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
     } else {
       runMutation();
     }
+  };
+
+export const createRecordMutation: StoreFn<'createRecordMutation'> =
+  (store$) =>
+  async ({ record, view, toast }, onSuccess, onError) => {
+    const runMutation = async () => {
+      const mutation: Mutation = {
+        type: 'CREATE_RECORD',
+        payload: {
+          id: '',
+          record,
+        },
+      };
+
+      const { error } = await store$.api.mutateAsync({
+        mutation,
+        viewName: view.viewName,
+        query: '',
+      });
+
+      if (error) {
+        onError?.(error.message);
+
+        renderErrorToast('error.createRecord', () => {
+          store$.errorDialog.error.set(error);
+        });
+      } else {
+        if (toast) {
+          renderSuccessToast('');
+        }
+
+        console.warn('Record created successfully');
+        onSuccess?.();
+      }
+    };
+
+    runMutation();
   };
 
 export const optimisticUpdateStore = ({

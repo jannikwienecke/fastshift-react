@@ -237,9 +237,14 @@ export const makeCommandbarProps = <T extends RecordType>(
           />
         );
       } catch (e) {
-        console.error('Error rendering commandbar item', e);
         return (
-          <div className="flex flex-row gap-2 items-center">{item.label}</div>
+          <div className="flex flex-row gap-4 items-center">
+            <div className=" text-foreground/50">
+              {item.icon ? <Icon icon={item.icon} /> : <div />}
+            </div>
+
+            <div>{item.label}</div>
+          </div>
         );
       }
     },

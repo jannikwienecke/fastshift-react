@@ -1,4 +1,5 @@
 import {
+  BaseViewConfigManager,
   ComboxboxItem,
   CommandbarProps,
   CREATE_NEW_OPTION,
@@ -14,6 +15,8 @@ import Fuse from 'fuse.js';
 import { getViewFieldsOptions } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { comboboxStore$ } from './legend.store.derived.combobox';
+import { PlusIcon } from 'lucide-react';
+import { makeAddNewCommand } from '../commands/commands';
 
 export const getCommandbarDefaultListProps = () => {
   const viewConfigManager = store$.viewConfigManager.get();
@@ -184,4 +187,35 @@ export const getCommandbarSelectedViewField = () => {
   }
 
   throw new Error('Field type not supported');
+};
+
+export const getCommandbarCommandGroups = () => {
+  if (store$.commandbar.selectedViewField.get())
+    return [] satisfies PropsType['itemGroups'];
+
+  const views = store$.views.get();
+  const query = store$.commandbar.query.get();
+
+  const groups = Object.values(views)
+    .map((view) => {
+      // const fieldConfig =
+      if (!view) return [];
+
+      const commands: ComboxboxItem[] = [makeAddNewCommand(view)];
+
+      const fuseCommands = new Fuse(commands, {
+        keys: ['label'] satisfies Array<keyof ComboxboxItem>,
+        threshold: 0.4,
+      });
+
+      const filteredCommands = query
+        ? fuseCommands.search(query).map((result) => result.item)
+        : commands;
+
+      return filteredCommands;
+    }, [] satisfies PropsType['itemGroups'])
+    .filter(Boolean)
+    .filter((g) => g.length);
+
+  return groups satisfies PropsType['itemGroups'];
 };

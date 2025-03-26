@@ -4,7 +4,6 @@ import {
   makeDayMonthString,
   makeRow,
   makeRowFromValue,
-  Row,
 } from '@apps-next/core';
 import {
   dateUtils,
@@ -22,6 +21,9 @@ import { StoreFn } from './legend.store.types';
 export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   store$.deselectRelationField();
   store$.filterCloseAll();
+
+  store$.commandform.rect.set(undefined);
+  store$.commandform.field.set(undefined);
 
   // displayOptions
   store$.displayOptionsCloseCombobox();
@@ -69,6 +71,12 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
       } else {
         store$.combobox.query.set('');
         store$.filterSelectFilterType(value);
+      }
+    } else if (store$.commandform.open.get()) {
+      store$.combobox.query.set('');
+
+      if (store$.commandform.field.get()) {
+        store$.commanformSelectRelationalValue(value);
       }
     } else {
       if (!state.multiple) {

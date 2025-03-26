@@ -47,7 +47,7 @@ export const PriorityComponent = (props: PriorityProps) => {
 
   return (
     <div
-      className="flex items-center gap-3"
+      className="flex items-center gap-2"
       data-testid={`priority-${priority}`}
     >
       {priority === 'urgent' ? (

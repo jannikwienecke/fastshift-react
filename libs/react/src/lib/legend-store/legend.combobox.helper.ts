@@ -54,8 +54,8 @@ export const getViewFieldsOptions = (options?: {
 
   const fuse = new Fuse(filterOptions, {
     keys: ['label'],
-    distance: 700,
-    threshold: 0.6,
+    // distance: 1000,
+    threshold: 0.4,
   });
 
   const result = fuse.search(query);
@@ -379,6 +379,30 @@ export const getSharedStateFilter = (): ComboboxStateCommonType => {
     query: store$.combobox.query.get(),
     field: selectedFilterField,
     selected: selectedOfFilter,
+    row: null,
+    placeholder:
+      makeFilterPropsOptions.placeholder.get() ??
+      t('filter.button.placeholder'),
+  };
+
+  return stateShared;
+};
+
+export const getSharedStateCommandForm = (): ComboboxStateCommonType => {
+  const field = store$.commandform.field.get();
+
+  const row = store$.commandform.row.raw.get();
+  const value = row?.[field?.name ?? ''] ?? null;
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: store$.commandform.rect.get() ?? null,
+    searchable: true,
+    name: 'commandform',
+    isNewState: true,
+    open: true,
+    query: store$.combobox.query.get(),
+    field: field ?? null,
+    selected: Array.isArray(value) ? value : [],
     row: null,
     placeholder:
       makeFilterPropsOptions.placeholder.get() ??

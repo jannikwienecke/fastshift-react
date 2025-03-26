@@ -120,7 +120,7 @@ export const ProjectComponentCombobox = (props: {
   return (
     <div className="flex gap-2 items-center w-full">
       <Icon icon={view.icon} />
-      <div className="text-sm">{project?.label}</div>
+      <div className="text-xs">{project?.label}</div>
     </div>
   );
 };

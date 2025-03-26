@@ -8,6 +8,7 @@ export const CREATE_NEW_OPTION = 'create-new-option';
 export const TOGGLE_FIELD_LABEL = 'toggle-field-label';
 
 export const DELETE_OPTION = 'delete-option';
+export const ADD_NEW_OPTION = 'add-new-option';
 
 export const DEFAULT_MAX_ITEMS_GROUPING = 500;
 
@@ -21,12 +22,14 @@ export const NO_GROUPING_FIELD: FieldConfig = {
   isList: false,
   name: 'displayOptions.grouping.noGrouping',
   type: 'String',
+  editSearchString: '',
 };
 
 export const NO_SORTING_FIELD: FieldConfig = {
   isList: false,
   name: 'displayOptions.sorting.noSorting',
   type: 'String',
+  editSearchString: '',
 };
 
 export const ifNoneNullElseValue = (value: string) =>

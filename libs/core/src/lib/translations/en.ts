@@ -80,6 +80,11 @@ export const en = {
     showDetails: 'Show details',
     deleteRecord: 'Could not delete entry. Please try again',
   },
+  success: {
+    createRecord: {
+      title: '✅ Created Successfully',
+    },
+  },
 
   confirmationAlert: {
     title: 'Are you sure?',

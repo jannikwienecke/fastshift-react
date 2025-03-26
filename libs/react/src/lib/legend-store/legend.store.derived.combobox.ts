@@ -18,6 +18,7 @@ import {
   getSharedStateGrouping,
   makeComboboxStateFilterValuesNumber,
   getSharedStateCommandbar,
+  getSharedStateCommandForm,
 } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
@@ -26,6 +27,7 @@ import { ComboboxState, MakeComboboxStateProps } from './legend.store.types';
 export const comboboxStore$ = observable<ComboboxState>(() => {
   const filterIsOpen = store$.filter.open.get();
   const commandbarIsOpen = store$.commandbar.open.get();
+  const commandformIsOpen = store$.commandform.open.get();
 
   const displayOptions = store$.displayOptions.get();
   const displayOptionsSortingIsOpen = displayOptions.sorting.isOpen;
@@ -39,22 +41,30 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     ? store$.commandbar.selectedViewField.get()
     : null;
 
+  const selectedCommandformField = commandformIsOpen
+    ? store$.commandform.field.get()
+    : null;
+
   const selectedListField = store$.list.selectedRelationField.get()?.field;
 
   const isList = !!store$.list.selectedRelationField.get();
   const isFilter = filterIsOpen;
   const isCommandbar = !!commandbarIsOpen;
+  const isCommandform = commandformIsOpen;
 
   if (
     !isList &&
     !isFilter &&
     !displayOptionsSortingIsOpen &&
     !displayOptionsGroupingIsOpen &&
-    !isCommandbar
+    !isCommandbar &&
+    !isCommandform
   )
     return DEFAULT_COMBOBOX_STATE;
 
-  const field = isCommandbar
+  const field = isCommandform
+    ? selectedCommandformField
+    : isCommandbar
     ? selectedCommandbarField
     : isList
     ? selectedListField
@@ -65,6 +75,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const stateSharedFilter = getSharedStateFilter();
   const stateSharedList = getSharedStateList();
+  const stateSharedCommandform = getSharedStateCommandForm();
 
   const stateSharedSorting = getSharedStateSorting();
   const stateSharedGrouping = getSharedStateGrouping();
@@ -77,8 +88,13 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const multipleFilter = null;
   const multipleList = field?.relation?.manyToManyTable ? true : false;
+  const multipleCommanform = selectedCommandformField?.relation?.manyToManyTable
+    ? true
+    : false;
 
-  const stateShared = isCommandbar
+  const stateShared = isCommandform
+    ? stateSharedCommandform
+    : isCommandbar
     ? getSharedStateCommandbar()
     : isList
     ? stateSharedList
@@ -89,7 +105,11 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     : stateSharedFilter;
 
   const selected = isList ? selectedOfList : selectedOfFilter;
-  const multiple = isList ? multipleList : multipleFilter;
+  const multiple = isCommandform
+    ? multipleCommanform
+    : isList
+    ? multipleList
+    : multipleFilter;
   const getDateOptions = isList ? getDateOptionsList : getDateOptionsFilter;
 
   let options: MakeComboboxStateProps | null = null;

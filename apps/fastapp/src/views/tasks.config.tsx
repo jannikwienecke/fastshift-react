@@ -47,7 +47,7 @@ export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
         comboboxListValue: ({ data, row }) => {
           return (
             <div className="flex flex-row items-center gap-1">
-              <div>{data.name}</div>
+              <div>{data.name}1</div>
             </div>
           );
         },

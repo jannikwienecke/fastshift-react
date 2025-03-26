@@ -34,34 +34,46 @@ export const ClientViewProviderConvex = (
   props: QueryProviderPropsWithViewFieldsConfig
 ) => {
   const patechedViewFields = patchDict(props.viewConfig.viewFields, (f) => {
-    const translated = t(`${f.name}.edit`);
-    const noTranslation = translated === `${f.name}.edit`;
+    // const translated = t(`${f.name}.edit`);
+    // const noTranslation = translated === `${f.name}.edit`;
 
-    const isMany = f.relation?.type === 'manyToMany';
-    const translatedName = t(`${f.name}.${isMany ? 'other' : 'one'}`);
-    const noTranslationName =
-      translatedName === `${f.name}.${isMany ? 'other' : 'one'}`;
+    // const isMany = f.relation?.type === 'manyToMany';
+    // const translatedName = t(`${f.name}.${isMany ? 'other' : 'one'}`);
+    // const noTranslationName =
+    //   translatedName === `${f.name}.${isMany ? 'other' : 'one'}`;
 
-    const fieldLabelToUse = noTranslationName
-      ? f.name.firstUpper()
-      : translatedName;
+    // const fieldLabelToUse = noTranslationName
+    //   ? f.name.firstUpper()
+    //   : translatedName;
 
-    const fallbackKey =
-      f.relation?.type === 'manyToMany'
-        ? 'changeOrAdd'
-        : f.relation
-        ? 'setField'
-        : 'changeField';
+    // const fallbackKey =
+    //   f.relation?.type === 'manyToMany'
+    //     ? 'changeOrAdd'
+    //     : f.relation
+    //     ? 'setField'
+    //     : 'changeField';
 
-    const toUse = noTranslation
-      ? t(`common.${fallbackKey}`, { field: fieldLabelToUse })
-      : translated;
+    // const toUse = noTranslation
+    //   ? t(`common.${fallbackKey}`, { field: fieldLabelToUse })
+    //   : translated;
+
+    const userFieldConfig = props.viewConfig.fields?.[f.name];
+    const displayFIeld = props.viewConfig.displayField.field;
+    const softDeleteField = props.viewConfig.mutation?.softDeleteField;
+
+    const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
+    const isDisplayField =
+      displayFIeld && f.name === displayFIeld ? true : undefined;
 
     return {
       ...f,
       label: f.label || `${f.name}.one`,
       // editLabel: f.editLabel || `${f.name}.edit`,
+      isDisplayField,
       editLabel: `${f.name}.edit`,
+      hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
+      defaultValue: userFieldConfig?.defaultValue,
+
       // editSearchString: toUse
     };
   });
@@ -91,10 +103,23 @@ export const ClientViewProviderConvex = (
 
     return {
       ...view,
-      viewFields: patchDict(view.viewFields, (f) => ({
-        ...f,
-        label: f.label || renderModelName(f.name, t),
-      })),
+      viewFields: patchDict(view.viewFields, (f) => {
+        const userFieldConfig = props.viewConfig.fields?.[f.name];
+        const displayFIeld = props.viewConfig.displayField.field;
+        const softDeleteField = props.viewConfig.mutation?.softDeleteField;
+
+        const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
+        const isDisplayField =
+          displayFIeld && f.name === displayFIeld ? true : undefined;
+
+        return {
+          ...f,
+          isDisplayField,
+          label: f.label || renderModelName(f.name, t),
+          hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
+          defaultValue: userFieldConfig?.defaultValue,
+        };
+      }),
     };
   });
 

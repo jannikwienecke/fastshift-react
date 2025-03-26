@@ -5,7 +5,7 @@ import { Icon } from './render-icon';
 import { getComponent } from './ui-components.helper';
 
 export const DefaultComboboxFieldValue = (props: {
-  row: Row;
+  row?: Row;
   fieldName?: string;
   icon?: React.FC;
 }) => {
@@ -28,7 +28,7 @@ export const DefaultComboboxFieldValue = (props: {
   return (
     <div className="flex gap-2 items-center w-full">
       {iconToUse ? <Icon icon={iconToUse} color={color} /> : null}
-      <div className="text-sm">{props.row.label}</div>
+      <div className="text-xs">{props.row?.label}</div>
     </div>
   );
 };
@@ -72,7 +72,6 @@ export const ComboboxFieldValue = ({
           <ComponentToRender data={raw} row={row?.raw ?? {}} />
         </>
       ) : (
-        // <>{t(value.label as any)}</>
         <DefaultComboboxFieldValue
           row={value}
           fieldName={field?.name as string}

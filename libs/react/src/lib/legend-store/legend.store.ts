@@ -18,6 +18,7 @@ import {
   contextMenuOpen,
 } from './legend.contextmenu.fn';
 import {
+  createRecordMutation,
   deleteRecordMutation,
   selectRowsMutation,
   updateRecordMutation,
@@ -77,6 +78,13 @@ import {
   datePickerDialogSelectDate,
   datePickerDialogSubmit,
 } from './legend.datepickerdialog.fn';
+import {
+  commandformChangeInput,
+  commandformClose,
+  commandformOpen,
+  commandformSubmit,
+  commanformSelectRelationalValue,
+} from './legend.commandform.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -152,11 +160,20 @@ export const store$ = observable<LegendStore>({
   selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
   updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
   deleteRecordMutation: (...props) => deleteRecordMutation(store$)(...props),
+  createRecordMutation: (...props) => createRecordMutation(store$)(...props),
   commandbarOpen: (...props) => commandbarOpen(store$)(...props),
   commandbarClose: (...props) => commandbarClose(store$)(...props),
   commandbarSelectItem: (...props) => commandbarSelectItem(store$)(...props),
   commandbarUpdateQuery: (...props) => commandbarUpdateQuery(store$)(...props),
   commandbarSetValue: (...props) => commandbarSetValue(store$)(...props),
+
+  commandformOpen: (...props) => commandformOpen(store$)(...props),
+  commandformClose: (...props) => commandformClose(store$)(...props),
+  commanformSelectRelationalValue: (...props) =>
+    commanformSelectRelationalValue(store$)(...props),
+  commandformChangeInput: (...props) =>
+    commandformChangeInput(store$)(...props),
+  commandformSubmit: (...props) => commandformSubmit(store$)(...props),
 
   // date picker dialog
   datePickerDialogOpen: (...props) => datePickerDialogOpen(store$)(...props),

@@ -1,11 +1,11 @@
-import { makeRowFromValue, Row, TOGGLE_FIELD_LABEL } from '@apps-next/core';
-import { StoreFn } from './legend.store.types';
-import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
+import { ADD_NEW_OPTION, makeRowFromValue, Row } from '@apps-next/core';
 import {
   dateUtils,
   operatorMap,
   SELECT_FILTER_DATE,
 } from '../ui-adapter/filter-adapter';
+import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
+import { StoreFn } from './legend.store.types';
 
 export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => () => {
   store$.commandbar.open.set(true);
@@ -210,6 +210,9 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         store$.commandbar.query.set('');
       }
     } catch (error) {
-      throw new Error('Field type not supported2');
+      if (item.id === ADD_NEW_OPTION && item.viewName) {
+        store$.commandformOpen(item.viewName);
+        store$.commandbarClose();
+      }
     }
   };

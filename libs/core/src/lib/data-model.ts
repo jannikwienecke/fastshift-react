@@ -38,7 +38,7 @@ export const makeData = (registeredViews: RegisteredViews, name: string) => {
       throw new Error(`View ${name} not found`);
     }
 
-    const viewConfigManager = new BaseViewConfigManager(viewConfig);
+    const viewConfigManager = new BaseViewConfigManager(viewConfig, {});
 
     const label = viewConfigManager.getDisplayFieldLabel();
     return {
@@ -131,5 +131,5 @@ export const makeNoneOption = (field: FieldConfig) => {
 };
 
 export const makeRowFromField = (field: FieldConfig): Row => {
-  return makeRow(field.name, field.name, field, field);
+  return makeRow(field.name, field.label ?? field.name, field, field);
 };

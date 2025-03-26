@@ -2,7 +2,13 @@ import { BaseViewConfigManagerInterface } from './base-view-config';
 import { TOGGLE_FIELD_LABEL } from './core.constants';
 import { makeRow, Row } from './data-model';
 import { t, TranslationKeys } from './translations';
-import { FieldConfig, ID, QUERY_KEY_PREFIX, RegisteredViews } from './types';
+import {
+  FieldConfig,
+  ID,
+  QUERY_KEY_PREFIX,
+  RegisteredViews,
+  ViewConfigType,
+} from './types';
 import { DisplayOptionsType } from './types/displayOptions.types';
 import {
   DisplayOptionsUiType,
@@ -320,6 +326,19 @@ export const getFieldLabel = (field: FieldConfig, singular?: true) => {
 
   const fieldLabelToUse = noTranslationName
     ? field.name.firstUpper()
+    : translatedName;
+
+  return fieldLabelToUse;
+};
+
+export const getViewLabel = (view: ViewConfigType, singular?: true) => {
+  const translatedName = t(`${view.tableName}.${!singular ? 'other' : 'one'}`);
+
+  const noTranslationName =
+    translatedName === `${view.tableName}.${!singular ? 'other' : 'one'}`;
+
+  const fieldLabelToUse = noTranslationName
+    ? view.tableName.firstUpper()
     : translatedName;
 
   return fieldLabelToUse;

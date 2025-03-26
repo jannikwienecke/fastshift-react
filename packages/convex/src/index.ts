@@ -32,8 +32,16 @@ export const tasksConfig = createViewConfig(
       // dueDate (date in the name -> date field)
       // dueDate (date with upper case D -> Due Date)
       dueDate: { isDateField: true },
+      completed: {
+        defaultValue: true,
+        hideFromForm: true,
+      },
       todos: {
+        hideFromForm: true,
         // showCheckboxInList: false,
+      },
+      tasks: {
+        hideFromForm: true,
       },
     },
     includeFields: ['tags', 'tasks', 'todos'],

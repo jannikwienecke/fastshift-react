@@ -1,12 +1,15 @@
-import { Row } from '../data-model';
 import { TranslationKeys } from '../translations';
-import { RecordType } from './base.types';
+import { FieldConfig, RecordType } from './base.types';
 import { DisplayOptionsUiType, FilterItemType } from './filter.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
   label: string;
   icon?: React.FC<any>;
+  field?: FieldConfig;
+  viewName?: string;
+  tablename?: string;
+  // value?: unknown;
 };
 
 export type DisplayOptionsViewField = {
@@ -149,6 +152,10 @@ export type MakeCommandbarPropsOption<T extends RecordType = RecordType> = {
   //
 };
 
+export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
+  //
+};
+
 export type DisplayOptionsProps = {
   label: string;
   onOpen: (rect: DOMRect) => void;
@@ -201,6 +208,30 @@ export type ConfirmationDialogProps = {
   onClose: () => void;
   submitLabel?: string;
   cancelLabel?: string;
+};
+
+export type CommandformItem = ComboxboxItem & {
+  // render: () => React.ReactNode;
+};
+
+export type FormErrors = { [fieldName: string]: { error: string } };
+
+export type CommandformProps = {
+  open?: boolean;
+  formState: {
+    isReady: boolean;
+    errors: FormErrors;
+  };
+  onClose: () => void;
+  complexFields: CommandformItem[];
+  primitiveFields: CommandformItem[];
+  render: (field: CommandformItem) => React.ReactNode;
+  onClick: (field: CommandformItem, rect: DOMRect) => void;
+  onInputChange: (field: CommandformItem, value: string) => void;
+  onSubmit: () => void;
+  onCheckedChange: (field: CommandformItem, checked: boolean) => void;
+
+  // onOpen: () => void;
 };
 
 export type CommandbarProps = {
