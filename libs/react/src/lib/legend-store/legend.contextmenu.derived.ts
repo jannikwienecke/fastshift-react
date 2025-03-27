@@ -2,13 +2,22 @@ import {
   ContextMenuFieldItem,
   ContextMenuUiOptions,
   MakeContextMenuPropsOptions,
+  makeDayMonthString,
   makeNoneOption,
   makeRowFromValue,
+  NONE_OPTION,
   Row,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { getComponent } from '../ui-components/ui-components.helper';
 import { store$ } from './legend.store';
+import { makeComboboxStateFilterValuesDate } from './legend.combobox.helper';
+import {
+  dateUtils,
+  getOptionsForDateField,
+  getTimeValueFromDateString,
+} from '../ui-adapter/filter-adapter';
+import { DEFAULT_DATE_OPTIONS_FOR_EDIT } from '../ui-adapter/filter-adapter/filter.constants';
 
 export const contextMenuProps = observable<
   Partial<MakeContextMenuPropsOptions>
@@ -34,6 +43,8 @@ export const derviedContextMenuOptions = observable(() => {
       fields: null,
       modelName: viewConfigManager.viewConfig.tableName,
       onDelete: () => null,
+      onEdit: () => null,
+
       isDeleted: false,
     } satisfies Omit<ContextMenuUiOptions, 'renderOption' | 'renderField'>;
   }
@@ -41,10 +52,10 @@ export const derviedContextMenuOptions = observable(() => {
   const fieldsToRender = viewConfigManager
     .getViewFieldList()
     .sort((a, b) => {
-      const hasEnumOrRelationalA = a.enum || a.relation;
-      const hasEnumOrRelationalB = b.enum || b.relation;
+      const hasEnumDateOrRelationalA = a.enum || a.relation || a.isDateField;
+      const hasEnumDateOrRelationalB = b.enum || b.relation || b.isDateField;
 
-      if (hasEnumOrRelationalA && !hasEnumOrRelationalB) {
+      if (hasEnumDateOrRelationalA && !hasEnumDateOrRelationalB) {
         return -1;
       }
 
@@ -64,6 +75,11 @@ export const derviedContextMenuOptions = observable(() => {
         ? f.enum.values.map((v) => makeRowFromValue(v.name, f))
         : null;
 
+      // const dateOptions = mak
+      const getDateOptionsList = dateUtils.getOptionsForEdit;
+      const { values: dateOptions } =
+        makeComboboxStateFilterValuesDate(f, getDateOptionsList) ?? {};
+
       const relationalValuesForField = relationalValues[f.name]?.get();
 
       const valueOrValues = row?.getValue(f.name);
@@ -72,6 +88,8 @@ export const derviedContextMenuOptions = observable(() => {
         ? null
         : Array.isArray(valueOrValues)
         ? valueOrValues
+        : f.isDateField && typeof valueOrValues === 'number'
+        ? [makeDayMonthString(new Date(valueOrValues))]
         : [valueOrValues];
 
       const selectedRows =
@@ -79,7 +97,9 @@ export const derviedContextMenuOptions = observable(() => {
           return (v as Row | undefined)?.raw ? v : makeRowFromValue(v, f);
         }) ?? [];
 
-      const allOptions = enumOptions
+      const allOptions = dateOptions
+        ? dateOptions
+        : enumOptions
         ? enumOptions
         : [...(relationalValuesForField?.rows ?? [])];
 
@@ -94,6 +114,9 @@ export const derviedContextMenuOptions = observable(() => {
         noneOptionRow: makeNoneOption(f),
         value: row,
         selected: [...selectedRows].filter((v) => !!v.id),
+        onClickOption: async () => {
+          store$.contextmenuClickOnField(f);
+        },
         onCheckOption: async (checkedRow) => {
           store$.selectRowsMutation({
             row,
@@ -104,7 +127,15 @@ export const derviedContextMenuOptions = observable(() => {
           });
         },
         onSelectOption: async (option) => {
-          store$.updateRecordMutation({ field: f, row, valueRow: option });
+          const isNone = 'No date' === option.id;
+          const datetime = !isNone
+            ? getTimeValueFromDateString(option.id, true)
+            : null;
+          store$.updateRecordMutation({
+            field: f,
+            row,
+            valueRow: makeRowFromValue(datetime ?? NONE_OPTION, f),
+          });
         },
       } satisfies ContextMenuFieldItem;
     });
@@ -112,10 +143,11 @@ export const derviedContextMenuOptions = observable(() => {
   return {
     ...contextmenuState,
     isOpen: !!contextmenuState.rect,
-    onClose: () => store$.contextMenuClose(),
     fields: fieldsToRender,
     modelName: viewConfigManager.viewConfig.tableName,
-    onDelete: () => store$.contextmenuDeleteRow(row),
     isDeleted,
+    onClose: () => store$.contextMenuClose(),
+    onDelete: () => store$.contextmenuDeleteRow(row),
+    onEdit: () => store$.contextmenuEditRow(row),
   } satisfies Omit<ContextMenuUiOptions, 'renderOption' | 'renderField'>;
 });

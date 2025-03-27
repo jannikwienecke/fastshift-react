@@ -13,8 +13,10 @@ import {
   displayOptionsToggleSorting,
 } from './legend-store.fn.displayOptions';
 import {
+  contextmenuClickOnField,
   contextMenuClose,
   contextmenuDeleteRow,
+  contextmenuEditRow,
   contextMenuOpen,
 } from './legend.contextmenu.fn';
 import {
@@ -68,6 +70,7 @@ import { LegendStore } from './legend.store.types';
 import {
   commandbarClose,
   commandbarOpen,
+  commandbarOpenWithFieldValue,
   commandbarSelectItem,
   commandbarSetValue,
   commandbarUpdateQuery,
@@ -156,6 +159,9 @@ export const store$ = observable<LegendStore>({
   contextMenuOpen: (...props) => contextMenuOpen(store$)(...props),
   contextMenuClose: (...props) => contextMenuClose(store$)(...props),
   contextmenuDeleteRow: (...props) => contextmenuDeleteRow(store$)(...props),
+  contextmenuEditRow: (...props) => contextmenuEditRow(store$)(...props),
+  contextmenuClickOnField: (...props) =>
+    contextmenuClickOnField(store$)(...props),
 
   selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
   updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
@@ -166,6 +172,8 @@ export const store$ = observable<LegendStore>({
   commandbarSelectItem: (...props) => commandbarSelectItem(store$)(...props),
   commandbarUpdateQuery: (...props) => commandbarUpdateQuery(store$)(...props),
   commandbarSetValue: (...props) => commandbarSetValue(store$)(...props),
+  commandbarOpenWithFieldValue: (...props) =>
+    commandbarOpenWithFieldValue(store$)(...props),
 
   commandformOpen: (...props) => commandformOpen(store$)(...props),
   commandformClose: (...props) => commandformClose(store$)(...props),

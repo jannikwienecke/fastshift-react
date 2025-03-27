@@ -1,6 +1,6 @@
 import { batch } from '@legendapp/state';
 import { StoreFn } from './legend.store.types';
-import { makeData } from '@apps-next/core';
+import { makeData, Row } from '@apps-next/core';
 
 export const contextMenuOpen: StoreFn<'contextMenuOpen'> =
   (store$) => (rect, record) => {
@@ -30,4 +30,25 @@ export const contextmenuDeleteRow: StoreFn<'contextmenuDeleteRow'> =
     store$.deleteRecordMutation({ row }, () => {
       store$.contextMenuClose();
     });
+  };
+
+export const contextmenuEditRow: StoreFn<'contextmenuEditRow'> =
+  (store$) => (row) => {
+    setTimeout(() => {
+      store$.commandformOpen(
+        store$.viewConfigManager.viewConfig.viewName.get()
+      );
+
+      store$.commandform.row.set(row);
+    }, 0);
+  };
+
+export const contextmenuClickOnField: StoreFn<'contextmenuClickOnField'> =
+  (store$) => (field) => {
+    const activeRow = store$.contextMenuState.row.get();
+
+    if (!activeRow) return;
+
+    store$.contextMenuClose();
+    store$.commandbarOpenWithFieldValue(field, activeRow as Row);
   };

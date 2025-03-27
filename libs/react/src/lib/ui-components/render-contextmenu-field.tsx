@@ -1,5 +1,4 @@
 import { FieldConfig, Row, useTranslation } from '@apps-next/core';
-import { RenderComponent } from './render-component';
 import { getComponent } from './ui-components.helper';
 
 export const ContextmenuFieldLabel = ({

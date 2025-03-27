@@ -1,5 +1,4 @@
 import {
-  BaseViewConfigManager,
   ComboxboxItem,
   CommandbarProps,
   CREATE_NEW_OPTION,
@@ -12,11 +11,10 @@ import {
   TranslationKeys,
 } from '@apps-next/core';
 import Fuse from 'fuse.js';
+import { makeAddNewCommand } from '../commands/commands';
 import { getViewFieldsOptions } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { comboboxStore$ } from './legend.store.derived.combobox';
-import { PlusIcon } from 'lucide-react';
-import { makeAddNewCommand } from '../commands/commands';
 
 export const getCommandbarDefaultListProps = () => {
   const viewConfigManager = store$.viewConfigManager.get();
@@ -34,7 +32,7 @@ export const getCommandbarDefaultListProps = () => {
   return {
     headerLabel: `${viewName} - ${rowInFocus?.label ?? ''}`,
     inputPlaceholder: 'Type a command or search....',
-    itemGroups: [items].map((group) => group),
+    itemGroups: [items],
   };
 };
 
@@ -46,6 +44,7 @@ export const getCommandbarSelectedViewField = () => {
 
   if (viewField.type === 'String') {
     return {
+      inputPlaceholder: '',
       itemGroups: [
         [
           {
@@ -102,9 +101,10 @@ export const getCommandbarSelectedViewField = () => {
       (v) => v.id === relationalRow?.id
     );
 
-    const all = hasRelationalRowInValues
-      ? [...(combobox.values ?? [])]
-      : [relationalRow as Row, ...(combobox.values ?? [])];
+    const all =
+      relationalRow && !hasRelationalRowInValues
+        ? [relationalRow, ...(combobox.values ?? [])]
+        : [...(combobox.values ?? [])];
 
     all
       .sort((a, b) => {
@@ -114,7 +114,8 @@ export const getCommandbarSelectedViewField = () => {
         if (b.id === relationalRow?.id) return 1;
         return 0;
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter((f) => f.id);
 
     return {
       itemGroups: [

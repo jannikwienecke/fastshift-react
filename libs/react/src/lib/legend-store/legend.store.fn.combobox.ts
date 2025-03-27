@@ -7,6 +7,7 @@ import {
 } from '@apps-next/core';
 import {
   dateUtils,
+  getTimeValueFromDateString,
   operatorMap,
   SELECT_FILTER_DATE,
 } from '../ui-adapter/filter-adapter';
@@ -165,10 +166,8 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
 
       let valueToUse = value;
       if (field.type === 'Date' && row) {
-        const parsed = dateUtils.parseOption(value.id, operatorMap.is);
-        const { start } = dateUtils.getStartAndEndDate(parsed);
-        start?.setHours(2, 0, 0, 0);
-        valueToUse = makeRowFromValue(start?.getTime() ?? 0, field);
+        const datetime = getTimeValueFromDateString(value.id, true);
+        valueToUse = makeRowFromValue(datetime, field);
       }
 
       store$.updateRecordMutation({

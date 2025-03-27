@@ -1,22 +1,22 @@
 import {
-  BaseViewConfigManager,
   CommandformProps,
   getFieldLabel,
   MakeCommandformPropsOption,
+  makeDayMonthString,
   makeRowFromField,
   makeRowFromValue,
   RecordType,
   Row,
 } from '@apps-next/core';
 
+import { CommandFormBadge } from '@apps-next/ui';
+import { store$ } from '../legend-store';
 import { commandbarProps$ } from '../legend-store/legend.commandbar.derived';
 import { derivedCommandformState$ } from '../legend-store/legend.commandform.derived';
 import {
   ComboboxFieldValue,
   DefaultComboboxFieldValue,
 } from '../ui-components/render-combobox-field-value';
-import { store$ } from '../legend-store';
-import { CommandFormBadge } from '@apps-next/ui';
 
 export const makeCommandformProps = <T extends RecordType>(
   options?: MakeCommandformPropsOption<T>
@@ -40,10 +40,13 @@ export const makeCommandformProps = <T extends RecordType>(
       if (!field) return null;
 
       if (hasField && value && !Array.isArray(value) && newRow) {
-        const nonRelationalValue =
-          field.enum || field.type === 'Date'
-            ? makeRowFromValue(value, field)
-            : null;
+        const nonRelationalValue = field.enum
+          ? makeRowFromValue(value, field)
+          : field.type === 'Date' && typeof value === 'number'
+          ? makeRowFromValue(makeDayMonthString(new Date(value)), field)
+          : field.type === 'Date'
+          ? makeRowFromValue(value, field)
+          : null;
 
         return (
           <CommandFormBadge active>

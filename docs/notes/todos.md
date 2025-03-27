@@ -32,7 +32,25 @@ created: 1723444498044
 - [x] add tests for grouping / sorting
 - [x] default sorting / default grouping
 - [x] add confirmation dialog (framework approach, to be enabled by field and action?)
+
 - [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
+
+<!-- Steps until tests and big refactoring -->
+
+- [x] can click on list item right click -> Edit task -> opens commandform
+- [ ] can click on list item rigjt click -> non relational fields edit -> open
+- [ ] write tests to make sure all works
+- [ ] refactoring
+
+<!-- FEATURE -->
+
+- [ ] when created a new task -> click on notifiaction -> open task
+- [ ] open after creation, in config
+- [ ] update design / message / icon of success notification
+- [ ] way to show what fields are missing / errors in form
+
+BUG: When we scoll down, then update the task, we suddenly only see the last x tasks
+BUG: When we select a tag in the commandbar -> then select one in the list combobox -> Error
 
 ## How we handle Deletes with soft delete
 

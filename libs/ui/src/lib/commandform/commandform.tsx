@@ -1,4 +1,4 @@
-import { CommandformProps } from '@apps-next/core';
+import { CommandformProps, useTranslation } from '@apps-next/core';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { StickyNoteIcon, TerminalSquareIcon } from 'lucide-react';
 import React from 'react';
@@ -6,6 +6,7 @@ import { Button, Dialog, DialogContent } from '../components';
 import { Command, CommandSeparator } from '../components/command';
 import { cn } from '../utils';
 import { Checkbox } from '../components/checkbox';
+import { ComboboxPopover } from '../combobox-popover';
 
 const CommandformContainer = (
   props: (CommandformProps & { children: React.ReactNode }) | undefined
@@ -16,6 +17,7 @@ const CommandformContainer = (
     <Dialog
       {...props}
       open={props?.open}
+      // modal={}
       modal={false}
       onOpenChange={(open) => {
         !open && props.onClose?.();
@@ -25,6 +27,8 @@ const CommandformContainer = (
         <DialogTitle className="sr-only">Commandbar Dialog</DialogTitle>
         {props.children}
       </DialogContent>
+
+      <div className="fixed top-0 left-0 h-screen w-screen bg-foreground/10" />
     </Dialog>
   );
 };
@@ -73,6 +77,7 @@ const Header = () => {
 };
 
 export function Commandform(props: CommandformProps | undefined) {
+  const { t } = useTranslation();
   if (!props?.open) return null;
 
   return (
@@ -82,53 +87,93 @@ export function Commandform(props: CommandformProps | undefined) {
           shouldFilter={false}
           className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
         >
-          <div className="px-3 pt-3 pb-1 flex flex-col gap-4">
+          <div
+            key={'content-commanform'}
+            className="px-3 pt-3 pb-1 flex flex-col gap-4"
+          >
             <Header />
 
-            {props.primitiveFields.map((field) => {
-              if (field.field?.type === 'Boolean') {
-                return null;
-              }
+            {props.primitiveFields
+              .filter(
+                (field) =>
+                  field.field?.type !== 'Date' && !field.field?.richEditor
+              )
+              .map((field) => {
+                if (field.field?.type === 'String') {
+                  return (
+                    <div key={`primitive-string-field-${field.field?.name}`}>
+                      <input
+                        placeholder={field.label}
+                        defaultValue={
+                          field.value
+                            ? undefined
+                            : (field.field.defaultValue as string) ?? ''
+                        }
+                        value={(field.value as string) || undefined}
+                        className={cn(
+                          'outline-none border-none w-full',
+                          field.field.isDisplayField ? 'text-lg' : 'text-base'
+                        )}
+                        onChange={(e) => {
+                          props.onInputChange(field, e.currentTarget.value);
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return <div>NOT YET: {field.field?.name}</div>;
+              })}
 
-              if (field.field?.type === 'String') {
+            {props.primitiveFields
+              .filter((field) => field.field?.richEditor)
+              .map((field) => {
                 return (
-                  <div>
-                    <input
-                      placeholder={field.label}
-                      defaultValue={(field.field.defaultValue as string) ?? ''}
-                      className={cn(
-                        'outline-none border-none w-full',
-                        field.field.isDisplayField ? 'text-lg' : 'text-base'
-                      )}
+                  <div key={`primitive-textarea-field-${field.field?.name}`}>
+                    <textarea
+                      placeholder={t('richEditor.placeholder', {
+                        name: field.label,
+                      })}
+                      className="text-base outline-none border-none w-full pb-12"
+                      cols={3}
                       onChange={(e) => {
                         props.onInputChange(field, e.currentTarget.value);
+                      }}
+                      defaultValue={
+                        field.value
+                          ? undefined
+                          : field.field?.defaultValue ?? ''
+                      }
+                      value={(field.value as string) || undefined}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const target = e.target as HTMLTextAreaElement;
+                          const start = target.selectionStart;
+                          const end = target.selectionEnd;
+                          const value = target.value;
+                          target.value =
+                            value.substring(0, start) +
+                            '\n' +
+                            value.substring(end);
+                          target.selectionStart = target.selectionEnd =
+                            start + 1;
+                        }
                       }}
                     />
                   </div>
                 );
-              }
-              return <div>NOT YET: {field.field?.name}</div>;
-            })}
-
-            {/* <div>
-              <textarea
-                placeholder="Add description..."
-                className="text-base outline-none border-none w-full pb-12"
-                cols={3}
-              />
-            </div> */}
+              })}
 
             <div className="flex flex-row gap-4">
               {props.primitiveFields.map((field) => {
                 if (field.field?.type === 'Boolean') {
                   // TODO: HIER WEITER MACHEN
-                  // cannot use projects -> need to get projectId
-                  // prioty -> dfault value
                   // extract into own components
-
-                  console.log(field.field);
                   return (
-                    <div className="flex flex-row gap-2 items-center text-sm">
+                    <div
+                      key={`primitive-boolean-field-${field.field.name}`}
+                      className="flex flex-row gap-2 items-center text-sm"
+                    >
                       <Checkbox
                         defaultChecked={field.field.defaultValue as boolean}
                         onCheckedChange={(checked) => {
@@ -148,6 +193,7 @@ export function Commandform(props: CommandformProps | undefined) {
                 {props.complexFields.map((f) => {
                   return (
                     <button
+                      key={`complex-field-btn-commandform-${f.field?.name}`}
                       onClick={(e) => {
                         props.onClick(
                           f,

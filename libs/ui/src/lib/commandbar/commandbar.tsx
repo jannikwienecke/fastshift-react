@@ -36,7 +36,6 @@ export const CommandDialogList = (props: {
 }) => {
   const { groupLabels } = props;
   const value: string | undefined = useCommandState((state) => state.value);
-
   React.useEffect(() => {
     if (!value) return;
 

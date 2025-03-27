@@ -9,7 +9,7 @@ export type ComboxboxItem = {
   field?: FieldConfig;
   viewName?: string;
   tablename?: string;
-  // value?: unknown;
+  value?: unknown;
 };
 
 export type DisplayOptionsViewField = {
@@ -222,9 +222,10 @@ export type CommandformProps = {
     isReady: boolean;
     errors: FormErrors;
   };
-  onClose: () => void;
   complexFields: CommandformItem[];
   primitiveFields: CommandformItem[];
+  modal?: boolean;
+  onClose: () => void;
   render: (field: CommandformItem) => React.ReactNode;
   onClick: (field: CommandformItem, rect: DOMRect) => void;
   onInputChange: (field: CommandformItem, value: string) => void;

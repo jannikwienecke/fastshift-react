@@ -1,5 +1,6 @@
 import {
   ERROR_STATUS,
+  FieldConfig,
   MutationHandlerReturnType,
   MutationPropsServer,
 } from '@apps-next/core';
@@ -11,17 +12,46 @@ import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
 import { getErrorMessage } from './convex-utils';
 
 export const createMutation = async (
-  ctx: ConvexContext,
-  { mutation, viewConfigManager }: MutationPropsServer
+  ctx: GenericMutationCtx,
+  props: MutationPropsServer
 ) => {
+  const { mutation, viewConfigManager } = props;
   if (mutation.type !== 'CREATE_RECORD') throw new Error('INVALID MUTATION-1');
 
   const { record } = mutation.payload;
   const displayField = viewConfigManager.getDisplayFieldLabel();
   const displayValue = record?.[displayField];
 
+  const manyToManyFields: FieldConfig[] = [];
+  Object.entries(record).forEach(([fieldName, value]) => {
+    const field = viewConfigManager.getFieldByRelationFieldName(fieldName);
+    if (field && field.relation?.manyToManyTable) {
+      manyToManyFields.push(field);
+    }
+  });
+
   try {
     const res = await ctx.db.insert(viewConfigManager.getTableName(), record);
+
+    console.log(record);
+
+    for (const index in manyToManyFields) {
+      const field = manyToManyFields[index];
+      if (!field?.relation?.fieldName) return;
+
+      console.log(field.relation.fieldName);
+      const ids = record[field?.relation?.fieldName];
+      console.log({ ids, res, table: field.name });
+
+      await selectRecordsMutation(ctx, {
+        ...props,
+        mutation: {
+          type: 'SELECT_RECORDS',
+          payload: { newIds: ids, idsToDelete: [], table: field.name, id: res },
+        },
+      });
+    }
+
     return {
       message: `Record ID="${res}" (${displayValue}) created successfully`,
       status: 201 as const,
@@ -116,7 +146,7 @@ export const updateMutation = async (
 };
 
 export const selectRecordsMutation = async (
-  ctx: GenericMutationCtx,
+  ctx: ConvexContext,
   props: MutationPropsServer
 ) => {
   const { mutation, viewConfigManager } = props;

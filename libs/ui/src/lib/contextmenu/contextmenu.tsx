@@ -38,16 +38,22 @@ const MenuItemContent: React.FC<{
   field: ContextMenuFieldItem;
   renderField: (field: ContextMenuFieldItem) => React.ReactNode;
 }> = ({ field, renderField }) => (
-  <div className="w-full flex flex-row items-center">
+  <button
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      field.onClickOption();
+    }}
+    className="w-full flex flex-row items-center"
+  >
     <div className="pr-2">
       <FieldIcon field={field} />
     </div>
-
     {renderField(field)}
     <ContextMenuShortcut>
       ⌘{field.name.slice(0, 1).toUpperCase()}
     </ContextMenuShortcut>
-  </div>
+  </button>
 );
 
 const SubMenuContent: React.FC<{
@@ -213,9 +219,10 @@ export const ContextMenuDefault = ({
 
       <ContextMenuContent data-testid="contextmenu" className="w-56">
         {fields?.map((field) => {
-          const isEnumOrRelationalField = field.enum || field.relation;
+          const isEnumDateOrRelationalField =
+            field.enum || field.relation || field.isDateField;
 
-          if (!isEnumOrRelationalField) {
+          if (!isEnumDateOrRelationalField) {
             return (
               <ContextMenuItem key={field.name}>
                 <MenuItemContent field={field} renderField={renderField} />
@@ -264,6 +271,7 @@ export const ContextMenuDefault = ({
               props.onDelete();
             }}
           >
+            {/* REFACTOR Important -> have kind of class that manages commands outside of the UI module. */}
             <div className="flex flex-row items-center">
               <div className="pr-2">
                 <TrashIcon className="w-3 h-3" />
@@ -275,6 +283,25 @@ export const ContextMenuDefault = ({
             <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
           </ContextMenuItem>
         ) : null}
+
+        <ContextMenuItem
+          className="cursor-pointer"
+          role="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            props.onEdit();
+          }}
+        >
+          <div className="flex flex-row items-center">
+            <div className="pr-2">
+              <PencilIcon className="w-3 h-3" />
+            </div>
+            <div>
+              {t('common.editName', { name: renderModelName(modelName, t) })}
+            </div>
+          </div>
+          <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );

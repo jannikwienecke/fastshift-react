@@ -42,6 +42,18 @@ export type FieldRelationType = {
   manyToManyModelFields?: FieldConfig[];
 };
 
+export type FieldConfigOptions<
+  T extends GetTableName = any,
+  F extends keyof GetTableDataType<T> = any
+> = {
+  // defaultValue?: unknown;
+  defaultValue?: GetTableDataType<T>[F];
+  hideFromForm?: boolean;
+  isDisplayField?: true;
+  richEditor?: boolean;
+  isDateField?: boolean;
+};
+
 export type FieldConfig<TName = string> = {
   isId?: boolean;
   isRelationalIdField?: boolean;
@@ -56,14 +68,12 @@ export type FieldConfig<TName = string> = {
   relation?: FieldRelationType;
   isSystemField?: boolean;
   isRecursive?: boolean;
-  defaultValue?: unknown;
-  hideFromForm?: boolean;
-  isDisplayField?: true;
+  //
   enum?: {
     name: string;
     values: Enum[];
   };
-};
+} & FieldConfigOptions;
 
 export type GetTableName = keyof RegisteredRouter['config']['_datamodel'];
 

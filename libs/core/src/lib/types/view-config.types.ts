@@ -1,5 +1,6 @@
 import {
   FieldConfig,
+  FieldConfigOptions,
   GetTableDataType,
   GetTableName,
   IndexField,
@@ -31,12 +32,14 @@ export type ViewConfigType<T extends GetTableName = any> =
       field: keyof GetTableDataType<T>;
     };
     fields?: {
-      [field in keyof GetTableDataType<T>]?: {
-        isDateField?: boolean;
-        showCheckboxInList?: boolean;
-        defaultValue?: unknown;
-        hideFromForm?: boolean;
-      };
+      // [field in keyof GetTableDataType<T>]?: {
+      //   isDateField?: boolean;
+      //   showCheckboxInList?: boolean;
+      //   defaultValue?: GetTableDataType<T>[field];
+      //   hideFromForm?: boolean;
+      //   richEditor?: boolean; // for now just textarea
+      // };
+      [field in keyof GetTableDataType<T>]?: FieldConfigOptions<T, field>;
     };
     query?: {
       showDeleted?: boolean;

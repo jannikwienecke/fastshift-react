@@ -3,6 +3,7 @@ import {
   ifNoneNullElseValue,
   makeData,
   Mutation,
+  NONE_OPTION,
   RecordType,
   Row,
   TranslationKeys,
@@ -225,10 +226,19 @@ export const optimisticUpdateStore = ({
   updateGlobalDataModel?: boolean;
 }): (() => void) => {
   console.warn('Starting optimistic update', record);
+
+  record = Object.entries(record).reduce((prev, [key, value]) => {
+    const _value = value === NONE_OPTION ? undefined : value;
+    return { ...prev, [key]: _value };
+  }, record);
+
   const originalRows = [...store$.dataModel.rows.get()];
 
   // Merge updated row data
-  const updatedRowData = { ...row.raw, ...record };
+  const updatedRowData = {
+    ...row.raw,
+    ...record,
+  };
   console.warn('Updated row data:', updatedRowData);
 
   // Generate updated data rows

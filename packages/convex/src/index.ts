@@ -7,6 +7,7 @@ import { CubeIcon, TokensIcon } from '@radix-ui/react-icons';
 import schema from '../convex/schema';
 import { createViewConfig } from '@apps-next/react';
 import { CheckCheckIcon, TagIcon } from 'lucide-react';
+import { Doc } from '../convex/_generated/dataModel';
 
 export * from '../convex/_generated/api';
 export * from '../convex/schema';
@@ -33,11 +34,17 @@ export const tasksConfig = createViewConfig(
       // dueDate (date with upper case D -> Due Date)
       dueDate: { isDateField: true },
       completed: {
-        defaultValue: true,
+        defaultValue: false,
         hideFromForm: true,
       },
+      priority: {
+        defaultValue: 1,
+      },
+      description: {
+        richEditor: true,
+      },
       todos: {
-        hideFromForm: true,
+        // hideFromForm: true,
         // showCheckboxInList: false,
       },
       tasks: {

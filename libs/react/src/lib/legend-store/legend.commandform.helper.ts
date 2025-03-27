@@ -10,6 +10,7 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import { store$ } from './legend.store';
+import { getTimeValueFromDateString } from '../ui-adapter/filter-adapter';
 
 export const getViewConfigManager = () => {
   const view = store$.commandform.view.get() as ViewConfigType;
@@ -68,18 +69,23 @@ export const getRecordTypeFromRow = () => {
 
   const obj = allFields.reduce((prev, field) => {
     const value = row.getValue?.(field.name);
-    console.log(field, value);
 
     const valueToUse =
       field.type === 'Boolean'
         ? Boolean(value)
+        : field.type === 'Date' && value
+        ? getTimeValueFromDateString(value, true)
+        : field.relation?.manyToManyTable
+        ? (value as Row[] | undefined)?.map?.((x) => x.id)
         : field.relation
-        ? (value as Row).id || undefined
+        ? (value as Row | undefined)?.id || undefined
         : value;
 
+    const fieldNameRelation = field.relation?.fieldName ?? null;
+    const nameToUse = fieldNameRelation ?? field.name;
     return {
       ...prev,
-      [field.name]: valueToUse,
+      [nameToUse]: valueToUse,
     };
   }, {} as RecordType);
 

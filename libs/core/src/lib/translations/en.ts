@@ -53,7 +53,7 @@ export const en = {
     cancel: 'Cancel',
     delete: 'Delete {{name}}',
     edit: 'Edit',
-    editField: 'Edit {{name}}',
+    editName: 'Edit {{name}}',
     saveField: 'Save {{name}}',
     change: 'Change',
     no: 'No',
@@ -73,6 +73,10 @@ export const en = {
 
   datePicker: {
     description: 'Please select a date from the calendar.',
+  },
+
+  richEditor: {
+    placeholder: 'Add {{name}}...',
   },
 
   error: {

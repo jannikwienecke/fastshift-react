@@ -157,7 +157,11 @@ export const RenderCommandform = observer(
     return (
       <Memo>
         {() => {
-          return <Commandform {...makeCommandformProps({})} />;
+          return (
+            <>
+              <Commandform {...makeCommandformProps({})} />
+            </>
+          );
         }}
       </Memo>
     );

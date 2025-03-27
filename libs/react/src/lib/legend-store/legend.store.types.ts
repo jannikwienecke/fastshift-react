@@ -256,6 +256,8 @@ export type LegendStore = {
   contextMenuOpen: (rect: DOMRect, row: RecordType) => void;
   contextMenuClose: () => void;
   contextmenuDeleteRow: (row: Row) => void;
+  contextmenuEditRow: (row: Row) => void;
+  contextmenuClickOnField: (field: FieldConfig) => void;
 
   selectRowsMutation: (props: {
     field: FieldConfig;
@@ -286,6 +288,7 @@ export type LegendStore = {
   // commandbar
   commandbarOpen: () => void;
   commandbarClose: () => void;
+  commandbarOpenWithFieldValue: (field: FieldConfig, row: Row) => void;
   commandbarUpdateQuery: (query: string) => void;
   commandbarSelectItem: (item: ComboxboxItem) => void;
   commandbarSetValue: (value: ComboxboxItem) => void;

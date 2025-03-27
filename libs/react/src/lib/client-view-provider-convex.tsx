@@ -67,13 +67,13 @@ export const ClientViewProviderConvex = (
 
     return {
       ...f,
+      ...userFieldConfig,
       label: f.label || `${f.name}.one`,
-      // editLabel: f.editLabel || `${f.name}.edit`,
       isDisplayField,
       editLabel: `${f.name}.edit`,
       hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
-      defaultValue: userFieldConfig?.defaultValue,
 
+      // editLabel: f.editLabel || `${f.name}.edit`,
       // editSearchString: toUse
     };
   });
@@ -114,10 +114,10 @@ export const ClientViewProviderConvex = (
 
         return {
           ...f,
+          ...userFieldConfig,
           isDisplayField,
           label: f.label || renderModelName(f.name, t),
           hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
-          defaultValue: userFieldConfig?.defaultValue,
         };
       }),
     };

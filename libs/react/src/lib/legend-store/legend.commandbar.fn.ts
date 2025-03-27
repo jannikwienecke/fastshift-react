@@ -1,4 +1,9 @@
-import { ADD_NEW_OPTION, makeRowFromValue, Row } from '@apps-next/core';
+import {
+  ADD_NEW_OPTION,
+  FieldConfig,
+  makeRowFromValue,
+  Row,
+} from '@apps-next/core';
 import {
   dateUtils,
   operatorMap,
@@ -18,6 +23,25 @@ export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
   store$.commandbar.selectedViewField.set(undefined);
   store$.combobox.query.set('');
   comboboxDebouncedQuery$.set('');
+};
+
+export const commandbarOpenWithFieldValue: StoreFn<
+  'commandbarOpenWithFieldValue'
+> = (store$) => (field: FieldConfig, row: Row) => {
+  const value = row?.getValue?.(field.name);
+  store$.commandbarOpen();
+
+  console.log(value);
+  if ((value as Row | undefined)?.id) {
+    store$.commandbar.query.set('');
+    store$.commandbar.activeItem.set(row);
+  } else if (typeof value !== 'object') {
+    store$.commandbar.query.set(value);
+    store$.commandbar.activeItem.set(row);
+  } else {
+    //
+  }
+  store$.commandbar.selectedViewField.set(field);
 };
 
 export const commandbarUpdateQuery: StoreFn<'commandbarUpdateQuery'> =

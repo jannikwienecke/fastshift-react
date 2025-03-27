@@ -251,7 +251,8 @@ export const makeListProps = <T extends RecordType = RecordType>(
     onContextMenu: store$.onContextMenuListItem,
     onKeyPress: (type) => {
       const commandbarIsOpen = store$.commandbar.open.get();
-      if (commandbarIsOpen) return;
+      const commandformIsOpen = store$.commandform.open.get();
+      if (commandbarIsOpen || commandformIsOpen) return;
 
       const indexOfRowInFocus = dataModel.rows?.findIndex(
         (row) => row.id === store$.list.rowInFocus.get()?.row?.id

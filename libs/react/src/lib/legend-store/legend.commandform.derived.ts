@@ -11,6 +11,8 @@ import { observable } from '@legendapp/state';
 import { getComponent } from '../ui-components/ui-components.helper';
 import { store$ } from './legend.store';
 import { getFormState } from './legend.commandform.helper';
+import { comboboxStore$ } from './legend.store.derived.combobox';
+import { makeComboboxProps } from '../ui-adapter';
 
 export const commandformProps$ = observable<
   Partial<MakeCommandformPropsOption>
@@ -31,7 +33,6 @@ export const derivedCommandformState$ = observable(() => {
   );
 
   const formState = getFormState();
-  console.log(formState);
   const newRow = store$.commandform.row.get();
 
   const complexFields = viewConfigManager
@@ -72,15 +73,18 @@ export const derivedCommandformState$ = observable(() => {
         componentType: 'icon',
       });
 
-      const label = getFieldLabel(field, true) ?? '';
+      const value = newRow
+        ? (newRow?.getValue?.(field.name) as string | number)
+        : undefined;
 
-      console.log(field.isDisplayField);
+      const label = getFieldLabel(field, true) ?? '';
 
       return {
         id: field.name,
         label,
         icon: icon ? icon : undefined,
         field,
+        value: value,
       } satisfies ComboxboxItem;
     });
 
@@ -90,6 +94,7 @@ export const derivedCommandformState$ = observable(() => {
     formState,
     complexFields,
     primitiveFields,
+    modal: !comboboxStore$.open.get(),
 
     onClose: () => {
       if (store$.commandform.rect.get()) {
