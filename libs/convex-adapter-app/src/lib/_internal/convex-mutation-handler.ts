@@ -33,15 +33,11 @@ export const createMutation = async (
   try {
     const res = await ctx.db.insert(viewConfigManager.getTableName(), record);
 
-    console.log(record);
-
     for (const index in manyToManyFields) {
       const field = manyToManyFields[index];
       if (!field?.relation?.fieldName) return;
 
-      console.log(field.relation.fieldName);
       const ids = record[field?.relation?.fieldName];
-      console.log({ ids, res, table: field.name });
 
       await selectRecordsMutation(ctx, {
         ...props,
@@ -127,8 +123,6 @@ export const updateMutation = async (
   );
 
   try {
-    console.log('updateMutation record', { record, payload: mutation.payload });
-
     await ctx.db.patch(mutation.payload.id, record);
     return {
       message: 'Record updated successfully',

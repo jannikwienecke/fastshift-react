@@ -52,6 +52,7 @@ export type FieldConfigOptions<
   isDisplayField?: true;
   richEditor?: boolean;
   isDateField?: boolean;
+  showCheckboxInList?: boolean;
 };
 
 export type FieldConfig<TName = string> = {

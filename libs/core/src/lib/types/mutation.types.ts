@@ -1,6 +1,6 @@
 import { BaseViewConfigManagerInterface } from '../base-view-config';
 import { FieldConfig, ID } from './base.types';
-import { RegisteredViews, ViewConfigType } from './view-config.types';
+import { RegisteredViews } from './view-config.types';
 
 type MutationRecord = Record<string, any>;
 

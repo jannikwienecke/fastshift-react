@@ -138,12 +138,14 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   if (!options) return DEFAULT_COMBOBOX_STATE;
 
+  const selected_ = options.selected?.length
+    ? options.selected
+    : stateShared.selected;
+
   return {
     ...stateShared,
     ...options,
-    selected: options.selected?.length
-      ? options.selected
-      : stateShared.selected,
+    selected: selected_,
     multiple: multiple === null ? options.multiple : multiple,
     showCheckboxInList: showCheckboxInList === false ? false : !!multiple,
   } satisfies ComboboxState;

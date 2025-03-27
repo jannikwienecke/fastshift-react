@@ -8,6 +8,7 @@ import {
   getEditLabel,
   getFieldLabel,
   getRelationTableName,
+  makeData,
   makeNoneOption,
   makeRow,
   makeRowFromField,
@@ -163,7 +164,9 @@ export const handleRelationalField = (
   const removedSelectedIds = removedSelected$.get().map((r) => r.id);
   const newSelectedIds = newSelected$.get().map((r) => r.id);
 
-  const defaultSelected = initSelected$.get() ?? defaultSelectedProps;
+  const defaultSelected = initSelected$.get()?.length
+    ? initSelected$.get()
+    : defaultSelectedProps;
 
   const selectedOfList = defaultData?.rows.filter((r) => {
     const isInDefault = defaultSelected?.find?.((s) => s['id'] === r['id']);
@@ -171,7 +174,9 @@ export const handleRelationalField = (
     const isInRemovedSelected = removedSelectedIds.includes(r.id.toString());
 
     if (isInRemovedSelected) return false;
-    if (isInDefault || isInNewSelected) return true;
+    if (isInDefault || isInNewSelected) {
+      return true;
+    }
 
     return false;
   });
@@ -476,7 +481,5 @@ export const getDefaultSelectedList = (): Row[] => {
 
   if (!Array.isArray(selected)) return [];
 
-  return selected?.map((s) =>
-    makeRowFromValue(s['id'], selectedRelationField.field)
-  );
+  return makeData(store$.views.get(), 'tags')(selected).rows;
 };

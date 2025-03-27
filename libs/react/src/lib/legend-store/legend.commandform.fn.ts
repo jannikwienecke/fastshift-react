@@ -10,7 +10,6 @@ import { StoreFn } from './legend.store.types';
 export const commandformOpen: StoreFn<'commandformOpen'> =
   (store$) => (viewName) => {
     const view = store$.views[viewName]?.get();
-    console.log('OPEN', view);
 
     if (!view) return;
 
@@ -84,7 +83,6 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
     const { row, view } = store$.commandform.get() ?? {};
     if (!row || !view) return;
 
-    console.log(row);
     const formState = getFormState();
     if (!formState.isReady) return;
 

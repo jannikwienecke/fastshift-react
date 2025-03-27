@@ -6,7 +6,6 @@ import {
   NONE_OPTION,
   RecordType,
   Row,
-  TranslationKeys,
 } from '@apps-next/core';
 import { observable, Observable } from '@legendapp/state';
 import { renderErrorToast, renderSuccessToast } from '../toast';
@@ -256,11 +255,15 @@ export const optimisticUpdateStore = ({
     .rows?.[0];
 
   if (updatedRow) {
-    store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
-    // const selectedOption = store$.list.rowInFocus.row.get();
-    store$.list.rowInFocus.row.set(updatedRow);
-
-    store$.contextMenuState.row.set(updatedRow);
+    if (store$.list.selectedRelationField.row.get()) {
+      store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
+    }
+    if (store$.list.rowInFocus.row.get()) {
+      store$.list.rowInFocus.row.set(updatedRow);
+    }
+    if (store$.contextMenuState.row.get()) {
+      store$.contextMenuState.row.set(updatedRow);
+    }
     if (updateGlobalDataModel) {
       store$.dataModel.rows.set(updatedRows);
     }

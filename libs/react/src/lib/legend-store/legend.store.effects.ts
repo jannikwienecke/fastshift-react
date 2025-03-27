@@ -1,6 +1,11 @@
 import { Observable, observable } from '@legendapp/state';
 import { LegendStore } from './legend.store.types';
-import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
+import {
+  comboboxDebouncedQuery$,
+  initSelected$,
+  newSelected$,
+  removedSelected$,
+} from './legend.combobox.helper';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
@@ -9,18 +14,23 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const filterField = store$.filter.selectedField.get();
     const filterDateField = store$.filter.selectedDateField.get();
     const filterOperatorField = store$.filter.selectedOperatorField.get();
+    const commandbarField = store$.commandbar.selectedViewField.get();
 
     if (
       !listRelationField &&
       !filterField &&
       !filterDateField &&
-      !filterOperatorField
+      !filterOperatorField &&
+      !commandbarField
     ) {
       store$.combobox.selected.set([]);
       store$.combobox.values.set(null);
       store$.combobox.query.set('');
       store$.combobox.multiple.set(false);
       store$.combobox.datePicker.set(null);
+      initSelected$.set(null);
+      newSelected$.set([]);
+      removedSelected$.set([]);
     }
 
     let timeout: NodeJS.Timeout;

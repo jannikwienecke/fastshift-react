@@ -22,6 +22,7 @@ export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
   store$.commandbar.itemGroups.set([]);
   store$.commandbar.selectedViewField.set(undefined);
   store$.combobox.query.set('');
+  // store$.list.selectedRelationField.set()
   comboboxDebouncedQuery$.set('');
 };
 
@@ -31,7 +32,6 @@ export const commandbarOpenWithFieldValue: StoreFn<
   const value = row?.getValue?.(field.name);
   store$.commandbarOpen();
 
-  console.log(value);
   if ((value as Row | undefined)?.id) {
     store$.commandbar.query.set('');
     store$.commandbar.activeItem.set(row);
@@ -117,14 +117,14 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
       const row = store$.list.rowInFocus.get();
       const value = row?.row?.getValue(field.name);
 
-      console.log({
-        SELECTITEM: '',
-        item,
-        field,
-        row,
-        value,
-        selectedViewField,
-      });
+      // console.log({
+      //   SELECTITEM: '',
+      //   item,
+      //   field,
+      //   row,
+      //   value,
+      //   selectedViewField,
+      // });
 
       if (selectedViewField && row?.row) {
         if (selectedViewField.type === 'String' && query?.length) {
@@ -209,7 +209,6 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
             checkedRow: item as Row,
             existingRows: existingRows,
           });
-          store$.commandbarClose();
 
           return;
         } else {

@@ -67,9 +67,9 @@ export const ClientViewProviderConvex = (
 
     return {
       ...f,
-      ...userFieldConfig,
+      ...(userFieldConfig ?? {}),
       label: f.label || `${f.name}.one`,
-      isDisplayField,
+      isDisplayField: isDisplayField as true | undefined,
       editLabel: `${f.name}.edit`,
       hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
 
