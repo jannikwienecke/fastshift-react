@@ -217,7 +217,7 @@ export const ContextMenuDefault = ({
     >
       <ContextMenuTrigger ref={ref} className="w-0 h-0 invisible sr-only" />
 
-      <ContextMenuContent data-testid="contextmenu" className="w-56">
+      <ContextMenuContent data-testid="contextmenu" className="w-64">
         {fields?.map((field) => {
           const isEnumDateOrRelationalField =
             field.enum || field.relation || field.isDateField;

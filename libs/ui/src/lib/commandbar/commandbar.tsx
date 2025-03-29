@@ -134,7 +134,10 @@ const CommandbarContainer = (
       open={props.open}
       onOpenChange={(open) => !open && props.onClose?.()}
     >
-      <DialogContent className="overflow-hidden p-0 rounded-md">
+      <DialogContent
+        className="overflow-hidden p-0 rounded-md"
+        data-testid="commandbar"
+      >
         <DialogTitle className="sr-only">Commandbar Dialog</DialogTitle>
         {props.children}
       </DialogContent>

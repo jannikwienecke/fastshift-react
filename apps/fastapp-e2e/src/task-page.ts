@@ -10,6 +10,8 @@ export class TaskPage {
   readonly contextmenu: Locator;
   readonly displayOptions: Locator;
   readonly displayOptionsButton: Locator;
+  readonly commandbar: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.filterButton = page.getByTestId('filter-button');
@@ -19,6 +21,7 @@ export class TaskPage {
     this.contextmenu = page.getByTestId('contextmenu');
     this.displayOptions = page.getByTestId('display-options');
     this.displayOptionsButton = page.getByTestId('display-options-button');
+    this.commandbar = page.getByTestId('commandbar');
   }
 
   async goto() {

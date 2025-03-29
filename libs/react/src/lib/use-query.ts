@@ -92,7 +92,19 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const parsedDisplayOptions = convertDisplayOptionsForBackend(displayOptions);
 
   const cursor = store$.fetchMore.currentCursor.get();
-  const isDone = store$.fetchMore.isDone.get();
+  // const isDone = store$.fetchMore.isDone.get();
+
+  React.useEffect(() => {
+    console.log(cursor.position);
+  }, [cursor.position]);
+
+  React.useEffect(() => {
+    console.log(parsedDisplayOptions);
+  }, [parsedDisplayOptions]);
+
+  React.useEffect(() => {
+    console.log(parsedFilters);
+  }, [parsedFilters]);
 
   const queryPropsMerged = React.useMemo(() => {
     return {

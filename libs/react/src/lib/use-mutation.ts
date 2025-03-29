@@ -26,7 +26,10 @@ export const useMutation = () => {
       });
     },
     onSuccess: () => {
-      store$.fetchMore.reset.set(true);
+      console.log('SET TRUE');
+      setTimeout(() => {
+        store$.fetchMore.reset.set(true);
+      }, 300);
 
       setTimeout(() => {
         reset$.set({ value: reset$.get().value + 1 });
@@ -41,10 +44,11 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      store$.fetchMore.isFetching.set(true);
+      console.log('MUTATE.....');
       store$.fetchMore.reset.set(true);
-      store$.fetchMore.isDone.set(false);
 
+      store$.fetchMore.isFetching.set(true);
+      store$.fetchMore.isDone.set(false);
       lastViewName.current = vars.viewName;
     },
   });

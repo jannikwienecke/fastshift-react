@@ -20,6 +20,7 @@ export const globalQueryReset: StoreFn<'globalQueryReset'> = (store$) => () => {
 export const globalFetchMore: StoreFn<'globalFetchMore'> = (store$) => () => {
   if (store$.fetchMore.isDone.get()) return;
 
+  console.log('FETCH MORE');
   batch(() => {
     store$.fetchMore.set((prev) => ({
       ...prev,

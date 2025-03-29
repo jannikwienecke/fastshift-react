@@ -122,11 +122,14 @@ export class BaseViewConfigManager<
     return (this.viewConfig.query?.primarySearchField as string) ?? undefined;
   }
 
-  // getPrimarySearchField add
-
-  getViewFieldList(options?: { includeSystemFields?: boolean }): FieldConfig[] {
-    // return Object.values(this.modelConfig?.viewFields ?? {});
+  getViewFieldList(options?: {
+    includeSystemFields?: boolean;
+    includeSoftDeleteField?: boolean;
+  }): FieldConfig[] {
     return Object.values(this.viewConfig?.viewFields ?? {}).filter((f) => {
+      const isSoftDeleteField = this.getSoftDeleteField() === f.name;
+      if (isSoftDeleteField && !options?.includeSoftDeleteField) return false;
+
       return options?.includeSystemFields ? true : !f.isSystemField;
     });
   }

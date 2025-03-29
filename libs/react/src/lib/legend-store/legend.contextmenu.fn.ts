@@ -1,6 +1,6 @@
 import { batch } from '@legendapp/state';
 import { StoreFn } from './legend.store.types';
-import { makeData, Row } from '@apps-next/core';
+import { makeData, makeRowFromValue, Row } from '@apps-next/core';
 
 export const contextMenuOpen: StoreFn<'contextMenuOpen'> =
   (store$) => (rect, record) => {
@@ -49,6 +49,16 @@ export const contextmenuClickOnField: StoreFn<'contextmenuClickOnField'> =
 
     if (!activeRow) return;
 
-    store$.contextMenuClose();
-    store$.commandbarOpenWithFieldValue(field, activeRow as Row);
+    if (field.type === 'Boolean') {
+      const value = activeRow.getValue?.(field.name);
+      store$.updateRecordMutation({
+        field,
+        row: activeRow as Row,
+        valueRow: makeRowFromValue(!value, field),
+      });
+      store$.contextMenuClose();
+    } else {
+      store$.contextMenuClose();
+      store$.commandbarOpenWithFieldValue(field, activeRow as Row);
+    }
   };

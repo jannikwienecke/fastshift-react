@@ -44,6 +44,7 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
 
   React.useEffect(() => {
     if (reset) {
+      console.log('RESET...');
       isDoneRef.current = false;
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -62,11 +63,17 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
       ignoreNewData$.set((prev) => prev - 1);
       return;
     }
+    if (!isFetching) return;
 
-    const allData =
-      isFetching && !reset
-        ? [...(prevDataRef.current ?? []), ...(data ?? [])]
-        : data;
+    let allData: RecordType[] = [];
+    const prevData = prevDataRef.current ?? [];
+    const position = store$.fetchMore.currentCursor.position.get();
+    if (isFetching && reset && position) {
+      const prevWithoutCursor = prevData.slice(0, position);
+      allData = [...prevWithoutCursor, ...(data ?? [])];
+    } else {
+      allData = isFetching && !reset ? [...prevData, ...(data ?? [])] : data;
+    }
 
     store$.createDataModel(allData);
 
