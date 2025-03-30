@@ -35,7 +35,7 @@ export const createMutation = async (
 
     for (const index in manyToManyFields) {
       const field = manyToManyFields[index];
-      if (!field?.relation?.fieldName) return;
+      if (!field?.relation?.fieldName) continue;
 
       const ids = record[field?.relation?.fieldName];
 
@@ -140,7 +140,7 @@ export const updateMutation = async (
 };
 
 export const selectRecordsMutation = async (
-  ctx: ConvexContext,
+  ctx: GenericMutationCtx,
   props: MutationPropsServer
 ) => {
   const { mutation, viewConfigManager } = props;
