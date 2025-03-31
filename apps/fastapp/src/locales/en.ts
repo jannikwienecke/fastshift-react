@@ -13,9 +13,10 @@ export const en = {
     one: 'Project',
     other: 'Projects',
   },
-  // nme: {
-  //   edit: 'Rename Task!!',
-  // },
+  name: {
+    edit: 'Rename Task',
+    // changeField: 'Update description',
+  },
   tags: {
     one: 'Tag',
     other: 'Tags',

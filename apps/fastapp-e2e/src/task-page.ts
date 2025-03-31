@@ -11,6 +11,7 @@ export class TaskPage {
   readonly displayOptions: Locator;
   readonly displayOptionsButton: Locator;
   readonly commandbar: Locator;
+  readonly commandform: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -22,6 +23,7 @@ export class TaskPage {
     this.displayOptions = page.getByTestId('display-options');
     this.displayOptionsButton = page.getByTestId('display-options-button');
     this.commandbar = page.getByTestId('commandbar');
+    this.commandform = page.getByTestId('commandform');
   }
 
   async goto() {

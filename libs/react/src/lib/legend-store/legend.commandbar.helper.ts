@@ -26,6 +26,8 @@ export const getCommandbarDefaultListProps = () => {
     row: rowInFocus,
   });
 
+  console.log(viewgetViewFieldsOptions);
+
   const items: ComboxboxItem[] =
     viewgetViewFieldsOptions?.values?.map((item) => item) ?? [];
 
@@ -205,7 +207,7 @@ export const getCommandbarCommandGroups = () => {
 
       const fuseCommands = new Fuse(commands, {
         keys: ['label'] satisfies Array<keyof ComboxboxItem>,
-        threshold: 0.4,
+        threshold: 0.1,
       });
 
       const filteredCommands = query

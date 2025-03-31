@@ -323,6 +323,26 @@ test.describe('Task management', () => {
     await expect(page.getByText(/design mockups/i)).toBeVisible();
   });
 
+  test('tasks has many todos, can add and remove todos', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await firstListItem.getByText('1 / 2').click();
+
+    await taskPage.comboboxPopover.getByText(/Todo 2/i).click();
+
+    await expect(firstListItem.getByText('1 / 1')).toBeVisible();
+
+    await taskPage.comboboxPopover.getByText(/Todo 1/i).click();
+
+    await taskPage.comboboxPopover.getByText(/Todo 1/i).click();
+
+    await page.reload();
+
+    await expect(firstListItem.getByText('1 / 1')).toBeVisible();
+  });
+
   test('can right click on a task and open the context menu', async ({
     taskPage,
     page,
@@ -376,24 +396,62 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByTestId('priority-urgent')).toBeVisible();
   });
 
-  test('tasks has many todos, can add and remove todos', async ({
+  test('can right click on a task and toggle completed state', async ({
     taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
-    await firstListItem.getByText('1 / 2').click();
+    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
 
-    await taskPage.comboboxPopover.getByText(/Todo 2/i).click();
+    // right click on the first list item
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
 
-    await expect(firstListItem.getByText('1 / 1')).toBeVisible();
+    await taskPage.contextmenu.getByText(/mark as completed/i).click();
 
-    await taskPage.comboboxPopover.getByText(/Todo 1/i).click();
+    await expect(firstListItem.getByText(/✅/i)).toBeVisible();
+  });
 
-    await taskPage.comboboxPopover.getByText(/Todo 1/i).click();
+  test('can right click on a task and open commandbar by clicking on project', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
 
-    await page.reload();
+    // right click on the first list item
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
 
-    await expect(firstListItem.getByText('1 / 1')).toBeVisible();
+    await taskPage.contextmenu.getByText(/project/i).click();
+
+    await taskPage.commandbar.getByText(/fitness plan/i).click();
+    await expect(firstListItem.getByText(/fitness plan/i)).toBeVisible();
+    await expect(firstListItem.getByText(/website redesign/i)).toBeHidden();
+  });
+
+  test('can right click on a task and click edit to open commandform', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+
+    // right click on the first list item
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    await taskPage.contextmenu.getByText(/edit task/i).click();
+
+    await expect(
+      taskPage.commandform.getByText(/design mockups/i)
+    ).toBeVisible();
   });
 
   test('can right click on a task, and delete the task in the context menu', async ({
@@ -516,8 +574,99 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText(/fitness plan/i)).toBeVisible();
   });
 
-  // [ ] add test -> scroll down to the bottom -> update project -> scroll to the top and we should be able to see the very first task item
-  //  [ ] expand test for contextmenu
+  test('can open and navigate in the commandbar', async ({
+    taskPage,
+    page,
+  }) => {
+    // press cmd + k
+    await page.waitForTimeout(500);
+    await taskPage.page.keyboard.press('Meta+k');
+    await expect(taskPage.commandbar).toBeVisible();
+
+    // expect to see the commandbar and the text /project/i
+    await expect(
+      taskPage.commandbar.getByText(/project/i).first()
+    ).toBeVisible();
+
+    await taskPage.commandbar
+      .getByPlaceholder(/type a command or search/i)
+      .fill('rename task');
+
+    await expect(taskPage.commandbar.getByText(/rename task/i)).toBeVisible();
+    // now we should no be seeing the project
+    await expect(taskPage.commandbar.getByText(/project/i)).toBeHidden();
+
+    await taskPage.commandbar
+      .getByPlaceholder(/type a command or search/i)
+      .clear();
+
+    await taskPage.commandbar
+      .getByPlaceholder(/type a command or search/i)
+      .fill('create new');
+
+    await expect(
+      taskPage.commandbar.getByText(/create new task/i).first()
+    ).toBeVisible();
+
+    await expect(
+      taskPage.commandbar.getByText(/create new project/i)
+    ).toBeVisible();
+
+    await expect(
+      taskPage.commandbar.getByText(/create new tag/i)
+    ).toBeVisible();
+
+    await taskPage.commandbar
+      .getByPlaceholder(/type a command or search/i)
+      .clear();
+
+    await expect(
+      taskPage.commandbar.getByText(/update description/i)
+    ).toBeVisible();
+  });
+
+  test('can open commandbar and then toggle completed state', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+
+    // open commandbar
+    await taskPage.page.keyboard.press('Meta+k');
+    await expect(taskPage.commandbar).toBeVisible();
+
+    await taskPage.commandbar.getByText(/mark as completed/i).click();
+
+    await expect(taskPage.commandbar).toBeHidden();
+
+    await expect(firstListItem.getByText(/✅/i)).toBeVisible();
+  });
+
+  test('can open commandbar and update the project', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+
+    // open commandbar
+    await taskPage.page.keyboard.press('Meta+k');
+    await expect(taskPage.commandbar).toBeVisible();
+    await taskPage.commandbar.getByText(/add to project/i).click();
+
+    await expect(
+      taskPage.commandbar.getByText(/create new project/i)
+    ).toBeVisible();
+    await expect(taskPage.commandbar.getByText(/no project/i)).toBeVisible();
+    await expect(taskPage.commandbar.getByText(/projects/i)).toBeVisible();
+
+    await taskPage.commandbar.getByPlaceholder('type a').fill('fitness plan');
+    await taskPage.commandbar.getByText(/fitness plan/i).click();
+
+    await expect(firstListItem.getByText(/fitness plan/i)).toBeVisible();
+  });
+
   // add tests for commandbar
   //  add tests for commanform
 });

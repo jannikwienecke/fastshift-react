@@ -77,7 +77,7 @@ export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
     },
 
     name: {
-      fieldLabel: () => t('tasks.edit'),
+      // fieldLabel: () => t('tasks.edit'),
       component: {
         icon: PencilLineIcon,
         contextmenuFieldItem: NameFieldItem,

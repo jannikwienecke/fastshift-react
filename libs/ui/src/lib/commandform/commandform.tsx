@@ -23,7 +23,10 @@ const CommandformContainer = (
         !open && props.onClose?.();
       }}
     >
-      <DialogContent className="overflow-hidden p-0 rounded-md">
+      <DialogContent
+        className="overflow-hidden p-0 rounded-md"
+        data-testid="commandform"
+      >
         <DialogTitle className="sr-only">Commandbar Dialog</DialogTitle>
         {props.children}
       </DialogContent>
