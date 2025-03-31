@@ -247,7 +247,6 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
 
         if (!command) return;
 
-        console.log(command);
         if (!command.options?.keepCommandbarOpen) {
           store$.commandbarClose();
         }

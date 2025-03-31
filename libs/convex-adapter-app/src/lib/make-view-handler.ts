@@ -15,8 +15,6 @@ export const makeViewLoaderHandler =
   (views: RegisteredViews) => (ctx: GenericQueryCtx, args: any) => {
     const viewConfig = views[args['viewName'] as any as keyof typeof views];
 
-    console.log('MakeViewLoaderHandler', { views, args, viewConfig });
-
     return viewLoaderHandler(ctx, {
       ...(args as QueryDto),
       viewConfig,

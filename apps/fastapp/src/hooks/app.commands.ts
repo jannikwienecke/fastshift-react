@@ -26,7 +26,6 @@ export const useCommands = () => {
     id: 'reset-db',
     label: t('commands.resetDb'),
     handler: async (options) => {
-      console.log(options);
       resettingDb$.set(true);
       const promises = [mutateAsync({}), waitFor(1000)];
       await Promise.all(promises);
