@@ -483,6 +483,39 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText(/track monthly/i)).toBeVisible();
   });
 
+  test('can scroll down, load more tasks, update a task and scroll to the top', async ({
+    taskPage,
+    page,
+  }) => {
+    // scroll down to the bottom
+    // we want to test that if we fetch the next page of the pagination
+    // and we update any item, all the previous pages that were loaded are still there
+    await expect(page.getByText(/design mockups/i)).toBeVisible();
+
+    await page.mouse.wheel(0, 10000);
+    await page.getByText(/create training schedule/i).click();
+    await page.mouse.wheel(0, 10000);
+    await page.waitForTimeout(400);
+    await page.getByText(/practice edit/i).click();
+
+    await page.getByText(/learn photo/i).click();
+    await taskPage.comboboxPopover.getByText(/no project/i).click();
+    await expect(page.getByText(/learn photo/i)).toBeHidden();
+    await page.waitForTimeout(400);
+
+    await page.mouse.wheel(0, -10000);
+    await page.waitForTimeout(400);
+    await expect(page.getByText(/design mockups/i)).toBeVisible();
+
+    // now we also want to test that when we change a item from the first pagination page
+    // it still updates correctly
+    const firstListItem = await taskPage.getListItem(0);
+    await firstListItem.getByText(/website redesign/i).click();
+    await taskPage.comboboxPopover.getByText(/fitness plan/i).click();
+    await expect(firstListItem.getByText(/website redesign/i)).toBeHidden();
+    await expect(firstListItem.getByText(/fitness plan/i)).toBeVisible();
+  });
+
   // [ ] add test -> scroll down to the bottom -> update project -> scroll to the top and we should be able to see the very first task item
   //  [ ] expand test for contextmenu
   // add tests for commandbar
