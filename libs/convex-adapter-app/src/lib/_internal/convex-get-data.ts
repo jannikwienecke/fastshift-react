@@ -25,6 +25,7 @@ import { ConvexRecordType } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const { viewConfigManager, filters, registeredViews } = args;
+  console.log('GET DATA', { args: viewConfigManager.viewConfig });
 
   const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
 
