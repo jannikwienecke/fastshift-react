@@ -61,3 +61,5 @@ created: 1723444498044
 - we "delete" a project, the task has still the reference but does not show it
 - when we undelete the project, the task will show the project again
 - same for projects when we "delete" a task (just filters out all the tasks that were deleted)
+
+- [ ] show on which deployment i am currently am, or with which i am connected....
