@@ -34,7 +34,7 @@ export const createDataModel: StoreFn<'createDataModel'> =
 
 export const init: StoreFn<'init'> =
   (store$) =>
-  (data, relationalData, viewConfigManager, views, uiViewConfig) => {
+  (data, relationalData, viewConfigManager, views, uiViewConfig, commands) => {
     batch(() => {
       store$.fetchMore.assign({
         isDone: false,
@@ -54,6 +54,7 @@ export const init: StoreFn<'init'> =
       store$.viewConfigManager.set(viewConfigManager);
       store$.uiViewConfig.set(uiViewConfig);
       store$.filter.filters.set([]);
+      store$.commands.set(commands);
 
       if (!store$.viewConfigManager.get()) return;
 

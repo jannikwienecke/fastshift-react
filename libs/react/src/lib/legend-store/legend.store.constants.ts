@@ -70,6 +70,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'commandbar'
   | 'commandform'
   | 'datePickerDialogState'
+  | 'commands'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -113,6 +114,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   inputDialog: {
     valueDict: {},
   },
+  commands: [],
   displayOptions: {
     showEmptyGroups: true,
     softDeleteEnabled: false,

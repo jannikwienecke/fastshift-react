@@ -54,4 +54,7 @@ export default {
     notFound: 'Nicht gefunden',
     unauthorized: 'Nicht autorisiert',
   },
+  commands: {
+    resetDb: 'Datenbank zurücksetzen',
+  },
 } satisfies typeof en;

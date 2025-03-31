@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
 import { BaseConfigInterface } from './config.types';
+import React from 'react';
 
 const documentBaseSchema = z.object({
   id: z.string(),
@@ -116,3 +117,13 @@ export type DataModel<TableNames extends string = any> = {
 export type DataProvider = 'convex' | 'default';
 
 export type ID = string | number;
+
+export type Command = {
+  id: string;
+  label: string;
+  icon: React.FC<any>;
+  options?: {
+    keepCommandbarOpen?: boolean;
+  };
+  handler: (props: { row?: RecordType }) => Promise<void>;
+};

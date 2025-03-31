@@ -199,7 +199,6 @@ export const getCommandbarCommandGroups = () => {
 
   const groups = Object.values(views)
     .map((view) => {
-      // const fieldConfig =
       if (!view) return [];
 
       const commands: ComboxboxItem[] = [makeAddNewCommand(view)];

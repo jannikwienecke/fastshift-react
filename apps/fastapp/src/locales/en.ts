@@ -63,6 +63,9 @@ export const en = {
     notFound: 'Not found',
     unauthorized: 'Unauthorized',
   },
+  commands: {
+    resetDb: 'Reset database',
+  },
 };
 
 export default en;

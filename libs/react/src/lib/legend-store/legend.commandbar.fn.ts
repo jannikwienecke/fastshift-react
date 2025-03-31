@@ -69,7 +69,7 @@ export const commandbarSetValue: StoreFn<'commandbarSetValue'> =
   };
 
 export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
-  (store$) => (item) => {
+  (store$) => async (item) => {
     const selectedViewField = store$.commandbar.selectedViewField.get();
     const query = store$.commandbar.query.get();
 
@@ -236,6 +236,25 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
       if (item.id === ADD_NEW_OPTION && item.viewName) {
         store$.commandformOpen(item.viewName);
         store$.commandbarClose();
+      } else {
+        // FEATURE -> make the commands injection system scalable
+        // items groups should be set by the item itself, should carry a group-id
+        // handle running handler, error handling, which props needs to be passed
+        // probably the active row
+        const command = store$.commands
+          .get()
+          .find((command) => command.id === item.id);
+
+        if (!command) return;
+
+        console.log(command);
+        if (!command.options?.keepCommandbarOpen) {
+          store$.commandbarClose();
+        }
+
+        await command.handler({
+          row: store$.list.rowInFocus.get()?.row || undefined,
+        });
       }
     }
   };

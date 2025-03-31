@@ -4,6 +4,7 @@ import {
   BaseConfigInterface,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  Command,
   patchDict,
   QueryReturnOrUndefined,
   RegisteredViews,
@@ -23,6 +24,7 @@ export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
+  commands: Command[];
   queryKey: any[];
 } & { children: React.ReactNode };
 
@@ -139,10 +141,11 @@ export const ClientViewProviderConvex = (
         data?.relationalData ?? {},
         viewConfigManager,
         views,
-        props.uiViewConfig
+        props.uiViewConfig,
+        props.commands
       );
     }
-  }, [data, props.uiViewConfig, viewConfigManager, views]);
+  }, [data, props.uiViewConfig, viewConfigManager, views, props.commands]);
 
   if (!isInitialized) return null;
   return <Content>{props.children}</Content>;

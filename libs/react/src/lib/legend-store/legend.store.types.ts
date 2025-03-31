@@ -1,9 +1,9 @@
 import {
   BaseViewConfigManagerInterface,
   ComboxboxItem,
+  Command,
   CommandbarProps,
   CommandformItem,
-  CommandformProps,
   ContextMenuState,
   ContinueCursor,
   DataModelNew,
@@ -132,6 +132,7 @@ export type LegendStore = {
   //   VIEW STATE
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
+  commands: Command[];
 
   api?: {
     mutate?: (args: MutationDto) => void;
@@ -181,7 +182,8 @@ export type LegendStore = {
     relationalData: QueryRelationalData,
     viewConfigManager: BaseViewConfigManagerInterface,
     views: RegisteredViews,
-    uiViewConfig: UiViewConfig
+    uiViewConfig: UiViewConfig,
+    commands: Command[]
   ) => void;
 
   createDataModel: (data: RecordType[]) => void;

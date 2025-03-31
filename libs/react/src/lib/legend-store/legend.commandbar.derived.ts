@@ -27,6 +27,8 @@ export const derivedCommandbarState$ = observable(() => {
   const commandbarPropsSelectedViewField = getCommandbarSelectedViewField();
   const commandsGroups = getCommandbarCommandGroups();
 
+  const commands: CommandbarProps['itemGroups'] = [[...store$.commands.get()]];
+
   const props = {
     ...store$.commandbar.get(),
     ...defaultCommandbarProps,
@@ -41,6 +43,6 @@ export const derivedCommandbarState$ = observable(() => {
 
   return {
     ...props,
-    itemGroups: [...props.itemGroups, ...(commandsGroups ?? [])],
+    itemGroups: [...props.itemGroups, ...(commandsGroups ?? []), ...commands],
   };
 });

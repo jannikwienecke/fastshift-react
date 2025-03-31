@@ -22,6 +22,8 @@ import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
 import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query';
 import { api } from '@apps-next/convex';
+import { resettingDb$ } from '../application-store/app.store';
+import { Loader, LoaderIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/fastApp')({
   component: () => <FastAppLayoutComponent />,
@@ -48,6 +50,14 @@ const FastAppLayoutComponent = observer(() => {
       <Layout>
         <Outlet />
       </Layout>
+
+      {resettingDb$.get() ? (
+        <div className="fixed top-0 left-0 h-screen w-screen bg-black/50 flex items-center justify-center z-50">
+          <LoaderIcon className="animate-spin h-10 w-10 text-white" />
+        </div>
+      ) : (
+        <></>
+      )}
 
       <ErrorDetailsDialog />
       <Toaster richColors duration={2000} />

@@ -69,6 +69,7 @@ export const en = {
     // [TOGGLE_FIELD_LABEL]: TOGGLE_FIELD_LABEL,
     markAs: 'Mark as {{field}}',
     unmarkAs: 'Unmark as {{field}}',
+    resetDb: 'Reset Database',
   },
 
   datePicker: {
