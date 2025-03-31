@@ -1,5 +1,6 @@
-import { RecordType } from '@apps-next/core';
+import { makeData, RecordType } from '@apps-next/core';
 import { StoreFn } from './legend.store.types';
+import { copyRow } from './legend.utils';
 
 export const listSelect: StoreFn<'selectListItem'> =
   (store$) => (record: RecordType) => {
@@ -16,7 +17,10 @@ export const listSelect: StoreFn<'selectListItem'> =
 
 export const listSelectRelationField: StoreFn<'selectRelationField'> =
   (store$) => (props) => {
-    store$.list.selectedRelationField.set(props);
+    store$.list.selectedRelationField.set({
+      ...props,
+      row: copyRow(props.row),
+    });
   };
 
 export const listDeselectRelationField: StoreFn<'deselectRelationField'> =

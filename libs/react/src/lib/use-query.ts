@@ -133,6 +133,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   return {
     ...queryReturn,
+    allIds: queryReturn.data?.allIds ?? [],
     data: queryReturn.data?.data ?? [],
     relationalData: queryReturn.data?.relationalData ?? {},
     continueCursor: queryReturn.data?.continueCursor,

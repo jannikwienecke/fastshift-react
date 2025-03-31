@@ -52,7 +52,7 @@ appState.theme.set('dark');
 If needed, respond to changes with `.onChange()`:
 ```ts
 appState.theme.onChange(newTheme => {
-  console.log('Theme changed to:', newTheme);
+  // console.log('Theme changed to:', newTheme);
 });
 ```
 

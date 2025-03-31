@@ -7,6 +7,7 @@ import {
   removedSelected$,
 } from './legend.combobox.helper';
 import { comboboxStore$ } from './legend.store.derived.combobox';
+import { _log } from '@apps-next/core';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   observable(function handleResetCombobox() {
@@ -60,10 +61,11 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   observable(function handleFilterChange() {
     const filters = store$.filter.filters.get();
 
+    _log.debug('handleFilterChange: ', filters);
+
+    store$.state.set('filter-changed');
+
     store$.fetchMore.assign({
-      reset: true,
-      isFetching: true,
-      isFetched: false,
       isDone: false,
       currentCursor: { cursor: null, position: null },
       nextCursor: { cursor: null, position: null },
@@ -75,18 +77,18 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const order = store$.displayOptions.sorting.order.get();
     const grouping = store$.displayOptions.grouping.field.get();
 
-    (field?.name || grouping?.name) &&
-      console.log(
+    if (field?.name || grouping?.name) {
+      _log.debug(
         'handleDisplayOptionsChange: ',
         field?.name,
         order,
         grouping?.name
       );
+    }
+
+    store$.state.set('updating-display-options');
 
     store$.fetchMore.assign({
-      reset: true,
-      isFetching: true,
-      isFetched: false,
       isDone: false,
       currentCursor: { cursor: null, position: null },
       nextCursor: { cursor: null, position: null },

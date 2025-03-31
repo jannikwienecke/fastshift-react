@@ -25,6 +25,7 @@ export const viewLoaderHandler = async (
   if (args.relationQuery && !args.relationQuery.tableName) {
     return {
       data: [],
+      allIds: [],
       continueCursor: { position: null, cursor: null },
       isDone: true,
     };
@@ -60,14 +61,19 @@ export const viewLoaderHandler = async (
       data,
       continueCursor: { position: null, cursor: null },
       isDone: true,
+      allIds: [],
     };
   }
 
   invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
 
-  const { data, continueCursor, isDone } = await getData(ctx, serverProps);
+  const { data, continueCursor, isDone, allIds } = await getData(
+    ctx,
+    serverProps
+  );
 
   return {
+    allIds: allIds?.map((id) => id.toString()) ?? [],
     continueCursor,
     isDone,
     data,

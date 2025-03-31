@@ -139,6 +139,8 @@ export const ClientViewProviderConvex = (
       store$.init(
         data?.data ?? [],
         data?.relationalData ?? {},
+        data?.continueCursor ?? null,
+        data?.isDone ?? false,
         viewConfigManager,
         views,
         props.uiViewConfig,

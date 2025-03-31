@@ -1,6 +1,14 @@
-import { getViewByName, makeData, RelationalDataModel } from '@apps-next/core';
-import { StoreFn } from './legend.store.types';
-import { batch } from '@legendapp/state';
+import {
+  _log,
+  getViewByName,
+  makeData,
+  QueryReturnOrUndefined,
+  QueryReturnType,
+  RecordType,
+  RelationalDataModel,
+} from '@apps-next/core';
+import { LegendStore, StoreFn } from './legend.store.types';
+import { batch, Observable } from '@legendapp/state';
 import { displayOptionsProps } from './legend.store.derived.displayOptions';
 
 export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
@@ -34,21 +42,32 @@ export const createDataModel: StoreFn<'createDataModel'> =
 
 export const init: StoreFn<'init'> =
   (store$) =>
-  (data, relationalData, viewConfigManager, views, uiViewConfig, commands) => {
+  (
+    data,
+    relationalData,
+    continueCursor,
+    isDone,
+    viewConfigManager,
+    views,
+    uiViewConfig,
+    commands
+  ) => {
     batch(() => {
       store$.fetchMore.assign({
-        isDone: false,
+        isDone,
         currentCursor: {
           position: null,
           cursor: null,
         },
-        nextCursor: {
+        nextCursor: continueCursor ?? {
           position: null,
           cursor: null,
         },
-        isFetched: false,
-        isFetching: true,
+        // isFetched: true,
+        // isFetching: false,
       });
+
+      store$.state.set('initialized');
 
       store$.views.set(views);
       store$.viewConfigManager.set(viewConfigManager);
@@ -109,4 +128,121 @@ export const init: StoreFn<'init'> =
 
     createDataModel(store$)(data);
     createRelationalDataModel(store$)(relationalData);
+  };
+
+const handlingFetchMoreState = async (
+  store$: Observable<LegendStore>,
+  queryReturn: QueryReturnType
+) => {
+  const newData = queryReturn.data ?? [];
+  const prevData = store$.dataModel.get().rows.map((row) => row.raw);
+  const all = [...prevData, ...newData];
+
+  store$.createDataModel(all);
+  store$.state.set('initialized');
+
+  store$.fetchMore.assign({
+    currentCursor: store$.fetchMore.currentCursor.get(),
+
+    nextCursor: queryReturn.continueCursor,
+    isDone: queryReturn.isDone ?? false,
+  });
+};
+
+const handlingDisplayOptionsChangeState = async (
+  store$: Observable<LegendStore>,
+  queryReturn: QueryReturnType
+) => {
+  // we only want to have the new data -> discard the previous data
+  const newData = queryReturn.data ?? [];
+  const all = [...newData];
+
+  store$.createDataModel(all);
+  store$.state.set('initialized');
+
+  store$.fetchMore.assign({
+    currentCursor: store$.fetchMore.currentCursor.get(),
+    nextCursor: queryReturn.continueCursor,
+    isDone: queryReturn.isDone ?? false,
+  });
+};
+
+const handleFilterChangedState = async (
+  store$: Observable<LegendStore>,
+  queryReturn: QueryReturnType
+) => {
+  // we only want to have the new data -> discard the previous data
+  const newData = queryReturn.data ?? [];
+  const all = [...newData];
+
+  store$.createDataModel(all);
+  store$.state.set('initialized');
+
+  store$.fetchMore.assign({
+    currentCursor: store$.fetchMore.currentCursor.get(),
+    nextCursor: queryReturn.continueCursor,
+    isDone: queryReturn.isDone ?? false,
+  });
+};
+
+const handleMutatingState = async (
+  store$: Observable<LegendStore>,
+  queryReturn: QueryReturnType
+) => {
+  // we only want to have the new data -> discard the previous data
+  const ids = queryReturn.allIds;
+  const newData = queryReturn.data ?? [];
+  const prevData = store$.dataModel.get().rows.map((row) => row.raw);
+
+  const _new = prevData
+    .filter((row) => {
+      return ids?.some((id) => id === row.id);
+    })
+    .map((row) => {
+      const newRow = newData.find((r) => r.id === row.id);
+      if (!newRow) return row;
+      else return newRow;
+    });
+
+  store$.state.set('initialized');
+  store$.createDataModel(_new);
+
+  store$.fetchMore.assign({
+    currentCursor: store$.fetchMore.currentCursor.get(),
+    nextCursor: queryReturn.continueCursor,
+    isDone: queryReturn.isDone ?? false,
+  });
+};
+
+export const handleIncomingData: StoreFn<'handleIncomingData'> =
+  (store$) => async (data) => {
+    const state = store$.state.get();
+    switch (state) {
+      case 'fetching-more':
+        _log.debug('RECEIVING DATA AFTER FETCHING MORE', data);
+        await handlingFetchMoreState(store$, data);
+        break;
+
+      case 'updating-display-options':
+        _log.debug('RECEIVING DATA AFTER UPDATING DISPLAY OPTIONS');
+        await handlingDisplayOptionsChangeState(store$, data);
+        break;
+
+      case 'filter-changed':
+        _log.debug('RECEIVING DATA AFTER FILTER CHANGED');
+        await handleFilterChangedState(store$, data);
+        break;
+
+      case 'mutating':
+        _log.debug('====RECEIVING DATA AFTER MUTATION');
+        handleMutatingState(store$, data);
+        break;
+
+      case 'initialized':
+        _log.debug('RECEIVING DATA AFTER INITIALIZED -> Do NOTHING');
+        break;
+
+      default:
+        break;
+    }
   };

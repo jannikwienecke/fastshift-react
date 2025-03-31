@@ -1,5 +1,6 @@
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../packages/convex/convex/_generated/api';
+import { _log } from '@apps-next/core';
 
 export async function seedDatabase() {
   const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
@@ -15,7 +16,7 @@ export async function seedDatabase() {
 
   try {
     await convex.mutation(api.init.default);
-    console.log('Database seeded successfully');
+    _log.info('Database seeded successfully');
   } catch (error) {
     console.error('Error seeding database:', error);
     throw error;

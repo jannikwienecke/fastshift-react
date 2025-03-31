@@ -15,6 +15,7 @@ import {
   MutationHandlerErrorType,
   MutationReturnDto,
   QueryRelationalData,
+  QueryReturnOrUndefined,
   RecordType,
   RegisteredViews,
   RelationalDataModel,
@@ -112,13 +113,19 @@ export type DatePickerState = {
 export type FetchMoreOptions = {
   currentCursor: ContinueCursor;
   nextCursor: ContinueCursor;
-  isFetching: boolean;
-  isFetched: boolean;
   isDone: boolean;
-  reset?: boolean;
 };
 
 export type LegendStore = {
+  handleIncomingData: (props: QueryReturnOrUndefined) => void;
+
+  state:
+    | 'initialized'
+    | 'fetching-more'
+    | 'updating-display-options'
+    | 'filter-changed'
+    | 'mutating';
+
   // MAIN DATA MODEL
   dataModel: DataModelNew;
   relationalDataModel: RelationalDataModel;
@@ -180,6 +187,8 @@ export type LegendStore = {
   init: (
     data: RecordType[],
     relationalData: QueryRelationalData,
+    continueCursor: ContinueCursor | null,
+    isDone: boolean,
     viewConfigManager: BaseViewConfigManagerInterface,
     views: RegisteredViews,
     uiViewConfig: UiViewConfig,

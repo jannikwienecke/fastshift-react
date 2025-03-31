@@ -396,15 +396,6 @@ export const getEditLabel = (field: FieldConfig, row?: Row | null) => {
         ? customChangeOrAdd
         : null;
 
-    // if (customTranslationToUse) {
-    //   console.log({
-    //     customTranslationToUse,
-    //     customChangeField,
-    //     customSetField,
-    //     customChangeOrAdd,
-    //   });
-    // }
-
     const fallbackKey = booleanLabel
       ? booleanLabel
       : isMany

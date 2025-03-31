@@ -1,4 +1,5 @@
 import {
+  _log,
   ADD_NEW_OPTION,
   FieldConfig,
   makeRowFromValue,
@@ -117,14 +118,14 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
       const row = store$.list.rowInFocus.get();
       const value = row?.row?.getValue(field.name);
 
-      // console.log({
-      //   SELECTITEM: '',
-      //   item,
-      //   field,
-      //   row,
-      //   value,
-      //   selectedViewField,
-      // });
+      _log.debug({
+        SELECTITEM: '',
+        item,
+        field,
+        row,
+        value,
+        selectedViewField,
+      });
 
       if (selectedViewField && row?.row) {
         if (selectedViewField.type === 'String' && query?.length) {

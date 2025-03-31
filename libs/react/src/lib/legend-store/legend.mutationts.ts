@@ -1,4 +1,5 @@
 import {
+  _log,
   getRelationTableName,
   ifNoneNullElseValue,
   makeData,
@@ -10,6 +11,7 @@ import {
 import { observable, Observable } from '@legendapp/state';
 import { renderErrorToast, renderSuccessToast } from '../toast';
 import { LegendStore, StoreFn } from './legend.store.types';
+import { copyRow } from './legend.utils';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
@@ -258,14 +260,21 @@ export const optimisticUpdateStore = ({
     if (store$.list.selectedRelationField.row.get()) {
       store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
     }
+
     if (store$.list.rowInFocus.row.get()) {
       store$.list.rowInFocus.row.set(updatedRow);
     }
     if (store$.contextMenuState.row.get()) {
-      store$.contextMenuState.row.set(updatedRow);
+      store$.contextMenuState.row.set(copyRow(updatedRow));
     }
+
     if (updateGlobalDataModel) {
-      store$.dataModel.rows.set(updatedRows);
+      store$.dataModel.set((prev) => {
+        return {
+          ...prev,
+          rows: updatedRows,
+        };
+      });
     }
   }
 
@@ -273,6 +282,6 @@ export const optimisticUpdateStore = ({
   return () => {
     console.warn('Rolling back optimistic update');
     store$.dataModel.rows.set(originalRows);
-    store$.contextMenuState.row.set(row);
+    store$.contextMenuState.row.set(copyRow(row));
   };
 };

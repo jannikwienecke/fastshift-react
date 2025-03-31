@@ -28,27 +28,27 @@ logger.methodFactory = (methodName, logLevel, loggerName) => {
   };
 };
 
-logger.methodFactory = (methodName, logLevel, loggerName) => {
-  return (...messages: unknown[]) => {
-    console[methodName](...messages);
+// logger.methodFactory = (methodName, logLevel, loggerName) => {
+//   return (...messages: unknown[]) => {
+//     console[methodName](...messages);
 
-    try {
-      const existingLogs = JSON.parse(localStorage.getItem('app_logs') || '[]');
-      const newLogEntry = {
-        timestamp: new Date().toISOString(),
-        level: methodName.toUpperCase(),
-        messages,
-      };
+//     try {
+//       const existingLogs = JSON.parse(localStorage.getItem('app_logs') || '[]');
+//       const newLogEntry = {
+//         timestamp: new Date().toISOString(),
+//         level: methodName.toUpperCase(),
+//         messages,
+//       };
 
-      localStorage.setItem(
-        'app_logs',
-        JSON.stringify([...existingLogs, newLogEntry])
-      );
-    } catch (error) {
-      console.error('Failed to save logs to localStorage', error);
-    }
-  };
-};
+//       localStorage.setItem(
+//         'app_logs',
+//         JSON.stringify([...existingLogs, newLogEntry])
+//       );
+//     } catch (error) {
+//       console.error('Failed to save logs to localStorage', error);
+//     }
+//   };
+// };
 
 logger.setLevel(logger.getLevel()); // Apply new methodFactory
 

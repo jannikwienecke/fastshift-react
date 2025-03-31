@@ -13,6 +13,7 @@ import { store$ } from '../../legend-store/legend.store.js';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
 import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
+import { copyRow } from '../../legend-store/legend.utils.js';
 
 export const listItems$ = observable<ListProps['items']>([]);
 
@@ -226,8 +227,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
         focusType,
         onHover: () => {
-          // store$.list.rowInFocus.set({ row: item, hover: true, focus: false });
-          focusedRow$.set({ row: item, hover: true, focus: false });
+          focusedRow$.set({ row: copyRow(item), hover: true, focus: false });
         },
       } satisfies ListItem;
     }) ?? [];
@@ -236,7 +236,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
   if (!store$.list.rowInFocus.get()) {
     store$.list.rowInFocus.set({
-      row: dataModel.rows?.[0] ?? null,
+      row: dataModel.rows?.[0] ? copyRow(dataModel.rows?.[0] as Row) : null,
       hover: false,
       focus: false,
     });
@@ -267,7 +267,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
       newRow &&
         store$.list.rowInFocus.set({
-          row: newRow,
+          row: copyRow(newRow),
           hover: false,
           focus: true,
         });

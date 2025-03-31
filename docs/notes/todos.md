@@ -63,3 +63,5 @@ created: 1723444498044
 - same for projects when we "delete" a task (just filters out all the tasks that were deleted)
 
 - [ ] show on which deployment i am currently am, or with which i am connected....
+
+- BUG when set sorting to "Name" -> scroll down -> load more data, this data is not sorted!

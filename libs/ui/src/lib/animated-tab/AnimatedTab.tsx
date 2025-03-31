@@ -49,12 +49,3 @@ export function AnimatedTab<T extends TabItem>({
     </div>
   );
 }
-
-// Usage example:
-// const tabs = [
-//   { id: '1', label: 'Tab 1' },
-//   { id: '2', label: 'Tab 2' },
-//   { id: '3', label: 'Tab 3' },
-// ];
-//
-// <AnimatedTab tabs={tabs} onTabChange={(tab) => console.log('Active tab:', tab)} />

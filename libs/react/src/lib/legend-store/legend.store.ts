@@ -49,6 +49,7 @@ import {
 import {
   createDataModel,
   createRelationalDataModel,
+  handleIncomingData,
   init,
 } from './legend.store.fn.global';
 import {
@@ -91,7 +92,9 @@ import {
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
+  state: 'pending',
 
+  handleIncomingData: (...props) => handleIncomingData(store$)(...props),
   init: (...props) => init(store$)(...props),
   createDataModel: (...props) => createDataModel(store$)(...props),
   createRelationalDataModel: (...props) =>

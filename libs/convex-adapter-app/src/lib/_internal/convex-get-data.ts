@@ -1,4 +1,5 @@
 import {
+  _log,
   arrayIntersection,
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
@@ -24,6 +25,12 @@ import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
+  const log = (...props: any[]) => {
+    const view = args.viewConfigManager?.getTableName();
+    if (view !== 'tasks') return;
+    _log.debug(...props);
+  };
+
   const { viewConfigManager, filters, registeredViews } = args;
 
   const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
@@ -151,10 +158,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const position = args.paginateOptions?.cursor?.position ?? 0;
   const nextPosition = position + fetchLimit;
 
+  const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
+
   const fetch = async (multiple?: number) => {
     const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
-
-    const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
 
     const getAll = () => {
       isGetAll = true;
@@ -237,5 +244,5 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const data = parseConvexData(sortedRows);
 
-  return { data, continueCursor, isDone };
+  return { data, continueCursor, isDone, allIds };
 };

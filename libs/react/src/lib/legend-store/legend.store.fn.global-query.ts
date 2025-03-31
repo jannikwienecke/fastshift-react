@@ -1,5 +1,6 @@
 import { batch } from '@legendapp/state';
 import { StoreFn } from './legend.store.types';
+import { _log } from '@apps-next/core';
 
 let timeout: NodeJS.Timeout;
 export const globalQueryUpdate: StoreFn<'globalQueryUpdate'> =
@@ -18,15 +19,15 @@ export const globalQueryReset: StoreFn<'globalQueryReset'> = (store$) => () => {
 };
 
 export const globalFetchMore: StoreFn<'globalFetchMore'> = (store$) => () => {
+  _log.debug('Pagination: fetchMore...', store$.fetchMore.get());
   if (store$.fetchMore.isDone.get()) return;
 
-  console.log('FETCH MORE');
   batch(() => {
+    store$.state.set('fetching-more');
+
     store$.fetchMore.set((prev) => ({
       ...prev,
       currentCursor: prev.nextCursor,
-      isFetching: true,
-      isFetched: false,
     }));
   });
 };

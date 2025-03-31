@@ -1,6 +1,7 @@
 import { batch } from '@legendapp/state';
 import { StoreFn } from './legend.store.types';
 import { makeData, makeRowFromValue, Row } from '@apps-next/core';
+import { copyRow } from './legend.utils';
 
 export const contextMenuOpen: StoreFn<'contextMenuOpen'> =
   (store$) => (rect, record) => {
@@ -16,7 +17,7 @@ export const contextMenuOpen: StoreFn<'contextMenuOpen'> =
 
     batch(() => {
       store$.contextMenuState.rect.set(rect);
-      store$.contextMenuState.row.set(row);
+      store$.contextMenuState.row.set(copyRow(row));
     });
   };
 

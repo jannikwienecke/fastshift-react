@@ -6,9 +6,7 @@ import {
   makeRowFromValue,
 } from '@apps-next/core';
 import {
-  dateUtils,
   getTimeValueFromDateString,
-  operatorMap,
   SELECT_FILTER_DATE,
 } from '../ui-adapter/filter-adapter';
 import {

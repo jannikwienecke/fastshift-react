@@ -7,7 +7,6 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import { PlusIcon } from 'lucide-react';
-// reset db icon
 
 export const makeAddNewCommand = (view: ViewConfigType): ComboxboxItem => {
   const label = getViewLabel(view, true);
