@@ -26,7 +26,6 @@ export const useMutation = () => {
       });
     },
     onSuccess: () => {
-      console.log('SET TRUE');
       setTimeout(() => {
         store$.fetchMore.reset.set(true);
       }, 300);
@@ -44,7 +43,6 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      console.log('MUTATE.....');
       store$.fetchMore.reset.set(true);
 
       store$.fetchMore.isFetching.set(true);

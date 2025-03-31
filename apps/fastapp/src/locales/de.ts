@@ -1,6 +1,6 @@
 import en from './en';
 
-export default {
+export const de = {
   welcome: {
     title: 'Willkommen bei FastApp',
     description: 'Verwalten Sie Ihre Aufgaben und Projekte effizient',
@@ -15,30 +15,36 @@ export default {
     one: 'Projekt',
     other: 'Projekte',
   },
-
+  tags: {
+    one: 'Tag',
+    other: 'Tags',
+  },
   tasks: {
     one: 'Aufgabe',
     other: 'Aufgaben',
     create: 'Aufgabe erstellen',
-    edit: 'Aufgabe bearbeiten',
     delete: 'Aufgabe löschen',
   },
   priority: {
     one: 'Priorität',
     other: 'Prioritäten',
+    none: 'Keine Priorität',
     low: 'Niedrig',
     medium: 'Mittel',
     high: 'Hoch',
-  },
-  completed: {
-    one: 'Erledigt',
-    other: 'Erledigt',
+    urgent: 'Dringend',
   },
   description: {
     one: 'Beschreibung',
     other: 'Beschreibungen',
+    changeField: 'Beschreibung aktualisieren',
   },
-
+  completed: {
+    one: 'Erledigt',
+    other: 'Erledigt',
+    markAs: 'Als erledigt markieren ✅',
+    unMarkAs: 'Als nicht erledigt markieren',
+  },
   dueDate: {
     one: 'Fälligkeitsdatum',
     other: 'Fälligkeitsdaten',
@@ -58,3 +64,5 @@ export default {
     resetDb: 'Datenbank zurücksetzen',
   },
 } satisfies typeof en;
+
+export default de;

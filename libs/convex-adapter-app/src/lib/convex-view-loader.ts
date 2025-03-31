@@ -31,8 +31,7 @@ export const viewLoaderHandler = async (
   }
 
   const viewConfigManager = new BaseViewConfigManager(
-    args.viewConfig as ViewConfigType,
-    args.modelConfig
+    args.viewConfig as ViewConfigType
   );
 
   const parsedFilters = parseFilterStringForServer(

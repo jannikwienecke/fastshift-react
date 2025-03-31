@@ -62,6 +62,7 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
           name: '_creationTime',
           type: 'Date',
           isSystemField: true,
+          editSearchString: '',
         } satisfies FieldConfig,
       },
     };

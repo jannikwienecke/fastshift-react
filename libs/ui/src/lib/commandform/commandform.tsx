@@ -185,6 +185,7 @@ export function Commandform(props: CommandformProps | undefined) {
                     </div>
                   );
                 }
+                return null;
               })}
             </div>
 

@@ -52,7 +52,7 @@ export class BaseViewConfigManager<
 
   constructor(
     viewConfig: TViewConfig,
-    uiViewConfig: KUiViewConfig,
+    uiViewConfig: KUiViewConfig = {} as KUiViewConfig,
     public modelConfig?: ModelConfig
   ) {
     this.viewConfig = viewConfig;

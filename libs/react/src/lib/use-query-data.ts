@@ -44,13 +44,18 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
 
   React.useEffect(() => {
     if (reset) {
-      console.log('RESET...');
       isDoneRef.current = false;
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     }
   }, [reset]);
+
+  // REFACTOR: HIER WEITER MACHEN -> how we react to state changes
+  // INIT
+  // VIEW OPTIONS CHANGE
+  // MUTATION
+  // PAGINATION
 
   React.useEffect(() => {
     const { isFetching, reset } = store$.fetchMore.get();

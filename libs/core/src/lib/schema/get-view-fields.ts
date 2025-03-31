@@ -70,6 +70,7 @@ const parseFields = (
           : undefined,
         isList,
         isRecursive: fieldData.isRecursive,
+        editSearchString: '',
       } satisfies FieldConfig,
     ];
   });

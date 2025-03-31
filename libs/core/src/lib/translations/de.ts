@@ -1,5 +1,6 @@
 import { operatorLabels } from '../filters';
 import { en } from './en';
+
 export const de = {
   filter: {
     none: 'Keine',
@@ -39,7 +40,6 @@ export const de = {
   search: {
     placeholder: 'Suchen',
   },
-
   viewFields: {
     _creationTime: {
       label: 'Erstellt am',
@@ -47,27 +47,52 @@ export const de = {
   },
   common: {
     save: 'Speichern',
+    submit: 'Absenden',
+    confirm: 'Bestätigen',
     cancel: 'Abbrechen',
     delete: '{{name}} löschen',
     edit: 'Bearbeiten',
+    editName: '{{name}} bearbeiten',
+    saveField: '{{name}} speichern',
     change: 'Ändern',
-    none: 'Kein',
-    yes: 'Ja',
     no: 'Nein',
+    yes: 'Ja',
+    none: 'Kein',
     createNew: 'Neues {{name}}',
-    copy: 'Kopieren',
+    remove: '{{name}} entfernen',
+    copy: '{{name}} kopieren',
     deleted: 'Gelöscht',
     changeField: 'Ändern {{field}}...',
-    setField: '{{field}} setzen zu...',
+    setField: '{{field}} hinzufügen...',
     changeOrAdd: 'Ändern oder hinzufügen {{field}}...',
-    markAs: 'Als {{field}} makieren',
-    unmarkAs: 'Als nicht {{field}} makieren',
+    markAs: 'Als {{field}} markieren',
+    unmarkAs: 'Als nicht {{field}} markieren',
+    resetDb: 'Datenbank zurücksetzen',
   },
-
+  datePicker: {
+    description: 'Bitte wählen Sie ein Datum aus dem Kalender.',
+  },
+  richEditor: {
+    placeholder: '{{name}} hinzufügen...',
+  },
   error: {
     title: '⚠️ ️️Oops! Etwas ist schiefgelaufen',
     showDetails: 'Details anzeigen',
     deleteRecord:
       'Eintrag konnte nicht gelöscht werden. Bitte versuchen Sie es erneut',
+  },
+  success: {
+    createRecord: {
+      title: '✅ Erfolgreich erstellt',
+    },
+  },
+  confirmationAlert: {
+    title: 'Sind Sie sicher?',
+    description: 'Sind Sie sicher, dass Sie fortfahren möchten?',
+    delete: {
+      title: 'Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?',
+      description:
+        'Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihr Konto dauerhaft löschen und Ihre Daten von unseren Servern entfernen.',
+    },
   },
 } satisfies typeof en;

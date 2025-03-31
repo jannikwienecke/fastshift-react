@@ -61,7 +61,7 @@ const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
   const sortingFieldName = viewConfig.query?.sorting?.field;
   const groupingFieldName = viewConfig.query?.grouping?.field;
 
-  const viewConfigManager = new BaseViewConfigManager(viewConfig);
+  const viewConfigManager = new BaseViewConfigManager(viewConfig, {});
 
   const sortingField = sortingFieldName
     ? viewConfigManager.getFieldByRelationFieldName(
