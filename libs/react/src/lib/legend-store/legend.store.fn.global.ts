@@ -292,6 +292,9 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
+    console.log('state', state);
+    console.log('data', data.allIds.length);
+
     switch (state) {
       case 'fetching-more':
         _log.debug('RECEIVING DATA AFTER FETCHING MORE', data);

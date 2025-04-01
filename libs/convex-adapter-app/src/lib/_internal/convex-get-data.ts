@@ -160,8 +160,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
 
-  const field = viewConfigManager.viewConfig.mutation?.softDeleteField;
-
   const fetch = async (multiple?: number) => {
     const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
 

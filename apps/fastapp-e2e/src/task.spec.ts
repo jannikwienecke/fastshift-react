@@ -734,7 +734,9 @@ test.describe('Task management', () => {
 
     await taskPage.commandbar.getByText(/create new task/i).click();
 
-    await taskPage.commandform.getByPlaceholder(/name/i).fill('New Task Name');
+    await taskPage.commandform
+      .getByPlaceholder(/name/i)
+      .fill('second new task');
 
     await taskPage.commandform.getByText(/create issue/i).click();
 

@@ -37,7 +37,7 @@ const _schema = defineSchema({
     .index('projectId', ['projectId'])
     .index('dueDate', ['dueDate'])
     .index('name', ['name'])
-    // .index('completed', ['completed'])
+    .index('completed', ['completed'])
     .index('tasks', ['tasks'])
     .index('deleted', ['deleted'])
     .searchIndex('name_search', {
