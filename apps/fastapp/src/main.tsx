@@ -10,6 +10,7 @@ import {
 import { convex, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
 import './i18n';
+import { logger } from '@apps-next/core';
 
 // syncObservable(store$, {
 //   persist: {
@@ -17,6 +18,10 @@ import './i18n';
 //     plugin: ObservablePersistLocalStorage,
 //   },
 // });
+
+const isDev = import.meta.env.MODE === 'development';
+
+logger.setLevel(isDev ? 'info' : 'warn');
 
 const router = createRouter({
   routeTree,

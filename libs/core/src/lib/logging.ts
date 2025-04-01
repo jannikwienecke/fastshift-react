@@ -10,10 +10,9 @@ export const llinfo = log.info;
 export const lldebug = log.debug;
 export const lltrace = log.trace;
 
-const logger = log.getLogger('app'); // Use a named logger
+export const logger = log.getLogger('app'); // Use a named logger
 
 // Set the default log level (adjust based on environment)
-logger.setLevel(process.env['NODE_ENV'] === 'production' ? 'warn' : 'info');
 
 const originalFactory = logger.methodFactory;
 logger.methodFactory = (methodName, logLevel, loggerName) => {
