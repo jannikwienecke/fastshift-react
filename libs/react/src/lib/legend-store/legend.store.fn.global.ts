@@ -193,7 +193,7 @@ const handleMutatingState = async (
   const ids = queryReturn.allIds;
   const newData = queryReturn.data ?? [];
   const prevData = store$.dataModel.get().rows.map((row) => row.raw);
-
+  const prevIds = prevData.map((row) => row.id);
   const _new = prevData
     .filter((row) => {
       return ids?.some((id) => id === row.id);
@@ -204,8 +204,13 @@ const handleMutatingState = async (
       else return newRow;
     });
 
+  const newEntries =
+    newData.filter((row) => {
+      return !prevIds?.some((id) => id === row.id);
+    }) ?? [];
+
   store$.state.set('initialized');
-  store$.createDataModel(_new);
+  store$.createDataModel([..._new, ...newEntries]);
 
   store$.fetchMore.assign({
     currentCursor: store$.fetchMore.currentCursor.get(),
@@ -217,6 +222,8 @@ const handleMutatingState = async (
 export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
+    console.log(data);
+
     switch (state) {
       case 'fetching-more':
         _log.debug('RECEIVING DATA AFTER FETCHING MORE', data);

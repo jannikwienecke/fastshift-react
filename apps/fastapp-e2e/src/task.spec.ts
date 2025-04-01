@@ -711,8 +711,36 @@ test.describe('Task management', () => {
     // expect that the btn is NOT disabled
     await expect(taskPage.commandform.getByText(/create issue/i)).toBeEnabled();
 
-    // make sure its shown in the list
-    // we need also the creation time in the sorting
+    await taskPage.commandform.getByText(/create issue/i).click();
+
+    // scroll down
+    await page.mouse.wheel(0, 10000);
+    await page.waitForTimeout(200);
+    await page.mouse.wheel(0, 10000);
+    await page.waitForTimeout(200);
+    await page.mouse.wheel(0, 10000);
+    await page.waitForTimeout(200);
+    await page.mouse.wheel(0, 10000);
+
+    // now we have scrolled down and lodded all available tasks
+    // lets make sure that the task is there after adding
+    await expect(page.getByText(/new task name/i).first()).toBeVisible();
+
+    await openCommandbar(taskPage);
+
+    await taskPage.commandbar
+      .getByPlaceholder(/type a command or search/i)
+      .fill('create new taks');
+
+    await taskPage.commandbar.getByText(/create new task/i).click();
+
+    await taskPage.commandform.getByPlaceholder(/name/i).fill('New Task Name');
+
+    await taskPage.commandform.getByText(/create issue/i).click();
+
+    await expect(page.getByText(/second new task/i)).toBeVisible();
+
+    // TODO we need also the creation time in the sorting
     // and we need to be able to change sort direction for that
     // also need test for setting the date
   });
