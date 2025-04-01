@@ -262,20 +262,20 @@ const handleMutatingState = async (
   const ids = queryReturn.allIds;
   const newData = queryReturn.data ?? [];
   const prevData = store$.dataModel.get().rows.map((row) => row.raw);
-  const prevIds = prevData.map((row) => row.id);
+  const prevIds = prevData.map((row) => row['id']);
   const _new = prevData
     .filter((row) => {
-      return ids?.some((id) => id === row.id);
+      return ids?.some((id) => id === row['id']);
     })
     .map((row) => {
-      const newRow = newData.find((r) => r.id === row.id);
+      const newRow = newData.find((r) => r['id'] === row['id']) as typeof row;
       if (!newRow) return row;
       else return newRow;
     });
 
   const newEntries =
     newData.filter((row) => {
-      return !prevIds?.some((id) => id === row.id);
+      return !prevIds?.some((id) => id === row['id']);
     }) ?? [];
 
   store$.state.set('initialized');

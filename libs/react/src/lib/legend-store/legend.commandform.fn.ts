@@ -47,9 +47,9 @@ export const commanformSelectRelationalValue: StoreFn<
   let value;
   if (field.relation?.manyToManyTable) {
     // Check if item already exists
-    const exists = prevValues.some((v) => v.id === selectedRow.raw.id);
+    const exists = prevValues.some((v) => v['id'] === selectedRow.raw['id']);
     value = exists
-      ? prevValues.filter((v) => v.id !== selectedRow.raw.id)
+      ? prevValues.filter((v) => v['id'] !== selectedRow.raw['id'])
       : [...prevValues, selectedRow.raw];
   } else {
     const isNumber = !isNaN(+selectedRow.id);
