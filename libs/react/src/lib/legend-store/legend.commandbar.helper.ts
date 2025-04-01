@@ -19,18 +19,19 @@ import { comboboxStore$ } from './legend.store.derived.combobox';
 export const getCommandbarDefaultListProps = () => {
   const viewConfigManager = store$.viewConfigManager.get();
   const viewName = viewConfigManager.getViewName();
-  const rowInFocus = store$.list.rowInFocus.row.get() as Row | null;
+
+  const row = store$.commandbar.activeRow.get() as Row | undefined;
 
   const viewgetViewFieldsOptions = getViewFieldsOptions({
     useEditLabel: true,
-    row: rowInFocus,
+    row: row,
   });
 
   const items: ComboxboxItem[] =
     viewgetViewFieldsOptions?.values?.map((item) => item) ?? [];
 
   return {
-    headerLabel: `${viewName} - ${rowInFocus?.label ?? ''}`,
+    headerLabel: `${viewName} - ${row?.label ?? ''}`,
     inputPlaceholder: 'Type a command or search....',
     itemGroups: [items],
   };

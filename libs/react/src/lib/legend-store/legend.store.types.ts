@@ -179,6 +179,7 @@ export type LegendStore = {
   commandbar?: {
     selectedViewField?: FieldConfig;
     activeItem: ComboxboxItem | null;
+    activeRow: Row | null;
   } & Omit<
     CommandbarProps,
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'
@@ -286,6 +287,16 @@ export type LegendStore = {
     onSuccess?: () => void,
     onError?: (message: string) => void
   ) => void;
+  updateFullRecordMutation: (
+    props: {
+      row: Row;
+      record: RecordType;
+      view: ViewConfigType;
+      updateGlobalDataModel?: boolean;
+    },
+    onSuccess?: () => void,
+    onError?: (message: string) => void
+  ) => void;
   createRecordMutation: (
     props: { view: ViewConfigType; record: RecordType; toast?: boolean },
     onSuccess?: () => void,
@@ -298,7 +309,7 @@ export type LegendStore = {
   ) => void;
 
   // commandbar
-  commandbarOpen: () => void;
+  commandbarOpen: (row: Row | undefined | null) => void;
   commandbarClose: () => void;
   commandbarOpenWithFieldValue: (field: FieldConfig, row: Row) => void;
   commandbarUpdateQuery: (query: string) => void;
@@ -306,7 +317,7 @@ export type LegendStore = {
   commandbarSetValue: (value: ComboxboxItem) => void;
 
   // commandform
-  commandformOpen: (viewName: string) => void;
+  commandformOpen: (viewName: string, row?: Row) => void;
   commandformClose: () => void;
   commanformSelectRelationalValue: (row: Row) => void;
   commandformChangeInput: (
@@ -321,6 +332,7 @@ export type LegendStore = {
     rect?: DOMRect;
     field?: FieldConfig;
     row?: Row;
+    type: 'edit' | 'create';
     // selectedViewField?: FieldConfig;
     // activeItem: ComboxboxItem | null;
   };

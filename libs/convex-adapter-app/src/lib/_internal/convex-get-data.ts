@@ -33,8 +33,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const { viewConfigManager, filters, registeredViews } = args;
 
-  log(viewConfigManager.viewConfig?.viewName);
-
   const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
 
   const _indexFields = viewConfigManager.getIndexFields();
@@ -162,6 +160,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
 
+  const field = viewConfigManager.viewConfig.mutation?.softDeleteField;
+
   const fetch = async (multiple?: number) => {
     const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
 
@@ -175,33 +175,36 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
 
-    const rowsBeforeFilter =
-      allIds !== null && displayOptionsInfo.displaySortingIndexField
-        ? await dbQuery
-            .withIndex(
-              displayOptionsInfo.displaySortingIndexField.name?.toString()
-            )
-            .order(displayOptionsInfo.sorting?.order ?? 'asc')
-            .paginate({
-              cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-              numItems: fetchLimit + (idsToRemove.length ?? 0),
-            })
-        : allIds !== null
-        ? await getRecordsByIds(
-            idsAfterRemove?.slice(position, nextPosition) ?? [],
-            dbQuery
+    const rowsBeforeFilter = displayOptionsInfo.displaySortingIndexField
+      ? await dbQuery
+          .withIndex(
+            displayOptionsInfo.displaySortingIndexField.name?.toString()
           )
-        : anyFilter ||
-          (displayOptionsInfo.hasSortingField &&
-            !displayOptionsInfo.displaySortingIndexField)
-        ? await getAll()
-        : await dbQuery.paginate({
+          .order(displayOptionsInfo.sorting?.order ?? 'asc')
+          .paginate({
             cursor: args?.paginateOptions?.cursor?.cursor ?? null,
             numItems: fetchLimit + (idsToRemove.length ?? 0),
-          });
+          })
+      : allIds !== null
+      ? await getRecordsByIds(
+          idsAfterRemove?.slice(position, nextPosition) ?? [],
+          dbQuery
+        )
+      : anyFilter ||
+        (displayOptionsInfo.hasSortingField &&
+          !displayOptionsInfo.displaySortingIndexField)
+      ? await getAll()
+      : await dbQuery.paginate({
+          cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+          numItems: fetchLimit + (idsToRemove.length ?? 0),
+        });
 
-    const rows =
+    let rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
+
+    if (softDeleteEnabled && !showDeleted) {
+      rows = rows.filter((row) => idsNotDeleted.includes(row._id));
+    }
 
     if ('continueCursor' in rowsBeforeFilter) {
       continueCursor.cursor = rowsBeforeFilter.continueCursor;
@@ -232,7 +235,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const rawData = await mapWithInclude(rows, ctx, args);
 
-  let sortedRows = convexSortRows(rawData, args, displayOptionsInfo);
+  let sortedRows = convexSortRows(
+    rawData,
+    args,
+    displayOptionsInfo
+  ) as ConvexRecordType[];
 
   sortedRows =
     allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition);

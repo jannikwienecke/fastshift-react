@@ -75,7 +75,6 @@ export const makeComboboxStateSortingOptions =
   (): MakeComboboxStateProps | null => {
     const props = getViewFieldsOptions({ includeSystemFields: true });
     if (!props) return null;
-    console.log(props);
 
     let values = [...(props.values || [])];
     values = [...values, makeRowFromField(NO_SORTING_FIELD)];

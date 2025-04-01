@@ -214,6 +214,7 @@ export function Commandform(props: CommandformProps | undefined) {
                   onClick={() => props.onSubmit()}
                   size={'sm'}
                 >
+                  {/* FIXME -> correct translation here */}
                   Create Issue
                 </Button>
               </div>

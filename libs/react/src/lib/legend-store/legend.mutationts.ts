@@ -134,6 +134,42 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
     }
   };
 
+export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
+  (store$) =>
+  async ({ record, row }, onSuccess) => {
+    console.warn('Starting FULL updateRecordMutation');
+
+    const rollback = optimisticUpdateStore({
+      store$,
+      row,
+      record,
+    });
+
+    const mutation: Mutation = {
+      type: 'UPDATE_RECORD',
+      payload: {
+        id: row.id,
+        record,
+      },
+    };
+
+    console.warn('Mutation payload:', mutation);
+
+    const { error } = await store$.api.mutateAsync({
+      mutation,
+      viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+      query: store$.globalQuery.get(),
+    });
+
+    if (error) {
+      console.error('Error updating record:', error);
+      rollback();
+    } else {
+      onSuccess?.();
+      console.warn('Record updated successfully');
+    }
+  };
+
 export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
   (store$) =>
   async ({ row }, onSuccess, onError) => {

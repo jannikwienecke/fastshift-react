@@ -9,15 +9,13 @@ import {
   Row,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { getComponent } from '../ui-components/ui-components.helper';
-import { store$ } from './legend.store';
-import { makeComboboxStateFilterValuesDate } from './legend.combobox.helper';
 import {
   dateUtils,
-  getOptionsForDateField,
   getTimeValueFromDateString,
 } from '../ui-adapter/filter-adapter';
-import { DEFAULT_DATE_OPTIONS_FOR_EDIT } from '../ui-adapter/filter-adapter/filter.constants';
+import { getComponent } from '../ui-components/ui-components.helper';
+import { makeComboboxStateFilterValuesDate } from './legend.combobox.helper';
+import { store$ } from './legend.store';
 
 export const contextMenuProps = observable<
   Partial<MakeContextMenuPropsOptions>
@@ -127,14 +125,22 @@ export const derviedContextMenuOptions = observable(() => {
           });
         },
         onSelectOption: async (option) => {
-          const isNone = 'No date' === option.id;
-          const datetime = !isNone
-            ? getTimeValueFromDateString(option.id, true)
-            : null;
+          const isDateField = f.isDateField;
+
+          let value = option;
+          if (isDateField) {
+            const isNone = 'No date' === option.id;
+            const datetime = !isNone
+              ? getTimeValueFromDateString(option.id, true)
+              : null;
+
+            value = makeRowFromValue(datetime ?? NONE_OPTION, f);
+          }
+
           store$.updateRecordMutation({
             field: f,
             row,
-            valueRow: makeRowFromValue(datetime ?? NONE_OPTION, f),
+            valueRow: value,
           });
         },
       } satisfies ContextMenuFieldItem;

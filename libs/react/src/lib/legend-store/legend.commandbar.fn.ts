@@ -13,9 +13,10 @@ import {
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { StoreFn } from './legend.store.types';
 
-export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => () => {
+export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
   store$.openSpecificModal('commandbar', () => {
     store$.commandbar.open.set(true);
+    row && store$.commandbar.activeRow.set(row);
   });
 };
 
@@ -33,7 +34,7 @@ export const commandbarOpenWithFieldValue: StoreFn<
   'commandbarOpenWithFieldValue'
 > = (store$) => (field: FieldConfig, row: Row) => {
   const value = row?.getValue?.(field.name);
-  store$.commandbarOpen();
+  store$.commandbarOpen(row);
 
   if ((value as Row | undefined)?.id) {
     store$.commandbar.query.set('');
@@ -95,14 +96,14 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         selectedViewField?.relation?.type === 'manyToMany' &&
         isSpace
       ) {
-        const row = store$.list.rowInFocus.get();
-        if (!row?.row) return;
+        const row = store$.commandbar.activeRow.get();
+        if (!row) return;
 
-        const existingRows = row.row.getValue(selectedViewField.name) as Row[];
+        const existingRows = row.getValue?.(selectedViewField.name) as Row[];
 
         store$.selectRowsMutation({
           field: selectedViewField,
-          row: row.row,
+          row: row as Row,
           checkedRow: store$.commandbar.activeItem.get() as Row,
           existingRows: existingRows,
         });
@@ -117,8 +118,8 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
       const field =
         selectedViewField ??
         store$.viewConfigManager.getFieldBy(item.id.toString());
-      const row = store$.list.rowInFocus.get();
-      const value = row?.row?.getValue(field.name);
+      const row = store$.commandbar.activeRow.get();
+      const value = row?.getValue?.(field.name);
 
       _log.debug({
         SELECTITEM: '',
@@ -129,11 +130,11 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         selectedViewField,
       });
 
-      if (selectedViewField && row?.row) {
+      if (selectedViewField && row) {
         if (selectedViewField.type === 'String' && query?.length) {
           store$.updateRecordMutation({
             field: selectedViewField,
-            row: row.row,
+            row: row as Row,
             valueRow: makeRowFromValue(query, field),
           });
 
@@ -143,15 +144,15 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
           const isSelectSpecificDate = item.id === SELECT_FILTER_DATE;
 
           if (isSelectSpecificDate) {
-            const dateOfCurrentRow = row.row.getValue(
+            const dateOfCurrentRow = row.getValue?.(
               selectedViewField.name
             ) as number;
 
             store$.datePickerDialogOpen(new Date(dateOfCurrentRow), (date) => {
-              row.row &&
+              row &&
                 store$.updateRecordMutation({
                   field: selectedViewField,
-                  row: row.row,
+                  row: row as Row,
                   valueRow: makeRowFromValue(date.getTime(), field),
                 });
 
@@ -175,7 +176,7 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
             const valueRow = makeRowFromValue(start?.getTime(), field);
             store$.updateRecordMutation({
               field: selectedViewField,
-              row: row.row,
+              row: row as Row,
               valueRow,
             });
           }
@@ -184,7 +185,7 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         } else if (selectedViewField.enum) {
           store$.updateRecordMutation({
             field: selectedViewField,
-            row: row.row,
+            row: row as Row,
             valueRow: makeRowFromValue(item.id as string | number, field),
           });
           store$.commandbarClose();
@@ -195,20 +196,18 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         ) {
           store$.updateRecordMutation({
             field: selectedViewField,
-            row: row.row,
+            row: row as Row,
             valueRow: item as Row,
           });
           store$.commandbarClose();
 
           return;
         } else if (selectedViewField.relation) {
-          const existingRows = row.row.getValue(
-            selectedViewField.name
-          ) as Row[];
+          const existingRows = row.getValue?.(selectedViewField.name) as Row[];
 
           store$.selectRowsMutation({
             field: selectedViewField,
-            row: row.row,
+            row: row as Row,
             checkedRow: item as Row,
             existingRows: existingRows,
           });
@@ -217,10 +216,10 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         } else {
           throw new Error('Field type not supported1');
         }
-      } else if (field.type === 'Boolean' && row?.row) {
+      } else if (field.type === 'Boolean' && row) {
         store$.updateRecordMutation({
           field,
-          row: row.row,
+          row: row as Row,
           valueRow: makeRowFromValue(!value, field),
         });
 
@@ -255,7 +254,7 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         }
 
         await command.handler({
-          row: store$.list.rowInFocus.get()?.row || undefined,
+          row: store$.commandbar.activeRow.get() || undefined,
         });
       }
     }

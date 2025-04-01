@@ -8,7 +8,7 @@ import { comboboxStore$ } from './legend.store.derived.combobox';
 import { StoreFn } from './legend.store.types';
 
 export const commandformOpen: StoreFn<'commandformOpen'> =
-  (store$) => (viewName) => {
+  (store$) => (viewName, row) => {
     store$.openSpecificModal('commandform', () => {
       const view = store$.views[viewName]?.get();
 
@@ -18,7 +18,9 @@ export const commandformOpen: StoreFn<'commandformOpen'> =
       store$.commandform.view.set(view);
 
       const defaultRow = getDefaultRow();
-      defaultRow && store$.commandform.row.set(defaultRow);
+      defaultRow && store$.commandform.row.set(row || defaultRow);
+
+      store$.commandform.type.set(row?.id ? 'edit' : 'create');
     });
   };
 
@@ -95,20 +97,34 @@ export const commandformChangeInput: StoreFn<'commandformChangeInput'> =
 
 export const commandformSubmit: StoreFn<'commandformSubmit'> =
   (store$) => async () => {
-    const { row, view } = store$.commandform.get() ?? {};
+    const { row, view, type } = store$.commandform.get() ?? {};
     if (!row || !view) return;
 
     const formState = getFormState();
     if (!formState.isReady) return;
 
-    store$.createRecordMutation(
-      {
-        view,
-        record: getRecordTypeFromRow(),
-        toast: true,
-      },
-      () => {
-        store$.commandformClose();
-      }
-    );
+    if (type === 'edit') {
+      store$.updateFullRecordMutation(
+        {
+          record: getRecordTypeFromRow(),
+          row: row as Row,
+          view,
+          updateGlobalDataModel: true,
+        },
+        () => {
+          store$.commandformClose();
+        }
+      );
+    } else {
+      store$.createRecordMutation(
+        {
+          view,
+          record: getRecordTypeFromRow(),
+          toast: true,
+        },
+        () => {
+          store$.commandformClose();
+        }
+      );
+    }
   };

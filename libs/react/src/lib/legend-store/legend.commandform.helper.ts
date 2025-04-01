@@ -89,7 +89,6 @@ export const getRecordTypeFromRow = () => {
     };
   }, {} as RecordType);
 
-  console.log('getRecordTypeFromRow', obj);
   const softDeleteField = store$.viewConfigManager.getSoftDeleteIndexField();
   if (softDeleteField) {
     const softDeleteFieldName = softDeleteField.name;
@@ -108,8 +107,6 @@ export const createRow = (recordType: RecordType) => {
 
 export const getDefaultRow = () => {
   const viewFields = getViewFields();
-
-  console.log(viewFields);
 
   const obj = viewFields.reduce((prev, field) => {
     return {

@@ -73,16 +73,20 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   }).onChange(() => null);
 
   observable(function handleDisplayOptionsChange() {
+    const showDeleted = store$.displayOptions.showDeleted.get();
     const field = store$.displayOptions.sorting.field.get();
     const order = store$.displayOptions.sorting.order.get();
     const grouping = store$.displayOptions.grouping.field.get();
+    const showEmptyGroups = store$.displayOptions.showEmptyGroups.get();
 
-    if (field?.name || grouping?.name) {
+    if (field?.name || grouping?.name || showEmptyGroups || showDeleted) {
       _log.debug(
         'handleDisplayOptionsChange: ',
         field?.name,
         order,
-        grouping?.name
+        grouping?.name,
+        showEmptyGroups,
+        showDeleted
       );
     }
 

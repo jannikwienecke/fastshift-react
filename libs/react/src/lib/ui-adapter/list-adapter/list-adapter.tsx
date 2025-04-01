@@ -13,7 +13,7 @@ import { store$ } from '../../legend-store/legend.store.js';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
 import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
-import { copyRow } from '../../legend-store/legend.utils.js';
+import { copyRow, hasOpenDialog$ } from '../../legend-store/legend.utils.js';
 
 export const listItems$ = observable<ListProps['items']>([]);
 
@@ -227,6 +227,8 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
         focusType,
         onHover: () => {
+          if (hasOpenDialog$.get()) return;
+
           focusedRow$.set({ row: copyRow(item), hover: true, focus: false });
         },
       } satisfies ListItem;
@@ -250,9 +252,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
     grouping: listGrouping,
     onContextMenu: store$.onContextMenuListItem,
     onKeyPress: (type) => {
-      const commandbarIsOpen = store$.commandbar.open.get();
-      const commandformIsOpen = store$.commandform.open.get();
-      if (commandbarIsOpen || commandformIsOpen) return;
+      if (hasOpenDialog$.get()) return;
 
       const indexOfRowInFocus = dataModel.rows?.findIndex(
         (row) => row.id === store$.list.rowInFocus.get()?.row?.id

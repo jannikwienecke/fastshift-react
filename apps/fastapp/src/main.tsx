@@ -32,7 +32,6 @@ const router = createRouter({
       const xx = await queryClient.ensureQueryData(
         preloadQuery(api.query.viewLoader, viewConfig)
       );
-      console.log(xx);
       return xx;
     },
   },

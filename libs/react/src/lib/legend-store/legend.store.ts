@@ -23,6 +23,7 @@ import {
   createRecordMutation,
   deleteRecordMutation,
   selectRowsMutation,
+  updateFullRecordMutation,
   updateRecordMutation,
 } from './legend.mutationts';
 import { DEFAULT_LEGEND_STORE } from './legend.store.constants';
@@ -169,6 +170,8 @@ export const store$ = observable<LegendStore>({
 
   selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
   updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
+  updateFullRecordMutation: (...props) =>
+    updateFullRecordMutation(store$)(...props),
   deleteRecordMutation: (...props) => deleteRecordMutation(store$)(...props),
   createRecordMutation: (...props) => createRecordMutation(store$)(...props),
   commandbarOpen: (...props) => commandbarOpen(store$)(...props),

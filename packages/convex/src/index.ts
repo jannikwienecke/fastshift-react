@@ -62,6 +62,7 @@ export const tasksConfig = createViewConfig(
     includeFields: ['tags', 'tasks', 'todos'],
     query: {
       // sort so that the newest tasks are on top
+      // sorting: { field: 'name', direction: 'asc' },
       // sorting: { field: '_creationTime', direction: 'desc' },
       showDeleted: false,
       primarySearchField: 'name',

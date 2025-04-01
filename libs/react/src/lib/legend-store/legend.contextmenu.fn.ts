@@ -35,13 +35,10 @@ export const contextmenuDeleteRow: StoreFn<'contextmenuDeleteRow'> =
 
 export const contextmenuEditRow: StoreFn<'contextmenuEditRow'> =
   (store$) => (row) => {
-    setTimeout(() => {
-      store$.commandformOpen(
-        store$.viewConfigManager.viewConfig.viewName.get()
-      );
-
-      store$.commandform.row.set(row);
-    }, 0);
+    store$.commandformOpen(
+      store$.viewConfigManager.viewConfig.viewName.get(),
+      row
+    );
   };
 
 export const contextmenuClickOnField: StoreFn<'contextmenuClickOnField'> =
@@ -54,12 +51,12 @@ export const contextmenuClickOnField: StoreFn<'contextmenuClickOnField'> =
       const value = activeRow.getValue?.(field.name);
       store$.updateRecordMutation({
         field,
-        row: activeRow as Row,
+        row: copyRow(activeRow as Row),
         valueRow: makeRowFromValue(!value, field),
       });
       store$.contextMenuClose();
     } else {
       store$.contextMenuClose();
-      store$.commandbarOpenWithFieldValue(field, activeRow as Row);
+      store$.commandbarOpenWithFieldValue(field, copyRow(activeRow as Row));
     }
   };

@@ -149,8 +149,6 @@ export const ClientViewProviderConvex = (
     }
   }, [data, props.uiViewConfig, viewConfigManager, views, props.commands]);
 
-  console.log({ isInitialized });
-
   if (!isInitialized) {
     return null;
   }
