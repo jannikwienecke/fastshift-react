@@ -58,8 +58,11 @@ export const tasksConfig = createViewConfig(
         hideFromForm: true,
       },
     },
+
     includeFields: ['tags', 'tasks', 'todos'],
     query: {
+      // sort so that the newest tasks are on top
+      // sorting: { field: '_creationTime', direction: 'desc' },
       showDeleted: false,
       primarySearchField: 'name',
       // default sorting

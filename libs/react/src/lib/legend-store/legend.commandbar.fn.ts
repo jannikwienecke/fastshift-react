@@ -14,7 +14,9 @@ import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { StoreFn } from './legend.store.types';
 
 export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => () => {
-  store$.commandbar.open.set(true);
+  store$.openSpecificModal('commandbar', () => {
+    store$.commandbar.open.set(true);
+  });
 };
 
 export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {

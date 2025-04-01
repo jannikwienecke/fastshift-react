@@ -28,10 +28,12 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const log = (...props: any[]) => {
     const view = args.viewConfigManager?.getTableName();
     if (view !== 'tasks') return;
-    _log.debug(...props);
+    _log.info(...props);
   };
 
   const { viewConfigManager, filters, registeredViews } = args;
+
+  log(viewConfigManager.viewConfig?.viewName);
 
   const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
 
@@ -174,16 +176,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
 
     const rowsBeforeFilter =
-      allIds !== null
-        ? await getRecordsByIds(
-            idsAfterRemove?.slice(position, nextPosition) ?? [],
-            dbQuery
-          )
-        : anyFilter ||
-          (displayOptionsInfo.hasSortingField &&
-            !displayOptionsInfo.displaySortingIndexField)
-        ? await getAll()
-        : displayOptionsInfo.displaySortingIndexField
+      allIds !== null && displayOptionsInfo.displaySortingIndexField
         ? await dbQuery
             .withIndex(
               displayOptionsInfo.displaySortingIndexField.name?.toString()
@@ -193,6 +186,15 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
               cursor: args?.paginateOptions?.cursor?.cursor ?? null,
               numItems: fetchLimit + (idsToRemove.length ?? 0),
             })
+        : allIds !== null
+        ? await getRecordsByIds(
+            idsAfterRemove?.slice(position, nextPosition) ?? [],
+            dbQuery
+          )
+        : anyFilter ||
+          (displayOptionsInfo.hasSortingField &&
+            !displayOptionsInfo.displaySortingIndexField)
+        ? await getAll()
         : await dbQuery.paginate({
             cursor: args?.paginateOptions?.cursor?.cursor ?? null,
             numItems: fetchLimit + (idsToRemove.length ?? 0),

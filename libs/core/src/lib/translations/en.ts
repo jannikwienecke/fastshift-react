@@ -100,4 +100,8 @@ export const en = {
         'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
     },
   },
+  _creationTime: {
+    one: 'Created at',
+    other: 'Created at',
+  },
 };

@@ -47,7 +47,7 @@ export type ViewConfigType<T extends GetTableName = any> =
       indexFields?: IndexField[];
       primarySearchField?: keyof GetTableDataType<T>;
       sorting?: {
-        field: keyof GetTableDataType<T>;
+        field: keyof GetTableDataType<T> | '_creationTime';
         direction: 'asc' | 'desc';
       };
       grouping?: {

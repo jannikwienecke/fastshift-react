@@ -28,6 +28,7 @@ export interface BaseViewConfigManagerInterface<
   getRelationalFieldList(): FieldConfig[];
   getFieldBy(fieldName: string): FieldConfig;
   getFieldByRelationFieldName(relationFieldName: string): FieldConfig;
+  getSortingField(name: string): FieldConfig | undefined;
   getIndexFields(): IndexField[];
   getSoftDeleteIndexField(): SearchableField | undefined;
   getRelationFieldByTableName(tableName: string): FieldConfig;
@@ -158,6 +159,13 @@ export class BaseViewConfigManager<
     );
 
     return field as FieldConfig;
+  }
+
+  getSortingField(name?: string): FieldConfig | undefined {
+    return name
+      ? this.getFieldByRelationFieldName(name.toString()) ||
+          this.getFieldBy(name.toString())
+      : undefined;
   }
 
   getRelationFieldByTableName(tableName: string): FieldConfig {

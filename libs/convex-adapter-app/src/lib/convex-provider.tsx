@@ -58,16 +58,15 @@ const ProviderContent = (props: ConvexQueryProviderProps) => {
 };
 
 const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
-  const sortingFieldName = viewConfig.query?.sorting?.field;
+  const sorting = viewConfig.query?.sorting;
+  const sortingFieldName = sorting?.field;
   const groupingFieldName = viewConfig.query?.grouping?.field;
 
   const viewConfigManager = new BaseViewConfigManager(viewConfig, {});
 
-  const sortingField = sortingFieldName
-    ? viewConfigManager.getFieldByRelationFieldName(
-        sortingFieldName?.toString()
-      )
-    : undefined;
+  const sortingField = viewConfigManager.getSortingField(
+    sortingFieldName?.toString()
+  );
 
   const groupingField = groupingFieldName
     ? viewConfigManager.getFieldByRelationFieldName(
@@ -76,7 +75,12 @@ const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
     : undefined;
 
   const parsedDisplayOptions = convertDisplayOptionsForBackend({
-    sorting: { isOpen: false, rect: null, field: sortingField, order: 'asc' },
+    sorting: {
+      isOpen: false,
+      rect: null,
+      field: sortingField,
+      order: sorting?.direction ?? 'asc',
+    },
     grouping: { isOpen: false, rect: null, field: groupingField },
     isOpen: false,
     showEmptyGroups: false,
@@ -94,10 +98,51 @@ const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
     paginateOptions: {
       cursor: { position: null, cursor: null },
       numItems: DEFAULT_FETCH_LIMIT_QUERY,
-      // isDone: false,
     },
   });
 };
+
+// const makeQuery = (viewLoader: ViewLoader, viewConfig: ViewConfigType) => {
+//   const sortingFieldName = viewConfig.query?.sorting?.field;
+//   const groupingFieldName = viewConfig.query?.grouping?.field;
+
+//   const viewConfigManager = new BaseViewConfigManager(viewConfig, {});
+
+//   const sortingField = sortingFieldName
+//     ? viewConfigManager.getFieldByRelationFieldName(
+//         sortingFieldName?.toString()
+//       )
+//     : undefined;
+
+//   const groupingField = groupingFieldName
+//     ? viewConfigManager.getFieldByRelationFieldName(
+//         groupingFieldName?.toString()
+//       )
+//     : undefined;
+
+//   const parsedDisplayOptions = convertDisplayOptionsForBackend({
+//     sorting: { isOpen: false, rect: null, field: sortingField, order: 'asc' },
+//     grouping: { isOpen: false, rect: null, field: groupingField },
+//     isOpen: false,
+//     showEmptyGroups: false,
+//     showDeleted: false,
+//     softDeleteEnabled: false,
+//     viewField: { allFields: [], selected: [] },
+//     viewType: { type: 'list' },
+//   });
+
+//   return convexQuery(viewLoader, {
+//     viewName: viewConfig.viewName,
+//     query: '',
+//     filters: '',
+//     displayOptions: parsedDisplayOptions ?? null,
+//     paginateOptions: {
+//       cursor: { position: null, cursor: null },
+//       numItems: DEFAULT_FETCH_LIMIT_QUERY,
+//       // isDone: false,
+//     },
+//   });
+// };
 
 export const preloadQuery = (
   viewLoader: ConvexContext['viewLoader'],

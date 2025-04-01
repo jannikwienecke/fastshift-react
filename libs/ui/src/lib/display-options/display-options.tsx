@@ -226,8 +226,13 @@ function DisplayOptionsPopover(
   }
 ) {
   const { t } = useTranslation();
+
   return (
-    <Popover modal onOpenChange={(open) => !open && props.onClose()}>
+    <Popover
+      modal
+      open={props.isOpen}
+      onOpenChange={(open) => !open && props.onClose()}
+    >
       <PopoverTrigger asChild>
         <button className="h-7">{props.children}</button>
       </PopoverTrigger>

@@ -51,6 +51,7 @@ import {
   createRelationalDataModel,
   handleIncomingData,
   init,
+  openSpecificModal,
 } from './legend.store.fn.global';
 import {
   globalFetchMore,
@@ -193,4 +194,6 @@ export const store$ = observable<LegendStore>({
     datePickerDialogSelectDate(store$)(...props),
   datePickerDialogSubmit: (...props) =>
     datePickerDialogSubmit(store$)(...props),
+
+  openSpecificModal: (...props) => openSpecificModal(store$)(...props),
 });

@@ -335,6 +335,17 @@ export type LegendStore = {
   datePickerDialogClose: () => void;
   datePickerDialogSelectDate: (date: Date) => void;
   datePickerDialogSubmit: () => void;
+
+  openSpecificModal: (
+    type:
+      | 'commandbar'
+      | 'commandform'
+      | 'combobox'
+      | 'filter'
+      | 'displayoptions'
+      | 'contextmenu',
+    openCb: () => void
+  ) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

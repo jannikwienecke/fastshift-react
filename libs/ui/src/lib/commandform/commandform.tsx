@@ -3,10 +3,9 @@ import { DialogTitle } from '@radix-ui/react-dialog';
 import { StickyNoteIcon, TerminalSquareIcon } from 'lucide-react';
 import React from 'react';
 import { Button, Dialog, DialogContent } from '../components';
+import { Checkbox } from '../components/checkbox';
 import { Command, CommandSeparator } from '../components/command';
 import { cn } from '../utils';
-import { Checkbox } from '../components/checkbox';
-import { ComboboxPopover } from '../combobox-popover';
 
 const CommandformContainer = (
   props: (CommandformProps & { children: React.ReactNode }) | undefined

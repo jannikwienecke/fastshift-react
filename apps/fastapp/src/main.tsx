@@ -29,9 +29,11 @@ const router = createRouter({
       // TODO: [LATER] load user config from db here
       // await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      return queryClient.ensureQueryData(
+      const xx = await queryClient.ensureQueryData(
         preloadQuery(api.query.viewLoader, viewConfig)
       );
+      console.log(xx);
+      return xx;
     },
   },
 });

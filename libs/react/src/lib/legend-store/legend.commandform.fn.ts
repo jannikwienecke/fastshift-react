@@ -9,15 +9,17 @@ import { StoreFn } from './legend.store.types';
 
 export const commandformOpen: StoreFn<'commandformOpen'> =
   (store$) => (viewName) => {
-    const view = store$.views[viewName]?.get();
+    store$.openSpecificModal('commandform', () => {
+      const view = store$.views[viewName]?.get();
 
-    if (!view) return;
+      if (!view) return;
 
-    store$.commandform.open.set(true);
-    store$.commandform.view.set(view);
+      store$.commandform.open.set(true);
+      store$.commandform.view.set(view);
 
-    const defaultRow = getDefaultRow();
-    defaultRow && store$.commandform.row.set(defaultRow);
+      const defaultRow = getDefaultRow();
+      defaultRow && store$.commandform.row.set(defaultRow);
+    });
   };
 
 export const commandformClose: StoreFn<'commandformClose'> = (store$) => () => {

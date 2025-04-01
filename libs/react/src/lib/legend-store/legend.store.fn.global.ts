@@ -2,14 +2,79 @@ import {
   _log,
   getViewByName,
   makeData,
-  QueryReturnOrUndefined,
   QueryReturnType,
-  RecordType,
   RelationalDataModel,
+  sortRows,
 } from '@apps-next/core';
-import { LegendStore, StoreFn } from './legend.store.types';
 import { batch, Observable } from '@legendapp/state';
 import { displayOptionsProps } from './legend.store.derived.displayOptions';
+import { LegendStore, StoreFn } from './legend.store.types';
+
+export const openSpecificModal: StoreFn<'openSpecificModal'> =
+  (store$) => (type, openCb) => {
+    // store$.contextMenuOpen
+    const dict: {
+      [key: string]: {
+        close: () => void;
+        state?: () => Observable;
+      };
+    } = {
+      commandbar: {
+        close: store$.commandbarClose,
+        state: () => store$.commandbar.open,
+      },
+      commandform: {
+        close: store$.commandformClose,
+        state: () => store$.commandform.open,
+      },
+      combobox: {
+        close: store$.comboboxClose,
+      },
+      filter: {
+        close: store$.filterClose,
+        state: () => store$.filter.open,
+      },
+      displayoptions: {
+        close: store$.displayOptionsClose,
+        state: () => store$.displayOptions.isOpen,
+      },
+      contextmenu: {
+        close: store$.contextMenuClose,
+        state: () => store$.contextMenuState.row,
+      },
+    };
+
+    const hasOpenState = Object.entries(dict).reduce((acc, [key, value]) => {
+      if (acc === true) return acc;
+
+      if (key !== type) {
+        const state = value.state?.().get() ?? false;
+        return !!state;
+      }
+
+      return acc;
+    }, false as boolean);
+
+    if (hasOpenState) {
+      const allClose = Object.entries(dict).reduce((acc, [key, value]) => {
+        if (key !== type) {
+          return [...acc, value.close];
+        }
+        return acc;
+      }, [] as (() => void)[]);
+
+      batch(() => {
+        allClose.forEach((close) => close());
+      });
+    }
+
+    setTimeout(
+      () => {
+        openCb();
+      },
+      hasOpenState ? 250 : 0
+    );
+  };
 
 export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
   (store$) => (data) => {
@@ -32,10 +97,16 @@ export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
 
 export const createDataModel: StoreFn<'createDataModel'> =
   (store$) => (data) => {
+    const sorting = store$.displayOptions.sorting.get();
+    const sorted = sortRows(data, store$.views.get(), {
+      field: sorting.field,
+      order: sorting.order,
+    });
+
     const dataModel = makeData(
       store$.views.get(),
       store$.viewConfigManager.get().getTableName?.()
-    )(data);
+    )(sorted);
 
     store$.dataModel.set(dataModel);
   };
@@ -63,8 +134,6 @@ export const init: StoreFn<'init'> =
           position: null,
           cursor: null,
         },
-        // isFetched: true,
-        // isFetching: false,
       });
 
       store$.state.set('initialized');
@@ -102,7 +171,7 @@ export const init: StoreFn<'init'> =
       const sortingField = defaultSorting?.field
         ? viewConfigManager.getFieldByRelationFieldName(
             defaultSorting.field.toString()
-          )
+          ) || viewConfigManager.getFieldBy(defaultSorting.field.toString())
         : undefined;
 
       const groupByField = defaultGrouping?.field
@@ -222,7 +291,6 @@ const handleMutatingState = async (
 export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
-    console.log(data);
 
     switch (state) {
       case 'fetching-more':

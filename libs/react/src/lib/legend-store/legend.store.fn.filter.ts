@@ -14,8 +14,10 @@ import {
 import { StoreFn } from './legend.store.types';
 
 export const filterOpen: StoreFn<'filterOpen'> = (store$) => (rect) => {
-  store$.filter.open.set(true);
-  store$.filter.rect.set(rect);
+  store$.openSpecificModal('filter', () => {
+    store$.filter.open.set(true);
+    store$.filter.rect.set(rect);
+  });
 };
 
 export const filterClose: StoreFn<'filterClose'> = (store$) => () => {

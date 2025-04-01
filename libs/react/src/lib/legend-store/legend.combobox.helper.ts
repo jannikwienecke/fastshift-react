@@ -37,13 +37,16 @@ export const initSelected$ = observable<Row[] | null>(null);
 export const getViewFieldsOptions = (options?: {
   useEditLabel?: boolean;
   row?: Row | null;
+  includeSystemFields?: boolean;
 }): MakeComboboxStateProps | null => {
   let filterOptions: Row[] | null = null;
 
   const query =
     (store$.combobox.query.get() || store$.commandbar.query.get()) ?? '';
 
-  const viewFields = store$.viewConfigManager.get().getViewFieldList();
+  const viewFields = store$.viewConfigManager
+    .get()
+    .getViewFieldList({ includeSystemFields: options?.includeSystemFields });
 
   filterOptions = viewFields.map((field) => {
     const label = options?.useEditLabel
@@ -70,8 +73,9 @@ export const getViewFieldsOptions = (options?: {
 
 export const makeComboboxStateSortingOptions =
   (): MakeComboboxStateProps | null => {
-    const props = getViewFieldsOptions();
+    const props = getViewFieldsOptions({ includeSystemFields: true });
     if (!props) return null;
+    console.log(props);
 
     let values = [...(props.values || [])];
     values = [...values, makeRowFromField(NO_SORTING_FIELD)];

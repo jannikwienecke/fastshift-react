@@ -149,7 +149,11 @@ export const ClientViewProviderConvex = (
     }
   }, [data, props.uiViewConfig, viewConfigManager, views, props.commands]);
 
-  if (!isInitialized) return null;
+  console.log({ isInitialized });
+
+  if (!isInitialized) {
+    return null;
+  }
   return <Content>{props.children}</Content>;
 };
 

@@ -743,6 +743,31 @@ test.describe('Task management', () => {
     // TODO we need also the creation time in the sorting
     // and we need to be able to change sort direction for that
     // also need test for setting the date
+    // sorting must be applied to ALL ITEMS -> currently just for the x first items (first page)
+  });
+
+  test('sort by created at and then create a new item and see it in list on top', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+
+    await sortByField(taskPage, /created at/i, 'created');
+
+    await openCommandbar(taskPage);
+
+    await taskPage.commandbar
+      .getByPlaceholder(/type a command or search/i)
+      .fill('create new taks');
+
+    await taskPage.commandbar.getByText(/create new task/i).click();
+
+    await taskPage.commandform.getByPlaceholder(/name/i).fill('New Task Name');
+
+    await taskPage.commandform.getByText(/create issue/i).click();
+
+    expect(1).toBe(1);
   });
 });
 
@@ -798,12 +823,19 @@ const testingQueryBehavior = async ({ taskPage, page }) => {
   await expect(getByText(/today/i)).toBeVisible();
 };
 
-const sortByField = async (taskPage: TaskPage, name: RegExp) => {
+const sortByField = async (
+  taskPage: TaskPage,
+  name: RegExp,
+  query?: string
+) => {
   await taskPage.displayOptionsButton.click();
 
   await expect(taskPage.displayOptions).toBeVisible();
 
   await taskPage.displayOptions.getByText(/No sorting/i).click();
+
+  if (query)
+    await taskPage.comboboxPopover.getByPlaceholder(/filter by/i).fill(query);
 
   await taskPage.comboboxPopover.getByText(name).click();
 };
