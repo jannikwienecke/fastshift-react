@@ -48,7 +48,7 @@ export type FieldConfigOptions<
   F extends keyof GetTableDataType<T> = any
 > = {
   // defaultValue?: unknown;
-  defaultValue?: GetTableDataType<T>[F];
+  defaultValue?: GetTableDataType<T>[F] | (() => GetTableDataType<T>[F]);
   hideFromForm?: boolean;
   isDisplayField?: true;
   richEditor?: boolean;

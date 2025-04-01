@@ -31,7 +31,14 @@ export const tasksConfig = createViewConfig(
       // IMPROVEMENT: [LATER] add smart feature..
       // dueDate (date in the name -> date field)
       // dueDate (date with upper case D -> Due Date)
-      dueDate: { isDateField: true },
+      dueDate: {
+        isDateField: true,
+        defaultValue: () => {
+          const tommorow = new Date();
+          tommorow.setDate(tommorow.getDate() + 1);
+          return tommorow.getTime();
+        },
+      },
       completed: {
         defaultValue: false,
         hideFromForm: true,
@@ -42,6 +49,7 @@ export const tasksConfig = createViewConfig(
       description: {
         richEditor: true,
       },
+      deleted: { defaultValue: false },
       todos: {
         // hideFromForm: true,
         // showCheckboxInList: false,

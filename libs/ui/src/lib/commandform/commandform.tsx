@@ -141,11 +141,6 @@ export function Commandform(props: CommandformProps | undefined) {
                       onChange={(e) => {
                         props.onInputChange(field, e.currentTarget.value);
                       }}
-                      defaultValue={
-                        field.value
-                          ? undefined
-                          : field.field?.defaultValue ?? ''
-                      }
                       value={(field.value as string) || undefined}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {

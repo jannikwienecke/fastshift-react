@@ -26,8 +26,6 @@ export const getCommandbarDefaultListProps = () => {
     row: rowInFocus,
   });
 
-  console.log(viewgetViewFieldsOptions);
-
   const items: ComboxboxItem[] =
     viewgetViewFieldsOptions?.values?.map((item) => item) ?? [];
 
@@ -200,6 +198,19 @@ export const getCommandbarCommandGroups = () => {
   const query = store$.commandbar.query.get();
 
   const groups = Object.values(views)
+    .filter((view) => {
+      const numViewFields = Object.values(view?.viewFields ?? {}).length;
+      const numRelationalIdFields = Object.values(
+        view?.viewFields ?? {}
+      ).reduce((prev, current) => {
+        return current.type === 'OneToOneReference' ? prev + 1 : prev;
+      }, 0);
+
+      // we dont want to have manyToMany relations in the command bar
+      if (numViewFields < 4 && numRelationalIdFields > 1) return false;
+
+      return true;
+    })
     .map((view) => {
       if (!view) return [];
 

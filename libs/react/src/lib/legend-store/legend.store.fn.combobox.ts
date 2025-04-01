@@ -47,6 +47,7 @@ export const comboboxSelectDate: StoreFn<'comboboxSelectDate'> =
     store$.comboboxSelectValue(
       makeRow(dateAsNumber, dateString, date.toISOString(), field)
     );
+    store$.combobox.datePicker.set(null);
   };
 
 export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =

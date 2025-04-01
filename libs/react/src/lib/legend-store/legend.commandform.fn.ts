@@ -35,13 +35,26 @@ export const commanformSelectRelationalValue: StoreFn<
 
   const existingRow: RecordType | RecordType[] | null =
     row?.raw?.[field.name] ?? null;
+
   const prevValues: RecordType[] = Array.isArray(existingRow)
     ? existingRow
     : [];
 
-  const value = field.relation?.manyToManyTable
-    ? [...prevValues, selectedRow.raw]
-    : selectedRow.raw;
+  let value;
+  if (field.relation?.manyToManyTable) {
+    // Check if item already exists
+    const exists = prevValues.some((v) => v.id === selectedRow.raw.id);
+    value = exists
+      ? prevValues.filter((v) => v.id !== selectedRow.raw.id)
+      : [...prevValues, selectedRow.raw];
+  } else {
+    const isNumber = !isNaN(+selectedRow.id);
+
+    value =
+      field.type === 'Date' && isNumber
+        ? new Date(selectedRow.raw).getTime()
+        : selectedRow.raw;
+  }
 
   const data = makeData(
     store$.views.get(),

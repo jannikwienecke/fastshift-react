@@ -112,8 +112,9 @@ export const derivedCommandformState$ = observable(() => {
     onInputChange(field, value) {
       store$.commandformChangeInput(field, value);
     },
-    onCheckedChange: (field, value) =>
-      store$.commandformChangeInput(field, value),
+    onCheckedChange: (field, value) => {
+      store$.commandformChangeInput(field, value);
+    },
     onSubmit: () => store$.commandformSubmit(),
   } satisfies Omit<CommandformProps, 'render'>;
 });

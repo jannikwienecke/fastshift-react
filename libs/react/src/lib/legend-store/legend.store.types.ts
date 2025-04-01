@@ -120,6 +120,7 @@ export type LegendStore = {
   handleIncomingData: (props: QueryReturnOrUndefined) => void;
 
   state:
+    | 'pending'
     | 'initialized'
     | 'fetching-more'
     | 'updating-display-options'

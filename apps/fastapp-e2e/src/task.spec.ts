@@ -650,9 +650,8 @@ test.describe('Task management', () => {
     const firstListItem = await taskPage.getListItem(0);
     await expect(firstListItem.getByText(/❌/i)).toBeVisible();
 
-    // open commandbar
-    await taskPage.page.keyboard.press('Meta+k');
-    await expect(taskPage.commandbar).toBeVisible();
+    await openCommandbar(taskPage);
+
     await taskPage.commandbar.getByText(/add to project/i).click();
 
     await expect(
@@ -667,8 +666,56 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText(/fitness plan/i)).toBeVisible();
   });
 
-  // add tests for commandbar
   //  add tests for commanform
+  test('can open commandbar and then open commandform task create form', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+
+    await openCommandbar(taskPage);
+
+    await taskPage.commandbar
+      .getByPlaceholder(/type a command or search/i)
+      .fill('create new taks');
+
+    await taskPage.commandbar.getByText(/create new task/i).click();
+
+    // expect that the btn is disabled
+    await expect(
+      taskPage.commandform.getByText(/create issue/i)
+    ).toBeDisabled();
+
+    await taskPage.commandform.getByPlaceholder(/name/i).fill('New Task Name');
+    await taskPage.commandform
+      .getByPlaceholder(/description/i)
+      .fill('New Task Description');
+
+    await taskPage.commandform.getByText(/tag/i).click();
+    await taskPage.comboboxPopover.getByText(/important/i).click();
+    await page.waitForTimeout(200);
+    await taskPage.comboboxPopover.getByText(/important/i).click();
+
+    await expect(taskPage.commandform.getByText(/2 tags/i)).toBeHidden();
+    await taskPage.comboboxPopover.getByText(/important/i).click();
+
+    // close the popover
+    await taskPage.commandform
+      .getByText(/create issue/i)
+      .click({ force: true });
+
+    await taskPage.commandform.getByText(/project/i).click();
+    await taskPage.comboboxPopover.getByText(/website redesign/i).click();
+
+    // expect that the btn is NOT disabled
+    await expect(taskPage.commandform.getByText(/create issue/i)).toBeEnabled();
+
+    // make sure its shown in the list
+    // we need also the creation time in the sorting
+    // and we need to be able to change sort direction for that
+    // also need test for setting the date
+  });
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {
@@ -741,4 +788,10 @@ const groupByField = async (taskPage: TaskPage, name: RegExp) => {
   await taskPage.displayOptions.getByText(/No grouping/i).click();
 
   await taskPage.comboboxPopover.getByText(name).click();
+};
+
+const openCommandbar = async (taskPage: TaskPage) => {
+  // open commandbar
+  await taskPage.page.keyboard.press('Meta+k');
+  await expect(taskPage.commandbar).toBeVisible();
 };
