@@ -112,7 +112,14 @@ export const updateMutation = async (
 
   const record = Object.entries(mutation.payload.record).reduce(
     (acc, [key, value]) => {
-      if (value === null) {
+      if (
+        // only for testing purpose
+        key === 'name' &&
+        viewConfigManager.viewConfig.tableName === 'tasks' &&
+        value === '_error_'
+      ) {
+        acc[key] = undefined;
+      } else if (value === null) {
         acc[key] = undefined;
       } else {
         acc[key] = value;

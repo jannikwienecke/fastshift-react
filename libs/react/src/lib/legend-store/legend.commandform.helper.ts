@@ -46,7 +46,10 @@ export const getFormState = () => {
     const value = getValueForField(field);
     if (!field.isRequired && value === undefined) return prev;
 
-    if (field.isRequired && value === undefined) {
+    if (
+      field.isRequired &&
+      (value === undefined || value === '' || value === null)
+    ) {
       return {
         ...prev,
         [field.name]: { error: `Field ${field.label} is required` },

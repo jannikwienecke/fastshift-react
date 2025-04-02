@@ -137,7 +137,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
 
 export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
   (store$) =>
-  async ({ record, row }, onSuccess) => {
+  async ({ record, row }, onSuccess, onError) => {
     console.warn('Starting FULL updateRecordMutation');
 
     const rollback = optimisticUpdateStore({
@@ -165,6 +165,10 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
     if (error) {
       console.error('Error updating record:', error);
       rollback();
+      onError?.(error.message);
+      renderErrorToast('error.updateError', () => {
+        store$.errorDialog.error.set(error);
+      });
     } else {
       onSuccess?.();
       console.warn('Record updated successfully');
@@ -285,7 +289,9 @@ export const optimisticUpdateStore = ({
 
   record = Object.entries(record).reduce((prev, [key, value]) => {
     const _value = value === NONE_OPTION ? undefined : value;
-    const commandformRow = store$.commandform.row.get();
+    const commandformRow =
+      store$.commandform.open.get() && store$.commandform.row.get();
+
     try {
       const field = store$.viewConfigManager.getFieldBy(key);
       const manyToManyTablename = field.relation?.manyToManyTable;

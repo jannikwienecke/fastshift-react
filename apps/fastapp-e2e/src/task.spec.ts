@@ -841,7 +841,53 @@ test.describe('Task management', () => {
     // expect to see only one of the same task
     await expect(page.getByText(/Practice editing techniques/i)).toHaveCount(1);
   });
+
+  test('update an task record with invalid title, and see error message and rollback', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+
+    // right click on the first list item
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    await taskPage.contextmenu.getByText(/edit task/i).click();
+
+    await taskPage.commandform.getByPlaceholder(/name/i).fill('_error_');
+
+    await taskPage.commandform
+      .getByRole('button', { name: 'create issue' })
+      .click();
+
+    await expect(page.getByText(/_error_/i)).toBeVisible();
+
+    // expect commandform to be closed -> optimistic update
+    await expect(taskPage.commandform).toBeHidden();
+
+    // and then open it again -> rollback
+    await expect(taskPage.commandform).toBeVisible();
+    await expect(page.getByText(/_error_/i)).toBeHidden();
+
+    // update name
+    await taskPage.commandform
+      .getByPlaceholder(/name/i)
+      .fill('new name task...');
+
+    await taskPage.commandform
+      .getByRole('button', { name: 'create issue' })
+      .click();
+    await expect(page.getByText(/new name task.../i)).toBeVisible();
+    await expect(page.getByText(/_error_/i)).toBeHidden();
+    await expect(taskPage.commandform).toBeHidden();
+  });
 });
+
+// HIER WEITER MACHEN
+// edit commandform -> close directly, handle optimisic update...
 
 const testingQueryBehavior = async ({ taskPage, page }) => {
   await taskPage.openFilter(/due Date/i);

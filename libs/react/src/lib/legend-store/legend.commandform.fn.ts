@@ -1,4 +1,4 @@
-import { _log, makeData, RecordType, Row } from '@apps-next/core';
+import { _log, makeData, RecordType, Row, sortRows } from '@apps-next/core';
 import {
   getDefaultRow,
   getFormState,
@@ -6,6 +6,7 @@ import {
 } from './legend.commandform.helper';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { StoreFn } from './legend.store.types';
+import { copyRow } from './legend.utils';
 
 export const commandformOpen: StoreFn<'commandformOpen'> =
   (store$) => (viewName, row) => {
@@ -29,6 +30,7 @@ export const commandformClose: StoreFn<'commandformClose'> = (store$) => () => {
   store$.commandform.view.set(undefined);
   store$.commandform.field.set(undefined);
   store$.commandform.rect.set(undefined);
+  store$.commandform.row.set(undefined);
 };
 
 export const commanformSelectRelationalValue: StoreFn<
@@ -106,6 +108,7 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
 
     const field = store$.commandform.field.get();
     const rect = store$.commandform.rect.get();
+    const copiedRow = copyRow(row);
 
     if (type === 'edit') {
       store$.updateFullRecordMutation(
@@ -116,7 +119,14 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
           updateGlobalDataModel: true,
         },
         () => {
-          store$.commandformClose();
+          _log.info('Record updated successfully');
+        },
+        () => {
+          store$.commandform.open.set(true);
+          store$.commandform.view.set(view);
+          store$.commandform.field.set(field);
+          store$.commandform.rect.set(rect);
+          store$.commandform.row.set(copiedRow);
         }
       );
     } else {
@@ -133,9 +143,10 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
           store$.commandform.view.set(view);
           store$.commandform.field.set(field);
           store$.commandform.rect.set(rect);
+          store$.commandform.row.set(copiedRow);
         }
       );
-
-      store$.commandformClose();
     }
+
+    store$.commandformClose();
   };

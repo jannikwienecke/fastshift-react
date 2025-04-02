@@ -80,6 +80,8 @@ export const de = {
     showDetails: 'Details anzeigen',
     deleteRecord:
       'Eintrag konnte nicht gelöscht werden. Bitte versuchen Sie es erneut',
+    updateError:
+      'Eintrag konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut',
   },
   success: {
     createRecord: {

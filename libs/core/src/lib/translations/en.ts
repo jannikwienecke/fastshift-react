@@ -83,7 +83,8 @@ export const en = {
   error: {
     title: '⚠️ ️️Oops! Something went wrong',
     showDetails: 'Show details',
-    deleteRecord: 'Could not delete entry. Please try again',
+    deleteRecord: 'Could not delete record. Please try again',
+    updateError: 'Could not update record. Please try again',
   },
   success: {
     createRecord: {
