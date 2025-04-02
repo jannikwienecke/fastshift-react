@@ -460,7 +460,7 @@ test.describe('Task management', () => {
       .fill('design mockups - updated');
 
     await taskPage.commandform
-      .getByRole('button', { name: 'create issue' })
+      .getByRole('button', { name: 'update task' })
       .click();
 
     await expect(page.getByText(/design mockups - updated/i)).toBeVisible();
@@ -486,7 +486,7 @@ test.describe('Task management', () => {
     await page.waitForTimeout(500);
 
     await taskPage.commandform
-      .getByRole('button', { name: 'create issue' })
+      .getByRole('button', { name: 'update task' })
       .click();
 
     await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
@@ -701,9 +701,10 @@ test.describe('Task management', () => {
       taskPage.commandbar.getByText(/create new project/i)
     ).toBeVisible();
     await expect(taskPage.commandbar.getByText(/no project/i)).toBeVisible();
-    await expect(taskPage.commandbar.getByText(/projects/i)).toBeVisible();
 
-    await taskPage.commandbar.getByPlaceholder('type a').fill('fitness plan');
+    await taskPage.commandbar
+      .getByPlaceholder('change project to')
+      .fill('fitness plan');
     await taskPage.commandbar.getByText(/fitness plan/i).click();
 
     await expect(firstListItem.getByText(/fitness plan/i)).toBeVisible();
@@ -725,9 +726,7 @@ test.describe('Task management', () => {
     await taskPage.commandbar.getByText(/create new task/i).click();
 
     // expect that the btn is disabled
-    await expect(
-      taskPage.commandform.getByText(/create issue/i)
-    ).toBeDisabled();
+    await expect(taskPage.commandform.getByText(/create task/i)).toBeDisabled();
 
     await taskPage.commandform.getByPlaceholder(/name/i).fill('New Task Name');
     await taskPage.commandform
@@ -743,17 +742,15 @@ test.describe('Task management', () => {
     await taskPage.comboboxPopover.getByText(/important/i).click();
 
     // close the popover
-    await taskPage.commandform
-      .getByText(/create issue/i)
-      .click({ force: true });
+    await taskPage.commandform.getByText(/create task/i).click({ force: true });
 
     await taskPage.commandform.getByText(/project/i).click();
     await taskPage.comboboxPopover.getByText(/website redesign/i).click();
 
     // expect that the btn is NOT disabled
-    await expect(taskPage.commandform.getByText(/create issue/i)).toBeEnabled();
+    await expect(taskPage.commandform.getByText(/create task/i)).toBeEnabled();
 
-    await taskPage.commandform.getByText(/create issue/i).click();
+    await taskPage.commandform.getByText(/create task/i).click();
 
     await expect(page.getByText(/created Successfully/i)).toBeVisible();
 
@@ -776,7 +773,7 @@ test.describe('Task management', () => {
       .getByPlaceholder(/name/i)
       .fill('second new task');
 
-    await taskPage.commandform.getByText(/create issue/i).click();
+    await taskPage.commandform.getByText(/create task/i).click();
 
     await expect(page.getByText(/second new task/i)).toBeVisible();
   });
@@ -800,7 +797,7 @@ test.describe('Task management', () => {
 
     await taskPage.commandform.getByPlaceholder(/name/i).fill('New Task Name');
 
-    await taskPage.commandform.getByText(/create issue/i).click();
+    await taskPage.commandform.getByText(/create task/i).click();
 
     expect(1).toBe(1);
   });
@@ -860,7 +857,7 @@ test.describe('Task management', () => {
     await taskPage.commandform.getByPlaceholder(/name/i).fill('_error_');
 
     await taskPage.commandform
-      .getByRole('button', { name: 'create issue' })
+      .getByRole('button', { name: 'update task' })
       .click();
 
     await expect(page.getByText(/_error_/i)).toBeVisible();
@@ -878,7 +875,7 @@ test.describe('Task management', () => {
       .fill('new name task...');
 
     await taskPage.commandform
-      .getByRole('button', { name: 'create issue' })
+      .getByRole('button', { name: 'update task' })
       .click();
     await expect(page.getByText(/new name task.../i)).toBeVisible();
     await expect(page.getByText(/_error_/i)).toBeHidden();

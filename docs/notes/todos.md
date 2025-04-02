@@ -52,6 +52,7 @@ created: 1723444498044
 - [x] add headings for other relation related commands (add new Project, etc.)
 - [x] in contextmenu -> prorject -> new project, click nothing happens
 - [ ] click on filter in context menu should open the commandbar
+- [ ] header label in commandbar - setting project e.g;
 - [ ] contextmenu -> click tag -> select/deselect tag -> wrong behaviour
 - [ ] does not displays the deleted items
 - [ ] delete should be optimisc updaate..
