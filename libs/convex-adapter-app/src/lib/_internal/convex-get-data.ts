@@ -142,6 +142,13 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     softDeleteEnabled && !showDeleted ? idsNotDeleted : null
   );
 
+  const hasOnlyIdsNotDeleted =
+    idsNotDeleted.length > 0 &&
+    !idsManyToManyFilters.length &&
+    !idsOneToManyFilters.length &&
+    !idsIndexField.length &&
+    !idsSearchField.length;
+
   const idsToRemove = Array.from(
     new Set([
       ...idsManyToManyFiltersToRemove,
@@ -173,29 +180,38 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
 
-    const rowsBeforeFilter = displayOptionsInfo.displaySortingIndexField
-      ? await dbQuery
-          .withIndex(
-            displayOptionsInfo.displaySortingIndexField.name?.toString()
+    const countToBig = idsAfterRemove?.length && idsAfterRemove.length > 500;
+
+    if (countToBig) {
+      _log.warn('Querying too many items.');
+    }
+
+    const rowsBeforeFilter =
+      hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
+        ? await getRecordsByIds(
+            idsAfterRemove?.slice(position, nextPosition) ?? [],
+            dbQuery
           )
-          .order(displayOptionsInfo.sorting?.order ?? 'asc')
-          .paginate({
+        : allIds !== null && !countToBig
+        ? await getRecordsByIds(idsAfterRemove ?? [], dbQuery)
+        : displayOptionsInfo.displaySortingIndexField
+        ? await dbQuery
+            .withIndex(
+              displayOptionsInfo.displaySortingIndexField.name?.toString()
+            )
+            .order(displayOptionsInfo.sorting?.order ?? 'asc')
+            .paginate({
+              cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+              numItems: fetchLimit + (idsToRemove.length ?? 0),
+            })
+        : anyFilter ||
+          (displayOptionsInfo.hasSortingField &&
+            !displayOptionsInfo.displaySortingIndexField)
+        ? await getAll()
+        : await dbQuery.paginate({
             cursor: args?.paginateOptions?.cursor?.cursor ?? null,
             numItems: fetchLimit + (idsToRemove.length ?? 0),
-          })
-      : allIds !== null
-      ? await getRecordsByIds(
-          idsAfterRemove?.slice(position, nextPosition) ?? [],
-          dbQuery
-        )
-      : anyFilter ||
-        (displayOptionsInfo.hasSortingField &&
-          !displayOptionsInfo.displaySortingIndexField)
-      ? await getAll()
-      : await dbQuery.paginate({
-          cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-          numItems: fetchLimit + (idsToRemove.length ?? 0),
-        });
+          });
 
     let rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;

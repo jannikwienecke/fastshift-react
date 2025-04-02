@@ -23,8 +23,6 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
   for (const [tableName, tableSchema] of Object.entries(convexSchema)) {
     const fields: ModelField[] = [];
 
-    // log(tableSchema.validator.fields);
-
     for (const [fieldName, fieldSchema] of Object.entries(
       tableSchema.validator.fields
     )) {

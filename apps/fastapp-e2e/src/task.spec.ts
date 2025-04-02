@@ -741,11 +741,6 @@ test.describe('Task management', () => {
     await taskPage.commandform.getByText(/create issue/i).click();
 
     await expect(page.getByText(/second new task/i)).toBeVisible();
-
-    // TODO we need also the creation time in the sorting
-    // and we need to be able to change sort direction for that
-    // also need test for setting the date
-    // sorting must be applied to ALL ITEMS -> currently just for the x first items (first page)
   });
 
   test('sort by created at and then create a new item and see it in list on top', async ({

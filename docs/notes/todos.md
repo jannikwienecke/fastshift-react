@@ -37,23 +37,19 @@ created: 1723444498044
 - [x] can click on list item right click -> Edit task -> opens commandform
 - [x] can click on list item rigjt click -> non relational fields edit -> open
 - [x] BUG: When we scoll down, then update the task, we suddenly only see the last x tasks -> need test
-
-- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
-
-<!-- Steps until tests and big refactoring -->
-
-- [ ] write tests to make sure all works
-- [ ] refactoring
+- [x] show on which deployment i am currently am, or with which i am connected....
+- [x] BUG when set sorting to "Name" -> scroll down -> load more data, this data is not sorted!
+- [x] write tests to make sure all works
 
 <!-- FEATURE -->
 
+- [ ] Commandform -> extract field input components into own components
 - [ ] when created a new task -> click on notifiaction -> open task
 - [ ] open after creation, in config
 - [ ] update design / message / icon of success notification
 - [ ] way to show what fields are missing / errors in form
 - [ ] add tipTap
-
-<!-- HIER WEITER MACHEN -->
+- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
 
 ## How we handle Deletes with soft delete
 
@@ -61,7 +57,3 @@ created: 1723444498044
 - we "delete" a project, the task has still the reference but does not show it
 - when we undelete the project, the task will show the project again
 - same for projects when we "delete" a task (just filters out all the tasks that were deleted)
-
-- [ ] show on which deployment i am currently am, or with which i am connected....
-
-- BUG when set sorting to "Name" -> scroll down -> load more data, this data is not sorted!

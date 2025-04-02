@@ -164,8 +164,6 @@ export function Commandform(props: CommandformProps | undefined) {
             <div className="flex flex-row gap-4">
               {props.primitiveFields.map((field) => {
                 if (field.field?.type === 'Boolean') {
-                  // TODO: HIER WEITER MACHEN
-                  // extract into own components
                   return (
                     <div
                       key={`primitive-boolean-field-${field.field.name}`}

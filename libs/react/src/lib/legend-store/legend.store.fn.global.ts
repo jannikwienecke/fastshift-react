@@ -224,7 +224,11 @@ const handlingDisplayOptionsChangeState = async (
 ) => {
   // we only want to have the new data -> discard the previous data
   const newData = queryReturn.data ?? [];
-  const all = [...newData];
+  const allIds = queryReturn.allIds ?? [];
+
+  const all = [...newData].filter((row) => {
+    return allIds?.some((id) => id === row['id']);
+  });
 
   store$.createDataModel(all);
   store$.state.set('initialized');
@@ -242,7 +246,11 @@ const handleFilterChangedState = async (
 ) => {
   // we only want to have the new data -> discard the previous data
   const newData = queryReturn.data ?? [];
-  const all = [...newData];
+  const allIds = queryReturn.allIds ?? [];
+
+  const all = [...newData].filter((row) => {
+    return allIds?.some((id) => id === row['id']);
+  });
 
   store$.createDataModel(all);
   store$.state.set('initialized');
@@ -292,8 +300,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
-    console.log('state', state);
-    console.log('data', data.allIds.length);
+    _log.debug(`:handleIncomingData`, state, data);
 
     switch (state) {
       case 'fetching-more':
