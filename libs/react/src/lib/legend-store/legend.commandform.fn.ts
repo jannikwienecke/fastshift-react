@@ -103,6 +103,9 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
     const formState = getFormState();
     if (!formState.isReady) return;
 
+    const field = store$.commandform.field.get();
+    const rect = store$.commandform.rect.get();
+
     if (type === 'edit') {
       store$.updateFullRecordMutation(
         {
@@ -122,9 +125,15 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
           record: getRecordTypeFromRow(),
           toast: true,
         },
-        () => {
-          store$.commandformClose();
+        () => console.log('Record created successfully'),
+        (error) => {
+          store$.commandform.open.set(true);
+          store$.commandform.view.set(view);
+          store$.commandform.field.set(field);
+          store$.commandform.rect.set(rect);
         }
       );
+
+      store$.commandformClose();
     }
   };

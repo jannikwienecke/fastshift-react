@@ -1,7 +1,7 @@
 import {
-  _log,
   getRelationTableName,
   ifNoneNullElseValue,
+  INTERNAL_FIELDS,
   makeData,
   Mutation,
   NONE_OPTION,
@@ -10,6 +10,7 @@ import {
 } from '@apps-next/core';
 import { observable, Observable } from '@legendapp/state';
 import { renderErrorToast, renderSuccessToast } from '../toast';
+import { createRow } from './legend.commandform.helper';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';
 
@@ -215,6 +216,21 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
 export const createRecordMutation: StoreFn<'createRecordMutation'> =
   (store$) =>
   async ({ record, view, toast }, onSuccess, onError) => {
+    const row = createRow({
+      ...record,
+      id: '_tempId' + Math.random().toString(36).substring(2, 9),
+      [INTERNAL_FIELDS.creationTime.fieldName]: Date.now(),
+    });
+
+    if (!row) return;
+
+    const currentRows = store$.dataModel.rows.get();
+    const rows = store$.displayOptions.sorting.field.get()
+      ? [row, ...currentRows]
+      : [...currentRows, row];
+
+    store$.createDataModel(rows.map((r) => r.raw));
+
     const runMutation = async () => {
       const mutation: Mutation = {
         type: 'CREATE_RECORD',
@@ -236,6 +252,8 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
         renderErrorToast('error.createRecord', () => {
           store$.errorDialog.error.set(error);
         });
+
+        store$.createDataModel(currentRows.map((r) => r.raw));
       } else {
         if (toast) {
           renderSuccessToast('');
@@ -254,6 +272,7 @@ export const optimisticUpdateStore = ({
   record,
   sortedRecord,
   store$,
+
   updateGlobalDataModel = true,
 }: {
   row: Row;

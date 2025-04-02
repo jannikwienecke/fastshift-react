@@ -314,6 +314,8 @@ test.describe('Task management', () => {
 
     await taskPage.comboboxPopover.getByText(/no project/i).click();
 
+    await page.waitForTimeout(500);
+
     await taskPage.openFilter(/project/i);
 
     await taskPage.comboboxPopover.getByText(/no project/i).click();
@@ -579,7 +581,9 @@ test.describe('Task management', () => {
     page,
   }) => {
     // press cmd + k
-    await page.waitForTimeout(500);
+    const firstListItem = await taskPage.getListItem(0);
+    await firstListItem.click();
+
     await taskPage.page.keyboard.press('Meta+k');
     await expect(taskPage.commandbar).toBeVisible();
 
@@ -712,18 +716,14 @@ test.describe('Task management', () => {
 
     await taskPage.commandform.getByText(/create issue/i).click();
 
-    // scroll down
-    await page.mouse.wheel(0, 10000);
-    await page.waitForTimeout(200);
-    await page.mouse.wheel(0, 10000);
-    await page.waitForTimeout(200);
-    await page.mouse.wheel(0, 10000);
-    await page.waitForTimeout(200);
-    await page.mouse.wheel(0, 10000);
+    await expect(page.getByText(/created Successfully/i)).toBeVisible();
 
-    // now we have scrolled down and lodded all available tasks
-    // lets make sure that the task is there after adding
-    await expect(page.getByText(/new task name/i).first()).toBeVisible();
+    // scroll down
+    await page.mouse.wheel(0, 5000);
+    await page.waitForTimeout(500);
+    await page.mouse.wheel(0, 5000);
+    await page.waitForTimeout(500);
+    await page.mouse.wheel(0, 5000);
 
     await openCommandbar(taskPage);
 

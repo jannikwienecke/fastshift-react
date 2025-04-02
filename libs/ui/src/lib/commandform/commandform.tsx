@@ -106,12 +106,7 @@ export function Commandform(props: CommandformProps | undefined) {
                     <div key={`primitive-string-field-${field.field?.name}`}>
                       <input
                         placeholder={field.label}
-                        defaultValue={
-                          field.value
-                            ? undefined
-                            : (field.field.defaultValue as string) ?? ''
-                        }
-                        value={(field.value as string) || undefined}
+                        value={(field.value as string) || ''}
                         className={cn(
                           'outline-none border-none w-full',
                           field.field.isDisplayField ? 'text-lg' : 'text-base'
