@@ -281,10 +281,38 @@ export const optimisticUpdateStore = ({
   store$: Observable<LegendStore>;
   updateGlobalDataModel?: boolean;
 }): (() => void) => {
-  console.warn('Starting optimistic update', record);
+  console.warn('Starting optimistic update', { updateGlobalDataModel, record });
 
   record = Object.entries(record).reduce((prev, [key, value]) => {
     const _value = value === NONE_OPTION ? undefined : value;
+    const commandformRow = store$.commandform.row.get();
+    try {
+      const field = store$.viewConfigManager.getFieldBy(key);
+      const manyToManyTablename = field.relation?.manyToManyTable;
+
+      if (manyToManyTablename && commandformRow) {
+        // for many to many fields, we need the full row and not just the id
+        const rows = commandformRow.raw[key];
+        if (rows.length) {
+          return {
+            ...prev,
+            [key]: rows,
+          };
+        }
+      } else if (field.relation && commandformRow) {
+        return {
+          ...prev,
+        };
+      }
+    } catch (error) {
+      const field = store$.viewConfigManager.getFieldByRelationFieldName(key);
+      if (commandformRow) {
+        return {
+          [field.name]: commandformRow.raw[field.name],
+        };
+      }
+    }
+
     return { ...prev, [key]: _value };
   }, record);
 
@@ -295,12 +323,11 @@ export const optimisticUpdateStore = ({
     ...row.raw,
     ...record,
   };
-  console.warn('Updated row data:', updatedRowData);
-
   // Generate updated data rows
   const updatedRawRows = originalRows.map((r) =>
-    r.id === row.id ? { ...r.raw, ...(sortedRecord ?? record) } : r.raw
+    r.id === row.id ? { ...r.raw, ...(sortedRecord ?? updatedRowData) } : r.raw
   );
+
   const viewName = store$.viewConfigManager.get().getViewName();
   const updatedRows = makeData(
     store$.views.get(),

@@ -65,6 +65,7 @@ export const getFormState = () => {
 export const getRecordTypeFromRow = () => {
   const allFields = getViewFields();
   const row = store$.commandform.row.get();
+
   if (!row) return {};
 
   const obj = allFields.reduce((prev, field) => {
@@ -83,6 +84,7 @@ export const getRecordTypeFromRow = () => {
 
     const fieldNameRelation = field.relation?.fieldName ?? null;
     const nameToUse = fieldNameRelation ?? field.name;
+
     return {
       ...prev,
       [nameToUse]: valueToUse,

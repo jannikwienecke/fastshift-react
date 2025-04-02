@@ -1,4 +1,4 @@
-import { makeData, RecordType, Row } from '@apps-next/core';
+import { _log, makeData, RecordType, Row } from '@apps-next/core';
 import {
   getDefaultRow,
   getFormState,
@@ -98,6 +98,7 @@ export const commandformChangeInput: StoreFn<'commandformChangeInput'> =
 export const commandformSubmit: StoreFn<'commandformSubmit'> =
   (store$) => async () => {
     const { row, view, type } = store$.commandform.get() ?? {};
+
     if (!row || !view) return;
 
     const formState = getFormState();
@@ -125,8 +126,9 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
           record: getRecordTypeFromRow(),
           toast: true,
         },
-        () => console.log('Record created successfully'),
+        () => _log.info('Record created successfully'),
         (error) => {
+          _log.info('Error creating record. Resetting form state', error);
           store$.commandform.open.set(true);
           store$.commandform.view.set(view);
           store$.commandform.field.set(field);

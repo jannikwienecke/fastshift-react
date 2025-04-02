@@ -454,6 +454,45 @@ test.describe('Task management', () => {
     await expect(
       taskPage.commandform.getByText(/design mockups/i)
     ).toBeVisible();
+
+    await taskPage.commandform
+      .getByPlaceholder(/name/i)
+      .fill('design mockups - updated');
+
+    await taskPage.commandform
+      .getByRole('button', { name: 'create issue' })
+      .click();
+
+    await expect(page.getByText(/design mockups - updated/i)).toBeVisible();
+
+    await page.waitForTimeout(500);
+
+    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+
+    // do the same again to rename to original name
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    await page.waitForTimeout(500);
+
+    await taskPage.contextmenu.getByText(/edit task/i).click();
+
+    await page.waitForTimeout(500);
+
+    await taskPage.commandform.getByPlaceholder(/name/i).fill('design mockups');
+
+    await page.waitForTimeout(500);
+
+    await taskPage.commandform
+      .getByRole('button', { name: 'create issue' })
+      .click();
+
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+    await expect(
+      firstListItem.getByText(/design mockups - updated/i)
+    ).toBeHidden();
   });
 
   test('can right click on a task, and delete the task in the context menu', async ({
@@ -769,11 +808,39 @@ test.describe('Task management', () => {
   // add test where we filter by name="design" and then we sort by name,
   // we had a bug, where only 2 items were shown, but should be 3
   test('filter by name and sort by name', async ({ taskPage, page }) => {
-    expect(1).toBe(1);
+    // first filter by name
+    await taskPage.filterButton.click();
+    await taskPage.comboboxPopover.getByText(/name/i).click();
+
+    await page.getByPlaceholder(/name/i).fill('design');
+    await page.getByRole('button', { name: /save changes/i }).click();
+
+    await expect(page.getByText(/design mockups/i)).toBeVisible();
+
+    // expect that we have 3 list items
+    await expect(page.getByTestId('list-item')).toHaveCount(3);
+
+    // now we sort by name and expect to still see 3 items
+    await sortByField(taskPage, /name/i);
+    await expect(page.getByText(/design mockups/i)).toBeVisible();
+    await expect(page.getByTestId('list-item')).toHaveCount(3);
   });
 
   // add test -> scroll down, load more tasks, and still only see always one of the same task
   // we had a bug, where each time we scroll, we load the same task again
+  test('scroll down, load more tasks, and still only see one of the same task', async ({
+    taskPage,
+    page,
+  }) => {
+    // scroll down to the bottom
+    const firstListItem = await taskPage.getListItem(0);
+    await firstListItem.click();
+
+    await scrollToBottom(page);
+
+    // expect to see only one of the same task
+    await expect(page.getByText(/Practice editing techniques/i)).toHaveCount(1);
+  });
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {
@@ -859,4 +926,12 @@ const openCommandbar = async (taskPage: TaskPage) => {
   // open commandbar
   await taskPage.page.keyboard.press('Meta+k');
   await expect(taskPage.commandbar).toBeVisible();
+};
+
+export const scrollToBottom = async (page) => {
+  await page.mouse.wheel(0, 10000);
+  await page.waitForTimeout(500);
+  await page.mouse.wheel(0, 10000);
+  await page.waitForTimeout(500);
+  await page.mouse.wheel(0, 10000);
 };

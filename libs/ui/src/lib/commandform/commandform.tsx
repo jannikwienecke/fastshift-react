@@ -80,6 +80,7 @@ const Header = () => {
 
 export function Commandform(props: CommandformProps | undefined) {
   const { t } = useTranslation();
+
   if (!props?.open) return null;
 
   return (
@@ -100,11 +101,12 @@ export function Commandform(props: CommandformProps | undefined) {
                 (field) =>
                   field.field?.type !== 'Date' && !field.field?.richEditor
               )
-              .map((field) => {
+              .map((field, index) => {
                 if (field.field?.type === 'String') {
                   return (
                     <div key={`primitive-string-field-${field.field?.name}`}>
                       <input
+                        autoFocus={index === 0}
                         placeholder={field.label}
                         value={(field.value as string) || ''}
                         className={cn(
