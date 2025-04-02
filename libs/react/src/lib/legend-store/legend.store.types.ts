@@ -197,7 +197,7 @@ export type LegendStore = {
     commands: Command[]
   ) => void;
 
-  createDataModel: (data: RecordType[]) => void;
+  createDataModel: (data: RecordType[], tablename?: string) => void;
   createRelationalDataModel: (data: QueryRelationalData) => void;
 
   // global query
@@ -298,7 +298,12 @@ export type LegendStore = {
     onError?: (message: string) => void
   ) => void;
   createRecordMutation: (
-    props: { view: ViewConfigType; record: RecordType; toast?: boolean },
+    props: {
+      view: ViewConfigType;
+      record: RecordType;
+      toast?: boolean;
+      updateGlobalDataModel?: boolean;
+    },
     onSuccess?: () => void,
     onError?: (message: string) => void
   ) => void;

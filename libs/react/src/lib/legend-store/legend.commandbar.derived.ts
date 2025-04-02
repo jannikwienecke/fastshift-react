@@ -47,8 +47,17 @@ export const derivedCommandbarState$ = observable(() => {
     onValueChange: (...props) => store$.commandbarSetValue(...props),
   } satisfies Omit<CommandbarProps, 'renderItem'>;
 
+  const itemGroups = commandbarPropsSelectedViewField.itemGroups
+    ? commandbarPropsSelectedViewField.itemGroups
+    : [...props.itemGroups, ...(commandsGroups.itemGroups ?? []), ...commands];
+
+  const groupLabels = commandbarPropsSelectedViewField.groupLabels
+    ? commandbarPropsSelectedViewField.groupLabels
+    : [...(props.groupLabels ?? ['']), ...(commandsGroups.groupLabels ?? [])];
+
   return {
     ...props,
-    itemGroups: [...props.itemGroups, ...(commandsGroups ?? []), ...commands],
-  };
+    itemGroups,
+    groupLabels,
+  } satisfies Omit<CommandbarProps, 'renderItem'>;
 });

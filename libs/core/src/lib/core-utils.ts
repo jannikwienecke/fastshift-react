@@ -346,6 +346,19 @@ export const getViewLabel = (view: ViewConfigType, singular?: true) => {
   return fieldLabelToUse;
 };
 
+export const getTableLabel = (tableName: string, singular?: true) => {
+  const translatedName = t(`${tableName}.${!singular ? 'other' : 'one'}`);
+
+  const noTranslationName =
+    translatedName === `${tableName}.${!singular ? 'other' : 'one'}`;
+
+  const fieldLabelToUse = noTranslationName
+    ? tableName.firstUpper()
+    : translatedName;
+
+  return fieldLabelToUse;
+};
+
 export const getEditLabel = (field: FieldConfig, row?: Row | null) => {
   const label = field.editLabel;
 

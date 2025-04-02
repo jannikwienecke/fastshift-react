@@ -9,8 +9,6 @@ import {
   NONE_OPTION,
   RecordType,
   Row,
-  t,
-  TranslationKeys,
 } from '@apps-next/core';
 
 import { Checkbox, cn } from '@apps-next/ui';
@@ -42,6 +40,7 @@ export const makeCommandbarProps = <T extends RecordType>(
 
   return {
     ...state,
+    groupLabels: (state.groupLabels as string[]) ?? [''],
     renderItem(item, active, index) {
       const viewField = store$.commandbar.selectedViewField.get();
       const activeRow = store$.list.rowInFocus.row.get() as Row | null;

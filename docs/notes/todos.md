@@ -40,6 +40,25 @@ created: 1723444498044
 - [x] show on which deployment i am currently am, or with which i am connected....
 - [x] BUG when set sorting to "Name" -> scroll down -> load more data, this data is not sorted!
 - [x] write tests to make sure all works
+- [x] Filter0
+- [x] button text commandform
+- [x] error message show for delete and for update single attribute
+- [x] in rename or change description, we see the reset database command, related to the bug below
+- [x] in commandbar edit relation -> we see an empty row? remove
+- [x] in priority in commandbar -> shows the number and not the related text
+- [x] translation commandbar placeholder
+- [x] german translation: "Neues Aufgabe"
+- [x] commandbar placeholder -> show correct placeholder
+- [x] add headings for other relation related commands (add new Project, etc.)
+- [x] in contextmenu -> prorject -> new project, click nothing happens
+- [ ] click on filter in context menu should open the commandbar
+- [ ] contextmenu -> click tag -> select/deselect tag -> wrong behaviour
+- [ ] does not displays the deleted items
+- [ ] delete should be optimisc updaate..
+- [ ] Copy in contextmenu does nothing
+- [ ] in combobox render field names, label should be aligned (with or without icon), maybe default icon
+- [ ] in combobox, "Ändern projects"
+- [ ] add validation rules to config, name must have 3 charachtes, use arktype, frontend and backend
 
 <!-- FEATURE -->
 

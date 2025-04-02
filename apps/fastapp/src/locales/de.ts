@@ -25,6 +25,9 @@ export const de = {
     create: 'Aufgabe erstellen',
     delete: 'Aufgabe löschen',
   },
+  name: {
+    edit: 'Aufgabe umbenennen',
+  },
   priority: {
     one: 'Priorität',
     other: 'Prioritäten',

@@ -224,7 +224,7 @@ export type CommandformProps = {
   };
   complexFields: CommandformItem[];
   primitiveFields: CommandformItem[];
-  modal?: boolean;
+  type: 'create' | 'edit';
   onClose: () => void;
   render: (field: CommandformItem) => React.ReactNode;
   onClick: (field: CommandformItem, rect: DOMRect) => void;

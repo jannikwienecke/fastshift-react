@@ -39,6 +39,8 @@ export const commandbarOpenWithFieldValue: StoreFn<
   if ((value as Row | undefined)?.id) {
     store$.commandbar.query.set('');
     store$.commandbar.activeItem.set(row);
+  } else if (field.type === 'Enum') {
+    store$.commandbar.activeItem.set(row);
   } else if (typeof value !== 'object') {
     store$.commandbar.query.set(value);
     store$.commandbar.activeItem.set(row);

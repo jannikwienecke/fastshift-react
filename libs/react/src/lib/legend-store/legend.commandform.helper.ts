@@ -94,10 +94,10 @@ export const getRecordTypeFromRow = () => {
     };
   }, {} as RecordType);
 
-  const softDeleteField = store$.viewConfigManager.getSoftDeleteIndexField();
+  const softDeleteField = getViewConfigManager().getSoftDeleteField();
+
   if (softDeleteField) {
-    const softDeleteFieldName = softDeleteField.name;
-    obj[softDeleteFieldName] = false;
+    obj[softDeleteField] = false;
   }
 
   return obj;

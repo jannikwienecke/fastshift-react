@@ -1,6 +1,8 @@
 import {
+  ADD_NEW_OPTION,
   ContextMenuFieldItem,
   ContextMenuUiOptions,
+  getViewByName,
   MakeContextMenuPropsOptions,
   makeDayMonthString,
   makeNoneOption,
@@ -126,9 +128,14 @@ export const derviedContextMenuOptions = observable(() => {
         },
         onSelectOption: async (option) => {
           const isDateField = f.isDateField;
-
+          const addNew = option.id === ADD_NEW_OPTION;
           let value = option;
-          if (isDateField) {
+          if (addNew) {
+            if (view?.viewName) {
+              store$.commandformOpen(view?.viewName);
+            }
+            return;
+          } else if (isDateField) {
             const isNone = 'No date' === option.id;
             const datetime = !isNone
               ? getTimeValueFromDateString(option.id, true)

@@ -1,4 +1,9 @@
-import { CommandformProps, useTranslation } from '@apps-next/core';
+import {
+  CommandformProps,
+  getTableLabel,
+  getViewLabel,
+  useTranslation,
+} from '@apps-next/core';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { StickyNoteIcon, TerminalSquareIcon } from 'lucide-react';
 import React from 'react';
@@ -209,8 +214,9 @@ export function Commandform(props: CommandformProps | undefined) {
                   onClick={() => props.onSubmit()}
                   size={'sm'}
                 >
-                  {/* FIXME -> correct translation here */}
-                  Create Issue
+                  {t(`commandform.${props.type}`, {
+                    name: getTableLabel('tasks', true),
+                  })}
                 </Button>
               </div>
             </div>

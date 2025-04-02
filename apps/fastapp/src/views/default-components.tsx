@@ -70,7 +70,7 @@ export const RenderDisplayOptions = observer(
     const props = makeDisplayOptionsProps(options);
 
     return (
-      <div className="mr-8">
+      <div className="mr-4">
         <DisplayOptions.Default {...props} />
       </div>
     );

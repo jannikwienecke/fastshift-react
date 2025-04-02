@@ -5,6 +5,8 @@ import {
   DELETE_OPTION,
   getEditLabel,
   getFieldLabel,
+  getTableLabel,
+  getViewLabel,
   NONE_OPTION,
   Row,
   t,
@@ -33,7 +35,7 @@ export const getCommandbarDefaultListProps = () => {
   return {
     headerLabel: `${viewName} - ${row?.label ?? ''}`,
     inputPlaceholder: 'Type a command or search....',
-    itemGroups: [items],
+    itemGroups: [[...items, makeAddNewCommand(viewConfigManager.viewConfig)]],
   };
 };
 
@@ -77,7 +79,9 @@ export const getCommandbarSelectedViewField = () => {
     } satisfies PropsType;
   } else if (viewField.type === 'Enum') {
     return {
-      inputPlaceholder: getEditLabel(viewField),
+      inputPlaceholder: t('common.changeFieldTo', {
+        field: getFieldLabel(viewField),
+      }),
       itemGroups: [
         viewField.enum?.values.map((value) => ({
           id: value.name,
@@ -119,6 +123,9 @@ export const getCommandbarSelectedViewField = () => {
       .filter((f) => f.id);
 
     return {
+      inputPlaceholder: t('common.changeFieldTo', {
+        field: getFieldLabel(viewField),
+      }),
       itemGroups: [
         [
           {
@@ -130,7 +137,8 @@ export const getCommandbarSelectedViewField = () => {
         ],
         all.slice(0, 10),
       ],
-      groupLabels: ['New Project', 'Projects'],
+      // FIXME correct labels
+      groupLabels: ['New TEST', 'TEST!'],
     } satisfies PropsType;
   } else if (viewField.relation?.manyToManyRelation) {
     const selectedOption = store$.list.rowInFocus.row.get();
@@ -175,6 +183,9 @@ export const getCommandbarSelectedViewField = () => {
       : commands;
 
     return {
+      inputPlaceholder: t('common.changeOrAdd', {
+        field: getFieldLabel(viewField),
+      }),
       itemGroups: [
         filteredCommands,
         filteredExistingRows,
@@ -192,26 +203,30 @@ export const getCommandbarSelectedViewField = () => {
 };
 
 export const getCommandbarCommandGroups = () => {
-  if (store$.commandbar.selectedViewField.get())
-    return [] satisfies PropsType['itemGroups'];
+  if (store$.commandbar.selectedViewField.get()) return {} satisfies PropsType;
 
+  const currentView = store$.viewConfigManager.getViewName();
   const views = store$.views.get();
   const query = store$.commandbar.query.get();
 
-  const groups = Object.values(views)
-    .filter((view) => {
-      const numViewFields = Object.values(view?.viewFields ?? {}).length;
-      const numRelationalIdFields = Object.values(
-        view?.viewFields ?? {}
-      ).reduce((prev, current) => {
+  const viewsToUse = Object.values(views).filter((view) => {
+    if (view?.viewName === currentView) return false;
+
+    const numViewFields = Object.values(view?.viewFields ?? {}).length;
+    const numRelationalIdFields = Object.values(view?.viewFields ?? {}).reduce(
+      (prev, current) => {
         return current.type === 'OneToOneReference' ? prev + 1 : prev;
-      }, 0);
+      },
+      0
+    );
 
-      // we dont want to have manyToMany relations in the command bar
-      if (numViewFields < 4 && numRelationalIdFields > 1) return false;
+    // we dont want to have manyToMany relations in the command bar
+    if (numViewFields < 4 && numRelationalIdFields > 1) return false;
 
-      return true;
-    })
+    return true;
+  });
+
+  const groups = viewsToUse
     .map((view) => {
       if (!view) return [];
 
@@ -231,5 +246,11 @@ export const getCommandbarCommandGroups = () => {
     .filter(Boolean)
     .filter((g) => g.length);
 
-  return groups satisfies PropsType['itemGroups'];
+  return {
+    // groups satisfies PropsType['itemGroups'];
+    itemGroups: groups,
+    groupLabels: viewsToUse
+      .map((v) => (v ? getViewLabel(v, true) : ''))
+      .filter(Boolean),
+  } satisfies PropsType;
 };

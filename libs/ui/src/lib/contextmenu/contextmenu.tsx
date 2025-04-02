@@ -1,6 +1,10 @@
 import {
+  ADD_NEW_OPTION,
   ContextMenuFieldItem,
   ContextMenuUiOptions,
+  getFieldLabel,
+  getTableLabel,
+  makeRowFromValue,
   renderModelName,
   Row,
   useTranslation,
@@ -148,7 +152,13 @@ const SubMenuContent: React.FC<{
         <>
           <ContextMenuSeparator />
 
-          <ContextMenuItem className="">
+          <ContextMenuItem
+            className=""
+            onClick={() => {
+              console.log('Create new', field.name);
+              field.onSelectOption?.(makeRowFromValue(ADD_NEW_OPTION, field));
+            }}
+          >
             <div className="h-4 w-4 mr-1" />
             <div className="flex flex-row items-center gap-2">
               <PlusIcon
@@ -249,7 +259,7 @@ export const ContextMenuDefault = ({
               <div className="pr-2">
                 <CopyIcon className="w-3 h-3" />
               </div>
-              <div>{t('common.copy', { name: '' })}</div>
+              <div>{t('common.copy', { name: getTableLabel(modelName) })}</div>
             </div>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">

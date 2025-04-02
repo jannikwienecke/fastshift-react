@@ -110,6 +110,9 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
     const rect = store$.commandform.rect.get();
     const copiedRow = copyRow(row);
 
+    console.log({ row, view, type, field, rect });
+    const viewIsCurrentView =
+      view.viewName === store$.viewConfigManager.getViewName();
     if (type === 'edit') {
       store$.updateFullRecordMutation(
         {
@@ -135,6 +138,7 @@ export const commandformSubmit: StoreFn<'commandformSubmit'> =
           view,
           record: getRecordTypeFromRow(),
           toast: true,
+          updateGlobalDataModel: !!viewIsCurrentView,
         },
         () => _log.info('Record created successfully'),
         (error) => {

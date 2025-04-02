@@ -96,7 +96,7 @@ export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
   };
 
 export const createDataModel: StoreFn<'createDataModel'> =
-  (store$) => (data) => {
+  (store$) => (data, tableName) => {
     const sorting = store$.displayOptions.sorting.get();
     const sorted = sortRows(data, store$.views.get(), {
       field: sorting.field,
@@ -105,7 +105,7 @@ export const createDataModel: StoreFn<'createDataModel'> =
 
     const dataModel = makeData(
       store$.views.get(),
-      store$.viewConfigManager.get().getTableName?.()
+      tableName ?? store$.viewConfigManager.get().getTableName?.()
     )(sorted);
 
     store$.dataModel.set(dataModel);

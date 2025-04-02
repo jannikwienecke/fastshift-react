@@ -130,6 +130,9 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
     if (error) {
       console.error('Error updating record:', error);
       rollback();
+      renderErrorToast('error.updateRecord', () => {
+        store$.errorDialog.error.set(error);
+      });
     } else {
       console.warn('Record updated successfully');
     }
@@ -219,7 +222,11 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
 
 export const createRecordMutation: StoreFn<'createRecordMutation'> =
   (store$) =>
-  async ({ record, view, toast }, onSuccess, onError) => {
+  async (
+    { record, view, toast, updateGlobalDataModel },
+    onSuccess,
+    onError
+  ) => {
     const row = createRow({
       ...record,
       id: '_tempId' + Math.random().toString(36).substring(2, 9),
@@ -233,7 +240,7 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
       ? [row, ...currentRows]
       : [...currentRows, row];
 
-    store$.createDataModel(rows.map((r) => r.raw));
+    updateGlobalDataModel && store$.createDataModel(rows.map((r) => r.raw));
 
     const runMutation = async () => {
       const mutation: Mutation = {
@@ -257,7 +264,8 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
           store$.errorDialog.error.set(error);
         });
 
-        store$.createDataModel(currentRows.map((r) => r.raw));
+        updateGlobalDataModel &&
+          store$.createDataModel(currentRows.map((r) => r.raw));
       } else {
         if (toast) {
           renderSuccessToast('');

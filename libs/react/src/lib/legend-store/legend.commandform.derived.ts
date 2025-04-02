@@ -94,7 +94,7 @@ export const derivedCommandformState$ = observable(() => {
     formState,
     complexFields,
     primitiveFields,
-    modal: !comboboxStore$.open.get(),
+    type: store$.commandform.type.get() ?? 'create',
 
     onClose: () => {
       if (store$.commandform.rect.get()) {

@@ -20,6 +20,10 @@ export const en = {
       [operatorLabels.WITHIN]: 'Within',
     },
   },
+  commandform: {
+    create: 'Create {{name}}',
+    edit: 'Update {{name}}',
+  },
   displayOptions: {
     button: {
       label: 'Display',
@@ -64,6 +68,7 @@ export const en = {
     copy: 'Copy {{name}}',
     deleted: 'Deleted',
     changeField: 'Change {{field}}...',
+    changeFieldTo: 'Change {{field}} to...',
     setField: 'Add to {{field}}...',
     changeOrAdd: 'Change or add {{field}}...',
     // [TOGGLE_FIELD_LABEL]: TOGGLE_FIELD_LABEL,
