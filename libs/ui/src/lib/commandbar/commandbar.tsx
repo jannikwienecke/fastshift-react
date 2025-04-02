@@ -112,7 +112,7 @@ const CommandbarContainer = (
     const up = (e: KeyboardEvent) => {
       const key = e.key;
       const isSpace = key === ' ';
-      const isNumber = key.length === 1 && !isNaN(Number(key)) && !isSpace;
+      const isNumber = key?.length === 1 && !isNaN(Number(key)) && !isSpace;
 
       if (isNumber || isSpace) {
         e.preventDefault();
