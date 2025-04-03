@@ -1,4 +1,5 @@
 import {
+  _log,
   getRelationTableName,
   ifNoneNullElseValue,
   INTERNAL_FIELDS,
@@ -13,6 +14,11 @@ import { renderErrorToast, renderSuccessToast } from '../toast';
 import { createRow } from './legend.commandform.helper';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';
+import {
+  initSelected$,
+  newSelected$,
+  removedSelected$,
+} from './legend.combobox.helper';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
@@ -71,6 +77,7 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
       },
     };
 
+    console.warn('Mutation payload:');
     const { error } = await store$.api.mutateAsync({
       mutation,
       viewName: store$.viewConfigManager.viewConfig.viewName.get(),
@@ -80,14 +87,17 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
     if (error) {
       console.error('Error selecting rows:', error);
       rollback?.();
+      renderErrorToast('error.updateError', () => {
+        store$.errorDialog.error.set(error);
+      });
     } else {
       console.warn('Rows selected successfully');
+      checkedRows$.set([]);
+      idsToDelete$.set([]);
+      isRunning$.set(false);
     }
 
     // Reset temporary states
-    checkedRows$.set([]);
-    idsToDelete$.set([]);
-    isRunning$.set(false);
   };
 
 export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
@@ -182,6 +192,11 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
   (store$) =>
   async ({ row }, onSuccess, onError) => {
     const runMutation = async () => {
+      const allRows = store$.dataModel.rows.get();
+      const rollbackRows = allRows.map((r) => copyRow(r));
+      const rows = allRows.filter((r) => r.id !== row.id);
+      store$.dataModel.rows.set(rows);
+
       const mutation: Mutation = {
         type: 'DELETE_RECORD',
         payload: {
@@ -200,6 +215,8 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
         renderErrorToast('error.deleteRecord', () => {
           store$.errorDialog.error.set(error);
         });
+
+        store$.dataModel.rows.set(rollbackRows);
       } else {
         console.warn('Record deleted successfully');
         onSuccess?.();
@@ -295,6 +312,8 @@ export const optimisticUpdateStore = ({
 }): (() => void) => {
   console.warn('Starting optimistic update', { updateGlobalDataModel, record });
 
+  const initSelected = [...(initSelected$.get() ?? [])];
+
   record = Object.entries(record).reduce((prev, [key, value]) => {
     const _value = value === NONE_OPTION ? undefined : value;
     const commandformRow =
@@ -380,8 +399,19 @@ export const optimisticUpdateStore = ({
 
   // Return rollback function
   return () => {
-    console.warn('Rolling back optimistic update');
+    _log.warn('Rolling back optimistic update', originalRows);
+
     store$.dataModel.rows.set(originalRows);
     store$.contextMenuState.row.set(copyRow(row));
+    store$.commandbar.activeRow.set(copyRow(row));
+    store$.list.rowInFocus.row.set(copyRow(row));
+    store$.list.selectedRelationField.row.set(copyRow(row));
+
+    const removeSelected = removedSelected$.get();
+
+    initSelected$.set(initSelected);
+    newSelected$.set([]);
+    removedSelected$.set(removeSelected);
+    isRunning$.set(false);
   };
 };

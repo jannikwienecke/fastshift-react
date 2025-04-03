@@ -88,6 +88,7 @@ export const projectsConfig = createViewConfig(
     displayField: {
       field: 'label',
     },
+    fields: { dueDate: { isDateField: true } },
     query: {
       showDeleted: false,
     },

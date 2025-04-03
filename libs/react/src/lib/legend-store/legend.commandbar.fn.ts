@@ -2,6 +2,7 @@ import {
   _log,
   ADD_NEW_OPTION,
   FieldConfig,
+  getViewByName,
   makeRowFromValue,
   Row,
 } from '@apps-next/core';
@@ -133,6 +134,17 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
       });
 
       if (selectedViewField && row) {
+        if (item.id === ADD_NEW_OPTION) {
+          const view = getViewByName(
+            store$.views.get(),
+            selectedViewField.name
+          );
+
+          store$.commandformOpen(view.viewName);
+          store$.commandbarClose();
+          return;
+        }
+
         if (selectedViewField.type === 'String' && query?.length) {
           store$.updateRecordMutation({
             field: selectedViewField,
@@ -206,7 +218,6 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
           return;
         } else if (selectedViewField.relation) {
           const existingRows = row.getValue?.(selectedViewField.name) as Row[];
-          console.log('UPDATE ', existingRows.length);
 
           store$.selectRowsMutation({
             field: selectedViewField,

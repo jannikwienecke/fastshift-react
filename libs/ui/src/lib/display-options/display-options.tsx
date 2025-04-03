@@ -269,6 +269,8 @@ function DisplayOptionsPopover(
             <Switch
               onCheckedChange={props.onToggleShowDeleted}
               checked={props.showDeleted}
+              aria-label="show-deleted"
+              data-testid="show-deleted-switch"
             />
           </div>
         ) : null}

@@ -126,6 +126,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const deletedIndexField = viewConfigManager.getSoftDeleteIndexField();
 
   const query = queryClient(ctx, viewConfigManager.getTableName());
+
   const rowsNotDeleted =
     softDeleteEnabled && !showDeleted && deletedIndexField
       ? await filterByNotDeleted(query, deletedIndexField).collect()
@@ -133,7 +134,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const idsNotDeleted = rowsNotDeleted.map((row) => row._id);
 
-  const allIds = arrayIntersection(
+  let allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
     hasOneToManyFilter ? idsOneToManyFilters : null,
     isIndexSearch ? idsIndexField : null,
@@ -186,32 +187,49 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       _log.warn('Querying too many items.');
     }
 
+    const getRecordsIfNotSortedAndNoDeletedRows = () => {
+      return getRecordsByIds(
+        idsAfterRemove?.slice(position, nextPosition) ?? [],
+        dbQuery
+      );
+    };
+
+    const getRecordsHasIdsAndNotTooBig = () => {
+      return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
+    };
+
+    const getSortedRecords = () => {
+      if (!displayOptionsInfo.displaySortingIndexField) return [];
+
+      return dbQuery
+        .withIndex(displayOptionsInfo.displaySortingIndexField.name?.toString())
+        .order(displayOptionsInfo.sorting?.order ?? 'asc')
+        .paginate({
+          cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+          numItems: fetchLimit + (idsToRemove.length ?? 0),
+        });
+    };
+
+    const getPaginatedRecords = async () => {
+      const x = await dbQuery.paginate({
+        cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+        numItems: fetchLimit + (idsToRemove.length ?? 0),
+      });
+      return x;
+    };
+
     const rowsBeforeFilter =
       hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
-        ? await getRecordsByIds(
-            idsAfterRemove?.slice(position, nextPosition) ?? [],
-            dbQuery
-          )
-        : allIds !== null && !countToBig
-        ? await getRecordsByIds(idsAfterRemove ?? [], dbQuery)
+        ? await getRecordsIfNotSortedAndNoDeletedRows()
+        : !!allIds && !countToBig
+        ? await getRecordsHasIdsAndNotTooBig()
         : displayOptionsInfo.displaySortingIndexField
-        ? await dbQuery
-            .withIndex(
-              displayOptionsInfo.displaySortingIndexField.name?.toString()
-            )
-            .order(displayOptionsInfo.sorting?.order ?? 'asc')
-            .paginate({
-              cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-              numItems: fetchLimit + (idsToRemove.length ?? 0),
-            })
+        ? await getSortedRecords()
         : anyFilter ||
           (displayOptionsInfo.hasSortingField &&
             !displayOptionsInfo.displaySortingIndexField)
         ? await getAll()
-        : await dbQuery.paginate({
-            cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-            numItems: fetchLimit + (idsToRemove.length ?? 0),
-          });
+        : await getPaginatedRecords();
 
     let rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
@@ -267,5 +285,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const data = parseConvexData(sortedRows);
 
+  allIds = !allIds && data.length ? data.map((r) => r.id) : allIds;
   return { data, continueCursor, isDone, allIds };
 };

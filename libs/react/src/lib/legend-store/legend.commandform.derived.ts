@@ -95,7 +95,8 @@ export const derivedCommandformState$ = observable(() => {
     complexFields,
     primitiveFields,
     type: store$.commandform.type.get() ?? 'create',
-
+    viewName: store$.commandform.view.viewName.get() ?? '',
+    tableName: store$.commandform.view.tableName.get() ?? '',
     onClose: () => {
       if (store$.commandform.rect.get()) {
         return;

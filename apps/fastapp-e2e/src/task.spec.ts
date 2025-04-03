@@ -881,10 +881,126 @@ test.describe('Task management', () => {
     await expect(page.getByText(/_error_/i)).toBeHidden();
     await expect(taskPage.commandform).toBeHidden();
   });
-});
 
-// HIER WEITER MACHEN
-// edit commandform -> close directly, handle optimisic update...
+  test('can add and remove a tag to a task in the commandbar', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+    await expect(firstListItem.getByText(/urgent/i)).toBeHidden();
+    await expect(firstListItem.getByText(/important/i)).toBeHidden();
+
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    await taskPage.contextmenu.getByText(/tag/i).click();
+
+    await taskPage.commandbar.getByText(/urgent/i).click();
+    await taskPage.commandbar.getByText(/important/i).click();
+
+    await expect(firstListItem.getByText(/urgent/i)).toBeVisible();
+    await expect(firstListItem.getByText(/important/i)).toBeVisible();
+
+    await firstListItem.click({ force: true });
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    await taskPage.contextmenu.getByText(/tag/i).click();
+
+    await taskPage.commandbar.getByText(/urgent/i).click();
+    await taskPage.commandbar.getByText(/important/i).click();
+    await expect(firstListItem.getByText(/urgent/i)).toBeHidden();
+    await expect(firstListItem.getByText(/important/i)).toBeHidden();
+  });
+
+  test('can delete record and show the deleted items', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    await taskPage.contextmenu.getByText(/delete task/i).click();
+
+    // see /are you sure/i
+    await expect(page.getByText(/are you sure/i)).toBeVisible();
+    await page.getByRole('button', { name: 'confirm' }).click();
+
+    await expect(firstListItem.getByText(/design mockups/i)).toBeHidden();
+
+    await taskPage.displayOptionsButton.click();
+
+    await taskPage.displayOptions.getByTestId('show-deleted-switch').click();
+
+    await expect(page.getByText(/design mockups/i)).toBeVisible();
+  });
+
+  test('can open commandform to create new project', async ({
+    taskPage,
+    page,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+
+    // Right click on the first list item to open context menu
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    // Click on Project in the context menu
+    await taskPage.contextmenu.getByText(/project/i).click();
+
+    // Click on create new project in the commandbar
+    await taskPage.commandbar.getByText(/create new project/i).click();
+
+    // Expect commandform to be visible and create button to be disabled initially
+    await expect(taskPage.commandform).toBeVisible();
+    await expect(
+      taskPage.commandform.getByText(/create project/i)
+    ).toBeDisabled();
+
+    // Fill in project details
+    await taskPage.commandform
+      .getByPlaceholder(/label/i)
+      .fill('New Test Project');
+    await taskPage.commandform
+      .getByPlaceholder(/description/i)
+      .fill('Project Description');
+
+    // Expect create button to be enabled after filling required fields
+    await expect(
+      taskPage.commandform.getByText(/create project/i)
+    ).toBeEnabled();
+
+    // Create the project
+    await taskPage.commandform.getByText(/create project/i).click();
+
+    // Verify success message and project creation
+    await expect(page.getByText(/created Successfully/i)).toBeVisible();
+    await expect(page.getByText(/New Test Project/i)).toBeVisible();
+
+    // Verify the new project appears in the context menu
+    await firstListItem
+      .locator('div')
+      .first()
+      .click({ force: true, button: 'right' });
+
+    await taskPage.contextmenu.getByText(/project/i).hover();
+    await expect(
+      taskPage.contextmenu.getByText(/New Test Project/i)
+    ).toBeVisible();
+  });
+});
 
 const testingQueryBehavior = async ({ taskPage, page }) => {
   await taskPage.openFilter(/due Date/i);

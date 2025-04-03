@@ -158,7 +158,6 @@ const SubMenuContent: React.FC<{
           <ContextMenuItem
             className=""
             onClick={() => {
-              console.log('Create new', field.name);
               field.onSelectOption?.(makeRowFromValue(ADD_NEW_OPTION, field));
             }}
           >

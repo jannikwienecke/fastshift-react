@@ -107,6 +107,7 @@ export function Commandform(props: CommandformProps | undefined) {
                   field.field?.type !== 'Date' && !field.field?.richEditor
               )
               .map((field, index) => {
+                console.log(field.field?.name);
                 if (field.field?.type === 'String') {
                   return (
                     <div key={`primitive-string-field-${field.field?.name}`}>
@@ -125,7 +126,11 @@ export function Commandform(props: CommandformProps | undefined) {
                     </div>
                   );
                 }
-                return <div>NOT YET: {field.field?.name}</div>;
+                return (
+                  <div key={`not-yet-${field.field?.name}`}>
+                    NOT YET: {field.field?.name}
+                  </div>
+                );
               })}
 
             {props.primitiveFields
@@ -215,7 +220,7 @@ export function Commandform(props: CommandformProps | undefined) {
                   size={'sm'}
                 >
                   {t(`commandform.${props.type}`, {
-                    name: getTableLabel('tasks', true),
+                    name: getTableLabel(props.tableName, true),
                   })}
                 </Button>
               </div>

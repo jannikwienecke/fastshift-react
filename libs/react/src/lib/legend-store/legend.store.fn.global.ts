@@ -205,7 +205,7 @@ const handlingFetchMoreState = async (
 ) => {
   const newData = queryReturn.data ?? [];
   const prevData = store$.dataModel.get().rows.map((row) => row.raw);
-  const allIds = queryReturn.allIds ?? [];
+  const allIds = queryReturn.allIds;
 
   const all = [...prevData, ...newData];
 
@@ -310,7 +310,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
-    _log.debug(`:handleIncomingData`, state, data);
+    _log.info(`:handleIncomingData`, state, data);
 
     switch (state) {
       case 'fetching-more':

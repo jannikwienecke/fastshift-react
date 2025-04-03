@@ -111,7 +111,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     } else {
       const timeout = window.setTimeout(() => {
         hasOpenDialog$.set(false);
-      }, 75);
+      }, 1);
 
       timeout$.set(timeout);
     }

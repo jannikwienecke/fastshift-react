@@ -54,14 +54,16 @@ created: 1723444498044
 - [x] click on filter in context menu should open the commandbar
 - [x] header label in commandbar - setting project e.g;
 - [x] contextmenu -> click tag -> select/deselect tag -> wrong behaviour -> add test
+- [x] check for error handling in commandbar
+- [x] does not displays the deleted items -> add test
+- [x] delete should be optimisc updaate..
+- [x] in commandbar -> click new project -> error
 
-- [ ] does not displays the deleted items -> add test
-- [ ] delete should be optimisc updaate..
+- [ ] cannot create a project from the task view -> we dont have the relational data for project (owner e.g.)
 - [ ] Copy in contextmenu does nothing
 - [ ] in combobox render field names, label should be aligned (with or without icon), maybe default icon
 - [ ] in combobox, "Ändern projects"
 - [ ] add validation rules to config, name must have 3 charachtes, use arktype, frontend and backend -> add test
-- [ ] in commandbar -> click new project -> error
 
 <!-- FEATURE -->
 

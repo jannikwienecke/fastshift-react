@@ -27,6 +27,20 @@ const timeout$ = observable<number | null>(null);
 
 focusedRow$.onChange((state) => {
   const timeout = timeout$.get();
+  const commandbarIsOpen = store$.commandbar.open.get();
+  const commandformIsOpen = store$.commandform.open.get();
+  const contextmenuIsOpen = store$.contextMenuState.rect.get() !== null;
+  const filterIsOpen = store$.filter.open.get();
+  const displayOptionsIsOpen = store$.displayOptions.isOpen.get();
+  if (
+    commandbarIsOpen ||
+    commandformIsOpen ||
+    contextmenuIsOpen ||
+    filterIsOpen ||
+    displayOptionsIsOpen
+  ) {
+    return;
+  }
 
   if (state.value.row && !store$.list.rowInFocus.hover.get()) {
     store$.list.rowInFocus.set({
