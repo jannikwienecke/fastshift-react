@@ -315,16 +315,20 @@ export const patchDict = <T extends Record<string, any>>(
   }, dict);
 };
 
-export const getFieldLabel = (field: FieldConfig, singular?: true) => {
+export const getFieldLabel = (
+  field: FieldConfig,
+  singular?: true,
+  plural?: true
+) => {
   const isMany =
     field.relation?.type === 'manyToMany' || field.relation?.manyToManyRelation;
 
-  const translatedName = t(
-    `${field.name}.${isMany && !singular ? 'other' : 'one'}`
-  );
+  const usePlural = (isMany && !singular) || plural ? true : false;
+
+  const translatedName = t(`${field.name}.${usePlural ? 'other' : 'one'}`);
 
   const noTranslationName =
-    translatedName === `${field.name}.${isMany && !singular ? 'other' : 'one'}`;
+    translatedName === `${field.name}.${usePlural ? 'other' : 'one'}`;
 
   const fieldLabelToUse = noTranslationName
     ? field.name.firstUpper()

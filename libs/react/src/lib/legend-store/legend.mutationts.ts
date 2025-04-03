@@ -357,6 +357,10 @@ export const optimisticUpdateStore = ({
       store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
     }
 
+    if (store$.commandbar.activeRow.get()) {
+      store$.commandbar.activeRow.set(updatedRow);
+    }
+
     if (store$.list.rowInFocus.row.get()) {
       store$.list.rowInFocus.row.set(updatedRow);
     }

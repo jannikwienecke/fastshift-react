@@ -51,15 +51,17 @@ created: 1723444498044
 - [x] commandbar placeholder -> show correct placeholder
 - [x] add headings for other relation related commands (add new Project, etc.)
 - [x] in contextmenu -> prorject -> new project, click nothing happens
-- [ ] click on filter in context menu should open the commandbar
-- [ ] header label in commandbar - setting project e.g;
-- [ ] contextmenu -> click tag -> select/deselect tag -> wrong behaviour
-- [ ] does not displays the deleted items
+- [x] click on filter in context menu should open the commandbar
+- [x] header label in commandbar - setting project e.g;
+- [x] contextmenu -> click tag -> select/deselect tag -> wrong behaviour -> add test
+
+- [ ] does not displays the deleted items -> add test
 - [ ] delete should be optimisc updaate..
 - [ ] Copy in contextmenu does nothing
 - [ ] in combobox render field names, label should be aligned (with or without icon), maybe default icon
 - [ ] in combobox, "Ändern projects"
-- [ ] add validation rules to config, name must have 3 charachtes, use arktype, frontend and backend
+- [ ] add validation rules to config, name must have 3 charachtes, use arktype, frontend and backend -> add test
+- [ ] in commandbar -> click new project -> error
 
 <!-- FEATURE -->
 

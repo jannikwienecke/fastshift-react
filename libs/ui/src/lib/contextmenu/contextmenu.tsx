@@ -73,8 +73,11 @@ const SubMenuContent: React.FC<{
         <>
           <input
             type="text"
-            placeholder="Filter..."
-            onClick={(e) => e.stopPropagation()}
+            placeholder={t('filter.button.placeholder')}
+            onClick={(e) => {
+              e.stopPropagation();
+              field.onClickOption();
+            }}
             className="text-sm px-2 outline-none border-none w-full py-1"
           />
           <ContextMenuSeparator />

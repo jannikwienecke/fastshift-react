@@ -9,7 +9,7 @@ export const copyRow = (row: Row): Row => {
   )([{ ...row.raw }]).rows?.[0] as Row;
 };
 
-export const hasOpenDialog$ = observable(() => {
+export const _hasOpenDialog$ = observable(() => {
   const commandbarIsOpen = store$.commandbar.open.get();
   const commandformIsOpen = store$.commandform.open.get();
   const contextmenuIsOpen = store$.contextMenuState.rect.get() !== null;
@@ -24,3 +24,5 @@ export const hasOpenDialog$ = observable(() => {
     displayOptionsIsOpen
   );
 });
+
+export const hasOpenDialog$ = observable(false);

@@ -137,8 +137,12 @@ export const getCommandbarSelectedViewField = () => {
         ],
         all.slice(0, 10),
       ],
-      // FIXME correct labels
-      groupLabels: ['New TEST', 'TEST!'],
+      groupLabels: [
+        t('commandbar.newLabel' satisfies TranslationKeys, {
+          name: getFieldLabel(viewField, true),
+        }),
+        getFieldLabel(viewField, undefined, true),
+      ],
     } satisfies PropsType;
   } else if (viewField.relation?.manyToManyRelation) {
     const selectedOption = store$.list.rowInFocus.row.get();
@@ -182,6 +186,22 @@ export const getCommandbarSelectedViewField = () => {
       ? fuseCommands.search(query).map((result) => result.item)
       : commands;
 
+    const groupLabels = [
+      filteredCommands.length
+        ? t('commandbar.newLabel' satisfies TranslationKeys, {
+            name: getFieldLabel(viewField, true),
+          })
+        : null,
+      filteredExistingRows.length
+        ? t('commandbar.existingLabel' satisfies TranslationKeys, {
+            name: getFieldLabel(viewField, true),
+          })
+        : null,
+      optionsWithoutExistingRows.length
+        ? getFieldLabel(viewField, undefined, true)
+        : null,
+    ].filter((l) => l !== null);
+
     return {
       inputPlaceholder: t('common.changeOrAdd', {
         field: getFieldLabel(viewField),
@@ -190,12 +210,10 @@ export const getCommandbarSelectedViewField = () => {
         filteredCommands,
         filteredExistingRows,
         optionsWithoutExistingRows,
-      ],
-      groupLabels: [
-        filteredCommands.length ? 'New Tag' : '',
-        filteredExistingRows.length ? 'Existing Tags' : '',
-        optionsWithoutExistingRows.length ? 'Tags' : '',
-      ].filter(Boolean),
+      ]
+        .filter(Boolean)
+        .filter((g) => g.length),
+      groupLabels,
     } satisfies PropsType;
   }
 

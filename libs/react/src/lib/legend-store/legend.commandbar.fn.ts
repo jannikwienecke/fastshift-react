@@ -206,6 +206,7 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
           return;
         } else if (selectedViewField.relation) {
           const existingRows = row.getValue?.(selectedViewField.name) as Row[];
+          console.log('UPDATE ', existingRows.length);
 
           store$.selectRowsMutation({
             field: selectedViewField,

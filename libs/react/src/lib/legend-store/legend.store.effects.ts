@@ -8,8 +8,11 @@ import {
 } from './legend.combobox.helper';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { _log } from '@apps-next/core';
+import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
+  const timeout$ = observable<number | null>(null);
+
   observable(function handleResetCombobox() {
     const listRelationField = store$.list.selectedRelationField.get();
     const filterField = store$.filter.selectedField.get();
@@ -98,4 +101,19 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       nextCursor: { cursor: null, position: null },
     });
   }).onChange(() => null);
+
+  _hasOpenDialog$.onChange((state) => {
+    clearTimeout(timeout$.get() ?? 0);
+    timeout$.set(null);
+
+    if (state.value) {
+      hasOpenDialog$.set(true);
+    } else {
+      const timeout = window.setTimeout(() => {
+        hasOpenDialog$.set(false);
+      }, 75);
+
+      timeout$.set(timeout);
+    }
+  });
 };

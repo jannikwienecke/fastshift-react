@@ -50,7 +50,7 @@ focusedRow$.onChange((state) => {
         hover: true,
         focus: false,
       });
-    }, 300);
+    }, 200);
 
     timeout$.set(timeout);
   }
@@ -227,7 +227,9 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
         focusType,
         onHover: () => {
-          if (hasOpenDialog$.get()) return;
+          if (hasOpenDialog$.get()) {
+            return;
+          }
 
           focusedRow$.set({ row: copyRow(item), hover: true, focus: false });
         },

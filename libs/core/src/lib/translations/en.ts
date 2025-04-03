@@ -24,6 +24,10 @@ export const en = {
     create: 'Create {{name}}',
     edit: 'Update {{name}}',
   },
+  commandbar: {
+    newLabel: 'New {{name}}',
+    existingLabel: 'Existing {{name}}',
+  },
   displayOptions: {
     button: {
       label: 'Display',
