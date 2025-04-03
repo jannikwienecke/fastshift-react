@@ -93,6 +93,10 @@ export const de = {
       title: '✅ Erfolgreich erstellt',
     },
   },
+  commandbar: {
+    existingLabel: 'Zugewiesene {{name}}',
+    newLabel: 'Neue {{name}}',
+  },
   confirmationAlert: {
     title: 'Sind Sie sicher?',
     description: 'Sind Sie sicher, dass Sie fortfahren möchten?',
