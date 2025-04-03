@@ -3,7 +3,7 @@ import {
   makeViews,
 } from '@apps-next/convex-adapter-app';
 
-import { CubeIcon, TokensIcon } from '@radix-ui/react-icons';
+import { CubeIcon, PersonIcon, TokensIcon } from '@radix-ui/react-icons';
 import schema from '../convex/schema';
 import { createViewConfig } from '@apps-next/react';
 import { CheckCheckIcon, TagIcon } from 'lucide-react';
@@ -73,6 +73,12 @@ export const tasksConfig = createViewConfig(
     mutation: {
       softDelete: true,
       softDeleteField: 'deleted',
+      beforeInsert: (data) => {
+        return {
+          ...data,
+          completed: data.completed ?? false,
+        };
+      },
     },
   },
 
@@ -110,6 +116,24 @@ export const tagsConfig = createViewConfig(
   config.config
 );
 
+export const ownerConfig = createViewConfig(
+  'owner',
+  {
+    icon: PersonIcon,
+    displayField: { field: 'name' },
+    // onInsert
+    mutation: {
+      beforeInsert: (data) => {
+        return {
+          ...data,
+          name: data.firstname + ' ' + data.lastname,
+        };
+      },
+    },
+  },
+  config.config
+);
+
 export const todosConfig = createViewConfig(
   'todos',
   {
@@ -124,4 +148,5 @@ export const views = makeViews(config.config, [
   projectsConfig,
   todosConfig,
   tagsConfig,
+  ownerConfig,
 ]);

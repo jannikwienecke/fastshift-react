@@ -285,6 +285,5 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const data = parseConvexData(sortedRows);
 
-  allIds = !allIds && data.length ? data.map((r) => r.id) : allIds;
   return { data, continueCursor, isDone, allIds };
 };

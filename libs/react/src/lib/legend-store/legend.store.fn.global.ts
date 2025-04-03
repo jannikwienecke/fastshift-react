@@ -310,7 +310,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
-    _log.info(`:handleIncomingData`, state, data);
+    _log.debug(`:handleIncomingData`, state, data);
 
     switch (state) {
       case 'fetching-more':
@@ -340,4 +340,22 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
       default:
         break;
     }
+  };
+
+export const handleIncomingRelationalData: StoreFn<'handleIncomingData'> =
+  (store$) => async (data) => {
+    const relationalDataModel = Object.entries(
+      data.relationalData ?? {}
+    ).reduce((acc, [tableName, data]) => {
+      const viewConfig = getViewByName(store$.views.get(), tableName);
+      const _data = makeData(store$.views.get(), viewConfig?.viewName)(data);
+
+      acc[tableName] = _data;
+      return acc;
+    }, {} as RelationalDataModel);
+
+    store$.relationalDataModel.set((prev) => ({
+      ...prev,
+      ...relationalDataModel,
+    }));
   };

@@ -74,6 +74,7 @@ const init = server.mutation({
         firstname: data.firstname,
         lastname: data.lastname,
         age: data.age,
+        name: `${data.firstname} ${data.lastname}`,
       });
       owners.push(ownerId);
     }

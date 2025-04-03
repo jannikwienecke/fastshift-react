@@ -18,7 +18,7 @@ export const createMutation = async (
   const { mutation, viewConfigManager } = props;
   if (mutation.type !== 'CREATE_RECORD') throw new Error('INVALID MUTATION-1');
 
-  const { record } = mutation.payload;
+  let { record } = mutation.payload;
   const displayField = viewConfigManager.getDisplayFieldLabel();
   const displayValue = record?.[displayField];
 
@@ -29,6 +29,12 @@ export const createMutation = async (
       manyToManyFields.push(field);
     }
   });
+
+  const beforeInsert = viewConfigManager.viewConfig.mutation?.beforeInsert;
+
+  if (beforeInsert) {
+    record = beforeInsert(record);
+  }
 
   try {
     const res = await ctx.db.insert(viewConfigManager.getTableName(), record);

@@ -60,6 +60,7 @@ export type ViewConfigType<T extends GetTableName = any> =
     mutation?: {
       softDelete?: boolean;
       softDeleteField?: keyof GetTableDataType<T>;
+      beforeInsert?: (data: GetTableDataType<T>) => GetTableDataType<T>;
     };
     ui?: {
       list?: {

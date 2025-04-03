@@ -118,6 +118,7 @@ export type FetchMoreOptions = {
 
 export type LegendStore = {
   handleIncomingData: (props: QueryReturnOrUndefined) => void;
+  handleIncomingRelationalData: (props: QueryReturnOrUndefined) => void;
 
   state:
     | 'pending'

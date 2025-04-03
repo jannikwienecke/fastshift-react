@@ -12,7 +12,10 @@ const _schema = defineSchema({
     userId: v.id('users'),
     firstname: v.string(),
     lastname: v.string(),
+    name: v.optional(v.string()),
     age: v.number(),
+  }).searchIndex('name', {
+    searchField: 'name',
   }),
 
   tasks: defineTable({

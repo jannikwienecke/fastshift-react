@@ -107,7 +107,6 @@ export function Commandform(props: CommandformProps | undefined) {
                   field.field?.type !== 'Date' && !field.field?.richEditor
               )
               .map((field, index) => {
-                console.log(field.field?.name);
                 if (field.field?.type === 'String') {
                   return (
                     <div key={`primitive-string-field-${field.field?.name}`}>

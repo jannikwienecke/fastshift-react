@@ -58,8 +58,9 @@ created: 1723444498044
 - [x] does not displays the deleted items -> add test
 - [x] delete should be optimisc updaate..
 - [x] in commandbar -> click new project -> error
+- [x] cannot create a project from the task view -> we dont have the relational data for project (owner e.g.)
+- [x] how to handle fields that are calculated from other fields (name <- firstname & lastname)
 
-- [ ] cannot create a project from the task view -> we dont have the relational data for project (owner e.g.)
 - [ ] Copy in contextmenu does nothing
 - [ ] in combobox render field names, label should be aligned (with or without icon), maybe default icon
 - [ ] in combobox, "Ändern projects"

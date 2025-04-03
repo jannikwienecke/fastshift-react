@@ -7,6 +7,7 @@ import {
   GetTableName,
   RegisteredViews,
   ViewConfigType,
+  _log,
 } from '@apps-next/core';
 import { createViewConfig } from './create-view-config';
 import { CubeIcon } from '@radix-ui/react-icons';
@@ -52,6 +53,11 @@ export const generateDefaultViewConfigs = ({
         .filter((f) => f !== null);
 
       const displayField = getPrefferedDisplayField(options.map((f) => f.name));
+
+      if (!displayField) {
+        // _log.debug(`No display field found for view with table '${tableName}'`);
+      }
+
       const _config = createViewConfig(
         tableName as GetTableName,
         {
