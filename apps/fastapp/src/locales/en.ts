@@ -63,6 +63,7 @@ export const en = {
   errors: {
     notFound: 'Not found',
     unauthorized: 'Unauthorized',
+    minCharacters: 'Minimum {{count}} characters',
   },
   commands: {
     resetDb: 'Reset database',

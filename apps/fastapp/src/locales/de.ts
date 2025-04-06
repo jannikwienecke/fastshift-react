@@ -62,6 +62,7 @@ export const de = {
   errors: {
     notFound: 'Nicht gefunden',
     unauthorized: 'Nicht autorisiert',
+    minCharacters: 'Mindestens {{count}} Zeichen',
   },
   commands: {
     resetDb: 'Datenbank zurücksetzen',

@@ -1,5 +1,11 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
+  // allow autocomplete for ArkType expressions like "string | num"
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  // prioritize ArkType's "type" for autoimports
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
   "deno.enable": false,
   "todo-tree.general.tags": [
     "BUG",
@@ -12,7 +18,7 @@
     "IMPROVEMENT",
     "FEATURE",
     "IDEA",
-    "REFACTOR",
+    "REFACTOR"
   ],
   "todo-tree.highlights.customHighlight": {
     "IMPROVEMENT": {
@@ -38,6 +44,6 @@
       "foreground": "#FFA500",
       "iconColour": "#FFA500",
       "gutterIcon": true
-    },
+    }
   }
 }

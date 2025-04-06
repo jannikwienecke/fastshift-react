@@ -60,11 +60,14 @@ created: 1723444498044
 - [x] in commandbar -> click new project -> error
 - [x] cannot create a project from the task view -> we dont have the relational data for project (owner e.g.)
 - [x] how to handle fields that are calculated from other fields (name <- firstname & lastname)
-
-- [ ] Copy in contextmenu does nothing
+- [x] Copy in contextmenu does nothing
+- [x] in combobox, "Ändern projects"
+- [x] add validation rules to config, name must have 3 charachtes, use arktype, frontend and backend -> add test
+- [x] in convex helper -> taskId: mutation.payload.id -> make dynamic
+- [x] task can only add 1 todo for example, how would that work
+- [ ] refactor select many to many in all places
+- [ ] add tests for validation rules frontend and backend
 - [ ] in combobox render field names, label should be aligned (with or without icon), maybe default icon
-- [ ] in combobox, "Ändern projects"
-- [ ] add validation rules to config, name must have 3 charachtes, use arktype, frontend and backend -> add test
 
 <!-- FEATURE -->
 

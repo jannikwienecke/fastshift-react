@@ -3,10 +3,12 @@ import {
   makeViews,
 } from '@apps-next/convex-adapter-app';
 
-import { CubeIcon, PersonIcon, TokensIcon } from '@radix-ui/react-icons';
-import schema from '../convex/schema';
 import { createViewConfig } from '@apps-next/react';
+import { CubeIcon, PersonIcon, TokensIcon } from '@radix-ui/react-icons';
 import { CheckCheckIcon, TagIcon } from 'lucide-react';
+import schema from '../convex/schema';
+// import { DataType } from '@apps-next/core';
+// import { TFunction } from 'i18next';
 
 export * from '../convex/_generated/api';
 export * from '../convex/schema';
@@ -18,6 +20,16 @@ declare module '@apps-next/core' {
     config: typeof config;
   }
 }
+
+// type TaskViewDataType = DataType<
+//   'tasks',
+//   {
+//     projects: Projects;
+//     tags?: Tags[];
+//     tasks?: Tasks[];
+//     todos?: Todos[];
+//   }
+// >;
 
 export const tasksConfig = createViewConfig(
   'tasks',
@@ -38,6 +50,14 @@ export const tasksConfig = createViewConfig(
           tommorow.setDate(tommorow.getDate() + 1);
           return tommorow.getTime();
         },
+        // FIXME ARKTYPE
+        // validator: () => type(`Date > ${Date.now()}`),
+      },
+      name: {
+        // validator: () => type('string > 3'),
+        // optional -> otherwise it will use the default value
+        // validationErrorMessage: (t: TFunction) =>
+        //   t('errors.minCharacters', { count: 4 }),
       },
       completed: {
         defaultValue: false,
@@ -73,12 +93,42 @@ export const tasksConfig = createViewConfig(
     mutation: {
       softDelete: true,
       softDeleteField: 'deleted',
+
       beforeInsert: (data) => {
         return {
           ...data,
           completed: data.completed ?? false,
         };
       },
+      // beforeSelect: (data, options) => {
+      //   const completeTask = options.recordWithInclude as TaskViewDataType;
+
+      //   if (options.field === 'tags') {
+      //     const tags = completeTask.tags;
+      //     const tagsAfterRemove =
+      //       tags?.filter((tag) => !options.deleteIds.includes(tag._id)) ?? [];
+      //     const allTagIds = Array.from(
+      //       new Set([
+      //         ...options.newIds,
+      //         ...tagsAfterRemove.map((tag) => tag._id),
+      //       ])
+      //     );
+
+      //     if (allTagIds.length > 3) {
+      //       return {
+      //         error: 'You can only have at most one tag',
+      //       };
+      //     } else if (allTagIds.length < 1) {
+      //       return {
+      //         error: 'You need to have at least one tag',
+      //       };
+      //     }
+      //   }
+
+      //   return {
+      //     ...options,
+      //   };
+      // },
     },
   },
 

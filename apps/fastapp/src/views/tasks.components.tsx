@@ -84,8 +84,8 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
     <BubbleList
       items={tags.map((t) => {
         return {
-          label: t.name,
-          color: t.color,
+          label: t?.name,
+          color: t?.color,
           icon: null,
         };
       })}
