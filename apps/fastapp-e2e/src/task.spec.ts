@@ -320,9 +320,9 @@ test.describe('Task management', () => {
 
     await taskPage.comboboxPopover.getByText(/no project/i).click();
 
-    await page.waitForTimeout(500);
-
     await taskPage.openFilter(/project/i);
+
+    await page.waitForTimeout(700);
 
     await taskPage.comboboxPopover.getByText(/no project/i).click();
 
