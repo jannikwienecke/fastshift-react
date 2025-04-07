@@ -79,6 +79,40 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   return stored.current;
 };
 
+export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
+  queryProps?: Partial<QueryProps>
+): QueryReturnOrUndefined<QueryReturnType[0]> => {
+  const prisma = useApi();
+  const { registeredViews, viewConfigManager } = useView();
+
+  const view = store$.commandform.view.get();
+
+  const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
+    useStableQuery(prisma, {
+      registeredViews: queryProps?.registeredViews ?? registeredViews,
+      query: '',
+      modelConfig:
+        queryProps?.viewConfigManager?.modelConfig ||
+        viewConfigManager.modelConfig,
+      viewConfig:
+        registeredViews[
+          view?.viewName ?? viewConfigManager.viewConfig.viewName
+        ],
+      displayOptions: '',
+      paginateOptions: undefined,
+      disabled: view?.viewName ? false : true,
+    });
+
+  return {
+    ...queryReturn,
+    allIds: queryReturn.data?.allIds ?? [],
+    data: queryReturn.data?.data ?? [],
+    relationalData: queryReturn.data?.relationalData ?? {},
+    continueCursor: queryReturn.data?.continueCursor,
+    isDone: queryReturn.data?.isDone,
+  };
+};
+
 export const useQuery = <QueryReturnType extends RecordType[]>(
   queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
@@ -92,7 +126,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const parsedDisplayOptions = convertDisplayOptionsForBackend(displayOptions);
 
   const cursor = store$.fetchMore.currentCursor.get();
-  const isDone = store$.fetchMore.isDone.get();
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -134,6 +167,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   return {
     ...queryReturn,
+    allIds: queryReturn.data?.allIds ?? [],
     data: queryReturn.data?.data ?? [],
     relationalData: queryReturn.data?.relationalData ?? {},
     continueCursor: queryReturn.data?.continueCursor,

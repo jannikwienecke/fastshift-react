@@ -8,7 +8,8 @@
     "target": "ESNext",
     "strict": true,
     "types": ["vite/client", "vitest"],
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false
   },
   "files": [],
   "include": [],

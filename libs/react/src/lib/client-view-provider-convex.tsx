@@ -4,11 +4,15 @@ import {
   BaseConfigInterface,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  Command,
+  FieldConfig,
   patchDict,
   QueryReturnOrUndefined,
   RegisteredViews,
   renderModelName,
   UiViewConfig,
+  ViewConfigType,
+  ViewFieldConfig,
 } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -23,6 +27,7 @@ export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
+  commands: Command[];
   queryKey: any[];
 } & { children: React.ReactNode };
 
@@ -34,35 +39,21 @@ export const ClientViewProviderConvex = (
   props: QueryProviderPropsWithViewFieldsConfig
 ) => {
   const patechedViewFields = patchDict(props.viewConfig.viewFields, (f) => {
-    const translated = t(`${f.name}.edit`);
-    const noTranslation = translated === `${f.name}.edit`;
+    const userFieldConfig = props.viewConfig.fields?.[f.name];
+    const displayFIeld = props.viewConfig.displayField.field;
+    const softDeleteField = props.viewConfig.mutation?.softDeleteField;
 
-    const isMany = f.relation?.type === 'manyToMany';
-    const translatedName = t(`${f.name}.${isMany ? 'other' : 'one'}`);
-    const noTranslationName =
-      translatedName === `${f.name}.${isMany ? 'other' : 'one'}`;
-
-    const fieldLabelToUse = noTranslationName
-      ? f.name.firstUpper()
-      : translatedName;
-
-    const fallbackKey =
-      f.relation?.type === 'manyToMany'
-        ? 'changeOrAdd'
-        : f.relation
-        ? 'setField'
-        : 'changeField';
-
-    const toUse = noTranslation
-      ? t(`common.${fallbackKey}`, { field: fieldLabelToUse })
-      : translated;
+    const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
+    const isDisplayField =
+      displayFIeld && f.name === displayFIeld ? true : undefined;
 
     return {
       ...f,
+      ...(userFieldConfig ?? {}),
       label: f.label || `${f.name}.one`,
-      // editLabel: f.editLabel || `${f.name}.edit`,
+      isDisplayField: isDisplayField as true | undefined,
       editLabel: `${f.name}.edit`,
-      // editSearchString: toUse
+      hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
     };
   });
 
@@ -91,10 +82,23 @@ export const ClientViewProviderConvex = (
 
     return {
       ...view,
-      viewFields: patchDict(view.viewFields, (f) => ({
-        ...f,
-        label: f.label || renderModelName(f.name, t),
-      })),
+      viewFields: patchDict(view.viewFields, (f) => {
+        const userFieldConfig = props.viewConfig.fields?.[f.name];
+        const displayFIeld = props.viewConfig.displayField.field;
+        const softDeleteField = props.viewConfig.mutation?.softDeleteField;
+
+        const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
+        const isDisplayField =
+          displayFIeld && f.name === displayFIeld ? true : undefined;
+
+        return {
+          ...f,
+          ...userFieldConfig,
+          isDisplayField,
+          label: f.label || renderModelName(f.name, t),
+          hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
+        } satisfies FieldConfig;
+      }),
     };
   });
 
@@ -112,14 +116,19 @@ export const ClientViewProviderConvex = (
       store$.init(
         data?.data ?? [],
         data?.relationalData ?? {},
+        data?.continueCursor ?? null,
+        data?.isDone ?? false,
         viewConfigManager,
         views,
-        props.uiViewConfig
+        props.uiViewConfig,
+        props.commands
       );
     }
-  }, [data, props.uiViewConfig, viewConfigManager, views]);
+  }, [data, props.uiViewConfig, viewConfigManager, views, props.commands]);
 
-  if (!isInitialized) return null;
+  if (!isInitialized) {
+    return null;
+  }
   return <Content>{props.children}</Content>;
 };
 

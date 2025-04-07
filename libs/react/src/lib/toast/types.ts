@@ -1,6 +1,8 @@
+import { TranslationKeys } from '@apps-next/core';
+
 export interface ToastProps {
   id: string | number;
-  title: string;
+  title: TranslationKeys;
   description: string;
   variant?: 'default' | 'warning' | 'error';
   duration?: number;

@@ -1,4 +1,5 @@
 import {
+  _log,
   arrayIntersection,
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
@@ -24,6 +25,12 @@ import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
+  const log = (...props: any[]) => {
+    const view = args.viewConfigManager?.getTableName();
+    if (view !== 'tasks') return;
+    _log.info(...props);
+  };
+
   const { viewConfigManager, filters, registeredViews } = args;
 
   const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
@@ -119,6 +126,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const deletedIndexField = viewConfigManager.getSoftDeleteIndexField();
 
   const query = queryClient(ctx, viewConfigManager.getTableName());
+
   const rowsNotDeleted =
     softDeleteEnabled && !showDeleted && deletedIndexField
       ? await filterByNotDeleted(query, deletedIndexField).collect()
@@ -126,7 +134,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const idsNotDeleted = rowsNotDeleted.map((row) => row._id);
 
-  const allIds = arrayIntersection(
+  let allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
     hasOneToManyFilter ? idsOneToManyFilters : null,
     isIndexSearch ? idsIndexField : null,
@@ -134,6 +142,13 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     args.query ? idsQuerySearch : null,
     softDeleteEnabled && !showDeleted ? idsNotDeleted : null
   );
+
+  const hasOnlyIdsNotDeleted =
+    idsNotDeleted.length > 0 &&
+    !idsManyToManyFilters.length &&
+    !idsOneToManyFilters.length &&
+    !idsIndexField.length &&
+    !idsSearchField.length;
 
   const idsToRemove = Array.from(
     new Set([
@@ -151,10 +166,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const position = args.paginateOptions?.cursor?.position ?? 0;
   const nextPosition = position + fetchLimit;
 
+  const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
+
   const fetch = async (multiple?: number) => {
     const dbQuery = queryClient(ctx, viewConfigManager.getTableName());
-
-    const idsAfterRemove = allIds?.filter((id) => !idsToRemove.includes(id));
 
     const getAll = () => {
       isGetAll = true;
@@ -166,33 +181,62 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const anyFilter = args.query || filtersWithoutIndexOrSearchField?.length;
 
+    const countToBig = idsAfterRemove?.length && idsAfterRemove.length > 500;
+
+    if (countToBig) {
+      _log.warn('Querying too many items.');
+    }
+
+    const getRecordsIfNotSortedAndNoDeletedRows = () => {
+      return getRecordsByIds(
+        idsAfterRemove?.slice(position, nextPosition) ?? [],
+        dbQuery
+      );
+    };
+
+    const getRecordsHasIdsAndNotTooBig = () => {
+      return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
+    };
+
+    const getSortedRecords = () => {
+      if (!displayOptionsInfo.displaySortingIndexField) return [];
+
+      return dbQuery
+        .withIndex(displayOptionsInfo.displaySortingIndexField.name?.toString())
+        .order(displayOptionsInfo.sorting?.order ?? 'asc')
+        .paginate({
+          cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+          numItems: fetchLimit + (idsToRemove.length ?? 0),
+        });
+    };
+
+    const getPaginatedRecords = async () => {
+      const x = await dbQuery.paginate({
+        cursor: args?.paginateOptions?.cursor?.cursor ?? null,
+        numItems: fetchLimit + (idsToRemove.length ?? 0),
+      });
+      return x;
+    };
+
     const rowsBeforeFilter =
-      allIds !== null
-        ? await getRecordsByIds(
-            idsAfterRemove?.slice(position, nextPosition) ?? [],
-            dbQuery
-          )
+      hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
+        ? await getRecordsIfNotSortedAndNoDeletedRows()
+        : !!allIds && !countToBig
+        ? await getRecordsHasIdsAndNotTooBig()
+        : displayOptionsInfo.displaySortingIndexField
+        ? await getSortedRecords()
         : anyFilter ||
           (displayOptionsInfo.hasSortingField &&
             !displayOptionsInfo.displaySortingIndexField)
         ? await getAll()
-        : displayOptionsInfo.displaySortingIndexField
-        ? await dbQuery
-            .withIndex(
-              displayOptionsInfo.displaySortingIndexField.name?.toString()
-            )
-            .order(displayOptionsInfo.sorting?.order ?? 'asc')
-            .paginate({
-              cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-              numItems: fetchLimit + (idsToRemove.length ?? 0),
-            })
-        : await dbQuery.paginate({
-            cursor: args?.paginateOptions?.cursor?.cursor ?? null,
-            numItems: fetchLimit + (idsToRemove.length ?? 0),
-          });
+        : await getPaginatedRecords();
 
-    const rows =
+    let rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
+
+    if (softDeleteEnabled && !showDeleted) {
+      rows = rows.filter((row) => idsNotDeleted.includes(row._id));
+    }
 
     if ('continueCursor' in rowsBeforeFilter) {
       continueCursor.cursor = rowsBeforeFilter.continueCursor;
@@ -223,7 +267,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const rawData = await mapWithInclude(rows, ctx, args);
 
-  let sortedRows = convexSortRows(rawData, args, displayOptionsInfo);
+  let sortedRows = convexSortRows(
+    rawData,
+    args,
+    displayOptionsInfo
+  ) as ConvexRecordType[];
 
   sortedRows =
     allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition);
@@ -237,5 +285,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const data = parseConvexData(sortedRows);
 
-  return { data, continueCursor, isDone };
+  if (allIds === null && data.length) {
+    allIds = data.map((r) => r['id']);
+  }
+
+  return { data, continueCursor, isDone, allIds };
 };

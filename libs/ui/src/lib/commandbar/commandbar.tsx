@@ -1,5 +1,6 @@
-import { ComboxboxItem, CommandbarProps } from '@apps-next/core';
+import { CommandbarProps } from '@apps-next/core';
 import { DialogTitle } from '@radix-ui/react-dialog';
+import { useCommandState } from 'cmdk';
 import React from 'react';
 import { Dialog, DialogContent } from '../components';
 import {
@@ -10,7 +11,8 @@ import {
   CommandList,
   CommandSeparator,
 } from '../components/command';
-import { useCommandState } from 'cmdk';
+import { MessageCircleWarning } from 'lucide-react';
+import { CommandRenderErrors } from '../render-errors-command';
 
 export const CommandDialogInput = (props: {
   inputPlaceholder?: CommandbarProps['inputPlaceholder'];
@@ -33,10 +35,10 @@ export const CommandDialogList = (props: {
   renderItem: CommandbarProps['renderItem'];
   onSelect: CommandbarProps['onSelect'];
   onValueChange: CommandbarProps['onValueChange'];
+  row?: CommandbarProps['row'];
 }) => {
   const { groupLabels } = props;
   const value: string | undefined = useCommandState((state) => state.value);
-
   React.useEffect(() => {
     if (!value) return;
 
@@ -68,7 +70,7 @@ export const CommandDialogList = (props: {
                   key={item.id.toString()}
                   onSelect={() => props.onSelect?.(item)}
                 >
-                  {props.renderItem(item, active, index)}
+                  {props.renderItem(item, active, index, props.row)}
                 </CommandItem>
               );
             })}
@@ -113,7 +115,7 @@ const CommandbarContainer = (
     const up = (e: KeyboardEvent) => {
       const key = e.key;
       const isSpace = key === ' ';
-      const isNumber = key.length === 1 && !isNaN(Number(key)) && !isSpace;
+      const isNumber = key?.length === 1 && !isNaN(Number(key)) && !isSpace;
 
       if (isNumber || isSpace) {
         e.preventDefault();
@@ -135,7 +137,10 @@ const CommandbarContainer = (
       open={props.open}
       onOpenChange={(open) => !open && props.onClose?.()}
     >
-      <DialogContent className="overflow-hidden p-0 rounded-md">
+      <DialogContent
+        className="overflow-hidden p-0 rounded-md"
+        data-testid="commandbar"
+      >
         <DialogTitle className="sr-only">Commandbar Dialog</DialogTitle>
         {props.children}
       </DialogContent>
@@ -162,6 +167,13 @@ export function CommandDialogDefault(props: CommandbarProps | undefined) {
           <CommandDialogInput {...props} />
 
           <CommandDialogList {...props} />
+
+          <div className="px-4 pb-2">
+            <CommandRenderErrors
+              errors={[props.error?.message ?? '']}
+              showError={props.error?.showError ?? false}
+            />
+          </div>
         </Command>
       </CommandbarContainer>
     </>

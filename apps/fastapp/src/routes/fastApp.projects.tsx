@@ -223,6 +223,7 @@ export const Route = createFileRoute('/fastApp/projects')({
         views={views}
         uiViewConfig={uiViewConfig}
         queryKey={getQueryKey(projectsConfig)}
+        commands={[]}
       >
         <Project />
       </ClientViewProviderConvex>

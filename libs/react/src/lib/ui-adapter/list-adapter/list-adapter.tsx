@@ -7,12 +7,14 @@ import {
   Row,
   makeRowFromValue,
   FieldConfig,
+  _log,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from '../../legend-store/legend.store.js';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
 import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
+import { copyRow, hasOpenDialog$ } from '../../legend-store/legend.utils.js';
 
 export const listItems$ = observable<ListProps['items']>([]);
 
@@ -26,6 +28,20 @@ const timeout$ = observable<number | null>(null);
 
 focusedRow$.onChange((state) => {
   const timeout = timeout$.get();
+  const commandbarIsOpen = store$.commandbar.open.get();
+  const commandformIsOpen = store$.commandform.open.get();
+  const contextmenuIsOpen = store$.contextMenuState.rect.get() !== null;
+  const filterIsOpen = store$.filter.open.get();
+  const displayOptionsIsOpen = store$.displayOptions.isOpen.get();
+  if (
+    commandbarIsOpen ||
+    commandformIsOpen ||
+    contextmenuIsOpen ||
+    filterIsOpen ||
+    displayOptionsIsOpen
+  ) {
+    return;
+  }
 
   if (state.value.row && !store$.list.rowInFocus.hover.get()) {
     store$.list.rowInFocus.set({
@@ -49,7 +65,7 @@ focusedRow$.onChange((state) => {
         hover: true,
         focus: false,
       });
-    }, 300);
+    }, 200);
 
     timeout$.set(timeout);
   }
@@ -64,6 +80,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
   const { list } = viewConfigManager?.viewConfig?.ui || {};
   const fieldsLeft = options?.fieldsLeft ?? list?.fieldsLeft ?? [];
   const fieldsRight = options?.fieldsRight ?? list?.fieldsRight ?? [];
+
   const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
   const dataModel = store$.dataModel.get() as DataModelNew<T>;
 
@@ -164,8 +181,15 @@ export const makeListProps = <T extends RecordType = RecordType>(
             field = item.field;
             field = item.field;
           } catch (error) {
+            _log.error(
+              `Error getting field ${fieldName.toString()} from row ${
+                row.id
+              }: ${error}`
+            );
+            _log.error(row);
+
             throw new Error(
-              `Field ${field?.name} not found in row ${
+              `Field ${fieldName.toString()} not found in row ${
                 row.id
               } of view ${viewConfigManager.getViewName()}`
             );
@@ -226,8 +250,11 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
         focusType,
         onHover: () => {
-          // store$.list.rowInFocus.set({ row: item, hover: true, focus: false });
-          focusedRow$.set({ row: item, hover: true, focus: false });
+          if (hasOpenDialog$.get()) {
+            return;
+          }
+
+          focusedRow$.set({ row: copyRow(item), hover: true, focus: false });
         },
       } satisfies ListItem;
     }) ?? [];
@@ -236,7 +263,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
   if (!store$.list.rowInFocus.get()) {
     store$.list.rowInFocus.set({
-      row: dataModel.rows?.[0] ?? null,
+      row: dataModel.rows?.[0] ? copyRow(dataModel.rows?.[0] as Row) : null,
       hover: false,
       focus: false,
     });
@@ -250,8 +277,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
     grouping: listGrouping,
     onContextMenu: store$.onContextMenuListItem,
     onKeyPress: (type) => {
-      const commandbarIsOpen = store$.commandbar.open.get();
-      if (commandbarIsOpen) return;
+      if (hasOpenDialog$.get()) return;
 
       const indexOfRowInFocus = dataModel.rows?.findIndex(
         (row) => row.id === store$.list.rowInFocus.get()?.row?.id
@@ -266,7 +292,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
       newRow &&
         store$.list.rowInFocus.set({
-          row: newRow,
+          row: copyRow(newRow),
           hover: false,
           focus: true,
         });

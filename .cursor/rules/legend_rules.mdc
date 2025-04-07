@@ -1,0 +1,90 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+```mdc
+# Cursor Rules: Legend Store State Management
+
+## State Management with Legend Store
+
+Your project uses **Legend Store** for state management. Here are the fundamental rules and best practices for implementation:
+
+### 1. Installing Legend Store
+Ensure that Legend Store is installed in your project:
+```sh
+npm install @legendapp/state
+```
+
+### 2. Creating a Store
+Define a store in a separate file, e.g., `store.ts`:
+```ts
+import { observable } from '@legendapp/state';
+
+export const appState = observable({
+  user: null,
+  theme: 'light',
+  notifications: []
+});
+```
+
+### 3. Accessing the Store
+Use `useObservable` in components to access the store:
+```tsx
+import { useObservable } from '@legendapp/state/react';
+import { appState } from './store';
+
+export function UserProfile() {
+  const user = useObservable(appState.user);
+
+  return <div>Welcome, {user.get()?.name || 'Guest'}!</div>;
+}
+```
+
+### 4. Updating State
+Set new values using `.set()` or `.update()`, e.g.,
+```ts
+appState.user.set({ name: 'Max', loggedIn: true });
+appState.theme.set('dark');
+```
+
+### 5. Reactivity
+If needed, respond to changes with `.onChange()`:
+```ts
+appState.theme.onChange(newTheme => {
+  // console.log('Theme changed to:', newTheme);
+});
+```
+
+### 6. Persisting State
+If you want to persist state across sessions:
+```ts
+import { persistObservable } from '@legendapp/state/persist';
+import { observable } from '@legendapp/state';
+
+const settings = observable({ darkMode: false });
+persistObservable(settings, { local: 'settings' });
+```
+
+### 7. Using Observer to Wrap a Component
+You can use the `observer` function to wrap a component, which will make it react to state changes automatically. Here's an example:
+
+```tsx
+import { observer } from '@legendapp/state/react';
+import { appState } from './store';
+
+const TaskComponent = observer(() => {
+  const theme = useObservable(appState.theme);
+  return <div>Current theme: {theme.get()}</div>;
+});
+
+### 8. Best Practices
+- Keep stores modular (e.g., `authStore.ts`, `uiStore.ts`).
+- Use `computed()` for derived values.
+- Utilize `batch()` for multiple updates at once.
+- Implement `undo()` or `redo()` for state changes if necessary.
+
+---
+
+Following these rules ensures that your project remains well-structured and efficiently leverages **Legend Store**.
+```

@@ -10,7 +10,8 @@
     "declarationMap": true,
     "noPropertyAccessFromIndexSignature": false,
     "module": "esnext",
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "noUncheckedIndexedAccess": false
   },
   "files": [],
   "include": [],

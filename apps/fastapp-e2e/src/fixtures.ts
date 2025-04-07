@@ -1,6 +1,7 @@
 import { test as base } from '@playwright/test';
 import { seedDatabase } from './helpers/db-seed';
 import { TaskPage } from './task-page';
+import { _log } from '@apps-next/core';
 
 type Fixtures = {
   seedDatabase: () => Promise<void>;
@@ -17,12 +18,11 @@ export const test = base.extend<Fixtures>({
       use
     ) => {
       // This will run before each test that uses this fixture
-      console.log('Run: Seeding the database...');
       try {
         // await main();
         // hier
         await seedDatabase();
-        console.log('Database seeded successfully');
+        _log.info('Database seeded successfully');
       } catch (error) {
         console.error('Error seeding database:', error);
         throw error;

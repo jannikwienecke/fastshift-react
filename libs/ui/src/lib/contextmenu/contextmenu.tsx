@@ -1,6 +1,10 @@
 import {
+  ADD_NEW_OPTION,
   ContextMenuFieldItem,
   ContextMenuUiOptions,
+  getFieldLabel,
+  getTableLabel,
+  makeRowFromValue,
   renderModelName,
   Row,
   useTranslation,
@@ -38,16 +42,22 @@ const MenuItemContent: React.FC<{
   field: ContextMenuFieldItem;
   renderField: (field: ContextMenuFieldItem) => React.ReactNode;
 }> = ({ field, renderField }) => (
-  <div className="w-full flex flex-row items-center">
+  <button
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      field.onClickOption();
+    }}
+    className="w-full flex flex-row items-center"
+  >
     <div className="pr-2">
       <FieldIcon field={field} />
     </div>
-
     {renderField(field)}
     <ContextMenuShortcut>
       ⌘{field.name.slice(0, 1).toUpperCase()}
     </ContextMenuShortcut>
-  </div>
+  </button>
 );
 
 const SubMenuContent: React.FC<{
@@ -63,8 +73,11 @@ const SubMenuContent: React.FC<{
         <>
           <input
             type="text"
-            placeholder="Filter..."
-            onClick={(e) => e.stopPropagation()}
+            placeholder={t('filter.button.placeholder')}
+            onClick={(e) => {
+              e.stopPropagation();
+              field.onClickOption();
+            }}
             className="text-sm px-2 outline-none border-none w-full py-1"
           />
           <ContextMenuSeparator />
@@ -90,27 +103,6 @@ const SubMenuContent: React.FC<{
         </ContextMenuItem>
       ) : null}
 
-      {field.selected?.map((row) => (
-        <ContextMenuItem
-          key={`selected-${row.id}`}
-          className="group items-center flex flex-row"
-        >
-          {isManyToMany ? (
-            <div className="pr-2 grid place-items-center">
-              <Checkbox
-                onClick={(e) => e.stopPropagation()}
-                onCheckedChange={() => field.onCheckOption?.(row)}
-                checked
-                className="h-4 w-4"
-              />
-            </div>
-          ) : (
-            <CheckIcon className="w-4 h-4 mr-1" />
-          )}
-          <div>{renderOption(row, field)}</div>
-        </ContextMenuItem>
-      ))}
-
       {field.options?.map((row) => (
         <ContextMenuItem
           key={`option-${row.id}`}
@@ -124,8 +116,9 @@ const SubMenuContent: React.FC<{
           }}
         >
           {isManyToMany ? (
-            <div className="invisible group-hover:visible pr-2">
+            <div className=" group-hover:visible pr-2">
               <Checkbox
+                checked={field.selected?.some((r) => r.id === row.id)}
                 onClick={(e) => e.stopPropagation()}
                 onCheckedChange={() => field.onCheckOption?.(row)}
                 className="h-4 w-4"
@@ -142,7 +135,12 @@ const SubMenuContent: React.FC<{
         <>
           <ContextMenuSeparator />
 
-          <ContextMenuItem className="">
+          <ContextMenuItem
+            className=""
+            onClick={() => {
+              field.onSelectOption?.(makeRowFromValue(ADD_NEW_OPTION, field));
+            }}
+          >
             <div className="h-4 w-4 mr-1" />
             <div className="flex flex-row items-center gap-2">
               <PlusIcon
@@ -211,11 +209,12 @@ export const ContextMenuDefault = ({
     >
       <ContextMenuTrigger ref={ref} className="w-0 h-0 invisible sr-only" />
 
-      <ContextMenuContent data-testid="contextmenu" className="w-56">
+      <ContextMenuContent data-testid="contextmenu" className="w-64">
         {fields?.map((field) => {
-          const isEnumOrRelationalField = field.enum || field.relation;
+          const isEnumDateOrRelationalField =
+            field.enum || field.relation || field.isDateField;
 
-          if (!isEnumOrRelationalField) {
+          if (!isEnumDateOrRelationalField) {
             return (
               <ContextMenuItem key={field.name}>
                 <MenuItemContent field={field} renderField={renderField} />
@@ -224,9 +223,16 @@ export const ContextMenuDefault = ({
           }
 
           return (
-            <ContextMenuSub key={field.name}>
+            <ContextMenuSub
+              key={field.name}
+              onOpenChange={() => {
+                field.onHover?.();
+              }}
+            >
               <ContextMenuSubTrigger className="w-full">
-                <MenuItemContent field={field} renderField={renderField} />
+                <div className="w-full">
+                  <MenuItemContent field={field} renderField={renderField} />
+                </div>
               </ContextMenuSubTrigger>
 
               <SubMenuContent field={field} renderOption={renderOption} />
@@ -242,16 +248,35 @@ export const ContextMenuDefault = ({
               <div className="pr-2">
                 <CopyIcon className="w-3 h-3" />
               </div>
-              <div>{t('common.copy', { name: '' })}</div>
+              <div>{t('common.copy', { name: getTableLabel(modelName) })}</div>
             </div>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
-            <ContextMenuItem>
-              Copy ID
+            <ContextMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onCopy('id');
+              }}
+            >
+              {t('copy.id')}
               <ContextMenuShortcut>⌘.</ContextMenuShortcut>
             </ContextMenuItem>
-            <ContextMenuItem>Copy URL</ContextMenuItem>
-            <ContextMenuItem>Copy as JSON</ContextMenuItem>
+            <ContextMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onCopy('url');
+              }}
+            >
+              {t('copy.url')}
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onCopy('json');
+              }}
+            >
+              {t('copy.json')}
+            </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
 
@@ -264,6 +289,7 @@ export const ContextMenuDefault = ({
               props.onDelete();
             }}
           >
+            {/* REFACTOR Important -> have kind of class that manages commands outside of the UI module. */}
             <div className="flex flex-row items-center">
               <div className="pr-2">
                 <TrashIcon className="w-3 h-3" />
@@ -275,6 +301,25 @@ export const ContextMenuDefault = ({
             <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
           </ContextMenuItem>
         ) : null}
+
+        <ContextMenuItem
+          className="cursor-pointer"
+          role="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            props.onEdit();
+          }}
+        >
+          <div className="flex flex-row items-center">
+            <div className="pr-2">
+              <PencilIcon className="w-3 h-3" />
+            </div>
+            <div>
+              {t('common.editName', { name: renderModelName(modelName, t) })}
+            </div>
+          </div>
+          <ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );

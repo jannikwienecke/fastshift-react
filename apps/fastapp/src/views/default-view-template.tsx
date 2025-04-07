@@ -5,24 +5,14 @@ import {
   MakeListPropsOptions,
   RecordType,
 } from '@apps-next/core';
-import { MakeComboboxPropsOptions, store$ } from '@apps-next/react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  datePickerModal,
-} from '@apps-next/ui';
+import { MakeComboboxPropsOptions } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { Outlet } from '@tanstack/react-router';
 import React from 'react';
 import {
   RenderComboboxPopover,
   RenderCommandbar,
+  RenderCommandform,
   RenderConfirmationAlert,
   RenderContextmenu,
   RenderDatePickerDialog,
@@ -48,8 +38,6 @@ export const DefaultViewTemplate = observer(
             <RenderFilter options={props.filterOptions} />
           </div>
 
-          <RenderComboboxPopover options={props.comboboOptions} />
-
           {props.RenderInputDialog ? (
             <props.RenderInputDialog />
           ) : (
@@ -74,7 +62,11 @@ export const DefaultViewTemplate = observer(
 
         <RenderCommandbar />
 
+        <RenderCommandform />
+
         <RenderDatePickerDialog />
+
+        <RenderComboboxPopover options={props.comboboOptions} />
         {/* <AlertDialogDemo /> */}
       </>
     );

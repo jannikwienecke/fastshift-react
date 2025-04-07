@@ -1,5 +1,2 @@
 
 .env.local
-
-convex_local_storage
-convex_local_backend.sqlite3

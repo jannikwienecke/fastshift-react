@@ -1,11 +1,14 @@
 import { api } from '@apps-next/convex';
 import { getQueryKeyFn } from '@apps-next/convex-adapter-app';
+import { _log } from '@apps-next/core';
 
 import { ConvexQueryClient } from '@convex-dev/react-query';
 import { QueryClient } from '@tanstack/react-query';
 import { ConvexReactClient } from 'convex/react';
 
 const VITE_CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
+
+_log.warn('Convex URL:', VITE_CONVEX_URL);
 
 export const convex = new ConvexReactClient(VITE_CONVEX_URL);
 

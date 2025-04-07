@@ -11,7 +11,7 @@ export const derviedDatePickerDialogState$ = observable(() => {
   const field = store$.commandbar.selectedViewField.get();
 
   const title = field
-    ? t('common.editField' satisfies TranslationKeys, {
+    ? t('common.editName' satisfies TranslationKeys, {
         name: getFieldLabel(field, true),
       })
     : '';

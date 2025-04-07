@@ -68,7 +68,9 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'contextMenuState'
   | 'errorDialog'
   | 'commandbar'
+  | 'commandform'
   | 'datePickerDialogState'
+  | 'commands'
 > = {
   dataModel: {} as DataModelNew,
   views: {} as RegisteredViews,
@@ -91,8 +93,8 @@ export const DEFAULT_LEGEND_STORE: Pick<
       position: null,
       cursor: null,
     },
-    isFetching: true,
-    isFetched: false,
+    // isFetching: true,
+    // isFetched: false,
     isDone: false,
   },
   globalQuery: '',
@@ -112,6 +114,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   inputDialog: {
     valueDict: {},
   },
+  commands: [],
   displayOptions: {
     showEmptyGroups: true,
     softDeleteEnabled: false,
@@ -139,6 +142,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
 
   commandbar: undefined,
+  commandform: undefined,
 
   datePickerDialogState: {
     open: false,

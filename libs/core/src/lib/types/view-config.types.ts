@@ -1,12 +1,13 @@
 import {
   FieldConfig,
+  FieldConfigOptions,
   GetTableDataType,
   GetTableName,
+  ID,
   IndexField,
   SearchableField,
 } from './base.types';
 import { IncludeConfig } from './config.types';
-
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
 export type ViewConfigBaseInfo<T extends GetTableName> = {
@@ -31,10 +32,7 @@ export type ViewConfigType<T extends GetTableName = any> =
       field: keyof GetTableDataType<T>;
     };
     fields?: {
-      [field in keyof GetTableDataType<T>]?: {
-        isDateField?: boolean;
-        showCheckboxInList?: boolean;
-      };
+      [field in keyof GetTableDataType<T>]?: FieldConfigOptions<T, field>;
     };
     query?: {
       showDeleted?: boolean;
@@ -42,7 +40,7 @@ export type ViewConfigType<T extends GetTableName = any> =
       indexFields?: IndexField[];
       primarySearchField?: keyof GetTableDataType<T>;
       sorting?: {
-        field: keyof GetTableDataType<T>;
+        field: keyof GetTableDataType<T> | '_creationTime';
         direction: 'asc' | 'desc';
       };
       grouping?: {
@@ -52,9 +50,27 @@ export type ViewConfigType<T extends GetTableName = any> =
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;
     };
+
     mutation?: {
       softDelete?: boolean;
       softDeleteField?: keyof GetTableDataType<T>;
+      beforeInsert?: (data: GetTableDataType<T>) => GetTableDataType<T>;
+      beforeSelect?: (
+        data: GetTableDataType<T>,
+        options: {
+          newIds: ID[];
+          deleteIds: ID[];
+          recordWithInclude: unknown;
+          field: string;
+        }
+      ) =>
+        | {
+            newIds: ID[];
+            deleteIds: ID[];
+          }
+        | {
+            error: string;
+          };
     };
     ui?: {
       list?: {

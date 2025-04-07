@@ -4,6 +4,8 @@ import {
   getViewByName,
   MutationDto,
   MutationPropsServer,
+  patchAllViews,
+  patchViewConfig,
   QueryDto,
   RegisteredViews,
 } from '@apps-next/core';
@@ -13,24 +15,40 @@ import { viewMutationHandler } from './view-mutation';
 
 export const makeViewLoaderHandler =
   (views: RegisteredViews) => (ctx: GenericQueryCtx, args: any) => {
-    const viewConfig = views[args['viewName'] as any as keyof typeof views];
+    const viewConfig = getViewByName(views, args.viewName);
+
+    if (!viewConfig) throw new Error('viewConfig is not defined');
+
+    const viewConfigManager = new BaseViewConfigManager(
+      patchViewConfig(viewConfig)
+    );
+
+    const registeredViews = patchAllViews(views, viewConfig);
 
     return viewLoaderHandler(ctx, {
       ...(args as QueryDto),
       viewConfig,
-      registeredViews: views,
+      viewConfigManager,
+      registeredViews,
     } satisfies QueryDto);
   };
 
 export const makeViewMutationHandler =
   (views: RegisteredViews) => (ctx: any, args: MutationDto) => {
     const viewConfig = getViewByName(views, args.viewName);
-    const viewConfigManager = new BaseViewConfigManager(viewConfig);
+
+    if (!viewConfig) throw new Error('viewConfig is not defined');
+
+    const viewConfigManager = new BaseViewConfigManager(
+      patchViewConfig(viewConfig)
+    );
+
+    const registeredViews = patchAllViews(views, viewConfig);
 
     return viewMutationHandler(ctx, {
       ...args,
       mutation: args.mutation,
       viewConfigManager,
-      registeredViews: views,
+      registeredViews,
     } satisfies MutationPropsServer);
   };

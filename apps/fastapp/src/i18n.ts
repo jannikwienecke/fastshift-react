@@ -28,7 +28,7 @@ i18n
     fallbackLng: 'en',
     resources: makeResources(resources, {
       'filter.button.label': {
-        en: 'Filter0',
+        en: 'Filter',
         de: 'Filter.',
       },
     }),

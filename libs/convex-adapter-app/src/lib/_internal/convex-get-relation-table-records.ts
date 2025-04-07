@@ -31,7 +31,10 @@ export const getRelationTableRecords = async ({
 }) => {
   const relationTableClient = queryClient(ctx, relation);
   const viewOfField = getViewByName(registeredViews, relation);
-  const indexFields = new BaseViewConfigManager(viewOfField).getIndexFields();
+  const indexFields = new BaseViewConfigManager(
+    viewOfField,
+    {}
+  ).getIndexFields();
   const indexField = indexFields.find((f) => f.fields?.[0] === fieldName);
 
   let records: ConvexRecord[] = [];

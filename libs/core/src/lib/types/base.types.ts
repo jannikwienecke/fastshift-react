@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { z } from 'zod';
+import React from 'react';
+import { object, z } from 'zod';
 import { BaseConfigInterface } from './config.types';
 
-const documentBaseSchema = z.object({
+const documentBaseSchema = object({
   id: z.string(),
 });
 
@@ -42,6 +43,21 @@ export type FieldRelationType = {
   manyToManyModelFields?: FieldConfig[];
 };
 
+export type FieldConfigOptions<
+  T extends GetTableName = any,
+  F extends keyof GetTableDataType<T> = any
+> = {
+  // defaultValue?: unknown;
+  defaultValue?: GetTableDataType<T>[F] | (() => GetTableDataType<T>[F]);
+  hideFromForm?: boolean;
+  isDisplayField?: true;
+  richEditor?: boolean;
+  isDateField?: boolean;
+  showCheckboxInList?: boolean;
+  validator?: () => any;
+  validationErrorMessage?: (t: any) => string;
+};
+
 export type FieldConfig<TName = string> = {
   isId?: boolean;
   isRelationalIdField?: boolean;
@@ -56,11 +72,12 @@ export type FieldConfig<TName = string> = {
   relation?: FieldRelationType;
   isSystemField?: boolean;
   isRecursive?: boolean;
+  //
   enum?: {
     name: string;
     values: Enum[];
   };
-};
+} & FieldConfigOptions;
 
 export type GetTableName = keyof RegisteredRouter['config']['_datamodel'];
 
@@ -102,3 +119,13 @@ export type DataModel<TableNames extends string = any> = {
 export type DataProvider = 'convex' | 'default';
 
 export type ID = string | number;
+
+export type Command = {
+  id: string;
+  label: string;
+  icon: React.FC<any>;
+  options?: {
+    keepCommandbarOpen?: boolean;
+  };
+  handler: (props: { row?: RecordType }) => Promise<void>;
+};

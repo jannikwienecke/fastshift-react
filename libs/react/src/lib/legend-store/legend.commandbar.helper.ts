@@ -5,12 +5,14 @@ import {
   DELETE_OPTION,
   getEditLabel,
   getFieldLabel,
+  getViewLabel,
   NONE_OPTION,
   Row,
   t,
   TranslationKeys,
 } from '@apps-next/core';
 import Fuse from 'fuse.js';
+import { makeAddNewCommand } from '../commands/commands';
 import { getViewFieldsOptions } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { comboboxStore$ } from './legend.store.derived.combobox';
@@ -18,20 +20,21 @@ import { comboboxStore$ } from './legend.store.derived.combobox';
 export const getCommandbarDefaultListProps = () => {
   const viewConfigManager = store$.viewConfigManager.get();
   const viewName = viewConfigManager.getViewName();
-  const rowInFocus = store$.list.rowInFocus.row.get() as Row | null;
+
+  const row = store$.commandbar.activeRow.get() as Row | undefined;
 
   const viewgetViewFieldsOptions = getViewFieldsOptions({
     useEditLabel: true,
-    row: rowInFocus,
+    row: row,
   });
 
   const items: ComboxboxItem[] =
     viewgetViewFieldsOptions?.values?.map((item) => item) ?? [];
 
   return {
-    headerLabel: `${viewName} - ${rowInFocus?.label ?? ''}`,
+    headerLabel: `${viewName} - ${row?.label ?? ''}`,
     inputPlaceholder: 'Type a command or search....',
-    itemGroups: [items].map((group) => group),
+    itemGroups: [[...items, makeAddNewCommand(viewConfigManager.viewConfig)]],
   };
 };
 
@@ -41,8 +44,17 @@ export const getCommandbarSelectedViewField = () => {
 
   if (!viewField) return {};
 
+  const query = store$.commandbar.query.get();
   if (viewField.type === 'String') {
+    const error = store$.viewConfigManager.validateField(viewField, query);
+
+    const showError = store$.commandbar.error.showError.get();
     return {
+      inputPlaceholder: '',
+      error: {
+        showError: showError && error ? true : false,
+        message: error ? `Error: ${error}` : '',
+      },
       itemGroups: [
         [
           {
@@ -74,7 +86,9 @@ export const getCommandbarSelectedViewField = () => {
     } satisfies PropsType;
   } else if (viewField.type === 'Enum') {
     return {
-      inputPlaceholder: getEditLabel(viewField),
+      inputPlaceholder: t('common.changeFieldTo', {
+        field: getFieldLabel(viewField),
+      }),
       itemGroups: [
         viewField.enum?.values.map((value) => ({
           id: value.name,
@@ -99,9 +113,10 @@ export const getCommandbarSelectedViewField = () => {
       (v) => v.id === relationalRow?.id
     );
 
-    const all = hasRelationalRowInValues
-      ? [...(combobox.values ?? [])]
-      : [relationalRow as Row, ...(combobox.values ?? [])];
+    const all =
+      relationalRow && !hasRelationalRowInValues
+        ? [relationalRow, ...(combobox.values ?? [])]
+        : [...(combobox.values ?? [])];
 
     all
       .sort((a, b) => {
@@ -111,9 +126,13 @@ export const getCommandbarSelectedViewField = () => {
         if (b.id === relationalRow?.id) return 1;
         return 0;
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter((f) => f.id);
 
     return {
+      inputPlaceholder: t('common.changeFieldTo', {
+        field: getFieldLabel(viewField),
+      }),
       itemGroups: [
         [
           {
@@ -125,31 +144,31 @@ export const getCommandbarSelectedViewField = () => {
         ],
         all.slice(0, 10),
       ],
-      groupLabels: ['New Project', 'Projects'],
+      groupLabels: [
+        t('commandbar.newLabel' satisfies TranslationKeys, {
+          name: getFieldLabel(viewField, true),
+        }),
+        getFieldLabel(viewField, undefined, true),
+      ],
     } satisfies PropsType;
   } else if (viewField.relation?.manyToManyRelation) {
-    const selectedOption = store$.list.rowInFocus.row.get();
+    const { values, field, row, defaultSelected } = comboboxStore$.get() ?? {};
 
-    const existingRows: Row[] | undefined = selectedOption?.getValue?.(
-      viewField.name
-    );
+    const filteredExistingRows =
+      defaultSelected?.map((row) => ({
+        id: row.id,
+        label: row.label,
+      })) ?? [];
 
-    const options = comboboxStore$.values.get();
     const optionsWithoutExistingRows =
-      options?.filter(
-        (option) => !existingRows?.some((row) => row.id === option.id)
-      ) ?? [];
-
-    // const existingRowsFiltered =
-    const fuse = new Fuse(existingRows ?? [], {
-      keys: ['label'],
-      threshold: 0.3,
-    });
-
-    const query = store$.commandbar.query.get();
-    const filteredExistingRows = query
-      ? fuse.search(query).map((result) => result.item)
-      : existingRows ?? [];
+      values
+        ?.filter((row) => {
+          return !defaultSelected?.some((r) => r.id === row.id);
+        })
+        .map((row) => ({
+          id: row.id,
+          label: row.label,
+        })) ?? [];
 
     const commands = [
       {
@@ -169,19 +188,87 @@ export const getCommandbarSelectedViewField = () => {
       ? fuseCommands.search(query).map((result) => result.item)
       : commands;
 
+    const groupLabels = [
+      filteredCommands.length
+        ? t('commandbar.newLabel' satisfies TranslationKeys, {
+            name: getFieldLabel(viewField, true),
+          })
+        : null,
+      defaultSelected?.length
+        ? t('commandbar.existingLabel' satisfies TranslationKeys, {
+            name: getFieldLabel(viewField, true),
+          })
+        : null,
+      values?.length ? getFieldLabel(viewField, undefined, true) : null,
+    ].filter((l) => l !== null);
+
     return {
+      inputPlaceholder: t('common.changeOrAdd', {
+        field: getFieldLabel(viewField),
+      }),
       itemGroups: [
         filteredCommands,
         filteredExistingRows,
         optionsWithoutExistingRows,
-      ],
-      groupLabels: [
-        filteredCommands.length ? 'New Tag' : '',
-        filteredExistingRows.length ? 'Existing Tags' : '',
-        optionsWithoutExistingRows.length ? 'Tags' : '',
-      ].filter(Boolean),
+      ]
+        .filter(Boolean)
+        .filter((g) => g.length),
+      groupLabels,
     } satisfies PropsType;
   }
 
   throw new Error('Field type not supported');
+};
+
+export const getCommandbarCommandGroups = () => {
+  if (store$.commandbar.selectedViewField.get()) return {} satisfies PropsType;
+
+  const currentView = store$.viewConfigManager.getViewName();
+  const views = store$.views.get();
+  const query = store$.commandbar.query.get();
+
+  const viewsToUse = Object.values(views).filter((view) => {
+    if (view?.viewName === currentView) return false;
+
+    const numViewFields = Object.values(view?.viewFields ?? {}).length;
+    const numRelationalIdFields = Object.values(view?.viewFields ?? {}).reduce(
+      (prev, current) => {
+        return current.type === 'OneToOneReference' ? prev + 1 : prev;
+      },
+      0
+    );
+
+    // we dont want to have manyToMany relations in the command bar
+    if (numViewFields < 4 && numRelationalIdFields > 1) return false;
+
+    return true;
+  });
+
+  const groups = viewsToUse
+    .map((view) => {
+      if (!view) return [];
+
+      const commands: ComboxboxItem[] = [makeAddNewCommand(view)];
+
+      const fuseCommands = new Fuse(commands, {
+        keys: ['label'] satisfies Array<keyof ComboxboxItem>,
+        threshold: 0.1,
+      });
+
+      const filteredCommands = query
+        ? fuseCommands.search(query).map((result) => result.item)
+        : commands;
+
+      return filteredCommands;
+    }, [] satisfies PropsType['itemGroups'])
+    .filter(Boolean)
+    .filter((g) => g.length);
+
+  return {
+    // groups satisfies PropsType['itemGroups'];
+    itemGroups: groups,
+    groupLabels: viewsToUse
+      .map((v) => (v ? getViewLabel(v, true) : ''))
+      .filter(Boolean),
+  } satisfies PropsType;
 };

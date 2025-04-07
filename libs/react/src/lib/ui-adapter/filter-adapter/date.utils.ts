@@ -11,6 +11,7 @@ import {
 } from './filter.constants';
 import { filterHelper, stringsToComboxboxItems } from './filter.utils';
 import Fuse from 'fuse.js';
+import operatorMap from './filter.operator.define';
 
 export const SELECT_FILTER_DATE = 'Select specific date';
 
@@ -657,4 +658,21 @@ export const dateUtils = {
   getStartAndEndDate: (dateFilter: FilterDateType | null | undefined) => {
     return DateCalculator.getStartAndEndDate(dateFilter);
   },
+};
+
+export const getTimeValueFromDateString = <T extends boolean = true>(
+  value: string,
+  raiseException: T
+): T extends true ? number : number | undefined => {
+  const parsed = dateUtils.parseOption(value, operatorMap.is);
+  const { start } = dateUtils.getStartAndEndDate(parsed);
+  start?.setHours(2, 0, 0, 0);
+
+  if (!start && raiseException) throw new Error(`Invalid Date String`);
+
+  if (start && raiseException) return start?.getTime();
+
+  if (start && !raiseException) return start.getTime();
+
+  return 0;
 };

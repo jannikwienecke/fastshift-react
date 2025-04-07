@@ -266,7 +266,10 @@ export const getIdsFromIndexFilters = async (
         } else {
           rows = await dbQuery
             .withIndex(indexField.name, (q) =>
-              q.eq(indexField.field.toString(), value)
+              q.eq(
+                indexField.field.toString(),
+                value === 'true' ? true : value === 'false' ? false : value
+              )
             )
             .collect();
         }

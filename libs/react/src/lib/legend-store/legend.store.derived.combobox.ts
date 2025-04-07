@@ -18,14 +18,21 @@ import {
   getSharedStateGrouping,
   makeComboboxStateFilterValuesNumber,
   getSharedStateCommandbar,
+  getSharedStateCommandForm,
+  getSharedStateSelectState,
 } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
 import { ComboboxState, MakeComboboxStateProps } from './legend.store.types';
+import { selectState$ } from './legend.select-state';
 
 export const comboboxStore$ = observable<ComboboxState>(() => {
   const filterIsOpen = store$.filter.open.get();
   const commandbarIsOpen = store$.commandbar.open.get();
+  const commandformIsOpen = store$.commandform.open.get();
+
+  const selectState = selectState$.get();
+  const isSelectState = !!selectState.field.name;
 
   const displayOptions = store$.displayOptions.get();
   const displayOptionsSortingIsOpen = displayOptions.sorting.isOpen;
@@ -39,32 +46,45 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     ? store$.commandbar.selectedViewField.get()
     : null;
 
+  const selectedCommandformField = commandformIsOpen
+    ? store$.commandform.field.get()
+    : null;
+
   const selectedListField = store$.list.selectedRelationField.get()?.field;
 
   const isList = !!store$.list.selectedRelationField.get();
   const isFilter = filterIsOpen;
   const isCommandbar = !!commandbarIsOpen;
+  const isCommandform = commandformIsOpen;
 
   if (
     !isList &&
     !isFilter &&
     !displayOptionsSortingIsOpen &&
     !displayOptionsGroupingIsOpen &&
-    !isCommandbar
+    !isCommandbar &&
+    !isCommandform &&
+    !isSelectState
   )
     return DEFAULT_COMBOBOX_STATE;
 
-  const field = isCommandbar
-    ? selectedCommandbarField
-    : isList
-    ? selectedListField
-    : selectedFilterField ?? null;
+  const field =
+    isSelectState && !isList
+      ? selectState.field
+      : isCommandform
+      ? selectedCommandformField
+      : isCommandbar
+      ? selectedCommandbarField
+      : isList
+      ? selectedListField
+      : selectedFilterField ?? null;
 
   const { showCheckboxInList } =
     store$.viewConfigManager.viewConfig.fields.get()?.[field?.name ?? ''] ?? {};
 
   const stateSharedFilter = getSharedStateFilter();
   const stateSharedList = getSharedStateList();
+  const stateSharedCommandform = getSharedStateCommandForm();
 
   const stateSharedSorting = getSharedStateSorting();
   const stateSharedGrouping = getSharedStateGrouping();
@@ -77,19 +97,32 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   const multipleFilter = null;
   const multipleList = field?.relation?.manyToManyTable ? true : false;
+  const multipleCommanform = selectedCommandformField?.relation?.manyToManyTable
+    ? true
+    : false;
 
-  const stateShared = isCommandbar
-    ? getSharedStateCommandbar()
-    : isList
-    ? stateSharedList
-    : displayOptionsSortingIsOpen
-    ? stateSharedSorting
-    : displayOptionsGroupingIsOpen
-    ? stateSharedGrouping
-    : stateSharedFilter;
+  const stateShared =
+    isSelectState && !isList
+      ? getSharedStateSelectState()
+      : isCommandform
+      ? stateSharedCommandform
+      : isCommandbar
+      ? getSharedStateCommandbar()
+      : isList
+      ? stateSharedList
+      : displayOptionsSortingIsOpen
+      ? stateSharedSorting
+      : displayOptionsGroupingIsOpen
+      ? stateSharedGrouping
+      : stateSharedFilter;
 
   const selected = isList ? selectedOfList : selectedOfFilter;
-  const multiple = isList ? multipleList : multipleFilter;
+
+  const multiple = isCommandform
+    ? multipleCommanform
+    : isList
+    ? multipleList
+    : multipleFilter;
   const getDateOptions = isList ? getDateOptionsList : getDateOptionsFilter;
 
   let options: MakeComboboxStateProps | null = null;
@@ -118,12 +151,14 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   if (!options) return DEFAULT_COMBOBOX_STATE;
 
+  const selected_ = options.selected?.length
+    ? options.selected
+    : stateShared.selected;
+
   return {
     ...stateShared,
     ...options,
-    selected: options.selected?.length
-      ? options.selected
-      : stateShared.selected,
+    selected: selected_,
     multiple: multiple === null ? options.multiple : multiple,
     showCheckboxInList: showCheckboxInList === false ? false : !!multiple,
   } satisfies ComboboxState;

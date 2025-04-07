@@ -4,18 +4,12 @@ import {
   makeDayMonthString,
   makeRow,
   makeRowFromValue,
-  Row,
 } from '@apps-next/core';
 import {
-  dateUtils,
-  operatorMap,
+  getTimeValueFromDateString,
   SELECT_FILTER_DATE,
 } from '../ui-adapter/filter-adapter';
-import {
-  initSelected$,
-  newSelected$,
-  removedSelected$,
-} from './legend.combobox.helper';
+import { xSelect } from './legend.select-state';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { StoreFn } from './legend.store.types';
 
@@ -23,13 +17,14 @@ export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   store$.deselectRelationField();
   store$.filterCloseAll();
 
+  store$.commandform.rect.set(undefined);
+  store$.commandform.field.set(undefined);
+
   // displayOptions
   store$.displayOptionsCloseCombobox();
 
-  newSelected$.set([]);
-  removedSelected$.set([]);
-  initSelected$.set(null);
   store$.combobox.datePicker.set(null);
+  xSelect.close();
 };
 
 export const comboboxSelectDate: StoreFn<'comboboxSelectDate'> =
@@ -46,6 +41,7 @@ export const comboboxSelectDate: StoreFn<'comboboxSelectDate'> =
     store$.comboboxSelectValue(
       makeRow(dateAsNumber, dateString, date.toISOString(), field)
     );
+    store$.combobox.datePicker.set(null);
   };
 
 export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
@@ -70,30 +66,20 @@ export const comboboxSelectValue: StoreFn<'comboboxSelectValue'> =
         store$.combobox.query.set('');
         store$.filterSelectFilterType(value);
       }
+    } else if (store$.commandform.open.get()) {
+      store$.combobox.query.set('');
+
+      if (store$.commandform.field.get()) {
+        store$.commanformSelectRelationalValue(value);
+      }
     } else {
       if (!state.multiple) {
         store$.combobox.selected.set([value]);
 
         store$.comboboxRunSelectMutation(value, null);
       } else {
-        const selected = state.selected.some((s) => s.id === value.id)
-          ? state.selected.filter((s) => s.id !== value.id)
-          : [...state.selected, value];
-
-        store$.combobox.selected.set(selected);
-
-        if (!state.selected.map((s) => s.id).includes(value.id)) {
-          newSelected$.set([...newSelected$.get(), value]);
-
-          removedSelected$.set(
-            removedSelected$.get().filter((s) => s.id !== value.id)
-          );
-        } else {
-          removedSelected$.set([...removedSelected$.get(), value]);
-          newSelected$.set(newSelected$.get().filter((s) => s.id !== value.id));
-        }
-
-        store$.comboboxRunSelectMutation(value, state.selected);
+        xSelect.select(value);
+        return;
       }
     }
   };
@@ -157,22 +143,13 @@ export const comboboxRunSelectMutation: StoreFn<'comboboxRunSelectMutation'> =
 
       let valueToUse = value;
       if (field.type === 'Date' && row) {
-        const parsed = dateUtils.parseOption(value.id, operatorMap.is);
-        const { start } = dateUtils.getStartAndEndDate(parsed);
-        start?.setHours(2, 0, 0, 0);
-        valueToUse = makeRowFromValue(start?.getTime() ?? 0, field);
+        const datetime = getTimeValueFromDateString(value.id, true);
+        valueToUse = makeRowFromValue(datetime, field);
       }
 
       store$.updateRecordMutation({
         field,
         valueRow: valueToUse,
-        row,
-      });
-    } else {
-      store$.selectRowsMutation({
-        field,
-        existingRows: existingRows ?? [],
-        checkedRow: value,
         row,
       });
     }

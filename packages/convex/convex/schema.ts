@@ -12,7 +12,10 @@ const _schema = defineSchema({
     userId: v.id('users'),
     firstname: v.string(),
     lastname: v.string(),
+    name: v.optional(v.string()),
     age: v.number(),
+  }).searchIndex('name', {
+    searchField: 'name',
   }),
 
   tasks: defineTable({
@@ -37,6 +40,7 @@ const _schema = defineSchema({
     .index('projectId', ['projectId'])
     .index('dueDate', ['dueDate'])
     .index('name', ['name'])
+    .index('completed', ['completed'])
     .index('tasks', ['tasks'])
     .index('deleted', ['deleted'])
     .searchIndex('name_search', {

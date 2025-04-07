@@ -13,13 +13,18 @@ import {
   displayOptionsToggleSorting,
 } from './legend-store.fn.displayOptions';
 import {
+  contextmenuClickOnField,
   contextMenuClose,
+  contextmenuCopyRow,
   contextmenuDeleteRow,
+  contextmenuEditRow,
   contextMenuOpen,
 } from './legend.contextmenu.fn';
 import {
+  createRecordMutation,
   deleteRecordMutation,
   selectRowsMutation,
+  updateFullRecordMutation,
   updateRecordMutation,
 } from './legend.mutationts';
 import { DEFAULT_LEGEND_STORE } from './legend.store.constants';
@@ -46,7 +51,10 @@ import {
 import {
   createDataModel,
   createRelationalDataModel,
+  handleIncomingData,
+  handleIncomingRelationalData,
   init,
+  openSpecificModal,
 } from './legend.store.fn.global';
 import {
   globalFetchMore,
@@ -67,6 +75,7 @@ import { LegendStore } from './legend.store.types';
 import {
   commandbarClose,
   commandbarOpen,
+  commandbarOpenWithFieldValue,
   commandbarSelectItem,
   commandbarSetValue,
   commandbarUpdateQuery,
@@ -77,10 +86,21 @@ import {
   datePickerDialogSelectDate,
   datePickerDialogSubmit,
 } from './legend.datepickerdialog.fn';
+import {
+  commandformChangeInput,
+  commandformClose,
+  commandformOpen,
+  commandformSubmit,
+  commanformSelectRelationalValue,
+} from './legend.commandform.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
+  state: 'pending',
 
+  handleIncomingData: (...props) => handleIncomingData(store$)(...props),
+  handleIncomingRelationalData: (...props) =>
+    handleIncomingRelationalData(store$)(...props),
   init: (...props) => init(store$)(...props),
   createDataModel: (...props) => createDataModel(store$)(...props),
   createRelationalDataModel: (...props) =>
@@ -148,15 +168,31 @@ export const store$ = observable<LegendStore>({
   contextMenuOpen: (...props) => contextMenuOpen(store$)(...props),
   contextMenuClose: (...props) => contextMenuClose(store$)(...props),
   contextmenuDeleteRow: (...props) => contextmenuDeleteRow(store$)(...props),
-
+  contextmenuEditRow: (...props) => contextmenuEditRow(store$)(...props),
+  contextmenuClickOnField: (...props) =>
+    contextmenuClickOnField(store$)(...props),
+  contextmenuCopyRow: (...props) => contextmenuCopyRow(store$)(...props),
   selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
   updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
+  updateFullRecordMutation: (...props) =>
+    updateFullRecordMutation(store$)(...props),
   deleteRecordMutation: (...props) => deleteRecordMutation(store$)(...props),
+  createRecordMutation: (...props) => createRecordMutation(store$)(...props),
   commandbarOpen: (...props) => commandbarOpen(store$)(...props),
   commandbarClose: (...props) => commandbarClose(store$)(...props),
   commandbarSelectItem: (...props) => commandbarSelectItem(store$)(...props),
   commandbarUpdateQuery: (...props) => commandbarUpdateQuery(store$)(...props),
   commandbarSetValue: (...props) => commandbarSetValue(store$)(...props),
+  commandbarOpenWithFieldValue: (...props) =>
+    commandbarOpenWithFieldValue(store$)(...props),
+
+  commandformOpen: (...props) => commandformOpen(store$)(...props),
+  commandformClose: (...props) => commandformClose(store$)(...props),
+  commanformSelectRelationalValue: (...props) =>
+    commanformSelectRelationalValue(store$)(...props),
+  commandformChangeInput: (...props) =>
+    commandformChangeInput(store$)(...props),
+  commandformSubmit: (...props) => commandformSubmit(store$)(...props),
 
   // date picker dialog
   datePickerDialogOpen: (...props) => datePickerDialogOpen(store$)(...props),
@@ -165,4 +201,6 @@ export const store$ = observable<LegendStore>({
     datePickerDialogSelectDate(store$)(...props),
   datePickerDialogSubmit: (...props) =>
     datePickerDialogSubmit(store$)(...props),
+
+  openSpecificModal: (...props) => openSpecificModal(store$)(...props),
 });

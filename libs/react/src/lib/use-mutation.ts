@@ -1,17 +1,12 @@
-import { lldebug, MutationDto, MutationReturnDto } from '@apps-next/core';
-import {
-  useMutation as useMutationTanstack,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { _log, lldebug, MutationDto, MutationReturnDto } from '@apps-next/core';
+import { useMutation as useMutationTanstack } from '@tanstack/react-query';
 import React from 'react';
 import { toast } from 'sonner';
 import { store$ } from '..';
 import { useApi } from './use-api';
-import { reset$ } from './use-query-data';
 
 export const useMutation = () => {
   const api = useApi();
-  const queryClient = useQueryClient();
 
   const lastViewName = React.useRef('');
 
@@ -26,26 +21,16 @@ export const useMutation = () => {
       });
     },
     onSuccess: () => {
-      store$.fetchMore.reset.set(true);
-
-      setTimeout(() => {
-        reset$.set({ value: reset$.get().value + 1 });
-      }, 300);
+      _log.debug('Mutation success');
     },
 
-    onError: () => {
-      setTimeout(() => {
-        queryClient.invalidateQueries();
-        reset$.set({ value: reset$.get().value + 1 });
-      }, 300);
+    onError: (error) => {
+      _log.error(`Error in mutation: `, error);
     },
 
     onMutate: async (vars) => {
-      store$.fetchMore.isFetching.set(true);
-      store$.fetchMore.reset.set(true);
-      store$.fetchMore.isDone.set(false);
-
       lastViewName.current = vars.viewName;
+      store$.state.set('mutating');
     },
   });
 
@@ -84,7 +69,7 @@ export const useMutation = () => {
 
   React.useEffect(() => {
     if (error) {
-      console.log('Error in useMutation: ', error);
+      _log.error('Error in useMutation: ', error);
     }
   }, [error]);
 

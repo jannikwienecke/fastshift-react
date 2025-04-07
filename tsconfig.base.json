@@ -12,7 +12,7 @@
     "module": "esnext",
     "lib": ["es2020", "dom"],
     "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": false,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
@@ -21,7 +21,7 @@
       "@apps-next/convex-adapter-app": ["libs/convex-adapter-app/src/index.ts"],
       "@apps-next/core": ["libs/core/src/index.ts"],
       "@apps-next/react": ["libs/react/src/index.ts"],
-      "@apps-next/ui": ["libs/ui/src/index.ts"]
+      "@apps-next/ui": ["libs/ui/src/index.ts"],
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,3 +1,4 @@
+import { Row } from './data-model';
 import { FieldConfig, GetTableName, RecordType } from './types';
 
 export type ComponentType =
@@ -55,6 +56,7 @@ export type UiViewConfig<
 
           commandbarFieldItem: (props: {
             field: FieldConfig;
+            value: Row<U>;
           }) => React.ReactNode;
 
           default: (props: {

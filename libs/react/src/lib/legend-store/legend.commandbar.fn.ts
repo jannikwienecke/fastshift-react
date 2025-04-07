@@ -1,14 +1,26 @@
-import { makeRowFromValue, Row, TOGGLE_FIELD_LABEL } from '@apps-next/core';
-import { StoreFn } from './legend.store.types';
-import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
+import {
+  _log,
+  ADD_NEW_OPTION,
+  FieldConfig,
+  getViewByName,
+  makeRowFromValue,
+  Row,
+} from '@apps-next/core';
 import {
   dateUtils,
   operatorMap,
   SELECT_FILTER_DATE,
 } from '../ui-adapter/filter-adapter';
+import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
+import { StoreFn } from './legend.store.types';
+import { xSelect } from './legend.select-state';
+import { comboboxStore$ } from './legend.store.derived.combobox';
 
-export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => () => {
-  store$.commandbar.open.set(true);
+export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
+  store$.openSpecificModal('commandbar', () => {
+    store$.commandbar.open.set(true);
+    row && store$.commandbar.activeRow.set(row);
+  });
 };
 
 export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
@@ -17,7 +29,30 @@ export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
   store$.commandbar.itemGroups.set([]);
   store$.commandbar.selectedViewField.set(undefined);
   store$.combobox.query.set('');
+  store$.commandbar.error.set(undefined);
+  // store$.list.selectedRelationField.set()
   comboboxDebouncedQuery$.set('');
+};
+
+export const commandbarOpenWithFieldValue: StoreFn<
+  'commandbarOpenWithFieldValue'
+> = (store$) => (field: FieldConfig, row: Row) => {
+  const value = row?.getValue?.(field.name);
+  store$.commandbarOpen(row);
+
+  if ((value as Row | undefined)?.id) {
+    store$.commandbar.query.set('');
+    store$.commandbar.activeItem.set(row);
+  } else if (field.type === 'Enum') {
+    store$.commandbar.activeItem.set(row);
+  } else if (typeof value !== 'object') {
+    store$.commandbar.query.set(value);
+    store$.commandbar.activeItem.set(row);
+  } else {
+    //
+  }
+  store$.commandbar.selectedViewField.set(field);
+  xSelect.open(row, field);
 };
 
 export const commandbarUpdateQuery: StoreFn<'commandbarUpdateQuery'> =
@@ -37,6 +72,7 @@ export const commandbarUpdateQuery: StoreFn<'commandbarUpdateQuery'> =
     }
 
     store$.commandbar.query.set(query);
+    store$.combobox.query.set(query);
   };
 
 export const commandbarSetValue: StoreFn<'commandbarSetValue'> =
@@ -45,7 +81,7 @@ export const commandbarSetValue: StoreFn<'commandbarSetValue'> =
   };
 
 export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
-  (store$) => (item) => {
+  (store$) => async (item) => {
     const selectedViewField = store$.commandbar.selectedViewField.get();
     const query = store$.commandbar.query.get();
 
@@ -68,17 +104,11 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         selectedViewField?.relation?.type === 'manyToMany' &&
         isSpace
       ) {
-        const row = store$.list.rowInFocus.get();
-        if (!row?.row) return;
+        const row = store$.commandbar.activeRow.get();
+        if (!row) return;
 
-        const existingRows = row.row.getValue(selectedViewField.name) as Row[];
-
-        store$.selectRowsMutation({
-          field: selectedViewField,
-          row: row.row,
-          checkedRow: store$.commandbar.activeItem.get() as Row,
-          existingRows: existingRows,
-        });
+        xSelect.open(row as Row, selectedViewField);
+        xSelect.select(store$.commandbar.activeItem.get() as Row);
 
         return;
       } else {
@@ -90,10 +120,10 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
       const field =
         selectedViewField ??
         store$.viewConfigManager.getFieldBy(item.id.toString());
-      const row = store$.list.rowInFocus.get();
-      const value = row?.row?.getValue(field.name);
+      const row = store$.commandbar.activeRow.get();
+      const value = row?.getValue?.(field.name);
 
-      console.log({
+      _log.debug({
         SELECTITEM: '',
         item,
         field,
@@ -102,11 +132,31 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         selectedViewField,
       });
 
-      if (selectedViewField && row?.row) {
+      if (selectedViewField && row) {
+        if (item.id === ADD_NEW_OPTION) {
+          const view = getViewByName(
+            store$.views.get(),
+            selectedViewField.name
+          );
+
+          store$.commandformOpen(view.viewName);
+          store$.commandbarClose();
+          return;
+        }
+
         if (selectedViewField.type === 'String' && query?.length) {
+          const error = store$.viewConfigManager.validateField(
+            selectedViewField,
+            query
+          );
+          if (error) {
+            store$.commandbar.error.showError.set(true);
+            return;
+          }
+
           store$.updateRecordMutation({
             field: selectedViewField,
-            row: row.row,
+            row: row as Row,
             valueRow: makeRowFromValue(query, field),
           });
 
@@ -116,15 +166,15 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
           const isSelectSpecificDate = item.id === SELECT_FILTER_DATE;
 
           if (isSelectSpecificDate) {
-            const dateOfCurrentRow = row.row.getValue(
+            const dateOfCurrentRow = row.getValue?.(
               selectedViewField.name
             ) as number;
 
             store$.datePickerDialogOpen(new Date(dateOfCurrentRow), (date) => {
-              row.row &&
+              row &&
                 store$.updateRecordMutation({
                   field: selectedViewField,
-                  row: row.row,
+                  row: row as Row,
                   valueRow: makeRowFromValue(date.getTime(), field),
                 });
 
@@ -148,7 +198,7 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
             const valueRow = makeRowFromValue(start?.getTime(), field);
             store$.updateRecordMutation({
               field: selectedViewField,
-              row: row.row,
+              row: row as Row,
               valueRow,
             });
           }
@@ -157,7 +207,7 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         } else if (selectedViewField.enum) {
           store$.updateRecordMutation({
             field: selectedViewField,
-            row: row.row,
+            row: row as Row,
             valueRow: makeRowFromValue(item.id as string | number, field),
           });
           store$.commandbarClose();
@@ -168,33 +218,30 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         ) {
           store$.updateRecordMutation({
             field: selectedViewField,
-            row: row.row,
+            row: row as Row,
             valueRow: item as Row,
           });
           store$.commandbarClose();
 
           return;
         } else if (selectedViewField.relation) {
-          const existingRows = row.row.getValue(
-            selectedViewField.name
-          ) as Row[];
-
-          store$.selectRowsMutation({
-            field: selectedViewField,
-            row: row.row,
-            checkedRow: item as Row,
-            existingRows: existingRows,
-          });
-          store$.commandbarClose();
+          if ((item as Row | undefined)?.raw) {
+            xSelect.select(item as Row);
+          } else {
+            const row = comboboxStore$.values
+              .find((v) => v.id.get() === item.id)
+              ?.get();
+            row && xSelect.select(row as Row);
+          }
 
           return;
         } else {
           throw new Error('Field type not supported1');
         }
-      } else if (field.type === 'Boolean' && row?.row) {
+      } else if (field.type === 'Boolean' && row) {
         store$.updateRecordMutation({
           field,
-          row: row.row,
+          row: row as Row,
           valueRow: makeRowFromValue(!value, field),
         });
 
@@ -202,6 +249,8 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         return;
       } else {
         store$.commandbar.selectedViewField.set(field);
+
+        xSelect.open(row as Row, field);
       }
 
       if (field.type === 'String') {
@@ -210,6 +259,27 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         store$.commandbar.query.set('');
       }
     } catch (error) {
-      throw new Error('Field type not supported2');
+      if (item.id === ADD_NEW_OPTION && item.viewName) {
+        store$.commandformOpen(item.viewName);
+        store$.commandbarClose();
+      } else {
+        // FEATURE -> make the commands injection system scalable
+        // items groups should be set by the item itself, should carry a group-id
+        // handle running handler, error handling, which props needs to be passed
+        // probably the active row
+        const command = store$.commands
+          .get()
+          .find((command) => command.id === item.id);
+
+        if (!command) return;
+
+        if (!command.options?.keepCommandbarOpen) {
+          store$.commandbarClose();
+        }
+
+        await command.handler({
+          row: store$.commandbar.activeRow.get() || undefined,
+        });
+      }
     }
   };

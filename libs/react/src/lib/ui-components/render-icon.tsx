@@ -14,7 +14,7 @@ export function Icon(props: { icon?: React.FC<any>; color?: string }) {
         height: '0,75rem!important',
         width: '0,75rem!important',
       }}
-      // className="w-3 h-3"
+      className="w-3 h-3"
     />
   );
 }

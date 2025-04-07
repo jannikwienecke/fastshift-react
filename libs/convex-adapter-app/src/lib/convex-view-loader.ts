@@ -1,12 +1,10 @@
 import {
-  BaseViewConfigManager,
   invarant,
   parseDisplayOptionsStringForServer,
   parseFilterStringForServer,
   QueryDto,
   QueryReturnDto,
   QueryServerProps,
-  ViewConfigType,
 } from '@apps-next/core';
 import { getData } from './_internal/convex-get-data';
 import { getRelationalData } from './_internal/convex-get-relational-data';
@@ -25,15 +23,14 @@ export const viewLoaderHandler = async (
   if (args.relationQuery && !args.relationQuery.tableName) {
     return {
       data: [],
+      allIds: [],
       continueCursor: { position: null, cursor: null },
       isDone: true,
     };
   }
 
-  const viewConfigManager = new BaseViewConfigManager(
-    args.viewConfig as ViewConfigType,
-    args.modelConfig
-  );
+  const viewConfigManager = args.viewConfigManager;
+  if (!viewConfigManager) throw new Error('viewConfigManager is not defined');
 
   const parsedFilters = parseFilterStringForServer(
     args.filters ?? '',
@@ -61,14 +58,19 @@ export const viewLoaderHandler = async (
       data,
       continueCursor: { position: null, cursor: null },
       isDone: true,
+      allIds: [],
     };
   }
 
   invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
 
-  const { data, continueCursor, isDone } = await getData(ctx, serverProps);
+  const { data, continueCursor, isDone, allIds } = await getData(
+    ctx,
+    serverProps
+  );
 
   return {
+    allIds: allIds?.map((id) => id.toString()) ?? [],
     continueCursor,
     isDone,
     data,

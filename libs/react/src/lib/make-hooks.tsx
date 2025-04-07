@@ -10,6 +10,7 @@ import { makeContextMenuProps } from './ui-adapter/filter-adapter/contextmenu-ad
 import { makeConfirmationAlertProps } from './ui-adapter/confirmation-alert-adapter/confirmation-alert-adapter';
 import { makeCommandbarProps } from './ui-adapter/commandbar-adapter';
 import { makeDatePickerDialogProps } from './ui-adapter/adapter.datepickerdialog';
+import { makeCommandformProps } from './ui-adapter/commandform-adapter';
 
 export const makeHooks = <T extends DataType | ViewConfigType>(
   viewConfig?: T
@@ -25,6 +26,7 @@ export const makeHooks = <T extends DataType | ViewConfigType>(
     makeContextmenuProps: makeContextMenuProps<DataTypeToUse<T>>,
     makeConfirmationAlertProps: makeConfirmationAlertProps<DataTypeToUse<T>>,
     makeCommandbarProps: makeCommandbarProps<DataTypeToUse<T>>,
+    makeCommandformProps: makeCommandformProps<DataTypeToUse<T>>,
     makeDatePickerDialogProps: makeDatePickerDialogProps<DataTypeToUse<T>>,
   };
 };

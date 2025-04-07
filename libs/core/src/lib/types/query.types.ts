@@ -31,6 +31,8 @@ export type QueryProps = {
 
 export type QueryDto = {
   viewConfig?: ViewConfigType;
+  viewConfigManager?: BaseViewConfigManagerInterface;
+
   filters?: string;
   displayOptions?: string;
 } & Omit<QueryProps, 'viewConfigManager'>;
@@ -56,6 +58,7 @@ export type QueryReturnDto<T extends RecordType = RecordType> = {
   error?: unknown;
   continueCursor: ContinueCursor;
   isDone: boolean;
+  allIds: string[];
 };
 
 export type QueryError = {
@@ -70,8 +73,9 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
   isLoading: boolean;
   isError: boolean;
   error: QueryError | undefined | null;
-  isFetching: boolean;
-  isFetched: boolean;
+  allIds: string[];
+  // isFetching: boolean;
+  // isFetched: boolean;
   refetch: () => void;
 };
 

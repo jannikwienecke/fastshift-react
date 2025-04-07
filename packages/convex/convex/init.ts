@@ -1,9 +1,10 @@
 import * as server from './_generated/server';
 import { Id } from './_generated/dataModel';
+import { _log } from '@apps-next/core';
 
 const init = server.mutation({
   handler: async (ctx) => {
-    console.log('🌱 Seeding Convex database.....');
+    _log.info('🌱 Seeding Convex database.....');
 
     // Clear existing data
     const tables = [
@@ -73,6 +74,7 @@ const init = server.mutation({
         firstname: data.firstname,
         lastname: data.lastname,
         age: data.age,
+        name: `${data.firstname} ${data.lastname}`,
       });
       owners.push(ownerId);
     }
@@ -735,8 +737,6 @@ const init = server.mutation({
       await ctx.db.insert('todos', todo);
       await ctx.db.insert('todos', todo2);
     }
-
-    console.log('Seed data created successfully');
   },
 });
 

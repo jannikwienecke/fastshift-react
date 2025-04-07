@@ -1,8 +1,11 @@
 import {
   BaseViewConfigManagerInterface,
   ComboxboxItem,
+  Command,
   CommandbarProps,
+  CommandformItem,
   ContextMenuState,
+  ContextMenuUiOptions,
   ContinueCursor,
   DataModelNew,
   DisplayOptionsUiType,
@@ -13,12 +16,14 @@ import {
   MutationHandlerErrorType,
   MutationReturnDto,
   QueryRelationalData,
+  QueryReturnOrUndefined,
   RecordType,
   RegisteredViews,
   RelationalDataModel,
   Row,
   TranslationKeys,
   UiViewConfig,
+  ViewConfigType,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { PaginationOptions } from 'convex/server';
@@ -61,6 +66,7 @@ export type ComboboxState = {
   field: FieldConfig | null;
   row: Row | null;
   showCheckboxInList: boolean;
+  defaultSelected?: Row[];
 };
 
 export type ComboboxStateCommonType = Pick<
@@ -83,6 +89,7 @@ export type MakeComboboxStateProps = Pick<
   'values' | 'tableName' | 'multiple'
 > & {
   selected?: Row[];
+  defaultSelected?: Row[];
   datePickerProps?: DatePickerState;
 };
 
@@ -109,13 +116,21 @@ export type DatePickerState = {
 export type FetchMoreOptions = {
   currentCursor: ContinueCursor;
   nextCursor: ContinueCursor;
-  isFetching: boolean;
-  isFetched: boolean;
   isDone: boolean;
-  reset?: boolean;
 };
 
 export type LegendStore = {
+  handleIncomingData: (props: QueryReturnOrUndefined) => void;
+  handleIncomingRelationalData: (props: QueryReturnOrUndefined) => void;
+
+  state:
+    | 'pending'
+    | 'initialized'
+    | 'fetching-more'
+    | 'updating-display-options'
+    | 'filter-changed'
+    | 'mutating';
+
   // MAIN DATA MODEL
   dataModel: DataModelNew;
   relationalDataModel: RelationalDataModel;
@@ -129,6 +144,7 @@ export type LegendStore = {
   //   VIEW STATE
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
+  commands: Command[];
 
   api?: {
     mutate?: (args: MutationDto) => void;
@@ -167,6 +183,7 @@ export type LegendStore = {
   commandbar?: {
     selectedViewField?: FieldConfig;
     activeItem: ComboxboxItem | null;
+    activeRow: Row | null;
   } & Omit<
     CommandbarProps,
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'
@@ -176,12 +193,15 @@ export type LegendStore = {
   init: (
     data: RecordType[],
     relationalData: QueryRelationalData,
+    continueCursor: ContinueCursor | null,
+    isDone: boolean,
     viewConfigManager: BaseViewConfigManagerInterface,
     views: RegisteredViews,
-    uiViewConfig: UiViewConfig
+    uiViewConfig: UiViewConfig,
+    commands: Command[]
   ) => void;
 
-  createDataModel: (data: RecordType[]) => void;
+  createDataModel: (data: RecordType[], tablename?: string) => void;
   createRelationalDataModel: (data: QueryRelationalData) => void;
 
   // global query
@@ -253,18 +273,48 @@ export type LegendStore = {
   contextMenuOpen: (rect: DOMRect, row: RecordType) => void;
   contextMenuClose: () => void;
   contextmenuDeleteRow: (row: Row) => void;
+  contextmenuEditRow: (row: Row) => void;
+  contextmenuCopyRow: ContextMenuUiOptions['onCopy'];
+  contextmenuClickOnField: (field: FieldConfig) => void;
 
   selectRowsMutation: (props: {
     field: FieldConfig;
     row: Row;
     existingRows: Row[];
     checkedRow: Row;
+    newRows: Row[];
+    newIds: string[];
+    idsToDelete: string[];
   }) => void;
-  updateRecordMutation: (props: {
-    field: FieldConfig;
-    row: Row;
-    valueRow: Row;
-  }) => void;
+  updateRecordMutation: (
+    props: {
+      field: FieldConfig;
+      row: Row;
+      valueRow: Row;
+    },
+    onSuccess?: () => void,
+    onError?: (message: string) => void
+  ) => void;
+  updateFullRecordMutation: (
+    props: {
+      row: Row;
+      record: RecordType;
+      view: ViewConfigType;
+      updateGlobalDataModel?: boolean;
+    },
+    onSuccess?: () => void,
+    onError?: (message: string) => void
+  ) => void;
+  createRecordMutation: (
+    props: {
+      view: ViewConfigType;
+      record: RecordType;
+      toast?: boolean;
+      updateGlobalDataModel?: boolean;
+    },
+    onSuccess?: () => void,
+    onError?: (message: string) => void
+  ) => void;
   deleteRecordMutation: (
     props: { row: Row },
     onSuccess?: () => void,
@@ -272,11 +322,33 @@ export type LegendStore = {
   ) => void;
 
   // commandbar
-  commandbarOpen: () => void;
+  commandbarOpen: (row: Row | undefined | null) => void;
   commandbarClose: () => void;
+  commandbarOpenWithFieldValue: (field: FieldConfig, row: Row) => void;
   commandbarUpdateQuery: (query: string) => void;
   commandbarSelectItem: (item: ComboxboxItem) => void;
   commandbarSetValue: (value: ComboxboxItem) => void;
+
+  // commandform
+  commandformOpen: (viewName: string, row?: Row) => void;
+  commandformClose: () => void;
+  commanformSelectRelationalValue: (row: Row) => void;
+  commandformChangeInput: (
+    field: CommandformItem,
+    value: string | boolean
+  ) => void;
+  commandformSubmit: () => void;
+
+  commandform?: {
+    open: false;
+    view?: ViewConfigType<any>;
+    rect?: DOMRect;
+    field?: FieldConfig;
+    row?: Row;
+    type: 'edit' | 'create';
+    // selectedViewField?: FieldConfig;
+    // activeItem: ComboxboxItem | null;
+  };
 
   // date picker dialog
   datePickerDialogState: {
@@ -288,6 +360,17 @@ export type LegendStore = {
   datePickerDialogClose: () => void;
   datePickerDialogSelectDate: (date: Date) => void;
   datePickerDialogSubmit: () => void;
+
+  openSpecificModal: (
+    type:
+      | 'commandbar'
+      | 'commandform'
+      | 'combobox'
+      | 'filter'
+      | 'displayoptions'
+      | 'contextmenu',
+    openCb: () => void
+  ) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

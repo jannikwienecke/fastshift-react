@@ -47,8 +47,11 @@ export const derviedDisplayOptions = observable(() => {
       options?.label ??
       ('displayOptions.button.label' satisfies TranslationKeys),
 
-    viewFields: store$.viewConfigManager
-      .getViewFieldList()
+    viewFields: [
+      ...store$.viewConfigManager.getViewFieldList({
+        includeSystemFields: false,
+      }),
+    ]
       .filter((field) => {
         return (
           field.name !== INTERNAL_FIELDS.creationTime.fieldName &&
@@ -65,12 +68,16 @@ export const derviedDisplayOptions = observable(() => {
 
         return show;
       })
-      .map((field) => ({
-        ...field,
-        id: field.name,
-        label: field.label ?? field.name,
-        selected: store$.displayOptions.viewField.selected.includes(field.name),
-      })),
+      .map((field) => {
+        return {
+          ...field,
+          id: field.name,
+          label: field.label ?? field.name,
+          selected: store$.displayOptions.viewField.selected.includes(
+            field.name
+          ),
+        };
+      }),
 
     onSelectViewField: (...props) =>
       store$.displayOptionsSelectViewField(...props),

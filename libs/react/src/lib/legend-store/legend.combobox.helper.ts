@@ -8,6 +8,7 @@ import {
   getEditLabel,
   getFieldLabel,
   getRelationTableName,
+  makeData,
   makeNoneOption,
   makeRow,
   makeRowFromField,
@@ -17,6 +18,7 @@ import {
 import { observable } from '@legendapp/state';
 import Fuse from 'fuse.js';
 import { filterUtil, operator } from '../ui-adapter/filter-adapter';
+import { selectState$ } from './legend.select-state';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
 import { makeFilterPropsOptions } from './legend.store.derived.filter';
@@ -26,23 +28,20 @@ import {
 } from './legend.store.types';
 
 export const comboboxDebouncedQuery$ = observable('');
-// items that were selected/deselected in a "session" -> session ends when combobox is closed
-export const newSelected$ = observable<Row[]>([]);
-export const removedSelected$ = observable<Row[]>([]);
-// we need to save which items were selected when the combobox is opened
-// so that we can track which items are shown on the top (when adding a new item it should not move to the top. it should stay where it is)
-export const initSelected$ = observable<Row[] | null>(null);
 
 export const getViewFieldsOptions = (options?: {
   useEditLabel?: boolean;
   row?: Row | null;
+  includeSystemFields?: boolean;
 }): MakeComboboxStateProps | null => {
   let filterOptions: Row[] | null = null;
 
   const query =
     (store$.combobox.query.get() || store$.commandbar.query.get()) ?? '';
 
-  const viewFields = store$.viewConfigManager.get().getViewFieldList();
+  const viewFields = store$.viewConfigManager
+    .get()
+    .getViewFieldList({ includeSystemFields: options?.includeSystemFields });
 
   filterOptions = viewFields.map((field) => {
     const label = options?.useEditLabel
@@ -54,8 +53,8 @@ export const getViewFieldsOptions = (options?: {
 
   const fuse = new Fuse(filterOptions, {
     keys: ['label'],
-    distance: 700,
-    threshold: 0.6,
+    // distance: 1000,
+    threshold: 0.4,
   });
 
   const result = fuse.search(query);
@@ -69,7 +68,7 @@ export const getViewFieldsOptions = (options?: {
 
 export const makeComboboxStateSortingOptions =
   (): MakeComboboxStateProps | null => {
-    const props = getViewFieldsOptions();
+    const props = getViewFieldsOptions({ includeSystemFields: true });
     if (!props) return null;
 
     let values = [...(props.values || [])];
@@ -160,25 +159,19 @@ export const handleRelationalField = (
     valuesToUse = [noneOption, ...valuesToUse];
   }
 
-  const removedSelectedIds = removedSelected$.get().map((r) => r.id);
-  const newSelectedIds = newSelected$.get().map((r) => r.id);
-
-  const defaultSelected = initSelected$.get() ?? defaultSelectedProps;
-
+  const state = selectState$.get();
+  const defaultSelected = state.initalRows;
   const selectedOfList = defaultData?.rows.filter((r) => {
-    const isInDefault = defaultSelected?.find?.((s) => s['id'] === r['id']);
-    const isInNewSelected = newSelectedIds.includes(r.id.toString());
-    const isInRemovedSelected = removedSelectedIds.includes(r.id.toString());
+    const isInDefault = state.initalRows?.find?.((s) => s['id'] === r['id']);
+    const isRemoved = state.removedRows?.find?.((s) => s['id'] === r['id']);
+    const isInNew = state.newRows?.find?.((s) => s['id'] === r['id']);
 
-    if (isInRemovedSelected) return false;
-    if (isInDefault || isInNewSelected) return true;
+    if (isInNew) return true;
+    if (isRemoved) return false;
+    if (isInDefault) return true;
 
     return false;
   });
-
-  if (initSelected$.get() === null) {
-    initSelected$.set(selectedOfList || []);
-  }
 
   const defaultDataSelected = valuesToUse.filter((row) =>
     defaultSelected?.find?.((s) => s['id'] === row['id'])
@@ -195,6 +188,7 @@ export const handleRelationalField = (
     tableName: tableName,
     multiple: true,
     selected: selectedOfList,
+    defaultSelected: defaultSelected,
   };
 };
 
@@ -388,6 +382,30 @@ export const getSharedStateFilter = (): ComboboxStateCommonType => {
   return stateShared;
 };
 
+export const getSharedStateCommandForm = (): ComboboxStateCommonType => {
+  const field = store$.commandform.field.get();
+
+  const row = store$.commandform.row.raw.get();
+  const value = row?.[field?.name ?? ''] ?? null;
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: store$.commandform.rect.get() ?? null,
+    searchable: true,
+    name: 'commandform',
+    isNewState: true,
+    open: true,
+    query: store$.combobox.query.get(),
+    field: field ?? null,
+    selected: Array.isArray(value) ? value : [],
+    row: null,
+    placeholder:
+      makeFilterPropsOptions.placeholder.get() ??
+      t('filter.button.placeholder'),
+  };
+
+  return stateShared;
+};
+
 export const getSharedStateCommandbar = (): ComboboxStateCommonType => {
   const selectedCommandbarField = store$.commandbar.selectedViewField.get();
 
@@ -428,6 +446,26 @@ export const getSharedStateList = (): ComboboxStateCommonType => {
   return stateShared;
 };
 
+export const getSharedStateSelectState = (): ComboboxStateCommonType => {
+  const row = selectState$.parentRow.get();
+  const field = selectState$.field.get();
+  if (!row || !field) return DEFAULT_COMBOBOX_STATE;
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: {} as DOMRect,
+    searchable: field?.enum ? false : true,
+    name: field?.name ?? 'select-state',
+    isNewState: true,
+    open: false,
+    query: store$.combobox.query.get(),
+    field: field,
+    selected: getDefaultSelectedList(),
+    row: row as Row,
+  };
+
+  return stateShared;
+};
+
 export const getDefaultSelectedFilter = (): Row[] => {
   const selectedFilterField = store$.filter.selectedField.get();
   if (!selectedFilterField) return [];
@@ -452,7 +490,5 @@ export const getDefaultSelectedList = (): Row[] => {
 
   if (!Array.isArray(selected)) return [];
 
-  return selected?.map((s) =>
-    makeRowFromValue(s['id'], selectedRelationField.field)
-  );
+  return makeData(store$.views.get(), 'tags')(selected).rows;
 };

@@ -20,6 +20,14 @@ export const en = {
       [operatorLabels.WITHIN]: 'Within',
     },
   },
+  commandform: {
+    create: 'Create {{name}}',
+    edit: 'Update {{name}}',
+  },
+  commandbar: {
+    newLabel: 'New {{name}}',
+    existingLabel: 'Existing {{name}}',
+  },
   displayOptions: {
     button: {
       label: 'Display',
@@ -53,7 +61,7 @@ export const en = {
     cancel: 'Cancel',
     delete: 'Delete {{name}}',
     edit: 'Edit',
-    editField: 'Edit {{name}}',
+    editName: 'Edit {{name}}',
     saveField: 'Save {{name}}',
     change: 'Change',
     no: 'No',
@@ -64,21 +72,39 @@ export const en = {
     copy: 'Copy {{name}}',
     deleted: 'Deleted',
     changeField: 'Change {{field}}...',
+    changeFieldTo: 'Change {{field}} to...',
     setField: 'Add to {{field}}...',
     changeOrAdd: 'Change or add {{field}}...',
     // [TOGGLE_FIELD_LABEL]: TOGGLE_FIELD_LABEL,
     markAs: 'Mark as {{field}}',
     unmarkAs: 'Unmark as {{field}}',
+    resetDb: 'Reset Database',
   },
 
   datePicker: {
     description: 'Please select a date from the calendar.',
   },
 
+  richEditor: {
+    placeholder: 'Add {{name}}...',
+  },
+
   error: {
     title: '⚠️ ️️Oops! Something went wrong',
     showDetails: 'Show details',
-    deleteRecord: 'Could not delete entry. Please try again',
+    deleteRecord: 'Could not delete record. Please try again',
+    updateRecord: 'Could not update record. Please try again',
+  },
+  success: {
+    createRecord: {
+      title: '✅ Created Successfully',
+    },
+  },
+
+  copy: {
+    id: 'Copy ID',
+    url: 'Copy URL',
+    json: 'Copy as JSON',
   },
 
   confirmationAlert: {
@@ -89,5 +115,9 @@ export const en = {
       description:
         'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
     },
+  },
+  _creationTime: {
+    one: 'Created at',
+    other: 'Created at',
   },
 };

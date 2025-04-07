@@ -4,6 +4,7 @@ import {
   FieldConfig,
   GetTableName,
   renderModelName,
+  Row,
 } from '@apps-next/core';
 import { useViewOf } from '@apps-next/react';
 import { BubbleItem, BubbleList, Icon, PriorityComponent } from '@apps-next/ui';
@@ -83,8 +84,8 @@ export const TagsComponent = (props: { data: TaskViewDataType }) => {
     <BubbleList
       items={tags.map((t) => {
         return {
-          label: t.name,
-          color: t.color,
+          label: t?.name,
+          color: t?.color,
           icon: null,
         };
       })}
@@ -120,7 +121,7 @@ export const ProjectComponentCombobox = (props: {
   return (
     <div className="flex gap-2 items-center w-full">
       <Icon icon={view.icon} />
-      <div className="text-sm">{project?.label}</div>
+      <div className="text-xs">{project?.label}</div>
     </div>
   );
 };
@@ -135,15 +136,16 @@ export const NameFieldItem = (props: { field: FieldConfig }) => {
   );
 };
 
-export const NameFieldItemCommandbar = (props: { field: FieldConfig }) => {
-  const { t } = useTranslation();
-
+export const NameFieldItemCommandbar = (props: {
+  field: FieldConfig;
+  value: Row;
+}) => {
   return (
     <div className="flex gap-4 items-center w-full">
       <div>
         <PencilLine className="text-foreground/50 w-4 h-4 mr-0" />
       </div>
-      <div>{t('shared.rename', { model: renderModelName('tasks', t) })}</div>
+      <div>{props.value.label}</div>
     </div>
   );
 };

@@ -32,6 +32,52 @@ created: 1723444498044
 - [x] add tests for grouping / sorting
 - [x] default sorting / default grouping
 - [x] add confirmation dialog (framework approach, to be enabled by field and action?)
+- [x] BUG: When we select a tag in the commandbar -> then select one in the list combobox -> Error
+- [x] BUG: Contextmenu -> boolean field -> should toggle the value and not open the commandbar
+- [x] can click on list item right click -> Edit task -> opens commandform
+- [x] can click on list item rigjt click -> non relational fields edit -> open
+- [x] BUG: When we scoll down, then update the task, we suddenly only see the last x tasks -> need test
+- [x] show on which deployment i am currently am, or with which i am connected....
+- [x] BUG when set sorting to "Name" -> scroll down -> load more data, this data is not sorted!
+- [x] write tests to make sure all works
+- [x] Filter0
+- [x] button text commandform
+- [x] error message show for delete and for update single attribute
+- [x] in rename or change description, we see the reset database command, related to the bug below
+- [x] in commandbar edit relation -> we see an empty row? remove
+- [x] in priority in commandbar -> shows the number and not the related text
+- [x] translation commandbar placeholder
+- [x] german translation: "Neues Aufgabe"
+- [x] commandbar placeholder -> show correct placeholder
+- [x] add headings for other relation related commands (add new Project, etc.)
+- [x] in contextmenu -> prorject -> new project, click nothing happens
+- [x] click on filter in context menu should open the commandbar
+- [x] header label in commandbar - setting project e.g;
+- [x] contextmenu -> click tag -> select/deselect tag -> wrong behaviour -> add test
+- [x] check for error handling in commandbar
+- [x] does not displays the deleted items -> add test
+- [x] delete should be optimisc updaate..
+- [x] in commandbar -> click new project -> error
+- [x] cannot create a project from the task view -> we dont have the relational data for project (owner e.g.)
+- [x] how to handle fields that are calculated from other fields (name <- firstname & lastname)
+- [x] Copy in contextmenu does nothing
+- [x] in combobox, "Ändern projects"
+- [x] add validation rules to config, name must have 3 charachtes, use arktype, frontend and backend -> add test
+- [x] in convex helper -> taskId: mutation.payload.id -> make dynamic
+- [x] task can only add 1 todo for example, how would that work
+- [x] refactor select many to many in all places
+- [ ] local mode -> load all
+- [ ] add tests for validation rules frontend and backend
+- [ ] in combobox render field names, label should be aligned (with or without icon), maybe default icon
+
+<!-- FEATURE -->
+
+- [ ] Commandform -> extract field input components into own components
+- [ ] when created a new task -> click on notifiaction -> open task
+- [ ] open after creation, in config
+- [ ] update design / message / icon of success notification
+- [ ] way to show what fields are missing / errors in form
+- [ ] add tipTap
 - [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
 
 ## How we handle Deletes with soft delete

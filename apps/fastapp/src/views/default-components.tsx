@@ -1,4 +1,6 @@
 import {
+  MakeCommandbarPropsOption,
+  MakeCommandformPropsOption,
   MakeConfirmationAlertPropsOption,
   MakeDisplayOptionsPropsOptions,
   MakeFilterPropsOptions,
@@ -14,6 +16,8 @@ import {
 import {
   ComboboxPopover,
   commandbar,
+  Commandform,
+  // commandform,
   ConfirmationDialog,
   ContextMenuDefault,
   datePickerModal,
@@ -25,9 +29,12 @@ import {
 import { Memo, observer } from '@legendapp/state/react';
 import { TaskViewDataType } from '../views/tasks.components';
 
+import { _log } from '@apps-next/core';
+
 export const RenderComboboxPopover = observer(
   ({ options }: { options?: MakeComboboxPropsOptions }) => {
-    console.warn('Render Combobox Popover');
+    // console.warn('Render Combobox Popover');
+    _log.debug('Render Combobox Popover');
     const { makeComboboxProps } = makeHooks<RecordType>();
 
     return (
@@ -45,7 +52,7 @@ export const RenderComboboxPopover = observer(
 
 export const RenderFilter = observer(
   ({ options }: { options?: MakeFilterPropsOptions }) => {
-    console.warn('Render Filter');
+    _log.debug('Render Filter');
     const { makeFilterProps } = makeHooks<TaskViewDataType>();
     return (
       <Memo>
@@ -63,7 +70,7 @@ export const RenderDisplayOptions = observer(
     const props = makeDisplayOptionsProps(options);
 
     return (
-      <div className="mr-8">
+      <div className="mr-4">
         <DisplayOptions.Default {...props} />
       </div>
     );
@@ -72,7 +79,7 @@ export const RenderDisplayOptions = observer(
 
 export const RenderInputDialog = observer(
   (props: { options?: MakeInputDialogPropsOptions }) => {
-    console.warn('Render Input Dialog');
+    _log.debug('Render Input Dialog');
     const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
 
     return (
@@ -90,7 +97,7 @@ export const RenderInputDialog = observer(
 export const RenderList = observer(
   (props: { options?: MakeListPropsOptions }) => {
     const { makeListProps } = makeHooks<TaskViewDataType>();
-    console.warn('Render List');
+    _log.debug('Render List');
 
     return (
       <Memo>
@@ -104,7 +111,7 @@ export const RenderList = observer(
 
 export const RenderContextmenu = observer(() => {
   const { makeContextmenuProps } = makeHooks<TaskViewDataType>();
-
+  _log.debug('Render Contextmenu');
   return (
     <Memo>
       {() => {
@@ -117,7 +124,7 @@ export const RenderContextmenu = observer(() => {
 export const RenderConfirmationAlert = observer(
   (props: { options?: MakeConfirmationAlertPropsOption }) => {
     const { makeConfirmationAlertProps } = makeHooks<TaskViewDataType>();
-
+    _log.debug('Render Confirmation Alert');
     return (
       <Memo>
         {() => {
@@ -133,13 +140,31 @@ export const RenderConfirmationAlert = observer(
 );
 
 export const RenderCommandbar = observer(
-  (props: { options?: MakeConfirmationAlertPropsOption }) => {
+  (props: { options?: MakeCommandbarPropsOption }) => {
     const { makeCommandbarProps } = makeHooks<TaskViewDataType>();
-
+    _log.debug('Render Commandbar');
     return (
       <Memo>
         {() => {
           return <commandbar.default {...makeCommandbarProps({})} />;
+        }}
+      </Memo>
+    );
+  }
+);
+
+export const RenderCommandform = observer(
+  (props: { options?: MakeCommandformPropsOption }) => {
+    const { makeCommandformProps } = makeHooks<TaskViewDataType>();
+    _log.debug('Render Commandform');
+    return (
+      <Memo>
+        {() => {
+          return (
+            <>
+              <Commandform {...makeCommandformProps({})} />
+            </>
+          );
         }}
       </Memo>
     );
@@ -151,7 +176,7 @@ export const RenderDatePickerDialog = observer(
     //
   }) => {
     const { makeDatePickerDialogProps } = makeHooks<TaskViewDataType>();
-
+    _log.debug('Render DatePickerDialog');
     return (
       <Memo>
         {() => {
