@@ -133,7 +133,7 @@ export type LegendStore = {
 
   // MAIN DATA MODEL
   dataModel: DataModelNew;
-  dataModelBackup?: DataModelNew;
+  dataModelBackup: DataModelNew;
   relationalDataModel: RelationalDataModel;
   uiViewConfig: UiViewConfig;
 

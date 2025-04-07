@@ -20,6 +20,7 @@ import { addEffects, addLocalFiltering } from './legend-store';
 import { store$ } from './legend-store/legend.store';
 import { useMutation } from './use-mutation';
 import { useQueryData } from './use-query-data';
+import { addLocalDisplayOptionsHandling } from './legend-store/legend.local.display-options';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
@@ -138,6 +139,7 @@ const Content = observer((props: { children: React.ReactNode }) => {
   React.useLayoutEffect(() => {
     addEffects(store$);
     addLocalFiltering(store$);
+    addLocalDisplayOptionsHandling(store$);
 
     store$.api.assign({
       mutate: runMutate,

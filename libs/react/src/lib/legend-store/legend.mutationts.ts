@@ -15,7 +15,7 @@ import { createRow } from './legend.commandform.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';
-import { comboboxStore$ } from './legend.store.derived.combobox';
+import { setGlobalDataModel } from './legend.utils.helper';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
@@ -308,8 +308,7 @@ export const optimisticUpdateStore = ({
 
   record = patchRecord(record, store$);
 
-  const originalRows = [...store$.dataModel.rows.get()];
-
+  const originalRows = [...store$.dataModelBackup.rows.get()];
   // Merge updated row data
   const updatedRowData = {
     ...row.raw,
@@ -351,12 +350,7 @@ export const optimisticUpdateStore = ({
     }
 
     if (updateGlobalDataModel) {
-      store$.dataModel.set((prev) => {
-        return {
-          ...prev,
-          rows: updatedRows,
-        };
-      });
+      setGlobalDataModel(updatedRows);
     }
   }
 
@@ -366,7 +360,7 @@ export const optimisticUpdateStore = ({
       _log.warn('Rolling back optimistic update', originalRows);
       isRunning$.set(false);
 
-      store$.dataModel.rows.set(originalRows);
+      setGlobalDataModel(originalRows);
 
       if (store$.contextMenuState.row.get())
         store$.contextMenuState.row.set(copyRow(originalRow));

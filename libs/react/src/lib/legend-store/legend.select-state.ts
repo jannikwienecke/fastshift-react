@@ -40,6 +40,7 @@ const getState = () => {
   const toInsert = selectState$.toInsertRow.get() as Row | null;
   const toRemove = selectState$.toRemoveRow.get() as Row | null;
   const removedRows = selectState$.removedRows.get() as Row[];
+  const newRows = selectState$.newRows.get() as Row[];
 
   if (!field || !parentRow || !removedRows) throw new Error('Invalid state');
 
@@ -49,6 +50,7 @@ const getState = () => {
     existingRows,
     toInsert,
     toRemove,
+    newRows,
     removedRows,
   };
 };
@@ -106,13 +108,14 @@ export const select = (row: Row) => {
 };
 
 const onError = () => {
-  const { toInsert, toRemove, existingRows, removedRows } = getState();
+  const { toInsert, toRemove, existingRows, removedRows, newRows } = getState();
 
   console.warn('___ROLLBACK', {
     toInsert,
     toRemove,
     existingRows,
     removedRows,
+    newRows,
   });
 
   if (toRemove) {
@@ -127,6 +130,7 @@ const onError = () => {
     selectState$.newRows.set((prev) =>
       prev.filter((r) => r.id !== toInsert.id)
     );
+
     selectState$.toInsertRow.set(null);
   }
 };
@@ -156,6 +160,7 @@ selectState$.toRemoveRow.onChange((state) => {
     newIds: [],
     newRows: existingRows.filter((r) => r.id !== row.id),
   });
+  selectState$.toInsertRow.set(null);
 });
 
 selectState$.toInsertRow.onChange((state) => {
@@ -176,4 +181,5 @@ selectState$.toInsertRow.onChange((state) => {
     newIds: [row.id],
     newRows: [...existingRows, row],
   });
+  selectState$.toRemoveRow.set(null);
 });

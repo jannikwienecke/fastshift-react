@@ -1,4 +1,7 @@
 import {
+  FilterPrimitiveType,
+  FilterRelationType,
+  FilterType,
   NONE_OPTION,
   RecordType,
   Row,
@@ -13,12 +16,16 @@ import {
 } from '../ui-adapter/filter-adapter';
 import { LegendStore } from './legend.store.types';
 import { copyRow } from './legend.utils';
+import { filterRowsByShowDeleted } from './legend.utils.helper';
 
 const getFilteredRowsByIds = (rows: Row<RecordType>[], ids: string[]) => {
   return ids.map((id) => rows.find((row) => row.id === id) as Row);
 };
 
-const handleDateFilter = (rows: Row<RecordType>[], filter: any) => {
+const handleDateFilter = (
+  rows: Row<RecordType>[],
+  filter: FilterPrimitiveType
+) => {
   const { start, end } = dateUtils.getStartAndEndDate(filter.date);
   return rows.filter((row) => {
     const value = row.getValue(filter.field.name);
@@ -29,8 +36,11 @@ const handleDateFilter = (rows: Row<RecordType>[], filter: any) => {
   });
 };
 
-const handleRelationFilter = (rows: Row<RecordType>[], filter: any) => {
-  const filterIds = filter.values.map((v: any) => (v as Row).id);
+const handleRelationFilter = (
+  rows: Row<RecordType>[],
+  filter: FilterRelationType
+) => {
+  const filterIds = filter.values.map((v) => (v as Row).id);
   const hasNoneId = filterIds.some((id: string) => id === NONE_OPTION);
   const fieldName = filter.field.name;
 
@@ -38,7 +48,7 @@ const handleRelationFilter = (rows: Row<RecordType>[], filter: any) => {
     const value = row.getValue(fieldName);
 
     if (filter.field.enum) {
-      return filter.values.some((v: any) => v.raw === value);
+      return filter.values.some((v) => v.raw === value);
     }
 
     if (filter.field.relation?.manyToManyTable) {
@@ -54,7 +64,10 @@ const handleRelationFilter = (rows: Row<RecordType>[], filter: any) => {
   });
 };
 
-const handleStringFilter = (rows: Row<RecordType>[], filter: any) => {
+const handleStringFilter = (
+  rows: Row<RecordType>[],
+  filter: FilterPrimitiveType
+) => {
   const fuse = new Fuse(
     rows.map((r) => r.getValue(filter.field.name)),
     { keys: [filter.field.name], threshold: 0.3 }
@@ -71,63 +84,93 @@ const handleStringFilter = (rows: Row<RecordType>[], filter: any) => {
   );
 };
 
-const handleBooleanFilter = (rows: Row<RecordType>[], filter: any) => {
+const handleBooleanFilter = (
+  rows: Row<RecordType>[],
+  filter: FilterPrimitiveType
+) => {
   const filterValue = filter.value.id === 'true';
   return rows.filter((row) => row.getValue(filter.field.name) === filterValue);
 };
 
-export const addLocalFiltering = (store$: Observable<LegendStore>) => {
-  store$.filter.filters.onChange((changes) => {
-    const currentFilters = changes.value.map((f) => ({
-      ...f,
-      ...(f.field.type === 'Date' && {
-        date: dateUtils.parseOption(filterUtil().getValue(f), f.operator),
-      }),
-    }));
+const getRows = (store$: Observable<LegendStore>) => {
+  const backup = store$.dataModelBackup.get();
 
-    const backup = store$.dataModelBackup.get();
+  const rows: Row<RecordType>[] = backup
+    ? [...backup.rows]
+    : store$.dataModel.rows.get().map((r) => copyRow(r));
+  if (!backup) store$.dataModelBackup.set({ rows });
 
-    const rows: Row<RecordType>[] = backup
-      ? [...backup.rows]
-      : store$.dataModel.rows.get().map((r) => copyRow(r));
-    if (!backup) store$.dataModelBackup.set({ rows });
+  return filterRowsByShowDeleted(rows);
+};
 
-    if (!currentFilters.length) {
-      store$.dataModel.rows.set(rows);
-      return;
-    }
+export const applyFilter = (
+  store$: Observable<LegendStore>,
+  filters: FilterType[]
+) => {
+  const currentFilters = filters.map((f) => ({
+    ...f,
+    ...(f.field.type === 'Date' && {
+      date: dateUtils.parseOption(filterUtil().getValue(f), f.operator),
+    }),
+  }));
 
-    const [idsAdd, idsNotAdd] = currentFilters.reduce(
-      ([add, notAdd], filter) => {
-        const negate = isNegateOperator(filter.operator);
-        let filteredRows: Row<RecordType>[] = [];
+  const rows = getRows(store$);
 
-        if (filter.field.type === 'Date' && filter.type === 'primitive') {
-          filteredRows = handleDateFilter(rows, filter);
-        } else if (filter.type === 'relation') {
-          filteredRows = handleRelationFilter(rows, filter);
-        } else if (filter.type === 'primitive') {
-          if (filter.field.type === 'String') {
-            filteredRows = handleStringFilter(rows, filter);
-          } else if (filter.field.type === 'Boolean') {
-            filteredRows = handleBooleanFilter(rows, filter);
-          }
+  if (!currentFilters.length) {
+    store$.dataModel.rows.set(rows);
+    return;
+  }
+
+  const [idsAdd, idsNotAdd] = currentFilters.reduce(
+    ([add, notAdd], filter) => {
+      const negate = isNegateOperator(filter.operator);
+
+      console.log({ filter, negate });
+
+      let filteredRows: Row<RecordType>[] = [];
+
+      if (filter.field.type === 'Date' && filter.type === 'primitive') {
+        filteredRows = handleDateFilter(rows, filter);
+        console.log(filteredRows);
+      } else if (filter.type === 'relation') {
+        filteredRows = handleRelationFilter(rows, filter);
+      } else if (filter.type === 'primitive') {
+        if (filter.field.type === 'String') {
+          filteredRows = handleStringFilter(rows, filter);
+        } else if (filter.field.type === 'Boolean') {
+          filteredRows = handleBooleanFilter(rows, filter);
         }
+      }
 
-        const ids = filteredRows.map((row) => row.id);
-        negate ? notAdd.push(ids) : add.push(ids);
-        return [add, notAdd];
-      },
-      [[] as string[][], [] as string[][]]
-    );
+      const ids = filteredRows.map((row) => row.id);
+      negate ? notAdd.push(ids) : add.push(ids);
+      return [add, notAdd];
+    },
+    [[] as string[][], [] as string[][]]
+  );
 
-    const allIds = arrayIntersection(...idsAdd) ?? [];
-    const filteredRows = rows.filter(
+  const allIds = arrayIntersection(...idsAdd) ?? [];
+
+  let filteredRows: Row[] = [];
+  if (idsAdd.length === 0) {
+    filteredRows = rows.filter((row) => {
+      const isInNotAdd = idsNotAdd.some((ids) => ids.includes(row.id));
+      if (isInNotAdd) return false;
+      return true;
+    });
+  } else {
+    filteredRows = rows.filter(
       (row) =>
         allIds.some((id) => id === row.id) &&
         !idsNotAdd.some((ids) => ids.includes(row.id))
     );
+  }
 
-    store$.dataModel.rows.set(filteredRows);
+  store$.dataModel.rows.set(filteredRows);
+};
+
+export const addLocalFiltering = (store$: Observable<LegendStore>) => {
+  store$.filter.filters.onChange((changes) => {
+    applyFilter(store$, changes.value);
   });
 };
