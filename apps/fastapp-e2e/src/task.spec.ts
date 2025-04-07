@@ -318,13 +318,19 @@ test.describe('Task management', () => {
       .first()
       .click({ force: true });
 
+    await page.waitForTimeout(500);
+
     await taskPage.comboboxPopover.getByText(/no project/i).click();
+
+    await page.waitForTimeout(500);
 
     await taskPage.openFilter(/project/i);
 
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(1000);
 
     await taskPage.comboboxPopover.getByText(/no project/i).click();
+
+    await page.waitForTimeout(1000);
 
     await taskPage.closePopover();
 
