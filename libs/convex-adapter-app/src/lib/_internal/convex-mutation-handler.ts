@@ -171,7 +171,7 @@ export const updateMutation = async (
     return {
       status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
       message: `Error updating record. Record ID=${mutation.payload.id} displayField=${displayField} displayValue=${displayValue}`,
-      // error: getErrorMessage(error),
+      error: getErrorMessage(error),
     };
   }
 };
