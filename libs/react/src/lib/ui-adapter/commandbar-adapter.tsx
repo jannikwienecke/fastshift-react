@@ -41,9 +41,11 @@ export const makeCommandbarProps = <T extends RecordType>(
   return {
     ...state,
     groupLabels: (state.groupLabels as string[]) ?? [''],
-    renderItem(item, active, index) {
+    renderItem(item, active, index, activeRow) {
       const viewField = store$.commandbar.selectedViewField.get();
-      const activeRow = store$.list.rowInFocus.row.get() as Row | null;
+
+      if (!activeRow) return null;
+
       if (viewField && viewField.type === 'String') {
         const IconOf = getComponent({
           fieldName: viewField?.name,
@@ -66,7 +68,7 @@ export const makeCommandbarProps = <T extends RecordType>(
         );
       } else if (viewField && viewField.type === 'Date') {
         if (!activeRow) return null;
-        const currentRowValue = activeRow.getValue(viewField.name);
+        const currentRowValue = activeRow.getValue?.(viewField.name);
 
         return (
           <div className="flex flex-row gap-2 items-center">
@@ -89,7 +91,7 @@ export const makeCommandbarProps = <T extends RecordType>(
         );
       } else if (viewField && viewField.type === 'Enum' && activeRow) {
         const rowValue = makeRowFromValue(item.id.toString(), viewField);
-        const currentEnumValue = activeRow.getValue(viewField.name);
+        const currentEnumValue = activeRow.getValue?.(viewField.name);
         const isSelected = currentEnumValue === item.id;
 
         return (
@@ -152,9 +154,10 @@ export const makeCommandbarProps = <T extends RecordType>(
         );
       } else if (viewField && viewField.relation) {
         const rowValue = item as Row;
-        const currentValue = activeRow?.getValue(viewField.name) as
+        const currentValue = activeRow?.getValue?.(viewField.name) as
           | Row[]
           | undefined;
+
         const rowValueId = rowValue?.id ?? '';
 
         const Component =

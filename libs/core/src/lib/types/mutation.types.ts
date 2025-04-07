@@ -79,6 +79,8 @@ export const ERROR_STATUS = {
   UNAUTHORIZED: 401 as const,
   FORBIDDEN: 403 as const,
   NOT_FOUND: 404 as const,
+  // status code for when the record has invalid data (like name is empty)
+  INVALID_RECORD: 422 as const,
 } as const;
 
 export const STATUS = {

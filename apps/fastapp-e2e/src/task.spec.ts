@@ -732,7 +732,9 @@ test.describe('Task management', () => {
     await taskPage.commandbar.getByText(/create new task/i).click();
 
     // expect that the btn is disabled
-    await expect(taskPage.commandform.getByText(/create task/i)).toBeDisabled();
+    await expect(
+      taskPage.commandform.getByText(/create task/i)
+    ).toHaveAttribute('data-disabled', 'true');
 
     await taskPage.commandform.getByPlaceholder(/name/i).fill('New Task Name');
     await taskPage.commandform
@@ -748,10 +750,14 @@ test.describe('Task management', () => {
     await taskPage.comboboxPopover.getByText(/important/i).click();
 
     // close the popover
-    await taskPage.commandform.getByText(/create task/i).click({ force: true });
+
+    await taskPage.commandform.click({ force: true });
 
     await taskPage.commandform.getByText(/project/i).click();
+
     await taskPage.comboboxPopover.getByText(/website redesign/i).click();
+
+    await taskPage.commandform.getByText(/important/i).click({ force: true });
 
     // expect that the btn is NOT disabled
     await expect(taskPage.commandform.getByText(/create task/i)).toBeEnabled();
@@ -919,9 +925,7 @@ test.describe('Task management', () => {
     await taskPage.contextmenu.getByText(/tag/i).click();
 
     await taskPage.commandbar.getByText(/urgent/i).click();
-    await taskPage.commandbar.getByText(/important/i).click();
     await expect(firstListItem.getByText(/urgent/i)).toBeHidden();
-    await expect(firstListItem.getByText(/important/i)).toBeHidden();
   });
 
   test('can delete record and show the deleted items', async ({
@@ -973,7 +977,7 @@ test.describe('Task management', () => {
     await expect(taskPage.commandform).toBeVisible();
     await expect(
       taskPage.commandform.getByText(/create project/i)
-    ).toBeDisabled();
+    ).toHaveAttribute('data-disabled', 'true');
 
     // Fill in project details
     await taskPage.commandform

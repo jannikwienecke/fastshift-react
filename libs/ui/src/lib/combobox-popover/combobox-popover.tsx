@@ -1,6 +1,10 @@
 'use client';
 
-import { ComboboxPopoverProps, ComboxboxItem } from '@apps-next/core';
+import {
+  ComboboxPopoverProps,
+  ComboxboxItem,
+  getTableLabel,
+} from '@apps-next/core';
 import { CheckIcon } from '@radix-ui/react-icons';
 import React from 'react';
 import { Input } from '../components';
@@ -75,7 +79,10 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
                   value={input.query}
                   placeholder={
                     input.placeholder ||
-                    `${t('common.change')} ${comboboxProps.tableName}...`
+                    `${t('common.change')} ${getTableLabel(
+                      comboboxProps.tableName || comboboxProps.name,
+                      comboboxProps.multiple ? undefined : true
+                    )}...`
                   }
                   onChange={(event) => input.onChange(event.target.value)}
                   className={cn(

@@ -93,12 +93,18 @@ export const en = {
     title: '⚠️ ️️Oops! Something went wrong',
     showDetails: 'Show details',
     deleteRecord: 'Could not delete record. Please try again',
-    updateError: 'Could not update record. Please try again',
+    updateRecord: 'Could not update record. Please try again',
   },
   success: {
     createRecord: {
       title: '✅ Created Successfully',
     },
+  },
+
+  copy: {
+    id: 'Copy ID',
+    url: 'Copy URL',
+    json: 'Copy as JSON',
   },
 
   confirmationAlert: {

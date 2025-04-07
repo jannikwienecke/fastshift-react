@@ -1,14 +1,20 @@
 import { UiViewConfig } from './config.store';
 import { invarant } from './core-utils';
+import { t } from './translations';
+
 import {
   FieldConfig,
   IncludeConfig,
   IndexField,
+  RecordErrors,
+  RecordType,
   RegisteredViews,
   SearchableField,
   ViewConfigType,
   ViewFieldConfig,
 } from './types';
+
+import { z } from 'zod';
 
 export type ModelConfig = {
   searchableFields?: SearchableField;
@@ -39,14 +45,19 @@ export interface BaseViewConfigManagerInterface<
     registeredViews: RegisteredViews
   ): ViewConfigType | undefined;
   getUiViewConfig: () => UiViewConfig[string];
+  validateField: (field: FieldConfig, value: unknown) => string | undefined;
+  validateRecord: (
+    record: RecordType,
+    partialRecord?: true
+  ) => RecordErrors | null;
 
   modelConfig?: ModelConfig;
 }
 
 export class BaseViewConfigManager<
-  TViewConfig extends ViewConfigType = ViewConfigType<any>,
+  TViewConfig extends ViewConfigType = ViewConfigType,
   KUiViewConfig extends UiViewConfig = UiViewConfig
-> implements BaseViewConfigManagerInterface<any>
+> implements BaseViewConfigManagerInterface
 {
   viewConfig: TViewConfig;
   uiViewConfig: KUiViewConfig;
@@ -218,13 +229,75 @@ export class BaseViewConfigManager<
     fieldName: string,
     registeredViews: RegisteredViews
   ): ViewConfigType | undefined {
-    // const field = this.getFieldBy(fieldName);
-    // if (!field.relation) return undefined;
-
     const view = Object.values(registeredViews).find(
       (view) => view?.tableName === fieldName
     );
 
     return view;
+  }
+
+  validateField(field: FieldConfig, value: unknown): string | undefined {
+    if (!field.isRequired && value === undefined) return undefined;
+
+    if (
+      field.isRequired &&
+      (value === undefined || value === '' || value === null)
+    ) {
+      return `Field ${field.label} is required`;
+    }
+
+    if (field.validator) {
+      const zod = field.validator() as z.ZodType;
+      const parseResult = zod.safeParse(value);
+      if (parseResult.success) {
+        return undefined;
+      }
+
+      const out =
+        parseResult.error.errors?.[0]?.message ?? 'Something went wrong';
+
+      return field.validationErrorMessage
+        ? field.validationErrorMessage(t)
+        : out;
+    }
+
+    return undefined;
+  }
+
+  validateRecord(
+    record: RecordType | undefined | null,
+    partialRecord?: boolean
+  ): RecordErrors | null {
+    if (!record) return null;
+
+    const fields = this.getViewFieldList();
+
+    const errors = fields.reduce((prev, field) => {
+      let value = record[field.name];
+      if (partialRecord && value === undefined) {
+        return { ...prev };
+      }
+
+      value = field.isDateField ? new Date(value) : value;
+
+      const fieldnameRelation = field.relation?.fieldName;
+
+      if (value === undefined && fieldnameRelation) {
+        value = record[fieldnameRelation];
+      }
+
+      const error = this.validateField(field, value);
+      if (error) {
+        return {
+          ...prev,
+          [field.name]: { error },
+        };
+      }
+      return prev;
+    }, {} as RecordErrors);
+
+    if (Object.values(errors).length === 0) return null;
+
+    return errors;
   }
 }

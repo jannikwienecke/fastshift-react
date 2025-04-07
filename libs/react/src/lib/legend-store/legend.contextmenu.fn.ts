@@ -2,9 +2,12 @@ import { batch } from '@legendapp/state';
 import { StoreFn } from './legend.store.types';
 import { makeData, makeRowFromValue, Row } from '@apps-next/core';
 import { copyRow } from './legend.utils';
+import { selectState$, xSelect } from './legend.select-state';
 
 export const contextMenuOpen: StoreFn<'contextMenuOpen'> =
   (store$) => (rect, record) => {
+    selectState$.parentRow.set(null);
+
     const row = makeData(
       store$.views.get(),
       store$.viewConfigManager.getViewName()
@@ -24,6 +27,7 @@ export const contextMenuOpen: StoreFn<'contextMenuOpen'> =
 export const contextMenuClose: StoreFn<'contextMenuClose'> = (store$) => () => {
   store$.contextMenuState.rect.set(null);
   store$.contextMenuState.row.set(null);
+  xSelect.close();
 };
 
 export const contextmenuDeleteRow: StoreFn<'contextmenuDeleteRow'> =
@@ -58,5 +62,22 @@ export const contextmenuClickOnField: StoreFn<'contextmenuClickOnField'> =
     } else {
       store$.contextMenuClose();
       store$.commandbarOpenWithFieldValue(field, copyRow(activeRow as Row));
+    }
+  };
+
+export const contextmenuCopyRow: StoreFn<'contextmenuCopyRow'> =
+  (store$) => (type) => {
+    const row = store$.contextMenuState.row.get() as Row | undefined;
+    if (!row) return;
+    // copy to clipboard
+    const copy = copyRow(row);
+
+    if (type === 'id') {
+      navigator.clipboard.writeText(copy.id);
+    } else if (type === 'url') {
+      const currentUrl = window.location.href;
+      navigator.clipboard.writeText(`${currentUrl}?id=${copy.id}`);
+    } else if (type === 'json') {
+      navigator.clipboard.writeText(JSON.stringify(copy.raw));
     }
   };

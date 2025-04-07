@@ -12,13 +12,10 @@ import {
 import { observable, Observable } from '@legendapp/state';
 import { renderErrorToast, renderSuccessToast } from '../toast';
 import { createRow } from './legend.commandform.helper';
+import { selectState$, xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';
-import {
-  initSelected$,
-  newSelected$,
-  removedSelected$,
-} from './legend.combobox.helper';
+import { comboboxStore$ } from './legend.store.derived.combobox';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
@@ -28,23 +25,16 @@ export const ignoreNewData$ = observable(0);
 
 export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   (store$) =>
-  async ({ field, existingRows = [], checkedRow, row }) => {
-    // Check if the entry already exists
-    const isSelected = existingRows.some((r) => r.id === checkedRow.id);
-
-    if (isSelected) {
-      // Deselect row: remove from checkedRows and add to delete list
-      checkedRows$.set((prev) => prev.filter((r) => r.id !== checkedRow.id));
-      idsToDelete$.set((prev) => [...prev, checkedRow.id]);
-    } else {
-      // Select row: add to checkedRows
-      checkedRows$.set((prev) => [...prev, checkedRow]);
-    }
-
-    // New row list based on toggle
-    const newRows = isSelected
-      ? existingRows.filter((r) => r.id !== checkedRow.id)
-      : [...existingRows, checkedRow];
+  async ({
+    field,
+    existingRows = [],
+    checkedRow,
+    row,
+    newRows,
+    newIds,
+    idsToDelete,
+  }) => {
+    _log.warn('___RUN Mutation', { newRows, idsToDelete, newIds });
 
     // Perform optimistic update
     const rollback = optimisticUpdateStore({
@@ -72,12 +62,11 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
       payload: {
         id: row.id,
         table: getRelationTableName(field),
-        idsToDelete: idsToDelete$.get(),
-        newIds: checkedRows$.get().map((r) => r.id),
+        idsToDelete: idsToDelete,
+        newIds: newIds,
       },
     };
 
-    console.warn('Mutation payload:');
     const { error } = await store$.api.mutateAsync({
       mutation,
       viewName: store$.viewConfigManager.viewConfig.viewName.get(),
@@ -85,9 +74,9 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
     });
 
     if (error) {
-      console.error('Error selecting rows:', error);
+      _log.error('Error selecting rows:', error);
       rollback?.();
-      renderErrorToast('error.updateError', () => {
+      renderErrorToast('error.updateRecord', () => {
         store$.errorDialog.error.set(error);
       });
     } else {
@@ -179,7 +168,7 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
       console.error('Error updating record:', error);
       rollback();
       onError?.(error.message);
-      renderErrorToast('error.updateError', () => {
+      renderErrorToast('error.updateRecord', () => {
         store$.errorDialog.error.set(error);
       });
     } else {
@@ -229,6 +218,7 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
       store$.confirmationAlert.description.set(
         'confirmationAlert.delete.description'
       );
+
       store$.confirmationAlert.onConfirm.set({
         cb: runMutation,
       });
@@ -250,14 +240,16 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
       [INTERNAL_FIELDS.creationTime.fieldName]: Date.now(),
     });
 
+    const optimisicRecord = row ? patchRecord(row.raw, store$) : {};
+
     if (!row) return;
 
-    const currentRows = store$.dataModel.rows.get();
+    const currentRows = store$.dataModel.rows.get().map((r) => r.raw);
     const rows = store$.displayOptions.sorting.field.get()
-      ? [row, ...currentRows]
-      : [...currentRows, row];
+      ? [optimisicRecord, ...currentRows]
+      : [...currentRows, optimisicRecord];
 
-    updateGlobalDataModel && store$.createDataModel(rows.map((r) => r.raw));
+    updateGlobalDataModel && store$.createDataModel(rows);
 
     const runMutation = async () => {
       const mutation: Mutation = {
@@ -282,7 +274,7 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
         });
 
         updateGlobalDataModel &&
-          store$.createDataModel(currentRows.map((r) => r.raw));
+          store$.createDataModel(currentRows.map((r) => r['raw']));
       } else {
         if (toast) {
           renderSuccessToast('');
@@ -310,44 +302,11 @@ export const optimisticUpdateStore = ({
   store$: Observable<LegendStore>;
   updateGlobalDataModel?: boolean;
 }): (() => void) => {
-  console.warn('Starting optimistic update', { updateGlobalDataModel, record });
+  _log.warn('Starting optimistic update', { updateGlobalDataModel, record });
 
-  const initSelected = [...(initSelected$.get() ?? [])];
+  const originalRow = copyRow(row);
 
-  record = Object.entries(record).reduce((prev, [key, value]) => {
-    const _value = value === NONE_OPTION ? undefined : value;
-    const commandformRow =
-      store$.commandform.open.get() && store$.commandform.row.get();
-
-    try {
-      const field = store$.viewConfigManager.getFieldBy(key);
-      const manyToManyTablename = field.relation?.manyToManyTable;
-
-      if (manyToManyTablename && commandformRow) {
-        // for many to many fields, we need the full row and not just the id
-        const rows = commandformRow.raw[key];
-        if (rows.length) {
-          return {
-            ...prev,
-            [key]: rows,
-          };
-        }
-      } else if (field.relation && commandformRow) {
-        return {
-          ...prev,
-        };
-      }
-    } catch (error) {
-      const field = store$.viewConfigManager.getFieldByRelationFieldName(key);
-      if (commandformRow) {
-        return {
-          [field.name]: commandformRow.raw[field.name],
-        };
-      }
-    }
-
-    return { ...prev, [key]: _value };
-  }, record);
+  record = patchRecord(record, store$);
 
   const originalRows = [...store$.dataModel.rows.get()];
 
@@ -387,6 +346,10 @@ export const optimisticUpdateStore = ({
       store$.contextMenuState.row.set(copyRow(updatedRow));
     }
 
+    if (selectState$.parentRow.get()) {
+      selectState$.parentRow.raw.set(updatedRow.raw);
+    }
+
     if (updateGlobalDataModel) {
       store$.dataModel.set((prev) => {
         return {
@@ -399,19 +362,77 @@ export const optimisticUpdateStore = ({
 
   // Return rollback function
   return () => {
-    _log.warn('Rolling back optimistic update', originalRows);
+    setTimeout(() => {
+      _log.warn('Rolling back optimistic update', originalRows);
+      isRunning$.set(false);
 
-    store$.dataModel.rows.set(originalRows);
-    store$.contextMenuState.row.set(copyRow(row));
-    store$.commandbar.activeRow.set(copyRow(row));
-    store$.list.rowInFocus.row.set(copyRow(row));
-    store$.list.selectedRelationField.row.set(copyRow(row));
+      store$.dataModel.rows.set(originalRows);
 
-    const removeSelected = removedSelected$.get();
+      if (store$.contextMenuState.row.get())
+        store$.contextMenuState.row.set(copyRow(originalRow));
 
-    initSelected$.set(initSelected);
-    newSelected$.set([]);
-    removedSelected$.set(removeSelected);
-    isRunning$.set(false);
+      if (store$.commandbar.activeRow.get())
+        store$.commandbar.activeRow.set(copyRow(originalRow));
+
+      if (store$.list.rowInFocus.row.get())
+        store$.list.rowInFocus.row.set(copyRow(originalRow));
+
+      if (store$.list.selectedRelationField.row.get()) {
+        store$.list.selectedRelationField.row.set(copyRow(originalRow));
+      }
+
+      if (selectState$.parentRow.get()) {
+        selectState$.parentRow.set(copyRow(originalRow));
+      }
+
+      xSelect.onError();
+    }, 0);
   };
+};
+
+export const patchRecord = (
+  record: RecordType,
+  store$: Observable<LegendStore>
+) => {
+  const commandformRow =
+    store$.commandform.open.get() && store$.commandform.row.get();
+
+  record = Object.entries(record).reduce((prev, [key, value]) => {
+    const _value = value === NONE_OPTION ? undefined : value;
+
+    try {
+      const field = store$.viewConfigManager.getFieldBy(key);
+      const manyToManyTablename = field.relation?.manyToManyTable;
+
+      if (manyToManyTablename && commandformRow) {
+        const rows = commandformRow?.raw?.[key];
+
+        if (rows.length) {
+          return {
+            ...prev,
+            [key]: rows,
+          };
+        }
+      } else if (field.relation && commandformRow) {
+        return {
+          ...prev,
+        };
+      }
+    } catch (error) {
+      const field = store$.viewConfigManager.getFieldByRelationFieldName(key);
+
+      if (commandformRow && field) {
+        return {
+          ...prev,
+          [field.name]:
+            selectState$.parentRow.raw[field.name].get() ??
+            commandformRow.raw[field.name],
+        };
+      }
+    }
+
+    return { ...prev, [key]: _value };
+  }, record);
+
+  return record;
 };

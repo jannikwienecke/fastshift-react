@@ -5,6 +5,7 @@ import {
   CommandbarProps,
   CommandformItem,
   ContextMenuState,
+  ContextMenuUiOptions,
   ContinueCursor,
   DataModelNew,
   DisplayOptionsUiType,
@@ -65,6 +66,7 @@ export type ComboboxState = {
   field: FieldConfig | null;
   row: Row | null;
   showCheckboxInList: boolean;
+  defaultSelected?: Row[];
 };
 
 export type ComboboxStateCommonType = Pick<
@@ -87,6 +89,7 @@ export type MakeComboboxStateProps = Pick<
   'values' | 'tableName' | 'multiple'
 > & {
   selected?: Row[];
+  defaultSelected?: Row[];
   datePickerProps?: DatePickerState;
 };
 
@@ -271,6 +274,7 @@ export type LegendStore = {
   contextMenuClose: () => void;
   contextmenuDeleteRow: (row: Row) => void;
   contextmenuEditRow: (row: Row) => void;
+  contextmenuCopyRow: ContextMenuUiOptions['onCopy'];
   contextmenuClickOnField: (field: FieldConfig) => void;
 
   selectRowsMutation: (props: {
@@ -278,6 +282,9 @@ export type LegendStore = {
     row: Row;
     existingRows: Row[];
     checkedRow: Row;
+    newRows: Row[];
+    newIds: string[];
+    idsToDelete: string[];
   }) => void;
   updateRecordMutation: (
     props: {

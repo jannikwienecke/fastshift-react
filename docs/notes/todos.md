@@ -65,7 +65,7 @@ created: 1723444498044
 - [x] add validation rules to config, name must have 3 charachtes, use arktype, frontend and backend -> add test
 - [x] in convex helper -> taskId: mutation.payload.id -> make dynamic
 - [x] task can only add 1 todo for example, how would that work
-- [ ] refactor select many to many in all places
+- [x] refactor select many to many in all places
 - [ ] add tests for validation rules frontend and backend
 - [ ] in combobox render field names, label should be aligned (with or without icon), maybe default icon
 

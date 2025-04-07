@@ -1,13 +1,9 @@
-import { Observable, observable } from '@legendapp/state';
-import { LegendStore } from './legend.store.types';
-import {
-  comboboxDebouncedQuery$,
-  initSelected$,
-  newSelected$,
-  removedSelected$,
-} from './legend.combobox.helper';
-import { comboboxStore$ } from './legend.store.derived.combobox';
 import { _log } from '@apps-next/core';
+import { Observable, observable } from '@legendapp/state';
+import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
+import { xSelect } from './legend.select-state';
+import { comboboxStore$ } from './legend.store.derived.combobox';
+import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
@@ -32,9 +28,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       store$.combobox.query.set('');
       store$.combobox.multiple.set(false);
       store$.combobox.datePicker.set(null);
-      initSelected$.set(null);
-      newSelected$.set([]);
-      removedSelected$.set([]);
+      xSelect.close();
     }
 
     let timeout: NodeJS.Timeout;
@@ -58,7 +52,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     if (!tableName) return;
     if (fieldCommandbar?.name !== tableName) return;
 
-    comboboxDebouncedQuery$.set(query ?? '');
+    comboboxStore$.query.set(query ?? '');
   }).onChange(() => null);
 
   observable(function handleFilterChange() {

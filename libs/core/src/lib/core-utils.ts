@@ -510,3 +510,63 @@ export const sortRows = (
 
   return rows;
 };
+
+export const patchAllViews = (
+  views: RegisteredViews,
+  viewConfig: ViewConfigType
+) => {
+  if (!viewConfig) return views;
+
+  return patchDict(views ?? {}, (view) => {
+    if (!view) return view;
+
+    // return view;
+
+    return {
+      ...view,
+      viewFields: patchDict(view.viewFields, (f) => {
+        const userFieldConfig = viewConfig.fields?.[f.name];
+        const displayFIeld = viewConfig.displayField.field;
+        const softDeleteField = viewConfig.mutation?.softDeleteField;
+
+        const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
+        const isDisplayField =
+          displayFIeld && f.name === displayFIeld ? true : undefined;
+
+        return {
+          ...f,
+          ...userFieldConfig,
+          isDisplayField,
+          label: f.label || getFieldLabel(f),
+          hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
+        } satisfies FieldConfig;
+      }),
+    };
+  });
+};
+
+export const patchViewConfig = (viewConfig: ViewConfigType) => {
+  const patechedViewFields = patchDict(viewConfig.viewFields, (f) => {
+    const userFieldConfig = viewConfig.fields?.[f.name];
+    const displayFIeld = viewConfig.displayField.field;
+    const softDeleteField = viewConfig.mutation?.softDeleteField;
+
+    const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
+    const isDisplayField =
+      displayFIeld && f.name === displayFIeld ? true : undefined;
+
+    return {
+      ...f,
+      ...(userFieldConfig ?? {}),
+      label: f.label || `${f.name}.one`,
+      isDisplayField: isDisplayField as true | undefined,
+      editLabel: `${f.name}.edit`,
+      hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
+    };
+  });
+
+  return {
+    ...viewConfig,
+    viewFields: patechedViewFields,
+  } satisfies ViewConfigType;
+};

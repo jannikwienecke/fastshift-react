@@ -1,3 +1,4 @@
+import { Row } from '../data-model';
 import { TranslationKeys } from '../translations';
 import { FieldConfig, RecordType } from './base.types';
 import { DisplayOptionsUiType, FilterItemType } from './filter.types';
@@ -214,14 +215,15 @@ export type CommandformItem = ComboxboxItem & {
   // render: () => React.ReactNode;
 };
 
-export type FormErrors = { [fieldName: string]: { error: string } };
+export type RecordErrors = { [fieldName: string]: { error: string } };
 
 export type CommandformProps = {
   open?: boolean;
   formState: {
     isReady: boolean;
-    errors: FormErrors;
+    errors: RecordErrors;
   };
+  errors: string[];
   complexFields: CommandformItem[];
   primitiveFields: CommandformItem[];
   type: 'create' | 'edit';
@@ -244,11 +246,17 @@ export type CommandbarProps = {
   headerLabel: string;
   inputPlaceholder: string;
   query?: string;
+  error?: {
+    message: string;
+    showError: boolean;
+  };
+  row?: Row;
 
   renderItem: (
     item: ComboxboxItem,
     active: boolean,
-    index: number
+    index: number,
+    row?: Row
   ) => React.ReactNode;
 
   onClose: () => void;

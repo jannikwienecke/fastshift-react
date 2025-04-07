@@ -13,6 +13,8 @@ import {
 } from '../ui-adapter/filter-adapter';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { StoreFn } from './legend.store.types';
+import { xSelect } from './legend.select-state';
+import { comboboxStore$ } from './legend.store.derived.combobox';
 
 export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
   store$.openSpecificModal('commandbar', () => {
@@ -27,6 +29,7 @@ export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
   store$.commandbar.itemGroups.set([]);
   store$.commandbar.selectedViewField.set(undefined);
   store$.combobox.query.set('');
+  store$.commandbar.error.set(undefined);
   // store$.list.selectedRelationField.set()
   comboboxDebouncedQuery$.set('');
 };
@@ -49,6 +52,7 @@ export const commandbarOpenWithFieldValue: StoreFn<
     //
   }
   store$.commandbar.selectedViewField.set(field);
+  xSelect.open(row, field);
 };
 
 export const commandbarUpdateQuery: StoreFn<'commandbarUpdateQuery'> =
@@ -68,6 +72,7 @@ export const commandbarUpdateQuery: StoreFn<'commandbarUpdateQuery'> =
     }
 
     store$.commandbar.query.set(query);
+    store$.combobox.query.set(query);
   };
 
 export const commandbarSetValue: StoreFn<'commandbarSetValue'> =
@@ -102,14 +107,8 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         const row = store$.commandbar.activeRow.get();
         if (!row) return;
 
-        const existingRows = row.getValue?.(selectedViewField.name) as Row[];
-
-        store$.selectRowsMutation({
-          field: selectedViewField,
-          row: row as Row,
-          checkedRow: store$.commandbar.activeItem.get() as Row,
-          existingRows: existingRows,
-        });
+        xSelect.open(row as Row, selectedViewField);
+        xSelect.select(store$.commandbar.activeItem.get() as Row);
 
         return;
       } else {
@@ -146,6 +145,15 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         }
 
         if (selectedViewField.type === 'String' && query?.length) {
+          const error = store$.viewConfigManager.validateField(
+            selectedViewField,
+            query
+          );
+          if (error) {
+            store$.commandbar.error.showError.set(true);
+            return;
+          }
+
           store$.updateRecordMutation({
             field: selectedViewField,
             row: row as Row,
@@ -217,14 +225,14 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
 
           return;
         } else if (selectedViewField.relation) {
-          const existingRows = row.getValue?.(selectedViewField.name) as Row[];
-
-          store$.selectRowsMutation({
-            field: selectedViewField,
-            row: row as Row,
-            checkedRow: item as Row,
-            existingRows: existingRows,
-          });
+          if ((item as Row | undefined)?.raw) {
+            xSelect.select(item as Row);
+          } else {
+            const row = comboboxStore$.values
+              .find((v) => v.id.get() === item.id)
+              ?.get();
+            row && xSelect.select(row as Row);
+          }
 
           return;
         } else {
@@ -241,6 +249,8 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
         return;
       } else {
         store$.commandbar.selectedViewField.set(field);
+
+        xSelect.open(row as Row, field);
       }
 
       if (field.type === 'String') {

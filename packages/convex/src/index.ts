@@ -2,13 +2,13 @@ import {
   createConfigFromConvexSchema,
   makeViews,
 } from '@apps-next/convex-adapter-app';
-
+import { z } from 'zod';
 import { createViewConfig } from '@apps-next/react';
 import { CubeIcon, PersonIcon, TokensIcon } from '@radix-ui/react-icons';
 import { CheckCheckIcon, TagIcon } from 'lucide-react';
-import schema from '../convex/schema';
-// import { DataType } from '@apps-next/core';
-// import { TFunction } from 'i18next';
+import schema, { Projects, Tags, Tasks, Todos } from '../convex/schema';
+import { DataType } from '@apps-next/core';
+import { TFunction } from 'i18next';
 
 export * from '../convex/_generated/api';
 export * from '../convex/schema';
@@ -21,15 +21,16 @@ declare module '@apps-next/core' {
   }
 }
 
-// type TaskViewDataType = DataType<
-//   'tasks',
-//   {
-//     projects: Projects;
-//     tags?: Tags[];
-//     tasks?: Tasks[];
-//     todos?: Todos[];
-//   }
-// >;
+// FIXME -> Defined in one place
+type TaskViewDataType = DataType<
+  'tasks',
+  {
+    projects: Projects;
+    tags?: Tags[];
+    tasks?: Tasks[];
+    todos?: Todos[];
+  }
+>;
 
 export const tasksConfig = createViewConfig(
   'tasks',
@@ -50,14 +51,14 @@ export const tasksConfig = createViewConfig(
           tommorow.setDate(tommorow.getDate() + 1);
           return tommorow.getTime();
         },
-        // FIXME ARKTYPE
-        // validator: () => type(`Date > ${Date.now()}`),
+        validator: () => z.date().min(new Date()),
       },
       name: {
-        // validator: () => type('string > 3'),
+        // FIXME ARKTYPE
+        validator: () => z.string().min(3),
         // optional -> otherwise it will use the default value
-        // validationErrorMessage: (t: TFunction) =>
-        //   t('errors.minCharacters', { count: 4 }),
+        validationErrorMessage: (t: TFunction) =>
+          t('errors.minCharacters', { count: 3 }),
       },
       completed: {
         defaultValue: false,
@@ -100,35 +101,35 @@ export const tasksConfig = createViewConfig(
           completed: data.completed ?? false,
         };
       },
-      // beforeSelect: (data, options) => {
-      //   const completeTask = options.recordWithInclude as TaskViewDataType;
+      beforeSelect: (data, options) => {
+        const completeTask = options.recordWithInclude as TaskViewDataType;
 
-      //   if (options.field === 'tags') {
-      //     const tags = completeTask.tags;
-      //     const tagsAfterRemove =
-      //       tags?.filter((tag) => !options.deleteIds.includes(tag._id)) ?? [];
-      //     const allTagIds = Array.from(
-      //       new Set([
-      //         ...options.newIds,
-      //         ...tagsAfterRemove.map((tag) => tag._id),
-      //       ])
-      //     );
+        if (options.field === ('tags' satisfies keyof TaskViewDataType)) {
+          const tags = completeTask.tags;
+          const tagsAfterRemove =
+            tags?.filter((tag) => !options.deleteIds.includes(tag._id)) ?? [];
+          const allTagIds = Array.from(
+            new Set([
+              ...options.newIds,
+              ...tagsAfterRemove.map((tag) => tag._id),
+            ])
+          );
 
-      //     if (allTagIds.length > 3) {
-      //       return {
-      //         error: 'You can only have at most one tag',
-      //       };
-      //     } else if (allTagIds.length < 1) {
-      //       return {
-      //         error: 'You need to have at least one tag',
-      //       };
-      //     }
-      //   }
+          if (allTagIds.length > 3) {
+            return {
+              error: 'You can only have at most one tag',
+            };
+          } else if (allTagIds.length < 1) {
+            return {
+              error: 'You need to have at least one tag',
+            };
+          }
+        }
 
-      //   return {
-      //     ...options,
-      //   };
-      // },
+        return {
+          ...options,
+        };
+      },
     },
   },
 

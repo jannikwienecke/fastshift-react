@@ -2,15 +2,18 @@ import {
   BaseViewConfigManager,
   CommandformProps,
   FieldConfig,
-  FormErrors,
+  // RecordErrors,
   invarant,
   makeData,
   RecordType,
   Row,
   ViewConfigType,
+  _log,
+  getFieldLabel,
 } from '@apps-next/core';
-import { store$ } from './legend.store';
+// import { type } from 'arktype';
 import { getTimeValueFromDateString } from '../ui-adapter/filter-adapter';
+import { store$ } from './legend.store';
 
 export const getViewConfigManager = () => {
   const view = store$.commandform.view.get() as ViewConfigType;
@@ -40,28 +43,18 @@ export const getValueForField = (field: FieldConfig) => {
 };
 
 export const getFormState = () => {
-  const fields = getViewFields();
+  const viewConfigManager = getViewConfigManager();
+  const row = store$.commandform.row.get();
 
-  const errors = fields.reduce((prev, field) => {
-    const value = getValueForField(field);
-    if (!field.isRequired && value === undefined) return prev;
+  const errors = viewConfigManager.validateRecord(row?.raw);
 
-    if (
-      field.isRequired &&
-      (value === undefined || value === '' || value === null)
-    ) {
-      return {
-        ...prev,
-        [field.name]: { error: `Field ${field.label} is required` },
-      };
-    }
-
-    return { ...prev };
-  }, {} as FormErrors);
+  if (errors) {
+    _log.warn('Form State Errors: ', errors);
+  }
 
   return {
-    isReady: Object.values(errors).length === 0,
-    errors,
+    isReady: !errors,
+    errors: errors ?? {},
   } satisfies CommandformProps['formState'];
 };
 
@@ -72,6 +65,7 @@ export const getRecordTypeFromRow = () => {
   if (!row) return {};
 
   const obj = allFields.reduce((prev, field) => {
+    // Instead of trying to pick individual fields, we'll validate the whole object at the end
     const value = row.getValue?.(field.name);
 
     const valueToUse =
@@ -124,4 +118,16 @@ export const getDefaultRow = () => {
   }, {} as RecordType);
 
   return createRow(obj);
+};
+
+export const getErrorListFromFormState = (): string[] => {
+  const viewFields = getViewFields();
+  const formState = getFormState();
+
+  return Object.entries(formState.errors).map(([key, value]) => {
+    const field = viewFields.find((f) => f.name === key);
+    if (!field) return '';
+
+    return `${getFieldLabel(field, true)}: ${value.error}`;
+  });
 };

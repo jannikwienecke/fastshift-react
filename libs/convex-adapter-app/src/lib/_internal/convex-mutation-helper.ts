@@ -7,7 +7,7 @@ import { asyncMap } from 'convex-helpers';
 import { mutationClient, queryClient } from './convex-client';
 import { getRelationTableRecords } from './convex-get-relation-table-records';
 import { GenericMutationCtx } from './convex.server.types';
-import { ConvexRecordType, ID } from './types.convex';
+import { ConvexRecordType, ID, RecordType } from './types.convex';
 
 export const deleteIds = async (
   ids: ID[],
@@ -66,18 +66,13 @@ export const insertIds = async (
   ids: ID[],
   { viewConfigManager, mutation }: MutationPropsServer,
   ctx: GenericMutationCtx,
-  field: FieldConfig
+  field: FieldConfig,
+  record: RecordType
 ) => {
   const tableFieldName = getTableFieldName(viewConfigManager, field);
   if (!ids || ids.length === 0) return;
 
   if (field.isRecursive && tableFieldName) {
-    const client = queryClient(ctx, field.name);
-
-    const record = await client
-      .withIndex('by_id', (q) => q.eq('_id', mutation.payload.id))
-      .first();
-
     const existingIds = record[tableFieldName] as ID[];
 
     await ctx.db.patch(mutation.payload.id, {
@@ -87,15 +82,22 @@ export const insertIds = async (
     return;
   }
 
+  const relationFieldName = field.relation?.manyToManyModelFields?.find(
+    (f) => f.relation?.tableName === field.name
+  )?.relation?.fieldName;
   await asyncMap(ids, async (value) => {
     if (field.relation?.type === 'oneToMany' && tableFieldName) {
       await ctx.db.patch(value, { [tableFieldName]: mutation.payload.id });
-    } else if (field.relation?.manyToManyTable) {
+    } else if (
+      field.relation?.manyToManyTable &&
+      tableFieldName &&
+      relationFieldName
+    ) {
       await mutationClient(ctx).insert(
         field.relation.manyToManyTable as string,
         {
-          taskId: mutation.payload.id,
-          tagId: value,
+          [tableFieldName]: mutation.payload.id,
+          [relationFieldName]: value,
         }
       );
     }

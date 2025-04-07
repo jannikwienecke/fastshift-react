@@ -5,11 +5,14 @@ import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   Command,
+  FieldConfig,
   patchDict,
   QueryReturnOrUndefined,
   RegisteredViews,
   renderModelName,
   UiViewConfig,
+  ViewConfigType,
+  ViewFieldConfig,
 } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -36,29 +39,6 @@ export const ClientViewProviderConvex = (
   props: QueryProviderPropsWithViewFieldsConfig
 ) => {
   const patechedViewFields = patchDict(props.viewConfig.viewFields, (f) => {
-    // const translated = t(`${f.name}.edit`);
-    // const noTranslation = translated === `${f.name}.edit`;
-
-    // const isMany = f.relation?.type === 'manyToMany';
-    // const translatedName = t(`${f.name}.${isMany ? 'other' : 'one'}`);
-    // const noTranslationName =
-    //   translatedName === `${f.name}.${isMany ? 'other' : 'one'}`;
-
-    // const fieldLabelToUse = noTranslationName
-    //   ? f.name.firstUpper()
-    //   : translatedName;
-
-    // const fallbackKey =
-    //   f.relation?.type === 'manyToMany'
-    //     ? 'changeOrAdd'
-    //     : f.relation
-    //     ? 'setField'
-    //     : 'changeField';
-
-    // const toUse = noTranslation
-    //   ? t(`common.${fallbackKey}`, { field: fieldLabelToUse })
-    //   : translated;
-
     const userFieldConfig = props.viewConfig.fields?.[f.name];
     const displayFIeld = props.viewConfig.displayField.field;
     const softDeleteField = props.viewConfig.mutation?.softDeleteField;
@@ -74,9 +54,6 @@ export const ClientViewProviderConvex = (
       isDisplayField: isDisplayField as true | undefined,
       editLabel: `${f.name}.edit`,
       hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
-
-      // editLabel: f.editLabel || `${f.name}.edit`,
-      // editSearchString: toUse
     };
   });
 
@@ -120,7 +97,7 @@ export const ClientViewProviderConvex = (
           isDisplayField,
           label: f.label || renderModelName(f.name, t),
           hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
-        };
+        } satisfies FieldConfig;
       }),
     };
   });

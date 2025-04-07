@@ -5,7 +5,6 @@ import {
   DELETE_OPTION,
   getEditLabel,
   getFieldLabel,
-  getTableLabel,
   getViewLabel,
   NONE_OPTION,
   Row,
@@ -45,9 +44,17 @@ export const getCommandbarSelectedViewField = () => {
 
   if (!viewField) return {};
 
+  const query = store$.commandbar.query.get();
   if (viewField.type === 'String') {
+    const error = store$.viewConfigManager.validateField(viewField, query);
+
+    const showError = store$.commandbar.error.showError.get();
     return {
       inputPlaceholder: '',
+      error: {
+        showError: showError && error ? true : false,
+        message: error ? `Error: ${error}` : '',
+      },
       itemGroups: [
         [
           {
@@ -145,28 +152,23 @@ export const getCommandbarSelectedViewField = () => {
       ],
     } satisfies PropsType;
   } else if (viewField.relation?.manyToManyRelation) {
-    const selectedOption = store$.list.rowInFocus.row.get();
+    const { values, field, row, defaultSelected } = comboboxStore$.get() ?? {};
 
-    const existingRows: Row[] | undefined = selectedOption?.getValue?.(
-      viewField.name
-    );
+    const filteredExistingRows =
+      defaultSelected?.map((row) => ({
+        id: row.id,
+        label: row.label,
+      })) ?? [];
 
-    const options = comboboxStore$.values.get();
     const optionsWithoutExistingRows =
-      options?.filter(
-        (option) => !existingRows?.some((row) => row.id === option.id)
-      ) ?? [];
-
-    // const existingRowsFiltered =
-    const fuse = new Fuse(existingRows ?? [], {
-      keys: ['label'],
-      threshold: 0.3,
-    });
-
-    const query = store$.commandbar.query.get();
-    const filteredExistingRows = query
-      ? fuse.search(query).map((result) => result.item)
-      : existingRows ?? [];
+      values
+        ?.filter((row) => {
+          return !defaultSelected?.some((r) => r.id === row.id);
+        })
+        .map((row) => ({
+          id: row.id,
+          label: row.label,
+        })) ?? [];
 
     const commands = [
       {
@@ -192,14 +194,12 @@ export const getCommandbarSelectedViewField = () => {
             name: getFieldLabel(viewField, true),
           })
         : null,
-      filteredExistingRows.length
+      defaultSelected?.length
         ? t('commandbar.existingLabel' satisfies TranslationKeys, {
             name: getFieldLabel(viewField, true),
           })
         : null,
-      optionsWithoutExistingRows.length
-        ? getFieldLabel(viewField, undefined, true)
-        : null,
+      values?.length ? getFieldLabel(viewField, undefined, true) : null,
     ].filter((l) => l !== null);
 
     return {

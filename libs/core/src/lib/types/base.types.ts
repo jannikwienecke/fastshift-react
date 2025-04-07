@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { z } from 'zod';
-import { BaseConfigInterface } from './config.types';
 import React from 'react';
+import { object, z } from 'zod';
+import { BaseConfigInterface } from './config.types';
 
-const documentBaseSchema = z.object({
+const documentBaseSchema = object({
   id: z.string(),
 });
 
@@ -54,6 +54,8 @@ export type FieldConfigOptions<
   richEditor?: boolean;
   isDateField?: boolean;
   showCheckboxInList?: boolean;
+  validator?: () => any;
+  validationErrorMessage?: (t: any) => string;
 };
 
 export type FieldConfig<TName = string> = {

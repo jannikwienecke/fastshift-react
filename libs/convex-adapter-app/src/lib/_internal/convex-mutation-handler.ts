@@ -4,12 +4,13 @@ import {
   MutationHandlerReturnType,
   MutationPropsServer,
 } from '@apps-next/core';
+import { mapWithInclude } from './convex-map-with-include';
 import { deleteIds, insertIds } from './convex-mutation-helper';
+import { getErrorMessage } from './convex-utils';
 import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx } from './convex.server.types';
 import { ID } from './types.convex';
 import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
-import { getErrorMessage } from './convex-utils';
 
 export const createMutation = async (
   ctx: GenericMutationCtx,
@@ -37,6 +38,18 @@ export const createMutation = async (
   }
 
   try {
+    const errors = viewConfigManager.validateRecord(record);
+    if (errors) {
+      return {
+        status: ERROR_STATUS.INVALID_RECORD,
+        // status:
+        message: `Error creating record. Record=${JSON.stringify(
+          record
+        )} displayField=${displayField} displayValue=${displayValue}`,
+        error: JSON.stringify(errors),
+      };
+    }
+
     const res = await ctx.db.insert(viewConfigManager.getTableName(), record);
 
     for (const index in manyToManyFields) {
@@ -64,7 +77,7 @@ export const createMutation = async (
       message: `Error creating record. Record=${JSON.stringify(
         record
       )} displayField=${displayField} displayValue=${displayValue}`,
-      error: getErrorMessage(error),
+      // error: getErrorMessage(error),
     };
   }
 };
@@ -98,7 +111,7 @@ export const deleteMutation = async (
     return {
       status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
       message: errorMsg,
-      error: getErrorMessage(error),
+      // error: getErrorMessage(error),
     };
   }
 
@@ -136,6 +149,17 @@ export const updateMutation = async (
   );
 
   try {
+    const errors = viewConfigManager.validateRecord(record, true);
+    if (errors) {
+      return {
+        status: ERROR_STATUS.INVALID_RECORD,
+        message: `Error updating record. Record=${JSON.stringify(record)} ID=${
+          mutation.payload.id
+        }`,
+        error: JSON.stringify(errors),
+      };
+    }
+
     await ctx.db.patch(mutation.payload.id, record);
     return {
       message: 'Record updated successfully',
@@ -147,7 +171,7 @@ export const updateMutation = async (
     return {
       status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
       message: `Error updating record. Record ID=${mutation.payload.id} displayField=${displayField} displayValue=${displayValue}`,
-      error: getErrorMessage(error),
+      // error: getErrorMessage(error),
     };
   }
 };
@@ -164,8 +188,27 @@ export const selectRecordsMutation = async (
 
   const field = viewConfigManager.getFieldBy(table);
 
+  const record = await ctx.db.get(mutation.payload.id);
+
+  const recordsWithInclude = await mapWithInclude([record], ctx, props);
+
+  const result = viewConfigManager.viewConfig.mutation?.beforeSelect?.(record, {
+    newIds,
+    deleteIds: idsToDelete,
+    recordWithInclude: recordsWithInclude?.[0],
+    field: field.name,
+  });
+
+  if (result && 'error' in result) {
+    return {
+      status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+      message: `Error selecting records. newIDs=${idsToDelete} deleteIDs=${newIds}`,
+      error: result.error,
+    };
+  }
+
   try {
-    await insertIds(newIds as ID[], props, ctx, field);
+    await insertIds(newIds as ID[], props, ctx, field, record);
     await deleteIds(idsToDelete as ID[], props, ctx, field);
   } catch (error) {
     return {

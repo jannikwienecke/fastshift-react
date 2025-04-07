@@ -7,6 +7,14 @@ import {
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';
+import {
+  dateUtils,
+  defaultOperators,
+  getTimeValueFromDateString,
+  operator,
+  operatorMap,
+  operators,
+} from '../ui-adapter/filter-adapter';
 
 export const commandformOpen: StoreFn<'commandformOpen'> =
   (store$) => (viewName, row) => {
@@ -56,9 +64,13 @@ export const commanformSelectRelationalValue: StoreFn<
   } else {
     const isNumber = !isNaN(+selectedRow.id);
 
+    const parsedDateValue = getTimeValueFromDateString(selectedRow.id, true);
+
     value =
       field.type === 'Date' && isNumber
         ? new Date(selectedRow.raw).getTime()
+        : field.type === 'Date'
+        ? parsedDateValue
         : selectedRow.raw;
   }
 

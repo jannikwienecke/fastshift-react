@@ -31,6 +31,8 @@ export type QueryProps = {
 
 export type QueryDto = {
   viewConfig?: ViewConfigType;
+  viewConfigManager?: BaseViewConfigManagerInterface;
+
   filters?: string;
   displayOptions?: string;
 } & Omit<QueryProps, 'viewConfigManager'>;

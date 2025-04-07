@@ -15,6 +15,7 @@ import {
 import {
   contextmenuClickOnField,
   contextMenuClose,
+  contextmenuCopyRow,
   contextmenuDeleteRow,
   contextmenuEditRow,
   contextMenuOpen,
@@ -170,7 +171,7 @@ export const store$ = observable<LegendStore>({
   contextmenuEditRow: (...props) => contextmenuEditRow(store$)(...props),
   contextmenuClickOnField: (...props) =>
     contextmenuClickOnField(store$)(...props),
-
+  contextmenuCopyRow: (...props) => contextmenuCopyRow(store$)(...props),
   selectRowsMutation: (...props) => selectRowsMutation(store$)(...props),
   updateRecordMutation: (...props) => updateRecordMutation(store$)(...props),
   updateFullRecordMutation: (...props) =>

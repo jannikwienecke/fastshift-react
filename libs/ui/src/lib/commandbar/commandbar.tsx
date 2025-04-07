@@ -1,5 +1,6 @@
-import { ComboxboxItem, CommandbarProps } from '@apps-next/core';
+import { CommandbarProps } from '@apps-next/core';
 import { DialogTitle } from '@radix-ui/react-dialog';
+import { useCommandState } from 'cmdk';
 import React from 'react';
 import { Dialog, DialogContent } from '../components';
 import {
@@ -10,7 +11,8 @@ import {
   CommandList,
   CommandSeparator,
 } from '../components/command';
-import { useCommandState } from 'cmdk';
+import { MessageCircleWarning } from 'lucide-react';
+import { CommandRenderErrors } from '../render-errors-command';
 
 export const CommandDialogInput = (props: {
   inputPlaceholder?: CommandbarProps['inputPlaceholder'];
@@ -33,6 +35,7 @@ export const CommandDialogList = (props: {
   renderItem: CommandbarProps['renderItem'];
   onSelect: CommandbarProps['onSelect'];
   onValueChange: CommandbarProps['onValueChange'];
+  row?: CommandbarProps['row'];
 }) => {
   const { groupLabels } = props;
   const value: string | undefined = useCommandState((state) => state.value);
@@ -67,7 +70,7 @@ export const CommandDialogList = (props: {
                   key={item.id.toString()}
                   onSelect={() => props.onSelect?.(item)}
                 >
-                  {props.renderItem(item, active, index)}
+                  {props.renderItem(item, active, index, props.row)}
                 </CommandItem>
               );
             })}
@@ -164,6 +167,13 @@ export function CommandDialogDefault(props: CommandbarProps | undefined) {
           <CommandDialogInput {...props} />
 
           <CommandDialogList {...props} />
+
+          <div className="px-4 pb-2">
+            <CommandRenderErrors
+              errors={[props.error?.message ?? '']}
+              showError={props.error?.showError ?? false}
+            />
+          </div>
         </Command>
       </CommandbarContainer>
     </>

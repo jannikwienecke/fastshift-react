@@ -48,6 +48,7 @@ export type ContextMenuFieldItem = {
   onClickOption: () => Promise<void>;
   onSelectOption: (row: Row) => Promise<void>;
   onCheckOption: (row: Row) => Promise<void>;
+  onHover: () => void;
 } & FieldConfig;
 
 export type ContextMenuUiOptions = {
@@ -55,6 +56,7 @@ export type ContextMenuUiOptions = {
   onClose: () => void;
   onDelete: () => void;
   onEdit: () => void;
+  onCopy: (type: 'id' | 'url' | 'json') => void;
   fields: ContextMenuFieldItem[] | null;
   renderOption: (row: Row, field: ContextMenuFieldItem) => JSX.Element;
   renderField: (field: ContextMenuFieldItem) => JSX.Element;

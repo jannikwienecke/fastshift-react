@@ -7,6 +7,7 @@ import {
   Row,
   makeRowFromValue,
   FieldConfig,
+  _log,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from '../../legend-store/legend.store.js';
@@ -79,6 +80,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
   const { list } = viewConfigManager?.viewConfig?.ui || {};
   const fieldsLeft = options?.fieldsLeft ?? list?.fieldsLeft ?? [];
   const fieldsRight = options?.fieldsRight ?? list?.fieldsRight ?? [];
+
   const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
   const dataModel = store$.dataModel.get() as DataModelNew<T>;
 
@@ -179,8 +181,15 @@ export const makeListProps = <T extends RecordType = RecordType>(
             field = item.field;
             field = item.field;
           } catch (error) {
+            _log.error(
+              `Error getting field ${fieldName.toString()} from row ${
+                row.id
+              }: ${error}`
+            );
+            _log.error(row);
+
             throw new Error(
-              `Field ${field?.name} not found in row ${
+              `Field ${fieldName.toString()} not found in row ${
                 row.id
               } of view ${viewConfigManager.getViewName()}`
             );

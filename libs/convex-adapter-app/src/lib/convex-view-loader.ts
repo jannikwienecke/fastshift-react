@@ -1,12 +1,10 @@
 import {
-  BaseViewConfigManager,
   invarant,
   parseDisplayOptionsStringForServer,
   parseFilterStringForServer,
   QueryDto,
   QueryReturnDto,
   QueryServerProps,
-  ViewConfigType,
 } from '@apps-next/core';
 import { getData } from './_internal/convex-get-data';
 import { getRelationalData } from './_internal/convex-get-relational-data';
@@ -31,9 +29,8 @@ export const viewLoaderHandler = async (
     };
   }
 
-  const viewConfigManager = new BaseViewConfigManager(
-    args.viewConfig as ViewConfigType
-  );
+  const viewConfigManager = args.viewConfigManager;
+  if (!viewConfigManager) throw new Error('viewConfigManager is not defined');
 
   const parsedFilters = parseFilterStringForServer(
     args.filters ?? '',

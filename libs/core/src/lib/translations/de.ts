@@ -85,7 +85,7 @@ export const de = {
     showDetails: 'Details anzeigen',
     deleteRecord:
       'Eintrag konnte nicht gelöscht werden. Bitte versuchen Sie es erneut',
-    updateError:
+    updateRecord:
       'Eintrag konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut',
   },
   success: {
@@ -93,6 +93,13 @@ export const de = {
       title: '✅ Erfolgreich erstellt',
     },
   },
+
+  copy: {
+    id: 'ID kopieren',
+    url: 'URL kopieren',
+    json: 'Als JSON kopieren',
+  },
+
   commandbar: {
     existingLabel: 'Zugewiesene {{name}}',
     newLabel: 'Neue {{name}}',

@@ -1,9 +1,16 @@
-import { GetTableName, ViewConfigType } from '@apps-next/core';
+import {
+  BaseViewConfigManagerInterface,
+  GetTableName,
+  RegisteredViews,
+  ViewConfigType,
+} from '@apps-next/core';
 import { store$ } from './legend-store/legend.store';
 
 export const useView = () => {
-  const viewConfigManager = store$.viewConfigManager.get();
-  const registeredViews = store$.views.get();
+  const viewConfigManager =
+    store$.viewConfigManager.get() as BaseViewConfigManagerInterface;
+
+  const registeredViews = store$.views.get() as RegisteredViews;
 
   if (!viewConfigManager) throw new Error('View Config Manager not found');
 

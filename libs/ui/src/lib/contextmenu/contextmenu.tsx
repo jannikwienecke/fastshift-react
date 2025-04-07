@@ -103,27 +103,6 @@ const SubMenuContent: React.FC<{
         </ContextMenuItem>
       ) : null}
 
-      {field.selected?.map((row) => (
-        <ContextMenuItem
-          key={`selected-${row.id}`}
-          className="group items-center flex flex-row"
-        >
-          {isManyToMany ? (
-            <div className="pr-2 grid place-items-center">
-              <Checkbox
-                onClick={(e) => e.stopPropagation()}
-                onCheckedChange={() => field.onCheckOption?.(row)}
-                checked
-                className="h-4 w-4"
-              />
-            </div>
-          ) : (
-            <CheckIcon className="w-4 h-4 mr-1" />
-          )}
-          <div>{renderOption(row, field)}</div>
-        </ContextMenuItem>
-      ))}
-
       {field.options?.map((row) => (
         <ContextMenuItem
           key={`option-${row.id}`}
@@ -137,8 +116,9 @@ const SubMenuContent: React.FC<{
           }}
         >
           {isManyToMany ? (
-            <div className="invisible group-hover:visible pr-2">
+            <div className=" group-hover:visible pr-2">
               <Checkbox
+                checked={field.selected?.some((r) => r.id === row.id)}
                 onClick={(e) => e.stopPropagation()}
                 onCheckedChange={() => field.onCheckOption?.(row)}
                 className="h-4 w-4"
@@ -243,9 +223,16 @@ export const ContextMenuDefault = ({
           }
 
           return (
-            <ContextMenuSub key={field.name}>
+            <ContextMenuSub
+              key={field.name}
+              onOpenChange={() => {
+                field.onHover?.();
+              }}
+            >
               <ContextMenuSubTrigger className="w-full">
-                <MenuItemContent field={field} renderField={renderField} />
+                <div className="w-full">
+                  <MenuItemContent field={field} renderField={renderField} />
+                </div>
               </ContextMenuSubTrigger>
 
               <SubMenuContent field={field} renderOption={renderOption} />
@@ -265,12 +252,31 @@ export const ContextMenuDefault = ({
             </div>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
-            <ContextMenuItem>
-              Copy ID
+            <ContextMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onCopy('id');
+              }}
+            >
+              {t('copy.id')}
               <ContextMenuShortcut>⌘.</ContextMenuShortcut>
             </ContextMenuItem>
-            <ContextMenuItem>Copy URL</ContextMenuItem>
-            <ContextMenuItem>Copy as JSON</ContextMenuItem>
+            <ContextMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onCopy('url');
+              }}
+            >
+              {t('copy.url')}
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onCopy('json');
+              }}
+            >
+              {t('copy.json')}
+            </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
 

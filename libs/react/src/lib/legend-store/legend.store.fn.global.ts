@@ -205,19 +205,19 @@ const handlingFetchMoreState = async (
 ) => {
   const newData = queryReturn.data ?? [];
   const prevData = store$.dataModel.get().rows.map((row) => row.raw);
-  const allIds = queryReturn.allIds;
 
   const all = [...prevData, ...newData];
 
-  const toShow = allIds
-    .map((id) => {
-      const row = all.find((r) => r['id'] === id);
-      if (!row) return null;
-      return row;
-    })
-    .filter((row) => row !== null);
+  // const allIds = queryReturn.allIds;
+  // const toShow = allIds
+  //   .map((id) => {
+  //     const row = all.find((r) => r['id'] === id);
+  //     if (!row) return null;
+  //     return row;
+  //   })
+  //   .filter((row) => row !== null);
 
-  store$.createDataModel(toShow);
+  store$.createDataModel(all);
   store$.state.set('initialized');
 
   store$.fetchMore.assign({

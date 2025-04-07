@@ -1,7 +1,6 @@
 import {
   CommandbarProps,
   MakeConfirmationAlertPropsOption,
-  Row,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import {
@@ -11,7 +10,6 @@ import {
 } from './legend.commandbar.helper';
 import { store$ } from './legend.store';
 import { copyRow } from './legend.utils';
-
 export const commandbarProps$ = observable<
   Partial<MakeConfirmationAlertPropsOption>
 >({});
@@ -37,6 +35,7 @@ export const derivedCommandbarState$ = observable(() => {
     ...defaultCommandbarProps,
     ...commandbarPropsSelectedViewField,
 
+    row: store$.list.rowInFocus.get()?.row ?? undefined,
     onClose: () => store$.commandbarClose(),
     onOpen: () => {
       const row = store$.list.rowInFocus.get()?.row;

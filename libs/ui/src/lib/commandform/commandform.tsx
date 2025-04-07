@@ -11,6 +11,7 @@ import { Button, Dialog, DialogContent } from '../components';
 import { Checkbox } from '../components/checkbox';
 import { Command, CommandSeparator } from '../components/command';
 import { cn } from '../utils';
+import { CommandRenderErrors } from '../render-errors-command';
 
 const CommandformContainer = (
   props: (CommandformProps & { children: React.ReactNode }) | undefined
@@ -211,17 +212,32 @@ export function Commandform(props: CommandformProps | undefined) {
 
               <CommandSeparator className="my-0" />
 
-              <div className="flex flex-row items-center justify-between pb-2">
-                <div />
+              <div className="flex flex-row-reverse justify-between pb-2 w-full">
                 <Button
-                  disabled={!props.formState.isReady}
+                  // disabled={!props.formState.isReady}
+                  data-disabled={!props.formState.isReady}
                   onClick={() => props.onSubmit()}
                   size={'sm'}
+                  className={cn(
+                    'peer hover',
+                    props.formState.isReady ? '' : 'opacity-70'
+                  )}
                 >
                   {t(`commandform.${props.type}`, {
                     name: getTableLabel(props.tableName, true),
                   })}
                 </Button>
+
+                <div className="peer-hover:block hidden transition-opacity max-w-[450px] overflow-scroll">
+                  {!props.formState.isReady ? (
+                    <CommandRenderErrors
+                      errors={props.errors}
+                      showError={props.errors.length > 0}
+                    />
+                  ) : (
+                    <div className="w-4 h-4" />
+                  )}
+                </div>
               </div>
             </div>
           </div>
