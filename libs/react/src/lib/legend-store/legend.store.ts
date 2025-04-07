@@ -13,6 +13,21 @@ import {
   displayOptionsToggleSorting,
 } from './legend-store.fn.displayOptions';
 import {
+  commandbarClose,
+  commandbarOpen,
+  commandbarOpenWithFieldValue,
+  commandbarSelectItem,
+  commandbarSetValue,
+  commandbarUpdateQuery,
+} from './legend.commandbar.fn';
+import {
+  commandformChangeInput,
+  commandformClose,
+  commandformOpen,
+  commandformSubmit,
+  commanformSelectRelationalValue,
+} from './legend.commandform.fn';
+import {
   contextmenuClickOnField,
   contextMenuClose,
   contextmenuCopyRow,
@@ -20,6 +35,12 @@ import {
   contextmenuEditRow,
   contextMenuOpen,
 } from './legend.contextmenu.fn';
+import {
+  datePickerDialogClose,
+  datePickerDialogOpen,
+  datePickerDialogSelectDate,
+  datePickerDialogSubmit,
+} from './legend.datepickerdialog.fn';
 import {
   createRecordMutation,
   deleteRecordMutation,
@@ -72,27 +93,6 @@ import {
   listSelectRelationField,
 } from './legend.store.fn.list';
 import { LegendStore } from './legend.store.types';
-import {
-  commandbarClose,
-  commandbarOpen,
-  commandbarOpenWithFieldValue,
-  commandbarSelectItem,
-  commandbarSetValue,
-  commandbarUpdateQuery,
-} from './legend.commandbar.fn';
-import {
-  datePickerDialogClose,
-  datePickerDialogOpen,
-  datePickerDialogSelectDate,
-  datePickerDialogSubmit,
-} from './legend.datepickerdialog.fn';
-import {
-  commandformChangeInput,
-  commandformClose,
-  commandformOpen,
-  commandformSubmit,
-  commanformSelectRelationalValue,
-} from './legend.commandform.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
