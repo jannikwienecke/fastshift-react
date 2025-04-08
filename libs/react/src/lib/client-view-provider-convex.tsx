@@ -11,17 +11,16 @@ import {
   RegisteredViews,
   renderModelName,
   UiViewConfig,
-  ViewConfigType,
-  ViewFieldConfig,
 } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { t } from 'i18next';
 import React from 'react';
-import { addEffects } from './legend-store';
+import { addEffects, addLocalFiltering } from './legend-store';
 import { store$ } from './legend-store/legend.store';
 import { useMutation } from './use-mutation';
 import { useQueryData } from './use-query-data';
-import { t } from 'i18next';
+import { addLocalDisplayOptionsHandling } from './legend-store/legend.local.display-options';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
@@ -139,6 +138,8 @@ const Content = observer((props: { children: React.ReactNode }) => {
 
   React.useLayoutEffect(() => {
     addEffects(store$);
+    addLocalFiltering(store$);
+    addLocalDisplayOptionsHandling(store$);
 
     store$.api.assign({
       mutate: runMutate,

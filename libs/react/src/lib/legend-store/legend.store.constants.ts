@@ -52,6 +52,7 @@ export const DEFAULT_DATE_PICKER_STATE: DatePickerState | null = null;
 export const DEFAULT_LEGEND_STORE: Pick<
   LegendStore,
   | 'dataModel'
+  | 'dataModelBackup'
   | 'views'
   | 'uiViewConfig'
   | 'viewConfigManager'
@@ -73,6 +74,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'commands'
 > = {
   dataModel: {} as DataModelNew,
+  dataModelBackup: { rows: [] } as DataModelNew,
   views: {} as RegisteredViews,
   viewConfigManager: {} as BaseViewConfigManagerInterface,
   relationalDataModel: {} as RelationalDataModel,

@@ -122,8 +122,13 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const query = store$.globalQueryDebounced.get();
   const filters = store$.filter.filters.get();
   const displayOptions = store$.displayOptions.get();
-  const parsedFilters = convertFiltersForBackend(filters);
-  const parsedDisplayOptions = convertDisplayOptionsForBackend(displayOptions);
+
+  const parsedFilters = viewConfigManager.localModeEnabled
+    ? ''
+    : convertFiltersForBackend(filters);
+  const parsedDisplayOptions = viewConfigManager.localModeEnabled
+    ? ''
+    : convertDisplayOptionsForBackend(displayOptions);
 
   const cursor = store$.fetchMore.currentCursor.get();
 

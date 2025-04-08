@@ -3,6 +3,7 @@ import {
   arrayIntersection,
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
+  DEFAULT_LOCAL_MODE_LIMIT,
   DEFAULT_MAX_ITEMS_GROUPING,
   QueryServerProps,
 } from '@apps-next/core';
@@ -24,11 +25,30 @@ import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
 
+const LOG_LEVEL = 'info' as string;
+
+// const updateLocalLevel = () => {
+// if (import.meta.env.MODE === 'development') {
+//   LOG_LEVEL = 'debug';
+// } else if (import.meta.env.MODE === 'test') {
+//   LOG_LEVEL = 'warn';
+// } else {
+//   LOG_LEVEL = 'info';
+// }
+// };
+
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const log = (...props: any[]) => {
     const view = args.viewConfigManager?.getTableName();
     if (view !== 'tasks') return;
     _log.info(...props);
+  };
+
+  const debug = (...props: any[]) => {
+    if (LOG_LEVEL !== 'debug') return;
+    const view = args.viewConfigManager?.getTableName();
+    if (view !== 'tasks') return;
+    _log.debug(...props);
   };
 
   const { viewConfigManager, filters, registeredViews } = args;
@@ -42,7 +62,17 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
   const displayOptionsInfo = getDisplayOptionsInfo(args);
-  const showDeleted = displayOptionsInfo.showDeleted;
+
+  const localModeEnabled = viewConfigManager.localModeEnabled;
+  const showDeleted = displayOptionsInfo.showDeleted || localModeEnabled;
+
+  debug('Convex:getData', {
+    filters: filters?.length,
+    displayField,
+    displayOptionsInfo,
+    localModeEnabled,
+    showDeleted,
+  });
 
   let isDone = false;
   let isGetAll = false;
@@ -159,7 +189,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     ])
   );
 
-  const fetchLimit = args.displayOptions?.grouping?.field.name
+  const fetchLimit = localModeEnabled
+    ? DEFAULT_LOCAL_MODE_LIMIT
+    : args.displayOptions?.grouping?.field.name
     ? DEFAULT_MAX_ITEMS_GROUPING
     : DEFAULT_FETCH_LIMIT_QUERY;
 
@@ -188,6 +220,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     }
 
     const getRecordsIfNotSortedAndNoDeletedRows = () => {
+      debug('Convex:getRecordsIfNotSortedAndNoDeletedRows');
       return getRecordsByIds(
         idsAfterRemove?.slice(position, nextPosition) ?? [],
         dbQuery
@@ -195,10 +228,12 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     };
 
     const getRecordsHasIdsAndNotTooBig = () => {
+      debug('Convex:getRecordsHasIdsAndNotTooBig');
       return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
     };
 
     const getSortedRecords = () => {
+      debug('Convex:getSortedRecords');
       if (!displayOptionsInfo.displaySortingIndexField) return [];
 
       return dbQuery
@@ -211,11 +246,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     };
 
     const getPaginatedRecords = async () => {
-      const x = await dbQuery.paginate({
+      debug('Convex:getPaginatedRecords');
+      return await dbQuery.paginate({
         cursor: args?.paginateOptions?.cursor?.cursor ?? null,
         numItems: fetchLimit + (idsToRemove.length ?? 0),
       });
-      return x;
     };
 
     const rowsBeforeFilter =
@@ -257,6 +292,14 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const rows: ConvexRecordType[] = [];
 
   const newRows = await fetch();
+
+  if (localModeEnabled && newRows.length === DEFAULT_LOCAL_MODE_LIMIT) {
+    _log.warn(
+      `WARNING: Local Mode enabled and limit reached! Consider disabled local mode or addding a defautlt filter`
+    );
+  } else {
+    debug('Convex:fetchedRows.length', newRows.length);
+  }
 
   const filtered = newRows.filter(
     (r) =>

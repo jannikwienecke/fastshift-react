@@ -62,11 +62,15 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     store$.state.set('filter-changed');
 
-    store$.fetchMore.assign({
-      isDone: false,
-      currentCursor: { cursor: null, position: null },
-      nextCursor: { cursor: null, position: null },
-    });
+    if (store$.viewConfigManager.localModeEnabled.get()) {
+      _log.debug('handleFilterChange: local mode. No fetchMore');
+    } else {
+      store$.fetchMore.assign({
+        isDone: false,
+        currentCursor: { cursor: null, position: null },
+        nextCursor: { cursor: null, position: null },
+      });
+    }
   }).onChange(() => null);
 
   observable(function handleDisplayOptionsChange() {
@@ -89,11 +93,15 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     store$.state.set('updating-display-options');
 
-    store$.fetchMore.assign({
-      isDone: false,
-      currentCursor: { cursor: null, position: null },
-      nextCursor: { cursor: null, position: null },
-    });
+    if (store$.viewConfigManager.localModeEnabled.get()) {
+      _log.debug('handleDisplayOptionsChange: local mode. No fetchMore');
+    } else {
+      store$.fetchMore.assign({
+        isDone: false,
+        currentCursor: { cursor: null, position: null },
+        nextCursor: { cursor: null, position: null },
+      });
+    }
   }).onChange(() => null);
 
   _hasOpenDialog$.onChange((state) => {

@@ -23,6 +23,9 @@ export type ViewConfigType<T extends GetTableName = any> =
   ViewConfigBaseInfo<T> & {
     _generated?: boolean;
     viewFields: ViewFieldConfig;
+    localMode?: {
+      enabled: boolean;
+    };
     includeFields: IncludeConfig<keyof GetTableDataType<T>>[string];
     displayField: {
       field: keyof GetTableDataType<T>;

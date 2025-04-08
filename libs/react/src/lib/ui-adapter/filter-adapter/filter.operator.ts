@@ -106,6 +106,18 @@ export const isEnumNegateOperator = (operator: FilterOperatorType) => {
   return operator.label === 'is not' || operator.label === 'is not any of';
 };
 
+export const isStringNegateOperator = (operator: FilterOperatorType) => {
+  return operator.label === 'does not contain' || operator.label === 'is not';
+};
+
+export const isNegateOperator = (operator: FilterOperatorType) => {
+  return (
+    isRelationNegateOperator(operator) ||
+    isEnumNegateOperator(operator) ||
+    isStringNegateOperator(operator)
+  );
+};
+
 export const initDateOperator = (field: FieldConfig, value?: Row | null) => {
   const operator = defaultOperatorMap[field.type];
   if (!operator) return defaultOperator;
