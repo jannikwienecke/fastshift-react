@@ -9,6 +9,7 @@ import {
 import { batch, Observable } from '@legendapp/state';
 import { displayOptionsProps } from './legend.store.derived.displayOptions';
 import { LegendStore, StoreFn } from './legend.store.types';
+import { setGlobalDataModel } from './legend.utils.helper';
 
 export const openSpecificModal: StoreFn<'openSpecificModal'> =
   (store$) => (type, openCb) => {
@@ -108,7 +109,7 @@ export const createDataModel: StoreFn<'createDataModel'> =
       tableName ?? store$.viewConfigManager.get().getTableName?.()
     )(sorted);
 
-    store$.dataModel.set(dataModel);
+    setGlobalDataModel(dataModel.rows);
   };
 
 export const init: StoreFn<'init'> =
@@ -208,16 +209,17 @@ const handlingFetchMoreState = async (
 
   const all = [...prevData, ...newData];
 
-  // const allIds = queryReturn.allIds;
-  // const toShow = allIds
-  //   .map((id) => {
-  //     const row = all.find((r) => r['id'] === id);
-  //     if (!row) return null;
-  //     return row;
-  //   })
-  //   .filter((row) => row !== null);
+  const allIds = queryReturn.allIds;
+  const toShow = allIds
+    .map((id) => {
+      const row = all.find((r) => r['id'] === id);
+      if (!row) return null;
+      return row;
+    })
+    .filter((row) => row !== null);
+  store$.createDataModel(toShow);
 
-  store$.createDataModel(all);
+  // store$.createDataModel(all);
   store$.state.set('initialized');
 
   store$.fetchMore.assign({
@@ -311,6 +313,13 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
     const state = store$.state.get();
 
     _log.debug(`:handleIncomingData`, state, data);
+
+    if (store$.viewConfigManager.localModeEnabled.get()) {
+      _log.debug(`handleIncomingData:debugMode-> Update Data Model`);
+      store$.createDataModel(data.data ?? []);
+
+      return;
+    }
 
     switch (state) {
       case 'fetching-more':

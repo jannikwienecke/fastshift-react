@@ -51,6 +51,8 @@ export interface BaseViewConfigManagerInterface<
     partialRecord?: true
   ) => RecordErrors | null;
 
+  localModeEnabled: boolean;
+
   modelConfig?: ModelConfig;
 }
 
@@ -62,6 +64,8 @@ export class BaseViewConfigManager<
   viewConfig: TViewConfig;
   uiViewConfig: KUiViewConfig;
 
+  localModeEnabled = false;
+
   constructor(
     viewConfig: TViewConfig,
     uiViewConfig: KUiViewConfig = {} as KUiViewConfig,
@@ -70,6 +74,10 @@ export class BaseViewConfigManager<
     this.viewConfig = viewConfig;
     this.uiViewConfig = uiViewConfig;
     this.modelConfig = modelConfig;
+
+    if (viewConfig.localMode?.enabled) {
+      this.localModeEnabled = viewConfig.localMode.enabled;
+    }
   }
 
   getTableName(): string {

@@ -129,7 +129,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
 
       <div
         ref={observerTarget}
-        className="h-[10px] flex items-center justify-center relative -top-[40%] w-1 opacity-0 invisible"
+        className="flex items-center justify-center relative -top-[40%] w-12 h-12 opacity-100 bg-red-300 invisible"
       />
     </>
   );

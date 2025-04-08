@@ -125,13 +125,10 @@ export const applyFilter = (
     ([add, notAdd], filter) => {
       const negate = isNegateOperator(filter.operator);
 
-      console.log({ filter, negate });
-
       let filteredRows: Row<RecordType>[] = [];
 
       if (filter.field.type === 'Date' && filter.type === 'primitive') {
         filteredRows = handleDateFilter(rows, filter);
-        console.log(filteredRows);
       } else if (filter.type === 'relation') {
         filteredRows = handleRelationFilter(rows, filter);
       } else if (filter.type === 'primitive') {

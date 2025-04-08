@@ -1,13 +1,12 @@
-import { PaginationOptions } from 'convex/server';
 import {
   BaseViewConfigManagerInterface,
   ModelConfig,
 } from '../base-view-config';
 import { RecordType } from './base.types';
+import { DisplayOptionsType } from './displayOptions.types';
 import { FilterType } from './filter.types';
 import { MutationDto, MutationReturnDto } from './mutation.types';
 import { RegisteredViews, ViewConfigType } from './view-config.types';
-import { DisplayOptionsType } from './displayOptions.types';
 
 export type QueryProps = {
   query?: string;
