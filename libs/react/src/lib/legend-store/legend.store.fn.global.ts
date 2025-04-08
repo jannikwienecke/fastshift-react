@@ -344,6 +344,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
 
       case 'initialized':
         _log.debug('RECEIVING DATA AFTER INITIALIZED -> Do NOTHING');
+        handleMutatingState(store$, data);
         break;
 
       default:
