@@ -54,7 +54,6 @@ export const tasksConfig = createViewConfig(
         validator: () => z.date().min(new Date()),
       },
       name: {
-        // FIXME ARKTYPE
         validator: () => z.string().min(3),
         // optional -> otherwise it will use the default value
         validationErrorMessage: (t: TFunction) =>
@@ -81,6 +80,10 @@ export const tasksConfig = createViewConfig(
     },
 
     includeFields: ['tags', 'tasks', 'todos'],
+
+    localMode: {
+      enabled: false,
+    },
     query: {
       // sort so that the newest tasks are on top
       // sorting: { field: 'name', direction: 'asc' },

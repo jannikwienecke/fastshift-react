@@ -30,6 +30,6 @@ hamann-monorepo/
 
 ## Getting Started
 
-## Run The APp
+## Run The APP
 
 `nx serve apps-next`

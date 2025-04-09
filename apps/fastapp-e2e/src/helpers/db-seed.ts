@@ -3,7 +3,7 @@ import { api } from '../../../../packages/convex/convex/_generated/api';
 import { _log } from '@apps-next/core';
 
 export async function seedDatabase() {
-  const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
+  const isGithubActions = process.env.GITHUB_ACTIONS === 'true' || true;
   const CONVEX_URL = isGithubActions
     ? 'https://deafening-marmot-647.convex.cloud'
     : 'http://127.0.0.1:3210';

@@ -21,7 +21,7 @@ import { logger } from '@apps-next/core';
 
 const isDev = import.meta.env.MODE === 'development';
 
-logger.setLevel(isDev ? 'info' : 'warn');
+logger.setLevel(isDev ? 'debug' : 'warn');
 
 const router = createRouter({
   routeTree,
