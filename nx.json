@@ -14,7 +14,7 @@
     ],
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
-  "nxCloudAccessToken": "NGQzODhhNGItMDQ3OS00YjJlLWI0MzUtNjE1NWQxZmIzZWQ2fHJlYWQtd3JpdGU=",
+  "nxCloudAccessToken": "OGQ3ZmU2OGMtMTAxYS00NDZmLTkwY2EtMzRiYjg0OGYxOWQzfHJlYWQtd3JpdGU=",
   "plugins": [
     {
       "plugin": "@nx/vite/plugin",
@@ -26,24 +26,9 @@
         "serveStaticTargetName": "serve-static"
       }
     },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
-    {
-      "plugin": "@nx/playwright/plugin",
-      "options": {
-        "targetName": "e2e"
-      }
-    },
-    {
-      "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      }
-    }
+    { "plugin": "@nx/eslint/plugin", "options": { "targetName": "lint" } },
+    { "plugin": "@nx/playwright/plugin", "options": { "targetName": "e2e" } },
+    { "plugin": "@nx/jest/plugin", "options": { "targetName": "test" } }
   ],
   "generators": {
     "@nx/react": {
@@ -53,21 +38,14 @@
         "linter": "eslint",
         "bundler": "vite"
       },
-      "component": {
-        "style": "tailwind"
-      },
+      "component": { "style": "tailwind" },
       "library": {
         "style": "tailwind",
         "linter": "eslint",
         "unitTestRunner": "vitest"
       }
     },
-    "@nx/next": {
-      "application": {
-        "style": "tailwind",
-        "linter": "eslint"
-      }
-    }
+    "@nx/next": { "application": { "style": "tailwind", "linter": "eslint" } }
   },
   "targetDefaults": {
     "@nx/js:tsc": {
@@ -80,16 +58,7 @@
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
-    "@nx/next:dev": {
-      "cache": true,
-      "options": {
-        "turbo": true
-      }
-    }
+    "@nx/next:dev": { "cache": true, "options": { "turbo": true } }
   },
-  "release": {
-    "version": {
-      "preVersionCommand": "npx nx run-many -t build"
-    }
-  }
+  "release": { "version": { "preVersionCommand": "npx nx run-many -t build" } }
 }
