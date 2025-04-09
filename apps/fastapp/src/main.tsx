@@ -7,11 +7,15 @@ import {
   preloadQuery,
 } from '@apps-next/convex-adapter-app';
 
-import { logger, UserViewData } from '@apps-next/core';
+import { logger } from '@apps-next/core';
 import './i18n';
-import { convex, queryClient } from './query-client';
+import {
+  convex,
+  getUserViewData,
+  getUserViewQuery,
+  queryClient,
+} from './query-client';
 import { routeTree } from './routeTree.gen';
-import { convexQuery } from '@convex-dev/react-query';
 
 // syncObservable(store$, {
 //   persist: {
@@ -28,23 +32,17 @@ const router = createRouter({
   routeTree,
   defaultPreload: 'viewport',
   defaultStaleTime: 5000,
-  // Wrap:
+
   context: {
     queryClient,
     preloadQuery: async (viewConfig) => {
-      await queryClient.ensureQueryData(
-        convexQuery(api.query.userViewData, {})
-      );
+      await queryClient.ensureQueryData(getUserViewQuery());
 
-      const userViewData = queryClient.getQueryData(
-        convexQuery(api.query.userViewData, {}).queryKey
-      ) as UserViewData;
+      const userViewData = getUserViewData();
 
-      const xx = await queryClient.ensureQueryData(
+      return await queryClient.ensureQueryData(
         preloadQuery(api.query.viewLoader, viewConfig, userViewData)
       );
-
-      return xx;
     },
   },
 });
