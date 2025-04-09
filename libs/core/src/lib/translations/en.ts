@@ -116,6 +116,10 @@ export const en = {
         'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
     },
   },
+  saveViewDropdown: {
+    saveToThisView: 'Save to this view',
+    createNewView: 'Create new view...',
+  },
   _creationTime: {
     one: 'Created at',
     other: 'Created at',

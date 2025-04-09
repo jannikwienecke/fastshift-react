@@ -2,9 +2,9 @@ import { config, tasksConfig, views } from '@apps-next/convex';
 import { ClientViewProviderConvex, makeHooks, store$ } from '@apps-next/react';
 import { InputDialog } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useParams } from '@tanstack/react-router';
 import { useCommands } from '../hooks/app.commands';
-import { getQueryKey } from '../query-client';
+import { getQueryKey, getUserViewData } from '../query-client';
 import { DefaultViewTemplate } from '../views/default-view-template';
 import { TaskViewDataType } from '../views/tasks.components';
 import { uiViewConfig } from '../views/tasks.config';
@@ -39,13 +39,18 @@ const Task = observer(() => {
   );
 });
 
-export const Route = createFileRoute('/fastApp/tasks')({
-  loader: async ({ context }) => context.preloadQuery(tasksConfig),
+export const Route = createFileRoute('/fastApp/$view')({
+  loader: async (props) => {
+    return props.context.preloadQuery(tasksConfig, props.params.view);
+  },
   component: () => <TaskComponent />,
 });
 
 const TaskComponent = observer(() => {
   const { commands } = useCommands();
+  const { view } = useParams({ from: '/fastApp/$view' });
+
+  const userViewData = getUserViewData(view);
 
   return (
     <ClientViewProviderConvex
@@ -54,7 +59,8 @@ const TaskComponent = observer(() => {
       viewConfig={tasksConfig}
       globalConfig={config.config}
       uiViewConfig={uiViewConfig}
-      queryKey={getQueryKey(tasksConfig)}
+      queryKey={getQueryKey(tasksConfig, view)}
+      userViewData={userViewData}
     >
       <Task />
     </ClientViewProviderConvex>

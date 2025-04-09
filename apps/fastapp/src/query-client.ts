@@ -14,20 +14,26 @@ export const convex = new ConvexReactClient(VITE_CONVEX_URL);
 
 const convexQueryClient = new ConvexQueryClient(convex);
 
-export const getUserViewQuery = () => {
-  return convexQuery(api.query.userViewData, {});
+export const getUserViewQuery = (viewName: string) => {
+  console.log('getUserViewQuery', { viewName });
+
+  return convexQuery(api.query.userViewData, {
+    viewName: viewName ?? null,
+  });
 };
 
-export const getUserViewData = () => {
+export const getUserViewData = (viewName: string) => {
   const userViewData = queryClient.getQueryData(
-    getUserViewQuery().queryKey
+    getUserViewQuery(viewName).queryKey
   ) as UserViewData;
+
+  console.log({ userViewData });
 
   return userViewData;
 };
 
-export const getQueryKey = (viewConfig: ViewConfigType) => {
-  const userViewData = getUserViewData();
+export const getQueryKey = (viewConfig: ViewConfigType, viewName: string) => {
+  const userViewData = getUserViewData(viewName);
   return preloadQuery(api.query.viewLoader, viewConfig, userViewData).queryKey;
 };
 

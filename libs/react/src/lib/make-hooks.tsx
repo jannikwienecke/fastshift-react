@@ -11,6 +11,7 @@ import { makeConfirmationAlertProps } from './ui-adapter/confirmation-alert-adap
 import { makeCommandbarProps } from './ui-adapter/commandbar-adapter';
 import { makeDatePickerDialogProps } from './ui-adapter/adapter.datepickerdialog';
 import { makeCommandformProps } from './ui-adapter/commandform-adapter';
+import { makeSaveViewDropdownProps } from './ui-adapter/adapter.saveViewDropdown';
 
 export const makeHooks = <T extends DataType | ViewConfigType>(
   viewConfig?: T
@@ -28,5 +29,6 @@ export const makeHooks = <T extends DataType | ViewConfigType>(
     makeCommandbarProps: makeCommandbarProps<DataTypeToUse<T>>,
     makeCommandformProps: makeCommandformProps<DataTypeToUse<T>>,
     makeDatePickerDialogProps: makeDatePickerDialogProps<DataTypeToUse<T>>,
+    makeSaveViewDropdownProps: makeSaveViewDropdownProps<DataTypeToUse<T>>,
   };
 };

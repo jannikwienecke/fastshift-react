@@ -20,6 +20,7 @@ import {
   RenderFilter,
   RenderInputDialog,
   RenderList,
+  RenderSaveViewDropdown,
 } from './default-components';
 
 export const DefaultViewTemplate = observer(
@@ -34,8 +35,18 @@ export const DefaultViewTemplate = observer(
     return (
       <>
         <div className="p-2 flex flex-col gap-2 grow overflow-scroll">
-          <div className="flex flex-col w-full ">
-            <RenderFilter options={props.filterOptions} />
+          <div className="flex flex-row w-full justify-between">
+            <div className="grow pr-12">
+              <RenderFilter options={props.filterOptions} />
+            </div>
+
+            <div className="flex flex-row gap-2 mr-4 items-center">
+              <RenderDisplayOptions options={props.displayOptions} />
+
+              <div className="h-[18px] w-[1px] bg-foreground/10 mx-2" />
+
+              <RenderSaveViewDropdown />
+            </div>
           </div>
 
           {props.RenderInputDialog ? (
@@ -47,10 +58,6 @@ export const DefaultViewTemplate = observer(
           <RenderContextmenu />
 
           <div className="flex flex-col w-full ">
-            <div className="flex flex-row gap-2 justify-end">
-              <RenderDisplayOptions options={props.displayOptions} />
-            </div>
-
             <RenderList options={props.listOptions} />
           </div>
           <hr />

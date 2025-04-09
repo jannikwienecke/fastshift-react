@@ -25,6 +25,7 @@ import {
   Filter,
   InputDialog,
   List,
+  SaveViewDropdown,
 } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { TaskViewDataType } from '../views/tasks.components';
@@ -69,11 +70,7 @@ export const RenderDisplayOptions = observer(
     const { makeDisplayOptionsProps } = makeHooks<TaskViewDataType>();
     const props = makeDisplayOptionsProps(options);
 
-    return (
-      <div className="mr-4">
-        <DisplayOptions.Default {...props} />
-      </div>
-    );
+    return <DisplayOptions.Default {...props} />;
   }
 );
 
@@ -181,6 +178,22 @@ export const RenderDatePickerDialog = observer(
       <Memo>
         {() => {
           return <datePickerModal.default {...makeDatePickerDialogProps({})} />;
+        }}
+      </Memo>
+    );
+  }
+);
+
+export const RenderSaveViewDropdown = observer(
+  (props: {
+    //
+  }) => {
+    const { makeSaveViewDropdownProps } = makeHooks<TaskViewDataType>();
+    _log.debug('Render SaveViewDropdown');
+    return (
+      <Memo>
+        {() => {
+          return <SaveViewDropdown {...makeSaveViewDropdownProps({})} />;
         }}
       </Memo>
     );

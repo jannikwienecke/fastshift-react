@@ -53,6 +53,7 @@ export type ContinueCursor = {
 
 export type UserViewData = {
   displayOptions: string | null;
+  name: string;
 };
 
 export type QueryReturnDto<T extends RecordType = RecordType> = {

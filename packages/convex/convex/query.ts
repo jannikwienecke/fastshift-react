@@ -8,6 +8,7 @@ import { asyncMap } from 'convex-helpers';
 import { views } from '../src/index';
 import { Id } from './_generated/dataModel';
 import { UserViewData } from '@apps-next/core';
+import { v } from 'convex/values';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -33,10 +34,41 @@ export const testQuery = server.mutation({
 });
 
 export const userViewData = server.query({
+  args: { viewName: v.union(v.string(), v.null()) },
+
   handler: async (ctx, args) => {
+    if (!args.viewName) return null;
+
+    const viewName = args.viewName as string;
+    const view = await ctx.db
+      .query('views')
+      .withIndex('name', (q) => q.eq('name', viewName))
+      .first();
+
+    console.log('userViewData', { view });
+
+    if (!view) return null;
+
     return {
-      displayOptions: 'sorting=name:asc',
+      ...view,
+      name: view.name,
+      displayOptions: view.displayOptions ?? null,
     } satisfies UserViewData;
+  },
+});
+
+export const createUserViewData = server.mutation({
+  handler: async (ctx, args) => {
+    const view = await ctx.db
+      .query('views')
+      .withIndex('name', (q) => q.eq('name', 'TestTask'))
+      .first();
+
+    ctx.db.insert('views', {
+      baseView: '',
+      name: '',
+      displayOptions: '',
+    });
   },
 });
 

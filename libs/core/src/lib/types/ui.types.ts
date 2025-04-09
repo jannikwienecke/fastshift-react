@@ -200,6 +200,11 @@ export type FilterProps = {
   renderFilterValue: (filterValue: FilterItemType) => React.ReactNode;
 };
 
+export type SaveViewDropdownProps = {
+  onSave: () => void;
+  onSaveAsNewView: () => void;
+};
+
 export type ConfirmationDialogProps = {
   open: boolean;
   title?: TranslationKeys;

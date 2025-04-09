@@ -4,8 +4,11 @@
   "editor.quickSuggestions": {
     "strings": "on"
   },
+  "editor.fontSize": 14,
   // prioritize ArkType's "type" for autoimports
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": [
+    "^(node:)?os$"
+  ],
   "deno.enable": false,
   "todo-tree.general.tags": [
     "BUG",

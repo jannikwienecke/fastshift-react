@@ -15,7 +15,7 @@ export const FilterDefault = (props: FilterProps) => {
   const { filters, onOpen, label } = props;
   return (
     <>
-      <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-row gap-2 flex-wrap">
         {filters.length > 0 && <FilterList {...props} />}
 
         <FilterButton
@@ -30,14 +30,19 @@ export const FilterDefault = (props: FilterProps) => {
 
 const FilterList = (props: FilterProps) => {
   return (
-    <div
-      data-testid="filter-list"
-      className="flex flex-row gap-2 items-center flex-wrap text-xs"
-    >
+    // <div
+    //   data-testid="filter-list"
+    //   className="flex flex-row gap-2 items-center flex-wrap text-xs"
+    // >
+    <>
       {props.filters.map((f) => {
         const ref = React.createRef<HTMLDivElement>();
         return (
-          <span key={`filter-${f.name}-${f.operator}`} ref={ref}>
+          <span
+            key={`filter-${f.name}-${f.operator}`}
+            ref={ref}
+            className="text-xs"
+          >
             <FilterItem
               renderFilterItem={props.renderFilterValue}
               filter={f}
@@ -58,7 +63,7 @@ const FilterList = (props: FilterProps) => {
           </span>
         );
       })}
-    </div>
+    </>
   );
 };
 

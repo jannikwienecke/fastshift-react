@@ -77,7 +77,7 @@ export const createMutation = async (
       message: `Error creating record. Record=${JSON.stringify(
         record
       )} displayField=${displayField} displayValue=${displayValue}`,
-      // error: getErrorMessage(error),
+      error: getErrorMessage(error),
     };
   }
 };
@@ -111,7 +111,7 @@ export const deleteMutation = async (
     return {
       status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
       message: errorMsg,
-      // error: getErrorMessage(error),
+      error: getErrorMessage(error),
     };
   }
 
@@ -229,4 +229,51 @@ export const mutationHandlers: MUTATION_HANDLER_CONVEX = {
   DELETE_RECORD: deleteMutation,
   UPDATE_RECORD: updateMutation,
   SELECT_RECORDS: selectRecordsMutation,
+  USER_VIEW_MUTATION: async (
+    ctx: GenericMutationCtx,
+    props: MutationPropsServer
+  ) => {
+    if (props.mutation.type !== 'USER_VIEW_MUTATION')
+      throw new Error('INVALID MUTATION-5');
+
+    console.log('USER_VIEW_MUTATION', props.mutation);
+
+    const viewName = props.mutation.payload.name as string;
+
+    const view = await ctx.db
+      .query('views')
+      .withIndex('name', (q: any) => q.eq('name', viewName))
+      .first();
+
+    if (view) {
+      try {
+        await ctx.db.patch(view._id, {
+          displayOptions: props.mutation.payload.displayOptions,
+        });
+        return { message: 'ok', status: 200 as const };
+      } catch (error) {
+        return {
+          status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+          message: `Error updating user view. name=${props.mutation.payload.name}`,
+          error: getErrorMessage(error),
+        };
+      }
+    }
+
+    try {
+      await ctx.db.insert('views', {
+        baseView: props.viewConfigManager.getViewName(),
+        name: props.mutation.payload.name,
+        displayOptions: props.mutation.payload.displayOptions,
+      });
+    } catch (error) {
+      return {
+        status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+        message: `Error creating user view. name=${props.mutation.payload.name}`,
+        error: getErrorMessage(error),
+      };
+    }
+
+    return { message: 'ok', status: 200 as const };
+  },
 };

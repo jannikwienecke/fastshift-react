@@ -28,6 +28,7 @@ export type QueryProviderConvexProps = {
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
   commands: Command[];
+  userViewData: UserViewData;
   queryKey: any[];
 } & { children: React.ReactNode };
 
@@ -104,12 +105,6 @@ export const ClientViewProviderConvex = (
 
   const queryClient = useQueryClient();
 
-  const userViewData = queryClient.getQueryData([
-    'convexQuery',
-    'query:userViewData',
-    {},
-  ]) as UserViewData;
-
   const data = queryClient.getQueryData(
     props.queryKey
   ) as QueryReturnOrUndefined;
@@ -128,7 +123,7 @@ export const ClientViewProviderConvex = (
         views,
         props.uiViewConfig,
         props.commands,
-        userViewData
+        props.userViewData
       );
     }
   }, [
@@ -137,7 +132,7 @@ export const ClientViewProviderConvex = (
     viewConfigManager,
     views,
     props.commands,
-    userViewData,
+    props.userViewData,
   ]);
 
   if (!isInitialized) {

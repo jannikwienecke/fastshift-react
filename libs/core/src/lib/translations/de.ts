@@ -113,6 +113,10 @@ export const de = {
         'Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihr Konto dauerhaft löschen und Ihre Daten von unseren Servern entfernen.',
     },
   },
+  saveViewDropdown: {
+    saveToThisView: 'In diese Ansicht speichern',
+    createNewView: 'Neue Ansicht erstellen...',
+  },
   _creationTime: {
     one: 'Created at',
     other: 'Created at',

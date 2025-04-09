@@ -117,4 +117,7 @@ export type ConvexContext = {
   viewLoader: ViewLoader;
 };
 
-export type ConvexPreloadQuery = (viewConfig: ViewConfigType) => void;
+export type ConvexPreloadQuery = (
+  viewConfig: ViewConfigType,
+  viewName: string
+) => void;
