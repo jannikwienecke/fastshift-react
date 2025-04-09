@@ -1,7 +1,9 @@
 import {
   _log,
+  FieldConfig,
   getViewByName,
   makeData,
+  parseDisplayOptionsStringForServer,
   QueryReturnType,
   RelationalDataModel,
   sortRows,
@@ -122,7 +124,8 @@ export const init: StoreFn<'init'> =
     viewConfigManager,
     views,
     uiViewConfig,
-    commands
+    commands,
+    view
   ) => {
     batch(() => {
       store$.fetchMore.assign({
@@ -163,17 +166,32 @@ export const init: StoreFn<'init'> =
         !!viewConfigManager.viewConfig.mutation?.softDelete
       );
 
-      const defaultSorting =
-        store$.viewConfigManager.viewConfig.query.sorting.get();
+      const displayOptions = parseDisplayOptionsStringForServer(
+        view?.displayOptions ?? '',
+        viewConfigManager
+      );
+
+      let sortingField: FieldConfig | undefined = undefined;
+      let sortingOrder: 'asc' | 'desc' = 'asc';
+
+      if (displayOptions.sorting) {
+        sortingField = displayOptions.sorting.field;
+        sortingOrder = displayOptions.sorting.order;
+      } else {
+        const defaultSorting =
+          store$.viewConfigManager.viewConfig.query.sorting.get();
+
+        sortingField = defaultSorting?.field
+          ? viewConfigManager.getFieldByRelationFieldName(
+              defaultSorting.field.toString()
+            ) || viewConfigManager.getFieldBy(defaultSorting.field.toString())
+          : undefined;
+
+        sortingOrder = defaultSorting?.direction || 'asc';
+      }
 
       const defaultGrouping =
         store$.viewConfigManager.viewConfig.query.grouping.get();
-
-      const sortingField = defaultSorting?.field
-        ? viewConfigManager.getFieldByRelationFieldName(
-            defaultSorting.field.toString()
-          ) || viewConfigManager.getFieldBy(defaultSorting.field.toString())
-        : undefined;
 
       const groupByField = defaultGrouping?.field
         ? viewConfigManager.getFieldByRelationFieldName(
@@ -187,7 +205,7 @@ export const init: StoreFn<'init'> =
         isOpen: false,
         rect: null,
         field: sortingField,
-        order: defaultSorting?.direction || 'asc',
+        order: sortingOrder,
       });
       store$.displayOptions.grouping.assign({
         isOpen: false,

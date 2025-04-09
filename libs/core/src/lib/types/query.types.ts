@@ -51,6 +51,10 @@ export type ContinueCursor = {
   cursor: string | null;
 };
 
+export type UserViewData = {
+  displayOptions: string | null;
+};
+
 export type QueryReturnDto<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   relationalData?: QueryRelationalData;
@@ -58,6 +62,7 @@ export type QueryReturnDto<T extends RecordType = RecordType> = {
   continueCursor: ContinueCursor;
   isDone: boolean;
   allIds: string[];
+  view?: UserViewData;
 };
 
 export type QueryError = {
@@ -73,6 +78,7 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
   isError: boolean;
   error: QueryError | undefined | null;
   allIds: string[];
+  view?: UserViewData;
   // isFetching: boolean;
   // isFetched: boolean;
   refetch: () => void;

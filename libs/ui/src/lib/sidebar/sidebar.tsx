@@ -177,7 +177,7 @@ export const SidebarLink = ({
   const { open, animate } = useSidebar();
   return (
     <Link
-      // preload="intent"
+      preload="intent"
       to={link.href ?? ''}
       className={cn(
         'flex items-center justify-start gap-2  group/sidebar py-2',

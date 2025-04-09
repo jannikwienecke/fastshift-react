@@ -7,6 +7,7 @@ import * as server from './_generated/server';
 import { asyncMap } from 'convex-helpers';
 import { views } from '../src/index';
 import { Id } from './_generated/dataModel';
+import { UserViewData } from '@apps-next/core';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -28,6 +29,14 @@ export const testQuery = server.mutation({
     } catch (error) {
       console.error('testQuery error', { error });
     }
+  },
+});
+
+export const userViewData = server.query({
+  handler: async (ctx, args) => {
+    return {
+      displayOptions: 'sorting=name:asc',
+    } satisfies UserViewData;
   },
 });
 

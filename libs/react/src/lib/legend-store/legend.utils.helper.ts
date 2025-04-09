@@ -31,5 +31,8 @@ export const setGlobalDataModel = (rows: Row[]) => {
   store$.dataModelBackup.rows.set(rows);
 
   applyFilter(store$, store$.filter.filters.get());
-  applyDisplayOptions(store$, store$.displayOptions.get());
+
+  if (store$.viewConfigManager.localModeEnabled) {
+    applyDisplayOptions(store$, store$.displayOptions.get());
+  }
 };

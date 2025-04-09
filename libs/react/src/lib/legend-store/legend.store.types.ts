@@ -23,6 +23,7 @@ import {
   Row,
   TranslationKeys,
   UiViewConfig,
+  UserViewData,
   ViewConfigType,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
@@ -199,7 +200,8 @@ export type LegendStore = {
     viewConfigManager: BaseViewConfigManagerInterface,
     views: RegisteredViews,
     uiViewConfig: UiViewConfig,
-    commands: Command[]
+    commands: Command[],
+    userView: UserViewData | undefined
   ) => void;
 
   createDataModel: (data: RecordType[], tablename?: string) => void;

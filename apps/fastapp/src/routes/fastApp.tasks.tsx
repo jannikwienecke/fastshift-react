@@ -54,7 +54,7 @@ const TaskComponent = observer(() => {
       viewConfig={tasksConfig}
       globalConfig={config.config}
       uiViewConfig={uiViewConfig}
-      queryKey={getQueryKey(tasksConfig)}
+      getQueryKey={getQueryKey(tasksConfig)}
     >
       <Task />
     </ClientViewProviderConvex>
