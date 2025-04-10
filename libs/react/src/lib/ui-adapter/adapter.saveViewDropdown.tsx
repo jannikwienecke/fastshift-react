@@ -1,6 +1,7 @@
 import { FilterType, RecordType, SaveViewDropdownProps } from '@apps-next/core';
 import { store$ } from '../legend-store';
 import { getParsedViewSettings } from '../legend-store/legend.utils.helper';
+import { renderErrorToast } from '../toast';
 
 type Props<T> = {
   // Add any specific properties for the Props type here
@@ -73,7 +74,6 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
       }
     },
     async onSave() {
-      console.log('Save View');
       const result = await store$.api.mutateAsync({
         query: '',
         viewName: store$.viewConfigManager.getViewName(),
@@ -89,10 +89,30 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
           },
         },
       });
+
+      if (result.error) {
+        renderErrorToast(`Error saving view: ${result.error.message}`, () => {
+          console.log('Error saving view callback');
+        });
+      }
+
+      if (result.success) {
+        const displayOptions = store$.displayOptions.get();
+        const filters = store$.filter.filters.get();
+        const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
+        const copyOfFilters = JSON.parse(JSON.stringify(filters));
+
+        store$.userViewSettings.form.set(undefined);
+        store$.userViewSettings.open.set(false);
+        store$.userViewSettings.hasChanged.set(false);
+
+        store$.userViewSettings.initialSettings.set({
+          displayOptions: copyOfDisplayOptions,
+          filters: copyOfFilters,
+        });
+      }
     },
     async onSaveAsNewView() {
-      console.log('Save As New View');
-
       store$.userViewSettings.form.set({
         type: 'create',
         viewName: '',

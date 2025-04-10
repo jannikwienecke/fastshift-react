@@ -4,13 +4,13 @@ import {
   MutationHandlerReturnType,
   MutationPropsServer,
 } from '@apps-next/core';
-import { mutationClient } from './convex-client';
+import { mutationClient, queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
 import { deleteIds, insertIds } from './convex-mutation-helper';
 import { getErrorMessage } from './convex-utils';
 import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx } from './convex.server.types';
-import { ID } from './types.convex';
+import { ConvexRecord, ID } from './types.convex';
 import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
 
 export const createMutation = async (
@@ -231,18 +231,21 @@ export const userViewMutation = async (
 ) => {
   const { mutation, viewConfigManager } = props;
 
+  console.log('userViewMutation', mutation);
+
   if (mutation.type !== 'USER_VIEW_MUTATION')
     throw new Error('INVALID MUTATION-5');
 
   const { displayOptions, filters, name, type } = mutation.payload;
 
-  const dbQuery = mutationClient(ctx);
+  const dbMutation = mutationClient(ctx);
+  const dbQuery = queryClient(ctx, 'views');
 
   const viewName = mutation.payload.name;
 
   if (type === 'CREATE_VIEW') {
     try {
-      await dbQuery.insert('views', {
+      await dbMutation.insert('views', {
         name: name,
         baseView: viewConfigManager.getViewName(),
         displayOptions,
@@ -262,13 +265,26 @@ export const userViewMutation = async (
   }
 
   if (type === 'UPDATE_VIEW') {
-    const view = await dbQuery
-      .withIndex('name', (q) => q.eq('name', viewName))
-      .first();
+    console.log('update view');
+
+    let view: ConvexRecord | null = null;
+    try {
+      view = await dbQuery
+        .withIndex('name', (q) => q.eq('name', viewName))
+        .first();
+    } catch (error) {
+      return {
+        status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+        message: `Error fetching user view. name=${name}`,
+        error: getErrorMessage(error),
+      };
+    }
+
+    console.log('view', view);
 
     if (view) {
       try {
-        await dbQuery.patch(view._id, {
+        await dbMutation.patch(view._id, {
           displayOptions,
           filters,
         });
@@ -280,6 +296,25 @@ export const userViewMutation = async (
         return {
           status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
           message: `Error updating user view. name=${name}`,
+          error: getErrorMessage(error),
+        };
+      }
+    } else {
+      try {
+        const baseView = viewConfigManager.getViewName();
+        console.log('NO VIEW FOUND', { baseView });
+        await dbMutation.insert('views', {
+          name: baseView,
+          baseView,
+          displayOptions,
+          filters,
+        });
+      } catch (error) {
+        console.log('ERROR INSERTING VIEW', { error });
+
+        return {
+          status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+          message: `Error creating user view. name=${name}`,
           error: getErrorMessage(error),
         };
       }
