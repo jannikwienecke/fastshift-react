@@ -11,8 +11,8 @@ const _schema = defineSchema({
 
   views: defineTable({
     baseView: v.string(),
-    // min 2 characters and string
     name: v.string(),
+    description: v.optional(v.string()),
     displayOptions: v.optional(v.string()),
     filters: v.optional(v.string()),
   })

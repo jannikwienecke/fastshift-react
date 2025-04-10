@@ -37,6 +37,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
                 payload: {
                   type: 'CREATE_VIEW',
                   name: form.viewName,
+                  description: form.viewDescription,
                   ...parsedViewSettings,
                 },
               },
@@ -46,6 +47,18 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
               store$.userViewSettings.form.set(undefined);
               store$.userViewSettings.open.set(false);
               store$.userViewSettings.hasChanged.set(false);
+
+              const displayOptions = store$.displayOptions.get();
+              const filters = store$.filter.filters.get();
+              const copyOfDisplayOptions = JSON.parse(
+                JSON.stringify(displayOptions)
+              );
+              const copyOfFilters = JSON.parse(JSON.stringify(filters));
+
+              store$.userViewSettings.initialSettings.set({
+                displayOptions: copyOfDisplayOptions,
+                filters: copyOfFilters,
+              });
             }
           },
         }
@@ -81,6 +94,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
           type: 'USER_VIEW_MUTATION',
           payload: {
             type: 'UPDATE_VIEW',
+            description: form?.viewDescription ?? null,
             name:
               store$.userViewData.get()?.name ??
               store$.viewConfigManager.getViewName(),

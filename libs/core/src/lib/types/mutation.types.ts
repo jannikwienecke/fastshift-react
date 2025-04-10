@@ -56,6 +56,7 @@ export type USER_VIEW_MUTATION = {
   payload: {
     type: UserViewMutationType;
     name: string;
+    description: string | null;
     filters: string;
     displayOptions: string;
   };

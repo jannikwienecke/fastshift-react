@@ -236,7 +236,7 @@ export const userViewMutation = async (
   if (mutation.type !== 'USER_VIEW_MUTATION')
     throw new Error('INVALID MUTATION-5');
 
-  const { displayOptions, filters, name, type } = mutation.payload;
+  const { displayOptions, filters, name, type, description } = mutation.payload;
 
   const dbMutation = mutationClient(ctx);
   const dbQuery = queryClient(ctx, 'views');
@@ -247,6 +247,7 @@ export const userViewMutation = async (
     try {
       await dbMutation.insert('views', {
         name: name,
+        description,
         baseView: viewConfigManager.getViewName(),
         displayOptions,
         filters,
@@ -287,6 +288,8 @@ export const userViewMutation = async (
         await dbMutation.patch(view._id, {
           displayOptions,
           filters,
+          name,
+          description: description ?? '',
         });
         return {
           message: 'User view updated successfully',
@@ -304,10 +307,11 @@ export const userViewMutation = async (
         const baseView = viewConfigManager.getViewName();
         console.log('NO VIEW FOUND', { baseView });
         await dbMutation.insert('views', {
-          name: baseView,
           baseView,
           displayOptions,
           filters,
+          name: baseView,
+          description: description ?? '',
         });
       } catch (error) {
         console.log('ERROR INSERTING VIEW', { error });
