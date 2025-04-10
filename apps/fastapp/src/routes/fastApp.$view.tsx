@@ -1,5 +1,5 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
-import { ClientViewProviderConvex, makeHooks, store$ } from '@apps-next/react';
+import { ClientViewProviderConvex, makeHooks } from '@apps-next/react';
 import { InputDialog } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';

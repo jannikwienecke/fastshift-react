@@ -64,9 +64,14 @@ export type ContextMenuUiOptions = {
   isDeleted?: boolean;
 } & ContextMenuState;
 
-// export type
-export type DisplayOptionsUiType = {
-  isOpen: boolean;
+export type UserViewForm = {
+  type: 'edit' | 'create';
+  viewName: string;
+  viewDescription: string;
+  iconName?: string;
+};
+
+export type DisplayOptionsUiTypeData = {
   showEmptyGroups: boolean;
   viewType: {
     type: 'list' | 'board';
@@ -91,6 +96,10 @@ export type DisplayOptionsUiType = {
     allFields: string[];
   };
 };
+// export type
+export type DisplayOptionsUiType = {
+  isOpen: boolean;
+} & DisplayOptionsUiTypeData;
 
 export type FilterItemType = {
   label: string;

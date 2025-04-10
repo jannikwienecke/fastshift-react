@@ -72,7 +72,10 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'commandform'
   | 'datePickerDialogState'
   | 'commands'
+  | 'state'
+  | 'userViewSettings'
 > = {
+  state: 'pending',
   dataModel: {} as DataModelNew,
   dataModelBackup: { rows: [] } as DataModelNew,
   views: {} as RegisteredViews,
@@ -149,5 +152,10 @@ export const DEFAULT_LEGEND_STORE: Pick<
   datePickerDialogState: {
     open: false,
     selected: null,
+  },
+
+  userViewSettings: {
+    initialSettings: null,
+    open: false,
   },
 };

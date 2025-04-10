@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { Doc, TableNames } from './_generated/dataModel';
+import { z } from 'zod';
 
 const _schema = defineSchema({
   users: defineTable({
@@ -10,8 +11,10 @@ const _schema = defineSchema({
 
   views: defineTable({
     baseView: v.string(),
+    // min 2 characters and string
     name: v.string(),
     displayOptions: v.optional(v.string()),
+    filters: v.optional(v.string()),
   })
     .index('baseView', ['baseView'])
     .index('name', ['name']),

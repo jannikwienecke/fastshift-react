@@ -1,7 +1,11 @@
 import { Row } from '../data-model';
 import { TranslationKeys } from '../translations';
 import { FieldConfig, RecordType } from './base.types';
-import { DisplayOptionsUiType, FilterItemType } from './filter.types';
+import {
+  DisplayOptionsUiType,
+  FilterItemType,
+  UserViewForm,
+} from './filter.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
@@ -203,6 +207,9 @@ export type FilterProps = {
 export type SaveViewDropdownProps = {
   onSave: () => void;
   onSaveAsNewView: () => void;
+  onReset: () => void;
+  show: boolean;
+  form?: UserViewForm;
 };
 
 export type ConfirmationDialogProps = {

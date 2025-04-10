@@ -7,8 +7,11 @@ import * as server from './_generated/server';
 import { asyncMap } from 'convex-helpers';
 import { views } from '../src/index';
 import { Id } from './_generated/dataModel';
-import { UserViewData } from '@apps-next/core';
+import { _log, UserViewData } from '@apps-next/core';
 import { v } from 'convex/values';
+import { z } from 'zod';
+import { zCustomMutation } from 'convex-helpers/server/zod';
+import { NoOp } from 'convex-helpers/server/customFunctions';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -45,7 +48,7 @@ export const userViewData = server.query({
       .withIndex('name', (q) => q.eq('name', viewName))
       .first();
 
-    console.log('userViewData', { view });
+    _log.debug('userViewData', { view });
 
     if (!view) return null;
 
@@ -57,17 +60,29 @@ export const userViewData = server.query({
   },
 });
 
-export const createUserViewData = server.mutation({
+const zMutation = zCustomMutation(server.mutation, NoOp);
+
+export const createUserViewData = zMutation({
+  args: {
+    viewName: z.string().min(2),
+    displayOptions: z.string().min(1).optional(),
+    filters: z.string().min(1).optional(),
+  },
   handler: async (ctx, args) => {
     const view = await ctx.db
       .query('views')
-      .withIndex('name', (q) => q.eq('name', 'TestTask'))
+      .withIndex('name', (q) => q.eq('name', args.viewName))
       .first();
 
-    ctx.db.insert('views', {
+    if (view) {
+      return { message: 'View already exists' };
+    }
+
+    await ctx.db.insert('views', {
       baseView: '',
-      name: '',
-      displayOptions: '',
+      name: args.viewName,
+      displayOptions: args.displayOptions ?? '',
+      filters: args.filters ?? '',
     });
   },
 });

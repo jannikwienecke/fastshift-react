@@ -43,8 +43,6 @@ export const DefaultViewTemplate = observer(
             <div className="flex flex-row gap-2 mr-4 items-center">
               <RenderDisplayOptions options={props.displayOptions} />
 
-              <div className="h-[18px] w-[1px] bg-foreground/10 mx-2" />
-
               <RenderSaveViewDropdown />
             </div>
           </div>

@@ -125,7 +125,7 @@ export const init: StoreFn<'init'> =
     views,
     uiViewConfig,
     commands,
-    view
+    userViewData
   ) => {
     batch(() => {
       store$.fetchMore.assign({
@@ -148,6 +148,8 @@ export const init: StoreFn<'init'> =
       store$.filter.filters.set([]);
       store$.commands.set(commands);
 
+      store$.userViewData.set(userViewData);
+
       if (!store$.viewConfigManager.get()) return;
 
       const viewFields = store$.viewConfigManager
@@ -167,7 +169,7 @@ export const init: StoreFn<'init'> =
       );
 
       const displayOptions = parseDisplayOptionsStringForServer(
-        view?.displayOptions ?? '',
+        userViewData?.displayOptions ?? '',
         viewConfigManager
       );
 
@@ -216,6 +218,10 @@ export const init: StoreFn<'init'> =
 
     createDataModel(store$)(data);
     createRelationalDataModel(store$)(relationalData);
+
+    setTimeout(() => {
+      store$.state.set('initialized');
+    }, 0);
   };
 
 const handlingFetchMoreState = async (
@@ -238,7 +244,6 @@ const handlingFetchMoreState = async (
   store$.createDataModel(toShow);
 
   // store$.createDataModel(all);
-  store$.state.set('initialized');
 
   store$.fetchMore.assign({
     currentCursor: store$.fetchMore.currentCursor.get(),

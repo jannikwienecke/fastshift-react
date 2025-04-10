@@ -1,4 +1,3 @@
-import { TOGGLE_FIELD_LABEL } from '../core.constants';
 import { operatorLabels } from '../filters';
 
 export const en = {
@@ -56,6 +55,7 @@ export const en = {
   },
   common: {
     save: 'Save',
+    reset: 'Reset',
     submit: 'Submit',
     confirm: 'Confirm',
     cancel: 'Cancel',

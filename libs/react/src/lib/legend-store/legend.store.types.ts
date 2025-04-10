@@ -9,6 +9,7 @@ import {
   ContinueCursor,
   DataModelNew,
   DisplayOptionsUiType,
+  DisplayOptionsUiTypeData,
   DisplayOptionsViewField,
   FieldConfig,
   FilterType,
@@ -24,6 +25,7 @@ import {
   TranslationKeys,
   UiViewConfig,
   UserViewData,
+  UserViewForm,
   ViewConfigType,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
@@ -147,6 +149,7 @@ export type LegendStore = {
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
   commands: Command[];
+  userViewData: UserViewData | undefined;
 
   api?: {
     mutate?: (args: MutationDto) => void;
@@ -374,6 +377,18 @@ export type LegendStore = {
       | 'contextmenu',
     openCb: () => void
   ) => void;
+
+  // user view settings state
+  userViewSettings: {
+    initialSettings: {
+      filters: FilterType[];
+      displayOptions: DisplayOptionsUiTypeData;
+    } | null;
+
+    hasChanged: boolean;
+    open: boolean;
+    form?: UserViewForm;
+  };
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

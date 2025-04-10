@@ -185,15 +185,28 @@ export const RenderDatePickerDialog = observer(
 );
 
 export const RenderSaveViewDropdown = observer(
-  (props: {
+  (options: {
     //
   }) => {
     const { makeSaveViewDropdownProps } = makeHooks<TaskViewDataType>();
     _log.debug('Render SaveViewDropdown');
+
+    const props = makeSaveViewDropdownProps({
+      show: false,
+    });
+
+    if (!props.show) return null;
+
     return (
       <Memo>
         {() => {
-          return <SaveViewDropdown {...makeSaveViewDropdownProps({})} />;
+          return (
+            <>
+              <div className="h-[18px] w-[1px] bg-foreground/10 mx-2" />
+
+              <SaveViewDropdown {...props} />
+            </>
+          );
         }}
       </Memo>
     );
