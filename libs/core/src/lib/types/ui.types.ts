@@ -209,7 +209,12 @@ export type SaveViewDropdownProps = {
   onSaveAsNewView: () => void;
   onReset: () => void;
   show: boolean;
-  form?: UserViewForm;
+  form?: UserViewForm & {
+    onSave: () => void;
+    onCancel: () => void;
+    onNameChange: (name: string) => void;
+    onDescriptionChange: (description: string) => void;
+  };
 };
 
 export type ConfirmationDialogProps = {

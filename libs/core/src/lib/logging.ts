@@ -2,7 +2,7 @@ import * as logging from 'loglevel';
 
 const log = logging;
 
-log.setDefaultLevel('debug');
+// log.setDefaultLevel('debug');
 
 export const llerror = log.error;
 export const llwarn = log.warn;

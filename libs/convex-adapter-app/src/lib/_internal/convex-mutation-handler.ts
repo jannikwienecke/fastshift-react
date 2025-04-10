@@ -4,6 +4,7 @@ import {
   MutationHandlerReturnType,
   MutationPropsServer,
 } from '@apps-next/core';
+import { mutationClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
 import { deleteIds, insertIds } from './convex-mutation-helper';
 import { getErrorMessage } from './convex-utils';
@@ -11,7 +12,6 @@ import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx } from './convex.server.types';
 import { ID } from './types.convex';
 import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
-import { queryClient } from './convex-client';
 
 export const createMutation = async (
   ctx: GenericMutationCtx,
@@ -236,7 +236,7 @@ export const userViewMutation = async (
 
   const { displayOptions, filters, name, type } = mutation.payload;
 
-  const dbQuery = queryClient(ctx, 'views');
+  const dbQuery = mutationClient(ctx);
 
   const viewName = mutation.payload.name;
 

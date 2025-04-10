@@ -1,8 +1,10 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
-import { ClientViewProviderConvex, makeHooks } from '@apps-next/react';
+import { UserViewForm } from '@apps-next/core';
+import { ClientViewProviderConvex, makeHooks, store$ } from '@apps-next/react';
 import { InputDialog } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, useParams } from '@tanstack/react-router';
+import { createFileRoute, useParams, useRouter } from '@tanstack/react-router';
+import React from 'react';
 import { useCommands } from '../hooks/app.commands';
 import { getQueryKey, getUserViewData } from '../query-client';
 import { DefaultViewTemplate } from '../views/default-view-template';
@@ -49,8 +51,21 @@ export const Route = createFileRoute('/fastApp/$view')({
 const TaskComponent = observer(() => {
   const { commands } = useCommands();
   const { view } = useParams({ from: '/fastApp/$view' });
+  const router = useRouter();
 
   const userViewData = getUserViewData(view);
+
+  const navigateRef = React.useRef(router.navigate);
+  React.useEffect(() => {
+    store$.userViewSettings.form.onChange((v) => {
+      const change = v.changes?.[0];
+      if (change.prevAtPath && !change.valueAtPath) {
+        const prevAtPath = change.prevAtPath;
+        const viewName = (prevAtPath as UserViewForm).viewName;
+        navigateRef.current({ to: `/fastApp/${viewName}` });
+      }
+    });
+  }, []);
 
   return (
     <ClientViewProviderConvex

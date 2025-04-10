@@ -122,11 +122,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const query = store$.globalQueryDebounced.get();
 
-  const parsedViewSettings = React.useMemo(() => {
-    return store$.viewConfigManager.localModeEnabled
-      ? getParsedViewSettings()
-      : undefined;
-  }, []);
+  const parsedViewSettings = getParsedViewSettings();
 
   const cursor = store$.fetchMore.currentCursor.get();
 

@@ -56,9 +56,11 @@ export const getParsedViewSettings = () => {
   const filters = store$.filter.filters.get();
   const displayOptions = store$.displayOptions.get();
 
+  const parsedDisplayOptions = convertDisplayOptionsForBackend(displayOptions);
+
   return {
     filters: convertFiltersForBackend(filters),
-    displayOptions: convertDisplayOptionsForBackend(displayOptions),
+    displayOptions: parsedDisplayOptions,
   } satisfies {
     filters?: string;
     displayOptions?: string;

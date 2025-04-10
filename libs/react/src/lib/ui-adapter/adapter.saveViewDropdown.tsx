@@ -1,10 +1,4 @@
-import {
-  FilterType,
-  parseDisplayOptionsStringForServer,
-  parseFilterStringForServer,
-  RecordType,
-  SaveViewDropdownProps,
-} from '@apps-next/core';
+import { FilterType, RecordType, SaveViewDropdownProps } from '@apps-next/core';
 import { store$ } from '../legend-store';
 import { getParsedViewSettings } from '../legend-store/legend.utils.helper';
 
@@ -17,9 +11,44 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
 ): SaveViewDropdownProps => {
   const parsedViewSettings = getParsedViewSettings();
 
+  const form = store$.userViewSettings.form.get();
   return {
     show: store$.userViewSettings.hasChanged.get(),
-    form: store$.userViewSettings.form.get(),
+    form: form
+      ? {
+          ...form,
+          onCancel: () => {
+            store$.userViewSettings.form.set(undefined);
+          },
+          onNameChange: (name: string) => {
+            store$.userViewSettings.form.viewName.set(name);
+          },
+          onDescriptionChange: (description: string) => {
+            store$.userViewSettings.form.viewDescription.set(description);
+          },
+
+          onSave: async () => {
+            const result = await store$.api.mutateAsync({
+              query: '',
+              viewName: store$.viewConfigManager.getViewName(),
+              mutation: {
+                type: 'USER_VIEW_MUTATION',
+                payload: {
+                  type: 'CREATE_VIEW',
+                  name: form.viewName,
+                  ...parsedViewSettings,
+                },
+              },
+            });
+
+            if (result.success) {
+              store$.userViewSettings.form.set(undefined);
+              store$.userViewSettings.open.set(false);
+              store$.userViewSettings.hasChanged.set(false);
+            }
+          },
+        }
+      : undefined,
 
     onReset: () => {
       const initial = store$.userViewSettings.initialSettings.get();
@@ -70,22 +99,6 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
         viewDescription: '',
         iconName: undefined,
       });
-
-      // const result = await store$.api.mutateAsync({
-      //   query: '',
-      //   viewName: store$.viewConfigManager.getViewName(),
-      //   mutation: {
-      //     type: 'USER_VIEW_MUTATION',
-      //     payload: {
-      //       type: 'CREATE_VIEW',
-      //       name: 'new-user-view',
-
-      //       ...parsedViewSettings,
-      //     },
-      //   },
-      // });
-
-      // console.log('Mutation Result:', result);
     },
   } satisfies SaveViewDropdownProps;
 };

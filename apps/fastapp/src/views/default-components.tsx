@@ -26,6 +26,7 @@ import {
   InputDialog,
   List,
   SaveViewDropdown,
+  UserViewForm,
 } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { TaskViewDataType } from '../views/tasks.components';
@@ -205,6 +206,33 @@ export const RenderSaveViewDropdown = observer(
               <div className="h-[18px] w-[1px] bg-foreground/10 mx-2" />
 
               <SaveViewDropdown {...props} />
+            </>
+          );
+        }}
+      </Memo>
+    );
+  }
+);
+
+export const RenderUserViewForm = observer(
+  (options: {
+    //
+  }) => {
+    const { makeSaveViewDropdownProps } = makeHooks<TaskViewDataType>();
+    _log.debug('Render RenderUserViewForm');
+
+    const props = makeSaveViewDropdownProps({
+      show: false,
+    });
+
+    if (!props.form?.type) return null;
+
+    return (
+      <Memo>
+        {() => {
+          return (
+            <>
+              <UserViewForm {...props} />
             </>
           );
         }}
