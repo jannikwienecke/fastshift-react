@@ -313,9 +313,11 @@ export const userViewMutation = async (
           name: baseView,
           description: description ?? '',
         });
+        return {
+          message: 'User view created successfully',
+          status: 201 as const,
+        };
       } catch (error) {
-        console.log('ERROR INSERTING VIEW', { error });
-
         return {
           status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
           message: `Error creating user view. name=${name}`,

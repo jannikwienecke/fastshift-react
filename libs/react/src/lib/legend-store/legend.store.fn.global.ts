@@ -185,6 +185,7 @@ export const init: StoreFn<'init'> =
 
       let sortingField: FieldConfig | undefined = undefined;
       let sortingOrder: 'asc' | 'desc' = 'asc';
+      let groupByField: FieldConfig | undefined = undefined;
       let filters = [] as FilterType[];
 
       if (filtersUserView.length) {
@@ -209,14 +210,19 @@ export const init: StoreFn<'init'> =
         sortingOrder = defaultSorting?.direction || 'asc';
       }
 
-      const defaultGrouping =
-        store$.viewConfigManager.viewConfig.query.grouping.get();
+      // TODO -> MAKE SURE ALL DISPLAY OPTIONS ARE SET
+      if (displayOptionsUserView.grouping) {
+        groupByField = displayOptionsUserView.grouping.field;
+      } else {
+        const defaultGrouping =
+          store$.viewConfigManager.viewConfig.query.grouping.get();
 
-      const groupByField = defaultGrouping?.field
-        ? viewConfigManager.getFieldByRelationFieldName(
-            defaultGrouping.field.toString()
-          )
-        : undefined;
+        groupByField = defaultGrouping?.field
+          ? viewConfigManager.getFieldByRelationFieldName(
+              defaultGrouping.field.toString()
+            )
+          : undefined;
+      }
 
       displayOptionsProps.set({});
 

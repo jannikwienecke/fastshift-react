@@ -18,11 +18,13 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
   const parsedViewSettings = getParsedViewSettings();
 
   const form = store$.userViewSettings.form.get();
+
   return {
     show: store$.userViewSettings.hasChanged.get(),
     form: form
       ? {
           ...form,
+          viewName: store$.userViewSettings.form.viewName.get() ?? '',
           onCancel: () => {
             store$.userViewSettings.form.set(undefined);
           },

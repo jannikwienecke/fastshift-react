@@ -13,7 +13,7 @@ import { SaveViewDropdownProps, useTranslation } from '@apps-next/core';
 export function SaveViewDropdown(props: SaveViewDropdownProps) {
   const { t } = useTranslation();
 
-  if (!props.show) return null;
+  if (!props.show || props.form) return null;
   return (
     <>
       <Button

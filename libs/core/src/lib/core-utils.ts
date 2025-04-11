@@ -137,7 +137,7 @@ export const parseFilterStringForServer = (
 
       const decodedOperator = decodeURIComponent(operator ?? '');
       const decodedType = decodeURIComponent(type ?? '');
-      let decodedValue = decodeURIComponent(value ?? '');
+      const decodedValue = decodeURIComponent(value ?? '');
 
       if (decodedType === 'relation') {
         const values = decodedValue.split(',').map((value) => {
@@ -158,15 +158,15 @@ export const parseFilterStringForServer = (
           type: 'relation',
         };
       } else {
-        decodedValue = decodedValue.split('||')?.[0];
-        const label = decodedValue.split('||')?.[1];
-
+        const splitted = decodedValue.split('||');
+        const value = splitted[0];
+        const label = splitted[1];
         return {
           field,
           operator: {
             label: decodedOperator as FilterOperatorType['label'],
           },
-          value: makeRow(decodedValue, label, decodedValue, field),
+          value: makeRow(value, label ?? value, value, field),
           type: 'primitive',
         };
       }

@@ -3,6 +3,8 @@ import { InboxIcon, TerminalIcon } from 'lucide-react';
 import { Button } from '../components';
 
 export const UserViewForm = (props: SaveViewDropdownProps) => {
+  const viewName = props.form?.viewName;
+
   return (
     <div>
       <div className="flex flex-row justify-between items-center">
@@ -41,6 +43,7 @@ export const UserViewForm = (props: SaveViewDropdownProps) => {
             </Button>
 
             <Button
+              disabled={!viewName || viewName.length < 2}
               onClick={props.form?.onSave}
               variant={'default'}
               className="h-7 px-2 text-xs font-normal"

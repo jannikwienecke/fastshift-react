@@ -27,7 +27,7 @@ export class TaskPage {
   }
 
   async goto() {
-    await this.page.goto('/fastApp/tasks', { timeout: 5000 });
+    await this.page.goto('/fastApp/Task', { timeout: 5000 });
   }
 
   async getListItem(index: number) {

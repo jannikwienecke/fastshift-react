@@ -196,7 +196,7 @@ export const RenderSaveViewDropdown = observer(
       show: false,
     });
 
-    if (!props.show) return null;
+    if (!props.show || props.form) return null;
 
     return (
       <Memo>
@@ -219,24 +219,24 @@ export const RenderUserViewForm = observer(
     //
   }) => {
     const { makeSaveViewDropdownProps } = makeHooks<TaskViewDataType>();
-    _log.debug('Render RenderUserViewForm');
+    _log.info('Render RenderUserViewForm');
 
     const props = makeSaveViewDropdownProps({
       show: false,
     });
 
-    if (!props.form?.type) return null;
+    console.log(props);
 
     return (
-      <Memo>
-        {() => {
-          return (
-            <>
-              <UserViewForm {...props} />
-            </>
-          );
-        }}
-      </Memo>
+      // <Memo>
+      //   {() => {
+      //     return (
+      <>
+        <UserViewForm {...props} />
+      </>
+      //     );
+      //   }}
+      // </Memo>
     );
   }
 );
