@@ -1,4 +1,4 @@
-import { _log } from '@apps-next/core';
+import { _log, FilterType } from '@apps-next/core';
 import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { xSelect } from './legend.select-state';
@@ -8,6 +8,24 @@ import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
+
+  const normalizeFilters = (filters: FilterType[]) => {
+    return filters
+      .sort((a, b) => a.field.name.localeCompare(b.field.name))
+      .map((f) => {
+        const { field, operator, type } = f;
+
+        if (type === 'relation') {
+          const sortedValues = f.values.sort((a, b) =>
+            a.label.localeCompare(b.label)
+          );
+          const ids = sortedValues.map((v) => v.id).join(';');
+          return `field:${f.field.name},operator:${operator.label},ids:${ids}`;
+        } else {
+          return `field:${field.name},operator:${operator.label},value:${f.value.id}`;
+        }
+      });
+  };
 
   observable(function handleResetCombobox() {
     const listRelationField = store$.list.selectedRelationField.get();
@@ -218,5 +236,17 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     };
 
     store$.userViewSettings.hasChanged.set(anythingChanged());
+  });
+
+  store$.filter.filters.onChange((changes) => {
+    const initial = normalizeFilters(
+      store$.userViewSettings.initialSettings.filters.get() ?? []
+    );
+    const currentFilters = normalizeFilters(changes.value);
+
+    const filtersChanged =
+      JSON.stringify(initial) !== JSON.stringify(currentFilters);
+
+    store$.userViewSettings.hasChanged.set(filtersChanged);
   });
 };

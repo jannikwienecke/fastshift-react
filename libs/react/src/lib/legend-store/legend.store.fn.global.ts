@@ -1,9 +1,11 @@
 import {
   _log,
   FieldConfig,
+  FilterType,
   getViewByName,
   makeData,
   parseDisplayOptionsStringForServer,
+  parseFilterStringForServer,
   QueryReturnType,
   RelationalDataModel,
   sortRows,
@@ -168,17 +170,32 @@ export const init: StoreFn<'init'> =
         !!viewConfigManager.viewConfig.mutation?.softDelete
       );
 
-      const displayOptions = parseDisplayOptionsStringForServer(
+      createDataModel(store$)(data);
+      createRelationalDataModel(store$)(relationalData);
+
+      const displayOptionsUserView = parseDisplayOptionsStringForServer(
         userViewData?.displayOptions ?? '',
+        viewConfigManager
+      );
+
+      const filtersUserView = parseFilterStringForServer(
+        userViewData?.filters ?? '',
         viewConfigManager
       );
 
       let sortingField: FieldConfig | undefined = undefined;
       let sortingOrder: 'asc' | 'desc' = 'asc';
+      let filters = [] as FilterType[];
 
-      if (displayOptions.sorting) {
-        sortingField = displayOptions.sorting.field;
-        sortingOrder = displayOptions.sorting.order;
+      if (filtersUserView.length) {
+        filters = filtersUserView;
+      } else {
+        filters = [] as FilterType[];
+      }
+
+      if (displayOptionsUserView.sorting) {
+        sortingField = displayOptionsUserView.sorting.field;
+        sortingOrder = displayOptionsUserView.sorting.order;
       } else {
         const defaultSorting =
           store$.viewConfigManager.viewConfig.query.sorting.get();
@@ -203,6 +220,8 @@ export const init: StoreFn<'init'> =
 
       displayOptionsProps.set({});
 
+      store$.filter.filters.set(filters);
+
       store$.displayOptions.sorting.assign({
         isOpen: false,
         rect: null,
@@ -215,9 +234,6 @@ export const init: StoreFn<'init'> =
         field: groupByField,
       });
     });
-
-    createDataModel(store$)(data);
-    createRelationalDataModel(store$)(relationalData);
 
     setTimeout(() => {
       store$.state.set('initialized');

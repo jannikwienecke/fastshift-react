@@ -98,7 +98,7 @@ const makeQuery = (
   return convexQuery(viewLoader, {
     viewName: viewConfig.viewName,
     query: '',
-    filters: '',
+    filters: userViewData?.filters ?? '',
     displayOptions: userViewData?.displayOptions || parsedDisplayOptions || '',
     paginateOptions: {
       cursor: { position: null, cursor: null },

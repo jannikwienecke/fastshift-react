@@ -1,4 +1,9 @@
-import { FilterType, RecordType, SaveViewDropdownProps } from '@apps-next/core';
+import {
+  convertFiltersForBackend,
+  FilterType,
+  RecordType,
+  SaveViewDropdownProps,
+} from '@apps-next/core';
 import { store$ } from '../legend-store';
 import { getParsedViewSettings } from '../legend-store/legend.utils.helper';
 import { renderErrorToast } from '../toast';
@@ -87,6 +92,10 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
       }
     },
     async onSave() {
+      const filters = store$.filter.filters.get();
+
+      const filtersConverted = convertFiltersForBackend(filters);
+
       const result = await store$.api.mutateAsync({
         query: '',
         viewName: store$.viewConfigManager.getViewName(),
@@ -100,6 +109,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
               store$.viewConfigManager.getViewName(),
 
             ...parsedViewSettings,
+            filters: filtersConverted,
           },
         },
       });
