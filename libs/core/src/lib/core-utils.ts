@@ -179,19 +179,42 @@ export const convertDisplayOptionsForBackend = (
 ): string => {
   if (!displayOptions.sorting.field && !displayOptions.grouping) return '';
 
-  const sortingString = displayOptions.sorting.field
-    ? `sorting=${displayOptions.sorting.field.name}:${displayOptions.sorting.order}`
+  const {
+    grouping,
+    sorting,
+    showDeleted,
+    showEmptyGroups,
+    viewField,
+    viewType,
+  } = displayOptions;
+  const sortingString = sorting.field
+    ? `sorting=${sorting.field.name}:${sorting.order}`
     : '';
 
-  const groupingString = displayOptions.grouping.field
-    ? `grouping=${displayOptions.grouping.field.name}`
+  const groupingString = grouping.field
+    ? `grouping=${grouping.field.name}`
     : '';
 
-  const deletedString = displayOptions.showDeleted
-    ? `showDeleted=${displayOptions.showDeleted}`
+  const deletedString = showDeleted ? `showDeleted=${showDeleted}` : '';
+
+  const showEmptyGroupsString = showEmptyGroups
+    ? `showEmptyGroups=${showEmptyGroups}`
     : '';
 
-  return [sortingString, groupingString, deletedString]
+  const viewFieldString = viewField.hidden
+    ? `viewField=${viewField.hidden.join(',')}`
+    : '';
+
+  const viewTypeString = viewType ? `viewType=${viewType.type}` : '';
+
+  return [
+    sortingString,
+    groupingString,
+    deletedString,
+    showEmptyGroupsString,
+    viewFieldString,
+    viewTypeString,
+  ]
     .filter(Boolean)
     .join(';');
 };
@@ -230,8 +253,12 @@ export const parseDisplayOptionsStringForServer = (
       };
     } else if (key === 'showDeleted') {
       options.showDeleted = value === 'true';
-    } else {
-      //
+    } else if (key === 'showEmptyGroups') {
+      options.showEmptyGroups = value === 'true';
+    } else if (key === 'viewField') {
+      options.selectedViewFields = value.split(',').map((v) => v);
+    } else if (key === 'viewType') {
+      options.viewType = value as DisplayOptionsUiType['viewType']['type'];
     }
   });
 

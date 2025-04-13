@@ -15,8 +15,6 @@ type Props<T> = {
 export const makeSaveViewDropdownProps = <T extends RecordType>(
   options?: Props<T>
 ): SaveViewDropdownProps => {
-  const parsedViewSettings = getParsedViewSettings();
-
   const form = store$.userViewSettings.form.get();
 
   return {
@@ -45,7 +43,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
                   type: 'CREATE_VIEW',
                   name: form.viewName,
                   description: form.viewDescription,
-                  ...parsedViewSettings,
+                  ...getParsedViewSettings(),
                 },
               },
             });
@@ -110,7 +108,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
               store$.userViewData.get()?.name ??
               store$.viewConfigManager.getViewName(),
 
-            ...parsedViewSettings,
+            ...getParsedViewSettings(),
             filters: filtersConverted,
           },
         },

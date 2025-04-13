@@ -4,14 +4,15 @@ import { ConvexProvider } from 'convex/react';
 import { ConvexQueryProviderProps, ViewLoader } from './_internal/types.convex';
 
 import {
-  BaseViewConfigManager,
+  configManager,
   convertDisplayOptionsForBackend,
+  convertFiltersForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
   QueryProps,
   UserViewData,
   ViewConfigType,
 } from '@apps-next/core';
-import { QueryContext, store$ } from '@apps-next/react';
+import { QueryContext } from '@apps-next/react';
 import React from 'react';
 
 export const ConvexQueryProvider = (props: ConvexQueryProviderProps) => {
@@ -63,43 +64,15 @@ const makeQuery = (
   viewConfig: ViewConfigType,
   userViewData?: UserViewData
 ) => {
-  const sorting = viewConfig.query?.sorting;
-  const sortingFieldName = sorting?.field;
-  const groupingFieldName = viewConfig.query?.grouping?.field;
-
-  const viewConfigManager = new BaseViewConfigManager(viewConfig, {});
-
-  const sortingField = viewConfigManager.getSortingField(
-    sortingFieldName?.toString()
-  );
-
-  const groupingField = groupingFieldName
-    ? viewConfigManager.getFieldByRelationFieldName(
-        groupingFieldName?.toString()
-      )
-    : undefined;
-
-  const parsedDisplayOptions = convertDisplayOptionsForBackend({
-    sorting: {
-      isOpen: false,
-      rect: null,
-      field: sortingField,
-      order: sorting?.direction ?? 'asc',
-    },
-    grouping: { isOpen: false, rect: null, field: groupingField },
-    isOpen: false,
-    showEmptyGroups: false,
-    showDeleted: false,
-    softDeleteEnabled: false,
-    viewField: { allFields: [], selected: [] },
-    viewType: { type: 'list' },
-  });
+  const mergedConfig = configManager(viewConfig).mergeAndCreate(userViewData);
 
   return convexQuery(viewLoader, {
     viewName: viewConfig.viewName,
     query: '',
-    filters: userViewData?.filters ?? '',
-    displayOptions: userViewData?.displayOptions || parsedDisplayOptions || '',
+    filters: convertFiltersForBackend(mergedConfig.filters),
+    displayOptions: convertDisplayOptionsForBackend(
+      mergedConfig.dispplayOptions
+    ),
     paginateOptions: {
       cursor: { position: null, cursor: null },
       numItems: DEFAULT_FETCH_LIMIT_QUERY,

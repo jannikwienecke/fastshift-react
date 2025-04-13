@@ -1,5 +1,6 @@
 import {
   _log,
+  configManager,
   FieldConfig,
   FilterType,
   getViewByName,
@@ -154,91 +155,21 @@ export const init: StoreFn<'init'> =
 
       if (!store$.viewConfigManager.get()) return;
 
+      createDataModel(store$)(data);
+      createRelationalDataModel(store$)(relationalData);
+
+      const { filters, dispplayOptions } = configManager(
+        viewConfigManager.viewConfig
+      ).mergeAndCreate(userViewData);
+
+      store$.filter.filters.set(filters);
+      store$.displayOptions.set(dispplayOptions);
+
       const viewFields = store$.viewConfigManager
         .get()
         .getViewFieldList()
         .map((field) => field.name);
-
-      store$.displayOptions.viewField.selected.set(viewFields);
       store$.displayOptions.viewField.allFields.set(viewFields);
-
-      store$.displayOptions.showDeleted.set(
-        !!viewConfigManager.viewConfig.query?.showDeleted
-      );
-
-      store$.displayOptions.softDeleteEnabled.set(
-        !!viewConfigManager.viewConfig.mutation?.softDelete
-      );
-
-      createDataModel(store$)(data);
-      createRelationalDataModel(store$)(relationalData);
-
-      const displayOptionsUserView = parseDisplayOptionsStringForServer(
-        userViewData?.displayOptions ?? '',
-        viewConfigManager
-      );
-
-      const filtersUserView = parseFilterStringForServer(
-        userViewData?.filters ?? '',
-        viewConfigManager
-      );
-
-      let sortingField: FieldConfig | undefined = undefined;
-      let sortingOrder: 'asc' | 'desc' = 'asc';
-      let groupByField: FieldConfig | undefined = undefined;
-      let filters = [] as FilterType[];
-
-      if (filtersUserView.length) {
-        filters = filtersUserView;
-      } else {
-        filters = [] as FilterType[];
-      }
-
-      if (displayOptionsUserView.sorting) {
-        sortingField = displayOptionsUserView.sorting.field;
-        sortingOrder = displayOptionsUserView.sorting.order;
-      } else {
-        const defaultSorting =
-          store$.viewConfigManager.viewConfig.query.sorting.get();
-
-        sortingField = defaultSorting?.field
-          ? viewConfigManager.getFieldByRelationFieldName(
-              defaultSorting.field.toString()
-            ) || viewConfigManager.getFieldBy(defaultSorting.field.toString())
-          : undefined;
-
-        sortingOrder = defaultSorting?.direction || 'asc';
-      }
-
-      // TODO -> MAKE SURE ALL DISPLAY OPTIONS ARE SET
-      if (displayOptionsUserView.grouping) {
-        groupByField = displayOptionsUserView.grouping.field;
-      } else {
-        const defaultGrouping =
-          store$.viewConfigManager.viewConfig.query.grouping.get();
-
-        groupByField = defaultGrouping?.field
-          ? viewConfigManager.getFieldByRelationFieldName(
-              defaultGrouping.field.toString()
-            )
-          : undefined;
-      }
-
-      displayOptionsProps.set({});
-
-      store$.filter.filters.set(filters);
-
-      store$.displayOptions.sorting.assign({
-        isOpen: false,
-        rect: null,
-        field: sortingField,
-        order: sortingOrder,
-      });
-      store$.displayOptions.grouping.assign({
-        isOpen: false,
-        rect: null,
-        field: groupByField,
-      });
     });
 
     setTimeout(() => {

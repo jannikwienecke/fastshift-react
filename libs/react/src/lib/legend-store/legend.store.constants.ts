@@ -74,6 +74,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'commands'
   | 'state'
   | 'userViewSettings'
+  | 'userViewData'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
@@ -121,7 +122,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
   commands: [],
   displayOptions: {
-    showEmptyGroups: true,
+    // showEmptyGroups?,
     softDeleteEnabled: false,
     showDeleted: false,
     isOpen: false,
@@ -133,7 +134,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
       rect: null,
     },
     viewField: {
-      selected: [],
+      hidden: [],
       allFields: [],
     },
     grouping: {
@@ -157,5 +158,8 @@ export const DEFAULT_LEGEND_STORE: Pick<
   userViewSettings: {
     initialSettings: null,
     open: false,
+    hasChanged: false,
   },
+
+  userViewData: undefined,
 };

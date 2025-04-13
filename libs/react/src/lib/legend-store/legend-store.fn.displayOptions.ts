@@ -82,13 +82,21 @@ export const displayOptionsSelectField: StoreFn<'displayOptionsSelectField'> =
 export const displayOptionsSelectViewField: StoreFn<
   'displayOptionsSelectViewField'
 > = (store$) => (field) => {
-  const prevSelectedViewFields = store$.displayOptions.viewField.selected.get();
+  const prevSelectedViewFields = store$.displayOptions.viewField.hidden.get();
+  const allFields = store$.displayOptions.viewField.allFields.get();
+
+  if (prevSelectedViewFields === null || prevSelectedViewFields === undefined) {
+    store$.displayOptions.viewField.hidden.set(
+      allFields.filter((f) => f !== field.id).map((f) => f)
+    );
+    return;
+  }
 
   const selected = prevSelectedViewFields.includes(field.id)
     ? prevSelectedViewFields.filter((id) => id !== field.id)
     : [...prevSelectedViewFields, field.id];
 
-  store$.displayOptions.viewField.selected.set(selected);
+  store$.displayOptions.viewField.hidden.set(selected);
 };
 
 export const displayOptionsToggleShowEmptyGroups: StoreFn<
@@ -108,7 +116,7 @@ export const displayOptionsReset: StoreFn<'displayOptionsReset'> =
   (store$) => () => {
     store$.displayOptions.grouping.field.set(undefined);
     store$.displayOptions.sorting.field.set(undefined);
-    store$.displayOptions.viewField.selected.set(
+    store$.displayOptions.viewField.hidden.set(
       store$.viewConfigManager.getViewFieldList?.().map((field) => field.name)
     );
     store$.displayOptions.showEmptyGroups.set(true);

@@ -1,4 +1,5 @@
 import { FieldConfig } from './base.types';
+import { DisplayOptionsUiType } from './filter.types';
 
 export type DisplayOptionsType = {
   sorting?: {
@@ -10,4 +11,7 @@ export type DisplayOptionsType = {
   };
 
   showDeleted?: boolean;
+  selectedViewFields?: string[];
+  showEmptyGroups?: boolean;
+  viewType?: DisplayOptionsUiType['viewType']['type'];
 };

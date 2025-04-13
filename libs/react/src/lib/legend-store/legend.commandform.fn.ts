@@ -55,6 +55,7 @@ export const commanformSelectRelationalValue: StoreFn<
     : [];
 
   let value;
+
   if (field.relation?.manyToManyTable) {
     // Check if item already exists
     const exists = prevValues.some((v) => v['id'] === selectedRow.raw['id']);
@@ -64,13 +65,11 @@ export const commanformSelectRelationalValue: StoreFn<
   } else {
     const isNumber = !isNaN(+selectedRow.id);
 
-    const parsedDateValue = getTimeValueFromDateString(selectedRow.id, true);
-
     value =
       field.type === 'Date' && isNumber
         ? new Date(selectedRow.raw).getTime()
         : field.type === 'Date'
-        ? parsedDateValue
+        ? getTimeValueFromDateString(selectedRow.id, true)
         : selectedRow.raw;
   }
 

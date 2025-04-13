@@ -72,11 +72,11 @@ export type UserViewForm = {
 };
 
 export type DisplayOptionsUiTypeData = {
-  showEmptyGroups: boolean;
+  showEmptyGroups?: boolean;
   viewType: {
     type: 'list' | 'board';
   };
-  showDeleted: boolean;
+  showDeleted?: boolean;
   softDeleteEnabled: boolean;
   sorting: {
     isOpen: boolean;
@@ -92,7 +92,7 @@ export type DisplayOptionsUiTypeData = {
     label?: string;
   };
   viewField: {
-    selected: string[];
+    hidden?: string[] | null;
     allFields: string[];
   };
 };

@@ -69,13 +69,16 @@ export const derviedDisplayOptions = observable(() => {
         return show;
       })
       .map((field) => {
+        const selectedFields = store$.displayOptions.viewField.hidden.get();
+        const selected =
+          selectedFields === null
+            ? true
+            : selectedFields?.includes?.(field.name) ?? false;
         return {
           ...field,
           id: field.name,
           label: field.label ?? field.name,
-          selected: store$.displayOptions.viewField.selected.includes(
-            field.name
-          ),
+          selected,
         };
       }),
 
@@ -101,7 +104,7 @@ export const derviedDisplayOptions = observable(() => {
     showResetButton:
       !!sorting.field ||
       !!grouping.field ||
-      store$.displayOptions.viewField.selected.length !==
+      store$.displayOptions.viewField.hidden.length !==
         store$.displayOptions.viewField.allFields.length,
 
     sorting: {

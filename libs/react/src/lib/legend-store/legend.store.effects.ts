@@ -170,14 +170,14 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const sortingOrder = value.sorting.order;
     const showEmptyGroups = value.showEmptyGroups;
     const showDeleted = value.showDeleted;
-    const selectedViewFields = value.viewField.selected;
+    const selectedViewFields = value.viewField.hidden;
 
     const initialGroupingField = initial?.grouping.field?.name;
     const initialSortingField = initial?.sorting.field?.name;
     const initialSortingOrder = initial?.sorting.order;
     const initialShowEmptyGroups = initial?.showEmptyGroups;
     const initialShowDeleted = initial?.showDeleted;
-    const initialSelectedViewFields = initial?.viewField.selected;
+    const initialSelectedViewFields = initial?.viewField.hidden;
 
     const anythingChanged = () => {
       let changed = false;
@@ -217,13 +217,16 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         });
         changed = true;
       }
+
       if (
-        !selectedViewFields?.every((field) =>
-          initialSelectedViewFields?.includes(field)
-        ) ||
-        !initialSelectedViewFields?.every((field) =>
-          selectedViewFields?.includes(field)
-        )
+        (selectedViewFields &&
+          !selectedViewFields?.every((field) =>
+            initialSelectedViewFields?.includes(field)
+          )) ||
+        (initialSelectedViewFields &&
+          !initialSelectedViewFields?.every((field) =>
+            selectedViewFields?.includes(field)
+          ))
       ) {
         _log.debug('selectedViewFields changed:', {
           from: initialSelectedViewFields,
@@ -234,6 +237,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
       return changed;
     };
+
+    console.log('anythingChanged', anythingChanged());
 
     store$.userViewSettings.hasChanged.set(anythingChanged());
   });

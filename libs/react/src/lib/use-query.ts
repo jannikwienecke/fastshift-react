@@ -1,6 +1,4 @@
 import {
-  convertDisplayOptionsForBackend,
-  convertFiltersForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
   makeQueryKey,
   QueryDto,
@@ -15,10 +13,10 @@ import {
 } from '@tanstack/react-query';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
+import { getParsedViewSettings } from './legend-store/legend.utils.helper';
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
-import { getParsedViewSettings } from './legend-store/legend.utils.helper';
 
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const queryOptions = api.makeQueryOptions
@@ -137,8 +135,10 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       viewConfig:
         queryProps?.viewConfigManager?.viewConfig ||
         viewConfigManager.viewConfig,
-      filters: parsedViewSettings?.filters,
-      displayOptions: parsedViewSettings?.displayOptions,
+      filters: queryProps?.relationQuery ? '' : parsedViewSettings?.filters,
+      displayOptions: queryProps?.relationQuery
+        ? ''
+        : parsedViewSettings?.displayOptions,
       paginateOptions: {
         cursor: cursor,
         numItems: DEFAULT_FETCH_LIMIT_QUERY,
