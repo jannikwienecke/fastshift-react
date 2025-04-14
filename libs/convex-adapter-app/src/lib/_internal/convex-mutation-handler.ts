@@ -231,8 +231,6 @@ export const userViewMutation = async (
 ) => {
   const { mutation, viewConfigManager } = props;
 
-  console.log('userViewMutation', mutation);
-
   if (mutation.type !== 'USER_VIEW_MUTATION')
     throw new Error('INVALID MUTATION-5');
 
@@ -266,8 +264,6 @@ export const userViewMutation = async (
   }
 
   if (type === 'UPDATE_VIEW') {
-    console.log('update view');
-
     let view: ConvexRecord | null = null;
     try {
       view = await dbQuery
@@ -280,8 +276,6 @@ export const userViewMutation = async (
         error: getErrorMessage(error),
       };
     }
-
-    console.log('view', view);
 
     if (view) {
       try {
@@ -305,7 +299,6 @@ export const userViewMutation = async (
     } else {
       try {
         const baseView = viewConfigManager.getViewName();
-        console.log('NO VIEW FOUND', { baseView });
         await dbMutation.insert('views', {
           baseView,
           displayOptions,

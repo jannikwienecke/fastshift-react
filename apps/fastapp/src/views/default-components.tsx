@@ -225,8 +225,6 @@ export const RenderUserViewForm = observer(
       show: false,
     });
 
-    console.log(props);
-
     return (
       // <Memo>
       //   {() => {

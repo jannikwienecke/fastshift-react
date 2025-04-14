@@ -160,12 +160,23 @@ export const handleRelationalField = (
   }
 
   const state = selectState$.get();
+  const initialSelectedFilterRows = state.initialSelectedFilterRows;
+  const selectedFilterRows = state.selectedFilterRows;
+
   const defaultSelected = state.initalRows;
   const selectedOfList = defaultData?.rows.filter((r) => {
     const isInDefault = state.initalRows?.find?.((s) => s['id'] === r['id']);
     const isRemoved = state.removedRows?.find?.((s) => s['id'] === r['id']);
     const isInNew = state.newRows?.find?.((s) => s['id'] === r['id']);
+    const isInSelectedFilterRows = selectedFilterRows?.find?.(
+      (s) => s['id'] === r['id']
+    );
+    const isInInitialSelectedFilterRows = initialSelectedFilterRows?.find?.(
+      (s) => s['id'] === r['id']
+    );
 
+    if (isInSelectedFilterRows) return true;
+    if (isInInitialSelectedFilterRows) return true;
     if (isInNew) return true;
     if (isRemoved) return false;
     if (isInDefault) return true;
@@ -173,21 +184,62 @@ export const handleRelationalField = (
     return false;
   });
 
-  const defaultDataSelected = valuesToUse.filter((row) =>
+  const initialButNotInDefault = debouncedQuery.length
+    ? []
+    : state.initalRows
+        .filter((r) => !valuesToUse.find((s) => s.id === r.id))
+        .filter(
+          (r) => state.removedRows.find((s) => s.id === r.id) === undefined
+        );
+
+  const initialButNotInDefaultSelected = debouncedQuery.length
+    ? valuesToUse.filter(
+        (v) =>
+          state.initalRows.find((r) => r.id === v.id) ||
+          state.newRows.find((r) => r.id === v.id)
+      )
+    : initialButNotInDefault.filter(
+        (r) => !selectedOfList.find((s) => s.id === r.id)
+      );
+
+  const new_ = valuesToUse.concat(initialButNotInDefault);
+  const newSelected = selectedOfList.concat(initialButNotInDefaultSelected);
+
+  const defaultDataSelected = new_.filter((row) =>
     defaultSelected?.find?.((s) => s['id'] === row['id'])
   );
 
-  const defaultDataNotSelected = valuesToUse.filter(
+  const defaultDataNotSelected = new_.filter(
     (row) => !defaultDataSelected.find((s) => s.id === row.id)
   );
 
-  const valuesToUseSorted = [...defaultDataSelected, ...defaultDataNotSelected];
+  const valuesToUseSorted = [
+    ...defaultDataSelected,
+    ...defaultDataNotSelected,
+  ].sort((a, b) => {
+    const isInFilter = initialSelectedFilterRows?.find?.(
+      (s) => s['id'] === a['id']
+    );
+    const isInFilter2 = initialSelectedFilterRows?.find?.(
+      (s) => s['id'] === b['id']
+    );
+
+    const isNoneOption = a.id === noneOption.id;
+    const isNoneOption2 = b.id === noneOption.id;
+
+    if (isNoneOption && !isNoneOption2) return -1;
+    if (!isNoneOption && isNoneOption2) return 1;
+
+    if (isInFilter && !isInFilter2) return -1;
+    if (!isInFilter && isInFilter2) return 1;
+    return 0;
+  });
 
   return {
     values: valuesToUseSorted,
     tableName: tableName,
     multiple: true,
-    selected: selectedOfList,
+    selected: newSelected,
     defaultSelected: defaultSelected,
   };
 };

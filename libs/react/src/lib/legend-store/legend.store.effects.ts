@@ -1,7 +1,7 @@
 import { _log, FilterType } from '@apps-next/core';
 import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
-import { xSelect } from './legend.select-state';
+import { selectState$, xSelect } from './legend.select-state';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
@@ -238,8 +238,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       return changed;
     };
 
-    console.log('anythingChanged', anythingChanged());
-
     store$.userViewSettings.hasChanged.set(anythingChanged());
   });
 
@@ -253,5 +251,19 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       JSON.stringify(initial) !== JSON.stringify(currentFilters);
 
     store$.userViewSettings.hasChanged.set(filtersChanged);
+  });
+
+  store$.filter.filters.onChange((changes) => {
+    const valuesChanged = changes.changes?.[0].path?.[1] === 'values';
+    const index = +changes.changes?.[0].path?.[0];
+
+    if (valuesChanged) {
+      const filter = changes.value[index];
+      if (!filter) return;
+
+      if (filter.type === 'relation') {
+        selectState$.selectedFilterRows.set(filter.values);
+      }
+    }
   });
 };

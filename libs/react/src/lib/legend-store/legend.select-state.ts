@@ -13,6 +13,9 @@ export const selectState$ = observable({
 
   toInsertRow: null as null | Row,
   toRemoveRow: null as null | Row,
+
+  initialSelectedFilterRows: [] as Row[],
+  selectedFilterRows: [] as Row[],
 });
 
 const getParentRow = () => {
@@ -29,6 +32,7 @@ const getCurrentRows = () => {
   const parentRow = getParentRow();
 
   const rows = parentRow?.getValue?.(field.name);
+  if ((rows as Row)?.id) return [rows];
   if (!Array.isArray(rows)) return [];
   return rows;
 };
@@ -75,6 +79,8 @@ export const close = () => {
   selectState$.removedRows.set([]);
   selectState$.parentRow.set(null);
   selectState$.field.set({} as FieldConfig);
+  selectState$.initialSelectedFilterRows.set([]);
+  selectState$.selectedFilterRows.set([]);
 };
 
 export const select = (row: Row) => {

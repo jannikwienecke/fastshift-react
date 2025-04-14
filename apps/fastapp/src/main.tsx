@@ -26,7 +26,7 @@ import { routeTree } from './routeTree.gen';
 
 const isDev = import.meta.env.MODE === 'development';
 
-logger.setLevel(isDev ? 'debug' : 'warn');
+logger.setLevel(isDev ? 'info' : 'warn');
 
 const router = createRouter({
   routeTree,

@@ -2,12 +2,14 @@ import {
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   getRelationTableName,
   getViewByName,
+  NONE_OPTION,
   QueryRelationalData,
   QueryServerProps,
 } from '@apps-next/core';
 import { filterByNotDeleted, queryClient } from './convex-client';
 import { queryHelper } from './convex-query-helper';
 import { GenericQueryCtx } from './convex.server.types';
+import { ConvexRecord } from './types.convex';
 
 export const getRelationalData = async (
   ctx: GenericQueryCtx,
@@ -21,9 +23,11 @@ export const getRelationalData = async (
 
   const include = getInclude(viewConfigManager.getIncludeFields());
 
-  const relationalDataPromises = Object.keys({
+  const fields = Object.keys({
     ...include,
-  }).map((key) => {
+  });
+
+  const relationalDataPromises = fields.map((key) => {
     const manyToManyField = viewConfigManager.getManyToManyField(key);
 
     const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
@@ -58,7 +62,52 @@ export const getRelationalData = async (
       : dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
   });
 
+  const filtersWithRelationalValues =
+    args.filters
+      ?.filter((f) => f.type === 'relation')
+      .filter((f) => f.values.length) ?? [];
+
+  const indexFields = viewConfigManager.getIndexFields();
+
+  const dict: { [key: string]: ConvexRecord[] } = {};
+
+  for (const filter of filtersWithRelationalValues) {
+    const fieldName = filter.field.relation?.fieldName;
+
+    const indexField = indexFields.find((f) => f.fields?.[0] === fieldName);
+    if (!indexField) {
+      continue;
+    }
+
+    const values: ConvexRecord[] = [];
+    for (const value of filter.values) {
+      if (value.id === NONE_OPTION) continue;
+
+      const res = await ctx.db.get(value.id);
+
+      if (!res) continue;
+
+      values.push(res);
+    }
+
+    dict[filter.field.name] = values;
+  }
+
   const resultList = await Promise.all(relationalDataPromises);
+
+  Object.entries(dict).forEach(([key, value]) => {
+    const indexOfFields = fields.findIndex((f) => f === key);
+    if (indexOfFields !== -1) {
+      const prevValues = resultList[indexOfFields];
+      const prevIds = prevValues?.map((r) => r._id);
+      const notInPrev = value.filter((r) => !prevIds?.includes(r._id));
+
+      resultList[indexOfFields] = [
+        ...(prevValues ?? []),
+        ...notInPrev,
+      ] as ConvexRecord[];
+    }
+  });
 
   const relationalData = Object.keys(include).reduce((acc, key, index) => {
     const manyToManyField = viewConfigManager.getManyToManyField(key);

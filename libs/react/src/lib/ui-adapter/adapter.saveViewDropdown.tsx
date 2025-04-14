@@ -1,4 +1,5 @@
 import {
+  _log,
   convertFiltersForBackend,
   FilterType,
   RecordType,
@@ -116,7 +117,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
 
       if (result.error) {
         renderErrorToast(`Error saving view: ${result.error.message}`, () => {
-          console.log('Error saving view callback');
+          _log.error('Error saving view callback');
         });
       }
 

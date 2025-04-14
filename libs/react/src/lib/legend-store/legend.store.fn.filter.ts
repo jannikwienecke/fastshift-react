@@ -12,6 +12,7 @@ import {
   operator,
 } from '../ui-adapter/filter-adapter';
 import { StoreFn } from './legend.store.types';
+import { selectState$ } from './legend.select-state';
 
 export const filterOpen: StoreFn<'filterOpen'> = (store$) => (rect) => {
   store$.openSpecificModal('filter', () => {
@@ -209,6 +210,17 @@ export const filterRemoveFilter: StoreFn<'filterRemoveFilter'> =
 
 export const filterOpenExisting: StoreFn<'filterOpenExisting'> =
   (store$) => (filter, rect) => {
+    const currentFilters = store$.filter.filters.get();
+    const selectedFilter = currentFilters.find(
+      (f) => f.field.name === filter.field.name
+    );
+
+    setTimeout(() => {
+      if (selectedFilter?.type === 'relation') {
+        selectState$.initialSelectedFilterRows.set(selectedFilter.values);
+      }
+    }, 0);
+
     store$.filter.rect.set(rect);
 
     store$.filter.selectedField.set(filter.field);

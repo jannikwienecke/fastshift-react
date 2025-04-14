@@ -1146,13 +1146,18 @@ test.describe('Task management', () => {
     await expect(page.getByText(/today/i).first()).toBeVisible();
 
     const day = new Date().getDate();
-    console.log('day', day);
 
     await page
       .getByText(day.toString() + '.')
       .first()
       .click();
   });
+
+  // TODO: add a test where we set the filter to learn photography (which is not in the first 10 projects)
+  // expect it to be visible when opening the filter after reload...
+
+  // TODO: FOr projects. Assign task to project
+  // and assign a task which is not in the first 10 tasks -> expect to be visile
 
   // test("can ")
 });
