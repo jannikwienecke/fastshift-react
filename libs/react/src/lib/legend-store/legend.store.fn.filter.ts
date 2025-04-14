@@ -79,6 +79,17 @@ export const filterSelectFilterType: StoreFn<'filterSelectFilterType'> =
     } else {
       const field = viewConfigManager.getFieldBy(id);
 
+      if (field.relation) {
+        const existingFilters = store$.filter.filters.get();
+        const filter = existingFilters.find((f) => f.field.name === field.name);
+
+        if (filter) {
+          if (filter?.type === 'relation') {
+            selectState$.initialSelectedFilterRows.set(filter.values);
+          }
+        }
+      }
+
       if (field.type === 'Boolean' || field.enum) {
         store$.filter.selectedField.set(field);
       } else if (field.type === 'Date') {

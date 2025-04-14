@@ -30,6 +30,10 @@ export class TaskPage {
     await this.page.goto('/fastApp/Task', { timeout: 5000 });
   }
 
+  async gotoPage(name: string) {
+    await this.page.goto(`/fastApp/${name}`, { timeout: 5000 });
+  }
+
   async getListItem(index: number) {
     return this.page.getByTestId('list-item').nth(index);
   }

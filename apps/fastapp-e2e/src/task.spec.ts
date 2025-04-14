@@ -1153,13 +1153,71 @@ test.describe('Task management', () => {
       .click();
   });
 
-  // TODO: add a test where we set the filter to learn photography (which is not in the first 10 projects)
-  // expect it to be visible when opening the filter after reload...
+  test('can filter by learn photography (non default loaded project) ', async ({
+    taskPage,
+    page,
+  }) => {
+    await taskPage.openFilter(/project/i);
 
-  // TODO: FOr projects. Assign task to project
-  // and assign a task which is not in the first 10 tasks -> expect to be visile
+    await taskPage.comboboxPopover
+      .getByPlaceholder(/filter by/i)
+      .fill('learn photography');
 
-  // test("can ")
+    // we select a project which is not in the first 10 projects (key difference here)
+    await taskPage.comboboxPopover.getByText(/learn photo/i).click();
+
+    await taskPage.closePopover();
+
+    await taskPage.openFilter(/project/i);
+
+    await expect(
+      taskPage.comboboxPopover.getByText(/learn photo/i)
+    ).toBeVisible();
+
+    await page.getByText(/save/i).click({ force: true });
+    await page.getByText(/save/i).click();
+    await page.getByText(/save to this/i).click();
+
+    await page.waitForTimeout(1000);
+
+    await page.reload();
+
+    await taskPage.openFilter(/project/i);
+
+    await expect(
+      taskPage.comboboxPopover.getByText(/learn photo/i)
+    ).toBeVisible();
+  });
+
+  test('can assign a task to a project and see it in the list', async ({
+    taskPage,
+    page,
+  }) => {
+    await taskPage.gotoPage('projects');
+    // expect url
+    await expect(page).toHaveURL(/.*projects/);
+    const listItem = await taskPage.getListItem(0);
+    await listItem.getByText(/3/i).click();
+
+    await expect(
+      taskPage.comboboxPopover.getByText(/organize desk space/i)
+    ).toBeHidden();
+
+    await taskPage.comboboxPopover
+      .getByPlaceholder(/change tasks/i)
+      .fill('organize desk space');
+
+    await taskPage.comboboxPopover.getByText(/organize desk space/i).click();
+
+    await listItem.click({ force: true });
+
+    await expect(listItem.getByText(/4/i)).toBeVisible();
+    await listItem.getByText(/4/i).click();
+
+    await expect(
+      taskPage.comboboxPopover.getByText(/organize desk space/i)
+    ).toBeVisible();
+  });
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {

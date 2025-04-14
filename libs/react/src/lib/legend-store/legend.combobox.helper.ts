@@ -164,6 +164,18 @@ export const handleRelationalField = (
   const selectedFilterRows = state.selectedFilterRows;
 
   const defaultSelected = state.initalRows;
+
+  // if we have filter open -> we might have some filter selected which are not in the default data
+  // so we add them to the valuesToUse
+  if (state.initialSelectedFilterRows) {
+    state.initialSelectedFilterRows.forEach((r) => {
+      const hasInValueToUse = valuesToUse.find((v) => v.id === r.id);
+      if (!hasInValueToUse) {
+        valuesToUse = [...valuesToUse, r];
+      }
+    });
+  }
+
   const selectedOfList = defaultData?.rows.filter((r) => {
     const isInDefault = state.initalRows?.find?.((s) => s['id'] === r['id']);
     const isRemoved = state.removedRows?.find?.((s) => s['id'] === r['id']);

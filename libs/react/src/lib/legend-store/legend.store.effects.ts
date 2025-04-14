@@ -254,11 +254,25 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   });
 
   store$.filter.filters.onChange((changes) => {
+    _log.debug('filters: ', changes);
+
     const valuesChanged = changes.changes?.[0].path?.[1] === 'values';
     const index = +changes.changes?.[0].path?.[0];
+    const newFilter =
+      changes.changes?.[0].valueAtPath?.length &&
+      changes.changes?.[0].valueAtPath.length > 0;
+
+    if (newFilter && !valuesChanged) {
+      const filter = changes.value.slice(-1)[0];
+      if (!filter) return;
+      if (filter.type === 'relation') {
+        selectState$.selectedFilterRows.set(filter.values);
+      }
+    }
 
     if (valuesChanged) {
       const filter = changes.value[index];
+
       if (!filter) return;
 
       if (filter.type === 'relation') {
