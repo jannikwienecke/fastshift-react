@@ -993,7 +993,22 @@ test.describe('Task management', () => {
       .getByPlaceholder(/description/i)
       .fill('Project Description');
 
-    // TODO UPDATE THIS TEST -> we need to also set the owner and category
+    await taskPage.commandform.getByText(/owner/i).first().click();
+    await page.getByPlaceholder(/filter by/i).fill('Mike Johnson');
+    await expect(page.getByText(/john doe/i)).toBeHidden();
+    await page.getByText(/mike Johnson/i).click();
+
+    await taskPage.commandform
+      .getByText(/categories/i)
+      .first()
+      .click();
+
+    await page.getByText(/Education/i).click();
+
+    await page.getByRole('button', { name: /create project/i }).click();
+
+    await expect(page.getByText(/created Successfully/i)).toBeVisible();
+
     // // Expect create button to be enabled after filling required fields
     // await expect(
     //   taskPage.commandform.getByText(/create project/i)
