@@ -1,8 +1,8 @@
 import { api } from '@apps-next/convex';
-import { getQueryKeyFn } from '@apps-next/convex-adapter-app';
-import { _log } from '@apps-next/core';
+import { preloadQuery } from '@apps-next/convex-adapter-app';
+import { _log, UserViewData, ViewConfigType } from '@apps-next/core';
 
-import { ConvexQueryClient } from '@convex-dev/react-query';
+import { convexQuery, ConvexQueryClient } from '@convex-dev/react-query';
 import { QueryClient } from '@tanstack/react-query';
 import { ConvexReactClient } from 'convex/react';
 
@@ -14,7 +14,24 @@ export const convex = new ConvexReactClient(VITE_CONVEX_URL);
 
 const convexQueryClient = new ConvexQueryClient(convex);
 
-export const getQueryKey = getQueryKeyFn(api.query.viewLoader);
+export const getUserViewQuery = (viewName: string) => {
+  return convexQuery(api.query.userViewData, {
+    viewName: viewName ?? null,
+  });
+};
+
+export const getUserViewData = (viewName: string) => {
+  const userViewData = queryClient.getQueryData(
+    getUserViewQuery(viewName).queryKey
+  ) as UserViewData;
+
+  return userViewData;
+};
+
+export const getQueryKey = (viewConfig: ViewConfigType, viewName: string) => {
+  const userViewData = getUserViewData(viewName);
+  return preloadQuery(api.query.viewLoader, viewConfig, userViewData).queryKey;
+};
 
 export const queryClient = new QueryClient({
   defaultOptions: {

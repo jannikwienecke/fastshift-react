@@ -15,8 +15,8 @@ import { Route as KanbanImport } from './routes/kanban'
 import { Route as FastAppImport } from './routes/fastApp'
 import { Route as DisplayOptionsImport } from './routes/display-options'
 import { Route as IndexImport } from './routes/index'
-import { Route as FastAppTasksImport } from './routes/fastApp.tasks'
 import { Route as FastAppProjectsImport } from './routes/fastApp.projects'
+import { Route as FastAppViewImport } from './routes/fastApp.$view'
 
 // Create/Update Routes
 
@@ -40,13 +40,13 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const FastAppTasksRoute = FastAppTasksImport.update({
-  path: '/tasks',
+const FastAppProjectsRoute = FastAppProjectsImport.update({
+  path: '/projects',
   getParentRoute: () => FastAppRoute,
 } as any)
 
-const FastAppProjectsRoute = FastAppProjectsImport.update({
-  path: '/projects',
+const FastAppViewRoute = FastAppViewImport.update({
+  path: '/$view',
   getParentRoute: () => FastAppRoute,
 } as any)
 
@@ -82,18 +82,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KanbanImport
       parentRoute: typeof rootRoute
     }
+    '/fastApp/$view': {
+      id: '/fastApp/$view'
+      path: '/$view'
+      fullPath: '/fastApp/$view'
+      preLoaderRoute: typeof FastAppViewImport
+      parentRoute: typeof FastAppImport
+    }
     '/fastApp/projects': {
       id: '/fastApp/projects'
       path: '/projects'
       fullPath: '/fastApp/projects'
       preLoaderRoute: typeof FastAppProjectsImport
-      parentRoute: typeof FastAppImport
-    }
-    '/fastApp/tasks': {
-      id: '/fastApp/tasks'
-      path: '/tasks'
-      fullPath: '/fastApp/tasks'
-      preLoaderRoute: typeof FastAppTasksImport
       parentRoute: typeof FastAppImport
     }
   }
@@ -105,8 +105,8 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   DisplayOptionsRoute,
   FastAppRoute: FastAppRoute.addChildren({
+    FastAppViewRoute,
     FastAppProjectsRoute,
-    FastAppTasksRoute,
   }),
   KanbanRoute,
 })
@@ -134,19 +134,19 @@ export const routeTree = rootRoute.addChildren({
     "/fastApp": {
       "filePath": "fastApp.tsx",
       "children": [
-        "/fastApp/projects",
-        "/fastApp/tasks"
+        "/fastApp/$view",
+        "/fastApp/projects"
       ]
     },
     "/kanban": {
       "filePath": "kanban.tsx"
     },
-    "/fastApp/projects": {
-      "filePath": "fastApp.projects.tsx",
+    "/fastApp/$view": {
+      "filePath": "fastApp.$view.tsx",
       "parent": "/fastApp"
     },
-    "/fastApp/tasks": {
-      "filePath": "fastApp.tasks.tsx",
+    "/fastApp/projects": {
+      "filePath": "fastApp.projects.tsx",
       "parent": "/fastApp"
     }
   }

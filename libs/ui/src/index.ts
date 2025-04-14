@@ -24,3 +24,5 @@ export * from './lib/confirmation-alert';
 export * from './lib/commandbar';
 export * from './lib/commandform';
 export * from './lib/datepicker-modal';
+export * from './lib/save-view-dropdown/save-view-dropdown';
+export * from './lib/user-view-form/user-view-form';

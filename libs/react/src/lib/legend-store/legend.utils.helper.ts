@@ -1,4 +1,9 @@
-import { Row } from '@apps-next/core';
+import {
+  convertDisplayOptionsForBackend,
+  convertFiltersForBackend,
+  DisplayOptionsType,
+  Row,
+} from '@apps-next/core';
 import { store$ } from './legend.store';
 import { applyFilter } from './legend.local.filtering';
 import { applyDisplayOptions } from './legend.local.display-options';
@@ -31,5 +36,33 @@ export const setGlobalDataModel = (rows: Row[]) => {
   store$.dataModelBackup.rows.set(rows);
 
   applyFilter(store$, store$.filter.filters.get());
-  applyDisplayOptions(store$, store$.displayOptions.get());
+
+  if (store$.viewConfigManager.localModeEnabled) {
+    applyDisplayOptions(store$, store$.displayOptions.get());
+  }
+};
+
+// const filters = store$.filter.filters.get();
+// const displayOptions = store$.displayOptions.get();
+
+// const parsedFilters = viewConfigManager.localModeEnabled
+//   ? ''
+//   : convertFiltersForBackend(filters);
+// const parsedDisplayOptions = viewConfigManager.localModeEnabled
+//   ? ''
+//   : convertDisplayOptionsForBackend(displayOptions);
+
+export const getParsedViewSettings = () => {
+  const filters = store$.filter.filters.get();
+  const displayOptions = store$.displayOptions.get();
+
+  const parsedDisplayOptions = convertDisplayOptionsForBackend(displayOptions);
+
+  return {
+    filters: convertFiltersForBackend(filters),
+    displayOptions: parsedDisplayOptions,
+  } satisfies {
+    filters?: string;
+    displayOptions?: string;
+  };
 };

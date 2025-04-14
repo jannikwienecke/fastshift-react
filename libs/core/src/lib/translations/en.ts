@@ -1,4 +1,3 @@
-import { TOGGLE_FIELD_LABEL } from '../core.constants';
 import { operatorLabels } from '../filters';
 
 export const en = {
@@ -56,6 +55,7 @@ export const en = {
   },
   common: {
     save: 'Save',
+    reset: 'Reset',
     submit: 'Submit',
     confirm: 'Confirm',
     cancel: 'Cancel',
@@ -115,6 +115,10 @@ export const en = {
       description:
         'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
     },
+  },
+  saveViewDropdown: {
+    saveToThisView: 'Save to this view',
+    createNewView: 'Create new view...',
   },
   _creationTime: {
     one: 'Created at',

@@ -25,6 +25,8 @@ import {
   Filter,
   InputDialog,
   List,
+  SaveViewDropdown,
+  UserViewForm,
 } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { TaskViewDataType } from '../views/tasks.components';
@@ -69,11 +71,7 @@ export const RenderDisplayOptions = observer(
     const { makeDisplayOptionsProps } = makeHooks<TaskViewDataType>();
     const props = makeDisplayOptionsProps(options);
 
-    return (
-      <div className="mr-4">
-        <DisplayOptions.Default {...props} />
-      </div>
-    );
+    return <DisplayOptions.Default {...props} />;
   }
 );
 
@@ -183,6 +181,62 @@ export const RenderDatePickerDialog = observer(
           return <datePickerModal.default {...makeDatePickerDialogProps({})} />;
         }}
       </Memo>
+    );
+  }
+);
+
+export const RenderSaveViewDropdown = observer(
+  (options: {
+    //
+  }) => {
+    const { makeSaveViewDropdownProps } = makeHooks<TaskViewDataType>();
+    _log.debug('Render SaveViewDropdown');
+
+    const props = makeSaveViewDropdownProps({
+      show: false,
+    });
+
+    if (!props.show || props.form) return null;
+
+    return (
+      <Memo>
+        {() => {
+          return (
+            <>
+              <div className="h-[18px] w-[1px] bg-foreground/10 mx-2" />
+
+              <SaveViewDropdown {...props} />
+            </>
+          );
+        }}
+      </Memo>
+    );
+  }
+);
+
+export const RenderUserViewForm = observer(
+  (options: {
+    //
+  }) => {
+    const { makeSaveViewDropdownProps } = makeHooks<TaskViewDataType>();
+    _log.info('Render RenderUserViewForm');
+
+    const props = makeSaveViewDropdownProps({
+      show: false,
+    });
+
+    console.log(props);
+
+    return (
+      // <Memo>
+      //   {() => {
+      //     return (
+      <>
+        <UserViewForm {...props} />
+      </>
+      //     );
+      //   }}
+      // </Memo>
     );
   }
 );

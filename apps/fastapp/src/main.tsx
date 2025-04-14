@@ -7,10 +7,15 @@ import {
   preloadQuery,
 } from '@apps-next/convex-adapter-app';
 
-import { convex, queryClient } from './query-client';
-import { routeTree } from './routeTree.gen';
-import './i18n';
 import { logger } from '@apps-next/core';
+import './i18n';
+import {
+  convex,
+  getUserViewData,
+  getUserViewQuery,
+  queryClient,
+} from './query-client';
+import { routeTree } from './routeTree.gen';
 
 // syncObservable(store$, {
 //   persist: {
@@ -21,23 +26,23 @@ import { logger } from '@apps-next/core';
 
 const isDev = import.meta.env.MODE === 'development';
 
-logger.setLevel(isDev ? 'info' : 'warn');
+logger.setLevel(isDev ? 'debug' : 'warn');
 
 const router = createRouter({
   routeTree,
   defaultPreload: 'viewport',
   defaultStaleTime: 5000,
-  // Wrap:
+
   context: {
     queryClient,
-    preloadQuery: async (viewConfig) => {
-      // TODO: [LATER] load user config from db here
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
+    preloadQuery: async (viewConfig, viewName) => {
+      await queryClient.ensureQueryData(getUserViewQuery(viewName));
 
-      const xx = await queryClient.ensureQueryData(
-        preloadQuery(api.query.viewLoader, viewConfig)
+      const userViewData = getUserViewData(viewName);
+
+      return await queryClient.ensureQueryData(
+        preloadQuery(api.query.viewLoader, viewConfig, userViewData)
       );
-      return xx;
     },
   },
 });

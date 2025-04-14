@@ -1,6 +1,4 @@
 import {
-  convertDisplayOptionsForBackend,
-  convertFiltersForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
   makeQueryKey,
   QueryDto,
@@ -15,6 +13,7 @@ import {
 } from '@tanstack/react-query';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
+import { getParsedViewSettings } from './legend-store/legend.utils.helper';
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
@@ -120,15 +119,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const { registeredViews, viewConfigManager } = useView();
 
   const query = store$.globalQueryDebounced.get();
-  const filters = store$.filter.filters.get();
-  const displayOptions = store$.displayOptions.get();
 
-  const parsedFilters = viewConfigManager.localModeEnabled
-    ? ''
-    : convertFiltersForBackend(filters);
-  const parsedDisplayOptions = viewConfigManager.localModeEnabled
-    ? ''
-    : convertDisplayOptionsForBackend(displayOptions);
+  const parsedViewSettings = getParsedViewSettings();
 
   const cursor = store$.fetchMore.currentCursor.get();
 
@@ -143,8 +135,10 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       viewConfig:
         queryProps?.viewConfigManager?.viewConfig ||
         viewConfigManager.viewConfig,
-      filters: parsedFilters,
-      displayOptions: parsedDisplayOptions,
+      filters: queryProps?.relationQuery ? '' : parsedViewSettings?.filters,
+      displayOptions: queryProps?.relationQuery
+        ? ''
+        : parsedViewSettings?.displayOptions,
       paginateOptions: {
         cursor: cursor,
         numItems: DEFAULT_FETCH_LIMIT_QUERY,
@@ -161,10 +155,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     registeredViews,
     viewConfigManager.modelConfig,
     viewConfigManager.viewConfig,
-    parsedFilters,
     cursor,
-    parsedDisplayOptions,
-    // isDone,
+    parsedViewSettings,
   ]);
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =

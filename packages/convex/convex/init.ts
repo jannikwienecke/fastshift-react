@@ -16,6 +16,7 @@ const init = server.mutation({
       'users',
       'categories',
       'todos',
+      'views',
     ];
     for (const table of tables) {
       const ids = await ctx.db.query(table as any).collect();

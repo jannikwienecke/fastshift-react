@@ -64,14 +64,19 @@ export type ContextMenuUiOptions = {
   isDeleted?: boolean;
 } & ContextMenuState;
 
-// export type
-export type DisplayOptionsUiType = {
-  isOpen: boolean;
-  showEmptyGroups: boolean;
+export type UserViewForm = {
+  type: 'edit' | 'create';
+  viewName: string;
+  viewDescription: string;
+  iconName?: string;
+};
+
+export type DisplayOptionsUiTypeData = {
+  showEmptyGroups?: boolean;
   viewType: {
     type: 'list' | 'board';
   };
-  showDeleted: boolean;
+  showDeleted?: boolean;
   softDeleteEnabled: boolean;
   sorting: {
     isOpen: boolean;
@@ -87,10 +92,14 @@ export type DisplayOptionsUiType = {
     label?: string;
   };
   viewField: {
-    selected: string[];
+    hidden?: string[] | null;
     allFields: string[];
   };
 };
+// export type
+export type DisplayOptionsUiType = {
+  isOpen: boolean;
+} & DisplayOptionsUiTypeData;
 
 export type FilterItemType = {
   label: string;

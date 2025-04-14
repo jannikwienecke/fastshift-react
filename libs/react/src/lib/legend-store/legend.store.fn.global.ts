@@ -1,7 +1,12 @@
 import {
   _log,
+  configManager,
+  FieldConfig,
+  FilterType,
   getViewByName,
   makeData,
+  parseDisplayOptionsStringForServer,
+  parseFilterStringForServer,
   QueryReturnType,
   RelationalDataModel,
   sortRows,
@@ -122,7 +127,8 @@ export const init: StoreFn<'init'> =
     viewConfigManager,
     views,
     uiViewConfig,
-    commands
+    commands,
+    userViewData
   ) => {
     batch(() => {
       store$.fetchMore.assign({
@@ -145,59 +151,34 @@ export const init: StoreFn<'init'> =
       store$.filter.filters.set([]);
       store$.commands.set(commands);
 
+      store$.userViewData.set(userViewData);
+
       if (!store$.viewConfigManager.get()) return;
 
-      const viewFields = store$.viewConfigManager
-        .get()
-        .getViewFieldList()
-        .map((field) => field.name);
+      createDataModel(store$)(data);
+      createRelationalDataModel(store$)(relationalData);
 
-      store$.displayOptions.viewField.selected.set(viewFields);
-      store$.displayOptions.viewField.allFields.set(viewFields);
+      const { filters, dispplayOptions } = configManager(
+        viewConfigManager.viewConfig
+      ).mergeAndCreate(userViewData);
 
-      store$.displayOptions.showDeleted.set(
-        !!viewConfigManager.viewConfig.query?.showDeleted
-      );
+      store$.filter.filters.set(filters);
+      store$.displayOptions.set(dispplayOptions);
 
       store$.displayOptions.softDeleteEnabled.set(
         !!viewConfigManager.viewConfig.mutation?.softDelete
       );
 
-      const defaultSorting =
-        store$.viewConfigManager.viewConfig.query.sorting.get();
-
-      const defaultGrouping =
-        store$.viewConfigManager.viewConfig.query.grouping.get();
-
-      const sortingField = defaultSorting?.field
-        ? viewConfigManager.getFieldByRelationFieldName(
-            defaultSorting.field.toString()
-          ) || viewConfigManager.getFieldBy(defaultSorting.field.toString())
-        : undefined;
-
-      const groupByField = defaultGrouping?.field
-        ? viewConfigManager.getFieldByRelationFieldName(
-            defaultGrouping.field.toString()
-          )
-        : undefined;
-
-      displayOptionsProps.set({});
-
-      store$.displayOptions.sorting.assign({
-        isOpen: false,
-        rect: null,
-        field: sortingField,
-        order: defaultSorting?.direction || 'asc',
-      });
-      store$.displayOptions.grouping.assign({
-        isOpen: false,
-        rect: null,
-        field: groupByField,
-      });
+      const viewFields = store$.viewConfigManager
+        .get()
+        .getViewFieldList()
+        .map((field) => field.name);
+      store$.displayOptions.viewField.allFields.set(viewFields);
     });
 
-    createDataModel(store$)(data);
-    createRelationalDataModel(store$)(relationalData);
+    setTimeout(() => {
+      store$.state.set('initialized');
+    }, 0);
   };
 
 const handlingFetchMoreState = async (
@@ -220,7 +201,6 @@ const handlingFetchMoreState = async (
   store$.createDataModel(toShow);
 
   // store$.createDataModel(all);
-  store$.state.set('initialized');
 
   store$.fetchMore.assign({
     currentCursor: store$.fetchMore.currentCursor.get(),

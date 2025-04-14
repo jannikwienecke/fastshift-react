@@ -1,7 +1,11 @@
 import { Row } from '../data-model';
 import { TranslationKeys } from '../translations';
 import { FieldConfig, RecordType } from './base.types';
-import { DisplayOptionsUiType, FilterItemType } from './filter.types';
+import {
+  DisplayOptionsUiType,
+  FilterItemType,
+  UserViewForm,
+} from './filter.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
@@ -198,6 +202,19 @@ export type FilterProps = {
   onSelect: (filter: FilterItemType, rect: DOMRect) => void;
   onOperatorClicked: (filter: FilterItemType, rect: DOMRect) => void;
   renderFilterValue: (filterValue: FilterItemType) => React.ReactNode;
+};
+
+export type SaveViewDropdownProps = {
+  onSave: () => void;
+  onSaveAsNewView: () => void;
+  onReset: () => void;
+  show: boolean;
+  form?: UserViewForm & {
+    onSave: () => void;
+    onCancel: () => void;
+    onNameChange: (name: string) => void;
+    onDescriptionChange: (description: string) => void;
+  };
 };
 
 export type ConfirmationDialogProps = {

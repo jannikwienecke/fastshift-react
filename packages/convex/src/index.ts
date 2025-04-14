@@ -40,6 +40,7 @@ export const tasksConfig = createViewConfig(
     displayField: {
       field: 'name',
     },
+
     fields: {
       // IMPROVEMENT: [LATER] add smart feature..
       // dueDate (date in the name -> date field)
@@ -87,6 +88,7 @@ export const tasksConfig = createViewConfig(
       // sorting: { field: '_creationTime', direction: 'desc' },
       showDeleted: false,
       primarySearchField: 'name',
+      // selectedViewFields: ['name'],
       // default sorting
       // sorting: { field: 'projectId', direction: 'asc' },
       // grouping: { field: 'projectId' },

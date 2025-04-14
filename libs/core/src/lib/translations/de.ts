@@ -73,6 +73,7 @@ export const de = {
     markAs: 'Als {{field}} markieren',
     unmarkAs: 'Als nicht {{field}} markieren',
     resetDb: 'Datenbank zurücksetzen',
+    reset: 'Zurücksetzen',
   },
   datePicker: {
     description: 'Bitte wählen Sie ein Datum aus dem Kalender.',
@@ -112,6 +113,10 @@ export const de = {
       description:
         'Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihr Konto dauerhaft löschen und Ihre Daten von unseren Servern entfernen.',
     },
+  },
+  saveViewDropdown: {
+    saveToThisView: 'In diese Ansicht speichern',
+    createNewView: 'Neue Ansicht erstellen...',
   },
   _creationTime: {
     one: 'Created at',

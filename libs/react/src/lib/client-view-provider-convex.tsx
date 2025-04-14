@@ -11,22 +11,24 @@ import {
   RegisteredViews,
   renderModelName,
   UiViewConfig,
+  UserViewData,
 } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { t } from 'i18next';
 import React from 'react';
 import { addEffects, addLocalFiltering } from './legend-store';
+import { addLocalDisplayOptionsHandling } from './legend-store/legend.local.display-options';
 import { store$ } from './legend-store/legend.store';
 import { useMutation } from './use-mutation';
 import { useQueryData } from './use-query-data';
-import { addLocalDisplayOptionsHandling } from './legend-store/legend.local.display-options';
 
 export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
   commands: Command[];
+  userViewData: UserViewData;
   queryKey: any[];
 } & { children: React.ReactNode };
 
@@ -120,10 +122,18 @@ export const ClientViewProviderConvex = (
         viewConfigManager,
         views,
         props.uiViewConfig,
-        props.commands
+        props.commands,
+        props.userViewData
       );
     }
-  }, [data, props.uiViewConfig, viewConfigManager, views, props.commands]);
+  }, [
+    data,
+    props.uiViewConfig,
+    viewConfigManager,
+    views,
+    props.commands,
+    props.userViewData,
+  ]);
 
   if (!isInitialized) {
     return null;

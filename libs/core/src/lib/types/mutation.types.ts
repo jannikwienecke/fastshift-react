@@ -23,7 +23,8 @@ export type MutationWithoutRecordPayload = {
 export type MutationPayload =
   | MutationRecordPayload
   | MutationWithoutRecordPayload
-  | MutationSelectRecordsPayload;
+  | MutationSelectRecordsPayload
+  | USER_VIEW_MUTATION['payload'];
 
 export type CREATE_RECORD = {
   type: 'CREATE_RECORD';
@@ -49,11 +50,25 @@ export type DELETE_RECORD = {
   handler?: (items: MutationRecord[]) => MutationRecord[];
 };
 
+export type UserViewMutationType = 'UPDATE_VIEW' | 'CREATE_VIEW';
+
+export type USER_VIEW_MUTATION = {
+  type: 'USER_VIEW_MUTATION';
+  payload: {
+    type: UserViewMutationType;
+    name: string;
+    description: string | null;
+    filters: string;
+    displayOptions: string;
+  };
+};
+
 export type Mutation =
   | CREATE_RECORD
   | UPDATE_RECORD
   | SELECT_RECORDS
-  | DELETE_RECORD;
+  | DELETE_RECORD
+  | USER_VIEW_MUTATION;
 
 export type MutationDto = {
   viewName: string;

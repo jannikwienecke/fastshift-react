@@ -1,4 +1,4 @@
-import { _log } from '@apps-next/core';
+import { _log, FilterType } from '@apps-next/core';
 import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { xSelect } from './legend.select-state';
@@ -8,6 +8,24 @@ import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
+
+  const normalizeFilters = (filters: FilterType[]) => {
+    return filters
+      .sort((a, b) => a.field.name.localeCompare(b.field.name))
+      .map((f) => {
+        const { field, operator, type } = f;
+
+        if (type === 'relation') {
+          const sortedValues = f.values.sort((a, b) =>
+            a.label.localeCompare(b.label)
+          );
+          const ids = sortedValues.map((v) => v.id).join(';');
+          return `field:${f.field.name},operator:${operator.label},ids:${ids}`;
+        } else {
+          return `field:${field.name},operator:${operator.label},value:${f.value.id}`;
+        }
+      });
+  };
 
   observable(function handleResetCombobox() {
     const listRelationField = store$.list.selectedRelationField.get();
@@ -117,5 +135,123 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
       timeout$.set(timeout);
     }
+  });
+
+  store$.state.onChange((changes) => {
+    const userViewSettings = store$.userViewSettings.get();
+
+    if (userViewSettings.initialSettings !== null) return;
+
+    const filters = store$.filter.filters.get();
+    const displayOptions = {
+      ...store$.displayOptions.get(),
+      isOpen: undefined,
+    };
+
+    const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
+    const copyOfFilters = JSON.parse(JSON.stringify(filters));
+
+    store$.userViewSettings.initialSettings.set({
+      displayOptions: copyOfDisplayOptions,
+      filters: copyOfFilters,
+    });
+  });
+
+  store$.displayOptions.onChange((changes) => {
+    const initial =
+      store$.userViewSettings.initialSettings.displayOptions.get();
+    const value = {
+      ...changes.value,
+      isOpen: undefined,
+    };
+
+    const groupingField = value.grouping.field?.name;
+    const sortingField = value.sorting.field?.name;
+    const sortingOrder = value.sorting.order;
+    const showEmptyGroups = value.showEmptyGroups;
+    const showDeleted = value.showDeleted;
+    const selectedViewFields = value.viewField.hidden;
+
+    const initialGroupingField = initial?.grouping.field?.name;
+    const initialSortingField = initial?.sorting.field?.name;
+    const initialSortingOrder = initial?.sorting.order;
+    const initialShowEmptyGroups = initial?.showEmptyGroups;
+    const initialShowDeleted = initial?.showDeleted;
+    const initialSelectedViewFields = initial?.viewField.hidden;
+
+    const anythingChanged = () => {
+      let changed = false;
+
+      if (groupingField !== initialGroupingField) {
+        _log.debug('groupingField changed:', {
+          from: initialGroupingField,
+          to: groupingField,
+        });
+        changed = true;
+      }
+      if (sortingField !== initialSortingField) {
+        _log.debug('sortingField changed:', {
+          from: initialSortingField,
+          to: sortingField,
+        });
+        changed = true;
+      }
+      if (sortingOrder !== initialSortingOrder) {
+        _log.debug('sortingOrder changed:', {
+          from: initialSortingOrder,
+          to: sortingOrder,
+        });
+        changed = true;
+      }
+      if (showEmptyGroups !== initialShowEmptyGroups) {
+        _log.debug('showEmptyGroups changed:', {
+          from: initialShowEmptyGroups,
+          to: showEmptyGroups,
+        });
+        changed = true;
+      }
+      if (showDeleted !== initialShowDeleted) {
+        _log.debug('showDeleted changed:', {
+          from: initialShowDeleted,
+          to: showDeleted,
+        });
+        changed = true;
+      }
+
+      if (
+        (selectedViewFields &&
+          !selectedViewFields?.every((field) =>
+            initialSelectedViewFields?.includes(field)
+          )) ||
+        (initialSelectedViewFields &&
+          !initialSelectedViewFields?.every((field) =>
+            selectedViewFields?.includes(field)
+          ))
+      ) {
+        _log.debug('selectedViewFields changed:', {
+          from: initialSelectedViewFields,
+          to: selectedViewFields,
+        });
+        changed = true;
+      }
+
+      return changed;
+    };
+
+    console.log('anythingChanged', anythingChanged());
+
+    store$.userViewSettings.hasChanged.set(anythingChanged());
+  });
+
+  store$.filter.filters.onChange((changes) => {
+    const initial = normalizeFilters(
+      store$.userViewSettings.initialSettings.filters.get() ?? []
+    );
+    const currentFilters = normalizeFilters(changes.value);
+
+    const filtersChanged =
+      JSON.stringify(initial) !== JSON.stringify(currentFilters);
+
+    store$.userViewSettings.hasChanged.set(filtersChanged);
   });
 };

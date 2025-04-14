@@ -16,6 +16,7 @@ export const deleteIds = async (
   field: FieldConfig
 ) => {
   if (!ids || ids.length === 0) return;
+  if (mutation.type !== 'SELECT_RECORDS') throw new Error('INVALID MUTATION-4');
 
   const tableFieldName = getTableFieldName(viewConfigManager, field);
   const fieldNameRelationTable = getRelationTableFieldName(field);
@@ -24,7 +25,7 @@ export const deleteIds = async (
     const client = queryClient(ctx, field.name);
 
     const record = await client
-      .withIndex('by_id', (q) => q.eq('_id', mutation.payload.id))
+      .withIndex('by_id', (q) => q.eq('_id', mutation.payload['id']))
       .first();
 
     const existingIds = record[tableFieldName] as ID[];
@@ -32,7 +33,7 @@ export const deleteIds = async (
       (existingId: ID) => !ids.includes(existingId)
     );
 
-    await ctx.db.patch(mutation.payload.id, {
+    await ctx.db.patch(mutation.payload['id'], {
       [tableFieldName]: after,
     });
 
@@ -52,7 +53,7 @@ export const deleteIds = async (
       });
 
       const _id = records.find(
-        (r: ConvexRecordType) => r[tableFieldName] === mutation?.payload.id
+        (r: ConvexRecordType) => r[tableFieldName] === mutation?.payload['id']
       )?._id;
 
       if (_id) {
@@ -69,13 +70,15 @@ export const insertIds = async (
   field: FieldConfig,
   record: RecordType
 ) => {
+  if (mutation.type !== 'SELECT_RECORDS') throw new Error('INVALID MUTATION-4');
+
   const tableFieldName = getTableFieldName(viewConfigManager, field);
   if (!ids || ids.length === 0) return;
 
   if (field.isRecursive && tableFieldName) {
     const existingIds = record[tableFieldName] as ID[];
 
-    await ctx.db.patch(mutation.payload.id, {
+    await ctx.db.patch(mutation.payload['id'], {
       [tableFieldName]: [...existingIds, ...ids],
     });
 
@@ -87,7 +90,7 @@ export const insertIds = async (
   )?.relation?.fieldName;
   await asyncMap(ids, async (value) => {
     if (field.relation?.type === 'oneToMany' && tableFieldName) {
-      await ctx.db.patch(value, { [tableFieldName]: mutation.payload.id });
+      await ctx.db.patch(value, { [tableFieldName]: mutation.payload['id'] });
     } else if (
       field.relation?.manyToManyTable &&
       tableFieldName &&
@@ -96,7 +99,7 @@ export const insertIds = async (
       await mutationClient(ctx).insert(
         field.relation.manyToManyTable as string,
         {
-          [tableFieldName]: mutation.payload.id,
+          [tableFieldName]: mutation.payload['id'],
           [relationFieldName]: value,
         }
       );

@@ -4,7 +4,9 @@ import {
 } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
 
+import { _log, UserViewData } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
+import { v } from 'convex/values';
 import { views } from '../src/index';
 import { Id } from './_generated/dataModel';
 
@@ -30,6 +32,60 @@ export const testQuery = server.mutation({
     }
   },
 });
+
+export const userViewData = server.query({
+  args: { viewName: v.union(v.string(), v.null()) },
+
+  handler: async (ctx, args) => {
+    if (!args.viewName) return null;
+
+    const viewName = args.viewName as string;
+    const view = await ctx.db
+      .query('views')
+      .withIndex('name', (q) => q.eq('name', viewName))
+      .first();
+
+    _log.debug('userViewData', { view });
+
+    if (!view) return null;
+
+    return {
+      ...view,
+      name: view.name,
+      displayOptions: view.displayOptions ?? null,
+      filters: view.filters ?? null,
+    } satisfies UserViewData;
+  },
+});
+
+// const zMutation = zCustomMutation(server.mutation, NoOp);
+
+// export const createUserViewData = zMutation({
+//   args: {
+//     viewName: z.string().min(2),
+//     displayOptions: z.string().min(1).optional(),
+//     filters: z.string().min(1).optional(),
+//   },
+//   handler: async (ctx, args) => {
+//     const view = await ctx.db
+//       .query('views')
+//       .withIndex('name', (q) => q.eq('name', args.viewName))
+//       .first();
+
+//     if (view) {
+//       return { message: 'View already exists' };
+//     }
+
+//     await ctx.db.insert('views', {
+//       baseView: '',
+//       name: args.viewName,
+//       displayOptions: args.displayOptions ?? '',
+//       filters: args.filters ?? '',
+//     });
+
+//     return
+//   },
+// });
 
 export const displayOptions = server.query({
   handler: async (ctx) => {

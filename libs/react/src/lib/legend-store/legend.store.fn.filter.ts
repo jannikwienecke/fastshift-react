@@ -131,7 +131,8 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
         getByIndex(existingFilterIndex) as Observable<FilterRelationType>
       ).values.set([...exitingFilter.values, value]);
 
-      getByIndex(existingFilterIndex)?.operator.set(operator().value(filter));
+      const newOperator = operator().value(filter);
+      getByIndex(existingFilterIndex)?.operator.set(newOperator);
     };
 
     const removeFilterValue = (value: Row) => {
@@ -144,6 +145,9 @@ export const filterSelectFilterValue: StoreFn<'filterSelectFilterValue'> =
           existingFilterIndex
         ] as Observable<FilterRelationType>
       ).values.set(exitingFilter.values.filter((v) => v.id !== value.id));
+
+      const newOperator = operator().value(filter);
+      getByIndex(existingFilterIndex)?.operator.set(newOperator);
     };
 
     const resetFilter = () => {

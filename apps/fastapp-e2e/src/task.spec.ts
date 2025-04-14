@@ -125,14 +125,17 @@ test.describe('Task management', () => {
     await expect(page.getByText('fitness plan')).toHaveCount(4);
 
     // change filter from "is" to "is not"
-    await taskPage.filterList.getByText('is').click();
+    await taskPage.filterList.getByText(/is/i).click();
     await taskPage.comboboxPopover.getByText('is not').click();
-    await page.getByText('tasks').first().click({ force: true });
+    // await page
+    //   .getByText(/display/i)
+    //   .first()
+    //   .click({});
     // its 1 because we stil see thte name in the filter
     await expect(page.getByText('fitness plan')).toHaveCount(1);
 
     // click on 'fitness plan'
-    await page.getByText('fitness plan').click();
+    await page.getByText('fitness plan').click({});
     await taskPage.comboboxPopover.getByText('learn spanish').click();
     await page.getByText('tasks').first().click({ force: true });
     await expect(page.getByText('fitness plan')).toHaveCount(0);
@@ -763,7 +766,7 @@ test.describe('Task management', () => {
 
     await taskPage.comboboxPopover.getByText(/website redesign/i).click();
 
-    await taskPage.commandform.getByText(/important/i).click({ force: true });
+    // await taskPage.commandform.getByText(/important/i).click({ force: true });
 
     // expect that the btn is NOT disabled
     await expect(taskPage.commandform.getByText(/create task/i)).toBeEnabled();
@@ -993,7 +996,22 @@ test.describe('Task management', () => {
       .getByPlaceholder(/description/i)
       .fill('Project Description');
 
-    // TODO UPDATE THIS TEST -> we need to also set the owner and category
+    await taskPage.commandform.getByText(/owner/i).first().click();
+    await page.getByPlaceholder(/filter by/i).fill('Mike Johnson');
+    await expect(page.getByText(/john doe/i)).toBeHidden();
+    await page.getByText(/mike Johnson/i).click();
+
+    await taskPage.commandform
+      .getByText(/categories/i)
+      .first()
+      .click();
+
+    await page.getByText(/Education/i).click();
+
+    await page.getByRole('button', { name: /create project/i }).click();
+
+    await expect(page.getByText(/created Successfully/i)).toBeVisible();
+
     // // Expect create button to be enabled after filling required fields
     // await expect(
     //   taskPage.commandform.getByText(/create project/i)
@@ -1017,6 +1035,126 @@ test.describe('Task management', () => {
     //   taskPage.contextmenu.getByText(/New Test Project/i)
     // ).toBeVisible();
   });
+
+  test('can sort and save the view', async ({ taskPage, page }) => {
+    let firstListItem = await taskPage.getListItem(0);
+    await sortByField(taskPage, /name/i);
+    await firstListItem.click({ force: true });
+
+    await page.getByText(/reset/i).click();
+    await expect(page.getByText(/reset/i)).toBeHidden();
+    await expect(page.getByText(/save/i)).toBeHidden();
+
+    await sortByField(taskPage, /name/i);
+    await firstListItem.click({ force: true });
+    await page.getByText(/save/i).click();
+
+    await page.getByText(/save to this view/i).click();
+
+    await expect(page.getByText(/reset/i)).toBeHidden();
+    await expect(page.getByText(/save/i)).toBeHidden();
+
+    // reload page
+    await page.reload();
+
+    firstListItem = await taskPage.getListItem(0);
+
+    await expect(
+      firstListItem.getByText(/Assign launch team role/i)
+    ).toBeVisible();
+
+    await groupByField(taskPage, /project/i);
+    await firstListItem.click({ force: true });
+    await page.getByText(/save/i).click();
+    await page.getByText(/save to this view/i).click();
+
+    await page.waitForTimeout(500);
+
+    await page.reload();
+
+    await expect(page.getByTestId(`group-Website Redesign`)).toBeVisible();
+  });
+
+  test('can filter and save the view', async ({ taskPage, page }) => {
+    const firstListItem = await taskPage.getListItem(0);
+
+    await taskPage.filterButton.click();
+
+    // filter by project
+    await taskPage.comboboxPopover.getByText('Project').click();
+    await taskPage.comboboxPopover.getByText('fitness plan').click();
+
+    await firstListItem.click({ force: true });
+
+    await expect(page.getByText(/fitness plan/i)).toHaveCount(4);
+    await expect(page.getByText(/design mockups/i)).toBeHidden();
+
+    await page.getByText(/reset/i).click();
+
+    await expect(page.getByText(/reset/i)).toBeHidden();
+    await expect(page.getByText(/save/i)).toBeHidden();
+
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+
+    await taskPage.filterButton.click();
+
+    // filter by project
+    await taskPage.comboboxPopover.getByText('Project').click();
+    await taskPage.comboboxPopover.getByText('fitness plan').click();
+
+    await firstListItem.click({ force: true });
+
+    await page.getByText(/save/i).click();
+    await page.getByText(/save to this view/i).click();
+
+    await page.waitForTimeout(500);
+    await page.reload();
+
+    await expect(page.getByText(/fitness plan/i)).toHaveCount(4);
+    await expect(page.getByText(/design mockups/i)).toBeHidden();
+  });
+
+  test('can save date filter in a new view, and see it in the list', async ({
+    page,
+    taskPage,
+  }) => {
+    const firstListItem = await taskPage.getListItem(0);
+    // open filter
+    await taskPage.filterButton.click();
+
+    // click on due date
+    await taskPage.comboboxPopover.getByText(/due date/i).click();
+    await taskPage.comboboxPopover.getByText(/today/i).click();
+
+    await firstListItem.click({ force: true });
+
+    await expect(page.getByText(/today/i).first()).toBeVisible();
+
+    await page.getByText(/save/i).click();
+    await page.getByText(/create new view/i).click();
+
+    await page.getByPlaceholder(/enter view name/i).fill('today-view');
+    await page
+      .getByPlaceholder(/enter view description/i)
+      .fill('today view desc');
+    await page.getByRole('button', { name: 'save' }).click();
+
+    // expect url to contain the new view
+    await expect(page).toHaveURL(/.*today-view/);
+
+    await page.reload();
+    await expect(page.getByText(/today/i).first()).toBeVisible();
+
+    const day = new Date().getDate();
+    console.log('day', day);
+
+    await page
+      .getByText(day.toString() + '.')
+      .first()
+      .click();
+  });
+
+  // test("can ")
 });
 
 const testingQueryBehavior = async ({ taskPage, page }) => {

@@ -88,20 +88,23 @@ export const convertFiltersForBackend = (filters: FilterType[]): string => {
             if (typeof row.raw === 'number') {
               isNumberValue = true;
             }
-            return encodeURIComponent(filter.field.enum ? row.raw : row.id);
+            const id = filter.field.enum ? row.raw : row.id;
+            const label = filter.type === 'relation' ? row.label : row.raw;
+            return `${encodeURIComponent(id)}||${encodeURIComponent(label)}`;
           })
           .join(',');
 
         return `filter[]=${fieldId}:${operator}:${values}:${filter.type};${isNumberValue}`;
       } else {
         const value = encodeURIComponent(filter.value.raw);
-        return `filter[]=${fieldId}:${operator}:${value}:${filter.type};false`;
+        const label = encodeURIComponent(
+          filter.value.label || filter.value.raw
+        );
+        return `filter[]=${fieldId}:${operator}:${value}||${label}:${filter.type};false`;
       }
     })
     .join('&');
 };
-
-// filter[]=projects:is%20any%20of:j97e566mamt3b742cjdm45vbm570qhtp,j975gbehqm6g5dr9yya1az3jcd70p30b
 // how to parse this string into a filter object?
 export const parseFilterStringForServer = (
   filterString: string,
@@ -112,9 +115,9 @@ export const parseFilterStringForServer = (
   const filters = filterString.split('&');
   return filters
     .map((filter) => {
-      // Updated regex to capture isNumber separately.
+      // Updated regex to correctly parse label and type, ensuring it handles encoded values properly.
       const match = filter.match(
-        /filter\[\]=([^:]+):([^:]+):([^:]+):([^;]+);(true|false)/
+        /filter\[\]=([^:]+):([^:]+):([^:]*\|\|[^:]*):([^:]+);(true|false)/
       );
       const [, fieldIdWithPrefix, operator, value, type, isNumber] =
         match || [];
@@ -133,14 +136,18 @@ export const parseFilterStringForServer = (
       }
 
       const decodedOperator = decodeURIComponent(operator ?? '');
-      const decodedValue = decodeURIComponent(value ?? '');
       const decodedType = decodeURIComponent(type ?? '');
+      const decodedValue = decodeURIComponent(value ?? '');
 
       if (decodedType === 'relation') {
         const values = decodedValue.split(',').map((value) => {
-          const v = isNumber === 'true' ? Number(value) : value;
+          // const v = isNumber === 'true' ? Number(value) : value;
+          const _value = value.split('||')?.[0];
+          const _label = value.split('||')?.[1];
 
-          return makeRow(v, value, v, field);
+          const v = isNumber === 'true' ? Number(_value) : _value;
+
+          return makeRow(v, _label, v, field);
         });
         return {
           field,
@@ -151,12 +158,15 @@ export const parseFilterStringForServer = (
           type: 'relation',
         };
       } else {
+        const splitted = decodedValue.split('||');
+        const value = splitted[0];
+        const label = splitted[1];
         return {
           field,
           operator: {
             label: decodedOperator as FilterOperatorType['label'],
           },
-          value: makeRow(decodedValue, decodedValue, decodedValue, field),
+          value: makeRow(value, label ?? value, value, field),
           type: 'primitive',
         };
       }
@@ -169,19 +179,42 @@ export const convertDisplayOptionsForBackend = (
 ): string => {
   if (!displayOptions.sorting.field && !displayOptions.grouping) return '';
 
-  const sortingString = displayOptions.sorting.field
-    ? `sorting=${displayOptions.sorting.field.name}:${displayOptions.sorting.order}`
+  const {
+    grouping,
+    sorting,
+    showDeleted,
+    showEmptyGroups,
+    viewField,
+    viewType,
+  } = displayOptions;
+  const sortingString = sorting.field
+    ? `sorting=${sorting.field.name}:${sorting.order}`
     : '';
 
-  const groupingString = displayOptions.grouping.field
-    ? `grouping=${displayOptions.grouping.field.name}`
+  const groupingString = grouping.field
+    ? `grouping=${grouping.field.name}`
     : '';
 
-  const deletedString = displayOptions.showDeleted
-    ? `showDeleted=${displayOptions.showDeleted}`
+  const deletedString = showDeleted ? `showDeleted=${showDeleted}` : '';
+
+  const showEmptyGroupsString = showEmptyGroups
+    ? `showEmptyGroups=${showEmptyGroups}`
     : '';
 
-  return [sortingString, groupingString, deletedString]
+  const viewFieldString = viewField.hidden
+    ? `viewField=${viewField.hidden.join(',')}`
+    : '';
+
+  const viewTypeString = viewType ? `viewType=${viewType.type}` : '';
+
+  return [
+    sortingString,
+    groupingString,
+    deletedString,
+    showEmptyGroupsString,
+    viewFieldString,
+    viewTypeString,
+  ]
     .filter(Boolean)
     .join(';');
 };
@@ -220,8 +253,12 @@ export const parseDisplayOptionsStringForServer = (
       };
     } else if (key === 'showDeleted') {
       options.showDeleted = value === 'true';
-    } else {
-      //
+    } else if (key === 'showEmptyGroups') {
+      options.showEmptyGroups = value === 'true';
+    } else if (key === 'viewField') {
+      options.selectedViewFields = value.split(',').map((v) => v);
+    } else if (key === 'viewType') {
+      options.viewType = value as DisplayOptionsUiType['viewType']['type'];
     }
   });
 

@@ -5,7 +5,7 @@ import {
   MakeListPropsOptions,
   RecordType,
 } from '@apps-next/core';
-import { MakeComboboxPropsOptions } from '@apps-next/react';
+import { MakeComboboxPropsOptions, store$ } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { Outlet } from '@tanstack/react-router';
 import React from 'react';
@@ -20,6 +20,8 @@ import {
   RenderFilter,
   RenderInputDialog,
   RenderList,
+  RenderSaveViewDropdown,
+  RenderUserViewForm,
 } from './default-components';
 
 export const DefaultViewTemplate = observer(
@@ -34,8 +36,22 @@ export const DefaultViewTemplate = observer(
     return (
       <>
         <div className="p-2 flex flex-col gap-2 grow overflow-scroll">
-          <div className="flex flex-col w-full ">
-            <RenderFilter options={props.filterOptions} />
+          {store$.userViewSettings.form.get() ? (
+            <div className="ml-8 my-1 border-[1px] border-solid p-2 rounded-md border-gray-100">
+              <RenderUserViewForm />
+            </div>
+          ) : null}
+
+          <div className="flex flex-row w-full justify-between">
+            <div className="grow pr-12 pl-8">
+              <RenderFilter options={props.filterOptions} />
+            </div>
+
+            <div className="flex flex-row gap-2 mr-4 items-center">
+              <RenderDisplayOptions options={props.displayOptions} />
+
+              <RenderSaveViewDropdown />
+            </div>
           </div>
 
           {props.RenderInputDialog ? (
@@ -47,10 +63,6 @@ export const DefaultViewTemplate = observer(
           <RenderContextmenu />
 
           <div className="flex flex-col w-full ">
-            <div className="flex flex-row gap-2 justify-end">
-              <RenderDisplayOptions options={props.displayOptions} />
-            </div>
-
             <RenderList options={props.listOptions} />
           </div>
           <hr />

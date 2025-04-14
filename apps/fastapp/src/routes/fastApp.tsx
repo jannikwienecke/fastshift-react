@@ -18,12 +18,10 @@ import {
   Link,
   Outlet,
 } from '@tanstack/react-router';
+import { LoaderIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
-import { useConvexMutation, useConvexQuery } from '@convex-dev/react-query';
-import { api } from '@apps-next/convex';
 import { resettingDb$ } from '../application-store/app.store';
-import { Loader, LoaderIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/fastApp')({
   component: () => <FastAppLayoutComponent />,
@@ -33,18 +31,6 @@ export const Route = createFileRoute('/fastApp')({
 });
 
 const FastAppLayoutComponent = observer(() => {
-  const mutation = useConvexMutation(api.query.testQuery);
-
-  const handleTestQuery = async () => {
-    try {
-      await mutation({});
-    } catch (error) {
-      //
-    }
-  };
-
-  // return <button onClick={handleTestQuery}>Test Query</button>;
-
   return (
     <>
       <Layout>
@@ -78,7 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     },
     {
       label: t('navigation.tasks'),
-      href: '/fastApp/tasks',
+      href: '/fastApp/Task',
       icon: (
         <CircleIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),

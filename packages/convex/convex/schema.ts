@@ -8,6 +8,16 @@ const _schema = defineSchema({
     password: v.string(),
   }),
 
+  views: defineTable({
+    baseView: v.string(),
+    name: v.string(),
+    description: v.optional(v.string()),
+    displayOptions: v.optional(v.string()),
+    filters: v.optional(v.string()),
+  })
+    .index('baseView', ['baseView'])
+    .index('name', ['name']),
+
   owner: defineTable({
     userId: v.id('users'),
     firstname: v.string(),

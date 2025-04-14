@@ -162,9 +162,10 @@ export const makeListProps = <T extends RecordType = RecordType>(
         ?.filter((fieldName) => {
           const viewFieldDisplayOptions = store$.displayOptions.viewField.get();
 
-          const shouldDisplay = viewFieldDisplayOptions.selected.includes(
-            fieldName.toString()
-          );
+          const fields = viewFieldDisplayOptions.hidden
+            ? viewFieldDisplayOptions.hidden
+            : viewFieldDisplayOptions.allFields;
+          const shouldDisplay = fields?.includes(fieldName.toString());
 
           return shouldDisplay;
         })

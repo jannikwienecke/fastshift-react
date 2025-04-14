@@ -8,6 +8,7 @@ import {
   SearchableField,
 } from './base.types';
 import { IncludeConfig } from './config.types';
+import { DisplayOptionsUiType } from './filter.types';
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
 export type ViewConfigBaseInfo<T extends GetTableName> = {
@@ -17,6 +18,24 @@ export type ViewConfigBaseInfo<T extends GetTableName> = {
   icon: React.FC<any>;
   iconColor?: string;
   relativePath?: string;
+};
+
+export type ViewConfigQueryOptions<T extends GetTableName> = {
+  showDeleted?: boolean;
+  showEmptyGroups?: boolean;
+  searchableFields?: SearchableField[];
+  indexFields?: IndexField[];
+  primarySearchField?: keyof GetTableDataType<T>;
+  viewType?: DisplayOptionsUiType['viewType'];
+  selectedViewFields?: (keyof GetTableDataType<T>)[];
+
+  sorting?: {
+    field: keyof GetTableDataType<T> | '_creationTime';
+    direction: 'asc' | 'desc';
+  };
+  grouping?: {
+    field: keyof GetTableDataType<T>;
+  };
 };
 
 export type ViewConfigType<T extends GetTableName = any> =
@@ -37,19 +56,7 @@ export type ViewConfigType<T extends GetTableName = any> =
     fields?: {
       [field in keyof GetTableDataType<T>]?: FieldConfigOptions<T, field>;
     };
-    query?: {
-      showDeleted?: boolean;
-      searchableFields?: SearchableField[];
-      indexFields?: IndexField[];
-      primarySearchField?: keyof GetTableDataType<T>;
-      sorting?: {
-        field: keyof GetTableDataType<T> | '_creationTime';
-        direction: 'asc' | 'desc';
-      };
-      grouping?: {
-        field: keyof GetTableDataType<T>;
-      };
-    };
+    query?: ViewConfigQueryOptions<T>;
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;
     };

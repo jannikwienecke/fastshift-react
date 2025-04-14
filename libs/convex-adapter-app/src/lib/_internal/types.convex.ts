@@ -127,6 +127,7 @@ export type ConvexClient = {
     filter: (query: (q: SearchFilterBuilder) => any) => ConvexClient[string];
 
     insert: (tableName: string, data: RecordType) => Promise<void>;
+    patch: (id: ID, data: RecordType) => Promise<void>;
     paginate: (
       paginationOpts: PaginationOptions
     ) => Promise<PaginationResult<any>>;
