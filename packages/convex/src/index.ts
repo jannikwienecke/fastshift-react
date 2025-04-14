@@ -88,7 +88,7 @@ export const tasksConfig = createViewConfig(
       // sorting: { field: '_creationTime', direction: 'desc' },
       showDeleted: false,
       primarySearchField: 'name',
-      selectedViewFields: ['name'],
+      // selectedViewFields: ['name'],
       // default sorting
       // sorting: { field: 'projectId', direction: 'asc' },
       // grouping: { field: 'projectId' },

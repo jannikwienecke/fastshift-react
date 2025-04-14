@@ -4,9 +4,10 @@ import { _log } from '@apps-next/core';
 
 export async function seedDatabase() {
   const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
-  const CONVEX_URL = isGithubActions
-    ? 'https://deafening-marmot-647.convex.cloud'
-    : 'http://127.0.0.1:3210';
+  const CONVEX_URL =
+    isGithubActions || true
+      ? 'https://deafening-marmot-647.convex.cloud'
+      : 'http://127.0.0.1:3210';
 
   if (!CONVEX_URL) {
     throw new Error('VITE_CONVEX_URL is not set');

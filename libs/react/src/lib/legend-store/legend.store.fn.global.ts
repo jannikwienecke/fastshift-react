@@ -165,6 +165,10 @@ export const init: StoreFn<'init'> =
       store$.filter.filters.set(filters);
       store$.displayOptions.set(dispplayOptions);
 
+      store$.displayOptions.softDeleteEnabled.set(
+        !!viewConfigManager.viewConfig.mutation?.softDelete
+      );
+
       const viewFields = store$.viewConfigManager
         .get()
         .getViewFieldList()

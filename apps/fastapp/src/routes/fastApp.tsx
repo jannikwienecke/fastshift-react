@@ -64,7 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     },
     {
       label: t('navigation.tasks'),
-      href: '/fastApp/tasks',
+      href: '/fastApp/Task',
       icon: (
         <CircleIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),

@@ -15,7 +15,7 @@ export const FilterDefault = (props: FilterProps) => {
   const { filters, onOpen, label } = props;
   return (
     <>
-      <div className="flex flex-row gap-2 flex-wrap">
+      <div className="flex flex-row gap-2 flex-wrap" data-testid="filter-list">
         {filters.length > 0 && <FilterList {...props} />}
 
         <FilterButton

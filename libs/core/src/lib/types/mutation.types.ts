@@ -23,7 +23,8 @@ export type MutationWithoutRecordPayload = {
 export type MutationPayload =
   | MutationRecordPayload
   | MutationWithoutRecordPayload
-  | MutationSelectRecordsPayload;
+  | MutationSelectRecordsPayload
+  | USER_VIEW_MUTATION['payload'];
 
 export type CREATE_RECORD = {
   type: 'CREATE_RECORD';

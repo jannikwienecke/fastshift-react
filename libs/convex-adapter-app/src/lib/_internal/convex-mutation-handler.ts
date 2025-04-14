@@ -98,7 +98,7 @@ export const deleteMutation = async (
   if (softDeleteField) {
     errorMsg = `Error soft deleting record. softDeleteField=${softDeleteField.toString()} ID="${id}:`;
     mutationFn = () =>
-      ctx.db.patch(mutation.payload.id, {
+      ctx.db.patch(mutation.payload['id'], {
         [softDeleteField]: true,
       });
   } else {
@@ -161,7 +161,7 @@ export const updateMutation = async (
       };
     }
 
-    await ctx.db.patch(mutation.payload.id, record);
+    await ctx.db.patch(mutation.payload['id'], record);
     return {
       message: 'Record updated successfully',
       status: 200 as const,

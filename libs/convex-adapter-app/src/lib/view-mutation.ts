@@ -18,9 +18,7 @@ export const viewMutationHandler = async (
 ): Promise<MutationReturnDto> => {
   const args = _args as MutationPropsServer;
 
-  console.warn(
-    `Mutation Handler TYPE::${args.mutation.type}, ${args.mutation.payload.id}`
-  );
+  console.warn(`Mutation Handler TYPE::${args.mutation.type}`);
   const { mutation, registeredViews, viewConfigManager } = args;
 
   const handler = mutationHandlers[mutation.type];

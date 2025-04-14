@@ -125,14 +125,17 @@ test.describe('Task management', () => {
     await expect(page.getByText('fitness plan')).toHaveCount(4);
 
     // change filter from "is" to "is not"
-    await taskPage.filterList.getByText('is').click();
+    await taskPage.filterList.getByText(/is/i).click();
     await taskPage.comboboxPopover.getByText('is not').click();
-    await page.getByText('tasks').first().click({ force: true });
+    // await page
+    //   .getByText(/display/i)
+    //   .first()
+    //   .click({});
     // its 1 because we stil see thte name in the filter
     await expect(page.getByText('fitness plan')).toHaveCount(1);
 
     // click on 'fitness plan'
-    await page.getByText('fitness plan').click();
+    await page.getByText('fitness plan').click({});
     await taskPage.comboboxPopover.getByText('learn spanish').click();
     await page.getByText('tasks').first().click({ force: true });
     await expect(page.getByText('fitness plan')).toHaveCount(0);
@@ -763,7 +766,7 @@ test.describe('Task management', () => {
 
     await taskPage.comboboxPopover.getByText(/website redesign/i).click();
 
-    await taskPage.commandform.getByText(/important/i).click({ force: true });
+    // await taskPage.commandform.getByText(/important/i).click({ force: true });
 
     // expect that the btn is NOT disabled
     await expect(taskPage.commandform.getByText(/create task/i)).toBeEnabled();

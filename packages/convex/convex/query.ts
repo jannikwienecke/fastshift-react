@@ -4,14 +4,11 @@ import {
 } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
 
+import { _log, UserViewData } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
+import { v } from 'convex/values';
 import { views } from '../src/index';
 import { Id } from './_generated/dataModel';
-import { _log, UserViewData } from '@apps-next/core';
-import { v } from 'convex/values';
-import { z } from 'zod';
-import { zCustomMutation } from 'convex-helpers/server/zod';
-import { NoOp } from 'convex-helpers/server/customFunctions';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -56,36 +53,39 @@ export const userViewData = server.query({
       ...view,
       name: view.name,
       displayOptions: view.displayOptions ?? null,
+      filters: view.filters ?? null,
     } satisfies UserViewData;
   },
 });
 
-const zMutation = zCustomMutation(server.mutation, NoOp);
+// const zMutation = zCustomMutation(server.mutation, NoOp);
 
-export const createUserViewData = zMutation({
-  args: {
-    viewName: z.string().min(2),
-    displayOptions: z.string().min(1).optional(),
-    filters: z.string().min(1).optional(),
-  },
-  handler: async (ctx, args) => {
-    const view = await ctx.db
-      .query('views')
-      .withIndex('name', (q) => q.eq('name', args.viewName))
-      .first();
+// export const createUserViewData = zMutation({
+//   args: {
+//     viewName: z.string().min(2),
+//     displayOptions: z.string().min(1).optional(),
+//     filters: z.string().min(1).optional(),
+//   },
+//   handler: async (ctx, args) => {
+//     const view = await ctx.db
+//       .query('views')
+//       .withIndex('name', (q) => q.eq('name', args.viewName))
+//       .first();
 
-    if (view) {
-      return { message: 'View already exists' };
-    }
+//     if (view) {
+//       return { message: 'View already exists' };
+//     }
 
-    await ctx.db.insert('views', {
-      baseView: '',
-      name: args.viewName,
-      displayOptions: args.displayOptions ?? '',
-      filters: args.filters ?? '',
-    });
-  },
-});
+//     await ctx.db.insert('views', {
+//       baseView: '',
+//       name: args.viewName,
+//       displayOptions: args.displayOptions ?? '',
+//       filters: args.filters ?? '',
+//     });
+
+//     return
+//   },
+// });
 
 export const displayOptions = server.query({
   handler: async (ctx) => {

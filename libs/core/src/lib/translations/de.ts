@@ -73,6 +73,7 @@ export const de = {
     markAs: 'Als {{field}} markieren',
     unmarkAs: 'Als nicht {{field}} markieren',
     resetDb: 'Datenbank zurücksetzen',
+    reset: 'Zurücksetzen',
   },
   datePicker: {
     description: 'Bitte wählen Sie ein Datum aus dem Kalender.',
