@@ -2,6 +2,7 @@
 import React from 'react';
 import { object, z } from 'zod';
 import { BaseConfigInterface } from './config.types';
+import { CommandbarItem } from './ui.types';
 
 const documentBaseSchema = object({
   id: z.string(),
@@ -120,12 +121,6 @@ export type DataProvider = 'convex' | 'default';
 
 export type ID = string | number;
 
-export type Command = {
-  id: string;
-  label: string;
-  icon: React.FC<any>;
-  options?: {
-    keepCommandbarOpen?: boolean;
-  };
-  handler: (props: { row?: RecordType }) => Promise<void>;
-};
+export type UserStoreCommand = {
+  command: string;
+} & Omit<CommandbarItem, 'command'>;

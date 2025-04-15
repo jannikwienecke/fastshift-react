@@ -13,3 +13,4 @@ export * from './lib/types/filter.types';
 export * from './lib/translations';
 export * from './lib/filters';
 export * from './lib/core-config-manager';
+export * from './lib/core-filter';

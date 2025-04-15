@@ -1,6 +1,7 @@
 import { Row } from '../data-model';
 import { TranslationKeys } from '../translations';
 import { FieldConfig, RecordType } from './base.types';
+import { CommandHeader, CommandName } from './commands';
 import {
   DisplayOptionsUiType,
   FilterItemType,
@@ -256,10 +257,34 @@ export type CommandformProps = {
   // onOpen: () => void;
 };
 
+export type CommandbarItemHandler = (options: {
+  row: Row | undefined | null;
+  field: FieldConfig | undefined;
+  value: ComboxboxItem | undefined;
+}) => void;
+
+export type CommandbarItem = Omit<ComboxboxItem, 'label' | 'viewName'> & {
+  header?: CommandHeader | (() => string);
+  label:
+    | TranslationKeys
+    | (string & {
+        //
+      });
+  command: CommandName;
+  getViewName?: () => string;
+  getIsVisible?: () => boolean;
+  handler?: CommandbarItemHandler;
+  options?: {
+    keepCommandbarOpen?: boolean;
+  };
+};
+
 export type CommandbarProps = {
   open?: boolean;
-  itemGroups?: Array<ComboxboxItem[]>;
-  groupLabels?: string[];
+  groups: {
+    header: string;
+    items: (CommandbarItem & ComboxboxItem)[];
+  }[];
   headerLabel: string;
   inputPlaceholder: string;
   query?: string;

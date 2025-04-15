@@ -65,12 +65,13 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
   observable(function handleQueryCommandbarChange() {
     const query = store$.commandbar.query.get();
+
     const fieldCommandbar = store$.commandbar.selectedViewField.get();
-    const tableName = comboboxStore$.get().tableName;
-    if (!tableName) return;
-    if (fieldCommandbar?.name !== tableName) return;
+
+    if (!fieldCommandbar?.name) return;
 
     comboboxStore$.query.set(query ?? '');
+    store$.combobox.query.set(query ?? '');
   }).onChange(() => null);
 
   observable(function handleFilterChange() {

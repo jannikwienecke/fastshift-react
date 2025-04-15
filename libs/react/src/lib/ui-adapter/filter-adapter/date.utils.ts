@@ -1,4 +1,5 @@
 import {
+  _filter,
   ComboxboxItem,
   FilterDateType,
   FilterOperatorType,
@@ -16,11 +17,7 @@ import operatorMap from './filter.operator.define';
 export const SELECT_FILTER_DATE = 'Select specific date';
 
 const search = (items: string[], value: string) => {
-  const fuse = new Fuse(items, {
-    keys: ['label'],
-  });
-
-  return fuse.search(value);
+  return _filter(items, ['label' as any]).withQuery(value);
 };
 
 class DateOptions {
@@ -188,6 +185,8 @@ class DateOptions {
   }
 
   public getOptions(): ComboxboxItem[] {
+    const daysOpts = [1, 2, 3, 7, 10, 14];
+
     let options: ComboxboxItem[] = [];
     if (!this.value) {
       options = this.getDefaultOptions();
@@ -197,30 +196,32 @@ class DateOptions {
       options = dateOptions;
     } else if (this.hasWeek || this.hasDays || this.hasMonth) {
       options = this.getWeekMonthDayOptions();
+    } else if (this.hasFromNow && !this.hasNumber) {
+      options = daysOpts.map((o) => this.generateFromNowOptions(o, 'day'));
     } else if (this.hasNumber || this.hasFromNow || this.hasAgo) {
       options = this.getNumberOptions();
     } else {
       options = this.getDefaultOptions();
     }
 
-    const fuse = new Fuse(options, {
-      keys: ['label'],
-    });
+    const fuse = _filter(options, ['label']);
 
     const defaultOptions = stringsToComboxboxItems(
       DEFAULT_DATE_OPTIONS.filter(
-        (option) => fuse.search(option).length > 0
+        (option) => fuse.withQuery(option).length > 0
       ).filter((option) => !options.some((o) => o.id === option))
     );
 
     if (!this.value) return [...defaultOptions, ...options];
 
-    const values = search(
-      [...defaultOptions, ...options].map((o) => o.label),
-      this.value
-    );
+    const values = options.length
+      ? options.map((o) => o.label)
+      : search(
+          [...defaultOptions, ...options].map((o) => o.label),
+          this.value
+        );
 
-    return stringsToComboxboxItems(values.map((v) => v.item));
+    return stringsToComboxboxItems(values);
   }
 
   public getOptionsForEdit(): ComboxboxItem[] {
@@ -275,12 +276,10 @@ class DateOptions {
 
     const defaults = this.getDefaultOptionsForEdit();
 
-    const fuse = new Fuse(defaults, {
-      keys: ['label'],
-    });
+    const fuse = _filter(options, ['label']);
 
     const sorted = defaults.sort((a, b) => {
-      if (fuse.search(this.value).length > 0) return -1;
+      if (fuse.withQuery(this.value).length > 0) return -1;
 
       return 0;
     });
@@ -317,26 +316,44 @@ class DateOptions {
   private getWeekMonthDayOptions(): ComboxboxItem[] {
     const unit = this.hasWeek ? 'week' : this.hasMonth ? 'month' : 'day';
     const number = this.extractNumber(this.value);
-    const numbers = number ? [number] : [4, 6];
+    const numbers = number ? [number] : [1, 2, 4, 6];
 
-    return numbers.reduce((acc, num) => {
+    const options: ComboxboxItem[] = [];
+
+    if (!number) {
+      const thisWeekOption = {
+        id: `This ${unit}`,
+        label: `This ${unit}`,
+      };
+      options.push(thisWeekOption);
+
+      const lastWeekOption = {
+        id: `Last ${unit}`,
+        label: `Last ${unit}`,
+      };
+      options.push(lastWeekOption);
+    }
+
+    numbers.forEach((num) => {
       if (this.hasFromNow || !this.hasAgo) {
-        acc.push(this.generateFromNowOptions(num, unit));
+        options.push(this.generateFromNowOptions(num, unit));
       }
 
       if (this.hasAgo || !this.hasFromNow) {
-        acc.push(this.generateAgoOptions(num, unit));
+        options.push(this.generateAgoOptions(num, unit));
       }
-
-      return acc;
     }, [] as ComboxboxItem[]);
+
+    return options;
   }
 
   private getNumberOptions(): ComboxboxItem[] {
     const number = this.extractNumber(this.value) || 1;
     const units = ['day', 'week', 'month'];
 
-    const defaultOptions = number ? [] : this.getFilteredStaticOptions();
+    const defaultOptions = this.extractNumber(this.value)
+      ? []
+      : this.getFilteredStaticOptions();
 
     return units.reduce((acc, unit) => {
       if (this.hasFromNow || !this.hasAgo) {

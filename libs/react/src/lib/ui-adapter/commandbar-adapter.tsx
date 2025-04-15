@@ -40,7 +40,6 @@ export const makeCommandbarProps = <T extends RecordType>(
 
   return {
     ...state,
-    groupLabels: (state.groupLabels as string[]) ?? [''],
     renderItem(item, active, index, activeRow) {
       const viewField = store$.commandbar.selectedViewField.get();
 

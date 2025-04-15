@@ -123,6 +123,7 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     : isList
     ? multipleList
     : multipleFilter;
+
   const getDateOptions = isList ? getDateOptionsList : getDateOptionsFilter;
 
   let options: MakeComboboxStateProps | null = null;

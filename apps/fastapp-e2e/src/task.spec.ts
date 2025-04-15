@@ -19,6 +19,8 @@ test.describe('Task management', () => {
       .first()
       .click({ force: true });
 
+    // const test = await page.getByText(/set project/i)
+
     expect(true).toBe(true);
 
     await taskPage.comboboxPopover.waitFor({ state: 'visible' });
@@ -662,6 +664,7 @@ test.describe('Task management', () => {
       .getByPlaceholder(/type a command or search/i)
       .fill('create new');
 
+    // TODO HIER WEITER MACHEN -> Create new Task.. is missing under header "Task"
     await expect(
       taskPage.commandbar.getByText(/create new task/i).first()
     ).toBeVisible();
@@ -1226,6 +1229,7 @@ const testingQueryBehavior = async ({ taskPage, page }) => {
 
   const getByText = (l: RegExp) => taskPage.comboboxPopover.getByText(l);
 
+  // TODO HIER WEITER MACHEN -> WRONG FILTER VALUES
   await input.fill('week');
   await expect(getByText(/this week/i)).toBeVisible();
   await expect(getByText(/last week/i)).toBeVisible();

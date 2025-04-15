@@ -3,13 +3,10 @@ import {
   MakeConfirmationAlertPropsOption,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import {
-  getCommandbarCommandGroups,
-  getCommandbarDefaultListProps,
-  getCommandbarSelectedViewField,
-} from './legend.commandbar.helper';
 import { store$ } from './legend.store';
 import { copyRow } from './legend.utils';
+import { getCommandbarPropsForFieldType } from '../commands/commands-field-type';
+import { getCommandGroups } from '../commands';
 export const commandbarProps$ = observable<
   Partial<MakeConfirmationAlertPropsOption>
 >({});
@@ -24,18 +21,10 @@ export const derivedCommandbarState$ = observable(() => {
     } as CommandbarProps;
   }
 
-  const defaultCommandbarProps = getCommandbarDefaultListProps();
-  const commandbarPropsSelectedViewField = getCommandbarSelectedViewField();
-  const commandsGroups = getCommandbarCommandGroups();
+  const fieldTypeCommandbarProps = getCommandbarPropsForFieldType();
 
-  const commands: CommandbarProps['itemGroups'] = [[...store$.commands.get()]];
-
-  const props = {
-    ...store$.commandbar.get(),
-    ...defaultCommandbarProps,
-    ...commandbarPropsSelectedViewField,
-
-    row: store$.list.rowInFocus.get()?.row ?? undefined,
+  const props = store$.commandbar.get();
+  return {
     onClose: () => store$.commandbarClose(),
     onOpen: () => {
       const row = store$.list.rowInFocus.get()?.row;
@@ -44,19 +33,15 @@ export const derivedCommandbarState$ = observable(() => {
     onInputChange: (...props) => store$.commandbarUpdateQuery(...props),
     onSelect: (...props) => store$.commandbarSelectItem(...props),
     onValueChange: (...props) => store$.commandbarSetValue(...props),
-  } satisfies Omit<CommandbarProps, 'renderItem'>;
 
-  const itemGroups = commandbarPropsSelectedViewField.itemGroups
-    ? commandbarPropsSelectedViewField.itemGroups
-    : [...props.itemGroups, ...(commandsGroups.itemGroups ?? []), ...commands];
+    open: props?.open ?? false,
+    row: store$.list.rowInFocus.get()?.row ?? undefined,
+    headerLabel: props?.headerLabel ?? '',
+    inputPlaceholder: props?.inputPlaceholder ?? '',
+    query: props?.query ?? '',
+    error: props?.error ?? undefined,
+    groups: getCommandGroups(),
 
-  const groupLabels = commandbarPropsSelectedViewField.groupLabels
-    ? commandbarPropsSelectedViewField.groupLabels
-    : [...(props.groupLabels ?? ['']), ...(commandsGroups.groupLabels ?? [])];
-
-  return {
-    ...props,
-    itemGroups,
-    groupLabels,
+    ...(fieldTypeCommandbarProps ?? {}),
   } satisfies Omit<CommandbarProps, 'renderItem'>;
 });

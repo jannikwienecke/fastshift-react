@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
-  Command,
+  UserStoreCommand,
   GlobalConfig,
   IndexField,
   MutationReturnDto,

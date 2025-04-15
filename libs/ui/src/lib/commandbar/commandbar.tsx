@@ -11,7 +11,6 @@ import {
   CommandList,
   CommandSeparator,
 } from '../components/command';
-import { MessageCircleWarning } from 'lucide-react';
 import { CommandRenderErrors } from '../render-errors-command';
 
 export const CommandDialogInput = (props: {
@@ -30,29 +29,32 @@ export const CommandDialogInput = (props: {
 };
 
 export const CommandDialogList = (props: {
-  itemGroups?: CommandbarProps['itemGroups'];
-  groupLabels?: CommandbarProps['groupLabels'];
+  groups: CommandbarProps['groups'];
   renderItem: CommandbarProps['renderItem'];
   onSelect: CommandbarProps['onSelect'];
   onValueChange: CommandbarProps['onValueChange'];
   row?: CommandbarProps['row'];
 }) => {
-  const { groupLabels } = props;
   const value: string | undefined = useCommandState((state) => state.value);
+
   React.useEffect(() => {
     if (!value) return;
 
-    const item = props.itemGroups
-      ?.flat()
-      .find((item) => value.includes(item.label));
+    const item = props.groups
+      .map((g) => g.items)
+      .flat()
+      .find((i) => value.includes(i.label));
+
     item && props.onValueChange(item);
-  }, [props, props.itemGroups, value]);
+  }, [props, props.groups, value]);
 
   return (
     <CommandList className="px-3 pb-3 flex flex-col pt-2">
-      {props.itemGroups?.flatMap((group, index) => {
-        const isLast = index === (props.itemGroups?.length ?? 0) - 1;
-        const groupLabel = groupLabels?.[index];
+      {props.groups?.flatMap((group, index) => {
+        // const isLast = index === (props.itemGroups?.length ?? 0) - 1;
+        const isLast = false;
+
+        const groupLabel = group.header;
 
         return (
           <div key={`group-${index}`}>
@@ -62,7 +64,7 @@ export const CommandDialogList = (props: {
               </div>
             ) : null}
 
-            {group.map((item, index) => {
+            {group.items.map((item, index) => {
               const active = value?.includes(item.label.toString());
               if (!item) return null;
               return (

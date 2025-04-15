@@ -4,7 +4,7 @@ import {
   BaseConfigInterface,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
-  Command,
+  UserStoreCommand,
   FieldConfig,
   patchDict,
   QueryReturnOrUndefined,
@@ -27,7 +27,7 @@ export type QueryProviderConvexProps = {
   viewConfig: BaseViewConfigManagerInterface['viewConfig'];
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
-  commands: Command[];
+  commands: UserStoreCommand[];
   userViewData: UserViewData;
   queryKey: any[];
 } & { children: React.ReactNode };

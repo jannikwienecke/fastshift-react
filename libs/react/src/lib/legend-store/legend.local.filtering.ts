@@ -5,10 +5,10 @@ import {
   NONE_OPTION,
   RecordType,
   Row,
+  _filter,
   arrayIntersection,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
-import Fuse from 'fuse.js';
 import {
   dateUtils,
   filterUtil,
@@ -68,16 +68,16 @@ const handleStringFilter = (
   rows: Row<RecordType>[],
   filter: FilterPrimitiveType
 ) => {
-  const fuse = new Fuse(
-    rows.map((r) => r.getValue(filter.field.name)),
-    { keys: [filter.field.name], threshold: 0.3 }
+  const rowValues = rows.map((r) => r.getValue(filter.field.name));
+  const result = _filter(rowValues, [filter.field.name]).withQuery(
+    filter.value.id as string
   );
-  const result = fuse.search(filter.value.id as string);
+
   return getFilteredRowsByIds(
     rows,
     result.map((r) => {
       const row = rows.find(
-        (row) => row.getValue(filter.field.name) === r.item
+        (row) => row.getValue(filter.field.name) === r
       ) as Row;
       return row.id;
     })

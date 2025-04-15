@@ -1,4 +1,12 @@
 import { operatorLabels } from '../filters';
+import { CommandHeader as commandHeaders } from '../types/commands';
+
+export const headers: {
+  [key in commandHeaders]: string;
+} = {
+  view: 'View',
+  admin: 'Admin',
+};
 
 export const en = {
   filter: {
@@ -27,6 +35,13 @@ export const en = {
     newLabel: 'New {{name}}',
     existingLabel: 'Existing {{name}}',
   },
+
+  __commands: {
+    createNewView: 'Create new view',
+    saveView: 'Save view',
+    headers: headers,
+  },
+
   displayOptions: {
     button: {
       label: 'Display',

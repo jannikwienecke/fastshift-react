@@ -1,7 +1,7 @@
 import {
   BaseViewConfigManagerInterface,
   ComboxboxItem,
-  Command,
+  UserStoreCommand,
   CommandbarProps,
   CommandformItem,
   ContextMenuState,
@@ -148,7 +148,7 @@ export type LegendStore = {
   //   VIEW STATE
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
-  commands: Command[];
+  commands: UserStoreCommand[];
   userViewData: UserViewData | undefined;
 
   api?: {
@@ -203,7 +203,7 @@ export type LegendStore = {
     viewConfigManager: BaseViewConfigManagerInterface,
     views: RegisteredViews,
     uiViewConfig: UiViewConfig,
-    commands: Command[],
+    commands: UserStoreCommand[],
     userView: UserViewData | undefined
   ) => void;
 

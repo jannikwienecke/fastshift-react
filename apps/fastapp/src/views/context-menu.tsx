@@ -16,7 +16,7 @@ import {
 } from '@apps-next/ui';
 import React from 'react';
 import Fuse from 'fuse.js';
-import { RecordType } from '@apps-next/core';
+import { _filter, RecordType } from '@apps-next/core';
 
 export function ContextMenuDemo({ rect }: { rect: DOMRect | null }) {
   const { viewConfigManager } = useView();
@@ -31,18 +31,10 @@ export function ContextMenuDemo({ rect }: { rect: DOMRect | null }) {
 
   const ref = React.useRef<HTMLDivElement>(null);
 
-  const fuse = React.useMemo(() => {
-    return new Fuse(fields, {
-      keys: ['name'],
-      threshold: 0.3,
-    });
-  }, [fields]);
-
   const results = React.useMemo(() => {
     if (!query) return fields;
-    const result = fuse.search(query);
-    return result.map((r) => r.item);
-  }, [query, fields, fuse]);
+    return _filter(fields, ['name']).withQuery(query);
+  }, [query, fields]);
 
   const inptutRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {

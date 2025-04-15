@@ -91,7 +91,7 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
 
 export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
   (store$) =>
-  async ({ field, valueRow, row }) => {
+  async ({ field, valueRow, row }, onSuccess, onError) => {
     console.warn('Starting updateRecordMutation');
     const patchValue = field.relation
       ? ifNoneNullElseValue(valueRow.id)
@@ -129,11 +129,13 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
     if (error) {
       console.error('Error updating record:', error);
       rollback();
+      onError?.(error.message);
       renderErrorToast('error.updateRecord', () => {
         store$.errorDialog.error.set(error);
       });
     } else {
       console.warn('Record updated successfully');
+      onSuccess?.();
     }
   };
 
@@ -379,7 +381,9 @@ export const optimisticUpdateStore = ({
         selectState$.parentRow.set(copyRow(originalRow));
       }
 
-      xSelect.onError();
+      if (selectState$.parentRow.get()) {
+        xSelect.onError();
+      }
     }, 0);
   };
 };

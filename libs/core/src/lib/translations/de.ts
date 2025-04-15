@@ -1,5 +1,5 @@
 import { operatorLabels } from '../filters';
-import { en } from './en';
+import { headers, en } from './en';
 
 export const de = {
   filter: {
@@ -121,5 +121,11 @@ export const de = {
   _creationTime: {
     one: 'Created at',
     other: 'Created at',
+  },
+
+  __commands: {
+    createNewView: 'Create new view',
+    saveView: 'Save view',
+    headers: headers,
   },
 } satisfies typeof en;

@@ -1,5 +1,5 @@
 import { api } from '@apps-next/convex';
-import { Command } from '@apps-next/core';
+import { UserStoreCommand } from '@apps-next/core';
 import { useConvexMutation } from '@convex-dev/react-query';
 import { observable } from '@legendapp/state';
 import { useMutation } from '@tanstack/react-query';
@@ -21,10 +21,13 @@ export const useCommands = () => {
     mutationFn: useConvexMutation(api.init.default),
   });
 
-  const command: Command = {
+  const command: UserStoreCommand = {
     icon: TrashIcon,
     id: 'reset-db',
     label: t('commands.resetDb'),
+    command: 'reset-db',
+    header: 'admin',
+
     handler: async (options) => {
       resettingDb$.set(true);
       const promises = [mutateAsync({}), waitFor(1000)];

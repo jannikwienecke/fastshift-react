@@ -5,6 +5,7 @@ import {
   NO_SORTING_FIELD,
   RecordType,
   Row,
+  _filter,
   getEditLabel,
   getFieldLabel,
   getRelationTableName,
@@ -51,16 +52,10 @@ export const getViewFieldsOptions = (options?: {
     return makeRow(field.name, label || field.name, field, field);
   });
 
-  const fuse = new Fuse(filterOptions, {
-    keys: ['label'],
-    // distance: 1000,
-    threshold: 0.4,
-  });
-
-  const result = fuse.search(query);
+  const result = _filter(filterOptions, ['label']).withQuery(query);
 
   return {
-    values: query.length ? result.map((r) => r.item) : filterOptions,
+    values: query.length ? result : filterOptions,
     tableName: '',
     multiple: false,
   };
