@@ -28,8 +28,8 @@ export const deleteIds = async (
       .withIndex('by_id', (q) => q.eq('_id', mutation.payload['id']))
       .first();
 
-    const existingIds = record[tableFieldName] as ID[];
-    const after = existingIds.filter(
+    const existingIds = record[tableFieldName] as ID[] | undefined | null;
+    const after = existingIds?.filter(
       (existingId: ID) => !ids.includes(existingId)
     );
 
@@ -76,10 +76,10 @@ export const insertIds = async (
   if (!ids || ids.length === 0) return;
 
   if (field.isRecursive && tableFieldName) {
-    const existingIds = record[tableFieldName] as ID[];
+    const existingIds = record[tableFieldName] as ID[] | undefined | null;
 
     await ctx.db.patch(mutation.payload['id'], {
-      [tableFieldName]: [...existingIds, ...ids],
+      [tableFieldName]: [...(existingIds || []), ...ids],
     });
 
     return;

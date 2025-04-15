@@ -2,6 +2,7 @@ import {
   CommandbarProps,
   CREATE_NEW_OPTION,
   DELETE_OPTION,
+  getValue,
   MakeCommandbarPropsOption,
   makeDayMonthString,
   makeRow,
@@ -18,7 +19,7 @@ import {
   PencilLineIcon,
   PlusIcon,
 } from 'lucide-react';
-import { store$ } from '../legend-store';
+import { comboboxStore$, store$ } from '../legend-store';
 import {
   commandbarProps$,
   derivedCommandbarState$,
@@ -35,6 +36,8 @@ export const makeCommandbarProps = <T extends RecordType>(
   options?: MakeCommandbarPropsOption<T>
 ): CommandbarProps => {
   commandbarProps$.set(options ?? {});
+  // HIER WEITER M ACHEN -> TESTS TODOS  -> relkated task in combobox
+  comboboxStore$.get();
 
   const state = derivedCommandbarState$.get();
 
@@ -152,10 +155,12 @@ export const makeCommandbarProps = <T extends RecordType>(
           </div>
         );
       } else if (viewField && viewField.relation) {
-        const rowValue = item as Row;
-        const currentValue = activeRow?.getValue?.(viewField.name) as
+        const currentValue = getValue(activeRow, viewField.name) as
           | Row[]
           | undefined;
+
+        const values = comboboxStore$.values.get();
+        const rowValue = values?.find((v) => v.id === item.id) ?? (item as Row);
 
         const rowValueId = rowValue?.id ?? '';
 
@@ -164,7 +169,8 @@ export const makeCommandbarProps = <T extends RecordType>(
 
         const createNewOption = rowValue.id === CREATE_NEW_OPTION;
 
-        const isChecked = currentValue?.some((v) => v.id === rowValue.id);
+        const isChecked =
+          currentValue && currentValue?.some((v) => v.id === rowValue.id);
 
         return (
           <div className="flex flex-row items-center justify-between w-full">

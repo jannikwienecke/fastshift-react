@@ -5,11 +5,13 @@ import {
   NONE_OPTION,
   QueryRelationalData,
   QueryServerProps,
+  relationalViewHelper,
 } from '@apps-next/core';
 import { filterByNotDeleted, queryClient } from './convex-client';
 import { queryHelper } from './convex-query-helper';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
+import { mapWithInclude } from './convex-map-with-include';
 
 export const getRelationalData = async (
   ctx: GenericQueryCtx,
@@ -116,6 +118,7 @@ export const getRelationalData = async (
     const _key = getRelationTableName(field);
 
     const rows = resultList[index];
+
     acc[_key] =
       rows?.map((row) => ({
         ...row,
@@ -123,6 +126,23 @@ export const getRelationalData = async (
       })) ?? [];
     return acc;
   }, {} as QueryRelationalData);
+
+  for (const [tableName, rows] of Object.entries(relationalData)) {
+    const { relationalViewManager } = relationalViewHelper(
+      tableName,
+      args.registeredViews
+    );
+
+    args.viewConfigManager = relationalViewManager;
+
+    const rowsWithInclude = await mapWithInclude(
+      rows as ConvexRecord[],
+      ctx,
+      args
+    );
+
+    relationalData[tableName] = rowsWithInclude;
+  }
 
   return relationalData;
 };

@@ -36,7 +36,8 @@ export const derivedCommandbarState$ = observable(() => {
 
     open: props?.open ?? false,
     row: store$.list.rowInFocus.get()?.row ?? undefined,
-    headerLabel: props?.headerLabel ?? '',
+    headerLabel:
+      props?.headerLabel ?? store$.commandbar.activeRow.label.get() ?? '',
     inputPlaceholder: props?.inputPlaceholder ?? '',
     query: props?.query ?? '',
     error: props?.error ?? undefined,

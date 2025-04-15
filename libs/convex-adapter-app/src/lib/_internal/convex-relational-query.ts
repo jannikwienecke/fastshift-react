@@ -81,6 +81,7 @@ export const handleRelationalTableQuery = async ({
 
   const rows = await fetch();
 
+  args.viewConfigManager = relationalViewManager;
   const rowsWithInclude = await mapWithInclude(rows, ctx, args);
 
   return {

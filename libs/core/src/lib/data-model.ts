@@ -133,3 +133,20 @@ export const makeNoneOption = (field: FieldConfig) => {
 export const makeRowFromField = (field: FieldConfig): Row => {
   return makeRow(field.name, field.label ?? field.name, field, field);
 };
+
+export const getValue = (row: Row, fieldName: string) => {
+  const raw = row.raw;
+  const value = raw?.[fieldName];
+
+  if (value === null || value === undefined) return null;
+
+  if (Array.isArray(value)) {
+    return value as Row[];
+  }
+
+  if (typeof value === 'object') {
+    return value as Row;
+  }
+
+  return value as string | number | boolean;
+};

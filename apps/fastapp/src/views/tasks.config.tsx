@@ -1,11 +1,6 @@
 import { makeViewFieldsConfig } from '@apps-next/react';
-import { DateItem, DateListItem } from '@apps-next/ui';
-import {
-  BarChartHorizontal,
-  CalendarIcon,
-  PencilLineIcon,
-  TagIcon,
-} from 'lucide-react';
+import { BubbleItem, DateItem, DateListItem } from '@apps-next/ui';
+import { BarChartHorizontal, CalendarIcon, PencilLineIcon } from 'lucide-react';
 import {
   CompletedComponent,
   CompletedComponentCombobox,
@@ -20,14 +15,28 @@ import {
   TaskViewDataType,
 } from './tasks.components';
 
-import { todosConfig } from '@apps-next/convex';
-import { t } from 'i18next';
+import { Tasks, Todos, todosConfig } from '@apps-next/convex';
 
 export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   onDelete: {
     showConfirmation: true,
   },
   fields: {
+    tasks: {
+      component: {
+        comboboxListValue: ({ data, row }) => {
+          const task = data as unknown as TaskViewDataType;
+
+          return (
+            <div className="flex flex-row items-center gap-3">
+              <div>{task.name} </div>
+              <BubbleItem label={task.projects.label}></BubbleItem>
+            </div>
+          );
+        },
+      },
+    },
+
     todos: {
       component: {
         list: ({ data }) => {
@@ -44,10 +53,23 @@ export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
             </div>
           );
         },
+        // commandbarFieldItem: () => {
+        //   return '123';
+        // },
+        // contextmenuFieldOption: () => {
+        //   return '123';
+        // },
         comboboxListValue: ({ data, row }) => {
+          const todo = data as unknown as Todos & {
+            tasks?: Tasks;
+          };
+
           return (
-            <div className="flex flex-row items-center gap-1">
-              <div>{data.name}</div>
+            <div className="flex flex-row items-center gap-3">
+              <div>{data?.name} </div>
+              {todo?.tasks?.name ? (
+                <BubbleItem label={todo.tasks.name} />
+              ) : null}
             </div>
           );
         },

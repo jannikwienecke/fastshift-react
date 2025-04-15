@@ -41,21 +41,21 @@ export const mapWithInclude = async (
 
       try {
         const { fn, key } = await handleIncludeField(props);
-        let include: ConvexRecord | ConvexRecord[] | null = await fn();
+        let includeData: ConvexRecord | ConvexRecord[] | null = await fn();
 
         if (view.mutation?.softDelete) {
-          include = Array.isArray(include)
-            ? include.filter(
+          includeData = Array.isArray(includeData)
+            ? includeData.filter(
                 (i) => !i[view.mutation?.softDeleteField as keyof ConvexRecord]
               )
-            : include?.[view.mutation?.softDeleteField as any] === true
+            : includeData?.[view.mutation?.softDeleteField as any] === true
             ? null
-            : include;
+            : includeData;
         }
 
         return {
           ...accResolved,
-          [key ?? '']: include,
+          [key ?? '']: includeData,
         };
       } catch (error) {
         console.error('error', error);

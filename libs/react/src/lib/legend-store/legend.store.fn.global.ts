@@ -301,6 +301,8 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
       return;
     }
 
+    store$.createRelationalDataModel(data.relationalData ?? {});
+
     switch (state) {
       case 'fetching-more':
         _log.debug('RECEIVING DATA AFTER FETCHING MORE', data);

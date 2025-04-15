@@ -52,6 +52,7 @@ const _schema = defineSchema({
     .index('name', ['name'])
     .index('completed', ['completed'])
     .index('tasks', ['tasks'])
+    .index('todos', ['todos'])
     .index('deleted', ['deleted'])
     .searchIndex('name_search', {
       searchField: 'name',

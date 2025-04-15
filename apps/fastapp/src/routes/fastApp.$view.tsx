@@ -1,6 +1,11 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
 import { UserViewForm } from '@apps-next/core';
-import { ClientViewProviderConvex, makeHooks, store$ } from '@apps-next/react';
+import {
+  ClientViewProviderConvex,
+  comboboxStore$,
+  makeHooks,
+  store$,
+} from '@apps-next/react';
 import { InputDialog } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams, useRouter } from '@tanstack/react-router';

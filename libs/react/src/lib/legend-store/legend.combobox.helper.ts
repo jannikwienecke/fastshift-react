@@ -27,6 +27,7 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
+import { comboboxStore$ } from './legend.store.derived.combobox';
 
 export const comboboxDebouncedQuery$ = observable('');
 
@@ -243,7 +244,13 @@ export const handleRelationalField = (
   });
 
   return {
-    values: valuesToUseSorted,
+    // values: valuesToUseSorted,
+    values: valuesToUseSorted.map((v) => {
+      return {
+        ...v,
+        raw: JSON.parse(JSON.stringify(v.raw)),
+      };
+    }),
     tableName: tableName,
     multiple: true,
     selected: newSelected,
