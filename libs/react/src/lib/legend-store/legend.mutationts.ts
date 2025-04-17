@@ -11,7 +11,7 @@ import {
 } from '@apps-next/core';
 import { observable, Observable } from '@legendapp/state';
 import { renderErrorToast, renderSuccessToast } from '../toast';
-import { createRow } from './legend.commandform.helper';
+import { createRow } from './legend.form.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';
@@ -340,6 +340,10 @@ export const optimisticUpdateStore = ({
       store$.commandbar.activeRow.set(updatedRow);
     }
 
+    if (store$.detail.row.get()) {
+      store$.detail.row.set(updatedRow);
+    }
+
     if (store$.list.rowInFocus.row.get()) {
       store$.list.rowInFocus.row.set(updatedRow);
     }
@@ -366,6 +370,8 @@ export const optimisticUpdateStore = ({
 
       if (store$.contextMenuState.row.get())
         store$.contextMenuState.row.set(copyRow(originalRow));
+
+      if (store$.detail.row.get()) store$.detail.row.set(copyRow(originalRow));
 
       if (store$.commandbar.activeRow.get())
         store$.commandbar.activeRow.set(copyRow(originalRow));

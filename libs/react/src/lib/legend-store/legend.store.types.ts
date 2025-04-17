@@ -151,6 +151,8 @@ export type LegendStore = {
   commands: UserStoreCommand[];
   userViewData: UserViewData | undefined;
 
+  viewId: string | null;
+
   api?: {
     mutate?: (args: MutationDto) => void;
     mutateAsync?: (args: MutationDto) => Promise<MutationReturnDto>;
@@ -204,7 +206,8 @@ export type LegendStore = {
     views: RegisteredViews,
     uiViewConfig: UiViewConfig,
     commands: UserStoreCommand[],
-    userView: UserViewData | undefined
+    userView: UserViewData | undefined,
+    viewId: string | null
   ) => void;
 
   createDataModel: (data: RecordType[], tablename?: string) => void;
@@ -389,6 +392,24 @@ export type LegendStore = {
     open: boolean;
     form?: UserViewForm;
   };
+
+  detail?: {
+    row: Row;
+    selectedField?: FieldConfig;
+    rect?: DOMRect;
+    form: {
+      dirtyField?: FieldConfig;
+      dirtyValue?: string | number;
+      // error?: string;
+    };
+  };
+
+  detailpageChangeInput: (
+    field: CommandformItem,
+    value: string | boolean
+  ) => void;
+  detailpageBlurInput: (field: CommandformItem) => void;
+  detailpageEnter: (field: CommandformItem) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

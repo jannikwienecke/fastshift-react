@@ -191,7 +191,10 @@ export const selectRecordsMutation = async (
 
   const record = await ctx.db.get(mutation.payload.id);
 
-  const recordsWithInclude = await mapWithInclude([record], ctx, props);
+  const recordsWithInclude = await mapWithInclude([record], ctx, {
+    ...props,
+    viewId: props.viewId ?? null,
+  });
 
   const result = viewConfigManager.viewConfig.mutation?.beforeSelect?.(record, {
     newIds,

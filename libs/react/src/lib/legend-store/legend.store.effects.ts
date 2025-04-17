@@ -33,13 +33,15 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const filterDateField = store$.filter.selectedDateField.get();
     const filterOperatorField = store$.filter.selectedOperatorField.get();
     const commandbarField = store$.commandbar.selectedViewField.get();
+    const detailPageField = store$.detail.selectedField.get();
 
     if (
       !listRelationField &&
       !filterField &&
       !filterDateField &&
       !filterOperatorField &&
-      !commandbarField
+      !commandbarField &&
+      !detailPageField
     ) {
       store$.combobox.selected.set([]);
       store$.combobox.values.set(null);

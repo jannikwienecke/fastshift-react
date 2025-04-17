@@ -36,7 +36,7 @@ export const makeCommandbarProps = <T extends RecordType>(
   options?: MakeCommandbarPropsOption<T>
 ): CommandbarProps => {
   commandbarProps$.set(options ?? {});
-  // HIER WEITER M ACHEN -> TESTS TODOS  -> relkated task in combobox
+  // TODO HIER WEITER M ACHEN -> TESTS TODOS  -> relkated task in combobox
   comboboxStore$.get();
 
   const state = derivedCommandbarState$.get();

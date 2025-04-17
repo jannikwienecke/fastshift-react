@@ -8,6 +8,7 @@ export type ComponentType =
   | 'contextmenuFieldItem'
   | 'contextmenuFieldOption'
   | 'commandbarFieldItem'
+  | 'detailValue'
   // | 'filterValue'
   | 'icon';
 
@@ -27,6 +28,8 @@ export type UiViewConfig<
           icon: React.FC<any>;
 
           list: (props: { data: U }) => React.ReactNode;
+
+          detailValue: (props: { data: U }) => React.ReactNode;
 
           comboboxListValue: (props: {
             data: NonNullable<U[key]> extends Array<unknown>

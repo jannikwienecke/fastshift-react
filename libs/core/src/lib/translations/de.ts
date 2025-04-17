@@ -74,6 +74,8 @@ export const de = {
     unmarkAs: 'Als nicht {{field}} markieren',
     resetDb: 'Datenbank zurücksetzen',
     reset: 'Zurücksetzen',
+    setValue: '{{field}} setzen',
+    addMany: '{{field}} hinzufügen',
   },
   datePicker: {
     description: 'Bitte wählen Sie ein Datum aus dem Kalender.',

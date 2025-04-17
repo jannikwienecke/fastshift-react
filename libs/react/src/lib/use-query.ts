@@ -100,6 +100,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
       displayOptions: '',
       paginateOptions: undefined,
       disabled: view?.viewName ? false : true,
+      viewId: null,
     });
 
   return {
@@ -124,6 +125,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const cursor = store$.fetchMore.currentCursor.get();
 
+  const viewId = store$.viewId.get();
+
   const queryPropsMerged = React.useMemo(() => {
     return {
       ...queryProps,
@@ -144,6 +147,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
         numItems: DEFAULT_FETCH_LIMIT_QUERY,
         // isDone: isDone,
       },
+      viewId,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -157,6 +161,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     viewConfigManager.viewConfig,
     cursor,
     parsedViewSettings,
+    viewId,
   ]);
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =

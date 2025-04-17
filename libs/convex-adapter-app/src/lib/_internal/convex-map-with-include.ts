@@ -25,7 +25,7 @@ export const mapWithInclude = async (
 
       const view = getViewByName(registeredViews, field.name);
 
-      if (!field.relation) {
+      if (!field.relation || !view) {
         return acc;
       }
 

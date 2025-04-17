@@ -28,9 +28,14 @@ export const getUserViewData = (viewName: string) => {
   return userViewData;
 };
 
-export const getQueryKey = (viewConfig: ViewConfigType, viewName: string) => {
+export const getQueryKey = (
+  viewConfig: ViewConfigType,
+  viewName: string,
+  viewId: string | null
+) => {
   const userViewData = getUserViewData(viewName);
-  return preloadQuery(api.query.viewLoader, viewConfig, userViewData).queryKey;
+  return preloadQuery(api.query.viewLoader, viewConfig, userViewData, viewId)
+    .queryKey;
 };
 
 export const queryClient = new QueryClient({

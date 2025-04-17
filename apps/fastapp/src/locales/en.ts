@@ -64,6 +64,7 @@ export const en = {
     notFound: 'Not found',
     unauthorized: 'Unauthorized',
     minCharacters: 'Minimum {{count}} characters',
+    invalidEmail: 'Invalid email address',
   },
   commands: {
     resetDb: 'Reset database',

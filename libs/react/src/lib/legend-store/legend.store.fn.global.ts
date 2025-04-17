@@ -1,18 +1,13 @@
 import {
   _log,
   configManager,
-  FieldConfig,
-  FilterType,
   getViewByName,
   makeData,
-  parseDisplayOptionsStringForServer,
-  parseFilterStringForServer,
   QueryReturnType,
   RelationalDataModel,
   sortRows,
 } from '@apps-next/core';
 import { batch, Observable } from '@legendapp/state';
-import { displayOptionsProps } from './legend.store.derived.displayOptions';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { setGlobalDataModel } from './legend.utils.helper';
 
@@ -87,7 +82,9 @@ export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
     const relationalDataModel = Object.entries(data).reduce(
       (acc, [tableName, data]) => {
         const viewConfig = getViewByName(store$.views.get(), tableName);
-        const _data = makeData(store$.views.get(), viewConfig?.viewName)(data);
+        const view = viewConfig?.viewName;
+        if (!view) return acc;
+        const _data = makeData(store$.views.get(), view)(data);
 
         acc[tableName] = _data;
         return acc;
@@ -128,7 +125,8 @@ export const init: StoreFn<'init'> =
     views,
     uiViewConfig,
     commands,
-    userViewData
+    userViewData,
+    viewId
   ) => {
     batch(() => {
       store$.fetchMore.assign({
@@ -164,6 +162,7 @@ export const init: StoreFn<'init'> =
 
       store$.filter.filters.set(filters);
       store$.displayOptions.set(dispplayOptions);
+      store$.viewId.set(viewId);
 
       store$.displayOptions.softDeleteEnabled.set(
         !!viewConfigManager.viewConfig.mutation?.softDelete
@@ -340,6 +339,8 @@ export const handleIncomingRelationalData: StoreFn<'handleIncomingData'> =
       data.relationalData ?? {}
     ).reduce((acc, [tableName, data]) => {
       const viewConfig = getViewByName(store$.views.get(), tableName);
+      if (!viewConfig) return acc;
+
       const _data = makeData(store$.views.get(), viewConfig?.viewName)(data);
 
       acc[tableName] = _data;

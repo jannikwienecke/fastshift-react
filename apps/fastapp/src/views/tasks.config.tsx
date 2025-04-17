@@ -8,6 +8,7 @@ import {
   NameFieldItemCommandbar,
   PriorityListItemComponent as PriorityComponent,
   PriorityComponentCombobox,
+  PriorityDetailtemComponent,
   ProjectComponent,
   ProjectComponentCombobox,
   TagsComponent,
@@ -16,6 +17,7 @@ import {
 } from './tasks.components';
 
 import { Tasks, Todos, todosConfig } from '@apps-next/convex';
+import { EnvelopeOpenIcon, MobileIcon } from '@radix-ui/react-icons';
 
 export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
   onDelete: {
@@ -95,6 +97,7 @@ export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
         comboboxListValue: PriorityComponentCombobox,
         contextmenuFieldOption: PriorityComponentCombobox,
         default: PriorityComponentCombobox,
+        detailValue: PriorityDetailtemComponent,
       },
     },
 
@@ -104,6 +107,18 @@ export const uiViewConfig = makeViewFieldsConfig<TaskViewDataType>('tasks', {
         icon: PencilLineIcon,
         contextmenuFieldItem: NameFieldItem,
         commandbarFieldItem: NameFieldItemCommandbar,
+      },
+    },
+
+    email: {
+      component: {
+        icon: EnvelopeOpenIcon,
+      },
+    },
+
+    telefon: {
+      component: {
+        icon: MobileIcon,
       },
     },
 

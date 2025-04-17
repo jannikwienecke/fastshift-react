@@ -3,7 +3,7 @@ import {
   getDefaultRow,
   getFormState,
   getRecordTypeFromRow,
-} from './legend.commandform.helper';
+} from './legend.form.helper';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';

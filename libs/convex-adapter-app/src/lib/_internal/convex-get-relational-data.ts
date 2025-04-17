@@ -17,7 +17,7 @@ export const getRelationalData = async (
   ctx: GenericQueryCtx,
   args: QueryServerProps
 ) => {
-  const { viewConfigManager } = args;
+  const { viewConfigManager, viewId } = args;
 
   const displayField = viewConfigManager.getDisplayFieldLabel();
 
@@ -35,7 +35,7 @@ export const getRelationalData = async (
     const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
 
     const view = getViewByName(args.registeredViews, field.name);
-    const viewHasSoftDelete = view.mutation?.softDelete;
+    const viewHasSoftDelete = view?.mutation?.softDelete;
     const deletedIndexField = viewHasSoftDelete
       ? viewConfigManager.getSoftDeleteIndexField()
       : undefined;

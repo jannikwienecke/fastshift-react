@@ -279,7 +279,11 @@ export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] | null {
   return result;
 }
 
-export const getViewByName = (views: RegisteredViews, name: string) => {
+export const getViewByName = (
+  views: RegisteredViews,
+  name: string,
+  throwError?: boolean
+) => {
   const viewConfigByViewName = Object.values(views).find(
     (v) => v?.viewName === name
   );
@@ -290,7 +294,7 @@ export const getViewByName = (views: RegisteredViews, name: string) => {
     (v) => v?.tableName === name
   );
 
-  if (!viewConfigByTableName) {
+  if (!viewConfigByTableName && throwError) {
     console.error(views, name);
     throw new Error(`No View For "${name}" found`);
   }
@@ -356,7 +360,7 @@ export const getFieldLabel = (
   field: FieldConfig,
   singular?: true,
   plural?: true
-) => {
+): string => {
   const isMany =
     field.relation?.type === 'manyToMany' || field.relation?.manyToManyRelation;
 
@@ -484,7 +488,7 @@ export const sortRows = (
   if (!order) return rows;
 
   const displayFieldName = field.relation
-    ? getViewByName(views, field.name).displayField.field
+    ? getViewByName(views, field.name)?.displayField.field
     : null;
 
   rows.sort((a, b) => {

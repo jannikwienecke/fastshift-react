@@ -16,6 +16,8 @@ export const selectState$ = observable({
 
   initialSelectedFilterRows: [] as Row[],
   selectedFilterRows: [] as Row[],
+
+  rect: undefined as DOMRect | undefined,
 });
 
 const getParentRow = () => {
@@ -81,6 +83,7 @@ export const close = () => {
   selectState$.field.set({} as FieldConfig);
   selectState$.initialSelectedFilterRows.set([]);
   selectState$.selectedFilterRows.set([]);
+  selectState$.rect.set(undefined);
 };
 
 export const select = (row: Row) => {
@@ -170,7 +173,6 @@ selectState$.toRemoveRow.onChange((state) => {
 });
 
 selectState$.toInsertRow.onChange((state) => {
-  console.warn('___TO INSERT: ', state.value);
   if (!state.value) return;
 
   const { field, parentRow, existingRows } = getState();
@@ -178,14 +180,24 @@ selectState$.toInsertRow.onChange((state) => {
 
   if (!row) return;
 
-  store$.selectRowsMutation({
-    checkedRow: row,
-    field,
-    existingRows,
-    row: parentRow,
-    idsToDelete: [],
-    newIds: [row.id],
-    newRows: [...existingRows, row],
-  });
+  if (!field.relation?.manyToManyTable) {
+    console.info('___NOT MANY TO MANY');
+    store$.updateRecordMutation({
+      field,
+      row: parentRow,
+      valueRow: row,
+    });
+    close();
+  } else {
+    store$.selectRowsMutation({
+      checkedRow: row,
+      field,
+      existingRows,
+      row: parentRow,
+      idsToDelete: [],
+      newIds: [row.id],
+      newRows: [...existingRows, row],
+    });
+  }
   selectState$.toRemoveRow.set(null);
 });

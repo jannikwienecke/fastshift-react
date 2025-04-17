@@ -20,11 +20,16 @@ export const comboboxClose: StoreFn<'comboboxClose'> = (store$) => () => {
   store$.commandform.rect.set(undefined);
   store$.commandform.field.set(undefined);
 
+  store$.detail.rect.set(undefined);
+  store$.detail.selectedField.set(undefined);
+
   // displayOptions
   store$.displayOptionsCloseCombobox();
 
   store$.combobox.datePicker.set(null);
   xSelect.close();
+
+  store$.combobox.query.set('');
 };
 
 export const comboboxSelectDate: StoreFn<'comboboxSelectDate'> =

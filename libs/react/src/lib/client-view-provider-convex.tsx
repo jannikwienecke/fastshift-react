@@ -34,6 +34,7 @@ export type QueryProviderConvexProps = {
 
 type QueryProviderPropsWithViewFieldsConfig = QueryProviderConvexProps & {
   uiViewConfig: UiViewConfig;
+  viewId: string | null;
 };
 
 export const ClientViewProviderConvex = (
@@ -43,7 +44,6 @@ export const ClientViewProviderConvex = (
     const userFieldConfig = props.viewConfig.fields?.[f.name];
     const displayFIeld = props.viewConfig.displayField.field;
     const softDeleteField = props.viewConfig.mutation?.softDeleteField;
-
     const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
     const isDisplayField =
       displayFIeld && f.name === displayFIeld ? true : undefined;
@@ -80,17 +80,16 @@ export const ClientViewProviderConvex = (
 
   views = patchDict(views ?? {}, (view) => {
     if (!view) return view;
-
     return {
       ...view,
       viewFields: patchDict(view.viewFields, (f) => {
-        const userFieldConfig = props.viewConfig.fields?.[f.name];
-        const displayFIeld = props.viewConfig.displayField.field;
-        const softDeleteField = props.viewConfig.mutation?.softDeleteField;
+        const userFieldConfig = view.fields?.[f.name];
+        const displayField = view.displayField.field;
+        const softDeleteField = view.mutation?.softDeleteField;
 
         const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
         const isDisplayField =
-          displayFIeld && f.name === displayFIeld ? true : undefined;
+          displayField && f.name === displayField ? true : undefined;
 
         return {
           ...f,
@@ -111,6 +110,8 @@ export const ClientViewProviderConvex = (
 
   const [isInitialized, setIsInitialized] = React.useState(false);
 
+  const viewId = props.viewId;
+
   React.useLayoutEffect(() => {
     setIsInitialized(true);
     if (data && props.uiViewConfig && viewConfigManager && views) {
@@ -123,7 +124,8 @@ export const ClientViewProviderConvex = (
         views,
         props.uiViewConfig,
         props.commands,
-        props.userViewData
+        props.userViewData,
+        viewId
       );
     }
   }, [
@@ -133,6 +135,7 @@ export const ClientViewProviderConvex = (
     views,
     props.commands,
     props.userViewData,
+    viewId,
   ]);
 
   if (!isInitialized) {

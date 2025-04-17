@@ -1,14 +1,16 @@
 import { config, tasksConfig, views } from '@apps-next/convex';
 import { UserViewForm } from '@apps-next/core';
-import {
-  ClientViewProviderConvex,
-  comboboxStore$,
-  makeHooks,
-  store$,
-} from '@apps-next/react';
+import { ClientViewProviderConvex, makeHooks, store$ } from '@apps-next/react';
 import { InputDialog } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, useParams, useRouter } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Outlet,
+  useLocation,
+  useMatches,
+  useParams,
+  useRouter,
+} from '@tanstack/react-router';
 import React from 'react';
 import { useCommands } from '../hooks/app.commands';
 import { getQueryKey, getUserViewData } from '../query-client';
@@ -48,14 +50,22 @@ const Task = observer(() => {
 
 export const Route = createFileRoute('/fastApp/$view')({
   loader: async (props) => {
-    return props.context.preloadQuery(tasksConfig, props.params.view);
+    return props.context.preloadQuery(
+      tasksConfig,
+      props.params.view,
+      null
+      // (props.params as { id?: string } | undefined)?.id || null
+    );
   },
+
   component: () => <TaskComponent />,
 });
 
 const TaskComponent = observer(() => {
   const { commands } = useCommands();
   const { view } = useParams({ from: '/fastApp/$view' });
+  const { id } = useParams({ strict: false });
+
   const router = useRouter();
 
   const userViewData = getUserViewData(view);
@@ -70,7 +80,18 @@ const TaskComponent = observer(() => {
         navigateRef.current({ to: `/fastApp/${viewName}` });
       }
     });
-  }, []);
+
+    // store$.contextMenuState.row.onChange((changes) => {
+    //   const row = changes.value;
+    //   const prev = changes.changes?.[0].prevAtPath;
+    //   if (!row || prev) return;
+    //   router.navigate({
+    //     to: `${row.id}`,
+    //   });
+    // });
+  }, [router.navigate]);
+
+  // () => router.preloadRoute({"to": `/fastApp/${view}${id}` });
 
   return (
     <ClientViewProviderConvex
@@ -79,10 +100,12 @@ const TaskComponent = observer(() => {
       viewConfig={tasksConfig}
       globalConfig={config.config}
       uiViewConfig={uiViewConfig}
-      queryKey={getQueryKey(tasksConfig, view)}
+      queryKey={getQueryKey(tasksConfig, view, null)}
       userViewData={userViewData}
+      viewId={id || null}
     >
       <Task />
+      <Outlet />
     </ClientViewProviderConvex>
   );
 });

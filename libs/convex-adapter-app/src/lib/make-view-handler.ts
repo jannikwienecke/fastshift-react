@@ -50,5 +50,6 @@ export const makeViewMutationHandler =
       mutation: args.mutation,
       viewConfigManager,
       registeredViews,
+      viewId: null,
     } satisfies MutationPropsServer);
   };

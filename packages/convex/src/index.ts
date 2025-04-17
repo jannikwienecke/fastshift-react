@@ -55,11 +55,15 @@ export const tasksConfig = createViewConfig(
         validator: () => z.date().min(new Date()),
       },
       name: {
-        // FIXME ARKTYPE
+        // TODO: Not working on server side validation for update as attribute
         validator: () => z.string().min(3),
         // optional -> otherwise it will use the default value
         validationErrorMessage: (t: TFunction) =>
           t('errors.minCharacters', { count: 3 }),
+      },
+      email: {
+        validator: () => z.string().email(),
+        validationErrorMessage: (t: TFunction) => t('errors.invalidEmail'),
       },
       completed: {
         defaultValue: false,

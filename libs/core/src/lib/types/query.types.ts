@@ -10,6 +10,7 @@ import { RegisteredViews, ViewConfigType } from './view-config.types';
 
 export type QueryProps = {
   query?: string;
+  viewId: string | null;
   filters?: string;
   displayOptions?: string;
   paginateOptions?: {
@@ -31,12 +32,14 @@ export type QueryProps = {
 export type QueryDto = {
   viewConfig?: ViewConfigType;
   viewConfigManager?: BaseViewConfigManagerInterface;
+  viewId: string | null;
 
   filters?: string;
   displayOptions?: string;
 } & Omit<QueryProps, 'viewConfigManager'>;
 
 export type QueryServerProps = {
+  viewId?: string | null | undefined;
   filters?: FilterType[];
   displayOptions?: DisplayOptionsType;
   viewConfigManager: BaseViewConfigManagerInterface;

@@ -173,6 +173,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     softDeleteEnabled && !showDeleted ? idsNotDeleted : null
   );
 
+  if (args.viewId) {
+    allIds = [args.viewId];
+  }
+
   const hasOnlyIdsNotDeleted =
     idsNotDeleted.length > 0 &&
     !idsManyToManyFilters.length &&
@@ -270,7 +274,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
 
     if (softDeleteEnabled && !showDeleted) {
-      rows = rows.filter((row) => idsNotDeleted.includes(row._id));
+      rows = rows.filter((row) => idsNotDeleted.includes(row?._id));
     }
 
     if ('continueCursor' in rowsBeforeFilter) {

@@ -21,6 +21,7 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
   const viewFieldOrUndefined = store$.commandbar.selectedViewField.get();
   if (!viewFieldOrUndefined) return null;
 
+  const currentRow = store$.commandbar.activeRow.get();
   const query = store$.commandbar.query.get();
   const viewField = viewFieldOrUndefined as FieldConfig;
   const error =
@@ -48,7 +49,6 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
   };
 
   const dateType = () => {
-    const currentRow = store$.list.rowInFocus.row.get();
     const value = currentRow?.getValue?.(viewField.name);
 
     const options = comboboxStore$.values.get() ?? [];
@@ -91,11 +91,7 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
   };
 
   const nonManyToManyType = () => {
-    const selectedOption = store$.list.rowInFocus.row.get();
-
-    let relationalRow: Row | undefined = selectedOption?.getValue?.(
-      viewField.name
-    );
+    let relationalRow: Row | undefined = currentRow?.getValue?.(viewField.name);
 
     relationalRow = (relationalRow as Row | undefined)?.id
       ? relationalRow
@@ -215,6 +211,8 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
     if (viewField.relation?.manyToManyTable) {
       return manyToManyType();
     }
+
+    return null;
   };
 
   const props = handle();

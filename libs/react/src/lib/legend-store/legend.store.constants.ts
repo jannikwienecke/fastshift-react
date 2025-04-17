@@ -75,6 +75,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'state'
   | 'userViewSettings'
   | 'userViewData'
+  | 'viewId'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
@@ -83,6 +84,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   viewConfigManager: {} as BaseViewConfigManagerInterface,
   relationalDataModel: {} as RelationalDataModel,
   uiViewConfig: {} as UiViewConfig,
+  viewId: null,
   paginateOptions: {
     cursor: null,
     numItems: DEFAULT_FETCH_LIMIT_QUERY,

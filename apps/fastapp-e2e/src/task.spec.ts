@@ -1011,6 +1011,12 @@ test.describe('Task management', () => {
 
     await page.getByText(/Education/i).click();
 
+    await taskPage.commandform
+      .getByText(/due date/i)
+      .first()
+      .click();
+    await taskPage.comboboxPopover.getByText(/today/i).click();
+
     await page.getByRole('button', { name: /create project/i }).click();
 
     await expect(page.getByText(/created Successfully/i)).toBeVisible();

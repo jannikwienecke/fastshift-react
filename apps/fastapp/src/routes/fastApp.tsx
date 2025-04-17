@@ -105,7 +105,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       )}
     >
       <Sidebar open={open} setOpen={setOpen} isPinned={pinned}>
-        <SidebarBody className="justify-between gap-10  w-full">
+        <SidebarBody className="justify-between gap-10 mt-2  w-full border-r-[.5px]">
           <div className="flex flex-col flex-1 w-full overflow-y-auto">
             {open ? (
               <Logo

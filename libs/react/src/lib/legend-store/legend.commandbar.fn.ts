@@ -1,9 +1,9 @@
-import { CommandbarItem, FieldConfig, Row } from '@apps-next/core';
+import { FieldConfig, Row } from '@apps-next/core';
+import { handleCommand } from '../commands';
+import { commands } from '../commands/commands';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { xSelect } from './legend.select-state';
 import { StoreFn } from './legend.store.types';
-import { handleCommand } from '../commands';
-import { commands } from '../commands/commands';
 
 export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
   store$.openSpecificModal('commandbar', () => {
