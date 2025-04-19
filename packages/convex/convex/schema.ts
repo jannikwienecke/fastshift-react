@@ -11,6 +11,7 @@ const _schema = defineSchema({
   views: defineTable({
     baseView: v.string(),
     name: v.string(),
+    slug: v.string(),
     description: v.optional(v.string()),
     displayOptions: v.optional(v.string()),
     filters: v.optional(v.string()),

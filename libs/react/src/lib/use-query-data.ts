@@ -18,7 +18,7 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   const queryReturn = useQuery();
   const relationalQueryReturn = useRelationalQuery();
 
-  const dataModel = store$.dataModel.get() as DataModelNew<QueryReturnType>;
+  const dataModel = store$.dataModel.get() as DataModelNew<QueryReturnType[0]>;
   const relationalDataModel = store$.relationalDataModel.get();
 
   const queryReturnRef = React.useRef(queryReturn);

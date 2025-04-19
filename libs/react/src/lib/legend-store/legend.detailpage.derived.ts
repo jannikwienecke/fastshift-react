@@ -33,7 +33,7 @@ export const derviedDetailPage$ = observable(() => {
     complexFields: helper.getComplexFormFields(),
     displayField: helper.displayField,
     type: store$.commandform.type.get() ?? 'create',
-    viewName: helper.view.viewName,
+    viewName: store$.userViewData.name.get() ?? helper.view.viewName,
     tableName: helper.view.tableName,
 
     onClick: (field, rect: DOMRect) => {

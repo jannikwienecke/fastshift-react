@@ -29,7 +29,7 @@ export const DefaultViewTemplate = observer(
     listOptions?: MakeListPropsOptions<T>;
     comboboOptions?: MakeComboboxPropsOptions<T>;
     filterOptions?: MakeFilterPropsOptions<T>;
-    displayOptions: MakeDisplayOptionsPropsOptions<T>;
+    displayOptions?: MakeDisplayOptionsPropsOptions<T>;
     confirmationAlertOptions?: MakeConfirmationAlertPropsOption<T>;
     RenderInputDialog?: React.FC;
   }) => {

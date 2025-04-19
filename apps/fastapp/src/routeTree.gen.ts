@@ -15,7 +15,6 @@ import { Route as KanbanImport } from './routes/kanban'
 import { Route as FastAppImport } from './routes/fastApp'
 import { Route as DisplayOptionsImport } from './routes/display-options'
 import { Route as IndexImport } from './routes/index'
-import { Route as FastAppProjectsImport } from './routes/fastApp.projects'
 import { Route as FastAppViewImport } from './routes/fastApp.$view'
 import { Route as FastAppViewIdImport } from './routes/fastApp.$view.$id'
 
@@ -39,11 +38,6 @@ const DisplayOptionsRoute = DisplayOptionsImport.update({
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
-} as any)
-
-const FastAppProjectsRoute = FastAppProjectsImport.update({
-  path: '/projects',
-  getParentRoute: () => FastAppRoute,
 } as any)
 
 const FastAppViewRoute = FastAppViewImport.update({
@@ -95,13 +89,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FastAppViewImport
       parentRoute: typeof FastAppImport
     }
-    '/fastApp/projects': {
-      id: '/fastApp/projects'
-      path: '/projects'
-      fullPath: '/fastApp/projects'
-      preLoaderRoute: typeof FastAppProjectsImport
-      parentRoute: typeof FastAppImport
-    }
     '/fastApp/$view/$id': {
       id: '/fastApp/$view/$id'
       path: '/$id'
@@ -119,7 +106,6 @@ export const routeTree = rootRoute.addChildren({
   DisplayOptionsRoute,
   FastAppRoute: FastAppRoute.addChildren({
     FastAppViewRoute: FastAppViewRoute.addChildren({ FastAppViewIdRoute }),
-    FastAppProjectsRoute,
   }),
   KanbanRoute,
 })
@@ -147,8 +133,7 @@ export const routeTree = rootRoute.addChildren({
     "/fastApp": {
       "filePath": "fastApp.tsx",
       "children": [
-        "/fastApp/$view",
-        "/fastApp/projects"
+        "/fastApp/$view"
       ]
     },
     "/kanban": {
@@ -160,10 +145,6 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/fastApp/$view/$id"
       ]
-    },
-    "/fastApp/projects": {
-      "filePath": "fastApp.projects.tsx",
-      "parent": "/fastApp"
     },
     "/fastApp/$view/$id": {
       "filePath": "fastApp.$view.$id.tsx",

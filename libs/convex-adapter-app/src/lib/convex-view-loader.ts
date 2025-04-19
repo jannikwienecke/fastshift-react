@@ -62,7 +62,7 @@ export const viewLoaderHandler = async (
     };
   }
 
-  invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
+  invarant(Boolean(viewConfigManager), 'viewConfig.... is not defined');
 
   const { data, continueCursor, isDone, allIds } = await getData(
     ctx,

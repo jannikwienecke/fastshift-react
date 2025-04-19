@@ -17,6 +17,8 @@ import {
 } from './query-client';
 import { routeTree } from './routeTree.gen';
 
+import './views';
+
 // syncObservable(store$, {
 //   persist: {
 //     name: 'store-global',
@@ -41,7 +43,12 @@ const router = createRouter({
       const userViewData = getUserViewData(viewName);
 
       return await queryClient.ensureQueryData(
-        preloadQuery(api.query.viewLoader, viewConfig, userViewData, viewId)
+        preloadQuery(
+          api.query.viewLoader,
+          viewConfig,
+          userViewData ?? null,
+          viewId
+        )
       );
     },
   },

@@ -283,4 +283,18 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       }
     }
   });
+
+  store$.userViewSettings.form.type.onChange((changes) => {
+    const formType = changes.value;
+
+    if (formType === 'create') {
+      store$.userViewSettings.viewCreated.set(undefined);
+    }
+  });
+
+  store$.navigation.state.onChange((changes) => {
+    setTimeout(() => {
+      store$.navigation.state.set({ type: 'ready' });
+    }, 10);
+  });
 };

@@ -53,6 +53,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
   // rowInFocus: Row | null;
   items: TItem[];
   onSelect: (item: TItem) => void;
+  onClick: (item: TItem) => void;
   selected: Record<string, any>[];
   onKeyPress: (type: 'up' | 'down') => void;
   grouping: {

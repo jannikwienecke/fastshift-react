@@ -140,6 +140,10 @@ export type LegendStore = {
   relationalDataModel: RelationalDataModel;
   uiViewConfig: UiViewConfig;
 
+  navigation?: {
+    state: { type: 'ready' } | { type: 'navigate'; id?: string; view: string };
+  };
+
   // pagination options
   paginateOptions: PaginationOptions;
 
@@ -204,7 +208,7 @@ export type LegendStore = {
     isDone: boolean,
     viewConfigManager: BaseViewConfigManagerInterface,
     views: RegisteredViews,
-    uiViewConfig: UiViewConfig,
+    uiViewConfig: UiViewConfig | undefined,
     commands: UserStoreCommand[],
     userView: UserViewData | undefined,
     viewId: string | null
@@ -391,6 +395,10 @@ export type LegendStore = {
     hasChanged: boolean;
     open: boolean;
     form?: UserViewForm;
+    viewCreated?: {
+      name: string;
+      slug: string;
+    };
   };
 
   detail?: {

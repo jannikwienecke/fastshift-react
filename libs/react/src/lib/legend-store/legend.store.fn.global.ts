@@ -145,7 +145,7 @@ export const init: StoreFn<'init'> =
 
       store$.views.set(views);
       store$.viewConfigManager.set(viewConfigManager);
-      store$.uiViewConfig.set(uiViewConfig);
+      uiViewConfig && store$.uiViewConfig.set(uiViewConfig);
       store$.filter.filters.set([]);
       store$.commands.set(commands);
 

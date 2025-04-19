@@ -33,8 +33,9 @@ export const configManager = (viewConfig: ViewConfigType) => {
         const value = userValue as any as
           | DisplayOptionsType['grouping']
           | DisplayOptionsType['sorting'];
+
         const field = value?.field.name.toString();
-        const direction = value && 'sorting' in value ? value.sorting : null;
+        const direction = value && 'order' in value ? value.order : null;
 
         return {
           ...acc,

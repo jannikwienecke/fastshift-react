@@ -1,4 +1,11 @@
-import { _log, makeData, RecordType, Row, sortRows } from '@apps-next/core';
+import {
+  _log,
+  getViewByName,
+  makeData,
+  RecordType,
+  Row,
+} from '@apps-next/core';
+import { getTimeValueFromDateString } from '../ui-adapter/filter-adapter';
 import {
   getDefaultRow,
   getFormState,
@@ -7,19 +14,11 @@ import {
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';
-import {
-  dateUtils,
-  defaultOperators,
-  getTimeValueFromDateString,
-  operator,
-  operatorMap,
-  operators,
-} from '../ui-adapter/filter-adapter';
 
 export const commandformOpen: StoreFn<'commandformOpen'> =
   (store$) => (viewName, row) => {
     store$.openSpecificModal('commandform', () => {
-      const view = store$.views[viewName]?.get();
+      const view = getViewByName(store$.views.get(), viewName);
 
       if (!view) return;
 

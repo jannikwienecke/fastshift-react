@@ -272,6 +272,13 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
   return {
     onSelect: (item) => store$.selectListItem(item),
+    onClick: (item) => {
+      store$.navigation.state.set({
+        type: 'navigate',
+        view: store$.viewConfigManager.getViewName(),
+        id: item.id.toString(),
+      });
+    },
     selected,
     items,
     onReachEnd: store$.globalFetchMore,

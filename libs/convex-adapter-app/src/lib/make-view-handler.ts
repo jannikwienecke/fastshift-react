@@ -16,8 +16,12 @@ import { viewMutationHandler } from './view-mutation';
 export const makeViewLoaderHandler =
   (views: RegisteredViews) => (ctx: GenericQueryCtx, args: any) => {
     const viewConfig = getViewByName(views, args.viewName);
+    if (!args.viewName) return null;
 
-    if (!viewConfig) throw new Error('viewConfig is not defined');
+    if (!viewConfig) {
+      console.error('viewConfig is not defined', args.viewName);
+      throw new Error(`viewConfig is not defined: ${args.viewName}`);
+    }
 
     const viewConfigManager = new BaseViewConfigManager(
       patchViewConfig(viewConfig)
@@ -37,7 +41,7 @@ export const makeViewMutationHandler =
   (views: RegisteredViews) => (ctx: any, args: MutationDto) => {
     const viewConfig = getViewByName(views, args.viewName);
 
-    if (!viewConfig) throw new Error('viewConfig is not defined');
+    if (!viewConfig) throw new Error('viewConfig22 is not defined');
 
     const viewConfigManager = new BaseViewConfigManager(
       patchViewConfig(viewConfig)

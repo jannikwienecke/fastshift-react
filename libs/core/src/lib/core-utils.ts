@@ -285,7 +285,7 @@ export const getViewByName = (
   throwError?: boolean
 ) => {
   const viewConfigByViewName = Object.values(views).find(
-    (v) => v?.viewName === name
+    (v) => v?.viewName.toLowerCase() === name.toLowerCase()
   );
 
   if (viewConfigByViewName) return viewConfigByViewName;
@@ -299,6 +299,9 @@ export const getViewByName = (
     throw new Error(`No View For "${name}" found`);
   }
 
+  // if (name === 'tasks') {
+  //   console.log('USE FALLBACK!', { name, views });
+  // }
   return viewConfigByTableName;
 };
 
@@ -610,4 +613,29 @@ export const patchViewConfig = (viewConfig: ViewConfigType) => {
     ...viewConfig,
     viewFields: patechedViewFields,
   } satisfies ViewConfigType;
+};
+
+export const slugHelper = () => {
+  const slugify = (text: string) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/[^\w-]+/g, '') // Remove all non-word chars
+      .replace(/--+/g, '-') // Replace multiple - with single -
+      .replace(/^-+/, '') // Trim - from start of text
+      .replace(/-+$/, ''); // Trim - from end of text
+  };
+
+  const unslugify = (text: string) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/-/g, ' ') // Replace - with spaces
+      .replace(/^\s+|\s+$/g, '') // Trim spaces from start and end of text
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .replace(/^\s+|\s+$/g, ''); // Trim spaces from start and end of text
+  };
+
+  return { slugify, unslugify };
 };

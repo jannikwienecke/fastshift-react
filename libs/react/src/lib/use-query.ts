@@ -1,5 +1,6 @@
 import {
   DEFAULT_FETCH_LIMIT_QUERY,
+  getViewByName,
   makeQueryKey,
   QueryDto,
   QueryProps,
@@ -48,8 +49,10 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
 
   const result = useTanstackQuery({
     ...queryOptions,
-    // @ts-expect-error ---
-    enabled: args.paginateOptions?.isDone
+    enabled: !args.viewConfig
+      ? false
+      : // @ts-expect-error ---
+      args.paginateOptions?.isDone
       ? false
       : args.disabled === true
       ? false
@@ -86,6 +89,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
 
   const view = store$.commandform.view.get();
 
+  console.log();
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
     useStableQuery(prisma, {
       registeredViews: queryProps?.registeredViews ?? registeredViews,
@@ -93,10 +97,14 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
       modelConfig:
         queryProps?.viewConfigManager?.modelConfig ||
         viewConfigManager.modelConfig,
-      viewConfig:
-        registeredViews[
-          view?.viewName ?? viewConfigManager.viewConfig.viewName
-        ],
+      viewConfig: getViewByName(
+        registeredViews,
+        view?.viewName ?? viewConfigManager.viewConfig.viewName ?? ''
+      ),
+
+      // registeredViews[
+      //   view?.viewName ?? viewConfigManager.viewConfig.viewName
+      // ],
       displayOptions: '',
       paginateOptions: undefined,
       disabled: view?.viewName ? false : true,

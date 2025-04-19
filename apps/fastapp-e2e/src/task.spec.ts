@@ -367,7 +367,7 @@ test.describe('Task management', () => {
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
-    await firstListItem.locator('div').first().click({ force: true });
+    await firstListItem.locator('div').first();
     await expect(firstListItem.getByText(/website redesign/i)).toBeVisible();
     await expect(firstListItem.getByText(/important/i)).toBeHidden();
 

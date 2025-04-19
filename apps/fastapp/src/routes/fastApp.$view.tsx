@@ -1,110 +1,70 @@
-import { config, tasksConfig, views } from '@apps-next/convex';
-import { UserViewForm } from '@apps-next/core';
-import { ClientViewProviderConvex, makeHooks, store$ } from '@apps-next/react';
-import { InputDialog } from '@apps-next/ui';
+import { config, views } from '@apps-next/convex';
+import { _log } from '@apps-next/core';
+import { ClientViewProviderConvex } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
-import {
-  createFileRoute,
-  Outlet,
-  useLocation,
-  useMatches,
-  useParams,
-  useRouter,
-} from '@tanstack/react-router';
-import React from 'react';
-import { useCommands } from '../hooks/app.commands';
-import { getQueryKey, getUserViewData } from '../query-client';
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { getViewData } from '../application-store/app.store.utils';
+import { getQueryKey, getUserViewQuery, queryClient } from '../query-client';
+import { useViewParams } from '../shared/hooks';
+import { useCommands } from '../shared/hooks/app.commands';
+import { useAppEffects } from '../shared/hooks/app.effects';
+import { getViewParms } from '../shared/utils/app.helper';
 import { DefaultViewTemplate } from '../views/default-view-template';
-import { TaskViewDataType } from '../views/tasks.components';
-import { uiViewConfig } from '../views/tasks.config';
-
-const Task = observer(() => {
-  const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
-
-  return (
-    <DefaultViewTemplate<TaskViewDataType>
-      listOptions={{
-        fieldsLeft: ['name', 'projects', 'dueDate'],
-        fieldsRight: ['tags', 'completed', 'priority', 'todos'],
-      }}
-      filterOptions={{
-        hideFields: [],
-      }}
-      displayOptions={{
-        displayFieldsToShow: [
-          'name',
-          'completed',
-          'description',
-          'name',
-          'priority',
-          'projects',
-          'tags',
-        ],
-      }}
-      RenderInputDialog={observer(() => (
-        <InputDialog.Default {...makeInputDialogProps({})} />
-      ))}
-    />
-  );
-});
+import React from 'react';
 
 export const Route = createFileRoute('/fastApp/$view')({
   loader: async (props) => {
-    return props.context.preloadQuery(
-      tasksConfig,
-      props.params.view,
-      null
-      // (props.params as { id?: string } | undefined)?.id || null
-    );
+    const { viewName, slug } = getViewParms(props.params);
+    _log.debug(`Loader for view: ${viewName} - slug: ${slug}`);
+
+    await queryClient.ensureQueryData(getUserViewQuery(viewName));
+    const { viewData } = getViewData(viewName);
+
+    if (!viewData) {
+      _log.warn(`View ${viewName} not found, redirecting to /fastApp`);
+      return redirect({ to: '/fastApp' });
+    }
+
+    return props.context.preloadQuery(viewData.viewConfig, viewName, null);
   },
 
-  component: () => <TaskComponent />,
+  component: () => <ViewMainComponent />,
 });
 
-const TaskComponent = observer(() => {
+const ViewMainComponent = observer(() => {
+  _log.debug('Render ViewMainComponent');
+
+  const { viewName, id } = useViewParams();
+
+  const { viewData, userViewData } = getViewData(viewName);
+
+  const ViewComponent = viewData.main;
+  const activeViewConfig = viewData.viewConfig;
+  const activeViewUiConfig = viewData.uiViewConfig;
+
+  useAppEffects(viewName);
+
   const { commands } = useCommands();
-  const { view } = useParams({ from: '/fastApp/$view' });
-  const { id } = useParams({ strict: false });
 
-  const router = useRouter();
-
-  const userViewData = getUserViewData(view);
-
-  const navigateRef = React.useRef(router.navigate);
   React.useEffect(() => {
-    store$.userViewSettings.form.onChange((v) => {
-      const change = v.changes?.[0];
-      if (change.prevAtPath && !change.valueAtPath) {
-        const prevAtPath = change.prevAtPath;
-        const viewName = (prevAtPath as UserViewForm).viewName;
-        navigateRef.current({ to: `/fastApp/${viewName}` });
-      }
-    });
+    console.log('RENDER!!');
+  }, []);
 
-    // store$.contextMenuState.row.onChange((changes) => {
-    //   const row = changes.value;
-    //   const prev = changes.changes?.[0].prevAtPath;
-    //   if (!row || prev) return;
-    //   router.navigate({
-    //     to: `${row.id}`,
-    //   });
-    // });
-  }, [router.navigate]);
-
-  // () => router.preloadRoute({"to": `/fastApp/${view}${id}` });
-
+  if (!viewData) return null;
   return (
+    // render in upper level ->
+    // expose a update function -> this
     <ClientViewProviderConvex
       commands={commands}
       views={views}
-      viewConfig={tasksConfig}
+      viewConfig={activeViewConfig}
       globalConfig={config.config}
-      uiViewConfig={uiViewConfig}
-      queryKey={getQueryKey(tasksConfig, view, null)}
+      uiViewConfig={activeViewUiConfig}
+      queryKey={getQueryKey(activeViewConfig, viewName, null)}
       userViewData={userViewData}
       viewId={id || null}
     >
-      <Task />
+      {ViewComponent ? <ViewComponent /> : <DefaultViewTemplate />}
       <Outlet />
     </ClientViewProviderConvex>
   );

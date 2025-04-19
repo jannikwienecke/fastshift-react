@@ -4,6 +4,7 @@ import {
   FilterType,
   RecordType,
   SaveViewDropdownProps,
+  slugHelper,
 } from '@apps-next/core';
 import { store$ } from '../legend-store';
 import { getParsedViewSettings } from '../legend-store/legend.utils.helper';
@@ -53,6 +54,10 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
               store$.userViewSettings.form.set(undefined);
               store$.userViewSettings.open.set(false);
               store$.userViewSettings.hasChanged.set(false);
+              store$.userViewSettings.viewCreated.set({
+                name: form.viewName,
+                slug: slugHelper().slugify(form.viewName),
+              });
 
               const displayOptions = store$.displayOptions.get();
               const filters = store$.filter.filters.get();

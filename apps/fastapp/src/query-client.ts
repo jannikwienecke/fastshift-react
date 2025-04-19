@@ -23,7 +23,7 @@ export const getUserViewQuery = (viewName: string) => {
 export const getUserViewData = (viewName: string) => {
   const userViewData = queryClient.getQueryData(
     getUserViewQuery(viewName).queryKey
-  ) as UserViewData;
+  ) as UserViewData | undefined;
 
   return userViewData;
 };
@@ -34,8 +34,12 @@ export const getQueryKey = (
   viewId: string | null
 ) => {
   const userViewData = getUserViewData(viewName);
-  return preloadQuery(api.query.viewLoader, viewConfig, userViewData, viewId)
-    .queryKey;
+  return preloadQuery(
+    api.query.viewLoader,
+    viewConfig,
+    userViewData ?? null,
+    viewId
+  ).queryKey;
 };
 
 export const queryClient = new QueryClient({

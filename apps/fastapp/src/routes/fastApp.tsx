@@ -57,7 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const links = [
     {
       label: t('navigation.projects'),
-      href: '/fastApp/projects',
+      href: '/fastApp/my-projects',
       icon: (
         <DotIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
@@ -71,7 +71,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     },
     {
       label: t('navigation.settings'),
-      href: '#',
+      href: '/fastApp/owner',
       icon: (
         <MixIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),

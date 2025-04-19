@@ -28,18 +28,27 @@ export type QueryProviderConvexProps = {
   globalConfig: BaseConfigInterface;
   views: RegisteredViews;
   commands: UserStoreCommand[];
-  userViewData: UserViewData;
+  userViewData?: UserViewData;
   queryKey: any[];
 } & { children: React.ReactNode };
 
 type QueryProviderPropsWithViewFieldsConfig = QueryProviderConvexProps & {
-  uiViewConfig: UiViewConfig;
+  uiViewConfig?: UiViewConfig;
   viewId: string | null;
 };
 
 export const ClientViewProviderConvex = (
   props: QueryProviderPropsWithViewFieldsConfig
 ) => {
+  const runRef = React.useRef('');
+
+  React.useLayoutEffect(() => {
+    if (runRef.current === props.viewConfig.viewName) return;
+    runRef.current = props.viewConfig.viewName;
+    console.log('Render ClientViewProviderConvex', props.viewConfig.viewName);
+    store$.detail.set(undefined);
+  }, [props.viewConfig.viewName]);
+
   const patechedViewFields = patchDict(props.viewConfig.viewFields, (f) => {
     const userFieldConfig = props.viewConfig.fields?.[f.name];
     const displayFIeld = props.viewConfig.displayField.field;
@@ -114,7 +123,7 @@ export const ClientViewProviderConvex = (
 
   React.useLayoutEffect(() => {
     setIsInitialized(true);
-    if (data && props.uiViewConfig && viewConfigManager && views) {
+    if (data && viewConfigManager && views) {
       store$.init(
         data?.data ?? [],
         data?.relationalData ?? {},

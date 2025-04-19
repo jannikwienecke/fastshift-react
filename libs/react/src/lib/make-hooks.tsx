@@ -19,7 +19,7 @@ export const makeHooks = <T extends DataType | ViewConfigType>(
 ) => {
   return {
     useQuery: useQuery<DataTypeToUse<T>[]>,
-    useQueryData: useQueryData<DataTypeToUse<T>[]>,
+    useQueryData: useQueryData<DataTypeToUse<T>>,
     makeFilterProps: makeFilterProps<DataTypeToUse<T>>,
     makeDisplayOptionsProps: makeDisplayOptionsProps<DataTypeToUse<T>>,
     makeInputDialogProps: makeInputDialogProps<DataTypeToUse<T>>,

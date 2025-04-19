@@ -3,6 +3,7 @@ import {
   FieldConfig,
   MutationHandlerReturnType,
   MutationPropsServer,
+  slugHelper,
 } from '@apps-next/core';
 import { mutationClient, queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
@@ -252,6 +253,7 @@ export const userViewMutation = async (
         baseView: viewConfigManager.getViewName(),
         displayOptions,
         filters,
+        slug: slugHelper().slugify(name),
       });
     } catch (error) {
       return {

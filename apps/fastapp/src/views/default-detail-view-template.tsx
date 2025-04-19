@@ -1,5 +1,9 @@
 import { FormFieldProps, MakeDetailPropsOption } from '@apps-next/core';
-import { makeHooks } from '@apps-next/react';
+import {
+  FormField,
+  makeHooks,
+  RenderDetailComplexValue,
+} from '@apps-next/react';
 import { detailPage } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
 
@@ -9,8 +13,8 @@ export const DefaultDetailViewTemplate = observer(
     ...templateProps
   }: {
     detailOptions: MakeDetailPropsOption;
-    formField: React.FC<FormFieldProps>;
-    complexFormField: React.FC<FormFieldProps>;
+    formField?: React.FC<FormFieldProps>;
+    complexFormField?: React.FC<FormFieldProps>;
   }) => {
     const { makeDetailPageProps } = makeHooks();
     const props = makeDetailPageProps(detailOptions);
@@ -28,17 +32,19 @@ export const DefaultDetailViewTemplate = observer(
 
             <detailPage.formFields
               {...props}
-              FormField={templateProps.formField}
+              FormField={templateProps.formField ?? FormField}
             />
           </div>
         </div>
 
-        <div className="w-96 border-t pl-8 pr-4 ">
+        <div className="w-80 border-t pl-8 pr-4 ">
           <detailPage.propertiesHeader {...props} />
 
           <detailPage.propertiesList
             {...props}
-            ComplexFormField={templateProps.complexFormField}
+            ComplexFormField={
+              templateProps.complexFormField ?? RenderDetailComplexValue
+            }
           />
         </div>
       </div>

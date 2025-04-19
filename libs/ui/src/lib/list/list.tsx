@@ -18,6 +18,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   onContextMenu,
   grouping,
   onKeyPress,
+  onClick,
 }: ListProps<TItem>) {
   const { t } = useTranslation();
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -58,6 +59,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
               key={item.id}
               className=""
               item={item}
+              onClick={() => onClick(item)}
             >
               <div className="flex gap-1 pr-2">
                 <List.Control />
@@ -234,6 +236,7 @@ function Item(
     <ItemProvider value={{ item }}>
       <li
         onMouseEnter={item.onHover}
+        onClick={props.onClick}
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();

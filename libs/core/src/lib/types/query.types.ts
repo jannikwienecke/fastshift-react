@@ -55,6 +55,7 @@ export type ContinueCursor = {
 };
 
 export type UserViewData = {
+  baseView: string;
   displayOptions: string | null;
   filters: string | null;
   name: string;

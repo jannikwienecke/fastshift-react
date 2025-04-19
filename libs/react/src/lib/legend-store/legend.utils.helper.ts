@@ -1,12 +1,11 @@
 import {
   convertDisplayOptionsForBackend,
   convertFiltersForBackend,
-  DisplayOptionsType,
   Row,
 } from '@apps-next/core';
-import { store$ } from './legend.store';
-import { applyFilter } from './legend.local.filtering';
 import { applyDisplayOptions } from './legend.local.display-options';
+import { applyFilter } from './legend.local.filtering';
+import { store$ } from './legend.store';
 
 export const filterRowsByShowDeleted = (rows: Row[]) => {
   const showDeleted = store$.displayOptions.showDeleted.get();
@@ -14,7 +13,9 @@ export const filterRowsByShowDeleted = (rows: Row[]) => {
     store$.viewConfigManager.getSoftDeleteIndexField()?.field;
 
   const filtered = rows.filter((row) => {
-    const value = row.getValue(softDeleteField ?? '');
+    if (showDeleted) return true;
+
+    const value = softDeleteField && row.getValue(softDeleteField ?? '');
     return showDeleted ? true : value !== true;
   });
 

@@ -67,9 +67,9 @@ export const RenderFilter = observer(
 );
 
 export const RenderDisplayOptions = observer(
-  ({ options }: { options: MakeDisplayOptionsPropsOptions }) => {
+  (options?: { options?: MakeDisplayOptionsPropsOptions }) => {
     const { makeDisplayOptionsProps } = makeHooks<TaskViewDataType>();
-    const props = makeDisplayOptionsProps(options);
+    const props = makeDisplayOptionsProps(options?.options);
 
     return <DisplayOptions.Default {...props} />;
   }
