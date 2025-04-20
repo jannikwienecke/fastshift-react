@@ -48,7 +48,7 @@ export const userViewData = server.query({
     const viewName = args.viewName as string;
     const view = await ctx.db
       .query('views')
-      .withIndex('name', (q) => q.eq('name', viewName))
+      .withIndex('name', (q) => q.eq('name', viewName.toLowerCase()))
       .first();
 
     _log.debug('userViewData', { view });

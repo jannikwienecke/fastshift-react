@@ -129,6 +129,9 @@ export const init: StoreFn<'init'> =
     viewId
   ) => {
     batch(() => {
+      store$.userViewSettings.initialSettings.set(null);
+      store$.userViewSettings.hasChanged.set(false);
+
       store$.fetchMore.assign({
         isDone,
         currentCursor: {

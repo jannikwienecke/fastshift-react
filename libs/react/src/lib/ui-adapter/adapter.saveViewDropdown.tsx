@@ -110,6 +110,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
           payload: {
             type: 'UPDATE_VIEW',
             description: form?.viewDescription ?? null,
+
             name:
               store$.userViewData.get()?.name ??
               store$.viewConfigManager.getViewName(),

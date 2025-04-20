@@ -113,6 +113,8 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
           : true,
       viewId: null,
       onlyRelationalData: true,
+      parentViewName: null,
+      parentId: null,
     });
 
   return {

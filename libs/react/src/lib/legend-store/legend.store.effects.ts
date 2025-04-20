@@ -82,7 +82,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   // }).onChange(() => null);
 
   store$.filter.filters.onChange((changes) => {
-    console.log(changes);
     const filters = changes.value;
 
     _log.debug('handleFilterChange: ', filters);
@@ -118,7 +117,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         showDeleted
       );
     }
-    console.log('handleDisplayOptionsChange: ', changes);
 
     store$.state.set('updating-display-options');
 
@@ -194,6 +192,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const initialShowDeleted = initial?.showDeleted;
     const initialSelectedViewFields = initial?.viewField.hidden;
 
+    if (!initial) return;
+
     const anythingChanged = () => {
       let changed = false;
 
@@ -253,6 +253,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       return changed;
     };
 
+    console.log('any changes', anythingChanged());
+
     store$.userViewSettings.hasChanged.set(anythingChanged());
   });
 
@@ -265,6 +267,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const filtersChanged =
       JSON.stringify(initial) !== JSON.stringify(currentFilters);
 
+    console.log('filtersChanged', filtersChanged);
     store$.userViewSettings.hasChanged.set(filtersChanged);
   });
 
@@ -308,10 +311,5 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     setTimeout(() => {
       store$.navigation.state.set({ type: 'ready' });
     }, 10);
-  });
-
-  console.log('ADD EFFECT!!!!');
-  store$.detail.form.onChange((changes) => {
-    console.log('detail form changes', changes.value);
   });
 };

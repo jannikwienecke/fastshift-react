@@ -321,7 +321,10 @@ export const optimisticUpdateStore = ({
 
   record = patchRecord(record, store$);
 
-  const originalRows = [...store$.dataModelBackup.rows.get()];
+  const originalRows = [...store$.dataModelBackup.rows.get()].map((r) =>
+    copyRow(r)
+  );
+
   // Merge updated row data
   const updatedRowData = {
     ...row.raw,

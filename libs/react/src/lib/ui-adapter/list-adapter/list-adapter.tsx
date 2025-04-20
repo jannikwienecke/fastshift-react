@@ -96,7 +96,7 @@ const renderFields = <T extends RecordType>(
 
         return shouldDisplay;
       })
-      .map((fieldName) => {
+      .map((fieldName, index) => {
         let item;
         let label;
         let id;
@@ -109,6 +109,14 @@ const renderFields = <T extends RecordType>(
           field = item.field;
           field = item.field;
         } catch (error) {
+          if (index === 0) {
+            console.log('[-------fieldName---------]');
+            console.log(fieldName);
+            console.log(row);
+            console.log(viewConfigManager.viewConfig.viewName);
+            console.log('----');
+          }
+
           _log.error(
             `Error getting field ${fieldName.toString()} from row ${
               row.id
@@ -236,6 +244,23 @@ export const makeListProps = <T extends RecordType = RecordType>(
           ? 'hover'
           : 'none';
 
+      let valuesLeft: ListProps['items'][0]['valuesLeft'] = [];
+      let valuesRight: ListProps['items'][0]['valuesRight'] = [];
+
+      try {
+        valuesLeft = _renderLabel
+          ? renderLabel(item)
+          : renderFields(item, fieldsLeft);
+        valuesRight = renderFields(
+          item,
+          fieldsRight
+          // dataModel.rows?.[0] as Row<T>,
+          // fieldsRight
+        );
+      } catch (error) {
+        // _log.error(
+      }
+
       return {
         ...item.raw,
         deleted: viewConfigManager.viewConfig.mutation?.softDeleteField
@@ -245,10 +270,8 @@ export const makeListProps = <T extends RecordType = RecordType>(
           : false,
         id: item.id,
         icon: Icon,
-        valuesLeft: _renderLabel
-          ? renderLabel(item)
-          : renderFields(item, fieldsLeft),
-        valuesRight: renderFields(item, fieldsRight),
+        valuesLeft,
+        valuesRight,
         inFocus: isInFocus,
 
         focusType,

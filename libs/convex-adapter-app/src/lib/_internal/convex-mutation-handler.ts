@@ -309,6 +309,7 @@ export const userViewMutation = async (
           displayOptions,
           filters,
           name: baseView,
+          slug: slugHelper().slugify(name),
           description: description ?? '',
         });
         return {

@@ -30,7 +30,8 @@ export const Route = createFileRoute('/fastApp/$view')({
       return redirect({ to: '/fastApp' });
     }
 
-    if (props.cause === 'enter') {
+    if (props.cause === 'enter' && store$.state.get() === 'pending') {
+      console.log('ENTER!!!!!!');
       const viewConfigManager = new BaseViewConfigManager(
         {
           ...viewData.viewConfig,
