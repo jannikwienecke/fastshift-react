@@ -37,7 +37,13 @@ const router = createRouter({
 
   context: {
     queryClient,
-    preloadQuery: async (viewConfig, viewName, viewId) => {
+    preloadQuery: async (
+      viewConfig,
+      viewName,
+      viewId,
+      parentViewName,
+      parentId
+    ) => {
       await queryClient.ensureQueryData(getUserViewQuery(viewName));
 
       const userViewData = getUserViewData(viewName);
@@ -47,7 +53,9 @@ const router = createRouter({
           api.query.viewLoader,
           viewConfig,
           userViewData ?? null,
-          viewId
+          viewId ?? null,
+          parentViewName ?? null,
+          parentId ?? null
         )
       );
     },

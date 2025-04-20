@@ -95,7 +95,6 @@ export const RenderInputDialog = observer(
 export const RenderList = observer(
   (props: { options?: MakeListPropsOptions }) => {
     const { makeListProps } = makeHooks<TaskViewDataType>();
-    _log.debug('Render List');
 
     return (
       <Memo>

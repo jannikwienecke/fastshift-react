@@ -1,36 +1,39 @@
 import { DetailPageProps, MakeDetailPropsOption } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { detailFormHelper } from './legend.detailpage.helper';
-import {
-  getComplexFormFields,
-  getErrorListFromFormState,
-  getFormState,
-} from './legend.form.helper';
-import { store$ } from './legend.store';
-import { copyRow } from './legend.utils';
 import { selectState$, xSelect } from './legend.select-state';
+import { store$ } from './legend.store';
 
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
-detailPageProps$.onChange((changes) => {
-  const props = changes.value;
-  if (!props.row) return;
+// detailPageProps$.onChange((changes) => {
+//   const props = changes.value;
+//   console.log(changes);
 
-  store$.detail.row.set(copyRow(props.row));
-  store$.detail.form.set({});
-});
+//   if (!props.row) return;
+
+//   const viewConfigManager =
+//     store$.detail.viewConfigManager.get() as BaseViewConfigManagerInterface;
+
+//   if (!viewConfigManager.viewConfig) return;
+
+//   store$.detail.row.set(copyRow(props.row, viewConfigManager));
+//   store$.detail.form.set({});
+// });
 
 export const derviedDetailPage$ = observable(() => {
+  if (!store$.detail.row.get()) return {} as DetailPageProps;
+
   const helper = detailFormHelper();
 
   return {
-    ...(store$.commandform.get() ?? {}),
-
     row: helper.row,
     icon: helper.view.icon,
     formState: helper.formState,
     primitiveFields: helper.getPrimitiveFormFields(),
     complexFields: helper.getComplexFormFields(),
+    // complexFields: [],
+    // primitiveFields: [],
     displayField: helper.displayField,
     type: store$.commandform.type.get() ?? 'create',
     viewName: store$.userViewData.name.get() ?? helper.view.viewName,
@@ -54,5 +57,13 @@ export const derviedDetailPage$ = observable(() => {
     onSubmit: () => store$.commandformSubmit(),
 
     onEnter: (field) => store$.detailpageEnter(field),
+    onSelectView: (options) => {
+      console.log(options);
+      store$.navigation.state.set({
+        type: 'switch-detail-view',
+        model: options.model,
+        viewType: options.type,
+      });
+    },
   } satisfies Omit<DetailPageProps, 'render'>;
 });

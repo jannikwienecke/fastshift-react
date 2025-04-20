@@ -27,6 +27,7 @@ import {
   UserViewData,
   UserViewForm,
   ViewConfigType,
+  DetailRow,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { PaginationOptions } from 'convex/server';
@@ -125,6 +126,7 @@ export type FetchMoreOptions = {
 export type LegendStore = {
   handleIncomingData: (props: QueryReturnOrUndefined) => void;
   handleIncomingRelationalData: (props: QueryReturnOrUndefined) => void;
+  handleIncomingDetailData: (props: QueryReturnOrUndefined) => void;
 
   state:
     | 'pending'
@@ -141,7 +143,14 @@ export type LegendStore = {
   uiViewConfig: UiViewConfig;
 
   navigation?: {
-    state: { type: 'ready' } | { type: 'navigate'; id?: string; view: string };
+    state:
+      | { type: 'ready' }
+      | { type: 'navigate'; id?: string; view: string }
+      | {
+          type: 'switch-detail-view';
+          viewType: 'overview' | 'model';
+          model: string | null;
+        };
   };
 
   // pagination options
@@ -402,13 +411,20 @@ export type LegendStore = {
   };
 
   detail?: {
+    viewConfigManager: BaseViewConfigManagerInterface;
     row: Row;
+    detailRow?: DetailRow;
     selectedField?: FieldConfig;
     rect?: DOMRect;
     form: {
       dirtyField?: FieldConfig;
       dirtyValue?: string | number;
       // error?: string;
+    };
+    parentViewName: string;
+    view?: {
+      type: 'overview' | 'list';
+      selectedRelation?: string;
     };
   };
 

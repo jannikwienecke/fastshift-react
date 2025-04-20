@@ -58,8 +58,13 @@ export const FilterValue = (props: {
   }
 
   const translated = t(name as any);
-  const toDisplay = translated === name ? fallback : translated;
+  const toDisplay = translated.includes('returned an object instead of st')
+    ? fallback
+    : translated === name
+    ? fallback
+    : translated;
 
+  console.log({ toDisplay, translated, name });
   return (
     <div className="flex flex-row gap-2 items-center">
       <span>{Icon && <Icon className="w-4 h-4" />}</span>

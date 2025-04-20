@@ -17,6 +17,8 @@ import { Route as DisplayOptionsImport } from './routes/display-options'
 import { Route as IndexImport } from './routes/index'
 import { Route as FastAppViewImport } from './routes/fastApp.$view'
 import { Route as FastAppViewIdImport } from './routes/fastApp.$view.$id'
+import { Route as FastAppViewIdOverviewImport } from './routes/fastApp.$view.$id.overview'
+import { Route as FastAppViewIdModelImport } from './routes/fastApp.$view.$id.$model'
 
 // Create/Update Routes
 
@@ -48,6 +50,16 @@ const FastAppViewRoute = FastAppViewImport.update({
 const FastAppViewIdRoute = FastAppViewIdImport.update({
   path: '/$id',
   getParentRoute: () => FastAppViewRoute,
+} as any)
+
+const FastAppViewIdOverviewRoute = FastAppViewIdOverviewImport.update({
+  path: '/overview',
+  getParentRoute: () => FastAppViewIdRoute,
+} as any)
+
+const FastAppViewIdModelRoute = FastAppViewIdModelImport.update({
+  path: '/$model',
+  getParentRoute: () => FastAppViewIdRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -96,6 +108,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FastAppViewIdImport
       parentRoute: typeof FastAppViewImport
     }
+    '/fastApp/$view/$id/$model': {
+      id: '/fastApp/$view/$id/$model'
+      path: '/$model'
+      fullPath: '/fastApp/$view/$id/$model'
+      preLoaderRoute: typeof FastAppViewIdModelImport
+      parentRoute: typeof FastAppViewIdImport
+    }
+    '/fastApp/$view/$id/overview': {
+      id: '/fastApp/$view/$id/overview'
+      path: '/overview'
+      fullPath: '/fastApp/$view/$id/overview'
+      preLoaderRoute: typeof FastAppViewIdOverviewImport
+      parentRoute: typeof FastAppViewIdImport
+    }
   }
 }
 
@@ -105,7 +131,12 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   DisplayOptionsRoute,
   FastAppRoute: FastAppRoute.addChildren({
-    FastAppViewRoute: FastAppViewRoute.addChildren({ FastAppViewIdRoute }),
+    FastAppViewRoute: FastAppViewRoute.addChildren({
+      FastAppViewIdRoute: FastAppViewIdRoute.addChildren({
+        FastAppViewIdModelRoute,
+        FastAppViewIdOverviewRoute,
+      }),
+    }),
   }),
   KanbanRoute,
 })
@@ -148,7 +179,19 @@ export const routeTree = rootRoute.addChildren({
     },
     "/fastApp/$view/$id": {
       "filePath": "fastApp.$view.$id.tsx",
-      "parent": "/fastApp/$view"
+      "parent": "/fastApp/$view",
+      "children": [
+        "/fastApp/$view/$id/$model",
+        "/fastApp/$view/$id/overview"
+      ]
+    },
+    "/fastApp/$view/$id/$model": {
+      "filePath": "fastApp.$view.$id.$model.tsx",
+      "parent": "/fastApp/$view/$id"
+    },
+    "/fastApp/$view/$id/overview": {
+      "filePath": "fastApp.$view.$id.overview.tsx",
+      "parent": "/fastApp/$view/$id"
     }
   }
 }

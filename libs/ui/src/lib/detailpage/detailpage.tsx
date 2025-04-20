@@ -7,6 +7,7 @@ import {
   ShareIcon,
 } from 'lucide-react';
 import { Checkbox } from '../components/checkbox';
+import { Button } from '../components';
 
 const DetailPageHeader = (props: DetailPageProps) => {
   return (
@@ -21,6 +22,39 @@ const DetailPageHeader = (props: DetailPageProps) => {
         </div>
         <DotsHorizontalIcon />
         <StarIcon className="h-4" />
+
+        <div>
+          <Button
+            onClick={() =>
+              props.onSelectView({ model: null, type: 'overview' })
+            }
+            variant={'outline'}
+            className=""
+            size="sm"
+          >
+            Overview
+          </Button>
+
+          <Button
+            onClick={() =>
+              props.onSelectView({ model: 'tasks', type: 'model' })
+            }
+            variant={'ghost'}
+            className=""
+            size="sm"
+          >
+            Tasks
+          </Button>
+
+          <Button
+            onClick={() => props.onSelectView({ model: 'tags', type: 'model' })}
+            variant={'ghost'}
+            className=""
+            size="sm"
+          >
+            Tags
+          </Button>
+        </div>
       </div>
     </>
   );

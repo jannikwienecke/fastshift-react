@@ -64,7 +64,9 @@ const makeQuery = (
   viewLoader: ViewLoader,
   viewConfig: ViewConfigType,
   userViewData: UserViewData | null,
-  viewId: string | null
+  viewId: string | null,
+  parentViewName: string | null,
+  parentId: string | null
 ) => {
   const mergedConfig = configManager(viewConfig).mergeAndCreate(
     userViewData ?? undefined
@@ -78,6 +80,8 @@ const makeQuery = (
       mergedConfig.dispplayOptions
     ),
     viewId: viewId ?? null,
+    parentId: parentId ?? null,
+    parentViewName: parentViewName ?? null,
     paginateOptions: {
       cursor: { position: null, cursor: null },
       numItems: DEFAULT_FETCH_LIMIT_QUERY,
@@ -89,8 +93,19 @@ export const preloadQuery = (
   viewLoader: ConvexContext['viewLoader'],
   viewConfig: ViewConfigType,
   userViewData: UserViewData | null,
-  viewId: string | null = null
-) => makeQuery(viewLoader, viewConfig, userViewData, viewId);
+  viewId: string | null = null,
+  parentViewName: string | null = null,
+  parentId: string | null = null
+) => {
+  return makeQuery(
+    viewLoader,
+    viewConfig,
+    userViewData,
+    viewId,
+    parentViewName,
+    parentId
+  );
+};
 
 export type ConvexContext = {
   viewLoader: ViewLoader;
@@ -99,5 +114,7 @@ export type ConvexContext = {
 export type ConvexPreloadQuery = (
   viewConfig: ViewConfigType,
   viewName: string,
-  viewId: string | null
+  viewId: string | null,
+  parentViewName: string | null,
+  parentId: string | null
 ) => void;

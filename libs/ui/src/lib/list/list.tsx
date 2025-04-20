@@ -27,6 +27,9 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries?.[0]?.isIntersecting) {
+          // console.info(
+          //   'Observer triggered - loading more items - not implemented right now'
+          // );
           onReachEnd?.();
         }
       },

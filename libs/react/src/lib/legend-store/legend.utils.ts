@@ -1,11 +1,14 @@
-import { makeData, Row } from '@apps-next/core';
-import { store$ } from './legend.store';
+import { BaseViewConfigManagerInterface, makeData, Row } from '@apps-next/core';
 import { observable } from '@legendapp/state';
+import { store$ } from './legend.store';
 
-export const copyRow = (row: Row): Row => {
+export const copyRow = (
+  row: Row,
+  viewConfigManager?: BaseViewConfigManagerInterface
+): Row => {
   return makeData(
     store$.views.get(),
-    store$.viewConfigManager.getViewName()
+    viewConfigManager?.getViewName() ?? store$.viewConfigManager.getViewName()
   )([{ ...row.raw }]).rows?.[0] as Row;
 };
 
@@ -26,3 +29,14 @@ export const _hasOpenDialog$ = observable(() => {
 });
 
 export const hasOpenDialog$ = observable(false);
+
+export const getViewConfigManager = (): BaseViewConfigManagerInterface => {
+  const viewConfigDetail = store$.detail.viewConfigManager.get();
+  const detailForm = store$.detail.form.dirtyValue.get();
+
+  if (!detailForm || !viewConfigDetail) {
+    return store$.viewConfigManager.get();
+  }
+
+  return viewConfigDetail as BaseViewConfigManagerInterface;
+};

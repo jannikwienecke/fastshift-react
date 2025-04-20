@@ -1,20 +1,20 @@
 import {
   DataModelNew,
-  MakeListPropsOptions,
+  FieldConfig,
   ListItem,
   ListProps,
+  MakeListPropsOptions,
   RecordType,
   Row,
-  makeRowFromValue,
-  FieldConfig,
   _log,
+  makeRowFromValue,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
+import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
 import { store$ } from '../../legend-store/legend.store.js';
+import { copyRow, hasOpenDialog$ } from '../../legend-store/legend.utils.js';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
-import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
-import { copyRow, hasOpenDialog$ } from '../../legend-store/legend.utils.js';
 
 export const listItems$ = observable<ListProps['items']>([]);
 
@@ -71,30 +71,99 @@ focusedRow$.onChange((state) => {
   }
 });
 
+const listGrouping: ListProps['grouping'] = {
+  groupByTableName: '',
+  groupByField: '',
+  groupLabel: '',
+  groups: [],
+};
+
+const renderFields = <T extends RecordType>(
+  row: Row<T>,
+  fields: (keyof T)[]
+): ListProps['items'][0]['valuesLeft'] => {
+  const viewConfigManager = store$.viewConfigManager.get();
+
+  return (
+    fields
+      ?.filter((fieldName) => {
+        const viewFieldDisplayOptions = store$.displayOptions.viewField.get();
+
+        const fields = viewFieldDisplayOptions.hidden
+          ? viewFieldDisplayOptions.hidden
+          : viewFieldDisplayOptions.allFields;
+        const shouldDisplay = fields?.includes(fieldName.toString());
+
+        return shouldDisplay;
+      })
+      .map((fieldName) => {
+        let item;
+        let label;
+        let id;
+        let field;
+
+        try {
+          item = row.getField(fieldName);
+          label = item.label;
+          id = item.id;
+          field = item.field;
+          field = item.field;
+        } catch (error) {
+          _log.error(
+            `Error getting field ${fieldName.toString()} from row ${
+              row.id
+            }: ${error}`
+          );
+          _log.error(row);
+
+          throw new Error(
+            `Field ${fieldName.toString()} not found in row ${
+              row.id
+            } of view ${viewConfigManager.getViewName()}`
+          );
+        }
+
+        return {
+          id,
+          label,
+          relation: field.relation && {
+            ...field.relation,
+          },
+          render: () => {
+            return <ListFieldValue field={field} row={row} />;
+          },
+        };
+      }) ?? []
+  );
+};
+
+const renderLabel = <T extends RecordType>(item: Row<T>) => {
+  return [
+    {
+      id: item.id,
+      label: item.label,
+      render: () => <>{item.label}</>,
+    },
+  ];
+};
+
 export const makeListProps = <T extends RecordType = RecordType>(
   options?: MakeListPropsOptions<T>
 ): ListProps<T & ListItem> => {
   const viewConfigManager = store$.viewConfigManager.get();
+
   const selected = store$.list.selected.get();
 
-  const { list } = viewConfigManager?.viewConfig?.ui || {};
-  const fieldsLeft = options?.fieldsLeft ?? list?.fieldsLeft ?? [];
-  const fieldsRight = options?.fieldsRight ?? list?.fieldsRight ?? [];
+  const fieldsLeft = options?.fieldsLeft ?? [];
+  const fieldsRight = options?.fieldsRight ?? [];
+  const _renderLabel = fieldsLeft.length === 0;
 
-  const _renderLabel = fieldsLeft.length === 0 && list?.useLabel !== false;
   const dataModel = store$.dataModel.get() as DataModelNew<T>;
 
   const grouping = store$.displayOptions.grouping.get();
   const groupingIsRelationalField = grouping.field?.relation;
 
   const sorting = store$.displayOptions.sorting.get();
-
-  const listGrouping: ListProps['grouping'] = {
-    groupByTableName: '',
-    groupByField: '',
-    groupLabel: '',
-    groups: [],
-  };
 
   if (groupingIsRelationalField && grouping.field?.name) {
     listGrouping.groupByTableName = grouping.field.relation?.tableName ?? '';
@@ -152,73 +221,6 @@ export const makeListProps = <T extends RecordType = RecordType>(
       groupByLabel: `No ${listGrouping.groupLabel}`,
     });
   }
-
-  const renderFields = (
-    row: Row<T>,
-    fields: (keyof T)[]
-  ): ListProps['items'][0]['valuesLeft'] => {
-    return (
-      fields
-        ?.filter((fieldName) => {
-          const viewFieldDisplayOptions = store$.displayOptions.viewField.get();
-
-          const fields = viewFieldDisplayOptions.hidden
-            ? viewFieldDisplayOptions.hidden
-            : viewFieldDisplayOptions.allFields;
-          const shouldDisplay = fields?.includes(fieldName.toString());
-
-          return shouldDisplay;
-        })
-        .map((fieldName) => {
-          let item;
-          let label;
-          let id;
-          let field;
-
-          try {
-            item = row.getField(fieldName);
-            label = item.label;
-            id = item.id;
-            field = item.field;
-            field = item.field;
-          } catch (error) {
-            _log.error(
-              `Error getting field ${fieldName.toString()} from row ${
-                row.id
-              }: ${error}`
-            );
-            _log.error(row);
-
-            throw new Error(
-              `Field ${fieldName.toString()} not found in row ${
-                row.id
-              } of view ${viewConfigManager.getViewName()}`
-            );
-          }
-
-          return {
-            id,
-            label,
-            relation: field.relation && {
-              ...field.relation,
-            },
-            render: () => {
-              return <ListFieldValue field={field} row={row} />;
-            },
-          };
-        }) ?? []
-    );
-  };
-
-  const renderLabel = (item: Row<T>) => {
-    return [
-      {
-        id: item.id,
-        label: item.label,
-        render: () => <>{item.label}</>,
-      },
-    ];
-  };
 
   const items =
     dataModel?.rows?.map((item) => {

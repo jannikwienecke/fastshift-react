@@ -6,6 +6,7 @@ import {
 import { applyDisplayOptions } from './legend.local.display-options';
 import { applyFilter } from './legend.local.filtering';
 import { store$ } from './legend.store';
+import { getViewConfigManager } from './legend.form.helper';
 
 export const filterRowsByShowDeleted = (rows: Row[]) => {
   const showDeleted = store$.displayOptions.showDeleted.get();
@@ -23,6 +24,10 @@ export const filterRowsByShowDeleted = (rows: Row[]) => {
 };
 
 export const setGlobalDataModel = (rows: Row[]) => {
+  if (store$.detail.form.dirtyValue.get()) {
+    return;
+  }
+
   const filteredRows = filterRowsByShowDeleted(rows);
 
   //   datamodel has either ALL or not DELETED rows based on the config
@@ -38,7 +43,7 @@ export const setGlobalDataModel = (rows: Row[]) => {
 
   applyFilter(store$, store$.filter.filters.get());
 
-  if (store$.viewConfigManager.localModeEnabled) {
+  if (store$.viewConfigManager.localModeEnabled.get()) {
     applyDisplayOptions(store$, store$.displayOptions.get());
   }
 };

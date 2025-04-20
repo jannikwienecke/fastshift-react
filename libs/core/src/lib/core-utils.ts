@@ -299,9 +299,6 @@ export const getViewByName = (
     throw new Error(`No View For "${name}" found`);
   }
 
-  // if (name === 'tasks') {
-  //   console.log('USE FALLBACK!', { name, views });
-  // }
   return viewConfigByTableName;
 };
 

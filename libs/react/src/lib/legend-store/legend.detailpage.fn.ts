@@ -1,4 +1,5 @@
 import { detailFormHelper } from './legend.detailpage.helper';
+import { store$ } from './legend.store';
 import { StoreFn } from './legend.store.types';
 
 export const detailpageChangeInput: StoreFn<'detailpageChangeInput'> =
@@ -16,6 +17,7 @@ export const detailpageBlurInput: StoreFn<'detailpageBlurInput'> =
     const field = fieldItem.field;
     if (!field) return;
 
+    console.log('blur', field.name, store$.detail.form.get());
     helper.saveIfDirty(field);
   };
 

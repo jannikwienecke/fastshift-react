@@ -33,13 +33,18 @@ export type QueryDto = {
   viewConfig?: ViewConfigType;
   viewConfigManager?: BaseViewConfigManagerInterface;
   viewId: string | null;
+  parentViewName: string | null;
+  parentId: string | null;
 
   filters?: string;
   displayOptions?: string;
+  onlyRelationalData?: boolean;
 } & Omit<QueryProps, 'viewConfigManager'>;
 
 export type QueryServerProps = {
   viewId?: string | null | undefined;
+  parentId?: string | null | undefined;
+  parentViewName?: string | null | undefined;
   filters?: FilterType[];
   displayOptions?: DisplayOptionsType;
   viewConfigManager: BaseViewConfigManagerInterface;
@@ -81,6 +86,7 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
   continueCursor: ContinueCursor;
   isDone: boolean;
   isLoading: boolean;
+  isPending: boolean;
   isError: boolean;
   error: QueryError | undefined | null;
   allIds: string[];

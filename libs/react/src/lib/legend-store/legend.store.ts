@@ -73,6 +73,7 @@ import {
   createDataModel,
   createRelationalDataModel,
   handleIncomingData,
+  handleIncomingDetailData,
   handleIncomingRelationalData,
   init,
   openSpecificModal,
@@ -106,6 +107,8 @@ export const store$ = observable<LegendStore>({
   handleIncomingData: (...props) => handleIncomingData(store$)(...props),
   handleIncomingRelationalData: (...props) =>
     handleIncomingRelationalData(store$)(...props),
+  handleIncomingDetailData: (...props) =>
+    handleIncomingDetailData(store$)(...props),
   init: (...props) => init(store$)(...props),
   createDataModel: (...props) => createDataModel(store$)(...props),
   createRelationalDataModel: (...props) =>

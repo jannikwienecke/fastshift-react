@@ -21,6 +21,7 @@ export const FieldValue = ({
 
   const isDisplayField = field.isDisplayField;
   if (!row) return null;
+
   return (
     <div data-testid={`field-value-${fieldName}`}>
       {ComponentToRender ? (

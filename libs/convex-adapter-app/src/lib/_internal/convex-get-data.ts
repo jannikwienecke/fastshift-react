@@ -5,6 +5,7 @@ import {
   DEFAULT_FETCH_LIMIT_QUERY,
   DEFAULT_LOCAL_MODE_LIMIT,
   DEFAULT_MAX_ITEMS_GROUPING,
+  getViewByName,
   QueryServerProps,
 } from '@apps-next/core';
 import { filterByNotDeleted, queryClient } from './convex-client';
@@ -24,6 +25,7 @@ import { convexSortRows } from './convex-sort-rows';
 import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
+import { getRelationTableRecords } from './convex-get-relation-table-records';
 
 const LOG_LEVEL = 'info' as string;
 
@@ -40,7 +42,7 @@ const LOG_LEVEL = 'info' as string;
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const log = (...props: any[]) => {
     const view = args.viewConfigManager?.getTableName();
-    if (view !== 'tasks') return;
+    // if (view !== 'tags') return;
     _log.info(...props);
   };
 
@@ -164,16 +166,59 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const idsNotDeleted = rowsNotDeleted.map((row) => row._id);
 
+  let idsSubView = [] as string[];
+
+  if (args.parentId && args.parentViewName && args.viewName) {
+    const parentView = getViewByName(args.registeredViews, args.parentViewName);
+    const childView = getViewByName(args.registeredViews, args.viewName);
+
+    const { manyToManyTable, manyToManyModelFields } =
+      parentView?.viewFields[args.viewName].relation ?? {};
+
+    const fieldnameSubView = manyToManyModelFields?.find(
+      (f) => f.name === args.viewName
+    )?.relation?.fieldName;
+
+    const fieldName2 = manyToManyModelFields?.find(
+      (f) => f.name === parentView?.tableName
+    );
+
+    // console.log(args.viewName, args.parentId, args.parentViewName);
+    // console.log('manyToManyTable', manyToManyTable);
+    // console.log('fieldName1', fieldName1);
+    // console.log('fieldName2', fieldName2);
+
+    if (
+      manyToManyTable &&
+      fieldnameSubView &&
+      fieldName2?.relation?.fieldName
+    ) {
+      const query = queryClient(ctx, manyToManyTable);
+
+      const records = await query
+        .withIndex(fieldName2?.relation?.fieldName, (q: any) =>
+          q.eq(fieldName2?.relation?.fieldName, args.parentId)
+        )
+        .collect();
+
+      if (records.length) {
+        idsSubView = records.map((r) => r[fieldnameSubView]);
+      }
+    }
+  }
+
   let allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
     hasOneToManyFilter ? idsOneToManyFilters : null,
     isIndexSearch ? idsIndexField : null,
     isSearchFieldSearch ? idsSearchField : null,
     args.query ? idsQuerySearch : null,
-    softDeleteEnabled && !showDeleted ? idsNotDeleted : null
+    softDeleteEnabled && !showDeleted ? idsNotDeleted : null,
+    args.parentId && args.parentViewName ? idsSubView : null
   );
 
   if (args.viewId) {
+    // console.log('SET ALL IDS TO VIEW ID', args.viewId);
     allIds = [args.viewId];
   }
 
@@ -305,9 +350,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     debug('Convex:fetchedRows.length', newRows.length);
   }
 
-  const filtered = newRows.filter(
+  const filtered = newRows?.filter(
     (r) =>
-      !idsToRemove.includes(r._id) && !rows.map((r) => r._id).includes(r._id)
+      !idsToRemove.includes(r?._id) && !rows.map((r) => r?._id).includes(r?._id)
   );
 
   rows.push(...filtered);

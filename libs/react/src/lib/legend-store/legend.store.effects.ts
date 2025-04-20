@@ -76,8 +76,14 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     store$.combobox.query.set(query ?? '');
   }).onChange(() => null);
 
-  observable(function handleFilterChange() {
-    const filters = store$.filter.filters.get();
+  // observable(function handleFilterChange() {
+  //   const filters = store$.filter.filters.get();
+
+  // }).onChange(() => null);
+
+  store$.filter.filters.onChange((changes) => {
+    console.log(changes);
+    const filters = changes.value;
 
     _log.debug('handleFilterChange: ', filters);
 
@@ -92,14 +98,15 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         nextCursor: { cursor: null, position: null },
       });
     }
-  }).onChange(() => null);
+  });
 
-  observable(function handleDisplayOptionsChange() {
+  store$.displayOptions.onChange((changes) => {
     const showDeleted = store$.displayOptions.showDeleted.get();
     const field = store$.displayOptions.sorting.field.get();
     const order = store$.displayOptions.sorting.order.get();
     const grouping = store$.displayOptions.grouping.field.get();
     const showEmptyGroups = store$.displayOptions.showEmptyGroups.get();
+    if (store$.state.get() === 'pending') return;
 
     if (field?.name || grouping?.name || showEmptyGroups || showDeleted) {
       _log.debug(
@@ -111,6 +118,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         showDeleted
       );
     }
+    console.log('handleDisplayOptionsChange: ', changes);
 
     store$.state.set('updating-display-options');
 
@@ -123,7 +131,11 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         nextCursor: { cursor: null, position: null },
       });
     }
-  }).onChange(() => null);
+  });
+
+  // observable(function handleDisplayOptionsChange() {
+
+  // }).onChange(() => null);
 
   _hasOpenDialog$.onChange((state) => {
     clearTimeout(timeout$.get() ?? 0);
@@ -296,5 +308,10 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     setTimeout(() => {
       store$.navigation.state.set({ type: 'ready' });
     }, 10);
+  });
+
+  console.log('ADD EFFECT!!!!');
+  store$.detail.form.onChange((changes) => {
+    console.log('detail form changes', changes.value);
   });
 };

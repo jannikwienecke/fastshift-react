@@ -14,7 +14,7 @@ import { renderErrorToast, renderSuccessToast } from '../toast';
 import { createRow } from './legend.form.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
-import { copyRow } from './legend.utils';
+import { copyRow, getViewConfigManager } from './legend.utils';
 import { setGlobalDataModel } from './legend.utils.helper';
 
 // Temporary states
@@ -34,6 +34,8 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
     newIds,
     idsToDelete,
   }) => {
+    const viewConfigManager = getViewConfigManager();
+
     _log.warn('___RUN Mutation', { newRows, idsToDelete, newIds });
 
     // Perform optimistic update
@@ -69,7 +71,7 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
 
     const { error } = await store$.api.mutateAsync({
       mutation,
-      viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+      viewName: viewConfigManager.viewConfig.viewName,
       query: store$.globalQuery.get(),
     });
 
@@ -92,6 +94,8 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
 export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
   (store$) =>
   async ({ field, valueRow, row }, onSuccess, onError) => {
+    const viewConfigManager = getViewConfigManager();
+
     console.warn('Starting updateRecordMutation');
     const patchValue = field.relation
       ? ifNoneNullElseValue(valueRow.id)
@@ -103,7 +107,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
     console.warn('Record to update:', record);
 
     const fieldName =
-      store$.viewConfigManager.getFieldBy(field.name).relation?.fieldName ?? '';
+      viewConfigManager.getFieldBy(field.name).relation?.fieldName ?? '';
 
     const rollback = optimisticUpdateStore({
       store$,
@@ -122,7 +126,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
 
     const { error } = await store$.api.mutateAsync({
       mutation,
-      viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+      viewName: viewConfigManager.viewConfig.viewName,
       query: store$.globalQuery.get(),
     });
 
@@ -142,6 +146,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
 export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
   (store$) =>
   async ({ record, row }, onSuccess, onError) => {
+    const viewConfigManager = getViewConfigManager();
     console.warn('Starting FULL updateRecordMutation');
 
     const rollback = optimisticUpdateStore({
@@ -162,7 +167,7 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
 
     const { error } = await store$.api.mutateAsync({
       mutation,
-      viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+      viewName: viewConfigManager.viewConfig.viewName,
       query: store$.globalQuery.get(),
     });
 
@@ -182,6 +187,8 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
 export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
   (store$) =>
   async ({ row }, onSuccess, onError) => {
+    const viewConfigManager = getViewConfigManager();
+
     const runMutation = async () => {
       const allRows = store$.dataModel.rows.get();
       const rollbackRows = allRows.map((r) => copyRow(r));
@@ -196,7 +203,7 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
       };
       const { error } = await store$.api.mutateAsync({
         mutation,
-        viewName: store$.viewConfigManager.viewConfig.viewName.get(),
+        viewName: viewConfigManager.viewConfig.viewName,
         query: store$.globalQuery.get(),
       });
 
@@ -214,7 +221,7 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
       }
     };
 
-    if (store$.viewConfigManager.getUiViewConfig().onDelete?.showConfirmation) {
+    if (viewConfigManager.getUiViewConfig().onDelete?.showConfirmation) {
       store$.confirmationAlert.open.set(true);
       store$.confirmationAlert.title.set('confirmationAlert.delete.title');
       store$.confirmationAlert.description.set(
@@ -236,6 +243,8 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
     onSuccess,
     onError
   ) => {
+    const viewConfigManager = getViewConfigManager();
+
     const row = createRow({
       ...record,
       id: '_tempId' + Math.random().toString(36).substring(2, 9),
@@ -304,6 +313,8 @@ export const optimisticUpdateStore = ({
   store$: Observable<LegendStore>;
   updateGlobalDataModel?: boolean;
 }): (() => void) => {
+  const viewConfigManager = getViewConfigManager();
+
   _log.warn('Starting optimistic update', { updateGlobalDataModel, record });
 
   const originalRow = copyRow(row);
@@ -321,7 +332,7 @@ export const optimisticUpdateStore = ({
     r.id === row.id ? { ...r.raw, ...(sortedRecord ?? updatedRowData) } : r.raw
   );
 
-  const viewName = store$.viewConfigManager.get().getViewName();
+  const viewName = viewConfigManager.getViewName();
   const updatedRows = makeData(
     store$.views.get(),
     viewName
@@ -338,10 +349,6 @@ export const optimisticUpdateStore = ({
 
     if (store$.commandbar.activeRow.get()) {
       store$.commandbar.activeRow.set(updatedRow);
-    }
-
-    if (store$.detail.row.get()) {
-      store$.detail.row.set(updatedRow);
     }
 
     if (store$.list.rowInFocus.row.get()) {
@@ -398,6 +405,7 @@ export const patchRecord = (
   record: RecordType,
   store$: Observable<LegendStore>
 ) => {
+  const viewConfigManager = getViewConfigManager();
   const commandformRow =
     store$.commandform.open.get() && store$.commandform.row.get();
 
@@ -405,7 +413,7 @@ export const patchRecord = (
     const _value = value === NONE_OPTION ? undefined : value;
 
     try {
-      const field = store$.viewConfigManager.getFieldBy(key);
+      const field = viewConfigManager.getFieldBy(key);
       const manyToManyTablename = field.relation?.manyToManyTable;
 
       if (manyToManyTablename && commandformRow) {
@@ -423,7 +431,7 @@ export const patchRecord = (
         };
       }
     } catch (error) {
-      const field = store$.viewConfigManager.getFieldByRelationFieldName(key);
+      const field = viewConfigManager.getFieldByRelationFieldName(key);
 
       if (commandformRow && field) {
         return {

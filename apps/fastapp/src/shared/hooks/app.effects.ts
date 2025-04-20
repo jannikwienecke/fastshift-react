@@ -1,8 +1,9 @@
-import { slugHelper, UserViewForm } from '@apps-next/core';
+import { _log, slugHelper } from '@apps-next/core';
 import { store$ } from '@apps-next/react';
 import { useRouteContext, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { getViewData } from '../../application-store/app.store.utils';
+import { useViewParams } from './useViewParams';
 
 export const useAppEffects = (viewName: string) => {
   const { viewData } = getViewData(viewName);
@@ -14,9 +15,17 @@ export const useAppEffects = (viewName: string) => {
   const navigateRef = React.useRef(router.navigate);
   const preloadRef = React.useRef(preloadQuery);
 
+  const { id, slug } = useViewParams();
+
   const preloadRoute = React.useCallback(
     (id: string) => {
-      preloadRef.current(activeViewConfig, activeViewConfig.viewName, id);
+      preloadRef.current(
+        activeViewConfig,
+        activeViewConfig.viewName,
+        id,
+        null,
+        null
+      );
     },
     [activeViewConfig]
   );
@@ -25,7 +34,6 @@ export const useAppEffects = (viewName: string) => {
     store$.userViewSettings.viewCreated.slug.onChange((v) => {
       const slug = v.value;
       if (slug) {
-        const name = slugHelper().unslugify(slug);
         navigateRef.current({ to: `/fastApp/${slug}` });
       }
     });
@@ -34,6 +42,7 @@ export const useAppEffects = (viewName: string) => {
       const row = changes.value;
 
       if (row?.row?.id) {
+        _log.debug('Preload row', row.row.id);
         preloadRoute(row.row.id);
       }
     });
@@ -54,9 +63,34 @@ export const useAppEffects = (viewName: string) => {
 
           break;
 
+        case 'switch-detail-view':
+          (() => {
+            const model = state.model;
+            if (model && id) {
+              navigateRef.current({
+                to: `/fastApp/$view/$id/$model`,
+                params: {
+                  id,
+                  view: slug,
+                  model,
+                },
+              });
+            } else if (id) {
+              navigateRef.current({
+                to: '/fastApp/$view/$id/overview',
+                params: {
+                  id,
+                  view: slug,
+                },
+              });
+            }
+          })();
+
+          break;
+
         default:
           break;
       }
     });
-  }, [preloadRoute, viewName]);
+  }, [id, preloadRoute, slug, viewName]);
 };

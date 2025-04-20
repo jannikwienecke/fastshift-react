@@ -21,8 +21,12 @@ export const getViewConfigManager = () => {
   const defaultView = store$.viewConfigManager.get();
   const view = store$.commandform.view.get() as ViewConfigType | undefined;
 
+  const detailViewConfigManager = store$.detail.viewConfigManager.get();
+
   const viewConfigManager = view
     ? new BaseViewConfigManager(view)
+    : detailViewConfigManager
+    ? detailViewConfigManager
     : defaultView;
 
   return viewConfigManager as BaseViewConfigManager;
@@ -201,9 +205,10 @@ export const formHelper = (view: ViewConfigType, row?: Row) => {
     return row ? row?.getValue?.(fieldName) : undefined;
   };
 
-  const viewFields = viewConfigManager
-    .getViewFieldList()
-    .filter((f) => f.hideFromForm !== true);
+  const viewFields =
+    getViewConfigManager()
+      ?.getViewFieldList?.()
+      .filter((f) => f.hideFromForm !== true) ?? [];
 
   const primitiveFields = viewFields.filter(
     (field) => !field.relation && !field.enum && field.type !== 'Date'

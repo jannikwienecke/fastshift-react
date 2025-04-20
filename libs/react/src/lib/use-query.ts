@@ -18,6 +18,7 @@ import { getParsedViewSettings } from './legend-store/legend.utils.helper';
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
+import { getViewConfigManager } from './legend-store/legend.utils';
 
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const queryOptions = api.makeQueryOptions
@@ -89,7 +90,6 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
 
   const view = store$.commandform.view.get();
 
-  console.log();
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
     useStableQuery(prisma, {
       registeredViews: queryProps?.registeredViews ?? registeredViews,
@@ -99,7 +99,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
         viewConfigManager.modelConfig,
       viewConfig: getViewByName(
         registeredViews,
-        view?.viewName ?? viewConfigManager.viewConfig.viewName ?? ''
+        view?.viewName ?? viewConfigManager?.viewConfig?.viewName ?? ''
       ),
 
       // registeredViews[
@@ -107,8 +107,12 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
       // ],
       displayOptions: '',
       paginateOptions: undefined,
-      disabled: view?.viewName ? false : true,
+      disabled:
+        view?.viewName && view.viewName !== viewConfigManager?.getViewName()
+          ? false
+          : true,
       viewId: null,
+      onlyRelationalData: true,
     });
 
   return {
@@ -121,19 +125,65 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
   };
 };
 
+// export const useDetailQuery = <QueryReturnType extends RecordType[]>(
+//   queryProps?: Partial<QueryProps>
+// ): QueryReturnOrUndefined<QueryReturnType[0]> => {
+//   const prisma = useApi();
+//   const { registeredViews, viewConfigManager } = useView();
+
+//   const detail = store$.detail.get();
+//   console.log({ detail });
+
+//   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
+//     useStableQuery(prisma, {
+//       registeredViews: queryProps?.registeredViews ?? registeredViews,
+//       query: '',
+//       modelConfig:
+//         queryProps?.viewConfigManager?.modelConfig ||
+//         viewConfigManager.modelConfig,
+//       viewConfig: getViewByName(
+//         registeredViews,
+//         viewConfigManager.getViewName()
+//       ),
+
+//       // registeredViews[
+//       //   view?.viewName ?? viewConfigManager.viewConfig.viewName
+//       // ],
+//       displayOptions: '',
+//       paginateOptions: undefined,
+//       disabled: !detail?.row?.id,
+//       viewId: detail?.row?.id ?? null,
+//       onlyRelationalData: false,
+//     });
+
+//   // React.useEffect(() => {
+//   //   console.log('USE DETAIL QUERY', queryReturn.data);
+//   // }, [queryReturn.data]);
+
+//   console.log('USE DETAIL QUERY', queryReturn.data);
+//   return {
+//     ...queryReturn,
+//     allIds: queryReturn.data?.allIds ?? [],
+//     data: queryReturn.data?.data ?? [],
+//     relationalData: queryReturn.data?.relationalData ?? {},
+//     continueCursor: queryReturn.data?.continueCursor,
+//     isDone: queryReturn.data?.isDone,
+//   };
+// };
+
 export const useQuery = <QueryReturnType extends RecordType[]>(
   queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const prisma = useApi();
-  const { registeredViews, viewConfigManager } = useView();
+  const { registeredViews } = useView();
+
+  const viewConfigManager = store$.viewConfigManager.get();
 
   const query = store$.globalQueryDebounced.get();
 
   const parsedViewSettings = getParsedViewSettings();
 
   const cursor = store$.fetchMore.currentCursor.get();
-
-  const viewId = store$.viewId.get();
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -155,7 +205,10 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
         numItems: DEFAULT_FETCH_LIMIT_QUERY,
         // isDone: isDone,
       },
-      viewId,
+      viewId: null,
+
+      parentViewName: store$.detail.parentViewName.get() ?? null,
+      parentId: store$.detail.row.get()?.id ?? null,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -169,7 +222,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     viewConfigManager.viewConfig,
     cursor,
     parsedViewSettings,
-    viewId,
   ]);
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =

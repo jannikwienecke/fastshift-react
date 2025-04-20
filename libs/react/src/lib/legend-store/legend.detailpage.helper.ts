@@ -1,24 +1,43 @@
-import { FieldConfig, makeRowFromValue, Row } from '@apps-next/core';
+import {
+  BaseViewConfigManagerInterface,
+  FieldConfig,
+  makeRowFromValue,
+  Row,
+  ViewConfigType,
+} from '@apps-next/core';
 import { formHelper } from './legend.form.helper';
 import { store$ } from './legend.store';
 import { copyRow } from './legend.utils';
 
 export const detailFormHelper = () => {
-  const view = store$.viewConfigManager.viewConfig.get();
+  const view = store$.detail.viewConfigManager.viewConfig.get() as
+    | ViewConfigType
+    | undefined;
   const row = store$.detail.row.get() as Row;
+
+  if (!view) {
+    throw new Error('View is not set');
+  }
 
   const helper = formHelper(view, row);
   const form = store$.detail.form.get();
 
   const updateRow = (field: FieldConfig, value: unknown) => {
     const row = helper._updateRowValue(field, value);
-    row && store$.detail.row.set(copyRow(row));
+    row &&
+      store$.detail.row.set(
+        copyRow(
+          row,
+          store$.detail.viewConfigManager.get() as BaseViewConfigManagerInterface
+        )
+      );
     store$.detail.form.dirtyField.set(field);
     store$.detail.form.dirtyValue.set(value as string | number);
   };
 
   const saveIfDirty = (field: FieldConfig) => {
     const { dirtyField, dirtyValue } = form ?? {};
+
     if (field.name !== dirtyField?.name || !dirtyField.name) return;
 
     if (field.isRequired && dirtyValue === undefined) {

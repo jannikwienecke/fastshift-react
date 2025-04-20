@@ -141,8 +141,6 @@ export const init: StoreFn<'init'> =
         },
       });
 
-      store$.state.set('initialized');
-
       store$.views.set(views);
       store$.viewConfigManager.set(viewConfigManager);
       uiViewConfig && store$.uiViewConfig.set(uiViewConfig);
@@ -152,6 +150,8 @@ export const init: StoreFn<'init'> =
       store$.userViewData.set(userViewData);
 
       if (!store$.viewConfigManager.get()) return;
+
+      _log.debug('INIT DATA MODEL', data.length, Object.keys(relationalData));
 
       createDataModel(store$)(data);
       createRelationalDataModel(store$)(relationalData);
@@ -172,12 +172,14 @@ export const init: StoreFn<'init'> =
         .get()
         .getViewFieldList()
         .map((field) => field.name);
+
+      _log.info(store$.viewConfigManager.viewConfig.viewName.get());
       store$.displayOptions.viewField.allFields.set(viewFields);
     });
 
     setTimeout(() => {
       store$.state.set('initialized');
-    }, 0);
+    }, 10);
   };
 
 const handlingFetchMoreState = async (
@@ -277,7 +279,6 @@ const handleMutatingState = async (
       return !prevIds?.some((id) => id === row['id']);
     }) ?? [];
 
-  store$.state.set('initialized');
   store$.createDataModel([..._new, ...newEntries]);
 
   store$.fetchMore.assign({
@@ -285,13 +286,16 @@ const handleMutatingState = async (
     nextCursor: queryReturn.continueCursor,
     isDone: queryReturn.isDone ?? false,
   });
+
+  store$.state.set('initialized');
 };
 
 export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
-    _log.debug(`:handleIncomingData`, state, data);
+    _log.info(`:handleIncomingData`, state, data);
+    if (data.isPending) return;
 
     if (store$.viewConfigManager.localModeEnabled.get()) {
       _log.debug(`handleIncomingData:debugMode-> Update Data Model`);
@@ -351,4 +355,17 @@ export const handleIncomingRelationalData: StoreFn<'handleIncomingData'> =
       ...prev,
       ...relationalDataModel,
     }));
+  };
+
+export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
+  (store$) => async (data) => {
+    const rows = data.data;
+    _log.debug('handleIncomingDetailData', rows);
+
+    const tableName = store$.viewConfigManager.get().getTableName?.();
+    if (rows?.length === 1) {
+      const data = makeData(store$.views.get(), tableName)(rows);
+
+      store$.detail.detailRow.set(data.rows?.[0]);
+    }
   };

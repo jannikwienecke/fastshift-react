@@ -62,8 +62,6 @@ export const DefaultViewTemplate = observer(
               <RenderInputDialog />
             )}
 
-            <RenderContextmenu />
-
             <div className="flex flex-col w-full ">
               <RenderList options={props.listOptions} />
             </div>
@@ -73,6 +71,7 @@ export const DefaultViewTemplate = observer(
           </div>
         ) : null}
 
+        <RenderContextmenu />
         <RenderConfirmationAlert options={props.confirmationAlertOptions} />
         <RenderCommandbar />
         <RenderCommandform />

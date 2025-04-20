@@ -31,14 +31,19 @@ export const getUserViewData = (viewName: string) => {
 export const getQueryKey = (
   viewConfig: ViewConfigType,
   viewName: string,
-  viewId: string | null
+  viewId: string | null,
+  parentViewName: string | null,
+  parentId: string | null
 ) => {
   const userViewData = getUserViewData(viewName);
+
   return preloadQuery(
     api.query.viewLoader,
     viewConfig,
     userViewData ?? null,
-    viewId
+    viewId,
+    parentViewName,
+    parentId
   ).queryKey;
 };
 

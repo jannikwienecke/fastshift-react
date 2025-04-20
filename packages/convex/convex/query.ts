@@ -21,6 +21,12 @@ export const viewMutation = server.mutation({
 export const testQuery = server.mutation({
   async handler(ctx, args_0) {
     try {
+      // const res = await ctx.db
+      //   .query('tasks_tags')
+      //   .withIndex('taskId', (q) => q.eq('taskId', 'daa' as Id<'tasks'>))
+      //   .collect();
+      // // console.log(res[0].)
+
       const res = await ctx.db.patch(
         'jh71s0zc8vdtxrtppctrjkjdg97c24qs' as Id<'tasks'>,
         {
