@@ -10,6 +10,7 @@ import {
 import { batch, Observable } from '@legendapp/state';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { setGlobalDataModel } from './legend.utils.helper';
+import { selectState$, xSelect } from './legend.select-state';
 
 export const openSpecificModal: StoreFn<'openSpecificModal'> =
   (store$) => (type, openCb) => {
@@ -131,6 +132,17 @@ export const init: StoreFn<'init'> =
     batch(() => {
       store$.userViewSettings.initialSettings.set(null);
       store$.userViewSettings.hasChanged.set(false);
+
+      store$.contextMenuState.row.set(null);
+
+      xSelect.close();
+
+      store$.filterClose();
+      store$.comboboxClose();
+      store$.commandbarClose();
+      store$.commandformClose();
+      store$.displayOptionsClose();
+      store$.contextMenuClose();
 
       store$.fetchMore.assign({
         isDone,

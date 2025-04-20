@@ -134,6 +134,7 @@ export const derviedContextMenuOptions = observable(() => {
         },
         onHover: () => {
           if (f.relation?.manyToManyTable) {
+            console.log('OPEN DUE HOVER!!');
             xSelect.open(row, f);
           }
         },

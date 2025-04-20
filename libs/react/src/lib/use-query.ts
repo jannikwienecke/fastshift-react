@@ -18,7 +18,6 @@ import { getParsedViewSettings } from './legend-store/legend.utils.helper';
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
-import { getViewConfigManager } from './legend-store/legend.utils';
 
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const queryOptions = api.makeQueryOptions
