@@ -291,6 +291,8 @@ export type DetailPageProps = {
   type: 'create' | 'edit';
   viewName: string;
   tableName: string;
+  relationalListFields: CommandformItem[];
+  currentRelationalListField: CommandformItem | null;
   onSelectView: (props: {
     type: 'overview' | 'model';
     model: string | null;

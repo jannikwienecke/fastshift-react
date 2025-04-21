@@ -1,27 +1,23 @@
+import { views } from '@apps-next/convex';
+import {
+  _log,
+  BaseViewConfigManager,
+  getViewByName,
+  QueryReturnOrUndefined,
+  ViewFieldConfig,
+} from '@apps-next/core';
+import { store$ } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { getViewData } from '../application-store/app.store.utils';
+import { getQueryKey, getUserViewQuery, queryClient } from '../query-client';
+import { getViewParms, pachTheViews } from '../shared/utils/app.helper';
 import {
   RenderDisplayOptions,
   RenderFilter,
   RenderInputDialog,
   RenderList,
 } from '../views/default-components';
-import {
-  _log,
-  BaseViewConfigManager,
-  FieldConfig,
-  getViewByName,
-  patchDict,
-  QueryReturnOrUndefined,
-  renderModelName,
-  t,
-  ViewFieldConfig,
-} from '@apps-next/core';
-import { store$ } from '@apps-next/react';
-import { getQueryKey, getUserViewQuery, queryClient } from '../query-client';
-import { getViewData } from '../application-store/app.store.utils';
-import { views } from '@apps-next/convex';
-import { pachTheViews } from '../shared/utils/app.helper';
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
@@ -33,40 +29,38 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
 
     if (!view) throw new Error('NOT VALID MODEL');
 
-    const viewName = view.viewName;
+    const { viewName: parentViewName } = getViewParms(ctx.params);
 
-    await queryClient.ensureQueryData(getUserViewQuery(viewName));
-    const { viewData, userViewData } = getViewData(viewName);
+    await queryClient.ensureQueryData(getUserViewQuery(view.viewName));
+    const { viewData, userViewData } = getViewData(view.viewName);
 
     if (!viewData) {
-      _log.info(`View ${viewName} not found, redirecting to /fastApp`);
+      _log.info(`View ${view.viewName} not found, redirecting to /fastApp`);
       return redirect({ to: '/fastApp' });
     }
 
     await ctx.context.preloadQuery(
       viewData.viewConfig,
-      viewName,
+      view.viewName,
       null,
-      ctx.params.view,
+      parentViewName,
       ctx.params.id
     );
 
     const data = queryClient.getQueryData(
       getQueryKey(
         viewData.viewConfig,
-        viewName,
+        view.viewName,
         null,
-        ctx.params.view,
+        parentViewName,
         ctx.params.id
       )
     ) as QueryReturnOrUndefined;
 
-    console.log('DATA::', data.data);
-
     const viewConfigManager = new BaseViewConfigManager(
       {
         ...viewData.viewConfig,
-        viewFields: patched[viewName]?.viewFields as ViewFieldConfig,
+        viewFields: patched[view.viewName]?.viewFields as ViewFieldConfig,
       },
       viewData.uiViewConfig
     );
@@ -84,7 +78,7 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
       null
     );
 
-    store$.detail.parentViewName.set(ctx.params.view);
+    store$.detail.parentViewName.set(parentViewName);
   },
   component: () => <DetailModelListViewPage />,
 });

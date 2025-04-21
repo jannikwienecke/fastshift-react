@@ -1,6 +1,10 @@
 import { _log, slugHelper } from '@apps-next/core';
 import { store$ } from '@apps-next/react';
-import { useRouteContext, useRouter } from '@tanstack/react-router';
+import {
+  useLocation,
+  useRouteContext,
+  useRouter,
+} from '@tanstack/react-router';
 import React from 'react';
 import { getViewData } from '../../application-store/app.store.utils';
 import { useViewParams } from './useViewParams';
@@ -16,6 +20,16 @@ export const useAppEffects = (viewName: string) => {
   const preloadRef = React.useRef(preloadQuery);
 
   const { id, slug } = useViewParams();
+  const prevId = React.useRef(id);
+
+  React.useLayoutEffect(() => {
+    if (!id && prevId.current) {
+      console.log('ROUTE BACK FROM DETAIL');
+      store$.detail.set(undefined);
+    }
+
+    prevId.current = id;
+  }, [id]);
 
   const preloadRoute = React.useCallback(
     (id: string) => {
@@ -56,7 +70,9 @@ export const useAppEffects = (viewName: string) => {
             const id = state.id;
             if (id) {
               navigateRef.current({
-                to: `/fastApp/${slugHelper().slugify(state.view)}/${id}`,
+                to: `/fastApp/${slugHelper().slugify(
+                  state.view
+                )}/${id}/overview`,
               });
             }
           })();
@@ -68,7 +84,7 @@ export const useAppEffects = (viewName: string) => {
             const model = state.model;
             if (model && id) {
               navigateRef.current({
-                to: `/fastApp/$view/$id/$model`,
+                to: `/fastApp/$view/$id/${model}`,
                 params: {
                   id,
                   view: slug,

@@ -186,6 +186,10 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const cursor = store$.fetchMore.currentCursor.get();
 
+  // parentViewName: store$.detail.parentViewName.get() ?? null,
+  //     parentId: store$.detail.row.get()?.id ?? null,
+  const parentId = store$.detail.row.get()?.id ?? null;
+  const parentViewName = store$.detail.parentViewName.get() ?? null;
   const queryPropsMerged = React.useMemo(() => {
     return {
       ...queryProps,
@@ -208,8 +212,11 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       },
       viewId: null,
 
-      parentViewName: store$.detail.parentViewName.get() ?? null,
-      parentId: store$.detail.row.get()?.id ?? null,
+      parentViewName,
+      parentId,
+
+      // parentViewName: store$.detail.parentViewName.get() ?? null,
+      // parentId: store$.detail.row.get()?.id ?? null,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

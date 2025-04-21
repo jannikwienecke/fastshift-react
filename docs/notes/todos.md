@@ -66,9 +66,9 @@ created: 1723444498044
 - [x] in convex helper -> taskId: mutation.payload.id -> make dynamic
 - [x] task can only add 1 todo for example, how would that work
 - [x] refactor select many to many in all places
-- [ ] local mode -> load all
-- [ ] add tests for validation rules frontend and backend
-- [ ] in combobox render field names, label should be aligned (with or without icon), maybe default icon
+- [x] local mode -> load all
+- [x] add tests for validation rules frontend and backend
+- [x] in combobox render field names, label should be aligned (with or without icon), maybe default icon
 
 <!-- FEATURE -->
 
@@ -86,3 +86,11 @@ created: 1723444498044
 - we "delete" a project, the task has still the reference but does not show it
 - when we undelete the project, the task will show the project again
 - same for projects when we "delete" a task (just filters out all the tasks that were deleted)
+
+<!-- HIER WEITER MACHEN -->
+
+## NEW TODOS
+
+- [ ] when setting field from commandbar like email -> will not be validated
+- [ ] not everyting of the contextmenu list item is clickable
+- [ ] handle e.g. projects -> tasks list in detail

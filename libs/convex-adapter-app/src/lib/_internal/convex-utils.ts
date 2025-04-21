@@ -1,4 +1,4 @@
-import { RecordType } from '@apps-next/core';
+import { BaseViewConfigManagerInterface, RecordType } from '@apps-next/core';
 import { ConvexRecordType } from './types.convex';
 
 export const parseConvexData = (
@@ -17,4 +17,16 @@ export const getErrorMessage = (error: unknown): string => {
     JSON.stringify(error) ??
     'UNKNOWN ERROR'
   );
+};
+
+export const getIndexFieldByName = (
+  viewConfigManger: BaseViewConfigManagerInterface,
+  fieldName: string
+) => {
+  const indexFields = viewConfigManger.getIndexFields();
+  const indexField = indexFields.find((f) => f.fields?.[0] === fieldName);
+  return {
+    name: indexField?.name ?? '',
+    field: indexField?.fields?.[0] ?? '',
+  };
 };

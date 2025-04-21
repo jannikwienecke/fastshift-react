@@ -26,19 +26,24 @@ export const derviedDetailPage$ = observable(() => {
 
   const helper = detailFormHelper();
 
+  const relationalListFields =
+    helper
+      .getComplexFormFields()
+      .filter((f) => f.field.relation?.manyToManyModelFields?.length) ?? [];
+
   return {
     row: helper.row,
     icon: helper.view.icon,
     formState: helper.formState,
     primitiveFields: helper.getPrimitiveFormFields(),
     complexFields: helper.getComplexFormFields(),
-    // complexFields: [],
-    // primitiveFields: [],
+
     displayField: helper.displayField,
     type: store$.commandform.type.get() ?? 'create',
     viewName: store$.userViewData.name.get() ?? helper.view.viewName,
     tableName: helper.view.tableName,
-
+    relationalListFields,
+    currentRelationalListField: null,
     onClick: (field, rect: DOMRect) => {
       if (field.field) {
         xSelect.open(helper.row, field.field);

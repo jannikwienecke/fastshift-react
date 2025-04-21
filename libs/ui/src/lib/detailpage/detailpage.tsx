@@ -1,4 +1,8 @@
-import { DetailPageProps, FormFieldProps } from '@apps-next/core';
+import {
+  DetailPageProps,
+  FormFieldProps,
+  getFieldLabel,
+} from '@apps-next/core';
 import { CubeIcon, DotsHorizontalIcon } from '@radix-ui/react-icons';
 import {
   Layers3Icon,
@@ -23,37 +27,39 @@ const DetailPageHeader = (props: DetailPageProps) => {
         <DotsHorizontalIcon />
         <StarIcon className="h-4" />
 
-        <div>
+        <div className="flex flex-row gap-2">
           <Button
             onClick={() =>
               props.onSelectView({ model: null, type: 'overview' })
             }
-            variant={'outline'}
+            variant={!props.currentRelationalListField ? 'outline' : 'ghost'}
             className=""
             size="sm"
           >
             Overview
           </Button>
 
-          <Button
-            onClick={() =>
-              props.onSelectView({ model: 'tasks', type: 'model' })
-            }
-            variant={'ghost'}
-            className=""
-            size="sm"
-          >
-            Tasks
-          </Button>
-
-          <Button
-            onClick={() => props.onSelectView({ model: 'tags', type: 'model' })}
-            variant={'ghost'}
-            className=""
-            size="sm"
-          >
-            Tags
-          </Button>
+          {props.relationalListFields.map((field) => {
+            const isActive =
+              props.currentRelationalListField?.field?.name ===
+              field.field?.name;
+            if (!field.field) return null;
+            return (
+              <Button
+                onClick={() =>
+                  props.onSelectView({
+                    model: field.field?.name ?? '',
+                    type: 'model',
+                  })
+                }
+                variant={isActive ? 'outline' : 'ghost'}
+                className=""
+                size="sm"
+              >
+                {getFieldLabel(field.field)}
+              </Button>
+            );
+          })}
         </div>
       </div>
     </>

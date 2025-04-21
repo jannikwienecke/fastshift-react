@@ -20,6 +20,9 @@ import { DefaultViewTemplate } from '../views/default-view-template';
 export const Route = createFileRoute('/fastApp/$view')({
   loader: async (props) => {
     const { viewName, slug } = getViewParms(props.params);
+
+    console.log('LOAD PAGE:: ', props.cause);
+
     _log.debug(`Loader for view: ${viewName} - slug: ${slug}`);
 
     await queryClient.ensureQueryData(getUserViewQuery(viewName));
@@ -30,8 +33,9 @@ export const Route = createFileRoute('/fastApp/$view')({
       return redirect({ to: '/fastApp' });
     }
 
-    if (props.cause === 'enter' && store$.state.get() === 'pending') {
+    if (props.cause === 'enter' || store$.state.get() === 'pending') {
       console.log('ENTER!!!!!!');
+      store$.detail.set(undefined);
       const viewConfigManager = new BaseViewConfigManager(
         {
           ...viewData.viewConfig,
