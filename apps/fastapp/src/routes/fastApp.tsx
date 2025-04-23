@@ -132,7 +132,6 @@ const FastAppLayoutComponent = observer(() => {
   React.useEffect(() => {
     return () => {
       if (!id) return;
-      console.log('RESET !!!!', { id });
       globalStore.dispatch({
         type: 'CHANGE_VIEW',
         payload: {

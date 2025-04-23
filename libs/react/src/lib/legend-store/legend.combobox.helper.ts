@@ -27,7 +27,7 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
-import { comboboxStore$ } from './legend.store.derived.combobox';
+import { getViewConfigManager } from './legend.utils';
 
 export const comboboxDebouncedQuery$ = observable('');
 
@@ -41,9 +41,9 @@ export const getViewFieldsOptions = (options?: {
   const query =
     (store$.combobox.query.get() || store$.commandbar.query.get()) ?? '';
 
-  const viewFields = store$.viewConfigManager
-    .get()
-    .getViewFieldList({ includeSystemFields: options?.includeSystemFields });
+  const viewFields = getViewConfigManager().getViewFieldList({
+    includeSystemFields: options?.includeSystemFields,
+  });
 
   filterOptions = viewFields.map((field) => {
     const label = options?.useEditLabel

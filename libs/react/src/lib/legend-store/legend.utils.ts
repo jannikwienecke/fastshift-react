@@ -41,8 +41,12 @@ export const isDetail = () => {
   const viewConfigDetail = store$.detail.viewConfigManager.get();
   const detailForm = store$.detail.form.dirtyValue.get();
   const selectStateIsDetail = selectState$.isDetail.get();
+  const isDetailOverview = store$.detail.viewType.type.get() === 'overview';
 
-  return !!((detailForm || selectStateIsDetail) && viewConfigDetail);
+  return !!(
+    (detailForm || selectStateIsDetail || isDetailOverview) &&
+    viewConfigDetail
+  );
 };
 
 export const getViewConfigManager = (): BaseViewConfigManagerInterface => {

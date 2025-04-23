@@ -7,8 +7,9 @@ import { StoreFn } from './legend.store.types';
 
 export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
   store$.openSpecificModal('commandbar', () => {
-    store$.commandbar.open.set(true);
+    // first set row -> then open | important!
     row && store$.commandbar.activeRow.set(row);
+    store$.commandbar.open.set(true);
   });
 };
 

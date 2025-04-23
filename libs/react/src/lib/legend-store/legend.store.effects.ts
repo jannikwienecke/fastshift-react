@@ -339,6 +339,11 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         console.log('_______rows: ', changes);
         const queryKey = queryListViewOptions$.get()?.queryKey;
         console.log('______', queryKey);
+
+        // todos
+        // make this work - update the react query cahce
+        // next:
+        // in sub list, project -> task: make the contextmenu work
       }
     });
   });

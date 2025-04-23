@@ -1,4 +1,5 @@
 import {
+  BaseViewConfigManagerInterface,
   CommandbarProps,
   MakeConfirmationAlertPropsOption,
   Row,
@@ -15,7 +16,11 @@ export const commandbarProps$ = observable<
 const openCommandbar = () => {
   if (isDetailOverview()) {
     const detailRow = store$.detail.row.get() as Row | undefined;
-    detailRow && store$.commandbarOpen(copyRow(detailRow));
+    const viewConfigManager =
+      store$.detail.viewConfigManager.get() as BaseViewConfigManagerInterface;
+    if (viewConfigManager && detailRow) {
+      store$.commandbarOpen(copyRow(detailRow, viewConfigManager));
+    }
   } else {
     const listRow = store$.list.rowInFocus.get()?.row as Row | undefined;
     listRow && store$.commandbarOpen(copyRow(listRow));
