@@ -16,6 +16,7 @@ import { viewMutationHandler } from './view-mutation';
 export const makeViewLoaderHandler =
   (views: RegisteredViews) => (ctx: GenericQueryCtx, args: any) => {
     const viewConfig = getViewByName(views, args.viewName);
+
     if (!args.viewName) return null;
 
     if (!viewConfig) {
@@ -27,7 +28,7 @@ export const makeViewLoaderHandler =
       patchViewConfig(viewConfig)
     );
 
-    const registeredViews = patchAllViews(views, viewConfig);
+    const registeredViews = patchAllViews(views);
 
     return viewLoaderHandler(ctx, {
       ...(args as QueryDto),
@@ -47,7 +48,7 @@ export const makeViewMutationHandler =
       patchViewConfig(viewConfig)
     );
 
-    const registeredViews = patchAllViews(views, viewConfig);
+    const registeredViews = patchAllViews(views);
 
     return viewMutationHandler(ctx, {
       ...args,

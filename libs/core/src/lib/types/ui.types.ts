@@ -258,6 +258,7 @@ export type RecordErrors = { [fieldName: string]: { error: string } };
 
 export type FormState = {
   isReady: boolean;
+  isFieldReady: (field: FieldConfig) => boolean;
   errors: RecordErrors;
 };
 
@@ -278,13 +279,17 @@ export type CommandformProps = {
   onCheckedChange: (field: CommandformItem, checked: boolean) => void;
 };
 
+export type DetailViewTypeState =
+  | { type: 'overview' }
+  | {
+      type: 'model';
+      model: string;
+    };
+
 export type DetailPageProps = {
   row: Row;
   icon?: React.FC<any>;
-  formState: {
-    isReady: boolean;
-    errors: RecordErrors;
-  };
+  formState: FormState;
   complexFields: CommandformItem[];
   primitiveFields: CommandformItem[];
   displayField: CommandformItem | undefined;
@@ -293,10 +298,8 @@ export type DetailPageProps = {
   tableName: string;
   relationalListFields: CommandformItem[];
   currentRelationalListField: CommandformItem | null;
-  onSelectView: (props: {
-    type: 'overview' | 'model';
-    model: string | null;
-  }) => void;
+  viewTypeState: DetailViewTypeState;
+  onSelectView: (props: DetailViewTypeState) => void;
 } & FormFieldMethod;
 
 export type CommandbarItemHandler = (options: {

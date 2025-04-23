@@ -1,10 +1,6 @@
 import { _log, slugHelper } from '@apps-next/core';
 import { store$ } from '@apps-next/react';
-import {
-  useLocation,
-  useRouteContext,
-  useRouter,
-} from '@tanstack/react-router';
+import { useRouteContext, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { getViewData } from '../../application-store/app.store.utils';
 import { useViewParams } from './useViewParams';
@@ -20,16 +16,6 @@ export const useAppEffects = (viewName: string) => {
   const preloadRef = React.useRef(preloadQuery);
 
   const { id, slug } = useViewParams();
-  const prevId = React.useRef(id);
-
-  React.useLayoutEffect(() => {
-    if (!id && prevId.current) {
-      console.log('ROUTE BACK FROM DETAIL');
-      store$.detail.set(undefined);
-    }
-
-    prevId.current = id;
-  }, [id]);
 
   const preloadRoute = React.useCallback(
     (id: string) => {
@@ -45,6 +31,21 @@ export const useAppEffects = (viewName: string) => {
   );
 
   React.useEffect(() => {
+    store$.detail.parentViewName.onChange((changes) => {
+      const isOverview = store$.detail.viewType.type.get() === 'overview';
+      const parentViewName = changes.value;
+      const parentId = store$.detail.row.get()?.id ?? null;
+      const config = store$.viewConfigManager.viewConfig.get();
+      if (isOverview && parentViewName && config) {
+        preloadRef.current(
+          config,
+          config.viewName,
+          null,
+          parentViewName, // corrected variable name
+          parentId
+        );
+      }
+    });
     store$.userViewSettings.viewCreated.slug.onChange((v) => {
       const slug = v.value;
       if (slug) {
@@ -81,14 +82,13 @@ export const useAppEffects = (viewName: string) => {
 
         case 'switch-detail-view':
           (() => {
-            const model = state.model;
-            if (model && id) {
+            if (state.state.type === 'model' && id) {
               navigateRef.current({
-                to: `/fastApp/$view/$id/${model}`,
+                to: `/fastApp/$view/$id/${state.state.model}`,
                 params: {
                   id,
                   view: slug,
-                  model,
+                  model: state.state.model,
                 },
               });
             } else if (id) {
@@ -96,7 +96,7 @@ export const useAppEffects = (viewName: string) => {
                 to: '/fastApp/$view/$id/overview',
                 params: {
                   id,
-                  view: slug,
+                  view: slug ?? '',
                 },
               });
             }

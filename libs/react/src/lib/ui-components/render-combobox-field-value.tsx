@@ -3,6 +3,7 @@ import { useView } from '../use-view';
 import { FilterValue } from './render-filter-value';
 import { Icon } from './render-icon';
 import { getComponent } from './ui-components.helper';
+import { isDetail } from '../legend-store/legend.utils';
 
 export const DefaultComboboxFieldValue = (props: {
   row?: Row;
@@ -50,6 +51,7 @@ export const ComboboxFieldValue = ({
     ComponentToRender = getComponent({
       componentType,
       fieldName,
+      isDetail: isDetail(),
     });
   }
 

@@ -1,15 +1,11 @@
 import {
   _log,
   arrayIntersection,
-  BaseViewConfigManager,
-  BaseViewConfigManagerInterface,
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
   DEFAULT_LOCAL_MODE_LIMIT,
   DEFAULT_MAX_ITEMS_GROUPING,
-  getViewByName,
   QueryServerProps,
-  ViewConfigType,
 } from '@apps-next/core';
 import { filterByNotDeleted, queryClient } from './convex-client';
 import { getDisplayOptionsInfo } from './convex-display-options';
@@ -23,25 +19,14 @@ import {
   getIdsFromSearchFilters,
   getRecordsByIds,
 } from './convex-get-ids-from';
+import { getIdsFromParentView } from './convex-get-ids-from-parent-view';
 import { mapWithInclude } from './convex-map-with-include';
 import { convexSortRows } from './convex-sort-rows';
-import { getIndexFieldByName, parseConvexData } from './convex-utils';
+import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
-import { getRelationTableRecords } from './convex-get-relation-table-records';
-import { getIdsFromParentView } from './convex-get-ids-from-parent-view';
 
 const LOG_LEVEL = 'info' as string;
-
-// const updateLocalLevel = () => {
-// if (import.meta.env.MODE === 'development') {
-//   LOG_LEVEL = 'debug';
-// } else if (import.meta.env.MODE === 'test') {
-//   LOG_LEVEL = 'warn';
-// } else {
-//   LOG_LEVEL = 'info';
-// }
-// };
 
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const log = (...props: any[]) => {
@@ -52,9 +37,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const debug = (...props: any[]) => {
     if (LOG_LEVEL !== 'debug') return;
-    const view = args.viewConfigManager?.getTableName();
-    if (view !== 'tasks') return;
-    _log.debug(...props);
+    // const view = args.viewConfigManager?.getTableName();
+    // if (view !== 'task') return;
+    // _log.debug(...props);
+    console.log(...props);
   };
 
   const { viewConfigManager, filters, registeredViews } = args;

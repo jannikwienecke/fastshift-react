@@ -1,26 +1,28 @@
 import {
   _log,
-  BaseViewConfigManager,
   getViewByName,
-  makeData,
-  patchAllViews,
   QueryReturnOrUndefined,
   Row,
 } from '@apps-next/core';
-import { FormField, RenderDetailComplexValue, store$ } from '@apps-next/react';
+import {
+  FormField,
+  globalStore,
+  RenderDetailComplexValue,
+  store$,
+} from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
+import React from 'react';
 import { getViewData } from '../application-store/app.store.utils';
 import { getQueryKey, getUserViewQuery, queryClient } from '../query-client';
 import { useViewParams } from '../shared/hooks';
 import { getViewParms, pachTheViews } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
-import { views } from '@apps-next/convex';
-import React from 'react';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   loader: async (props) => {
     const { id, viewName } = getViewParms(props.params);
+    if (!viewName) return;
 
     if (!id) throw new Error('ID is required');
 
@@ -40,47 +42,30 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
 });
 
 const DetaiViewPage = observer(() => {
-  const { viewName, id } = useViewParams();
+  const { id } = useParams({ from: '/fastApp/$view/$id' });
+
+  let { viewName } = useViewParams();
+  viewName = viewName as string;
+
   const { viewData } = getViewData(viewName);
 
-  React.useEffect(() => {
-    if (!id) return;
+  const view = getViewByName(pachTheViews(), viewName);
+
+  const doOnceForId = React.useRef('');
+
+  if (id && id !== doOnceForId.current) {
+    doOnceForId.current = id;
 
     const queryKey = getQueryKey(viewData.viewConfig, viewName, id, null, null);
+    const detailQueryData = queryClient.getQueryData(
+      queryKey
+    ) as QueryReturnOrUndefined;
 
-    const data = queryClient.getQueryData(queryKey) as QueryReturnOrUndefined;
-    const rows = data.data;
-
-    const patched = pachTheViews();
-
-    const parsedRow = makeData(patched, viewName)(rows ?? []).rows?.[0];
-
-    if (!parsedRow) {
-      console.log('Row not found, redirecting to /fastApp');
-      throw redirect({ to: `/fastApp/${viewName}` });
-    }
-
-    console.log('SET DETAIL!!!!!');
-
-    const viewConfigManager = new BaseViewConfigManager(
-      {
-        ...viewData.viewConfig,
-        viewFields: patched[viewName]?.viewFields ?? {},
-      },
-      viewData.uiViewConfig
-    );
-
-    store$.detail.viewConfigManager.set(viewConfigManager);
-
-    store$.detail.row.set(parsedRow);
-    store$.detail.detailRow.set(parsedRow);
-    store$.detail.view.set({
-      type: 'list',
-      selectedRelation: 'tasks',
+    globalStore.dispatch({
+      type: 'LOAD_VIEW_DETAIL_PAGE',
+      payload: { id, viewName, data: detailQueryData },
     });
-  }, [id, viewData.uiViewConfig, viewData.viewConfig, viewName]);
-
-  const view = getViewByName(pachTheViews(), viewName);
+  }
 
   if (!view) {
     _log.info(`View ${viewName} not found, redirecting to /fastApp`);

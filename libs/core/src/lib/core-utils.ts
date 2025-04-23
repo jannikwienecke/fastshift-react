@@ -187,11 +187,11 @@ export const convertDisplayOptionsForBackend = (
     viewField,
     viewType,
   } = displayOptions;
-  const sortingString = sorting.field
+  const sortingString = sorting?.field
     ? `sorting=${sorting.field.name}:${sorting.order}`
     : '';
 
-  const groupingString = grouping.field
+  const groupingString = grouping?.field
     ? `grouping=${grouping.field.name}`
     : '';
 
@@ -201,7 +201,7 @@ export const convertDisplayOptionsForBackend = (
     ? `showEmptyGroups=${showEmptyGroups}`
     : '';
 
-  const viewFieldString = viewField.hidden
+  const viewFieldString = viewField?.hidden
     ? `viewField=${viewField.hidden.join(',')}`
     : '';
 
@@ -478,7 +478,7 @@ export const sortRows = (
     order?: 'asc' | 'desc';
   }
 ) => {
-  if (!sorting) return rows;
+  if (!sorting?.field) return rows;
 
   const ascending = sorting?.order === 'asc';
 
@@ -552,23 +552,16 @@ export const sortRows = (
   return rows;
 };
 
-export const patchAllViews = (
-  views: RegisteredViews,
-  viewConfig: ViewConfigType
-) => {
-  if (!viewConfig) return views;
-
+export const patchAllViews = (views: RegisteredViews) => {
   return patchDict(views ?? {}, (view) => {
     if (!view) return view;
-
-    // return view;
 
     return {
       ...view,
       viewFields: patchDict(view.viewFields, (f) => {
-        const userFieldConfig = viewConfig.fields?.[f.name];
-        const displayFIeld = viewConfig.displayField.field;
-        const softDeleteField = viewConfig.mutation?.softDeleteField;
+        const userFieldConfig = view.fields?.[f.name];
+        const displayFIeld = view.displayField.field;
+        const softDeleteField = view.mutation?.softDeleteField;
 
         const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
         const isDisplayField =
@@ -579,6 +572,7 @@ export const patchAllViews = (
           ...userFieldConfig,
           isDisplayField,
           label: f.label || getFieldLabel(f),
+          editLabel: `${f.name}.edit`,
           hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
         } satisfies FieldConfig;
       }),

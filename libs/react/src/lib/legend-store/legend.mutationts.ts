@@ -1,5 +1,6 @@
 import {
   _log,
+  BaseViewConfigManagerInterface,
   getRelationTableName,
   ifNoneNullElseValue,
   INTERNAL_FIELDS,
@@ -14,8 +15,9 @@ import { renderErrorToast, renderSuccessToast } from '../toast';
 import { createRow } from './legend.form.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
-import { copyRow, getViewConfigManager } from './legend.utils';
+import { copyRow, getViewConfigManager, isDetail } from './legend.utils';
 import { setGlobalDataModel } from './legend.utils.helper';
+import { globalStore } from './legend.store.global';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
@@ -315,7 +317,7 @@ export const optimisticUpdateStore = ({
 }): (() => void) => {
   const viewConfigManager = getViewConfigManager();
 
-  _log.warn('Starting optimistic update', { updateGlobalDataModel, record });
+  _log.debug('Starting optimistic update', { updateGlobalDataModel, record });
 
   const originalRow = copyRow(row);
 
@@ -345,6 +347,9 @@ export const optimisticUpdateStore = ({
   const updatedRow = makeData(store$.views.get(), viewName)([updatedRowData])
     .rows?.[0];
 
+  console.log('____SET UPDATED -> ');
+  updatedRow.updated = Date.now();
+
   if (updatedRow) {
     if (store$.list.selectedRelationField.row.get()) {
       store$.list.selectedRelationField.row.raw.set(updatedRow.raw);
@@ -365,7 +370,23 @@ export const optimisticUpdateStore = ({
       selectState$.parentRow.raw.set(updatedRow.raw);
     }
 
-    if (updateGlobalDataModel) {
+    // TODO DETAIL BRANCHING
+    if (store$.detail.row.get() && isDetail()) {
+      store$.detail.row.set(updatedRow);
+    }
+
+    if (updateGlobalDataModel && !isDetail()) {
+      console.log('____UPDATE GLOBAL DATA MODEL');
+
+      updatedRows.map((r) => {
+        const hasRow = r.id === updatedRow.id;
+        if (hasRow) {
+          r.updated = Date.now();
+          return r;
+        }
+        return r;
+      });
+
       setGlobalDataModel(updatedRows);
     }
   }

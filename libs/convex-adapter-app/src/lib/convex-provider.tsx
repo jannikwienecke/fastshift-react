@@ -72,20 +72,32 @@ const makeQuery = (
     userViewData ?? undefined
   );
 
+  if (viewId) {
+    return convexQuery(viewLoader, {
+      viewName: viewConfig.viewName,
+      query: '',
+      filters: '',
+      displayOptions: '',
+      viewId: viewId ?? null,
+    });
+  }
+
   return convexQuery(viewLoader, {
     viewName: viewConfig.viewName,
     query: '',
-    filters: convertFiltersForBackend(mergedConfig.filters),
-    displayOptions: convertDisplayOptionsForBackend(
-      mergedConfig.dispplayOptions
-    ),
+    filters: viewId ? '' : convertFiltersForBackend(mergedConfig.filters),
+    displayOptions: viewId
+      ? ''
+      : convertDisplayOptionsForBackend(mergedConfig.dispplayOptions),
     viewId: viewId ?? null,
     parentId: parentId ?? null,
     parentViewName: parentViewName ?? null,
-    paginateOptions: {
-      cursor: { position: null, cursor: null },
-      numItems: DEFAULT_FETCH_LIMIT_QUERY,
-    },
+    paginateOptions: viewId
+      ? undefined
+      : {
+          cursor: { position: null, cursor: null },
+          numItems: DEFAULT_FETCH_LIMIT_QUERY,
+        },
   });
 };
 
@@ -97,7 +109,7 @@ export const preloadQuery = (
   parentViewName: string | null = null,
   parentId: string | null = null
 ) => {
-  return makeQuery(
+  const query = makeQuery(
     viewLoader,
     viewConfig,
     userViewData,
@@ -105,6 +117,8 @@ export const preloadQuery = (
     parentViewName,
     parentId
   );
+
+  return query;
 };
 
 export type ConvexContext = {

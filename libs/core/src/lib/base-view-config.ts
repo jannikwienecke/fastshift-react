@@ -25,6 +25,7 @@ export interface BaseViewConfigManagerInterface<
   TViewConfig extends ViewConfigType = ViewConfigType
 > {
   viewConfig: TViewConfig;
+  uiViewConfig: UiViewConfig;
   getDisplayFieldLabel(): string;
   getSearchableFields(): SearchableField[] | undefined;
   getPrimarySearchField(): string | undefined;

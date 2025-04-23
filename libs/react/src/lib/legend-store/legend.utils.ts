@@ -1,6 +1,13 @@
-import { BaseViewConfigManagerInterface, makeData, Row } from '@apps-next/core';
+import {
+  BaseViewConfigManagerInterface,
+  makeData,
+  QueryReturnOrUndefined,
+  Row,
+} from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
+import { selectState$ } from './legend.select-state';
+import { queryListViewOptions$ } from './legend.queryProps.derived';
 
 export const copyRow = (
   row: Row,
@@ -30,13 +37,24 @@ export const _hasOpenDialog$ = observable(() => {
 
 export const hasOpenDialog$ = observable(false);
 
-export const getViewConfigManager = (): BaseViewConfigManagerInterface => {
+export const isDetail = () => {
   const viewConfigDetail = store$.detail.viewConfigManager.get();
   const detailForm = store$.detail.form.dirtyValue.get();
+  const selectStateIsDetail = selectState$.isDetail.get();
 
-  if (!detailForm || !viewConfigDetail) {
-    return store$.viewConfigManager.get();
+  return !!((detailForm || selectStateIsDetail) && viewConfigDetail);
+};
+
+export const getViewConfigManager = (): BaseViewConfigManagerInterface => {
+  if (isDetail()) {
+    const viewConfigDetail = store$.detail.viewConfigManager.get();
+
+    return viewConfigDetail as BaseViewConfigManagerInterface;
   }
 
-  return viewConfigDetail as BaseViewConfigManagerInterface;
+  return store$.viewConfigManager.get();
+};
+
+export const isDetailOverview = () => {
+  return store$.detail.viewType.type.get() === 'overview';
 };

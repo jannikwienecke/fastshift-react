@@ -5,12 +5,6 @@ import { observer } from '@legendapp/state/react';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/fastApp/$view/$id/overview')({
-  loader: async (props) => {
-    console.log('LOADER OVERVIEW...');
-    return {
-      //
-    };
-  },
   component: () => <DetaiViewPage />,
 });
 

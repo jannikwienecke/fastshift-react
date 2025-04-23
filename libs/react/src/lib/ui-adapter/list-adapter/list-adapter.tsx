@@ -164,6 +164,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
   const fieldsLeft = options?.fieldsLeft ?? [];
   const fieldsRight = options?.fieldsRight ?? [];
+
   const _renderLabel = fieldsLeft.length === 0;
 
   const dataModel = store$.dataModel.get() as DataModelNew<T>;
@@ -258,7 +259,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
           // fieldsRight
         );
       } catch (error) {
-        // _log.error(
+        _log.error(`Error rendering fields for row ${item.id}: ${error}`);
       }
 
       return {

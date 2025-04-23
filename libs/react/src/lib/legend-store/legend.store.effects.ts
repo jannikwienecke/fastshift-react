@@ -1,10 +1,14 @@
-import { _log, FilterType } from '@apps-next/core';
+import { _log, FilterType, QueryReturnOrUndefined } from '@apps-next/core';
 import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
+import {
+  queryDetailViewOptions$,
+  queryListViewOptions$,
+} from './legend.queryProps.derived';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -105,7 +109,23 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const order = store$.displayOptions.sorting.order.get();
     const grouping = store$.displayOptions.grouping.field.get();
     const showEmptyGroups = store$.displayOptions.showEmptyGroups.get();
-    if (store$.state.get() === 'pending') return;
+
+    if (changes.value.resetted) {
+      store$.displayOptions.resetted.set(false);
+      return;
+    }
+
+    if (changes.changes?.[0].path?.[0] === 'resetted') {
+      return;
+    }
+
+    if (changes.changes?.[0].path?.[0] === 'isOpen') {
+      return;
+    }
+
+    // if (prevAtPath === )
+
+    // if (store$.state.get() === 'pending') return;
 
     if (field?.name || grouping?.name || showEmptyGroups || showDeleted) {
       _log.debug(
@@ -183,14 +203,14 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const sortingOrder = value.sorting.order;
     const showEmptyGroups = value.showEmptyGroups;
     const showDeleted = value.showDeleted;
-    const selectedViewFields = value.viewField.hidden;
+    const selectedViewFields = value.viewField?.hidden;
 
     const initialGroupingField = initial?.grouping.field?.name;
     const initialSortingField = initial?.sorting.field?.name;
     const initialSortingOrder = initial?.sorting.order;
     const initialShowEmptyGroups = initial?.showEmptyGroups;
     const initialShowDeleted = initial?.showDeleted;
-    const initialSelectedViewFields = initial?.viewField.hidden;
+    const initialSelectedViewFields = initial?.viewField?.hidden;
 
     if (!initial) return;
 
@@ -253,8 +273,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       return changed;
     };
 
-    console.log('any changes', anythingChanged());
-
     store$.userViewSettings.hasChanged.set(anythingChanged());
   });
 
@@ -267,7 +285,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const filtersChanged =
       JSON.stringify(initial) !== JSON.stringify(currentFilters);
 
-    console.log('filtersChanged', filtersChanged);
     store$.userViewSettings.hasChanged.set(filtersChanged);
   });
 
@@ -311,5 +328,64 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     setTimeout(() => {
       store$.navigation.state.set({ type: 'ready' });
     }, 10);
+  });
+
+  store$.dataModel.rows.forEach((row) => {
+    row.updated.onChange((changes) => {
+      if (changes.isFromSync) return;
+      const prevAtPath = changes.changes?.[0].prevAtPath;
+      const valueAtPath = changes.changes?.[0].valueAtPath;
+      if (!prevAtPath && valueAtPath) {
+        console.log('_______rows: ', changes);
+        const queryKey = queryListViewOptions$.get()?.queryKey;
+        console.log('______', queryKey);
+      }
+    });
+  });
+
+  store$.detail.row.updated.onChange((changes) => {
+    if (!changes.value) return;
+
+    const queryKey = queryListViewOptions$.get()?.queryKey;
+    const queryKeyDetail = queryDetailViewOptions$.get()?.queryKey;
+
+    const row = store$.detail.row.get();
+    const parentView = store$.detail.parentViewName.get();
+
+    if (!queryKey || !queryKeyDetail) return;
+
+    if (!row || !parentView) return;
+
+    store$.api.queryClient.setQueryData(
+      queryKeyDetail,
+      (q: QueryReturnOrUndefined): QueryReturnOrUndefined => {
+        return {
+          ...q,
+          data: [row.raw],
+        };
+      }
+    );
+
+    store$.api.queryClient.setQueryData(
+      queryKey,
+      (q: QueryReturnOrUndefined) => {
+        if (!q) return q;
+
+        const rows = q.data ?? [];
+
+        return {
+          ...q,
+          data: rows.map((r) => {
+            if (r.id === row.id) {
+              return {
+                ...r,
+                ...row.raw,
+              };
+            }
+            return r;
+          }),
+        };
+      }
+    );
   });
 };

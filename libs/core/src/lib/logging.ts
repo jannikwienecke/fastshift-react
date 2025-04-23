@@ -17,13 +17,12 @@ export const logger = log.getLogger('app'); // Use a named logger
 const originalFactory = logger.methodFactory;
 logger.methodFactory = (methodName, logLevel, loggerName) => {
   const rawMethod = originalFactory(methodName, logLevel, loggerName);
+  // const prefix = `[${new Date().toISOString().slice(0, 16)}] `;
+  // const method = `[${methodName.toUpperCase()}]`;
+  const method = '';
+  const prefix = '';
   return (...messages) => {
-    rawMethod(
-      `[${new Date()
-        .toISOString()
-        .slice(0, 16)}] [${methodName.toUpperCase()}]`,
-      ...messages
-    );
+    rawMethod(`${prefix}${method}`, ...messages);
   };
 };
 

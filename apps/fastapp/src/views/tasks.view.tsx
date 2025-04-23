@@ -1,9 +1,8 @@
 import { tasksConfig } from '@apps-next/convex';
 import { MakeDetailPropsOption } from '@apps-next/core';
-import { makeHooks } from '@apps-next/react';
+import { makeHooks, viewRegistry } from '@apps-next/react';
 import { InputDialog } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
-import { viewStore } from '../application-store/app.store';
 import { DefaultViewTemplate } from '../views/default-view-template';
 import { TaskViewDataType } from '../views/tasks.components';
 import { DefaultDetailViewTemplate } from './default-detail-view-template';
@@ -46,7 +45,7 @@ const TaskDetailPage = observer((options: MakeDetailPropsOption) => {
   return <DefaultDetailViewTemplate detailOptions={options} />;
 });
 
-viewStore
+viewRegistry
   .addView(tasksConfig)
   .addComponents({ main: Task, detail: TaskDetailPage })
   .addUiConfig(tasksUiViewConfig);

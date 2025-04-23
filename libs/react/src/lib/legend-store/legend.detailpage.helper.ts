@@ -19,7 +19,8 @@ export const detailFormHelper = () => {
     throw new Error('View is not set');
   }
 
-  const helper = formHelper(view, row);
+  // TODO DETAIL BRANCHING
+  const helper = formHelper(view, row, true);
   const form = store$.detail.form.get();
 
   const updateRow = (field: FieldConfig, value: unknown) => {
@@ -44,13 +45,16 @@ export const detailFormHelper = () => {
       throw new Error(`Field ${field.name} is required`);
     }
 
-    if (!helper.formState.isReady) return;
+    if (!helper.formState.isFieldReady(field)) return;
 
     store$.updateRecordMutation({
       field,
       row,
       valueRow: makeRowFromValue(dirtyValue?.toString() || '', field),
     });
+
+    store$.detail.form.dirtyField.set(undefined);
+    store$.detail.form.dirtyValue.set(undefined);
   };
 
   return {

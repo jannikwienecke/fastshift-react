@@ -29,10 +29,10 @@ const DetailPageHeader = (props: DetailPageProps) => {
 
         <div className="flex flex-row gap-2">
           <Button
-            onClick={() =>
-              props.onSelectView({ model: null, type: 'overview' })
+            onClick={() => props.onSelectView({ type: 'overview' })}
+            variant={
+              props.viewTypeState.type === 'overview' ? 'outline' : 'ghost'
             }
-            variant={!props.currentRelationalListField ? 'outline' : 'ghost'}
             className=""
             size="sm"
           >
@@ -40,12 +40,15 @@ const DetailPageHeader = (props: DetailPageProps) => {
           </Button>
 
           {props.relationalListFields.map((field) => {
-            const isActive =
-              props.currentRelationalListField?.field?.name ===
-              field.field?.name;
+            const model =
+              props.viewTypeState.type === 'model'
+                ? props.viewTypeState.model
+                : '';
+            const isActive = model === field.field?.name;
             if (!field.field) return null;
             return (
               <Button
+                key={`relational-list-field-${field.field.name}`}
                 onClick={() =>
                   props.onSelectView({
                     model: field.field?.name ?? '',

@@ -31,6 +31,7 @@ export const derviedDetailPage$ = observable(() => {
       .getComplexFormFields()
       .filter((f) => f.field.relation?.manyToManyModelFields?.length) ?? [];
 
+  console.log(store$.detail.viewType.get());
   return {
     row: helper.row,
     icon: helper.view.icon,
@@ -44,9 +45,10 @@ export const derviedDetailPage$ = observable(() => {
     tableName: helper.view.tableName,
     relationalListFields,
     currentRelationalListField: null,
+    viewTypeState: store$.detail.viewType.get() ?? { type: 'overview' },
     onClick: (field, rect: DOMRect) => {
       if (field.field) {
-        xSelect.open(helper.row, field.field);
+        xSelect.open(helper.row, field.field, true);
         selectState$.rect.set(rect);
       }
     },
@@ -63,11 +65,11 @@ export const derviedDetailPage$ = observable(() => {
 
     onEnter: (field) => store$.detailpageEnter(field),
     onSelectView: (options) => {
-      console.log(options);
+      store$.detail.viewType.set(options);
+
       store$.navigation.state.set({
         type: 'switch-detail-view',
-        model: options.model,
-        viewType: options.type,
+        state: options,
       });
     },
   } satisfies Omit<DetailPageProps, 'render'>;

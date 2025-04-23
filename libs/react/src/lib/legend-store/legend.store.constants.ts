@@ -76,11 +76,13 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'userViewSettings'
   | 'userViewData'
   | 'viewId'
+  | 'userViews'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
   dataModelBackup: { rows: [] } as DataModelNew,
   views: {} as RegisteredViews,
+  userViews: [],
   viewConfigManager: {} as BaseViewConfigManagerInterface,
   relationalDataModel: {} as RelationalDataModel,
   uiViewConfig: {} as UiViewConfig,

@@ -8,17 +8,36 @@ import {
   t,
 } from '@apps-next/core';
 
-export const getViewParms = (params: { id?: string; view: string }) => {
-  const hasView = getViewByName(views, params.view);
+export const getViewParms = (params: {
+  id?: string;
+  view?: string;
+  model?: string;
+}) => {
+  if (!params?.view) {
+    return {
+      id: params.id,
+      viewName: undefined,
+      slug: undefined,
+      model: undefined,
+    };
+  }
 
+  const hasView = getViewByName(views, params?.view);
+
+  const model = params.model;
   if (hasView) {
-    return { id: params.id, viewName: params.view, slug: params.view };
+    return {
+      id: params.id,
+      viewName: params.view.toLowerCase(),
+      slug: params.view,
+      model,
+    };
   }
 
   const slug = params.view;
   const viewName = slugHelper().unslugify(slug);
 
-  return { id: params.id, viewName, slug };
+  return { id: params.id, viewName, slug, model };
 };
 
 export const pachTheViews = () => {

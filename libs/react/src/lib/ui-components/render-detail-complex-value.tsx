@@ -57,14 +57,21 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
     return <>{makeDayMonthString(new Date(value as number))}</>;
   };
 
+  const renderEnum = (value: number | string | boolean | undefined) => {
+    return <>{value}</>;
+  };
+
   const Component = getComponent({
     fieldName: fieldConfig.name,
     componentType: 'detailValue',
+    // TODO DETAIL BRANCHING
+    isDetail: true,
   });
 
   const isRow = !!(props.field.value as Row | undefined)?.raw;
   const isManyRows = Array.isArray(props.field.value);
   const isDate = fieldConfig.isDateField;
+  const isEnum = fieldConfig.enum;
   const value = field.value as Row | Row[] | string | number;
 
   const renderRow = isRow
@@ -73,6 +80,8 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
     ? () => renderManyRelation(value as Row[])
     : isDate
     ? () => renderDate(value as number)
+    : isEnum
+    ? () => renderEnum(value as number)
     : null;
 
   const view = getViewByName(store$.views.get(), fieldConfig.name ?? '');

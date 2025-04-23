@@ -20,6 +20,18 @@ export const getUserViewQuery = (viewName: string) => {
   });
 };
 
+export const getUserViewsQuery = () => {
+  return convexQuery(api.query.getUserViews, {});
+};
+
+export const getUserViews = () => {
+  const userViews = queryClient.getQueryData(
+    getUserViewsQuery().queryKey
+  ) as UserViewData[];
+
+  return userViews;
+};
+
 export const getUserViewData = (viewName: string) => {
   const userViewData = queryClient.getQueryData(
     getUserViewQuery(viewName).queryKey

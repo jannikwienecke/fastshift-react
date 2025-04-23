@@ -102,6 +102,7 @@ export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
 export const createDataModel: StoreFn<'createDataModel'> =
   (store$) => (data, tableName) => {
     const sorting = store$.displayOptions.sorting.get();
+
     const sorted = sortRows(data, store$.views.get(), {
       field: sorting.field,
       order: sorting.order,
@@ -123,7 +124,6 @@ export const init: StoreFn<'init'> =
     continueCursor,
     isDone,
     viewConfigManager,
-    views,
     uiViewConfig,
     commands,
     userViewData,
@@ -156,9 +156,7 @@ export const init: StoreFn<'init'> =
         },
       });
 
-      store$.views.set(views);
       store$.viewConfigManager.set(viewConfigManager);
-      uiViewConfig && store$.uiViewConfig.set(uiViewConfig);
       store$.filter.filters.set([]);
       store$.commands.set(commands);
 
@@ -188,7 +186,6 @@ export const init: StoreFn<'init'> =
         .getViewFieldList()
         .map((field) => field.name);
 
-      _log.info(store$.viewConfigManager.viewConfig.viewName.get());
       store$.displayOptions.viewField.allFields.set(viewFields);
     });
 
@@ -207,16 +204,24 @@ const handlingFetchMoreState = async (
   const all = [...prevData, ...newData];
 
   const allIds = queryReturn.allIds;
-  const toShow = allIds
-    .map((id) => {
-      const row = all.find((r) => r['id'] === id);
-      if (!row) return null;
-      return row;
-    })
-    .filter((row) => row !== null);
-  store$.createDataModel(toShow);
 
-  // store$.createDataModel(all);
+  const addedIds = [] as string[];
+  store$.createDataModel(
+    all.filter((row) => {
+      const isInAdded = addedIds.some((id) => id === row['id']);
+      const isInAllIds = allIds?.some((id) => id === row['id']);
+
+      if (isInAdded) {
+        return false;
+      }
+
+      if (isInAllIds) {
+        addedIds.push(row['id']);
+      }
+
+      return isInAllIds;
+    })
+  );
 
   store$.fetchMore.assign({
     currentCursor: store$.fetchMore.currentCursor.get(),
@@ -309,7 +314,8 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
-    _log.info(`:handleIncomingData`, state, data);
+    _log.info(`____handleIncomingData`, state, data.data?.length);
+
     if (data.isPending) return;
 
     if (store$.viewConfigManager.localModeEnabled.get()) {
@@ -324,6 +330,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
     switch (state) {
       case 'fetching-more':
         _log.debug('RECEIVING DATA AFTER FETCHING MORE', data);
+        console.log('handlingFetchMoreState!!!');
         await handlingFetchMoreState(store$, data);
         break;
 
@@ -375,12 +382,13 @@ export const handleIncomingRelationalData: StoreFn<'handleIncomingData'> =
 export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
   (store$) => async (data) => {
     const rows = data.data;
-    _log.debug('handleIncomingDetailData', rows);
 
-    const tableName = store$.viewConfigManager.get().getTableName?.();
+    const viewName = store$.detail.viewConfigManager.getViewName();
+    _log.info('____handleIncomingDetailData: ', rows?.length, viewName);
+
     if (rows?.length === 1) {
-      const data = makeData(store$.views.get(), tableName)(rows);
+      const data = makeData(store$.views.get(), viewName)(rows);
 
-      store$.detail.detailRow.set(data.rows?.[0]);
+      store$.detail.row.set(data.rows?.[0]);
     }
   };

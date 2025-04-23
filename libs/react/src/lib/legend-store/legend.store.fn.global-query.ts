@@ -22,6 +22,16 @@ export const globalFetchMore: StoreFn<'globalFetchMore'> = (store$) => () => {
   _log.debug('Pagination: fetchMore...', store$.fetchMore.get());
   if (store$.fetchMore.isDone.get()) return;
 
+  const state = store$.state.get();
+  if (
+    state === 'fetching-more' ||
+    state === 'filter-changed' ||
+    state === 'updating-display-options'
+  ) {
+    _log.debug('Not fetching more: State is ', state);
+    return;
+  }
+
   batch(() => {
     store$.state.set('fetching-more');
 

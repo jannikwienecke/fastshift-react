@@ -39,6 +39,12 @@ export const testQuery = server.mutation({
   },
 });
 
+export const getUserViews = server.query({
+  handler: async (ctx, args) => {
+    return await ctx.db.query('views').collect();
+  },
+});
+
 export const userViewData = server.query({
   args: { viewName: v.union(v.string(), v.null()) },
 

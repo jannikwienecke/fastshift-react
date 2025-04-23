@@ -1,9 +1,8 @@
 import { projectsConfig } from '@apps-next/convex';
 import { DataType } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
-import { viewStore } from '../application-store/app.store';
 import { DefaultViewTemplate } from './default-view-template';
-import { makeViewFieldsConfig } from '@apps-next/react';
+import { viewRegistry } from '@apps-next/react';
 
 export type ProjectsViewDataType = DataType<
   'projects',
@@ -39,5 +38,5 @@ const ProjectsMainPage = observer(() => {
   );
 });
 
-viewStore.addView(projectsConfig).addComponents({ main: ProjectsMainPage });
+viewRegistry.addView(projectsConfig).addComponents({ main: ProjectsMainPage });
 // .addUiConfig(uiViewConfig);

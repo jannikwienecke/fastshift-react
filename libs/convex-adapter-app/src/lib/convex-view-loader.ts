@@ -29,6 +29,14 @@ export const viewLoaderHandler = async (
     };
   }
 
+  // console.log('______VIEW LOADER START', {
+  //   ...args,
+  //   modelConfig: undefined,
+  //   viewConfigManager: undefined,
+  //   registeredViews: undefined,
+  //   viewConfig: undefined,
+  // });
+
   const viewConfigManager = args.viewConfigManager;
   if (!viewConfigManager) throw new Error('viewConfigManager is not defined');
 

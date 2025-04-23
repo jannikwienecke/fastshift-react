@@ -60,9 +60,15 @@ export const getFormState = () => {
     _log.warn('Form State Errors: ', errors);
   }
 
+  console.log({ errors });
   return {
     isReady: !errors,
     errors: errors ?? {},
+    isFieldReady: (field: FieldConfig) => {
+      const fieldErrors = errors?.[field.name];
+      if (!fieldErrors) return true;
+      return false;
+    },
   } satisfies CommandformProps['formState'];
 };
 
@@ -175,7 +181,11 @@ export const getComplexFormFields = () => {
   return complexFields;
 };
 
-export const formHelper = (view: ViewConfigType, row?: Row) => {
+export const formHelper = (
+  view: ViewConfigType,
+  row?: Row,
+  isDetail?: boolean
+) => {
   const viewConfigManager = new BaseViewConfigManager(view);
 
   const getFormState = () => {
@@ -187,6 +197,11 @@ export const formHelper = (view: ViewConfigType, row?: Row) => {
 
     return {
       isReady: !errors,
+      isFieldReady: (field: FieldConfig) => {
+        const fieldErrors = errors?.[field.name];
+        if (!fieldErrors) return true;
+        return false;
+      },
       errors: errors ?? {},
     } satisfies FormState;
   };
@@ -202,7 +217,13 @@ export const formHelper = (view: ViewConfigType, row?: Row) => {
   };
 
   const getValueOfRow = (fieldName: string) => {
-    return row ? row?.getValue?.(fieldName) : undefined;
+    try {
+      return row ? row?.getValue?.(fieldName) : undefined;
+    } catch (error) {
+      console.log('___GET VALUE OF ROW ERROR', error);
+      console.log(row);
+      console.log(fieldName);
+    }
   };
 
   const viewFields =
@@ -223,6 +244,7 @@ export const formHelper = (view: ViewConfigType, row?: Row) => {
       const icon = getComponent({
         fieldName: field.name,
         componentType: 'icon',
+        isDetail,
       });
 
       const value = getValueOfRow(field.name);
@@ -245,6 +267,7 @@ export const formHelper = (view: ViewConfigType, row?: Row) => {
       const icon = getComponent({
         fieldName: field.name,
         componentType: 'icon',
+        isDetail,
       });
 
       const label = getFieldLabel(field, true) ?? '';

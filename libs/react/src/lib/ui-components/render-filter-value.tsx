@@ -64,7 +64,6 @@ export const FilterValue = (props: {
     ? fallback
     : translated;
 
-  console.log({ toDisplay, translated, name });
   return (
     <div className="flex flex-row gap-2 items-center">
       <span>{Icon && <Icon className="w-4 h-4" />}</span>

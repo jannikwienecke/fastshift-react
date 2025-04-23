@@ -7,6 +7,7 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
+import { isDetail } from './legend-store/legend.utils';
 
 const viewConfigManager$ = observable(() => {
   const view = store$.commandform.view.get();
@@ -33,7 +34,11 @@ export const useComboboxQuery = () => {
     (store$.filter.open.get() && !store.field);
 
   const { data } = useQuery({
-    viewName: store$.commandform.view.get()?.viewName,
+    viewName:
+      // TODO DETAIL BRANCHING
+      store$.commandform.view.get()?.viewName ?? isDetail()
+        ? store$.detail.parentViewName.get()
+        : undefined,
     viewConfigManager: viewConfigManager ?? undefined,
     query: store.query,
     relationQuery: {

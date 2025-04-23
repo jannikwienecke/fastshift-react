@@ -28,9 +28,12 @@ import {
   UserViewForm,
   ViewConfigType,
   DetailRow,
+  DetailViewTypeState,
 } from '@apps-next/core';
-import { Observable } from '@legendapp/state';
+import { observable, Observable } from '@legendapp/state';
+import { QueryClient } from '@tanstack/react-query';
 import { PaginationOptions } from 'convex/server';
+import { MakeQueryOptions } from '../query-context';
 
 export type InputDialogState = {
   open: boolean;
@@ -123,6 +126,10 @@ export type FetchMoreOptions = {
   isDone: boolean;
 };
 
+export type GlobalStore = {
+  //
+};
+
 export type LegendStore = {
   handleIncomingData: (props: QueryReturnOrUndefined) => void;
   handleIncomingRelationalData: (props: QueryReturnOrUndefined) => void;
@@ -148,8 +155,7 @@ export type LegendStore = {
       | { type: 'navigate'; id?: string; view: string }
       | {
           type: 'switch-detail-view';
-          viewType: 'overview' | 'model';
-          model: string | null;
+          state: DetailViewTypeState;
         };
   };
 
@@ -161,6 +167,7 @@ export type LegendStore = {
   //   VIEW STATE
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
+  userViews: UserViewData[];
   commands: UserStoreCommand[];
   userViewData: UserViewData | undefined;
 
@@ -169,6 +176,8 @@ export type LegendStore = {
   api?: {
     mutate?: (args: MutationDto) => void;
     mutateAsync?: (args: MutationDto) => Promise<MutationReturnDto>;
+    queryClient?: QueryClient;
+    makeQueryOptions: MakeQueryOptions;
   };
 
   globalQuery: string;
@@ -216,7 +225,6 @@ export type LegendStore = {
     continueCursor: ContinueCursor | null,
     isDone: boolean,
     viewConfigManager: BaseViewConfigManagerInterface,
-    views: RegisteredViews,
     uiViewConfig: UiViewConfig | undefined,
     commands: UserStoreCommand[],
     userView: UserViewData | undefined,
@@ -412,7 +420,7 @@ export type LegendStore = {
 
   detail?: {
     viewConfigManager: BaseViewConfigManagerInterface;
-    row: Row;
+    row?: Row;
     detailRow?: DetailRow;
     selectedField?: FieldConfig;
     rect?: DOMRect;
@@ -422,10 +430,7 @@ export type LegendStore = {
       // error?: string;
     };
     parentViewName: string;
-    view?: {
-      type: 'overview' | 'list';
-      selectedRelation?: string;
-    };
+    viewType?: DetailViewTypeState;
   };
 
   detailpageChangeInput: (

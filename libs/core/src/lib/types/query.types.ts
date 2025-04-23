@@ -21,6 +21,8 @@ export type QueryProps = {
   viewConfigManager?: BaseViewConfigManagerInterface;
   registeredViews: RegisteredViews;
   modelConfig?: ModelConfig;
+  parentId?: string | null;
+  parentViewName?: string | null;
   viewName?: string;
   relationQuery?: {
     tableName: string;
@@ -33,9 +35,8 @@ export type QueryDto = {
   viewConfig?: ViewConfigType;
   viewConfigManager?: BaseViewConfigManagerInterface;
   viewId: string | null;
-  parentViewName: string | null;
-  parentId: string | null;
-
+  parentViewName?: string | null;
+  parentId?: string | null;
   filters?: string;
   displayOptions?: string;
   onlyRelationalData?: boolean;

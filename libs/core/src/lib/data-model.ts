@@ -7,6 +7,7 @@ export type Row<T extends RecordType | string | number | undefined = any> = {
   raw: T;
   label: string;
   id: string;
+  updated?: number;
   getValue<K extends keyof T>(
     key: K
   ): T[K] extends Array<any>

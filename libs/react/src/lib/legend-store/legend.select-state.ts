@@ -18,9 +18,16 @@ export const selectState$ = observable({
   selectedFilterRows: [] as Row[],
 
   rect: undefined as DOMRect | undefined,
+
+  isDetail: false,
 });
 
 const getParentRow = () => {
+  const detailRow = store$.detail.row.get();
+
+  // TODO DETAIL BRANCHING
+  if (detailRow && selectState$.isDetail.get()) return detailRow as Row;
+
   const row = store$.dataModel.rows
     .get()
     .find((r) => r.id === selectState$.parentRow.get()?.id);
@@ -29,6 +36,7 @@ const getParentRow = () => {
 };
 const getCurrentRows = () => {
   const field = selectState$.field.get();
+
   if (!field) return [];
 
   const parentRow = getParentRow();
@@ -61,7 +69,9 @@ const getState = () => {
   };
 };
 
-export const open = (row: Row, field: FieldConfig) => {
+export const open = (row: Row, field: FieldConfig, isDetail?: boolean) => {
+  selectState$.isDetail.set(!!isDetail);
+
   selectState$.parentRow.set(row);
   selectState$.field.set(field);
 
@@ -84,6 +94,7 @@ export const close = () => {
   selectState$.initialSelectedFilterRows.set([]);
   selectState$.selectedFilterRows.set([]);
   selectState$.rect.set(undefined);
+  selectState$.isDetail.set(false);
 };
 
 export const select = (row: Row) => {
@@ -181,7 +192,6 @@ selectState$.toInsertRow.onChange((state) => {
   if (!row) return;
 
   if (!field.relation?.manyToManyTable) {
-    console.info('___NOT MANY TO MANY');
     store$.updateRecordMutation({
       field,
       row: parentRow,
