@@ -1,20 +1,18 @@
 import {
   _log,
+  getViewByName,
   MakeDetailPropsOption,
   UiViewConfig,
   ViewConfigType,
+  ViewRegistryEntry,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
+import { store$ } from './legend.store';
 
 export const resettingDb$ = observable(false);
 
 const viewsConfigStore = observable<{
-  [key: string]: {
-    main?: () => React.ReactNode;
-    detail?: (options: MakeDetailPropsOption) => React.ReactNode;
-    viewConfig: ViewConfigType;
-    uiViewConfig?: UiViewConfig;
-  };
+  [key: string]: ViewRegistryEntry;
 }>({});
 
 const addView = (config: ViewConfigType) => {
@@ -58,8 +56,30 @@ const addView = (config: ViewConfigType) => {
   return storeFn;
 };
 
-const getView = (name: string) => {
-  return viewsConfigStore.get()[name.toLowerCase()];
+const getView = (name: string): ViewRegistryEntry => {
+  const store = viewsConfigStore.get();
+  const found = Object.entries(store).find(([key, value]) => {
+    return (
+      key === name.toLowerCase() ||
+      value.viewConfig.tableName.toLowerCase() === name.toLowerCase() ||
+      value.viewConfig.viewName.toLowerCase() === name.toLowerCase()
+    );
+  });
+
+  if (!found) {
+    const config = getViewByName(store$.views.get(), name);
+    if (!config) {
+      console.log({ views: store$.views.get(), name });
+      console.trace();
+
+      throw new Error(`View not found: :${name}`);
+    }
+    return {
+      viewConfig: config,
+    };
+  }
+
+  return found[1];
 };
 
 const getViews = () => {

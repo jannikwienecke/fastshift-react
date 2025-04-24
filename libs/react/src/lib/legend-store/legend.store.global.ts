@@ -1,20 +1,17 @@
 import {
   BaseViewConfigManager,
   configManager,
-  FieldConfig,
+  DEFAULT_FETCH_LIMIT_QUERY,
   getViewByName,
-  makeData,
-  patchDict,
+  patchAllViews,
   QueryReturnOrUndefined,
   RegisteredViews,
-  renderModelName,
   slugHelper,
-  t,
   UserViewData,
-  patchAllViews,
-  DEFAULT_FETCH_LIMIT_QUERY,
 } from '@apps-next/core';
+import { batch } from '@legendapp/state';
 import { viewRegistry } from './legend.app.registry';
+import { detailFormHelper } from './legend.detailpage.helper';
 import { xSelect } from './legend.select-state';
 import { store$ } from './legend.store';
 import {
@@ -22,8 +19,6 @@ import {
   createRelationalDataModel,
   handleIncomingDetailData,
 } from './legend.store.fn.global';
-import { detailFormHelper } from './legend.detailpage.helper';
-import { batch } from '@legendapp/state';
 
 // const patchAllViews = (views: RegisteredViews) => {
 //   return patchDict(views ?? {}, (view) => {
@@ -71,7 +66,7 @@ const createViewConfigManager = (viewName: string) => {
   const { uiViewConfig } = viewRegistry.getView(viewName) ?? {};
 
   if (!viewConfig) {
-    console.log('____', viewName, views);
+    console.warn('____', viewName, views);
     console.error('viewConfig is not defined::', viewName);
 
     throw new Error(`viewConfig is not defined: ${viewName}`);
@@ -157,7 +152,7 @@ const setStore = (viewName: string, parentViewName?: string) => {
 
 const handleQueryData = (data: QueryReturnOrUndefined) => {
   const isDone = DEFAULT_FETCH_LIMIT_QUERY > (data.data?.length ?? 0);
-  console.log('____Receive Data: Length: ', data.data?.length, { isDone });
+  console.warn('____Receive Data: Length: ', data.data?.length, { isDone });
   store$.fetchMore.isDone.set(isDone);
 
   createDataModel(store$)(data.data ?? []);
@@ -237,7 +232,7 @@ const handleInitLoadStore = (action: GlobalStoreAction) => {
 };
 
 const handleChangeView = (action: GlobalStoreAction) => {
-  console.log('____HANDLE CHANGE VIEW', action.type);
+  console.warn('____HANDLE CHANGE VIEW', action.type);
   if (action.type !== 'CHANGE_VIEW') return;
   const { viewName, data, resetDetail } = action.payload;
 
@@ -264,7 +259,7 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
   const { viewName, id, data } = action.payload;
   if (id === store$.detail.row.id.get()) return;
 
-  console.log('____LOAD VIEW DETAIL PAGE', action);
+  console.warn('____LOAD VIEW DETAIL PAGE', action);
 
   const viewConfigManager = createViewConfigManager(viewName);
 
@@ -322,7 +317,7 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
   ) {
     handleQueryData(data);
   } else {
-    console.log('____LOAD SUB VIEW LIST PAGE', action);
+    console.warn('____LOAD SUB VIEW LIST PAGE', action);
     setStore(viewName, parentViewName);
     resetStore();
 
@@ -340,4 +335,7 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
 
 export const globalStore = {
   dispatch,
+  setViews: (views: RegisteredViews) => {
+    store$.views.set(patchAllViews(views));
+  },
 };

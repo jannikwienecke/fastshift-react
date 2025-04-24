@@ -314,7 +314,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
-    _log.info(`____handleIncomingData`, state, data.data?.length);
+    _log.warn(`____handleIncomingData`, state, data.data?.length);
 
     if (data.isPending) return;
 
@@ -384,11 +384,37 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
     const rows = data.data;
 
     const viewName = store$.detail.viewConfigManager.getViewName();
-    _log.info('____handleIncomingDetailData: ', rows?.length, viewName);
+    _log.warn('____handleIncomingDetailData: ', rows?.length, viewName);
+
+    const key = `detail-${store$.detail.row.get()?.id}`;
+    const ignoreNext = store$.ignoreNextQueryDict?.[key].get();
+    const dirtyField = store$.detail.form.dirtyField.get();
+    const diryValue = store$.detail.form.dirtyValue.get();
 
     if (rows?.length === 1) {
-      const data = makeData(store$.views.get(), viewName)(rows);
+      if (ignoreNext > 1) {
+        store$.ignoreNextQueryDict[key].set(ignoreNext - 1);
+      } else {
+        if (!dirtyField || !diryValue) {
+          const data = makeData(store$.views.get(), viewName)(rows);
+          store$.detail.row.set({
+            ...data.rows?.[0],
+          });
+        } else {
+          const data = makeData(
+            store$.views.get(),
+            viewName
+          )([
+            {
+              ...rows[0],
+              [dirtyField.name]: diryValue,
+            },
+          ]);
+          const row = data.rows?.[0];
 
-      store$.detail.row.set(data.rows?.[0]);
+          store$.detail.row.set(row);
+        }
+        store$.ignoreNextQueryDict[key].set(0);
+      }
     }
   };

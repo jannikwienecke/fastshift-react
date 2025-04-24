@@ -359,11 +359,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   });
 
   store$.detail.row.updated.onChange((changes) => {
+    if (changes.isFromSync) return;
     if (!changes.value) return;
-
-    // todo when i change
-    // and then change again. we see the first request resolve, set the value, and then the 2 request resolved
-    // but we should never see the resolved value of the first request
 
     const queriesData = store$.api.queryClient.getQueriesData({});
 

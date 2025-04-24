@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { UiViewConfig } from '../config.store';
 import { IndexField, SearchableField } from './base.types';
+import { MakeDetailPropsOption } from './ui.types';
 import { ViewConfigType, ViewFieldConfig } from './view-config.types';
 
 export type IncludeConfig<T = any> = Record<string, T[]>;
@@ -54,3 +56,10 @@ export interface BaseConfigInterface<
   _datamodel: DataModelType;
   defaultViewConfigs: Partial<Record<string, ViewConfigType<any>>>;
 }
+
+export type ViewRegistryEntry = {
+  main?: () => React.ReactNode;
+  detail?: (options: MakeDetailPropsOption) => React.ReactNode;
+  viewConfig: ViewConfigType;
+  uiViewConfig?: UiViewConfig;
+};

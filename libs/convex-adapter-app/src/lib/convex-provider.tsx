@@ -68,6 +68,10 @@ const makeQuery = (
   parentViewName: string | null,
   parentId: string | null
 ) => {
+  if (!viewConfig) {
+    console.trace();
+    throw new Error('viewConfig is required');
+  }
   const mergedConfig = configManager(viewConfig).mergeAndCreate(
     userViewData ?? undefined
   );

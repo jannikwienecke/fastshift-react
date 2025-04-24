@@ -131,8 +131,8 @@ export const useDetailQuery = <
 
   const detail = store$.detail.get();
 
-  const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
-    useStableQuery(prisma, {
+  const queryPropsMerged = React.useMemo(() => {
+    return {
       registeredViews: store$.views.get(),
       viewConfig: detail?.viewConfigManager?.viewConfig,
       query: '',
@@ -144,7 +144,11 @@ export const useDetailQuery = <
       parentId: undefined,
       modelConfig: undefined,
       parentViewName: undefined,
-    });
+    };
+  }, [detail?.row?.id, detail?.viewConfigManager?.viewConfig]);
+
+  const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
+    useStableQuery(prisma, queryPropsMerged);
 
   return {
     ...queryReturn,
@@ -245,16 +249,35 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   //   });
   // }, [queryReturn?.data?.data]);
 
+  const mergedPropsRef = React.useRef(queryPropsMerged);
+  React.useEffect(() => {
+    mergedPropsRef.current = queryPropsMerged;
+  }, [queryPropsMerged]);
+
   React.useEffect(() => {
     if (!queryReturn?.data?.data) return;
 
-    console.log(
+    // console.log(mergedPropsRef.current);
+
+    // const queryPropsMerged = mergedPropsRef.current;
+
+    // const tableName = queryPropsMerged.viewConfig.tableName;
+    // const parentId = queryPropsMerged.parentId;
+
+    // console.log('tableName', tableName);
+    // const key = `${tableName}-${parentId}`;
+    // const ignoreNext = store$.ignoreNextQueryDict?.[key].get();
+    // console.log('ignoreNext', ignoreNext);
+
+    console.warn(
       '____USE QUERY NORMAL:: ',
       queryReturn?.data.data.length,
       'First:',
       queryReturn?.data?.data?.[0]?.name
     );
   }, [queryReturn?.data?.data]);
+  //
+  // console.log(queryReturn?.data?.data?.[0]?.name);
 
   return {
     ...queryReturn,

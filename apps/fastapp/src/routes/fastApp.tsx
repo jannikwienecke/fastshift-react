@@ -10,6 +10,7 @@ import {
   ErrorDetailsDialog,
   globalStore,
   store$,
+  viewRegistry,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import {
@@ -51,6 +52,8 @@ export const Route = createFileRoute('/fastApp')({
     if (store$.viewConfigManager.viewConfig.get()) {
       return;
     }
+
+    globalStore.setViews(views);
 
     _log.debug(`Loader for view: ${viewName} - slug: ${slug}`);
 

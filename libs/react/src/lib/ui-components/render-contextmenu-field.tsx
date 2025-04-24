@@ -21,6 +21,7 @@ export const ContextmenuFieldLabel = ({
     getComponent({
       componentType: 'contextmenuFieldItem',
       fieldName: field.name,
+      isDetail: false,
     });
 
   if (field && field.type === 'Boolean')
@@ -32,6 +33,7 @@ export const ContextmenuFieldLabel = ({
         )}
       </>
     );
+
   if (!field || !ComponentToRender) return <>{value.label.firstUpper()}</>;
 
   return (

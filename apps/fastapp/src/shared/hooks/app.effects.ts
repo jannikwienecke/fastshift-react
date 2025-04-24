@@ -26,7 +26,7 @@ export const useAppEffects = (viewName: string) => {
     if (!config || !parentViewName || !parentId) return;
     if (view.toLowerCase() === parentViewName.toLowerCase()) return;
 
-    console.log('_____PRELOAD ROUTE INIT');
+    console.warn('____PRELOAD ROUTE INIT');
     realPreloadRoute({
       from: '/fastApp/$view/$id/overview',
       to: `/fastApp/${slugHelper().slugify(

@@ -28,17 +28,12 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      console.log(vars);
       store$.state.set('mutating');
 
       if (vars.mutation.type !== 'UPDATE_RECORD') return;
-      console.log(isDetail());
       const detail = store$.detail.get();
-      const modelName = detail?.viewConfigManager.getTableName();
       const key =
-        isDetail() && modelName && detail?.row?.id
-          ? `${modelName}-${detail.row.id}`
-          : '';
+        isDetail() && detail?.row?.id ? `detail-${detail.row.id}` : '';
 
       store$.ignoreNextQueryDict.set((prev) => {
         const prevKey = prev[key];
@@ -48,8 +43,6 @@ export const useMutation = () => {
 
         return { ...prev, [key]: 1 };
       });
-
-      console.log(store$.ignoreNextQueryDict.get());
     },
   });
 

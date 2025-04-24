@@ -1,9 +1,19 @@
 import { views } from '@apps-next/convex';
-import { getViewByName, ViewConfigType } from '@apps-next/core';
+import {
+  getViewByName,
+  UserViewData,
+  ViewConfigType,
+  ViewRegistryEntry,
+} from '@apps-next/core';
 import { getUserViewData } from '../query-client';
 import { viewRegistry } from '@apps-next/react';
 
-export const getViewData = (viewName: string) => {
+export const getViewData = (
+  viewName: string
+): {
+  userViewData: UserViewData | null | undefined;
+  viewData: ViewRegistryEntry;
+} => {
   const userViewData = getUserViewData(viewName);
 
   let viewData = viewRegistry.getView(userViewData?.baseView ?? viewName);
@@ -12,7 +22,16 @@ export const getViewData = (viewName: string) => {
 
   if (!viewData && view) {
     viewData = {
-      viewConfig: view as any,
+      viewConfig: view as ViewConfigType,
+    };
+  }
+
+  if (!viewData.viewConfig) {
+    return {
+      viewData: {
+        viewConfig: view,
+      },
+      userViewData,
     };
   }
 

@@ -29,7 +29,7 @@ export const viewLoaderHandler = async (
     };
   }
 
-  // console.log('______VIEW LOADER START', {
+  // console.warn('____'VIEW LOADER START', {
   //   ...args,
   //   modelConfig: undefined,
   //   viewConfigManager: undefined,

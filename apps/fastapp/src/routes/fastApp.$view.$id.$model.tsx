@@ -17,7 +17,7 @@ import React from 'react';
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
-    console.log('____LOAD SUB MODEL', ctx.params.model);
+    console.warn('____LOAD SUB MODEL', ctx.params.model);
 
     const model = ctx.params.model;
     const view = getViewByName(views, model);

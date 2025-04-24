@@ -1,5 +1,5 @@
 import { _log } from '@apps-next/core';
-import { viewRegistry } from '@apps-next/react';
+import { store$, viewRegistry } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
@@ -15,9 +15,9 @@ export const Route = createFileRoute('/fastApp/$view')({
 
     if (props.cause !== 'preload') return;
 
-    const { viewConfig } = viewRegistry.getView(viewName);
+    const { viewConfig } = viewRegistry.getView(viewName) ?? {};
 
-    console.log('---> PRELOAD QUERY', viewName);
+    console.warn('---> PRELOAD QUERY', viewConfig);
     await props.context.preloadQuery(viewConfig, viewName, null, null, null);
   },
 
