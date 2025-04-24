@@ -366,10 +366,13 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     const queryKeyDetail = queriesData.find((q) => {
       const key = q?.[0]?.[2] as Record<string, any>;
-      if ('viewName' in key && key?.viewName.toLowerCase() !== 'my projects')
+      if (
+        'viewName' in key &&
+        key?.['viewName'].toLowerCase() !== 'my projects'
+      )
         return false;
       if ('relationQuery' in key) return false;
-      if (!key?.viewId) return false;
+      if (!key?.['viewId']) return false;
 
       const data = store$.api.queryClient.getQueryData(
         q[0]
@@ -396,10 +399,13 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     const queryKey = queriesData.find((q) => {
       const key = q?.[0]?.[2] as Record<string, any>;
-      if ('viewName' in key && key?.viewName.toLowerCase() !== 'my projects')
+      if (
+        'viewName' in key &&
+        key?.['viewName'].toLowerCase() !== 'my projects'
+      )
         return false;
       if ('relationQuery' in key) return false;
-      if (key?.viewId !== null) return false;
+      if (key?.['viewId'] !== null) return false;
 
       const data = store$.api.queryClient.getQueryData(q[0]);
       return !!data;
@@ -417,7 +423,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         return {
           ...q,
           data: rows.map((r) => {
-            if (r.id === row.id) {
+            if (r['id'] === row.id) {
               return {
                 ...r,
                 ...row.raw,

@@ -273,7 +273,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       '____USE QUERY NORMAL:: ',
       queryReturn?.data.data.length,
       'First:',
-      queryReturn?.data?.data?.[0]?.name
+      queryReturn?.data?.data?.[0]
     );
   }, [queryReturn?.data?.data]);
   //
