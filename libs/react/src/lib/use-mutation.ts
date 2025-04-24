@@ -41,8 +41,6 @@ export const useMutation = () => {
           ? `detail-${detail.row.id}`
           : vars.viewName;
 
-      // console.log('MUTATION KEY:', key);
-
       store$.ignoreNextQueryDict.set((prev) => {
         const prevKey = prev[key];
         if (prevKey) {

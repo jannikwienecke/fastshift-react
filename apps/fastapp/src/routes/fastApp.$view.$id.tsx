@@ -11,23 +11,24 @@ import {
   store$,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
-import {
-  createFileRoute,
-  redirect,
-  useLocation,
-  useMatches,
-  useMatchRoute,
-  useParams,
-} from '@tanstack/react-router';
+import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
 import React from 'react';
 import { getViewData } from '../application-store/app.store.utils';
-import { getQueryKey, getUserViewQuery, queryClient } from '../query-client';
+import {
+  getQueryKey,
+  getUserViewQuery,
+  getUserViews,
+  getUserViewsQuery,
+  queryClient,
+} from '../query-client';
 import { useViewParams } from '../shared/hooks';
 import { getViewParms, pachTheViews } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   loader: async (props) => {
+    await queryClient.ensureQueryData(getUserViewsQuery());
+
     const { id, viewName } = getViewParms(props.params);
     if (!viewName) return;
 
@@ -35,7 +36,8 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
 
     await queryClient.ensureQueryData(getUserViewQuery(viewName));
 
-    const { viewData } = getViewData(viewName);
+    const userViews = getUserViews();
+    const { viewData } = getViewData(viewName, userViews);
 
     await props.context.preloadQuery(
       viewData.viewConfig,
@@ -54,7 +56,8 @@ const DetaiViewPage = observer(() => {
   let { viewName } = useViewParams();
   viewName = viewName as string;
 
-  const { viewData } = getViewData(viewName);
+  const userViews = getUserViews();
+  const { viewData } = getViewData(viewName, userViews);
 
   const view = getViewByName(pachTheViews(), viewName);
 

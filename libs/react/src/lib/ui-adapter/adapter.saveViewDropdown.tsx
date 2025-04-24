@@ -95,6 +95,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
           ...copyOf,
           isOpen: store$.displayOptions.isOpen.get(),
         });
+        store$.displayOptions.sorting.isOpen.set(false);
       }
     },
     async onSave() {

@@ -4,13 +4,12 @@ import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 
 import { views } from '@apps-next/convex';
-import { _log, getViewByName, QueryReturnOrUndefined } from '@apps-next/core';
+import { _log, QueryReturnOrUndefined } from '@apps-next/core';
 import {
   ClientViewProviderConvex,
   ErrorDetailsDialog,
   globalStore,
   store$,
-  viewRegistry,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import {
@@ -40,11 +39,15 @@ import {
   queryClient,
 } from '../query-client';
 import { useCommands, useViewParams } from '../shared/hooks';
-import { getViewParms } from '../shared/utils/app.helper';
 import { useAppEffects } from '../shared/hooks/app.effects';
+import { getViewParms } from '../shared/utils/app.helper';
 
 export const Route = createFileRoute('/fastApp')({
   loader: async (props) => {
+    await queryClient.ensureQueryData(getUserViewsQuery());
+
+    const userViews = getUserViews();
+
     const { viewName, slug, id, model } = getViewParms(props.params);
 
     if (!viewName) return;
@@ -57,10 +60,7 @@ export const Route = createFileRoute('/fastApp')({
 
     _log.debug(`Loader for view: ${viewName} - slug: ${slug}`);
 
-    await queryClient.ensureQueryData(getUserViewsQuery());
-    const userViews = getUserViews();
-
-    const { viewData } = getViewData(viewName);
+    const { viewData, userViewData } = getViewData(viewName, userViews);
 
     if (!viewData) {
       _log.warn(`View ${viewName} not found, redirecting to /fastApp`);
@@ -71,14 +71,20 @@ export const Route = createFileRoute('/fastApp')({
 
     await props.context.preloadQuery(
       viewData.viewConfig,
-      viewName,
+      userViewData?.name ?? viewName,
       null,
       null,
       null
     );
 
     data = queryClient.getQueryData(
-      getQueryKey(viewData.viewConfig, viewName, null, null, null)
+      getQueryKey(
+        viewData.viewConfig,
+        userViewData?.name ?? viewName,
+        null,
+        null,
+        null
+      )
     ) as QueryReturnOrUndefined;
 
     globalStore.dispatch({
@@ -90,6 +96,7 @@ export const Route = createFileRoute('/fastApp')({
         views,
         id: id ?? null,
         model: model ?? null,
+        userView: userViewData,
       },
     });
   },
@@ -109,10 +116,17 @@ const FastAppLayoutComponent = observer(() => {
 
   useAppEffects(viewName);
 
-  const { viewData } = getViewData(viewName);
+  const userViews = getUserViews();
+  const { viewData, userViewData } = getViewData(viewName, userViews);
 
   const data = queryClient.getQueryData(
-    getQueryKey(viewData.viewConfig, viewName, null, null, null)
+    getQueryKey(
+      viewData.viewConfig,
+      userViewData?.name ?? viewName,
+      null,
+      null,
+      null
+    )
   ) as QueryReturnOrUndefined;
 
   const doOnceForViewRef = React.useRef('');

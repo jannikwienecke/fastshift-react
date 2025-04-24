@@ -60,7 +60,6 @@ export const getFormState = () => {
     _log.warn('Form State Errors: ', errors);
   }
 
-  console.log({ errors });
   return {
     isReady: !errors,
     errors: errors ?? {},
@@ -220,9 +219,9 @@ export const formHelper = (
     try {
       return row ? row?.getValue?.(fieldName) : undefined;
     } catch (error) {
-      console.log('___GET VALUE OF ROW ERROR', error);
-      console.log(row);
-      console.log(fieldName);
+      console.warn('___GET VALUE OF ROW ERROR', error);
+      console.warn(row);
+      console.warn(fieldName);
     }
   };
 

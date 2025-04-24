@@ -57,7 +57,6 @@ export const addLocalDisplayOptionsHandling = (
   store$.displayOptions.sorting.field.onChange((changes) => {
     if (!changes.value) return;
 
-    console.log('APPLY SORTING FIELD', changes);
     const prevAtPath = changes.changes[0].prevAtPath;
     if (!prevAtPath) return;
 
@@ -68,14 +67,12 @@ export const addLocalDisplayOptionsHandling = (
     const prevAtPath = changes.changes[0].prevAtPath;
     if (!prevAtPath) return;
 
-    console.log('APPLY SORTING ORDER', changes.value);
     applyDisplayOptions(store$, store$.displayOptions.get());
   });
   store$.displayOptions.showDeleted.onChange((changes) => {
     const prevAtPath = changes.changes[0].prevAtPath;
     if (!prevAtPath) return;
 
-    console.log('APPLY SHOW DELETED', changes.value);
     applyDisplayOptions(store$, store$.displayOptions.get());
   });
 };

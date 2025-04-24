@@ -50,6 +50,7 @@ import {
 
 export const getViewData = (viewName: string) => {
   const userViews = store$.userViews.get();
+
   const userViewData = userViews.find((view) => view.name === viewName);
   return userViewData;
 };
@@ -62,15 +63,18 @@ export const currentViewName = () =>
 const createViewConfigManager = (viewName: string) => {
   const views = store$.views.get();
 
-  const viewConfig = getViewByName(views, viewName);
-  const { uiViewConfig } = viewRegistry.getView(viewName) ?? {};
+  const viewData = getViewData(viewName);
+
+  const viewConfig = getViewByName(views, viewData?.baseView ?? viewName);
 
   if (!viewConfig) {
     console.warn('____', viewName, views);
     console.error('viewConfig is not defined::', viewName);
-
     throw new Error(`viewConfig is not defined: ${viewName}`);
   }
+
+  const { uiViewConfig } =
+    viewRegistry.getView(viewConfig?.viewName ?? viewName) ?? {};
 
   const viewConfigManager = new BaseViewConfigManager(
     {
@@ -114,7 +118,6 @@ const resetStore = () => {
 
 const setStore = (viewName: string, parentViewName?: string) => {
   store$.state.set('initialized');
-  viewName = slugHelper().unslugify(viewName);
 
   const userViewData = getViewData(viewName);
   const viewConfigManager = createViewConfigManager(viewName);
@@ -129,11 +132,14 @@ const setStore = (viewName: string, parentViewName?: string) => {
     store$.userViewData.set(userViewData);
     store$.detail.parentViewName.set(parentViewName);
 
+    console.log(
+      'soft delete',
+      viewConfigManager.viewConfig.mutation?.softDelete
+    );
+
     const viewFields = viewConfigManager
       .getViewFieldList()
       .map((field) => field.name);
-
-    // store$.displayOptions.viewField.allFields.set(viewFields);
 
     if (!parentViewName) {
       store$.displayOptions.set({
@@ -144,8 +150,25 @@ const setStore = (viewName: string, parentViewName?: string) => {
         resetted: true,
       });
       store$.filter.filters.set(filters);
+
+      const displayOptions = store$.displayOptions.get();
+      const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
+      const copyOfFilters = JSON.parse(JSON.stringify(filters));
+
+      store$.userViewSettings.initialSettings.set({
+        filters: copyOfFilters,
+        displayOptions: copyOfDisplayOptions,
+      });
+
+      store$.displayOptions.softDeleteEnabled.set(
+        !!viewConfigManager.viewConfig.mutation?.softDelete
+      );
     } else {
       store$.displayOptions.viewField.allFields.set(viewFields);
+
+      store$.displayOptions.softDeleteEnabled.set(
+        !!viewConfigManager.viewConfig.mutation?.softDelete
+      );
     }
   });
 
@@ -171,6 +194,7 @@ type GlobalStoreAction =
         data: QueryReturnOrUndefined;
         views: RegisteredViews;
         userViews: UserViewData[];
+        userView: UserViewData | null | undefined;
       };
     }
   | {
@@ -215,7 +239,7 @@ const dispatch = (action: GlobalStoreAction) => {
       return handleLoadDetailPage(action);
 
     default:
-      console.log('Unknown action type', action);
+      console.warn('Unknown action type', action);
       throw new Error('Unknown action type');
   }
 };
@@ -223,18 +247,19 @@ const dispatch = (action: GlobalStoreAction) => {
 const handleInitLoadStore = (action: GlobalStoreAction) => {
   if (action.type !== 'INIT_LOAD_STORE') return;
 
-  const { viewName, data, userViews, views } = action.payload;
+  console.debug('____INIT LOAD STORE', action);
+  const { viewName, data, userViews, views, userView } = action.payload;
 
   resetStore();
   store$.userViews.set(userViews);
   store$.views.set(patchAllViews(views));
 
-  setStore(viewName);
+  setStore(userView?.name ?? viewName);
   handleQueryData(data);
 };
 
 const handleChangeView = (action: GlobalStoreAction) => {
-  console.warn('____HANDLE CHANGE VIEW', action.type);
+  console.debug('____HANDLE CHANGE VIEW', action.type);
   if (action.type !== 'CHANGE_VIEW') return;
   const { viewName, data, resetDetail } = action.payload;
 

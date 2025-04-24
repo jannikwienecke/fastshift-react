@@ -65,6 +65,7 @@ export type UserViewData = {
   displayOptions: string | null;
   filters: string | null;
   name: string;
+  slug: string;
 };
 
 export type QueryReturnDto<T extends RecordType = RecordType> = {

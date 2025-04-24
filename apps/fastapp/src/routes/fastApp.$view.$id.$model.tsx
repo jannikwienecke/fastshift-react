@@ -4,7 +4,12 @@ import { globalStore, store$ } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
 import { getViewData } from '../application-store/app.store.utils';
-import { getQueryKey, queryClient } from '../query-client';
+import {
+  getQueryKey,
+  getUserViews,
+  getUserViewsQuery,
+  queryClient,
+} from '../query-client';
 import { getViewParms } from '../shared/utils/app.helper';
 import {
   RenderDisplayOptions,
@@ -18,6 +23,7 @@ import React from 'react';
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
     console.warn('____LOAD SUB MODEL', ctx.params.model);
+    await queryClient.ensureQueryData(getUserViewsQuery());
 
     const model = ctx.params.model;
     const view = getViewByName(views, model);
@@ -28,7 +34,8 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
 
     if (!parentViewName) throw new Error('NOT VALID VIEW');
 
-    const { viewData } = getViewData(view.viewName);
+    const userViews = getUserViews();
+    const { viewData } = getViewData(view.viewName, userViews);
 
     if (!viewData) {
       _log.info(`View ${view.viewName} not found, redirecting to /fastApp`);
@@ -52,7 +59,9 @@ const DetailModelListViewPage = observer(() => {
 
   const view = getViewByName(views, model);
 
-  const { viewData } = getViewData(view?.viewName ?? '');
+  const userViews = getUserViews();
+
+  const { viewData } = getViewData(view?.viewName ?? '', userViews);
 
   const doOnceForModelID = React.useRef('');
 

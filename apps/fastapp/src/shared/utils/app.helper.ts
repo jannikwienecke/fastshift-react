@@ -7,6 +7,7 @@ import {
   slugHelper,
   t,
 } from '@apps-next/core';
+import { getUserViews } from '../../query-client';
 
 export const getViewParms = (params: {
   id?: string;
@@ -22,13 +23,17 @@ export const getViewParms = (params: {
     };
   }
 
-  const hasView = getViewByName(views, params?.view);
+  const userViews = getUserViews();
+
+  const userViewData = userViews?.find((v) => v.slug === params.view);
+
+  const hasView = getViewByName(views, userViewData?.baseView ?? params?.view);
 
   const model = params.model;
   if (hasView) {
     return {
       id: params.id,
-      viewName: params.view.toLowerCase(),
+      viewName: userViewData?.name ?? hasView.viewName,
       slug: params.view,
       model,
     };

@@ -31,8 +31,8 @@ const LOG_LEVEL = 'info' as string;
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const log = (...props: any[]) => {
     const view = args.viewConfigManager?.getTableName();
-    // if (view !== 'tags') return;
-    _log.info(...props);
+    if (view !== 'tasks') return;
+    console.log(...props);
   };
 
   const debug = (...props: any[]) => {
@@ -169,7 +169,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   );
 
   if (args.viewId) {
-    // console.log('SET ALL IDS TO VIEW ID', args.viewId);
     allIds = [args.viewId];
   }
 
@@ -229,7 +228,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const getRecordsHasIdsAndNotTooBig = () => {
       debug('Convex:getRecordsHasIdsAndNotTooBig');
-      return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
+      return getRecordsByIds(
+        idsAfterRemove?.slice(position, nextPosition) ?? [],
+        dbQuery
+      );
     };
 
     const getSortedRecords = () => {
@@ -319,7 +321,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   sortedRows =
     allIds !== null
       ? // added this, before we returned all sortedRows
-        sortedRows.slice(position, nextPosition)
+        sortedRows
       : sortedRows.slice(position, nextPosition);
 
   sortedRows = await mapWithInclude(sortedRows, ctx, args);

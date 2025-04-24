@@ -172,23 +172,18 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   });
 
   store$.state.onChange((changes) => {
-    const userViewSettings = store$.userViewSettings.get();
-
-    if (userViewSettings.initialSettings !== null) return;
-
-    const filters = store$.filter.filters.get();
-    const displayOptions = {
-      ...store$.displayOptions.get(),
-      isOpen: undefined,
-    };
-
-    const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
-    const copyOfFilters = JSON.parse(JSON.stringify(filters));
-
-    store$.userViewSettings.initialSettings.set({
-      displayOptions: copyOfDisplayOptions,
-      filters: copyOfFilters,
-    });
+    // if (changes.value !== 'initialized') return;
+    // const userViewSettings = store$.userViewSettings.get();
+    // if (userViewSettings.initialSettings !== null) return;
+    // const filters = store$.filter.filters.get();
+    // const displayOptions = {
+    //   ...store$.displayOptions.get(),
+    //   isOpen: undefined,
+    // };
+    // store$.userViewSettings.initialSettings.set({
+    //   displayOptions: copyOfDisplayOptions,
+    //   filters: copyOfFilters,
+    // });
   });
 
   store$.displayOptions.onChange((changes) => {

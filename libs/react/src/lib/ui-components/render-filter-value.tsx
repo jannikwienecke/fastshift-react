@@ -60,7 +60,7 @@ export const FilterValue = (props: {
   const translated = t(name as any);
   const toDisplay = translated.includes('returned an object instead of st')
     ? fallback
-    : translated === name
+    : translated === name && translated.includes('.')
     ? fallback
     : translated;
 

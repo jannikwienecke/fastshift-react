@@ -174,12 +174,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const cursor = store$.fetchMore.currentCursor.get();
 
-  // parentViewName: store$.detail.parentViewName.get() ?? null,
-  //     parentId: store$.detail.row.get()?.id ?? null,
   const parentId = store$.detail.row.get()?.id ?? null;
   const parentViewName = store$.detail.parentViewName.get() ?? null;
-
-  // console.log({ parentId, parentViewName });
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -233,22 +229,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
     useStableQuery(prisma, queryPropsMerged);
 
-  // React.useEffect(() => {
-  //   // console.log('queryPropsMerged: ', queryPropsMerged);
-  //   const queryData = store$.api.queryClient.getQueriesData({});
-  //   queryData.forEach((query) => {
-  //     const queryKey = query[0];
-  //     const props = queryKey[2];
-  //     const data = query[1]?.data;
-
-  //     if (data?.length !== 35) return;
-
-  //     console.log('xxx----');
-  //     console.log('xxx', props);
-  //     console.log('xxx', data);
-  //   });
-  // }, [queryReturn?.data?.data]);
-
   const mergedPropsRef = React.useRef(queryPropsMerged);
   React.useEffect(() => {
     mergedPropsRef.current = queryPropsMerged;
@@ -257,18 +237,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   React.useEffect(() => {
     if (!queryReturn?.data?.data) return;
 
-    // console.log(mergedPropsRef.current);
-
-    // const queryPropsMerged = mergedPropsRef.current;
-
-    // const tableName = queryPropsMerged.viewConfig.tableName;
-    // const parentId = queryPropsMerged.parentId;
-
-    // console.log('tableName', tableName);
-    // const key = `${tableName}-${parentId}`;
-    // const ignoreNext = store$.ignoreNextQueryDict?.[key].get();
-    // console.log('ignoreNext', ignoreNext);
-
     console.warn(
       '____USE QUERY NORMAL:: ',
       queryReturn?.data.data.length,
@@ -276,8 +244,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       queryReturn?.data?.data?.[0]
     );
   }, [queryReturn?.data?.data]);
-  //
-  // console.log(queryReturn?.data?.data?.[0]?.name);
 
   return {
     ...queryReturn,

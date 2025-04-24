@@ -21,12 +21,6 @@ export const viewMutation = server.mutation({
 export const testQuery = server.mutation({
   async handler(ctx, args_0) {
     try {
-      // const res = await ctx.db
-      //   .query('tasks_tags')
-      //   .withIndex('taskId', (q) => q.eq('taskId', 'daa' as Id<'tasks'>))
-      //   .collect();
-      // // console.log(res[0].)
-
       const res = await ctx.db.patch(
         'jh71s0zc8vdtxrtppctrjkjdg97c24qs' as Id<'tasks'>,
         {
@@ -70,35 +64,6 @@ export const userViewData = server.query({
   },
 });
 
-// const zMutation = zCustomMutation(server.mutation, NoOp);
-
-// export const createUserViewData = zMutation({
-//   args: {
-//     viewName: z.string().min(2),
-//     displayOptions: z.string().min(1).optional(),
-//     filters: z.string().min(1).optional(),
-//   },
-//   handler: async (ctx, args) => {
-//     const view = await ctx.db
-//       .query('views')
-//       .withIndex('name', (q) => q.eq('name', args.viewName))
-//       .first();
-
-//     if (view) {
-//       return { message: 'View already exists' };
-//     }
-
-//     await ctx.db.insert('views', {
-//       baseView: '',
-//       name: args.viewName,
-//       displayOptions: args.displayOptions ?? '',
-//       filters: args.filters ?? '',
-//     });
-
-//     return
-//   },
-// });
-
 export const displayOptions = server.query({
   handler: async (ctx) => {
     const all = await ctx.db.query('tasks').withIndex('priority').collect();
@@ -111,90 +76,6 @@ export const displayOptions = server.query({
     const filter = tasks.filter(
       (t) => t.dueDate && t.dueDate >= start && t.dueDate <= end
     );
-
-    // await ctx.db
-    //   .query('tasks')
-    //   .withSearchIndex('name_search', (q) => q.search('name', 'a'))
-    //   .paginate();
-
-    // // ctx.db.query('tasks_tags').withIndex('taskId', (q) => q.eq('taskId', '123')).order('asc')
-    // const tasks = await ctx.db
-    //   .query('tasks')
-    //   // .withIndex('description', q => q.eq('description', '123'))
-    //   // .withSearchIndex('name_search', (q) => q.search('name', '123'))
-
-    //   .filter((q) =>
-    //     q.and(
-    //       q.or(
-    //         ...projectIds.map((projectId) =>
-    //           q.eq(q.field('projectId'), projectId)
-    //         )
-    //       )
-    //     )
-    //   )
-    //   .collect();
-
-    // const taskIds = [] as Id<'tasks'>[];
-
-    // // ctx.db.query('tasks').filter((q) => q.neq(q.field('priority'), 'medium'))
-    // // ctx.db
-    // //   .query('tasks')
-    // //   .paginate({ cursor: '', numItems: 1 })
-    // //   .filter((q) =>
-    // //     q.or(
-    // //       ...['low', 'medium'].map((priority) =>
-    // //         q.eq(q.field('priority'), priority)
-    // //       )
-    // //     )
-    // //   );
-
-    // // ctx.db.query("tasks").withSearchIndex('name_search', (q) => q.search('name', '123')).
-
-    // // const tasks = ctx.db
-    // //   .query('tasks')
-    // //   .filter((q) =>
-    // //     q.or(...taskIds.map((taskId) => q.eq(q.field('_id'), taskId)))
-    // //   )
-    // //   .collect();
-
-    // const res = ctx.db
-    //   .query('tasks')
-    //   //   .withSearchIndex('name_search', (q) => q.search('name', '123'))
-
-    //   //  filter by completed
-    //   .filter((q) => q.eq(q.field('completed'), true));
-
-    // // asyncMap([] as ID<"tasks">[], async (taskId) => {
-    // //   const task = await ctx.db.query('tasks').withIndex('by_id', (q) => q.eq(q.field('_id'), taskId)).first();
-    // //   return task;
-    // // });
-
-    // // const taskIds: Id<'tasks'>[] = [];
-    // // const taskTags = await ctx.db
-    // // .query("tasks_tags")
-    // // .withIndex("taskId", (q) =>
-    // //   q.eq("taskId", taskIds)
-    // // )
-    // // .collect();
-
-    // const tags = await ctx.db
-    //   .query('tags')
-    //   .filter((q) =>
-    //     q.or(...tagIds.map((tagId) => q.eq(q.field('_id'), tagId)))
-    //   )
-    //   .collect();
-
-    // const taskTags = await ctx.db
-    //   .query('tasks_tags')
-    //   .withIndex('taskId', (q) => q.in('taskId', '123'))
-    //   .collect();
-
-    // tasks.filter((task) => task.tags?.includes('123'));
-
-    // const tasks = await ctx.db
-    //   .query('tasks')
-    //   .filter((q) => q.field('projectId').oneOf(projectIds))
-    //   .collect();
   },
 });
 
@@ -220,8 +101,6 @@ export const deleteMutesttation = server.query({
       }
     );
 
-    // const res = ctx.db.query('projects').take();
-    // ctx.db.query('ca')
     return {};
   },
 });

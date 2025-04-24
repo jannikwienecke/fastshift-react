@@ -69,7 +69,7 @@ const getView = (name: string): ViewRegistryEntry => {
   if (!found) {
     const config = getViewByName(store$.views.get(), name);
     if (!config) {
-      console.log({ views: store$.views.get(), name });
+      console.warn({ views: store$.views.get(), name });
       console.trace();
 
       throw new Error(`View not found: :${name}`);

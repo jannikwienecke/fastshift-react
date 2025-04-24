@@ -101,8 +101,6 @@ export const getIdsFromManyToManyFilters = async (
 
         return recordsWithoutManyToMany.map((r) => r._id);
       } else {
-        // console.log({ fieldNameFilter, manyToManyTable, fieldNameView });
-
         const rows = await getRelationTableRecords({
           registeredViews,
           ctx,

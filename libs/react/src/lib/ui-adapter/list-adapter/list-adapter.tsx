@@ -110,11 +110,11 @@ const renderFields = <T extends RecordType>(
           field = item.field;
         } catch (error) {
           if (index === 0) {
-            console.log('[-------fieldName---------]');
-            console.log(fieldName);
-            console.log(row);
-            console.log(viewConfigManager.viewConfig.viewName);
-            console.log('----');
+            console.warn('[-------fieldName---------]');
+            console.warn(fieldName);
+            console.warn(row);
+            console.warn(viewConfigManager.viewConfig.viewName);
+            console.warn('----');
           }
 
           _log.error(

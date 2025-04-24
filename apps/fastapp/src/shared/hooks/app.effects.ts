@@ -3,6 +3,7 @@ import { store$ } from '@apps-next/react';
 import { useLocation, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { useViewParams } from './useViewParams';
+import { getUserViews } from '../../query-client';
 
 export const useAppEffects = (viewName: string) => {
   const router = useRouter();
@@ -36,9 +37,18 @@ export const useAppEffects = (viewName: string) => {
   }, [pathname, realPreloadRoute, view]);
 
   React.useLayoutEffect(() => {
-    store$.userViewSettings.viewCreated.slug.onChange((v) => {
+    store$.userViewSettings.viewCreated.slug.onChange(async (v) => {
+      const views = getUserViews();
+
+      store$.userViews.set(views);
+
       const slug = v.value;
       if (slug) {
+        await realPreloadRoute({
+          from: '/fastApp/$view',
+          to: `/fastApp/${slug}`,
+        });
+
         navigateRef.current({ to: `/fastApp/${slug}` });
       }
     });

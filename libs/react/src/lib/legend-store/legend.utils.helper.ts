@@ -26,11 +26,10 @@ export const filterRowsByShowDeleted = (rows: Row[]) => {
 
 export const setGlobalDataModel = (rows: Row[]) => {
   // if (store$.detail.form.dirtyValue.get()) {
-  //   console.log('DOES NOT UPDATE IS DIRY!!', store$.detail.form.get());
+  //   console.warn('DOES NOT UPDATE IS DIRY!!', store$.detail.form.get());
   //   return;
   // }
 
-  // console.log('SET GLOBAL', rows?.[0].label);
   const filteredRows = filterRowsByShowDeleted(rows);
 
   //   datamodel has either ALL or not DELETED rows based on the config
