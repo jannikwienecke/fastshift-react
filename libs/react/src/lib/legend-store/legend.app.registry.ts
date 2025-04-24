@@ -24,7 +24,7 @@ const addView = (config: ViewConfigType) => {
   });
 
   const addComponents = (components: {
-    main?: () => React.ReactNode;
+    main?: (props: { isSubView?: boolean }) => React.ReactNode;
     detail?: (options: MakeDetailPropsOption) => React.ReactNode;
   }) => {
     viewsConfigStore.set({

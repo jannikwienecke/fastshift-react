@@ -1,6 +1,5 @@
 import {
   _log,
-  BaseViewConfigManagerInterface,
   getRelationTableName,
   ifNoneNullElseValue,
   INTERNAL_FIELDS,
@@ -17,7 +16,6 @@ import { selectState$, xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { copyRow, getViewConfigManager, isDetail } from './legend.utils';
 import { setGlobalDataModel } from './legend.utils.helper';
-import { globalStore } from './legend.store.global';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
@@ -56,7 +54,6 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
 
     if (isRunning$.get()) {
       ignoreNewData$.set((prev) => prev + 1);
-      return;
     }
 
     isRunning$.set(true);

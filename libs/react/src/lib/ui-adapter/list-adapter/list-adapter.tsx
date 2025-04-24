@@ -89,9 +89,9 @@ const renderFields = <T extends RecordType>(
       ?.filter((fieldName) => {
         const viewFieldDisplayOptions = store$.displayOptions.viewField.get();
 
-        const fields = viewFieldDisplayOptions.hidden
+        const fields = viewFieldDisplayOptions?.hidden
           ? viewFieldDisplayOptions.hidden
-          : viewFieldDisplayOptions.allFields;
+          : viewFieldDisplayOptions?.allFields;
         const shouldDisplay = fields?.includes(fieldName.toString());
 
         return shouldDisplay;

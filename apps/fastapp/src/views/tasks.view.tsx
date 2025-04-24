@@ -8,11 +8,12 @@ import { TaskViewDataType } from '../views/tasks.components';
 import { DefaultDetailViewTemplate } from './default-detail-view-template';
 import { tasksUiViewConfig } from './tasks.config';
 
-const Task = observer(() => {
+const Task = observer((props) => {
   const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
 
   return (
     <DefaultViewTemplate<TaskViewDataType>
+      {...props}
       listOptions={{
         // handle if no fields are provided -> all fields shown in fields left...
         // fieldsLeft: [],

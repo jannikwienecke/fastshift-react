@@ -81,6 +81,10 @@ const DetailModelListViewPage = observer(() => {
     });
   }
 
+  if (viewData.main) {
+    return <viewData.main isSubView={true} />;
+  }
+
   return (
     <>
       <div className="p-2 flex flex-col gap-2 grow h-[50%] overflow-scroll">

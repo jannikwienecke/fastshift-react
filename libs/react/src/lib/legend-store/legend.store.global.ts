@@ -144,6 +144,8 @@ const setStore = (viewName: string, parentViewName?: string) => {
         resetted: true,
       });
       store$.filter.filters.set(filters);
+    } else {
+      store$.displayOptions.viewField.allFields.set(viewFields);
     }
   });
 

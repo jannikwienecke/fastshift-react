@@ -58,7 +58,7 @@ export interface BaseConfigInterface<
 }
 
 export type ViewRegistryEntry = {
-  main?: () => React.ReactNode;
+  main?: (props: { isSubView?: boolean }) => React.ReactNode;
   detail?: (options: MakeDetailPropsOption) => React.ReactNode;
   viewConfig: ViewConfigType;
   uiViewConfig?: UiViewConfig;

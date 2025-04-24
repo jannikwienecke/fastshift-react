@@ -11,6 +11,7 @@ import { batch, Observable } from '@legendapp/state';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { setGlobalDataModel } from './legend.utils.helper';
 import { selectState$, xSelect } from './legend.select-state';
+import { ignoreNewData$ } from './legend.mutationts';
 
 export const openSpecificModal: StoreFn<'openSpecificModal'> =
   (store$) => (type, openCb) => {
@@ -279,6 +280,11 @@ const handleMutatingState = async (
   store$: Observable<LegendStore>,
   queryReturn: QueryReturnType
 ) => {
+  if (ignoreNewData$.get() > 0) {
+    ignoreNewData$.set((prev) => prev - 1);
+    return;
+  }
+
   // we only want to have the new data -> discard the previous data
   const ids = queryReturn.allIds;
   const newData = queryReturn.data ?? [];
@@ -390,6 +396,11 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
     const ignoreNext = store$.ignoreNextQueryDict?.[key].get();
     const dirtyField = store$.detail.form.dirtyField.get();
     const diryValue = store$.detail.form.dirtyValue.get();
+
+    if (ignoreNewData$.get() > 0) {
+      ignoreNewData$.set((prev) => prev - 1);
+      return;
+    }
 
     if (rows?.length === 1) {
       if (ignoreNext > 1) {

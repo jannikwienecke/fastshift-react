@@ -30,10 +30,18 @@ export const useMutation = () => {
     onMutate: async (vars) => {
       store$.state.set('mutating');
 
-      if (vars.mutation.type !== 'UPDATE_RECORD') return;
+      if (
+        vars.mutation.type !== 'UPDATE_RECORD' &&
+        vars.mutation.type !== 'SELECT_RECORDS'
+      )
+        return;
       const detail = store$.detail.get();
       const key =
-        isDetail() && detail?.row?.id ? `detail-${detail.row.id}` : '';
+        isDetail() && detail?.row?.id
+          ? `detail-${detail.row.id}`
+          : vars.viewName;
+
+      // console.log('MUTATION KEY:', key);
 
       store$.ignoreNextQueryDict.set((prev) => {
         const prevKey = prev[key];

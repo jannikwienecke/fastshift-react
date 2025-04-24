@@ -410,7 +410,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     store$.api.queryClient.setQueryData(
       queryKey,
       (q: QueryReturnOrUndefined) => {
-        console.log(q);
         if (!q) return q;
 
         const rows = q.data ?? [];

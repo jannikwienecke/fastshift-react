@@ -113,7 +113,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
                 data-testid={`group-${group.groupByLabel}`}
                 key={group.groupById?.toString() ?? 'group-undefined'}
               >
-                <div className="bg-muted/70 border-y border-foreground/5 text-sm pr-6">
+                <div className="bg-muted/70 border-foreground/5 text-sm pr-6">
                   <div className="py-[8px] pl-9 flex justify-between items-center">
                     <div className="flex gap-2 items-center">
                       <div>{group.groupByLabel}</div>

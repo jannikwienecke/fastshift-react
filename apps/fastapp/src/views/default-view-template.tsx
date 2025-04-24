@@ -32,8 +32,41 @@ export const DefaultViewTemplate = observer(
     displayOptions?: MakeDisplayOptionsPropsOptions<T>;
     confirmationAlertOptions?: MakeConfirmationAlertPropsOption<T>;
     RenderInputDialog?: React.FC;
+    isSubView?: boolean;
   }) => {
     const { id } = useParams({ strict: false });
+
+    if (props.isSubView) {
+      return (
+        <div className="p-2 flex flex-col gap-2 grow overflow-scroll">
+          <div className="flex flex-row w-full justify-between">
+            <div className="grow pr-12 pl-8">
+              <RenderFilter options={props.filterOptions} />
+            </div>
+
+            <div className="flex flex-row gap-2 mr-4 items-center">
+              <RenderDisplayOptions options={props.displayOptions} />
+
+              <RenderSaveViewDropdown />
+            </div>
+          </div>
+
+          {props.RenderInputDialog ? (
+            <props.RenderInputDialog />
+          ) : (
+            <RenderInputDialog />
+          )}
+
+          <div className="flex flex-col w-full ">
+            <RenderList options={props.listOptions} />
+          </div>
+          <hr className="border-none" />
+
+          <Outlet />
+        </div>
+      );
+    }
+
     return (
       <>
         {!id ? (

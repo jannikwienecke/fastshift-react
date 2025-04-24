@@ -18,7 +18,7 @@ export const DefaultDetailViewTemplate = observer(
 
     return (
       <div className="w-full">
-        <div className="w-full py-2 flex flex-row">
+        <div className="w-full py-2 flex flex-row h-screen">
           <div className="flex-grow border-r-[.5px] ">
             <detailPage.header {...props} />
 
