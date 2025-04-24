@@ -132,11 +132,6 @@ const setStore = (viewName: string, parentViewName?: string) => {
     store$.userViewData.set(userViewData);
     store$.detail.parentViewName.set(parentViewName);
 
-    console.log(
-      'soft delete',
-      viewConfigManager.viewConfig.mutation?.softDelete
-    );
-
     const viewFields = viewConfigManager
       .getViewFieldList()
       .map((field) => field.name);
