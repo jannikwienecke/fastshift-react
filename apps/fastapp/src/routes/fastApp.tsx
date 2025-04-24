@@ -40,6 +40,7 @@ import {
 } from '../query-client';
 import { useCommands, useViewParams } from '../shared/hooks';
 import { getViewParms } from '../shared/utils/app.helper';
+import { useAppEffects } from '../shared/hooks/app.effects';
 
 export const Route = createFileRoute('/fastApp')({
   loader: async (props) => {
@@ -102,6 +103,8 @@ const FastAppLayoutComponent = observer(() => {
   const { id } = useParams({ strict: false });
   let { viewName } = useViewParams();
   viewName = viewName as string;
+
+  useAppEffects(viewName);
 
   const { viewData } = getViewData(viewName);
 

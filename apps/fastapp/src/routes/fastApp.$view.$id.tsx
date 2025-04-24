@@ -11,7 +11,14 @@ import {
   store$,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  redirect,
+  useLocation,
+  useMatches,
+  useMatchRoute,
+  useParams,
+} from '@tanstack/react-router';
 import React from 'react';
 import { getViewData } from '../application-store/app.store.utils';
 import { getQueryKey, getUserViewQuery, queryClient } from '../query-client';

@@ -6,21 +6,6 @@ import { store$ } from './legend.store';
 
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
-// detailPageProps$.onChange((changes) => {
-//   const props = changes.value;
-//   console.log(changes);
-
-//   if (!props.row) return;
-
-//   const viewConfigManager =
-//     store$.detail.viewConfigManager.get() as BaseViewConfigManagerInterface;
-
-//   if (!viewConfigManager.viewConfig) return;
-
-//   store$.detail.row.set(copyRow(props.row, viewConfigManager));
-//   store$.detail.form.set({});
-// });
-
 export const derviedDetailPage$ = observable(() => {
   if (!store$.detail.row.get()) return {} as DetailPageProps;
 
@@ -31,7 +16,6 @@ export const derviedDetailPage$ = observable(() => {
       .getComplexFormFields()
       .filter((f) => f.field.relation?.manyToManyModelFields?.length) ?? [];
 
-  console.log(store$.detail.viewType.get());
   return {
     row: helper.row,
     icon: helper.view.icon,
@@ -64,6 +48,14 @@ export const derviedDetailPage$ = observable(() => {
     onSubmit: () => store$.commandformSubmit(),
 
     onEnter: (field) => store$.detailpageEnter(field),
+
+    onHoverRelationalListField: (field) => {
+      store$.navigation.state.set({
+        type: 'preload-relational-sub-list',
+        state: { fieldName: field.field?.name ?? '' },
+      });
+    },
+
     onSelectView: (options) => {
       store$.detail.viewType.set(options);
 

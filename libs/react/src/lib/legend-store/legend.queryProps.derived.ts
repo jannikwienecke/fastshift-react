@@ -1,17 +1,18 @@
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
 import { getParsedViewSettings } from './legend.utils.helper';
-import { QueryProps } from '@apps-next/core';
 
 export const queryListViewOptions$ = observable(() => {
   const parsedViewSettings = getParsedViewSettings();
 
+  const parentViewName = store$.detail.parentViewName.get();
+
   const makeQueryOptions = store$.api.makeQueryOptions.get();
+  if (!parentViewName) return;
   if (!makeQueryOptions) return;
 
   const queryOptions = makeQueryOptions({
-    // TODO FIXME
-    viewName: 'task',
+    viewName: parentViewName,
     query: '',
     filters: parsedViewSettings.filters,
     displayOptions: parsedViewSettings.displayOptions,
@@ -21,6 +22,33 @@ export const queryListViewOptions$ = observable(() => {
     viewId: null,
     parentId: null,
     parentViewName: null,
+    paginateOptions: {
+      cursor: { position: null, cursor: null },
+      numItems: 35,
+    },
+  });
+
+  return queryOptions;
+});
+
+export const querySubListViewOptions$ = observable(() => {
+  const makeQueryOptions = store$.api.makeQueryOptions.get();
+  const row = store$.detail.row.get();
+  const parentViewName = store$.detail.parentViewName.get();
+  if (!row || !parentViewName) return;
+  if (!makeQueryOptions) return;
+
+  const queryOptions = makeQueryOptions({
+    viewName: store$.viewConfigManager.getViewName(),
+    query: '',
+    filters: '',
+    displayOptions: '',
+    modelConfig: undefined,
+    viewConfigManager: undefined,
+    registeredViews: {},
+    viewId: null,
+    parentId: row.id,
+    parentViewName: parentViewName,
     paginateOptions: {
       cursor: { position: null, cursor: null },
       numItems: 35,

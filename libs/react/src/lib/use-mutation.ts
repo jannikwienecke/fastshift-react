@@ -4,11 +4,10 @@ import React from 'react';
 import { toast } from 'sonner';
 import { store$ } from '..';
 import { useApi } from './use-api';
+import { isDetail } from './legend-store/legend.utils';
 
 export const useMutation = () => {
   const api = useApi();
-
-  const lastViewName = React.useRef('');
 
   const { mutate, isPending, mutateAsync, error } = useMutationTanstack({
     mutationFn: async (args: MutationDto) => {
@@ -29,8 +28,28 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      lastViewName.current = vars.viewName;
+      console.log(vars);
       store$.state.set('mutating');
+
+      if (vars.mutation.type !== 'UPDATE_RECORD') return;
+      console.log(isDetail());
+      const detail = store$.detail.get();
+      const modelName = detail?.viewConfigManager.getTableName();
+      const key =
+        isDetail() && modelName && detail?.row?.id
+          ? `${modelName}-${detail.row.id}`
+          : '';
+
+      store$.ignoreNextQueryDict.set((prev) => {
+        const prevKey = prev[key];
+        if (prevKey) {
+          return { ...prev, [key]: prevKey + 1 };
+        }
+
+        return { ...prev, [key]: 1 };
+      });
+
+      console.log(store$.ignoreNextQueryDict.get());
     },
   });
 

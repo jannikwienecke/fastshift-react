@@ -300,6 +300,7 @@ export type DetailPageProps = {
   currentRelationalListField: CommandformItem | null;
   viewTypeState: DetailViewTypeState;
   onSelectView: (props: DetailViewTypeState) => void;
+  onHoverRelationalListField: (field: CommandformItem) => void;
 } & FormFieldMethod;
 
 export type CommandbarItemHandler = (options: {

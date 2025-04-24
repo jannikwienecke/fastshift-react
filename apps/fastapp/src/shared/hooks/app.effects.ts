@@ -1,51 +1,41 @@
 import { _log, slugHelper } from '@apps-next/core';
 import { store$ } from '@apps-next/react';
-import { useRouteContext, useRouter } from '@tanstack/react-router';
+import { useLocation, useRouter } from '@tanstack/react-router';
 import React from 'react';
-import { getViewData } from '../../application-store/app.store.utils';
 import { useViewParams } from './useViewParams';
 
 export const useAppEffects = (viewName: string) => {
-  const { viewData } = getViewData(viewName);
-  const activeViewConfig = viewData.viewConfig;
-
   const router = useRouter();
-  const { preloadQuery } = useRouteContext({ from: '/fastApp/$view' });
 
   const navigateRef = React.useRef(router.navigate);
-  const preloadRef = React.useRef(preloadQuery);
+  const realPreloadRoute = router.preloadRoute;
 
   const { id, slug } = useViewParams();
+  const { pathname } = useLocation();
 
-  const preloadRoute = React.useCallback(
-    (id: string) => {
-      preloadRef.current(
-        activeViewConfig,
-        activeViewConfig.viewName,
-        id,
-        null,
-        null
-      );
-    },
-    [activeViewConfig]
-  );
+  const view = store$.viewConfigManager.viewConfig.viewName.get();
 
   React.useEffect(() => {
-    store$.detail.parentViewName.onChange((changes) => {
-      const isOverview = store$.detail.viewType.type.get() === 'overview';
-      const parentViewName = changes.value;
-      const parentId = store$.detail.row.get()?.id ?? null;
-      const config = store$.viewConfigManager.viewConfig.get();
-      if (isOverview && parentViewName && config) {
-        preloadRef.current(
-          config,
-          config.viewName,
-          null,
-          parentViewName, // corrected variable name
-          parentId
-        );
-      }
+    const isOverview = pathname.includes('/overview');
+    if (!isOverview) return;
+
+    const config = store$.viewConfigManager.viewConfig.get();
+    const parentViewName = store$.detail.parentViewName.get();
+    const parentId = store$.detail.row.get()?.id ?? null;
+
+    if (!config || !parentViewName || !parentId) return;
+    if (view.toLowerCase() === parentViewName.toLowerCase()) return;
+
+    console.log('_____PRELOAD ROUTE INIT');
+    realPreloadRoute({
+      from: '/fastApp/$view/$id/overview',
+      to: `/fastApp/${slugHelper().slugify(
+        parentViewName
+      )}/${parentId}/${view}`,
     });
+  }, [pathname, realPreloadRoute, view]);
+
+  React.useLayoutEffect(() => {
     store$.userViewSettings.viewCreated.slug.onChange((v) => {
       const slug = v.value;
       if (slug) {
@@ -58,7 +48,10 @@ export const useAppEffects = (viewName: string) => {
 
       if (row?.row?.id) {
         _log.debug('Preload row', row.row.id);
-        preloadRoute(row.row.id);
+        realPreloadRoute({
+          from: '/fastApp/$view',
+          to: `/fastApp/$view/${row.row.id}/overview`,
+        });
       }
     });
 
@@ -66,6 +59,24 @@ export const useAppEffects = (viewName: string) => {
       const state = changes.value;
 
       switch (state?.type) {
+        case 'preload-relational-sub-list':
+          (() => {
+            const fieldName = state.state.fieldName;
+            const row = store$.detail.row.get();
+            const id = row?.id;
+            const parentViewName = store$.detail.parentViewName.get();
+
+            if (fieldName && id && parentViewName) {
+              realPreloadRoute({
+                from: '/fastApp/$view/$id/overview',
+                to: `/fastApp/${slugHelper().slugify(
+                  parentViewName
+                )}/${id}/${fieldName}`,
+              });
+            }
+          })();
+          break;
+
         case 'navigate':
           (() => {
             const id = state.id;
@@ -108,5 +119,5 @@ export const useAppEffects = (viewName: string) => {
           break;
       }
     });
-  }, [id, preloadRoute, slug, viewName]);
+  }, [id, realPreloadRoute, slug, viewName]);
 };

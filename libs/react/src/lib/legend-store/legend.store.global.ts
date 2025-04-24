@@ -20,6 +20,7 @@ import { store$ } from './legend.store';
 import {
   createDataModel,
   createRelationalDataModel,
+  handleIncomingDetailData,
 } from './legend.store.fn.global';
 import { detailFormHelper } from './legend.detailpage.helper';
 import { batch } from '@legendapp/state';
@@ -225,8 +226,7 @@ const dispatch = (action: GlobalStoreAction) => {
 const handleInitLoadStore = (action: GlobalStoreAction) => {
   if (action.type !== 'INIT_LOAD_STORE') return;
 
-  const { viewName, data, userViews, views, id, model } = action.payload;
-  console.log({ id, model, data });
+  const { viewName, data, userViews, views } = action.payload;
 
   resetStore();
   store$.userViews.set(userViews);
@@ -237,7 +237,7 @@ const handleInitLoadStore = (action: GlobalStoreAction) => {
 };
 
 const handleChangeView = (action: GlobalStoreAction) => {
-  console.log('____HANDLE CHANGE VIE!!!!!!');
+  console.log('____HANDLE CHANGE VIEW', action.type);
   if (action.type !== 'CHANGE_VIEW') return;
   const { viewName, data, resetDetail } = action.payload;
 
@@ -265,15 +265,16 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
   if (id === store$.detail.row.id.get()) return;
 
   console.log('____LOAD VIEW DETAIL PAGE', action);
-  const parsedRow = makeData(store$.views.get(), viewName)(data.data ?? [])
-    .rows?.[0];
 
   const viewConfigManager = createViewConfigManager(viewName);
 
   store$.detail.viewConfigManager.set(viewConfigManager);
 
-  store$.detail.row.set(parsedRow);
-  store$.detail.detailRow.set(parsedRow);
+  batch(() => {
+    store$.detail.viewType.set({ type: 'overview' });
+    store$.detail.parentViewName.set(viewName);
+    handleIncomingDetailData(store$)(data);
+  });
 
   const helper = detailFormHelper();
   const relationalListFields =
@@ -287,28 +288,20 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
     firstRelationalListField?.field.name ?? ''
   );
 
-  store$.detail.viewType.set({ type: 'overview' });
-
   if (!viewConfigOfFirstRelationalListField) return;
 
-  setTimeout(() => {
-    const parentViewName = store$.detail.parentViewName.get();
-    if (parentViewName) return;
+  // setTimeout(() => {
+  handleLoadSubViewListPage({
+    type: 'LOAD_SUB_VIEW_LIST_PAGE',
+    payload: {
+      data: null,
+      id: action.payload.id,
+      viewName: firstRelationalListField?.field.name ?? '',
+      parentViewName: action.payload.viewName,
+    },
+  });
 
-    handleLoadSubViewListPage({
-      type: 'LOAD_SUB_VIEW_LIST_PAGE',
-      payload: {
-        data: null,
-        id: action.payload.id,
-        viewName: firstRelationalListField?.field.name ?? '',
-        parentViewName: action.payload.viewName,
-      },
-    });
-
-    setTimeout(() => {
-      store$.detail.viewType.set({ type: 'overview' });
-    }, 0);
-  }, 100);
+  // }, 100);
 };
 
 const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
@@ -324,26 +317,25 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
   if (
     currentId === id &&
     currentParentViewName === parentViewName &&
-    currentViewName === viewName
+    currentViewName === viewName &&
+    data
   ) {
-    // if (data) {
-    //   handleQueryData(data);
-    // }
-    return;
+    handleQueryData(data);
+  } else {
+    console.log('____LOAD SUB VIEW LIST PAGE', action);
+    setStore(viewName, parentViewName);
+    resetStore();
+
+    if (data) {
+      handleQueryData(data);
+    }
   }
 
-  console.log('____LOAD SUB VIEW LIST PAGE', action);
-  // store$.detail.parentViewName.set(parentViewName);
-  setStore(viewName, parentViewName);
-  resetStore();
-
-  if (data) {
-    handleQueryData(data);
+  data &&
     store$.detail.viewType.set({
       type: 'model',
       model: store$.viewConfigManager.getTableName(),
     });
-  }
 };
 
 export const globalStore = {

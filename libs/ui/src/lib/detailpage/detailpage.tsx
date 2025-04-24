@@ -48,6 +48,10 @@ const DetailPageHeader = (props: DetailPageProps) => {
             if (!field.field) return null;
             return (
               <Button
+                onMouseOver={() => {
+                  console.log('hovered', field.field?.name);
+                  props.onHoverRelationalListField(field);
+                }}
                 key={`relational-list-field-${field.field.name}`}
                 onClick={() =>
                   props.onSelectView({

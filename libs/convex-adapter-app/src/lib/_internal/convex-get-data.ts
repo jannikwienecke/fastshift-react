@@ -58,13 +58,13 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const localModeEnabled = viewConfigManager.localModeEnabled;
   const showDeleted = displayOptionsInfo.showDeleted || localModeEnabled;
 
-  debug('Convex:getData', {
-    filters: filters?.length,
-    displayField,
-    displayOptionsInfo,
-    localModeEnabled,
-    showDeleted,
-  });
+  // debug('Convex:getData', {
+  //   filters: filters?.length,
+  //   displayField,
+  //   displayOptionsInfo,
+  //   localModeEnabled,
+  //   showDeleted,
+  // });
 
   let isDone = false;
   let isGetAll = false;
@@ -308,16 +308,21 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   rows.push(...filtered);
 
-  const rawData = await mapWithInclude(rows, ctx, args);
-
   let sortedRows = convexSortRows(
-    rawData,
+    // comment out -> we want to map with include later, check if this is ok
+    // rawData,
+    rows,
     args,
     displayOptionsInfo
   ) as ConvexRecordType[];
 
   sortedRows =
-    allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition);
+    allIds !== null
+      ? // added this, before we returned all sortedRows
+        sortedRows.slice(position, nextPosition)
+      : sortedRows.slice(position, nextPosition);
+
+  sortedRows = await mapWithInclude(sortedRows, ctx, args);
 
   if (allIds !== null || isGetAll) {
     const newItemsLength = allIds !== null ? allIds.length : newRows.length;

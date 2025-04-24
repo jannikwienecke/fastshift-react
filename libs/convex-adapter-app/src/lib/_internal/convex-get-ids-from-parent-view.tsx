@@ -18,12 +18,6 @@ export const getIdsFromParentView = async (
 
   const handle = async () => {
     if (args.parentId && args.parentViewName && args.viewName) {
-      console.log(
-        'Sub View Fildering by: ',
-        args.parentViewName,
-        args.viewName
-      );
-
       const parentView = getViewByName(
         args.registeredViews,
         args.parentViewName

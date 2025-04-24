@@ -77,6 +77,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'userViewData'
   | 'viewId'
   | 'userViews'
+  | 'ignoreNextQueryDict'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
@@ -94,6 +95,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   errorDialog: {
     error: null,
   },
+  ignoreNextQueryDict: {},
   fetchMore: {
     currentCursor: {
       position: null,

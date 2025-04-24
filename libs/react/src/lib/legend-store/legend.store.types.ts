@@ -156,6 +156,10 @@ export type LegendStore = {
       | {
           type: 'switch-detail-view';
           state: DetailViewTypeState;
+        }
+      | {
+          type: 'preload-relational-sub-list';
+          state: { fieldName: string };
         };
   };
 
@@ -163,6 +167,10 @@ export type LegendStore = {
   paginateOptions: PaginationOptions;
 
   fetchMore: FetchMoreOptions;
+
+  ignoreNextQueryDict: {
+    [key: string]: number;
+  };
 
   //   VIEW STATE
   viewConfigManager: BaseViewConfigManagerInterface;

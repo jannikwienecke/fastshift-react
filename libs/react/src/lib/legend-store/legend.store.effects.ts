@@ -8,6 +8,7 @@ import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
 import {
   queryDetailViewOptions$,
   queryListViewOptions$,
+  querySubListViewOptions$,
 } from './legend.queryProps.derived';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
@@ -336,12 +337,21 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       const prevAtPath = changes.changes?.[0].prevAtPath;
       const valueAtPath = changes.changes?.[0].valueAtPath;
       if (!prevAtPath && valueAtPath) {
-        console.log('_______rows: ', changes);
-        const queryKey = queryListViewOptions$.get()?.queryKey;
-        console.log('______', queryKey);
+        const queryKey = querySubListViewOptions$.get()?.queryKey;
+        const rows = store$.dataModel.rows.get();
 
-        // todos
-        // make this work - update the react query cahce
+        if (!queryKey) return;
+
+        store$.api.queryClient.setQueryData(
+          queryKey,
+          (q: QueryReturnOrUndefined): QueryReturnOrUndefined => {
+            return {
+              ...q,
+              data: rows.map((r) => r.raw),
+            };
+          }
+        );
+
         // next:
         // in sub list, project -> task: make the contextmenu work
       }
@@ -351,13 +361,29 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   store$.detail.row.updated.onChange((changes) => {
     if (!changes.value) return;
 
-    const queryKey = queryListViewOptions$.get()?.queryKey;
-    const queryKeyDetail = queryDetailViewOptions$.get()?.queryKey;
+    // todo when i change
+    // and then change again. we see the first request resolve, set the value, and then the 2 request resolved
+    // but we should never see the resolved value of the first request
+
+    const queriesData = store$.api.queryClient.getQueriesData({});
+
+    const queryKeyDetail = queriesData.find((q) => {
+      const key = q?.[0]?.[2] as Record<string, any>;
+      if ('viewName' in key && key?.viewName.toLowerCase() !== 'my projects')
+        return false;
+      if ('relationQuery' in key) return false;
+      if (!key?.viewId) return false;
+
+      const data = store$.api.queryClient.getQueryData(
+        q[0]
+      ) as QueryReturnOrUndefined;
+      return data?.data?.length === 1;
+    })?.[0];
 
     const row = store$.detail.row.get();
     const parentView = store$.detail.parentViewName.get();
 
-    if (!queryKey || !queryKeyDetail) return;
+    if (!queryKeyDetail) return;
 
     if (!row || !parentView) return;
 
@@ -371,9 +397,23 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       }
     );
 
+    const queryKey = queriesData.find((q) => {
+      const key = q?.[0]?.[2] as Record<string, any>;
+      if ('viewName' in key && key?.viewName.toLowerCase() !== 'my projects')
+        return false;
+      if ('relationQuery' in key) return false;
+      if (key?.viewId !== null) return false;
+
+      const data = store$.api.queryClient.getQueryData(q[0]);
+      return !!data;
+    })?.[0];
+
+    if (!queryKey) return;
+
     store$.api.queryClient.setQueryData(
       queryKey,
       (q: QueryReturnOrUndefined) => {
+        console.log(q);
         if (!q) return q;
 
         const rows = q.data ?? [];

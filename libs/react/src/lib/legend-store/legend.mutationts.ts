@@ -347,7 +347,6 @@ export const optimisticUpdateStore = ({
   const updatedRow = makeData(store$.views.get(), viewName)([updatedRowData])
     .rows?.[0];
 
-  console.log('____SET UPDATED -> ');
   updatedRow.updated = Date.now();
 
   if (updatedRow) {
