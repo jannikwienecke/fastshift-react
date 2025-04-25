@@ -227,26 +227,6 @@ test.describe('Task management', () => {
     await expect(page.getByText(/design mockups/i)).toBeVisible();
   });
 
-  test('tasks has many todos, can add and remove todos', async ({
-    mainPage: taskPage,
-    page,
-  }) => {
-    const firstListItem = await taskPage.getListItem(0);
-    await firstListItem.getByText('1 / 2').click();
-
-    await taskPage.comboboxPopover.getByText(/Todo 2/i).click();
-
-    await expect(firstListItem.getByText('1 / 1')).toBeVisible();
-
-    await taskPage.comboboxPopover.getByText(/Todo 1/i).click();
-
-    await taskPage.comboboxPopover.getByText(/Todo 1/i).click();
-
-    await page.reload();
-
-    await expect(firstListItem.getByText('1 / 1')).toBeVisible();
-  });
-
   test('can right click on a task and open the context menu', async ({
     mainPage: taskPage,
     page,

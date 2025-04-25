@@ -218,6 +218,74 @@ test.describe('List Combobox', () => {
 
     await firstListItemInSubList.hasText(day2DigitsTommorow);
   });
+
+  test('tasks has many todos, can add and remove todos', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
+
+    await helper.navigation.goToListView('task');
+
+    let firstListItem = await helper.list.getFirstListItem();
+
+    const {
+      openListCombobox,
+      searchInCombobox,
+      selectInCombobox,
+      isVisible,
+      isHidden,
+    } = listCombobox({ mainPage, helper });
+
+    const oneOfTwo = '1 / 2';
+    const oneOfOne = '1 / 1';
+    const todo1 = 'Todo 1';
+    const todo2 = 'Todo 2';
+
+    await openListCombobox(firstListItem.locator, oneOfTwo);
+
+    await searchInCombobox('todos', '2');
+
+    await isVisible(todo2);
+    await isHidden(todo1);
+
+    await selectInCombobox(todo2);
+
+    await firstListItem.hasText(oneOfOne);
+
+    await firstListItem.locator.getByText(oneOfOne).click({ force: true });
+
+    await mainPage.page.reload();
+
+    await waitFor(mainPage.page, 300);
+
+    firstListItem = await helper.list.getFirstListItem();
+
+    await waitFor(mainPage.page, 100);
+
+    await firstListItem.hasText(oneOfOne);
+
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
+
+    firstListItem = await helper.list.getFirstListItem();
+    await firstListItem.hasText(oneOfOne);
+
+    await openListCombobox(firstListItem.locator, oneOfOne);
+
+    await waitFor(mainPage.page, 300);
+
+    await searchInCombobox('todos', '1');
+
+    await isVisible(todo1);
+    await isHidden(todo2);
+
+    await selectInCombobox(todo1);
+    await firstListItem.hasNoText(oneOfOne);
+  });
 });
 
 const selectCompletedStatus = async ({ mainPage, helper }: PartialFixtures) => {
@@ -322,7 +390,9 @@ const listCombobox = ({ mainPage: taskPage }: PartialFixtures) => {
 
     await input.fill(value);
 
-    await expect(taskPage.comboboxPopover.getByText(value)).toBeVisible();
+    await expect(
+      taskPage.comboboxPopover.getByText(value).first()
+    ).toBeVisible();
     if (hiddenValue) {
       await expect(
         taskPage.comboboxPopover.getByText(hiddenValue)
