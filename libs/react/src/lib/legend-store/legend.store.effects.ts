@@ -357,13 +357,15 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     if (changes.isFromSync) return;
     if (!changes.value) return;
 
+    const viewName = store$.detail.viewConfigManager.getViewName();
+
     const queriesData = store$.api.queryClient.getQueriesData({});
 
     const queryKeyDetail = queriesData.find((q) => {
       const key = q?.[0]?.[2] as Record<string, any>;
       if (
         'viewName' in key &&
-        key?.['viewName'].toLowerCase() !== 'my projects'
+        key?.['viewName'].toLowerCase() !== viewName.toLowerCase()
       )
         return false;
       if ('relationQuery' in key) return false;
@@ -396,7 +398,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       const key = q?.[0]?.[2] as Record<string, any>;
       if (
         'viewName' in key &&
-        key?.['viewName'].toLowerCase() !== 'my projects'
+        key?.['viewName'].toLowerCase() !== viewName.toLowerCase()
       )
         return false;
       if ('relationQuery' in key) return false;

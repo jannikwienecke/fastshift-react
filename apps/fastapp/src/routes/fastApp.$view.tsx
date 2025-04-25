@@ -3,7 +3,7 @@ import { viewRegistry } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
-import { getViewData } from '../application-store/app.store.utils';
+import { getViewData, wait } from '../application-store/app.store.utils';
 import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
 import { useViewParams } from '../shared/hooks';
 import { getViewParms } from '../shared/utils/app.helper';
@@ -11,6 +11,8 @@ import { DefaultViewTemplate } from '../views/default-view-template';
 
 export const Route = createFileRoute('/fastApp/$view')({
   loader: async (props) => {
+    await wait();
+
     await queryClient.ensureQueryData(getUserViewsQuery());
 
     const { viewName } = getViewParms(props.params);

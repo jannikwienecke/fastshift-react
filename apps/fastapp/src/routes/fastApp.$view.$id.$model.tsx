@@ -1,15 +1,17 @@
 import { views } from '@apps-next/convex';
 import { _log, getViewByName, QueryReturnOrUndefined } from '@apps-next/core';
-import { globalStore, store$ } from '@apps-next/react';
+import { globalStore } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
-import { getViewData } from '../application-store/app.store.utils';
+import React from 'react';
+import { getViewData, wait } from '../application-store/app.store.utils';
 import {
   getQueryKey,
   getUserViews,
   getUserViewsQuery,
   queryClient,
 } from '../query-client';
+import { useViewParams } from '../shared/hooks';
 import { getViewParms } from '../shared/utils/app.helper';
 import {
   RenderDisplayOptions,
@@ -17,11 +19,11 @@ import {
   RenderInputDialog,
   RenderList,
 } from '../views/default-components';
-import { useViewParams } from '../shared/hooks';
-import React from 'react';
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
+    await wait();
+
     console.warn('____LOAD SUB MODEL', ctx.params.model);
     await queryClient.ensureQueryData(getUserViewsQuery());
 

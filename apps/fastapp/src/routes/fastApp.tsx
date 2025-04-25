@@ -31,7 +31,7 @@ import { LoaderIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
 import { resettingDb$ } from '../application-store/app.store';
-import { getViewData } from '../application-store/app.store.utils';
+import { getViewData, wait } from '../application-store/app.store.utils';
 import {
   getQueryKey,
   getUserViews,
@@ -44,6 +44,8 @@ import { getViewParms } from '../shared/utils/app.helper';
 
 export const Route = createFileRoute('/fastApp')({
   loader: async (props) => {
+    await wait();
+
     await queryClient.ensureQueryData(getUserViewsQuery());
 
     const userViews = getUserViews();

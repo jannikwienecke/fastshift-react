@@ -91,6 +91,7 @@ created: 1723444498044
 
 ## NEW TODOS
 
+- [x] handle e.g. projects -> tasks list in detail
 - [ ] when setting field from commandbar like email -> will not be validated
 - [ ] not everyting of the contextmenu list item is clickable
-- [ ] handle e.g. projects -> tasks list in detail
+- [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus

@@ -13,7 +13,7 @@ import {
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
 import React from 'react';
-import { getViewData } from '../application-store/app.store.utils';
+import { getViewData, wait } from '../application-store/app.store.utils';
 import {
   getQueryKey,
   getUserViewQuery,
@@ -27,6 +27,8 @@ import { DefaultDetailViewTemplate } from '../views/default-detail-view-template
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   loader: async (props) => {
+    await wait();
+
     await queryClient.ensureQueryData(getUserViewsQuery());
 
     const { id, viewName } = getViewParms(props.params);
