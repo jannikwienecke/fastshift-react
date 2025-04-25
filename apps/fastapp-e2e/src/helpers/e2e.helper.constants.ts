@@ -25,8 +25,29 @@ const PRIORITY = {
   },
 };
 
+const TASK = {
+  values: {
+    firstListItem: 'Design mockups',
+    designMockups: 'Design mockups',
+    createWorkoutSchedule: 'Create workout schedule',
+  },
+};
+
+const FILTER = {
+  options: {
+    name: 'name',
+    project: 'project',
+    completed: 'completed',
+    tag: 'tag',
+    priority: 'priority',
+    date: 'due date',
+  },
+};
+
 export const CON = {
   project: PROJECT,
   tag: TAG,
   priority: PRIORITY,
+  task: TASK,
+  filter: FILTER,
 };

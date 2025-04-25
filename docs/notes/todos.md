@@ -97,3 +97,6 @@ created: 1723444498044
 - [ ] i am on a custom view -> move to another view, filter etc. stays -> not correct!
 - [ ] when setting field from commandbar like email -> will not be validated
 - [ ] not everyting of the contextmenu list item is clickable
+- [ ] cannot filter by tasks -> tasks or tasks->todos
+- [ ] when i am at projects -> tasks, dont show the filter for projects and the grouping for projects
+- [ ] show deleted in sub view not working
