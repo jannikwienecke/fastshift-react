@@ -1,11 +1,25 @@
 import { test as base } from '@playwright/test';
 import { seedDatabase } from './helpers/db-seed';
-import { TaskPage } from './task-page';
+import { MainViewPage } from './view-pom';
 import { _log } from '@apps-next/core';
+import { makeNavigationHelper, NavigationE2eHelper } from './helpers';
+import { ListE2eHelper, makeListHelper } from './helpers/e2e.helper.list';
 
-type Fixtures = {
+export type Fixtures = {
   seedDatabase: () => Promise<void>;
-  taskPage: TaskPage;
+  mainPage: MainViewPage;
+  helper: {
+    navigation: NavigationE2eHelper;
+    list: ListE2eHelper;
+  };
+};
+
+export type PartialFixtures = {
+  mainPage: MainViewPage;
+  helper: {
+    navigation: NavigationE2eHelper;
+    list: ListE2eHelper;
+  };
 };
 
 export const test = base.extend<Fixtures>({
@@ -39,9 +53,15 @@ export const test = base.extend<Fixtures>({
     { auto: true },
   ], // Setting auto: true makes this fixture run for every test
 
-  taskPage: async ({ page }, use) => {
-    const taskPage = new TaskPage(page);
-    await use(taskPage);
+  mainPage: async ({ page }, use) => {
+    const mainPage = new MainViewPage(page);
+    await use(mainPage);
+  },
+
+  helper: async ({ mainPage }, use) => {
+    const listHelper = makeListHelper(mainPage);
+    const navigationHelper = makeNavigationHelper(mainPage);
+    await use({ list: listHelper, navigation: navigationHelper } as const);
   },
 });
 

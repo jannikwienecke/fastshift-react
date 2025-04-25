@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures';
 
-test.beforeEach(async ({ taskPage, seedDatabase }) => {
+test.beforeEach(async ({ mainPage: taskPage, seedDatabase }) => {
   await seedDatabase();
   await taskPage.goto();
 });
@@ -10,7 +10,7 @@ test.setTimeout(20000);
 test.describe.configure({ mode: 'serial' });
 
 test.describe('Smoke Test', () => {
-  test('Can load and view all views', async ({ taskPage, page }) => {
+  test('Can load and view all views', async ({ mainPage: taskPage, page }) => {
     const firstListItem = await taskPage.getListItem(0);
 
     await firstListItem.click();

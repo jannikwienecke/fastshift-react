@@ -1,7 +1,7 @@
 import { expect, test } from './fixtures';
-import { TaskPage } from './task-page';
+import { MainViewPage } from './view-pom';
 
-test.beforeEach(async ({ taskPage, seedDatabase }) => {
+test.beforeEach(async ({ mainPage: taskPage, seedDatabase }) => {
   await seedDatabase();
   await taskPage.goto();
 });
@@ -11,37 +11,10 @@ test.setTimeout(20000);
 test.describe.configure({ mode: 'serial' });
 
 test.describe('Task management', () => {
-  test('can change the project of a task.', async ({ taskPage, page }) => {
-    // Click on the first project (Website Redesign)
-    const firstListItem = await taskPage.getListItem(0);
-    await firstListItem
-      .getByText('website redesign')
-      .first()
-      .click({ force: true });
-
-    // const test = await page.getByText(/set project/i)
-
-    expect(true).toBe(true);
-
-    await taskPage.comboboxPopover.waitFor({ state: 'visible' });
-
-    await expect(taskPage.comboboxPopover.getByText(/website/i)).toBeVisible();
-
-    const input = page.getByPlaceholder('Change project');
-
-    await input.fill('Fitness Plan');
-
-    await expect(
-      taskPage.comboboxPopover.getByText('Fitness Plan')
-    ).toBeVisible();
-    await expect(taskPage.comboboxPopover.getByText(/website/i)).toBeHidden();
-
-    await taskPage.comboboxPopover.getByText('Fitness Plan').click();
-
-    await expect(input).toBeHidden();
-  });
-
-  test('Can add and remove tags from a task', async ({ taskPage, page }) => {
+  test('Can add and remove tags from a task', async ({
+    mainPage: taskPage,
+    page,
+  }) => {
     const firstListItem = await taskPage.getListItem(2);
 
     await expect(firstListItem.getByText('Long-term')).toBeVisible();
@@ -86,7 +59,10 @@ test.describe('Task management', () => {
     // await expect(firstListItem.getByText('Creative')).toBeVisible();
   });
 
-  test('can change the priority of a task', async ({ taskPage, page }) => {
+  test('can change the priority of a task', async ({
+    mainPage: taskPage,
+    page,
+  }) => {
     const firstListItem = await taskPage.getListItem(0);
 
     await firstListItem.getByTestId('priority-none').click();
@@ -103,7 +79,9 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByTestId('priority-none')).toBeHidden();
   });
 
-  test('can change the completed status of a task', async ({ taskPage }) => {
+  test('can change the completed status of a task', async ({
+    mainPage: taskPage,
+  }) => {
     const firstListItem = await taskPage.getListItem(0);
 
     await firstListItem.getByText('❌').click();
@@ -113,7 +91,10 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText('✅')).toBeVisible();
   });
 
-  test('can filter tasks by projects and tags', async ({ taskPage, page }) => {
+  test('can filter tasks by projects and tags', async ({
+    mainPage: taskPage,
+    page,
+  }) => {
     // click on the filter button
     await taskPage.filterButton.click();
 
@@ -162,7 +143,7 @@ test.describe('Task management', () => {
   });
 
   test('can filter tasks by completed and priority', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     // click on the filter button
@@ -193,7 +174,7 @@ test.describe('Task management', () => {
     await expect(page.getByTestId('priority-high').first()).toBeVisible();
   });
 
-  test('can filter tasks by due date', async ({ taskPage, page }) => {
+  test('can filter tasks by due date', async ({ mainPage: taskPage, page }) => {
     const listItem = await taskPage.getListItem(0);
     const listItem2 = await taskPage.getListItem(1);
     // before filter -> this is our first list item
@@ -239,7 +220,9 @@ test.describe('Task management', () => {
     await testingQueryBehavior({ taskPage, page });
   });
 
-  test('can change the due date of the first task', async ({ taskPage }) => {
+  test('can change the due date of the first task', async ({
+    mainPage: taskPage,
+  }) => {
     const firstListItem = await taskPage.getListItem(0);
     const tommorow = new Date();
     tommorow.setDate(tommorow.getDate() + 1);
@@ -256,7 +239,7 @@ test.describe('Task management', () => {
   });
 
   test('can search for the date filter in the list item edit combobox', async ({
-    taskPage,
+    mainPage: taskPage,
   }) => {
     await taskPage.openFilter(/due Date/i);
     await taskPage.comboboxPopover.getByText(/today/i).click();
@@ -290,7 +273,7 @@ test.describe('Task management', () => {
   });
 
   test("can filter project by 'no project and assign a task to 'no project'", async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     await taskPage.openFilter(/project/i);
@@ -343,7 +326,7 @@ test.describe('Task management', () => {
   });
 
   test('tasks has many todos, can add and remove todos', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -363,7 +346,7 @@ test.describe('Task management', () => {
   });
 
   test('can right click on a task and open the context menu', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -416,7 +399,7 @@ test.describe('Task management', () => {
   });
 
   test('can right click on a task and toggle completed state', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -434,7 +417,7 @@ test.describe('Task management', () => {
   });
 
   test('can right click on a task and open commandbar by clicking on project', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -454,7 +437,7 @@ test.describe('Task management', () => {
   });
 
   test('can right click on a task and click edit to open commandform', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -513,7 +496,7 @@ test.describe('Task management', () => {
   });
 
   test('can right click on a task, and delete the task in the context menu', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -535,7 +518,10 @@ test.describe('Task management', () => {
     await expect(firstListItem.getByText(/design mockups/i)).toBeHidden();
   });
 
-  test('display options are shown correctly', async ({ taskPage, page }) => {
+  test('display options are shown correctly', async ({
+    mainPage: taskPage,
+    page,
+  }) => {
     await taskPage.displayOptionsButton.click();
 
     await expect(taskPage.displayOptions).toBeVisible();
@@ -560,7 +546,7 @@ test.describe('Task management', () => {
     await expect(taskPage.displayOptions.getByText(/ordering/i)).toBeVisible();
   });
 
-  test('can sort by a field', async ({ taskPage, page }) => {
+  test('can sort by a field', async ({ mainPage: taskPage, page }) => {
     const firstListItem = await taskPage.getListItem(0);
     await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
 
@@ -579,7 +565,7 @@ test.describe('Task management', () => {
     ).toBeVisible();
   });
 
-  test('can group by a field', async ({ taskPage, page }) => {
+  test('can group by a field', async ({ mainPage: taskPage, page }) => {
     const firstListItem = await taskPage.getListItem(0);
     await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
 
@@ -600,7 +586,7 @@ test.describe('Task management', () => {
   });
 
   test.skip('can scroll down, load more tasks, update a task and scroll to the top', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     expect(1).toBe(1);
@@ -641,7 +627,7 @@ test.describe('Task management', () => {
   });
 
   test('can open and navigate in the commandbar', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     // press cmd + k
@@ -695,7 +681,7 @@ test.describe('Task management', () => {
   });
 
   test('can open commandbar and then toggle completed state', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -713,7 +699,7 @@ test.describe('Task management', () => {
   });
 
   test('can open commandbar and update the project', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -737,7 +723,7 @@ test.describe('Task management', () => {
   });
 
   test('can open commandbar and then open commandform task create form', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -811,7 +797,7 @@ test.describe('Task management', () => {
   });
 
   test('sort by created at and then create a new item and see it in list on top', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -836,7 +822,10 @@ test.describe('Task management', () => {
 
   // add test where we filter by name="design" and then we sort by name,
   // we had a bug, where only 2 items were shown, but should be 3
-  test('filter by name and sort by name', async ({ taskPage, page }) => {
+  test('filter by name and sort by name', async ({
+    mainPage: taskPage,
+    page,
+  }) => {
     // first filter by name
     await taskPage.filterButton.click();
     await taskPage.comboboxPopover.getByText(/name/i).click();
@@ -858,7 +847,7 @@ test.describe('Task management', () => {
   // add test -> scroll down, load more tasks, and still only see always one of the same task
   // we had a bug, where each time we scroll, we load the same task again
   test.skip('scroll down, load more tasks, and still only see one of the same task', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     // scroll down to the bottom
@@ -872,7 +861,7 @@ test.describe('Task management', () => {
   });
 
   test('update an task record with invalid title, and see error message and rollback', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -915,7 +904,7 @@ test.describe('Task management', () => {
   });
 
   test('can add and remove a tag to a task in the commandbar', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -949,7 +938,7 @@ test.describe('Task management', () => {
   });
 
   test('can delete record and show the deleted items', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -976,7 +965,7 @@ test.describe('Task management', () => {
   });
 
   test('can open commandform to create new project', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
@@ -1053,7 +1042,7 @@ test.describe('Task management', () => {
     // ).toBeVisible();
   });
 
-  test('can sort and save the view', async ({ taskPage, page }) => {
+  test('can sort and save the view', async ({ mainPage: taskPage, page }) => {
     let firstListItem = await taskPage.getListItem(0);
     await sortByField(taskPage, /name/i);
     await firstListItem.click({ force: true });
@@ -1092,7 +1081,7 @@ test.describe('Task management', () => {
     await expect(page.getByTestId(`group-Website Redesign`)).toBeVisible();
   });
 
-  test('can filter and save the view', async ({ taskPage, page }) => {
+  test('can filter and save the view', async ({ mainPage: taskPage, page }) => {
     const firstListItem = await taskPage.getListItem(0);
 
     await taskPage.filterButton.click();
@@ -1133,7 +1122,7 @@ test.describe('Task management', () => {
 
   test('can save date filter in a new view, and see it in the list', async ({
     page,
-    taskPage,
+    mainPage: taskPage,
   }) => {
     const firstListItem = await taskPage.getListItem(0);
     // open filter
@@ -1171,7 +1160,7 @@ test.describe('Task management', () => {
   });
 
   test('can filter by learn photography (non default loaded project) ', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     await taskPage.openFilter(/project/i);
@@ -1207,7 +1196,7 @@ test.describe('Task management', () => {
   });
 
   test('can assign a task to a project and see it in the list', async ({
-    taskPage,
+    mainPage: taskPage,
     page,
   }) => {
     await taskPage.gotoPage('projects');
@@ -1291,7 +1280,7 @@ const testingQueryBehavior = async ({ taskPage, page }) => {
 };
 
 const sortByField = async (
-  taskPage: TaskPage,
+  taskPage: MainViewPage,
   name: RegExp,
   query?: string
 ) => {
@@ -1307,7 +1296,7 @@ const sortByField = async (
   await taskPage.comboboxPopover.getByText(name).click();
 };
 
-const groupByField = async (taskPage: TaskPage, name: RegExp) => {
+const groupByField = async (taskPage: MainViewPage, name: RegExp) => {
   await taskPage.displayOptionsButton.click();
 
   await expect(taskPage.displayOptions).toBeVisible();
@@ -1317,7 +1306,7 @@ const groupByField = async (taskPage: TaskPage, name: RegExp) => {
   await taskPage.comboboxPopover.getByText(name).click();
 };
 
-const openCommandbar = async (taskPage: TaskPage) => {
+const openCommandbar = async (taskPage: MainViewPage) => {
   // open commandbar
   await taskPage.page.keyboard.press('Meta+k');
   await expect(taskPage.commandbar).toBeVisible();

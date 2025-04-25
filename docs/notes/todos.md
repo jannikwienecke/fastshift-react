@@ -92,8 +92,8 @@ created: 1723444498044
 ## NEW TODOS
 
 - [x] handle e.g. projects -> tasks list in detail
-- [ ] not updating when convex db updates in task list view (only task view)
+- [ ] not updating when convex db updates in task list view (only task view) (i think worked again)
+- [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
 - [ ] i am on a custom view -> move to another view, filter etc. stays -> not correct!
 - [ ] when setting field from commandbar like email -> will not be validated
 - [ ] not everyting of the contextmenu list item is clickable
-- [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus

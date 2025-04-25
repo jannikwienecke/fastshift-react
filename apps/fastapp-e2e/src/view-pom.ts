@@ -1,7 +1,7 @@
 import { Locator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
-export class TaskPage {
+export class MainViewPage {
   readonly page: Page;
   readonly filterButton: Locator;
   readonly comboboxPopover: Locator;
@@ -12,6 +12,7 @@ export class TaskPage {
   readonly displayOptionsButton: Locator;
   readonly commandbar: Locator;
   readonly commandform: Locator;
+  readonly detailHeader: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -24,6 +25,7 @@ export class TaskPage {
     this.displayOptionsButton = page.getByTestId('display-options-button');
     this.commandbar = page.getByTestId('commandbar');
     this.commandform = page.getByTestId('commandform');
+    this.detailHeader = page.getByTestId('detail-page-header');
   }
 
   async goto() {
