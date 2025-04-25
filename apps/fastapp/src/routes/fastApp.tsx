@@ -206,7 +206,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       ),
     },
     {
-      label: t('navigation.settings'),
+      label: t('navigation.owner'),
       href: '/fastApp/owner',
       icon: (
         <MixIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />

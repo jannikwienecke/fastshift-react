@@ -6,7 +6,7 @@ export const en = {
   navigation: {
     projects: 'Projects',
     tasks: 'Tasks',
-    settings: 'Settings',
+    owner: 'Owner',
     logout: 'Logout',
   },
   projects: {
