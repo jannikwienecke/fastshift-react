@@ -8,6 +8,8 @@ import { ConvexReactClient } from 'convex/react';
 
 const VITE_CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
 
+console.log('===VITE_CONVEX_URL===', VITE_CONVEX_URL);
+
 _log.warn('Convex URL:', VITE_CONVEX_URL);
 
 export const convex = new ConvexReactClient(VITE_CONVEX_URL);
