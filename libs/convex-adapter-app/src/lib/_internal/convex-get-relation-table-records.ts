@@ -4,6 +4,7 @@ import {
   getViewByName,
   BaseViewConfigManager,
   NONE_OPTION,
+  ViewFieldConfig,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
 import { GenericQueryCtx } from './convex.server.types';
@@ -30,7 +31,9 @@ export const getRelationTableRecords = async ({
   id: ID;
 }) => {
   const relationTableClient = queryClient(ctx, relation);
-  const viewOfField = getViewByName(registeredViews, relation);
+  const viewOfField = getViewByName(registeredViews, relation, true);
+  if (!viewOfField) return [];
+
   const indexFields = new BaseViewConfigManager(
     viewOfField,
     {}

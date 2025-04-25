@@ -35,7 +35,7 @@ type TaskViewDataType = DataType<
 export const tasksConfig = createViewConfig(
   'tasks',
   {
-    viewName: 'Task',
+    viewName: 'task',
     icon: CubeIcon,
     displayField: {
       field: 'name',
@@ -55,11 +55,15 @@ export const tasksConfig = createViewConfig(
         validator: () => z.date().min(new Date()),
       },
       name: {
-        // FIXME ARKTYPE
+        // TODO: Not working on server side validation for update as attribute
         validator: () => z.string().min(3),
         // optional -> otherwise it will use the default value
         validationErrorMessage: (t: TFunction) =>
           t('errors.minCharacters', { count: 3 }),
+      },
+      email: {
+        validator: () => z.string().email(),
+        validationErrorMessage: (t: TFunction) => t('errors.invalidEmail'),
       },
       completed: {
         defaultValue: false,
@@ -141,7 +145,7 @@ export const tasksConfig = createViewConfig(
 export const projectsConfig = createViewConfig(
   'projects',
   {
-    viewName: 'my-project-view',
+    viewName: 'My Projects',
     icon: TokensIcon,
     includeFields: ['tasks'],
     displayField: {
@@ -181,6 +185,7 @@ export const ownerConfig = createViewConfig(
           ...data,
           name: data.firstname + ' ' + data.lastname,
         };
+        // FIXME -> also need to apply to update functions
       },
     },
   },

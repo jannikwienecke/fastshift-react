@@ -1,88 +1,60 @@
-import { config, tasksConfig, views } from '@apps-next/convex';
-import { UserViewForm } from '@apps-next/core';
-import {
-  ClientViewProviderConvex,
-  comboboxStore$,
-  makeHooks,
-  store$,
-} from '@apps-next/react';
-import { InputDialog } from '@apps-next/ui';
+import { _log } from '@apps-next/core';
+import { viewRegistry } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, useParams, useRouter } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';
-import { useCommands } from '../hooks/app.commands';
-import { getQueryKey, getUserViewData } from '../query-client';
+import { getViewData, wait } from '../application-store/app.store.utils';
+import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
+import { useViewParams } from '../shared/hooks';
+import { getViewParms } from '../shared/utils/app.helper';
 import { DefaultViewTemplate } from '../views/default-view-template';
-import { TaskViewDataType } from '../views/tasks.components';
-import { uiViewConfig } from '../views/tasks.config';
-
-const Task = observer(() => {
-  const { makeInputDialogProps } = makeHooks<TaskViewDataType>();
-
-  return (
-    <DefaultViewTemplate<TaskViewDataType>
-      listOptions={{
-        fieldsLeft: ['name', 'projects', 'dueDate'],
-        fieldsRight: ['tags', 'completed', 'priority', 'todos'],
-      }}
-      filterOptions={{
-        hideFields: [],
-      }}
-      displayOptions={{
-        displayFieldsToShow: [
-          'name',
-          'completed',
-          'description',
-          'name',
-          'priority',
-          'projects',
-          'tags',
-        ],
-      }}
-      RenderInputDialog={observer(() => (
-        <InputDialog.Default {...makeInputDialogProps({})} />
-      ))}
-    />
-  );
-});
 
 export const Route = createFileRoute('/fastApp/$view')({
   loader: async (props) => {
-    return props.context.preloadQuery(tasksConfig, props.params.view);
+    await wait();
+
+    await queryClient.ensureQueryData(getUserViewsQuery());
+
+    const { viewName } = getViewParms(props.params);
+
+    if (!viewName) return;
+
+    const userViews = getUserViews();
+    const { viewData, userViewData } = getViewData(viewName, userViews);
+
+    await props.context.preloadQuery(
+      viewData.viewConfig,
+      userViewData?.name ?? viewName,
+      null,
+      null,
+      null
+    );
   },
-  component: () => <TaskComponent />,
+
+  component: () => <ViewMainComponent />,
 });
 
-const TaskComponent = observer(() => {
-  const { commands } = useCommands();
-  const { view } = useParams({ from: '/fastApp/$view' });
-  const router = useRouter();
+const ViewMainComponent = observer(() => {
+  _log.debug('Render ViewMainComponent');
 
-  const userViewData = getUserViewData(view);
+  let { viewName } = useViewParams();
+  viewName = viewName as string;
 
-  const navigateRef = React.useRef(router.navigate);
+  const userViews = getUserViews();
+
+  const { viewData } = getViewData(viewName, userViews);
+
+  const ViewComponent = viewData.main;
+
   React.useEffect(() => {
-    store$.userViewSettings.form.onChange((v) => {
-      const change = v.changes?.[0];
-      if (change.prevAtPath && !change.valueAtPath) {
-        const prevAtPath = change.prevAtPath;
-        const viewName = (prevAtPath as UserViewForm).viewName;
-        navigateRef.current({ to: `/fastApp/${viewName}` });
-      }
-    });
+    _log.debug('Render ViewMainComponent useEffect');
   }, []);
 
+  if (!viewData) return null;
   return (
-    <ClientViewProviderConvex
-      commands={commands}
-      views={views}
-      viewConfig={tasksConfig}
-      globalConfig={config.config}
-      uiViewConfig={uiViewConfig}
-      queryKey={getQueryKey(tasksConfig, view)}
-      userViewData={userViewData}
-    >
-      <Task />
-    </ClientViewProviderConvex>
+    <>
+      {ViewComponent ? <ViewComponent /> : <DefaultViewTemplate />}
+      <Outlet />
+    </>
   );
 });

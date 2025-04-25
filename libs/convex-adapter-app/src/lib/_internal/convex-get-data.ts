@@ -19,6 +19,7 @@ import {
   getIdsFromSearchFilters,
   getRecordsByIds,
 } from './convex-get-ids-from';
+import { getIdsFromParentView } from './convex-get-ids-from-parent-view';
 import { mapWithInclude } from './convex-map-with-include';
 import { convexSortRows } from './convex-sort-rows';
 import { parseConvexData } from './convex-utils';
@@ -27,28 +28,19 @@ import { ConvexRecordType } from './types.convex';
 
 const LOG_LEVEL = 'info' as string;
 
-// const updateLocalLevel = () => {
-// if (import.meta.env.MODE === 'development') {
-//   LOG_LEVEL = 'debug';
-// } else if (import.meta.env.MODE === 'test') {
-//   LOG_LEVEL = 'warn';
-// } else {
-//   LOG_LEVEL = 'info';
-// }
-// };
-
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const log = (...props: any[]) => {
     const view = args.viewConfigManager?.getTableName();
     if (view !== 'tasks') return;
-    _log.info(...props);
+    console.log(...props);
   };
 
   const debug = (...props: any[]) => {
     if (LOG_LEVEL !== 'debug') return;
-    const view = args.viewConfigManager?.getTableName();
-    if (view !== 'tasks') return;
-    _log.debug(...props);
+    // const view = args.viewConfigManager?.getTableName();
+    // if (view !== 'task') return;
+    // _log.debug(...props);
+    console.log(...props);
   };
 
   const { viewConfigManager, filters, registeredViews } = args;
@@ -66,13 +58,13 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const localModeEnabled = viewConfigManager.localModeEnabled;
   const showDeleted = displayOptionsInfo.showDeleted || localModeEnabled;
 
-  debug('Convex:getData', {
-    filters: filters?.length,
-    displayField,
-    displayOptionsInfo,
-    localModeEnabled,
-    showDeleted,
-  });
+  // debug('Convex:getData', {
+  //   filters: filters?.length,
+  //   displayField,
+  //   displayOptionsInfo,
+  //   localModeEnabled,
+  //   showDeleted,
+  // });
 
   let isDone = false;
   let isGetAll = false;
@@ -153,6 +145,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
+  const idsSubView = await getIdsFromParentView(args, ctx, viewConfigManager);
+
   const deletedIndexField = viewConfigManager.getSoftDeleteIndexField();
 
   const query = queryClient(ctx, viewConfigManager.getTableName());
@@ -170,8 +164,13 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     isIndexSearch ? idsIndexField : null,
     isSearchFieldSearch ? idsSearchField : null,
     args.query ? idsQuerySearch : null,
-    softDeleteEnabled && !showDeleted ? idsNotDeleted : null
+    softDeleteEnabled && !showDeleted ? idsNotDeleted : null,
+    args.parentId && args.parentViewName ? idsSubView : null
   );
+
+  if (args.viewId) {
+    allIds = [args.viewId];
+  }
 
   const hasOnlyIdsNotDeleted =
     idsNotDeleted.length > 0 &&
@@ -229,7 +228,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const getRecordsHasIdsAndNotTooBig = () => {
       debug('Convex:getRecordsHasIdsAndNotTooBig');
-      return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
+      return getRecordsByIds(
+        idsAfterRemove?.slice(position, nextPosition) ?? [],
+        dbQuery
+      );
     };
 
     const getSortedRecords = () => {
@@ -270,7 +272,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
 
     if (softDeleteEnabled && !showDeleted) {
-      rows = rows.filter((row) => idsNotDeleted.includes(row._id));
+      rows = rows.filter((row) => idsNotDeleted.includes(row?._id));
     }
 
     if ('continueCursor' in rowsBeforeFilter) {
@@ -301,23 +303,28 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     debug('Convex:fetchedRows.length', newRows.length);
   }
 
-  const filtered = newRows.filter(
+  const filtered = newRows?.filter(
     (r) =>
-      !idsToRemove.includes(r._id) && !rows.map((r) => r._id).includes(r._id)
+      !idsToRemove.includes(r?._id) && !rows.map((r) => r?._id).includes(r?._id)
   );
 
   rows.push(...filtered);
 
-  const rawData = await mapWithInclude(rows, ctx, args);
-
   let sortedRows = convexSortRows(
-    rawData,
+    // comment out -> we want to map with include later, check if this is ok
+    // rawData,
+    rows,
     args,
     displayOptionsInfo
   ) as ConvexRecordType[];
 
   sortedRows =
-    allIds !== null ? sortedRows : sortedRows.slice(position, nextPosition);
+    allIds !== null
+      ? // added this, before we returned all sortedRows
+        sortedRows
+      : sortedRows.slice(position, nextPosition);
+
+  sortedRows = await mapWithInclude(sortedRows, ctx, args);
 
   if (allIds !== null || isGetAll) {
     const newItemsLength = allIds !== null ? allIds.length : newRows.length;

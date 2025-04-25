@@ -29,8 +29,19 @@ export const viewLoaderHandler = async (
     };
   }
 
+  // console.warn('____'VIEW LOADER START', {
+  //   ...args,
+  //   modelConfig: undefined,
+  //   viewConfigManager: undefined,
+  //   registeredViews: undefined,
+  //   viewConfig: undefined,
+  // });
+
   const viewConfigManager = args.viewConfigManager;
   if (!viewConfigManager) throw new Error('viewConfigManager is not defined');
+
+  // console.info(args.parentId);
+  // "filters": "filter[]=projects:is:j978hgpasa3s6pzej5j22abh2x7e86mf||Learn%20Spanish:relation;false",
 
   const parsedFilters = parseFilterStringForServer(
     args.filters ?? '',
@@ -62,12 +73,19 @@ export const viewLoaderHandler = async (
     };
   }
 
-  invarant(Boolean(viewConfigManager), 'viewConfig is not defined');
+  invarant(Boolean(viewConfigManager), 'viewConfig.... is not defined');
 
-  const { data, continueCursor, isDone, allIds } = await getData(
-    ctx,
-    serverProps
-  );
+  const getDataRes =
+    args.onlyRelationalData === true
+      ? {
+          continueCursor: { position: null, cursor: null },
+          isDone: true,
+          allIds: [],
+          data: [],
+        }
+      : await getData(ctx, serverProps);
+
+  const { data, continueCursor, isDone, allIds } = getDataRes;
 
   return {
     allIds: allIds?.map((id) => id.toString()) ?? [],

@@ -87,7 +87,7 @@ export const displayOptionsSelectViewField: StoreFn<
 
   if (prevSelectedViewFields === null || prevSelectedViewFields === undefined) {
     store$.displayOptions.viewField.hidden.set(
-      allFields.filter((f) => f !== field.id).map((f) => f)
+      allFields?.filter((f) => f !== field.id).map((f) => f)
     );
     return;
   }

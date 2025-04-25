@@ -21,6 +21,23 @@ const _sortRows = () => {
   return sorted;
 };
 
+const _sortRowsBackup = () => {
+  const rows = store$.dataModelBackup.rows.get().map((r) => r.raw);
+
+  const sortedRows = sortRows(
+    rows,
+    store$.views.get(),
+    store$.displayOptions.sorting.get()
+  );
+
+  const sorted = makeData(
+    store$.views.get(),
+    store$.viewConfigManager.getViewName()
+  )([...sortedRows]).rows;
+
+  return sorted;
+};
+
 export const applyDisplayOptions = (
   store$: Observable<LegendStore>,
   displayOptions: DisplayOptionsUiType
@@ -28,8 +45,10 @@ export const applyDisplayOptions = (
   applyFilter(store$, store$.filter.filters.get());
 
   const rows = _sortRows();
+  const rowsBackup = _sortRowsBackup();
 
   store$.dataModel.rows.set(rows);
+  store$.dataModelBackup.rows.set(rowsBackup);
 };
 
 export const addLocalDisplayOptionsHandling = (
@@ -38,16 +57,22 @@ export const addLocalDisplayOptionsHandling = (
   store$.displayOptions.sorting.field.onChange((changes) => {
     if (!changes.value) return;
 
+    const prevAtPath = changes.changes[0].prevAtPath;
+    if (!prevAtPath) return;
+
     applyDisplayOptions(store$, store$.displayOptions.get());
   });
-
   store$.displayOptions.sorting.order.onChange((changes) => {
     if (!changes.value) return;
+    const prevAtPath = changes.changes[0].prevAtPath;
+    if (!prevAtPath) return;
 
     applyDisplayOptions(store$, store$.displayOptions.get());
   });
-
   store$.displayOptions.showDeleted.onChange((changes) => {
+    const prevAtPath = changes.changes[0].prevAtPath;
+    if (!prevAtPath) return;
+
     applyDisplayOptions(store$, store$.displayOptions.get());
   });
 };

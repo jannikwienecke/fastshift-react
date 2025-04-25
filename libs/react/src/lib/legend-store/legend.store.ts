@@ -73,6 +73,7 @@ import {
   createDataModel,
   createRelationalDataModel,
   handleIncomingData,
+  handleIncomingDetailData,
   handleIncomingRelationalData,
   init,
   openSpecificModal,
@@ -93,6 +94,11 @@ import {
   listSelectRelationField,
 } from './legend.store.fn.list';
 import { LegendStore } from './legend.store.types';
+import {
+  detailpageBlurInput,
+  detailpageChangeInput,
+  detailpageEnter,
+} from './legend.detailpage.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -101,6 +107,8 @@ export const store$ = observable<LegendStore>({
   handleIncomingData: (...props) => handleIncomingData(store$)(...props),
   handleIncomingRelationalData: (...props) =>
     handleIncomingRelationalData(store$)(...props),
+  handleIncomingDetailData: (...props) =>
+    handleIncomingDetailData(store$)(...props),
   init: (...props) => init(store$)(...props),
   createDataModel: (...props) => createDataModel(store$)(...props),
   createRelationalDataModel: (...props) =>
@@ -203,4 +211,7 @@ export const store$ = observable<LegendStore>({
     datePickerDialogSubmit(store$)(...props),
 
   openSpecificModal: (...props) => openSpecificModal(store$)(...props),
+  detailpageChangeInput: (...props) => detailpageChangeInput(store$)(...props),
+  detailpageBlurInput: (...props) => detailpageBlurInput(store$)(...props),
+  detailpageEnter: (...props) => detailpageEnter(store$)(...props),
 });

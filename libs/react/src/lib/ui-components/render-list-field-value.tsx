@@ -22,8 +22,12 @@ export const ListFieldValue = ({
           !field.enum &&
           field.type !== 'Boolean' &&
           field.type !== 'Date'
-        )
+        ) {
           return null;
+        }
+
+        e.stopPropagation();
+        e.preventDefault();
 
         const rect = e.currentTarget.getBoundingClientRect();
 

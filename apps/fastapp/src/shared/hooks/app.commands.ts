@@ -5,7 +5,7 @@ import { observable } from '@legendapp/state';
 import { useMutation } from '@tanstack/react-query';
 import { TrashIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { resettingDb$ } from '../application-store/app.store';
+import { resettingDb$ } from '../../application-store/app.store';
 
 const waitFor = (ms: number) =>
   new Promise((resolve) => {

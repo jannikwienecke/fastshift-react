@@ -4,11 +4,12 @@ import React from 'react';
 import { toast } from 'sonner';
 import { store$ } from '..';
 import { useApi } from './use-api';
+import { isDetail } from './legend-store/legend.utils';
+
+// const isDev = import.meta.env.MODE === 'development';
 
 export const useMutation = () => {
   const api = useApi();
-
-  const lastViewName = React.useRef('');
 
   const { mutate, isPending, mutateAsync, error } = useMutationTanstack({
     mutationFn: async (args: MutationDto) => {
@@ -29,8 +30,27 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      lastViewName.current = vars.viewName;
       store$.state.set('mutating');
+
+      if (
+        vars.mutation.type !== 'UPDATE_RECORD' &&
+        vars.mutation.type !== 'SELECT_RECORDS'
+      )
+        return;
+      const detail = store$.detail.get();
+      const key =
+        isDetail() && detail?.row?.id
+          ? `detail-${detail.row.id}`
+          : vars.viewName;
+
+      store$.ignoreNextQueryDict.set((prev) => {
+        const prevKey = prev[key];
+        if (prevKey) {
+          return { ...prev, [key]: prevKey + 1 };
+        }
+
+        return { ...prev, [key]: 1 };
+      });
     },
   });
 
@@ -39,6 +59,10 @@ export const useMutation = () => {
       if (!mutateAsync) throw new Error('mutateAsync is not defined');
 
       try {
+        // if (isDev) {
+        //   await new Promise((resolve) => setTimeout(resolve, 750));
+        // }
+
         const res = await mutateAsync(args);
 
         if (!res) throw new Error('mutation failed');

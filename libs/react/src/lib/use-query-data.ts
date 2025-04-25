@@ -1,7 +1,7 @@
 import { DataModelNew, RecordType } from '@apps-next/core';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
-import { useQuery, useRelationalQuery } from './use-query';
+import { useDetailQuery, useQuery, useRelationalQuery } from './use-query';
 
 export type QueryStore<T extends RecordType> = {
   dataModel: DataModelNew<T>;
@@ -18,11 +18,15 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   const queryReturn = useQuery();
   const relationalQueryReturn = useRelationalQuery();
 
-  const dataModel = store$.dataModel.get() as DataModelNew<QueryReturnType>;
+  const detailQueryReturn = useDetailQuery();
+
+  const dataModel = store$.dataModel.get() as DataModelNew<QueryReturnType[0]>;
   const relationalDataModel = store$.relationalDataModel.get();
 
   const queryReturnRef = React.useRef(queryReturn);
   const relationalQueryReturnRef = React.useRef(relationalQueryReturn);
+  const detailQueryReturnRef = React.useRef(detailQueryReturn);
+
   React.useEffect(() => {
     queryReturnRef.current = queryReturn;
   }, [queryReturn]);
@@ -32,10 +36,14 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   }, [relationalQueryReturn]);
 
   React.useEffect(() => {
-    if (!queryReturn.data) return;
+    detailQueryReturnRef.current = detailQueryReturn;
+  }, [detailQueryReturn]);
+
+  React.useEffect(() => {
+    if (!queryReturn.data || queryReturn.isPending) return;
 
     store$.handleIncomingData(queryReturnRef.current);
-  }, [queryReturn.data]);
+  }, [queryReturn.data, queryReturn.isPending]);
 
   React.useEffect(() => {
     if (!relationalQueryReturn.relationalData) return;
@@ -43,6 +51,13 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
 
     store$.handleIncomingRelationalData(relationalQueryReturnRef.current);
   }, [relationalQueryReturn.relationalData]);
+
+  React.useEffect(() => {
+    if (!detailQueryReturn.data || detailQueryReturn.data.length !== 1) return;
+    if (!store$.detail.row.get()) return;
+
+    store$.handleIncomingDetailData(detailQueryReturnRef.current);
+  }, [detailQueryReturn.data]);
 
   return {
     dataModel,

@@ -88,7 +88,7 @@ export const makeResources = <
             current = current[key];
           }
           current[keys[keys.length - 1] as string] =
-            value[lang] ?? current[keys[keys.length - 1] as string];
+            value?.[lang] ?? current[keys[keys.length - 1] as string];
         });
       }
       return mergedResources;

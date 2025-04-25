@@ -19,6 +19,7 @@ import { comboboxStore$, store$ } from '../legend-store';
 import { xSelect } from '../legend-store/legend.select-state';
 import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
 import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
+import { getViewConfigManager } from '../legend-store/legend.utils';
 
 const getViewName = () => store$.viewConfigManager.getViewName();
 
@@ -64,7 +65,8 @@ const makeSelectModelAttributeCommand = (
     handler: ({ row }) => {
       _log.info('makeSelectModelAttributeCommand - handler');
 
-      const field = store$.viewConfigManager.getFieldBy(item.id.toString());
+      // TODO DETAIL BRANCHING
+      const field = getViewConfigManager().getFieldBy(item.id.toString());
 
       if (!row) return;
 

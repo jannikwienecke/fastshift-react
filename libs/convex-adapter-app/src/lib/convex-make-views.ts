@@ -20,7 +20,7 @@ export const makeViews = (
   const userDefinedViews = views.reduce((prev, currentView) => {
     return {
       ...prev,
-      [currentView.viewName]: currentView,
+      [currentView.viewName.toLowerCase()]: currentView,
     };
   }, {} as RegisteredViews);
 

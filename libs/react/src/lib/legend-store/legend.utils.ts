@@ -1,11 +1,21 @@
-import { makeData, Row } from '@apps-next/core';
-import { store$ } from './legend.store';
+import {
+  BaseViewConfigManagerInterface,
+  makeData,
+  QueryReturnOrUndefined,
+  Row,
+} from '@apps-next/core';
 import { observable } from '@legendapp/state';
+import { store$ } from './legend.store';
+import { selectState$ } from './legend.select-state';
+import { queryListViewOptions$ } from './legend.queryProps.derived';
 
-export const copyRow = (row: Row): Row => {
+export const copyRow = (
+  row: Row,
+  viewConfigManager?: BaseViewConfigManagerInterface
+): Row => {
   return makeData(
     store$.views.get(),
-    store$.viewConfigManager.getViewName()
+    viewConfigManager?.getViewName() ?? store$.viewConfigManager.getViewName()
   )([{ ...row.raw }]).rows?.[0] as Row;
 };
 
@@ -26,3 +36,29 @@ export const _hasOpenDialog$ = observable(() => {
 });
 
 export const hasOpenDialog$ = observable(false);
+
+export const isDetail = () => {
+  const viewConfigDetail = store$.detail.viewConfigManager.get();
+  const detailForm = store$.detail.form.dirtyValue.get();
+  const selectStateIsDetail = selectState$.isDetail.get();
+  const isDetailOverview = store$.detail.viewType.type.get() === 'overview';
+
+  return !!(
+    (detailForm || selectStateIsDetail || isDetailOverview) &&
+    viewConfigDetail
+  );
+};
+
+export const getViewConfigManager = (): BaseViewConfigManagerInterface => {
+  if (isDetail()) {
+    const viewConfigDetail = store$.detail.viewConfigManager.get();
+
+    return viewConfigDetail as BaseViewConfigManagerInterface;
+  }
+
+  return store$.viewConfigManager.get();
+};
+
+export const isDetailOverview = () => {
+  return store$.detail.viewType.type.get() === 'overview';
+};

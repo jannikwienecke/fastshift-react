@@ -1,5 +1,6 @@
 import {
   DEFAULT_FETCH_LIMIT_QUERY,
+  getViewByName,
   makeQueryKey,
   QueryDto,
   QueryProps,
@@ -29,7 +30,7 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         disabled: undefined as any,
         viewConfigManager: undefined,
-        viewName: args.viewConfig?.viewName ?? '',
+        viewName: args.viewName ?? args.viewConfig?.viewName ?? '',
         relationQuery: args.relationQuery,
         filters: args.relationQuery?.tableName ? '' : args.filters ?? '',
       })
@@ -48,8 +49,10 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
 
   const result = useTanstackQuery({
     ...queryOptions,
-    // @ts-expect-error ---
-    enabled: args.paginateOptions?.isDone
+    enabled: !args.viewConfig
+      ? false
+      : // @ts-expect-error ---
+      args.paginateOptions?.isDone
       ? false
       : args.disabled === true
       ? false
@@ -82,6 +85,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
   queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const prisma = useApi();
+
   const { registeredViews, viewConfigManager } = useView();
 
   const view = store$.commandform.view.get();
@@ -93,14 +97,58 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
       modelConfig:
         queryProps?.viewConfigManager?.modelConfig ||
         viewConfigManager.modelConfig,
-      viewConfig:
-        registeredViews[
-          view?.viewName ?? viewConfigManager.viewConfig.viewName
-        ],
+      viewConfig: getViewByName(
+        registeredViews,
+        view?.viewName ?? viewConfigManager?.viewConfig?.viewName ?? ''
+      ),
+
       displayOptions: '',
       paginateOptions: undefined,
-      disabled: view?.viewName ? false : true,
+      disabled:
+        view?.viewName && view.viewName !== viewConfigManager?.getViewName()
+          ? false
+          : true,
+      viewId: null,
+      onlyRelationalData: true,
+      parentViewName: null,
+      parentId: null,
     });
+
+  return {
+    ...queryReturn,
+    allIds: queryReturn.data?.allIds ?? [],
+    data: queryReturn.data?.data ?? [],
+    relationalData: queryReturn.data?.relationalData ?? {},
+    continueCursor: queryReturn.data?.continueCursor,
+    isDone: queryReturn.data?.isDone,
+  };
+};
+
+export const useDetailQuery = <
+  QueryReturnType extends RecordType[]
+>(): QueryReturnOrUndefined<QueryReturnType[0]> => {
+  const prisma = useApi();
+
+  const detail = store$.detail.get();
+
+  const queryPropsMerged = React.useMemo(() => {
+    return {
+      registeredViews: store$.views.get(),
+      viewConfig: detail?.viewConfigManager?.viewConfig,
+      query: '',
+      filters: '',
+      displayOptions: '',
+      paginateOptions: undefined,
+      disabled: !detail?.row?.id,
+      viewId: detail?.row?.id ?? null,
+      parentId: undefined,
+      modelConfig: undefined,
+      parentViewName: undefined,
+    };
+  }, [detail?.row?.id, detail?.viewConfigManager?.viewConfig]);
+
+  const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
+    useStableQuery(prisma, queryPropsMerged);
 
   return {
     ...queryReturn,
@@ -116,13 +164,18 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   queryProps?: Partial<QueryProps>
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const prisma = useApi();
-  const { registeredViews, viewConfigManager } = useView();
+  const { registeredViews } = useView();
+
+  const viewConfigManager = store$.viewConfigManager.get();
 
   const query = store$.globalQueryDebounced.get();
 
   const parsedViewSettings = getParsedViewSettings();
 
   const cursor = store$.fetchMore.currentCursor.get();
+
+  const parentId = store$.detail.row.get()?.id ?? null;
+  const parentViewName = store$.detail.parentViewName.get() ?? null;
 
   const queryPropsMerged = React.useMemo(() => {
     return {
@@ -135,32 +188,62 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       viewConfig:
         queryProps?.viewConfigManager?.viewConfig ||
         viewConfigManager.viewConfig,
-      filters: queryProps?.relationQuery ? '' : parsedViewSettings?.filters,
-      displayOptions: queryProps?.relationQuery
-        ? ''
-        : parsedViewSettings?.displayOptions,
+      filters:
+        queryProps?.relationQuery || store$.detail.parentViewName.get()
+          ? ''
+          : parsedViewSettings?.filters,
+      displayOptions:
+        queryProps?.relationQuery || store$.detail.parentViewName.get()
+          ? ''
+          : parsedViewSettings?.displayOptions,
       paginateOptions: {
         cursor: cursor,
         numItems: DEFAULT_FETCH_LIMIT_QUERY,
         // isDone: isDone,
       },
+      viewId: null,
+
+      parentViewName,
+      parentId,
+
+      // parentViewName: store$.detail.parentViewName.get() ?? null,
+      // parentId: store$.detail.row.get()?.id ?? null,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       viewConfigManager: undefined,
     };
   }, [
-    query,
     queryProps,
+    query,
     registeredViews,
     viewConfigManager.modelConfig,
     viewConfigManager.viewConfig,
+    parsedViewSettings?.filters,
+    parsedViewSettings?.displayOptions,
     cursor,
-    parsedViewSettings,
+    parentViewName,
+    parentId,
   ]);
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
     useStableQuery(prisma, queryPropsMerged);
+
+  const mergedPropsRef = React.useRef(queryPropsMerged);
+  React.useEffect(() => {
+    mergedPropsRef.current = queryPropsMerged;
+  }, [queryPropsMerged]);
+
+  React.useEffect(() => {
+    if (!queryReturn?.data?.data) return;
+
+    console.warn(
+      '____USE QUERY NORMAL:: ',
+      queryReturn?.data.data.length,
+      'First:',
+      queryReturn?.data?.data?.[0]
+    );
+  }, [queryReturn?.data?.data]);
 
   return {
     ...queryReturn,

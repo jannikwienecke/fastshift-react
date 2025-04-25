@@ -27,7 +27,7 @@ import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
 } from './legend.store.types';
-import { comboboxStore$ } from './legend.store.derived.combobox';
+import { getViewConfigManager } from './legend.utils';
 
 export const comboboxDebouncedQuery$ = observable('');
 
@@ -41,9 +41,9 @@ export const getViewFieldsOptions = (options?: {
   const query =
     (store$.combobox.query.get() || store$.commandbar.query.get()) ?? '';
 
-  const viewFields = store$.viewConfigManager
-    .get()
-    .getViewFieldList({ includeSystemFields: options?.includeSystemFields });
+  const viewFields = getViewConfigManager().getViewFieldList({
+    includeSystemFields: options?.includeSystemFields,
+  });
 
   filterOptions = viewFields.map((field) => {
     const label = options?.useEditLabel
@@ -472,6 +472,30 @@ export const getSharedStateCommandForm = (): ComboboxStateCommonType => {
   return stateShared;
 };
 
+export const getSharedStateDetailPage = (): ComboboxStateCommonType => {
+  const field = store$.detail.selectedField.get();
+
+  const row = store$.detail.row.raw.get();
+  const value = row?.[field?.name ?? ''] ?? null;
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: store$.detail.rect.get() ?? null,
+    searchable: true,
+    name: 'detail-page',
+    isNewState: true,
+    open: true,
+    query: store$.combobox.query.get(),
+    field: field ?? null,
+    selected: Array.isArray(value) ? value : [],
+    row: null,
+    placeholder:
+      makeFilterPropsOptions.placeholder.get() ??
+      t('filter.button.placeholder'),
+  };
+
+  return stateShared;
+};
+
 export const getSharedStateCommandbar = (): ComboboxStateCommonType => {
   const selectedCommandbarField = store$.commandbar.selectedViewField.get();
 
@@ -518,11 +542,11 @@ export const getSharedStateSelectState = (): ComboboxStateCommonType => {
   if (!row || !field) return DEFAULT_COMBOBOX_STATE;
 
   const stateShared: ComboboxStateCommonType = {
-    rect: {} as DOMRect,
+    rect: selectState$.rect.get() ?? null,
     searchable: field?.enum ? false : true,
     name: field?.name ?? 'select-state',
     isNewState: true,
-    open: false,
+    open: !!selectState$.rect.get(),
     query: store$.combobox.query.get(),
     field: field,
     selected: getDefaultSelectedList(),

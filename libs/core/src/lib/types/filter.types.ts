@@ -91,7 +91,7 @@ export type DisplayOptionsUiTypeData = {
     rect: DOMRect | null;
     label?: string;
   };
-  viewField: {
+  viewField?: {
     hidden?: string[] | null;
     allFields: string[];
   };
@@ -99,6 +99,7 @@ export type DisplayOptionsUiTypeData = {
 // export type
 export type DisplayOptionsUiType = {
   isOpen: boolean;
+  resetted?: boolean;
 } & DisplayOptionsUiTypeData;
 
 export type FilterItemType = {

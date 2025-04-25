@@ -105,7 +105,7 @@ export function Commandform(props: CommandformProps | undefined) {
             {props.primitiveFields
               .filter(
                 (field) =>
-                  field.field?.type !== 'Date' && !field.field?.richEditor
+                  field?.field?.type !== 'Date' && !field.field?.richEditor
               )
               .map((field, index) => {
                 if (field.field?.type === 'String') {

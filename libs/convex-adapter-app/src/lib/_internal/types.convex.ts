@@ -34,7 +34,7 @@ export type ViewLoader = FunctionReference<
   'query',
   'public',
   DefaultFunctionArgs,
-  QueryReturnDto
+  QueryReturnDto | null
 >;
 
 export type ViewMutation = FunctionReference<

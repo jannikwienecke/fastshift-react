@@ -25,6 +25,7 @@ export interface BaseViewConfigManagerInterface<
   TViewConfig extends ViewConfigType = ViewConfigType
 > {
   viewConfig: TViewConfig;
+  uiViewConfig: UiViewConfig;
   getDisplayFieldLabel(): string;
   getSearchableFields(): SearchableField[] | undefined;
   getPrimarySearchField(): string | undefined;
@@ -286,13 +287,16 @@ export class BaseViewConfigManager<
         return { ...prev };
       }
 
-      value = field.isDateField ? new Date(value) : value;
+      value =
+        field.isDateField && value !== undefined ? new Date(value) : value;
 
       const fieldnameRelation = field.relation?.fieldName;
 
       if (value === undefined && fieldnameRelation) {
         value = record[fieldnameRelation];
       }
+
+      if (value === '' && !field.isRequired) return prev;
 
       const error = this.validateField(field, value);
       if (error) {

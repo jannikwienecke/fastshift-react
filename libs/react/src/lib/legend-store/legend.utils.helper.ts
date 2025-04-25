@@ -1,12 +1,13 @@
 import {
+  _log,
   convertDisplayOptionsForBackend,
   convertFiltersForBackend,
-  DisplayOptionsType,
+  DEFAULT_FETCH_LIMIT_QUERY,
   Row,
 } from '@apps-next/core';
-import { store$ } from './legend.store';
-import { applyFilter } from './legend.local.filtering';
 import { applyDisplayOptions } from './legend.local.display-options';
+import { applyFilter } from './legend.local.filtering';
+import { store$ } from './legend.store';
 
 export const filterRowsByShowDeleted = (rows: Row[]) => {
   const showDeleted = store$.displayOptions.showDeleted.get();
@@ -14,7 +15,9 @@ export const filterRowsByShowDeleted = (rows: Row[]) => {
     store$.viewConfigManager.getSoftDeleteIndexField()?.field;
 
   const filtered = rows.filter((row) => {
-    const value = row.getValue(softDeleteField ?? '');
+    if (showDeleted) return true;
+
+    const value = softDeleteField && row.getValue(softDeleteField ?? '');
     return showDeleted ? true : value !== true;
   });
 
@@ -22,6 +25,11 @@ export const filterRowsByShowDeleted = (rows: Row[]) => {
 };
 
 export const setGlobalDataModel = (rows: Row[]) => {
+  // if (store$.detail.form.dirtyValue.get()) {
+  //   console.warn('DOES NOT UPDATE IS DIRY!!', store$.detail.form.get());
+  //   return;
+  // }
+
   const filteredRows = filterRowsByShowDeleted(rows);
 
   //   datamodel has either ALL or not DELETED rows based on the config
@@ -35,22 +43,15 @@ export const setGlobalDataModel = (rows: Row[]) => {
   //   backup has ALL rows
   store$.dataModelBackup.rows.set(rows);
 
-  applyFilter(store$, store$.filter.filters.get());
+  const isDone_ =
+    DEFAULT_FETCH_LIMIT_QUERY > store$.dataModel.rows.get().length;
 
-  if (store$.viewConfigManager.localModeEnabled) {
+  if (store$.viewConfigManager.localModeEnabled.get() || isDone_) {
+    _log.debug('setGlobalDataModel: APPLY FILTER! AND SORT');
+    applyFilter(store$, store$.filter.filters.get());
     applyDisplayOptions(store$, store$.displayOptions.get());
   }
 };
-
-// const filters = store$.filter.filters.get();
-// const displayOptions = store$.displayOptions.get();
-
-// const parsedFilters = viewConfigManager.localModeEnabled
-//   ? ''
-//   : convertFiltersForBackend(filters);
-// const parsedDisplayOptions = viewConfigManager.localModeEnabled
-//   ? ''
-//   : convertDisplayOptionsForBackend(displayOptions);
 
 export const getParsedViewSettings = () => {
   const filters = store$.filter.filters.get();

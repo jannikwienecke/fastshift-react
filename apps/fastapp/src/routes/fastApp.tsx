@@ -3,7 +3,14 @@ import { Button, cn, Sidebar, SidebarBody, SidebarLink } from '@apps-next/ui';
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 
-import { ErrorDetailsDialog } from '@apps-next/react';
+import { views } from '@apps-next/convex';
+import { _log, QueryReturnOrUndefined } from '@apps-next/core';
+import {
+  ClientViewProviderConvex,
+  ErrorDetailsDialog,
+  globalStore,
+  store$,
+} from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import {
   CircleIcon,
@@ -17,13 +24,85 @@ import {
   ErrorComponent,
   Link,
   Outlet,
+  redirect,
+  useParams,
 } from '@tanstack/react-router';
 import { LoaderIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
 import { resettingDb$ } from '../application-store/app.store';
+import { getViewData, wait } from '../application-store/app.store.utils';
+import {
+  getQueryKey,
+  getUserViews,
+  getUserViewsQuery,
+  queryClient,
+} from '../query-client';
+import { useCommands, useViewParams } from '../shared/hooks';
+import { useAppEffects } from '../shared/hooks/app.effects';
+import { getViewParms } from '../shared/utils/app.helper';
 
 export const Route = createFileRoute('/fastApp')({
+  loader: async (props) => {
+    await wait();
+
+    await queryClient.ensureQueryData(getUserViewsQuery());
+
+    const userViews = getUserViews();
+
+    const { viewName, slug, id, model } = getViewParms(props.params);
+
+    if (!viewName) return;
+    if (props.cause !== 'enter') return;
+    if (store$.viewConfigManager.viewConfig.get()) {
+      return;
+    }
+
+    globalStore.setViews(views);
+
+    _log.debug(`Loader for view: ${viewName} - slug: ${slug}`);
+
+    const { viewData, userViewData } = getViewData(viewName, userViews);
+
+    if (!viewData) {
+      _log.warn(`View ${viewName} not found, redirecting to /fastApp`);
+      return redirect({ to: '/fastApp' });
+    }
+
+    let data: QueryReturnOrUndefined | null = null;
+
+    await props.context.preloadQuery(
+      viewData.viewConfig,
+      userViewData?.name ?? viewName,
+      null,
+      null,
+      null
+    );
+
+    data = queryClient.getQueryData(
+      getQueryKey(
+        viewData.viewConfig,
+        userViewData?.name ?? viewName,
+        null,
+        null,
+        null
+      )
+    ) as QueryReturnOrUndefined;
+
+    globalStore.dispatch({
+      type: 'INIT_LOAD_STORE',
+      payload: {
+        viewName,
+        data,
+        userViews,
+        views,
+        id: id ?? null,
+        model: model ?? null,
+        userView: userViewData,
+      },
+    });
+  },
+
   component: () => <FastAppLayoutComponent />,
   errorComponent: (props) => {
     return <ErrorComponent {...props} />;
@@ -31,22 +110,79 @@ export const Route = createFileRoute('/fastApp')({
 });
 
 const FastAppLayoutComponent = observer(() => {
+  const { commands } = useCommands();
+
+  const { id } = useParams({ strict: false });
+  let { viewName } = useViewParams();
+  viewName = viewName as string;
+
+  useAppEffects(viewName);
+
+  const userViews = getUserViews();
+  const { viewData, userViewData } = getViewData(viewName, userViews);
+
+  const data = queryClient.getQueryData(
+    getQueryKey(
+      viewData.viewConfig,
+      userViewData?.name ?? viewName,
+      null,
+      null,
+      null
+    )
+  ) as QueryReturnOrUndefined;
+
+  const doOnceForViewRef = React.useRef('');
+
+  if (
+    (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
+    !id
+  ) {
+    globalStore.dispatch({ type: 'CHANGE_VIEW', payload: { data, viewName } });
+    doOnceForViewRef.current = viewName;
+  }
+
+  const viewNameRef = React.useRef(viewName);
+  const dataRef = React.useRef(data);
+
+  if (viewNameRef.current !== viewName) {
+    viewNameRef.current = viewName;
+  }
+  if (dataRef.current !== data) {
+    dataRef.current = data;
+  }
+
+  React.useEffect(() => {
+    return () => {
+      if (!id) return;
+      globalStore.dispatch({
+        type: 'CHANGE_VIEW',
+        payload: {
+          data: dataRef.current,
+          viewName: viewNameRef.current,
+          resetDetail: true,
+        },
+      });
+    };
+  }, [id]);
+
   return (
     <>
-      <Layout>
-        <Outlet />
-      </Layout>
+      <ClientViewProviderConvex commands={commands}>
+        <Layout>
+          <Outlet />
+        </Layout>
 
-      {resettingDb$.get() ? (
-        <div className="fixed top-0 left-0 h-screen w-screen bg-black/50 flex items-center justify-center z-50">
-          <LoaderIcon className="animate-spin h-10 w-10 text-white" />
-        </div>
-      ) : (
-        <></>
-      )}
+        {resettingDb$.get() ? (
+          <div className="fixed top-0 left-0 h-screen w-screen bg-black/50 flex items-center justify-center z-50">
+            <LoaderIcon className="animate-spin h-10 w-10 text-white" />
+          </div>
+        ) : (
+          <></>
+        )}
 
-      <ErrorDetailsDialog />
-      <Toaster richColors duration={2000} />
+        <ErrorDetailsDialog />
+        <Toaster richColors duration={2000} />
+      </ClientViewProviderConvex>
     </>
   );
 });
@@ -57,7 +193,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const links = [
     {
       label: t('navigation.projects'),
-      href: '/fastApp/projects',
+      href: '/fastApp/my-projects',
       icon: (
         <DotIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
@@ -71,7 +207,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     },
     {
       label: t('navigation.settings'),
-      href: '#',
+      href: '/fastApp/owner',
       icon: (
         <MixIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
       ),
@@ -105,7 +241,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       )}
     >
       <Sidebar open={open} setOpen={setOpen} isPinned={pinned}>
-        <SidebarBody className="justify-between gap-10  w-full">
+        <SidebarBody className="justify-between gap-10 mt-2  w-full border-r-[.5px]">
           <div className="flex flex-col flex-1 w-full overflow-y-auto">
             {open ? (
               <Logo

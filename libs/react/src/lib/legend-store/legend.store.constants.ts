@@ -75,14 +75,19 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'state'
   | 'userViewSettings'
   | 'userViewData'
+  | 'viewId'
+  | 'userViews'
+  | 'ignoreNextQueryDict'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
   dataModelBackup: { rows: [] } as DataModelNew,
   views: {} as RegisteredViews,
+  userViews: [],
   viewConfigManager: {} as BaseViewConfigManagerInterface,
   relationalDataModel: {} as RelationalDataModel,
   uiViewConfig: {} as UiViewConfig,
+  viewId: null,
   paginateOptions: {
     cursor: null,
     numItems: DEFAULT_FETCH_LIMIT_QUERY,
@@ -90,6 +95,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   errorDialog: {
     error: null,
   },
+  ignoreNextQueryDict: {},
   fetchMore: {
     currentCursor: {
       position: null,

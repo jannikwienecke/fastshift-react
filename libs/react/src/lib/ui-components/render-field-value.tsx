@@ -1,5 +1,6 @@
 import { ComponentType, FieldConfig, Row } from '@apps-next/core';
 import { getComponent } from './ui-components.helper';
+import { cn } from '@apps-next/ui';
 
 export const FieldValue = ({
   field,
@@ -18,7 +19,9 @@ export const FieldValue = ({
     componentType,
   });
 
+  const isDisplayField = field.isDisplayField;
   if (!row) return null;
+
   return (
     <div data-testid={`field-value-${fieldName}`}>
       {ComponentToRender ? (
@@ -32,7 +35,11 @@ export const FieldValue = ({
           />
         </>
       ) : (
-        <>{row?.getValueLabel(fieldName)}</>
+        <span
+          className={cn(isDisplayField ? '' : 'text-xs text-foreground/70')}
+        >
+          {row?.getValueLabel(fieldName)}
+        </span>
       )}
     </div>
   );

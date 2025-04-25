@@ -80,6 +80,7 @@ export type MutationPropsServer = {
   viewConfigManager: BaseViewConfigManagerInterface;
   registeredViews: RegisteredViews;
   mutation: Mutation;
+  viewId?: null | undefined;
 };
 
 export const SUCCESS_STATUS = {

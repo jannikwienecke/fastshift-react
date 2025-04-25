@@ -27,9 +27,13 @@ import {
   UserViewData,
   UserViewForm,
   ViewConfigType,
+  DetailRow,
+  DetailViewTypeState,
 } from '@apps-next/core';
-import { Observable } from '@legendapp/state';
+import { observable, Observable } from '@legendapp/state';
+import { QueryClient } from '@tanstack/react-query';
 import { PaginationOptions } from 'convex/server';
+import { MakeQueryOptions } from '../query-context';
 
 export type InputDialogState = {
   open: boolean;
@@ -122,9 +126,14 @@ export type FetchMoreOptions = {
   isDone: boolean;
 };
 
+export type GlobalStore = {
+  //
+};
+
 export type LegendStore = {
   handleIncomingData: (props: QueryReturnOrUndefined) => void;
   handleIncomingRelationalData: (props: QueryReturnOrUndefined) => void;
+  handleIncomingDetailData: (props: QueryReturnOrUndefined) => void;
 
   state:
     | 'pending'
@@ -140,20 +149,43 @@ export type LegendStore = {
   relationalDataModel: RelationalDataModel;
   uiViewConfig: UiViewConfig;
 
+  navigation?: {
+    state:
+      | { type: 'ready' }
+      | { type: 'navigate'; id?: string; view: string }
+      | {
+          type: 'switch-detail-view';
+          state: DetailViewTypeState;
+        }
+      | {
+          type: 'preload-relational-sub-list';
+          state: { fieldName: string };
+        };
+  };
+
   // pagination options
   paginateOptions: PaginationOptions;
 
   fetchMore: FetchMoreOptions;
 
+  ignoreNextQueryDict: {
+    [key: string]: number;
+  };
+
   //   VIEW STATE
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
+  userViews: UserViewData[];
   commands: UserStoreCommand[];
   userViewData: UserViewData | undefined;
+
+  viewId: string | null;
 
   api?: {
     mutate?: (args: MutationDto) => void;
     mutateAsync?: (args: MutationDto) => Promise<MutationReturnDto>;
+    queryClient?: QueryClient;
+    makeQueryOptions: MakeQueryOptions;
   };
 
   globalQuery: string;
@@ -201,10 +233,10 @@ export type LegendStore = {
     continueCursor: ContinueCursor | null,
     isDone: boolean,
     viewConfigManager: BaseViewConfigManagerInterface,
-    views: RegisteredViews,
-    uiViewConfig: UiViewConfig,
+    uiViewConfig: UiViewConfig | undefined,
     commands: UserStoreCommand[],
-    userView: UserViewData | undefined
+    userView: UserViewData | undefined,
+    viewId: string | null
   ) => void;
 
   createDataModel: (data: RecordType[], tablename?: string) => void;
@@ -388,7 +420,33 @@ export type LegendStore = {
     hasChanged: boolean;
     open: boolean;
     form?: UserViewForm;
+    viewCreated?: {
+      name: string;
+      slug: string;
+    };
   };
+
+  detail?: {
+    viewConfigManager: BaseViewConfigManagerInterface;
+    row?: Row;
+    detailRow?: DetailRow;
+    selectedField?: FieldConfig;
+    rect?: DOMRect;
+    form: {
+      dirtyField?: FieldConfig;
+      dirtyValue?: string | number;
+      // error?: string;
+    };
+    parentViewName: string;
+    viewType?: DetailViewTypeState;
+  };
+
+  detailpageChangeInput: (
+    field: CommandformItem,
+    value: string | boolean
+  ) => void;
+  detailpageBlurInput: (field: CommandformItem) => void;
+  detailpageEnter: (field: CommandformItem) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

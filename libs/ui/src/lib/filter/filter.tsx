@@ -91,7 +91,8 @@ const FilterItem = (props: {
             </div>
           ) : null}
 
-          <div>{translateField(t, filter)}</div>
+          <div>{filter.label}</div>
+          {/* <div>{translateField(t, filter)}</div> */}
         </div>
 
         <button

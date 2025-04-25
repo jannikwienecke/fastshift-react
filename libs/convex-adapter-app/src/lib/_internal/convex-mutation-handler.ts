@@ -3,6 +3,7 @@ import {
   FieldConfig,
   MutationHandlerReturnType,
   MutationPropsServer,
+  slugHelper,
 } from '@apps-next/core';
 import { mutationClient, queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
@@ -191,7 +192,10 @@ export const selectRecordsMutation = async (
 
   const record = await ctx.db.get(mutation.payload.id);
 
-  const recordsWithInclude = await mapWithInclude([record], ctx, props);
+  const recordsWithInclude = await mapWithInclude([record], ctx, {
+    ...props,
+    viewId: props.viewId ?? null,
+  });
 
   const result = viewConfigManager.viewConfig.mutation?.beforeSelect?.(record, {
     newIds,
@@ -249,6 +253,7 @@ export const userViewMutation = async (
         baseView: viewConfigManager.getViewName(),
         displayOptions,
         filters,
+        slug: slugHelper().slugify(name),
       });
     } catch (error) {
       return {
@@ -304,6 +309,7 @@ export const userViewMutation = async (
           displayOptions,
           filters,
           name: baseView,
+          slug: slugHelper().slugify(name),
           description: description ?? '',
         });
         return {

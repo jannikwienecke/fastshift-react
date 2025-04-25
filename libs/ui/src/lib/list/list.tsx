@@ -18,6 +18,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
   onContextMenu,
   grouping,
   onKeyPress,
+  onClick,
 }: ListProps<TItem>) {
   const { t } = useTranslation();
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -26,6 +27,9 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries?.[0]?.isIntersecting) {
+          // console.info(
+          //   'Observer triggered - loading more items - not implemented right now'
+          // );
           onReachEnd?.();
         }
       },
@@ -58,6 +62,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
               key={item.id}
               className=""
               item={item}
+              onClick={() => onClick(item)}
             >
               <div className="flex gap-1 pr-2">
                 <List.Control />
@@ -108,7 +113,7 @@ export function ListDefault<TItem extends ListItem = ListItem>({
                 data-testid={`group-${group.groupByLabel}`}
                 key={group.groupById?.toString() ?? 'group-undefined'}
               >
-                <div className="bg-muted/70 border-y border-foreground/5 text-sm pr-6">
+                <div className="bg-muted/70 border-foreground/5 text-sm pr-6">
                   <div className="py-[8px] pl-9 flex justify-between items-center">
                     <div className="flex gap-2 items-center">
                       <div>{group.groupByLabel}</div>
@@ -234,6 +239,7 @@ function Item(
     <ItemProvider value={{ item }}>
       <li
         onMouseEnter={item.onHover}
+        onClick={props.onClick}
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();

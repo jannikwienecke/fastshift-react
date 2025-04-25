@@ -19,7 +19,7 @@ export const ComboboxNoneValue = ({ field }: { field: FieldConfig | null }) => {
       <CircleDashedIcon className="text-foreground/60 h-4 w-4" />
 
       <div className="text-sm">
-        {t('common.none')} {renderModelName(view.tableName, t)}
+        {t('common.none')} {renderModelName(view?.tableName, t)}
       </div>
     </div>
   );

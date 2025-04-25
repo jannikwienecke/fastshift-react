@@ -1,8 +1,9 @@
-import { FieldConfig, Row } from '@apps-next/core';
+import { FieldConfig, getViewByName, Row } from '@apps-next/core';
 import { useView } from '../use-view';
 import { FilterValue } from './render-filter-value';
 import { Icon } from './render-icon';
 import { getComponent } from './ui-components.helper';
+import { isDetail } from '../legend-store/legend.utils';
 
 export const DefaultComboboxFieldValue = (props: {
   row?: Row;
@@ -11,9 +12,8 @@ export const DefaultComboboxFieldValue = (props: {
 }) => {
   const { registeredViews } = useView();
 
-  const view = Object.values(registeredViews).find(
-    (v) => v?.tableName === props.fieldName
-  );
+  const view = getViewByName(registeredViews, props.fieldName ?? '');
+
   const icon = getComponent({
     componentType: 'icon',
     fieldName: props.fieldName ?? '',
@@ -51,6 +51,7 @@ export const ComboboxFieldValue = ({
     ComponentToRender = getComponent({
       componentType,
       fieldName,
+      isDetail: isDetail(),
     });
   }
 

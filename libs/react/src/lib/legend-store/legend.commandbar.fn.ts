@@ -1,14 +1,15 @@
-import { CommandbarItem, FieldConfig, Row } from '@apps-next/core';
+import { FieldConfig, Row } from '@apps-next/core';
+import { handleCommand } from '../commands';
+import { commands } from '../commands/commands';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { xSelect } from './legend.select-state';
 import { StoreFn } from './legend.store.types';
-import { handleCommand } from '../commands';
-import { commands } from '../commands/commands';
 
 export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
   store$.openSpecificModal('commandbar', () => {
-    store$.commandbar.open.set(true);
+    // first set row -> then open | important!
     row && store$.commandbar.activeRow.set(row);
+    store$.commandbar.open.set(true);
   });
 };
 
@@ -119,173 +120,4 @@ export const commandbarSelectItem: StoreFn<'commandbarSelectItem'> =
     if (handleCommand(item)) return;
 
     throw new Error('Command not found');
-
-    // try {
-    //   const field =
-    //     selectedViewField ??
-    //     store$.viewConfigManager.getFieldBy(item.id.toString());
-    //   const row = store$.commandbar.activeRow.get();
-    //   const value = row?.getValue?.(field.name);
-
-    //   _log.debug({
-    //     SELECTITEM: '',
-    //     item,
-    //     field,
-    //     row,
-    //     value,
-    //     selectedViewField,
-    //   });
-
-    //   if (selectedViewField && row) {
-    //     if (item.id === ADD_NEW_OPTION) {
-    //       const view = getViewByName(
-    //         store$.views.get(),
-    //         selectedViewField.name
-    //       );
-
-    //       store$.commandformOpen(view.viewName);
-    //       store$.commandbarClose();
-    //       return;
-    //     }
-
-    //     if (selectedViewField.type === 'String' && query?.length) {
-    //       const error = store$.viewConfigManager.validateField(
-    //         selectedViewField,
-    //         query
-    //       );
-    //       if (error) {
-    //         store$.commandbar.error.showError.set(true);
-    //         return;
-    //       }
-
-    //       store$.updateRecordMutation({
-    //         field: selectedViewField,
-    //         row: row as Row,
-    //         valueRow: makeRowFromValue(query, field),
-    //       });
-
-    //       store$.commandbarClose();
-    //       return;
-    //     } else if (selectedViewField.type === 'Date') {
-    //       const isSelectSpecificDate = item.id === SELECT_FILTER_DATE;
-
-    //       if (isSelectSpecificDate) {
-    //         const dateOfCurrentRow = row.getValue?.(
-    //           selectedViewField.name
-    //         ) as number;
-
-    //         store$.datePickerDialogOpen(new Date(dateOfCurrentRow), (date) => {
-    //           row &&
-    //             store$.updateRecordMutation({
-    //               field: selectedViewField,
-    //               row: row as Row,
-    //               valueRow: makeRowFromValue(date.getTime(), field),
-    //             });
-
-    //           store$.commandbarClose();
-    //           store$.datePickerDialogClose();
-    //         });
-    //         return;
-    //       } else {
-    //         const parsed = dateUtils.parseOption(
-    //           item.id.toString(),
-    //           operatorMap.is
-    //         );
-
-    //         const { start } = dateUtils.getStartAndEndDate(parsed);
-    //         start?.setHours(2, 0, 0, 0);
-
-    //         if (!start) {
-    //           store$.commandbarClose();
-    //           return;
-    //         }
-
-    //         const valueRow = makeRowFromValue(start?.getTime(), field);
-
-    //         store$.updateRecordMutation({
-    //           field: selectedViewField,
-    //           row: row as Row,
-    //           valueRow,
-    //         });
-    //       }
-
-    //       store$.commandbarClose();
-    //     } else if (selectedViewField.enum) {
-    //       store$.updateRecordMutation({
-    //         field: selectedViewField,
-    //         row: row as Row,
-    //         valueRow: makeRowFromValue(item.id as string | number, field),
-    //       });
-    //       store$.commandbarClose();
-    //       return;
-    //     } else if (
-    //       selectedViewField.relation &&
-    //       !selectedViewField.relation.manyToManyRelation
-    //     ) {
-    //       store$.updateRecordMutation({
-    //         field: selectedViewField,
-    //         row: row as Row,
-    //         valueRow: item as Row,
-    //       });
-    //       store$.commandbarClose();
-
-    //       return;
-    //     } else if (selectedViewField.relation) {
-    //       if ((item as Row | undefined)?.raw) {
-    //         xSelect.select(item as Row);
-    //       } else {
-    //         const row = comboboxStore$.values
-    //           .find((v) => v.id.get() === item.id)
-    //           ?.get();
-    //         row && xSelect.select(row as Row);
-    //       }
-
-    //       return;
-    //     } else {
-    //       throw new Error('Field type not supported1');
-    //     }
-    //   } else if (field.type === 'Boolean' && row) {
-    //     store$.updateRecordMutation({
-    //       field,
-    //       row: row as Row,
-    //       valueRow: makeRowFromValue(!value, field),
-    //     });
-
-    //     store$.commandbarClose();
-    //     return;
-    //   } else {
-    //     store$.commandbar.selectedViewField.set(field);
-
-    //     xSelect.open(row as Row, field);
-    //   }
-
-    //   if (field.type === 'String') {
-    //     store$.commandbar.query.set(value.toString());
-    //   } else {
-    //     store$.commandbar.query.set('');
-    //   }
-    // } catch (error) {
-    //   if (item.id === ADD_NEW_OPTION && item.viewName) {
-    //     store$.commandformOpen(item.viewName);
-    //     store$.commandbarClose();
-    //   } else {
-    //     // FEATURE -> make the commands injection system scalable
-    //     // items groups should be set by the item itself, should carry a group-id
-    //     // handle running handler, error handling, which props needs to be passed
-    //     // probably the active row
-    //     const command = store$.commands
-    //       .get()
-    //       .find((command) => command.id === item.id);
-
-    //     if (!command) return;
-
-    //     if (!command.options?.keepCommandbarOpen) {
-    //       store$.commandbarClose();
-    //     }
-
-    //     await command.handler({
-    //       row: store$.commandbar.activeRow.get() || undefined,
-    //     });
-    //   }
-    // }
   };

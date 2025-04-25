@@ -393,6 +393,7 @@ class DateOptionParser {
     operator: FilterOperatorType
   ): FilterDateType | null {
     let lowerOption = option.toString().toLowerCase();
+
     let number = lowerOption.match(/\d+/)
       ? parseInt(lowerOption.match(/\d+/)?.[0] || '', 10)
       : null;
@@ -450,7 +451,7 @@ class DateOptionParser {
       return {
         operator: 'equal to',
         unit: unit as FilterDateType['unit'],
-        value: 1,
+        value: 2,
       };
     } else {
       const validOptions = ['today', 'tomorrow', 'yesterday'];
@@ -589,7 +590,6 @@ class DateCalculator {
       end.setDate(start.getDate() + multiplier * (value || 1));
     } else if (unit === 'months' || unit === 'month') {
       start = new Date();
-
       if (unit === 'month') start.setDate(1);
 
       end = new Date();
@@ -682,14 +682,17 @@ export const getTimeValueFromDateString = <T extends boolean = true>(
   raiseException: T
 ): T extends true ? number : number | undefined => {
   const parsed = dateUtils.parseOption(value, operatorMap.is);
-  const { start } = dateUtils.getStartAndEndDate(parsed);
+  const { start, end } = dateUtils.getStartAndEndDate(parsed);
   start?.setHours(2, 0, 0, 0);
+  end?.setHours(2, 0, 0, 0);
 
-  if (!start && raiseException) throw new Error(`Invalid Date String`);
+  const dateToUse = end ? end : start;
 
-  if (start && raiseException) return start?.getTime();
+  if (!dateToUse && raiseException) throw new Error(`Invalid Date String`);
 
-  if (start && !raiseException) return start.getTime();
+  if (dateToUse && raiseException) return dateToUse?.getTime();
+
+  if (dateToUse && !raiseException) return dateToUse.getTime();
 
   return 0;
 };

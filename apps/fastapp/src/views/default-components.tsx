@@ -67,9 +67,9 @@ export const RenderFilter = observer(
 );
 
 export const RenderDisplayOptions = observer(
-  ({ options }: { options: MakeDisplayOptionsPropsOptions }) => {
+  (options?: { options?: MakeDisplayOptionsPropsOptions }) => {
     const { makeDisplayOptionsProps } = makeHooks<TaskViewDataType>();
-    const props = makeDisplayOptionsProps(options);
+    const props = makeDisplayOptionsProps(options?.options);
 
     return <DisplayOptions.Default {...props} />;
   }
@@ -95,7 +95,6 @@ export const RenderInputDialog = observer(
 export const RenderList = observer(
   (props: { options?: MakeListPropsOptions }) => {
     const { makeListProps } = makeHooks<TaskViewDataType>();
-    _log.debug('Render List');
 
     return (
       <Memo>

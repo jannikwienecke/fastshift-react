@@ -10,6 +10,7 @@ import { RegisteredViews, ViewConfigType } from './view-config.types';
 
 export type QueryProps = {
   query?: string;
+  viewId: string | null;
   filters?: string;
   displayOptions?: string;
   paginateOptions?: {
@@ -20,6 +21,8 @@ export type QueryProps = {
   viewConfigManager?: BaseViewConfigManagerInterface;
   registeredViews: RegisteredViews;
   modelConfig?: ModelConfig;
+  parentId?: string | null;
+  parentViewName?: string | null;
   viewName?: string;
   relationQuery?: {
     tableName: string;
@@ -31,12 +34,18 @@ export type QueryProps = {
 export type QueryDto = {
   viewConfig?: ViewConfigType;
   viewConfigManager?: BaseViewConfigManagerInterface;
-
+  viewId: string | null;
+  parentViewName?: string | null;
+  parentId?: string | null;
   filters?: string;
   displayOptions?: string;
+  onlyRelationalData?: boolean;
 } & Omit<QueryProps, 'viewConfigManager'>;
 
 export type QueryServerProps = {
+  viewId?: string | null | undefined;
+  parentId?: string | null | undefined;
+  parentViewName?: string | null | undefined;
   filters?: FilterType[];
   displayOptions?: DisplayOptionsType;
   viewConfigManager: BaseViewConfigManagerInterface;
@@ -52,9 +61,11 @@ export type ContinueCursor = {
 };
 
 export type UserViewData = {
+  baseView: string;
   displayOptions: string | null;
   filters: string | null;
   name: string;
+  slug: string;
 };
 
 export type QueryReturnDto<T extends RecordType = RecordType> = {
@@ -77,6 +88,7 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
   continueCursor: ContinueCursor;
   isDone: boolean;
   isLoading: boolean;
+  isPending: boolean;
   isError: boolean;
   error: QueryError | undefined | null;
   allIds: string[];

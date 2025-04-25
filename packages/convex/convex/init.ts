@@ -289,6 +289,8 @@ const init = server.mutation({
         priority: 1,
         description: 'Design mockups for the website redesign',
         dueDate: tommorow,
+        email: 'wienecke.jannik@gmail.com',
+        telfon: '01713290545',
       },
       {
         name: 'Develop frontend',
@@ -700,6 +702,8 @@ const init = server.mutation({
           description: task.description,
           dueDate: task.dueDate,
           deleted: false,
+          email: task.email,
+          telefon: task.telfon,
           tasks,
         });
 

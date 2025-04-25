@@ -16,9 +16,18 @@ export const selectState$ = observable({
 
   initialSelectedFilterRows: [] as Row[],
   selectedFilterRows: [] as Row[],
+
+  rect: undefined as DOMRect | undefined,
+
+  isDetail: false,
 });
 
 const getParentRow = () => {
+  const detailRow = store$.detail.row.get();
+
+  // TODO DETAIL BRANCHING
+  if (detailRow && selectState$.isDetail.get()) return detailRow as Row;
+
   const row = store$.dataModel.rows
     .get()
     .find((r) => r.id === selectState$.parentRow.get()?.id);
@@ -27,6 +36,7 @@ const getParentRow = () => {
 };
 const getCurrentRows = () => {
   const field = selectState$.field.get();
+
   if (!field) return [];
 
   const parentRow = getParentRow();
@@ -59,7 +69,9 @@ const getState = () => {
   };
 };
 
-export const open = (row: Row, field: FieldConfig) => {
+export const open = (row: Row, field: FieldConfig, isDetail?: boolean) => {
+  selectState$.isDetail.set(!!isDetail);
+
   selectState$.parentRow.set(row);
   selectState$.field.set(field);
 
@@ -81,6 +93,8 @@ export const close = () => {
   selectState$.field.set({} as FieldConfig);
   selectState$.initialSelectedFilterRows.set([]);
   selectState$.selectedFilterRows.set([]);
+  selectState$.rect.set(undefined);
+  selectState$.isDetail.set(false);
 };
 
 export const select = (row: Row) => {
@@ -170,7 +184,6 @@ selectState$.toRemoveRow.onChange((state) => {
 });
 
 selectState$.toInsertRow.onChange((state) => {
-  console.warn('___TO INSERT: ', state.value);
   if (!state.value) return;
 
   const { field, parentRow, existingRows } = getState();
@@ -178,14 +191,23 @@ selectState$.toInsertRow.onChange((state) => {
 
   if (!row) return;
 
-  store$.selectRowsMutation({
-    checkedRow: row,
-    field,
-    existingRows,
-    row: parentRow,
-    idsToDelete: [],
-    newIds: [row.id],
-    newRows: [...existingRows, row],
-  });
+  if (!field.relation?.manyToManyTable) {
+    store$.updateRecordMutation({
+      field,
+      row: parentRow,
+      valueRow: row,
+    });
+    close();
+  } else {
+    store$.selectRowsMutation({
+      checkedRow: row,
+      field,
+      existingRows,
+      row: parentRow,
+      idsToDelete: [],
+      newIds: [row.id],
+      newRows: [...existingRows, row],
+    });
+  }
   selectState$.toRemoveRow.set(null);
 });

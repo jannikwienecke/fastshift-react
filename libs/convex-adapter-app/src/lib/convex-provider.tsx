@@ -34,6 +34,7 @@ const ProviderContent = (props: ConvexQueryProviderProps) => {
     (args: QueryProps) => {
       const return_ = convexQuery(props.viewLoader, {
         ...args,
+        viewId: args.viewId ?? null,
         viewConfig: undefined,
         registeredViews: undefined,
       });
@@ -62,29 +63,67 @@ const ProviderContent = (props: ConvexQueryProviderProps) => {
 const makeQuery = (
   viewLoader: ViewLoader,
   viewConfig: ViewConfigType,
-  userViewData?: UserViewData
+  userViewData: UserViewData | null,
+  viewId: string | null,
+  parentViewName: string | null,
+  parentId: string | null
 ) => {
-  const mergedConfig = configManager(viewConfig).mergeAndCreate(userViewData);
+  if (!viewConfig) {
+    console.trace();
+    throw new Error('viewConfig is required');
+  }
+  const mergedConfig = configManager(viewConfig).mergeAndCreate(
+    userViewData ?? undefined
+  );
+
+  if (viewId) {
+    return convexQuery(viewLoader, {
+      viewName: viewConfig.viewName,
+      query: '',
+      filters: '',
+      displayOptions: '',
+      viewId: viewId ?? null,
+    });
+  }
 
   return convexQuery(viewLoader, {
     viewName: viewConfig.viewName,
     query: '',
-    filters: convertFiltersForBackend(mergedConfig.filters),
-    displayOptions: convertDisplayOptionsForBackend(
-      mergedConfig.dispplayOptions
-    ),
-    paginateOptions: {
-      cursor: { position: null, cursor: null },
-      numItems: DEFAULT_FETCH_LIMIT_QUERY,
-    },
+    filters: viewId ? '' : convertFiltersForBackend(mergedConfig.filters),
+    displayOptions: viewId
+      ? ''
+      : convertDisplayOptionsForBackend(mergedConfig.dispplayOptions),
+    viewId: viewId ?? null,
+    parentId: parentId ?? null,
+    parentViewName: parentViewName ?? null,
+    paginateOptions: viewId
+      ? undefined
+      : {
+          cursor: { position: null, cursor: null },
+          numItems: DEFAULT_FETCH_LIMIT_QUERY,
+        },
   });
 };
 
 export const preloadQuery = (
   viewLoader: ConvexContext['viewLoader'],
   viewConfig: ViewConfigType,
-  userViewData?: UserViewData
-) => makeQuery(viewLoader, viewConfig, userViewData);
+  userViewData: UserViewData | null,
+  viewId: string | null = null,
+  parentViewName: string | null = null,
+  parentId: string | null = null
+) => {
+  const query = makeQuery(
+    viewLoader,
+    viewConfig,
+    userViewData,
+    viewId,
+    parentViewName,
+    parentId
+  );
+
+  return query;
+};
 
 export type ConvexContext = {
   viewLoader: ViewLoader;
@@ -92,5 +131,8 @@ export type ConvexContext = {
 
 export type ConvexPreloadQuery = (
   viewConfig: ViewConfigType,
-  viewName: string
+  viewName: string,
+  viewId: string | null,
+  parentViewName: string | null,
+  parentId: string | null
 ) => void;

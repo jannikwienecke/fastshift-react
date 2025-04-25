@@ -7,6 +7,7 @@ export type Row<T extends RecordType | string | number | undefined = any> = {
   raw: T;
   label: string;
   id: string;
+  updated?: number;
   getValue<K extends keyof T>(
     key: K
   ): T[K] extends Array<any>
@@ -32,6 +33,10 @@ export type RelationalDataModel<T extends RecordType = RecordType> = {
 };
 
 export const makeData = (registeredViews: RegisteredViews, name: string) => {
+  if (Object.keys(registeredViews).length === 0) {
+    throw new Error('Registered views not found');
+  }
+
   return <T extends RecordType = RecordType>(data: T[]): DataModelNew<T> => {
     const viewConfig = getViewByName(registeredViews, name);
     if (!viewConfig) {
@@ -150,3 +155,5 @@ export const getValue = (row: Row, fieldName: string) => {
 
   return value as string | number | boolean;
 };
+
+export type DetailRow = Row;

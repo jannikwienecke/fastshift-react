@@ -8,7 +8,6 @@ import {
   makeRowFromValue,
   NONE_OPTION,
   Row,
-  ViewConfigType,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import {
@@ -26,6 +25,9 @@ export const contextMenuProps = observable<
 >({});
 
 export const derviedContextMenuOptions = observable(() => {
+  if (!store$.viewConfigManager.viewConfig.get())
+    return {} as ContextMenuUiOptions;
+
   const contextmenuState = store$.contextMenuState.get();
   const viewConfigManager = store$.viewConfigManager.get();
   const relationalValues = store$.relationalDataModel;
@@ -55,7 +57,8 @@ export const derviedContextMenuOptions = observable(() => {
   const comboboxValues = comboboxStore$.values.get();
   const comboboxSelected = comboboxStore$.selected.get();
 
-  const fieldsToRender = viewConfigManager
+  const fieldsToRender = store$.viewConfigManager
+    .get()
     .getViewFieldList()
     .sort((a, b) => {
       const hasEnumDateOrRelationalA = a.enum || a.relation || a.isDateField;

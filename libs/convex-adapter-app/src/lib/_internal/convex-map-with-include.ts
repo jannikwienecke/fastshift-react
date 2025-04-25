@@ -25,7 +25,7 @@ export const mapWithInclude = async (
 
       const view = getViewByName(registeredViews, field.name);
 
-      if (!field.relation) {
+      if (!field.relation || !view) {
         return acc;
       }
 
@@ -86,6 +86,7 @@ type HelperProps = {
 
 export const handleIncludeField = (props: HelperProps) => {
   const { field } = props;
+
   if (
     field.relation?.manyToManyTable &&
     field.relation.manyToManyTable
@@ -156,6 +157,7 @@ export const getManyToManyRecords = async (props: HelperProps) => {
     recordWithoutRelations,
     registeredViews,
   } = props;
+
   // handle many to many
   // like: Tasks has Many tags <-> Tags has Many Tasks
   // we have a tasks_tags table

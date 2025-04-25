@@ -11,6 +11,7 @@ const _schema = defineSchema({
   views: defineTable({
     baseView: v.string(),
     name: v.string(),
+    slug: v.string(),
     description: v.optional(v.string()),
     displayOptions: v.optional(v.string()),
     filters: v.optional(v.string()),
@@ -34,6 +35,8 @@ const _schema = defineSchema({
     description: v.optional(v.string()),
     tags: v.optional(v.array(v.id('tags'))),
     projectId: v.optional(v.id('projects')),
+    email: v.optional(v.string()),
+    telefon: v.optional(v.string()),
     priority: v.union(
       v.literal(1),
       v.literal(2),

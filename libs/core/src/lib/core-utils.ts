@@ -187,11 +187,11 @@ export const convertDisplayOptionsForBackend = (
     viewField,
     viewType,
   } = displayOptions;
-  const sortingString = sorting.field
+  const sortingString = sorting?.field
     ? `sorting=${sorting.field.name}:${sorting.order}`
     : '';
 
-  const groupingString = grouping.field
+  const groupingString = grouping?.field
     ? `grouping=${grouping.field.name}`
     : '';
 
@@ -201,7 +201,7 @@ export const convertDisplayOptionsForBackend = (
     ? `showEmptyGroups=${showEmptyGroups}`
     : '';
 
-  const viewFieldString = viewField.hidden
+  const viewFieldString = viewField?.hidden
     ? `viewField=${viewField.hidden.join(',')}`
     : '';
 
@@ -279,9 +279,13 @@ export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] | null {
   return result;
 }
 
-export const getViewByName = (views: RegisteredViews, name: string) => {
+export const getViewByName = (
+  views: RegisteredViews,
+  name: string,
+  throwError?: boolean
+) => {
   const viewConfigByViewName = Object.values(views).find(
-    (v) => v?.viewName === name
+    (v) => v?.viewName.toLowerCase() === name.toLowerCase()
   );
 
   if (viewConfigByViewName) return viewConfigByViewName;
@@ -290,7 +294,7 @@ export const getViewByName = (views: RegisteredViews, name: string) => {
     (v) => v?.tableName === name
   );
 
-  if (!viewConfigByTableName) {
+  if (!viewConfigByTableName && throwError) {
     console.error(views, name);
     throw new Error(`No View For "${name}" found`);
   }
@@ -356,7 +360,7 @@ export const getFieldLabel = (
   field: FieldConfig,
   singular?: true,
   plural?: true
-) => {
+): string => {
   const isMany =
     field.relation?.type === 'manyToMany' || field.relation?.manyToManyRelation;
 
@@ -474,7 +478,7 @@ export const sortRows = (
     order?: 'asc' | 'desc';
   }
 ) => {
-  if (!sorting) return rows;
+  if (!sorting?.field) return rows;
 
   const ascending = sorting?.order === 'asc';
 
@@ -484,7 +488,7 @@ export const sortRows = (
   if (!order) return rows;
 
   const displayFieldName = field.relation
-    ? getViewByName(views, field.name).displayField.field
+    ? getViewByName(views, field.name)?.displayField.field
     : null;
 
   rows.sort((a, b) => {
@@ -548,23 +552,16 @@ export const sortRows = (
   return rows;
 };
 
-export const patchAllViews = (
-  views: RegisteredViews,
-  viewConfig: ViewConfigType
-) => {
-  if (!viewConfig) return views;
-
+export const patchAllViews = (views: RegisteredViews) => {
   return patchDict(views ?? {}, (view) => {
     if (!view) return view;
-
-    // return view;
 
     return {
       ...view,
       viewFields: patchDict(view.viewFields, (f) => {
-        const userFieldConfig = viewConfig.fields?.[f.name];
-        const displayFIeld = viewConfig.displayField.field;
-        const softDeleteField = viewConfig.mutation?.softDeleteField;
+        const userFieldConfig = view.fields?.[f.name];
+        const displayFIeld = view.displayField.field;
+        const softDeleteField = view.mutation?.softDeleteField;
 
         const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
         const isDisplayField =
@@ -575,6 +572,7 @@ export const patchAllViews = (
           ...userFieldConfig,
           isDisplayField,
           label: f.label || getFieldLabel(f),
+          editLabel: `${f.name}.edit`,
           hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
         } satisfies FieldConfig;
       }),
@@ -606,4 +604,29 @@ export const patchViewConfig = (viewConfig: ViewConfigType) => {
     ...viewConfig,
     viewFields: patechedViewFields,
   } satisfies ViewConfigType;
+};
+
+export const slugHelper = () => {
+  const slugify = (text: string) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/[^\w-]+/g, '') // Remove all non-word chars
+      .replace(/--+/g, '-') // Replace multiple - with single -
+      .replace(/^-+/, '') // Trim - from start of text
+      .replace(/-+$/, ''); // Trim - from end of text
+  };
+
+  const unslugify = (text: string) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/-/g, ' ') // Replace - with spaces
+      .replace(/^\s+|\s+$/g, '') // Trim spaces from start and end of text
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .replace(/^\s+|\s+$/g, ''); // Trim spaces from start and end of text
+  };
+
+  return { slugify, unslugify };
 };

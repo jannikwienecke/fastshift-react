@@ -1,10 +1,15 @@
-import { _log, FilterType } from '@apps-next/core';
+import { _log, FilterType, QueryReturnOrUndefined } from '@apps-next/core';
 import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
+import {
+  queryDetailViewOptions$,
+  queryListViewOptions$,
+  querySubListViewOptions$,
+} from './legend.queryProps.derived';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -33,13 +38,15 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const filterDateField = store$.filter.selectedDateField.get();
     const filterOperatorField = store$.filter.selectedOperatorField.get();
     const commandbarField = store$.commandbar.selectedViewField.get();
+    const detailPageField = store$.detail.selectedField.get();
 
     if (
       !listRelationField &&
       !filterField &&
       !filterDateField &&
       !filterOperatorField &&
-      !commandbarField
+      !commandbarField &&
+      !detailPageField
     ) {
       store$.combobox.selected.set([]);
       store$.combobox.values.set(null);
@@ -74,8 +81,13 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     store$.combobox.query.set(query ?? '');
   }).onChange(() => null);
 
-  observable(function handleFilterChange() {
-    const filters = store$.filter.filters.get();
+  // observable(function handleFilterChange() {
+  //   const filters = store$.filter.filters.get();
+
+  // }).onChange(() => null);
+
+  store$.filter.filters.onChange((changes) => {
+    const filters = changes.value;
 
     _log.debug('handleFilterChange: ', filters);
 
@@ -90,14 +102,31 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         nextCursor: { cursor: null, position: null },
       });
     }
-  }).onChange(() => null);
+  });
 
-  observable(function handleDisplayOptionsChange() {
+  store$.displayOptions.onChange((changes) => {
     const showDeleted = store$.displayOptions.showDeleted.get();
     const field = store$.displayOptions.sorting.field.get();
     const order = store$.displayOptions.sorting.order.get();
     const grouping = store$.displayOptions.grouping.field.get();
     const showEmptyGroups = store$.displayOptions.showEmptyGroups.get();
+
+    if (changes.value.resetted) {
+      store$.displayOptions.resetted.set(false);
+      return;
+    }
+
+    if (changes.changes?.[0].path?.[0] === 'resetted') {
+      return;
+    }
+
+    if (changes.changes?.[0].path?.[0] === 'isOpen') {
+      return;
+    }
+
+    // if (prevAtPath === )
+
+    // if (store$.state.get() === 'pending') return;
 
     if (field?.name || grouping?.name || showEmptyGroups || showDeleted) {
       _log.debug(
@@ -121,7 +150,11 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         nextCursor: { cursor: null, position: null },
       });
     }
-  }).onChange(() => null);
+  });
+
+  // observable(function handleDisplayOptionsChange() {
+
+  // }).onChange(() => null);
 
   _hasOpenDialog$.onChange((state) => {
     clearTimeout(timeout$.get() ?? 0);
@@ -139,23 +172,18 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   });
 
   store$.state.onChange((changes) => {
-    const userViewSettings = store$.userViewSettings.get();
-
-    if (userViewSettings.initialSettings !== null) return;
-
-    const filters = store$.filter.filters.get();
-    const displayOptions = {
-      ...store$.displayOptions.get(),
-      isOpen: undefined,
-    };
-
-    const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
-    const copyOfFilters = JSON.parse(JSON.stringify(filters));
-
-    store$.userViewSettings.initialSettings.set({
-      displayOptions: copyOfDisplayOptions,
-      filters: copyOfFilters,
-    });
+    // if (changes.value !== 'initialized') return;
+    // const userViewSettings = store$.userViewSettings.get();
+    // if (userViewSettings.initialSettings !== null) return;
+    // const filters = store$.filter.filters.get();
+    // const displayOptions = {
+    //   ...store$.displayOptions.get(),
+    //   isOpen: undefined,
+    // };
+    // store$.userViewSettings.initialSettings.set({
+    //   displayOptions: copyOfDisplayOptions,
+    //   filters: copyOfFilters,
+    // });
   });
 
   store$.displayOptions.onChange((changes) => {
@@ -171,14 +199,16 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const sortingOrder = value.sorting.order;
     const showEmptyGroups = value.showEmptyGroups;
     const showDeleted = value.showDeleted;
-    const selectedViewFields = value.viewField.hidden;
+    const selectedViewFields = value.viewField?.hidden;
 
     const initialGroupingField = initial?.grouping.field?.name;
     const initialSortingField = initial?.sorting.field?.name;
     const initialSortingOrder = initial?.sorting.order;
     const initialShowEmptyGroups = initial?.showEmptyGroups;
     const initialShowDeleted = initial?.showDeleted;
-    const initialSelectedViewFields = initial?.viewField.hidden;
+    const initialSelectedViewFields = initial?.viewField?.hidden;
+
+    if (!initial) return;
 
     const anythingChanged = () => {
       let changed = false;
@@ -280,5 +310,126 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         selectState$.selectedFilterRows.set(filter.values);
       }
     }
+  });
+
+  store$.userViewSettings.form.type.onChange((changes) => {
+    const formType = changes.value;
+
+    if (formType === 'create') {
+      store$.userViewSettings.viewCreated.set(undefined);
+    }
+  });
+
+  store$.navigation.state.onChange((changes) => {
+    setTimeout(() => {
+      store$.navigation.state.set({ type: 'ready' });
+    }, 10);
+  });
+
+  store$.dataModel.rows.forEach((row) => {
+    row.updated.onChange((changes) => {
+      if (changes.isFromSync) return;
+      const prevAtPath = changes.changes?.[0].prevAtPath;
+      const valueAtPath = changes.changes?.[0].valueAtPath;
+      if (!prevAtPath && valueAtPath) {
+        const queryKey = querySubListViewOptions$.get()?.queryKey;
+        const rows = store$.dataModel.rows.get();
+
+        if (!queryKey) return;
+
+        store$.api.queryClient.setQueryData(
+          queryKey,
+          (q: QueryReturnOrUndefined): QueryReturnOrUndefined => {
+            return {
+              ...q,
+              data: rows.map((r) => r.raw),
+            };
+          }
+        );
+
+        // next:
+        // in sub list, project -> task: make the contextmenu work
+      }
+    });
+  });
+
+  store$.detail.row.updated.onChange((changes) => {
+    if (changes.isFromSync) return;
+    if (!changes.value) return;
+
+    const viewName = store$.detail.viewConfigManager.getViewName();
+
+    const queriesData = store$.api.queryClient.getQueriesData({});
+
+    const queryKeyDetail = queriesData.find((q) => {
+      const key = q?.[0]?.[2] as Record<string, any>;
+      if (
+        'viewName' in key &&
+        key?.['viewName'].toLowerCase() !== viewName.toLowerCase()
+      )
+        return false;
+      if ('relationQuery' in key) return false;
+      if (!key?.['viewId']) return false;
+
+      const data = store$.api.queryClient.getQueryData(
+        q[0]
+      ) as QueryReturnOrUndefined;
+      return data?.data?.length === 1;
+    })?.[0];
+
+    const row = store$.detail.row.get();
+    const parentView = store$.detail.parentViewName.get();
+
+    if (!queryKeyDetail) return;
+
+    if (!row || !parentView) return;
+
+    store$.api.queryClient.setQueryData(
+      queryKeyDetail,
+      (q: QueryReturnOrUndefined): QueryReturnOrUndefined => {
+        return {
+          ...q,
+          data: [row.raw],
+        };
+      }
+    );
+
+    const queryKey = queriesData.find((q) => {
+      const key = q?.[0]?.[2] as Record<string, any>;
+      if (
+        'viewName' in key &&
+        key?.['viewName'].toLowerCase() !== viewName.toLowerCase()
+      )
+        return false;
+      if ('relationQuery' in key) return false;
+      if (key?.['viewId'] !== null) return false;
+
+      const data = store$.api.queryClient.getQueryData(q[0]);
+      return !!data;
+    })?.[0];
+
+    if (!queryKey) return;
+
+    store$.api.queryClient.setQueryData(
+      queryKey,
+      (q: QueryReturnOrUndefined) => {
+        if (!q) return q;
+
+        const rows = q.data ?? [];
+
+        return {
+          ...q,
+          data: rows.map((r) => {
+            if (r['id'] === row.id) {
+              return {
+                ...r,
+                ...row.raw,
+              };
+            }
+            return r;
+          }),
+        };
+      }
+    );
   });
 };

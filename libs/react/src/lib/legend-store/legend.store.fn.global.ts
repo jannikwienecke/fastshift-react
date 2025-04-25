@@ -1,20 +1,17 @@
 import {
   _log,
   configManager,
-  FieldConfig,
-  FilterType,
   getViewByName,
   makeData,
-  parseDisplayOptionsStringForServer,
-  parseFilterStringForServer,
   QueryReturnType,
   RelationalDataModel,
   sortRows,
 } from '@apps-next/core';
 import { batch, Observable } from '@legendapp/state';
-import { displayOptionsProps } from './legend.store.derived.displayOptions';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { setGlobalDataModel } from './legend.utils.helper';
+import { selectState$, xSelect } from './legend.select-state';
+import { ignoreNewData$ } from './legend.mutationts';
 
 export const openSpecificModal: StoreFn<'openSpecificModal'> =
   (store$) => (type, openCb) => {
@@ -87,7 +84,9 @@ export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
     const relationalDataModel = Object.entries(data).reduce(
       (acc, [tableName, data]) => {
         const viewConfig = getViewByName(store$.views.get(), tableName);
-        const _data = makeData(store$.views.get(), viewConfig?.viewName)(data);
+        const view = viewConfig?.viewName;
+        if (!view) return acc;
+        const _data = makeData(store$.views.get(), view)(data);
 
         acc[tableName] = _data;
         return acc;
@@ -104,6 +103,7 @@ export const createRelationalDataModel: StoreFn<'createRelationalDataModel'> =
 export const createDataModel: StoreFn<'createDataModel'> =
   (store$) => (data, tableName) => {
     const sorting = store$.displayOptions.sorting.get();
+
     const sorted = sortRows(data, store$.views.get(), {
       field: sorting.field,
       order: sorting.order,
@@ -125,12 +125,26 @@ export const init: StoreFn<'init'> =
     continueCursor,
     isDone,
     viewConfigManager,
-    views,
     uiViewConfig,
     commands,
-    userViewData
+    userViewData,
+    viewId
   ) => {
     batch(() => {
+      store$.userViewSettings.initialSettings.set(null);
+      store$.userViewSettings.hasChanged.set(false);
+
+      store$.contextMenuState.row.set(null);
+
+      xSelect.close();
+
+      store$.filterClose();
+      store$.comboboxClose();
+      store$.commandbarClose();
+      store$.commandformClose();
+      store$.displayOptionsClose();
+      store$.contextMenuClose();
+
       store$.fetchMore.assign({
         isDone,
         currentCursor: {
@@ -143,17 +157,15 @@ export const init: StoreFn<'init'> =
         },
       });
 
-      store$.state.set('initialized');
-
-      store$.views.set(views);
       store$.viewConfigManager.set(viewConfigManager);
-      store$.uiViewConfig.set(uiViewConfig);
       store$.filter.filters.set([]);
       store$.commands.set(commands);
 
       store$.userViewData.set(userViewData);
 
       if (!store$.viewConfigManager.get()) return;
+
+      _log.debug('INIT DATA MODEL', data.length, Object.keys(relationalData));
 
       createDataModel(store$)(data);
       createRelationalDataModel(store$)(relationalData);
@@ -164,6 +176,7 @@ export const init: StoreFn<'init'> =
 
       store$.filter.filters.set(filters);
       store$.displayOptions.set(dispplayOptions);
+      store$.viewId.set(viewId);
 
       store$.displayOptions.softDeleteEnabled.set(
         !!viewConfigManager.viewConfig.mutation?.softDelete
@@ -173,12 +186,13 @@ export const init: StoreFn<'init'> =
         .get()
         .getViewFieldList()
         .map((field) => field.name);
+
       store$.displayOptions.viewField.allFields.set(viewFields);
     });
 
     setTimeout(() => {
       store$.state.set('initialized');
-    }, 0);
+    }, 10);
   };
 
 const handlingFetchMoreState = async (
@@ -191,16 +205,24 @@ const handlingFetchMoreState = async (
   const all = [...prevData, ...newData];
 
   const allIds = queryReturn.allIds;
-  const toShow = allIds
-    .map((id) => {
-      const row = all.find((r) => r['id'] === id);
-      if (!row) return null;
-      return row;
-    })
-    .filter((row) => row !== null);
-  store$.createDataModel(toShow);
 
-  // store$.createDataModel(all);
+  const addedIds = [] as string[];
+  store$.createDataModel(
+    all.filter((row) => {
+      const isInAdded = addedIds.some((id) => id === row['id']);
+      const isInAllIds = allIds?.some((id) => id === row['id']);
+
+      if (isInAdded) {
+        return false;
+      }
+
+      if (isInAllIds) {
+        addedIds.push(row['id']);
+      }
+
+      return isInAllIds;
+    })
+  );
 
   store$.fetchMore.assign({
     currentCursor: store$.fetchMore.currentCursor.get(),
@@ -258,6 +280,11 @@ const handleMutatingState = async (
   store$: Observable<LegendStore>,
   queryReturn: QueryReturnType
 ) => {
+  if (ignoreNewData$.get() > 0) {
+    ignoreNewData$.set((prev) => prev - 1);
+    return;
+  }
+
   // we only want to have the new data -> discard the previous data
   const ids = queryReturn.allIds;
   const newData = queryReturn.data ?? [];
@@ -278,7 +305,6 @@ const handleMutatingState = async (
       return !prevIds?.some((id) => id === row['id']);
     }) ?? [];
 
-  store$.state.set('initialized');
   store$.createDataModel([..._new, ...newEntries]);
 
   store$.fetchMore.assign({
@@ -286,13 +312,17 @@ const handleMutatingState = async (
     nextCursor: queryReturn.continueCursor,
     isDone: queryReturn.isDone ?? false,
   });
+
+  store$.state.set('initialized');
 };
 
 export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
-    _log.debug(`:handleIncomingData`, state, data);
+    _log.warn(`____handleIncomingData`, state, data.data?.length);
+
+    if (data.isPending) return;
 
     if (store$.viewConfigManager.localModeEnabled.get()) {
       _log.debug(`handleIncomingData:debugMode-> Update Data Model`);
@@ -340,6 +370,8 @@ export const handleIncomingRelationalData: StoreFn<'handleIncomingData'> =
       data.relationalData ?? {}
     ).reduce((acc, [tableName, data]) => {
       const viewConfig = getViewByName(store$.views.get(), tableName);
+      if (!viewConfig) return acc;
+
       const _data = makeData(store$.views.get(), viewConfig?.viewName)(data);
 
       acc[tableName] = _data;
@@ -350,4 +382,49 @@ export const handleIncomingRelationalData: StoreFn<'handleIncomingData'> =
       ...prev,
       ...relationalDataModel,
     }));
+  };
+
+export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
+  (store$) => async (data) => {
+    const rows = data.data;
+
+    const viewName = store$.detail.viewConfigManager.getViewName();
+    _log.warn('____handleIncomingDetailData: ', rows?.length, viewName);
+
+    const key = `detail-${store$.detail.row.get()?.id}`;
+    const ignoreNext = store$.ignoreNextQueryDict?.[key].get();
+    const dirtyField = store$.detail.form.dirtyField.get();
+    const diryValue = store$.detail.form.dirtyValue.get();
+
+    if (ignoreNewData$.get() > 0) {
+      ignoreNewData$.set((prev) => prev - 1);
+      return;
+    }
+
+    if (rows?.length === 1) {
+      if (ignoreNext > 1) {
+        store$.ignoreNextQueryDict[key].set(ignoreNext - 1);
+      } else {
+        if (!dirtyField || !diryValue) {
+          const data = makeData(store$.views.get(), viewName)(rows);
+          store$.detail.row.set({
+            ...data.rows?.[0],
+          });
+        } else {
+          const data = makeData(
+            store$.views.get(),
+            viewName
+          )([
+            {
+              ...rows[0],
+              [dirtyField.name]: diryValue,
+            },
+          ]);
+          const row = data.rows?.[0];
+
+          store$.detail.row.set(row);
+        }
+        store$.ignoreNextQueryDict[key].set(0);
+      }
+    }
   };

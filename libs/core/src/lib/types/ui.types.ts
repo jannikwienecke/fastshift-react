@@ -16,6 +16,8 @@ export type ComboxboxItem = {
   viewName?: string;
   tablename?: string;
   value?: unknown;
+  rowValue?: Row;
+  rowValues?: Row[];
 };
 
 export type DisplayOptionsViewField = {
@@ -51,6 +53,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
   // rowInFocus: Row | null;
   items: TItem[];
   onSelect: (item: TItem) => void;
+  onClick: (item: TItem) => void;
   selected: Record<string, any>[];
   onKeyPress: (type: 'up' | 'down') => void;
   grouping: {
@@ -162,6 +165,10 @@ export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
   //
 };
 
+export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
+  row: Row;
+};
+
 export type DisplayOptionsProps = {
   label: string;
   onOpen: (rect: DOMRect) => void;
@@ -233,14 +240,31 @@ export type CommandformItem = ComboxboxItem & {
   // render: () => React.ReactNode;
 };
 
+export type FormFieldMethod = {
+  onClick: (field: CommandformItem, rect: DOMRect) => void;
+  onInputChange: (field: CommandformItem, value: string) => void;
+  onBlurInput: (field: CommandformItem) => void;
+  onSubmit: () => void;
+  onCheckedChange: (field: CommandformItem, checked: boolean) => void;
+  onEnter: (field: CommandformItem) => void;
+};
+
+export type FormFieldProps = {
+  field: CommandformItem;
+  formState: FormState;
+} & FormFieldMethod;
+
 export type RecordErrors = { [fieldName: string]: { error: string } };
+
+export type FormState = {
+  isReady: boolean;
+  isFieldReady: (field: FieldConfig) => boolean;
+  errors: RecordErrors;
+};
 
 export type CommandformProps = {
   open?: boolean;
-  formState: {
-    isReady: boolean;
-    errors: RecordErrors;
-  };
+  formState: FormState;
   errors: string[];
   complexFields: CommandformItem[];
   primitiveFields: CommandformItem[];
@@ -253,9 +277,31 @@ export type CommandformProps = {
   onInputChange: (field: CommandformItem, value: string) => void;
   onSubmit: () => void;
   onCheckedChange: (field: CommandformItem, checked: boolean) => void;
-
-  // onOpen: () => void;
 };
+
+export type DetailViewTypeState =
+  | { type: 'overview' }
+  | {
+      type: 'model';
+      model: string;
+    };
+
+export type DetailPageProps = {
+  row: Row;
+  icon?: React.FC<any>;
+  formState: FormState;
+  complexFields: CommandformItem[];
+  primitiveFields: CommandformItem[];
+  displayField: CommandformItem | undefined;
+  type: 'create' | 'edit';
+  viewName: string;
+  tableName: string;
+  relationalListFields: CommandformItem[];
+  currentRelationalListField: CommandformItem | null;
+  viewTypeState: DetailViewTypeState;
+  onSelectView: (props: DetailViewTypeState) => void;
+  onHoverRelationalListField: (field: CommandformItem) => void;
+} & FormFieldMethod;
 
 export type CommandbarItemHandler = (options: {
   row: Row | undefined | null;

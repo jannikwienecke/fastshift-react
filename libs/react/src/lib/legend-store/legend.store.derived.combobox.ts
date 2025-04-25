@@ -20,6 +20,7 @@ import {
   getSharedStateCommandbar,
   getSharedStateCommandForm,
   getSharedStateSelectState,
+  getSharedStateDetailPage,
 } from './legend.combobox.helper';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
