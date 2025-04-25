@@ -14,7 +14,19 @@ const TAG = {
   },
 };
 
+const PRIORITY = {
+  values: {
+    urgent: 'Urgent',
+    none: 'None',
+  },
+  testId: {
+    none: 'priority-none',
+    urgent: 'priority-urgent',
+  },
+};
+
 export const CON = {
   project: PROJECT,
   tag: TAG,
+  priority: PRIORITY,
 };

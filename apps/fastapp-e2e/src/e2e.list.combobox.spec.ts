@@ -114,7 +114,92 @@ test.describe('List Combobox', () => {
 
     await selectAndDeselectTag({ mainPage, helper });
   });
+
+  test('can change the priority of a task in main list', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
+    await helper.navigation.goToListView('task');
+
+    await selectPriority({ mainPage, helper });
+  });
+
+  test('can change the priority of a task in sub list', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
+
+    await selectPriority({ mainPage, helper });
+  });
+
+  test('can change the completed status of a task in main list', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
+
+    await helper.navigation.goToListView('task');
+
+    await selectCompletedStatus({ mainPage, helper });
+  });
+
+  test('can change the completed status of a task in sub list', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
+
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
+
+    await selectCompletedStatus({ mainPage, helper });
+  });
 });
+
+const selectCompletedStatus = async ({ mainPage, helper }: PartialFixtures) => {
+  const firstListItem = await helper.list.getFirstListItem();
+  await firstListItem.hasText('❌');
+
+  const { openListCombobox, pickOptionInCombobox } = listCombobox({
+    mainPage,
+    helper,
+  });
+
+  await openListCombobox(firstListItem.locator, '❌');
+
+  await pickOptionInCombobox('✅');
+
+  await firstListItem.hasText('✅');
+};
+
+const selectPriority = async ({ mainPage, helper }) => {
+  const firstListItem = await helper.list.getFirstListItem();
+  await firstListItem.hasTestId(CON.priority.testId.none);
+
+  const { openListComboboxWithTestId, pickOptionInCombobox } = listCombobox({
+    mainPage,
+    helper,
+  });
+
+  await openListComboboxWithTestId(
+    firstListItem.locator,
+    CON.priority.testId.none
+  );
+
+  await pickOptionInCombobox(CON.priority.values.urgent);
+
+  await firstListItem.hasTestId(CON.priority.testId.urgent);
+};
 
 const selectAndDeselectTag = async ({ helper, mainPage }: PartialFixtures) => {
   const listItem = await helper.list.getListItem(2);
@@ -165,6 +250,17 @@ const listCombobox = ({ mainPage: taskPage }: PartialFixtures) => {
     await expect(taskPage.comboboxPopover.getByText(name)).toBeVisible();
   };
 
+  const openListComboboxWithTestId = async (
+    listItem: Locator,
+    testId: string
+  ) => {
+    await listItem.getByTestId(testId).first().click({ force: true });
+
+    await taskPage.comboboxPopover.waitFor({ state: 'visible' });
+
+    await expect(taskPage.comboboxPopover.getByTestId(testId)).toBeVisible();
+  };
+
   const searchInCombobox = async (
     model: string,
     value: string,
@@ -208,6 +304,7 @@ const listCombobox = ({ mainPage: taskPage }: PartialFixtures) => {
 
   return {
     openListCombobox,
+    openListComboboxWithTestId,
     searchInCombobox,
     pickOptionInCombobox,
     selectInCombobox,

@@ -6,11 +6,9 @@ export type ListE2eHelper = {
     locator: Locator;
     hasText: (name: string) => Promise<void>;
     hasNoText: (name: string) => Promise<void>;
+    hasTestId: (name: string) => Promise<void>;
   }>;
-  getFirstListItem: () => Promise<{
-    locator: Locator;
-    hasText: (name: string) => Promise<void>;
-  }>;
+  getFirstListItem: () => ReturnType<ListE2eHelper['getListItem']>;
   hasLSizeOf: (size: number, timeout?: number) => Promise<void>;
 };
 
@@ -21,6 +19,8 @@ export const makeListHelper = (mainPage: MainViewPage): ListE2eHelper => {
       locator,
       hasText: (name: string) => expect(locator.getByText(name)).toBeVisible(),
       hasNoText: (name: string) => expect(locator.getByText(name)).toBeHidden(),
+      hasTestId: (name: string) =>
+        expect(locator.getByTestId(name)).toBeVisible(),
     };
   };
 
