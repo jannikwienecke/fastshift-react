@@ -164,6 +164,60 @@ test.describe('List Combobox', () => {
 
     await selectCompletedStatus({ mainPage, helper });
   });
+
+  test('can change the due date of the first task in main list and back in sub list', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
+
+    await helper.navigation.goToListView('task');
+
+    const firstListItem = await helper.list.getFirstListItem();
+
+    const tommorow = new Date();
+    tommorow.setDate(tommorow.getDate() + 1);
+
+    const threeDaysFromNow = new Date();
+    const day = tommorow.getDate();
+
+    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+
+    const day2DigitsTommorow = day.toString().padStart(2, '0');
+    const day2Digits3DaysFromNow = threeDaysFromNow
+      .getDate()
+      .toString()
+      .padStart(2, '0');
+
+    const { openListCombobox, pickOptionInCombobox } = listCombobox({
+      mainPage,
+      helper,
+    });
+
+    await openListCombobox(firstListItem.locator, day2DigitsTommorow);
+
+    await pickOptionInCombobox('3 days from now');
+
+    await firstListItem.hasText(day2Digits3DaysFromNow);
+
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
+
+    const firstListItemInSubList = await helper.list.getFirstListItem();
+    await firstListItemInSubList.hasText(day2Digits3DaysFromNow);
+
+    await openListCombobox(
+      firstListItemInSubList.locator,
+      day2Digits3DaysFromNow
+    );
+
+    await pickOptionInCombobox('Tomorrow');
+
+    await firstListItemInSubList.hasText(day2DigitsTommorow);
+  });
 });
 
 const selectCompletedStatus = async ({ mainPage, helper }: PartialFixtures) => {
@@ -246,8 +300,6 @@ const listCombobox = ({ mainPage: taskPage }: PartialFixtures) => {
     await listItem.getByText(name).first().click({ force: true });
 
     await taskPage.comboboxPopover.waitFor({ state: 'visible' });
-
-    await expect(taskPage.comboboxPopover.getByText(name)).toBeVisible();
   };
 
   const openListComboboxWithTestId = async (

@@ -140,24 +140,6 @@ test.describe('Task management', () => {
     await testingQueryBehavior({ taskPage, page });
   });
 
-  test('can change the due date of the first task', async ({
-    mainPage: taskPage,
-  }) => {
-    const firstListItem = await taskPage.getListItem(0);
-    const tommorow = new Date();
-    tommorow.setDate(tommorow.getDate() + 1);
-    const today = new Date();
-    const day = tommorow.getDate();
-    const day2DigitsTommorow = day.toString().padStart(2, '0');
-    const day2DigitsToday = today.getDate().toString().padStart(2, '0');
-
-    await firstListItem.getByText(day2DigitsTommorow).click();
-
-    await taskPage.comboboxPopover.getByText(/today/i).click();
-
-    await expect(firstListItem.getByText(day2DigitsToday)).toBeVisible();
-  });
-
   test('can search for the date filter in the list item edit combobox', async ({
     mainPage: taskPage,
   }) => {
