@@ -6,7 +6,7 @@ import { store$ } from '..';
 import { useApi } from './use-api';
 import { isDetail } from './legend-store/legend.utils';
 
-const isDev = import.meta.env.MODE === 'development';
+// const isDev = import.meta.env.MODE === 'development';
 
 export const useMutation = () => {
   const api = useApi();
@@ -59,9 +59,9 @@ export const useMutation = () => {
       if (!mutateAsync) throw new Error('mutateAsync is not defined');
 
       try {
-        if (isDev) {
-          await new Promise((resolve) => setTimeout(resolve, 750));
-        }
+        // if (isDev) {
+        //   await new Promise((resolve) => setTimeout(resolve, 750));
+        // }
 
         const res = await mutateAsync(args);
 
