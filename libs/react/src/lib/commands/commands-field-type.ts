@@ -24,14 +24,15 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
   const currentRow = store$.commandbar.activeRow.get();
   const query = store$.commandbar.query.get();
   const viewField = viewFieldOrUndefined as FieldConfig;
-  const error =
-    viewField && store$.viewConfigManager.validateField(viewField, query);
-  const showError = store$.commandbar.error.showError.get();
+
   const stringType = () => {
+    const error =
+      viewField && store$.viewConfigManager.validateField(viewField, query);
+
     return {
       inputPlaceholder: '',
       error: {
-        showError: showError && error ? true : false,
+        showError: !!error,
         message: error ? `Error: ${error}` : '',
       },
       groups: [

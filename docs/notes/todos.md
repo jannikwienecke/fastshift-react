@@ -99,19 +99,21 @@ created: 1723444498044
 - [x] not updating when convex db updates in task list view (only task view) (i think worked again)
 - [x] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
 - [x] i am on a custom view -> move to another view, filter etc. stays -> not correct!
-- [ ] local filtering for sub views not implemented
-- [ ] when setting field from commandbar like email -> will not be validated
+- [x] local filtering for sub views not implemented
+- [x] when i am at projects -> tasks, dont show the filter for projects and the grouping for projects
+- [x] remove tasks from sidebar (with config)
+
+- [x] when setting field from commandbar like email -> will not be validated
 - [ ] not everyting of the contextmenu list item is clickable
-- [ ] cannot filter by tasks -> tasks or tasks->todos
-- [ ] when i am at projects -> tasks, dont show the filter for projects and the grouping for projects
+- [ ] deleting "breaks" the app. Nothing is clickable
 - [ ] show deleted in sub view not working
 - [ ] change commandbar item in sublist -> create new task in project. Preselect project.
 - [ ] if we are in projects -task, but create a task in a different project. should not be visible after creation
 - [ ] handle views in sub list
 - [ ] should be "change category" in the combobox for project (we have always just one), update in test as well,
-- [ ] remove tasks from sidebar (with config)
 - [ ] checkmark in combobox list
 - [ ] add back custom commands
+- [ ] cannot filter by tasks -> tasks or tasks->todos
 
 <!-- todo tests -->
 

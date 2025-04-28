@@ -158,11 +158,16 @@ const makeUpdateRecordAttributeCommand = (
 
       if (field.type === 'String') {
         const query = store$.commandbar.query.get() ?? '';
+        const error =
+          field && store$.viewConfigManager.validateField(field, query);
+        if (error) return;
+
         value = makeRowFromValue(query, field);
       }
 
       if (field.isDateField) {
         const parsedRow = getParsedDateRowForMutation(options);
+
         value = parsedRow ?? value;
       }
 
