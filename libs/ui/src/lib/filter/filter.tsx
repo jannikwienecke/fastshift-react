@@ -78,7 +78,6 @@ const FilterItem = (props: {
   const { t } = useTranslation();
   const translatedOperator = t(`filter.operator.${filter.operator}` as any);
 
-  console.log({ filter });
   return (
     <div
       data-testid={`filter-item-${filter.name}`}

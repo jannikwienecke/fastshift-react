@@ -320,9 +320,12 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
   (store$) => async (data) => {
     const state = store$.state.get();
 
-    _log.warn(`____handleIncomingData`, state, data.data?.length);
-
     if (data.isPending) return;
+    _log.debug(
+      `____handleIncomingData`,
+      state,
+      data.data?.slice(0, 3).map((d) => d?.['name'])
+    );
 
     if (store$.viewConfigManager.localModeEnabled.get()) {
       _log.debug(`handleIncomingData:debugMode-> Update Data Model`);

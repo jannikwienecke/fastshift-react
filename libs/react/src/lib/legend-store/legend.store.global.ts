@@ -20,34 +20,6 @@ import {
   handleIncomingDetailData,
 } from './legend.store.fn.global';
 
-// const patchAllViews = (views: RegisteredViews) => {
-//   return patchDict(views ?? {}, (view) => {
-//     if (!view) return view;
-//     return {
-//       ...view,
-//       viewFields: patchDict(view.viewFields, (f) => {
-//         // eslint-disable-next-line
-//         // @ts-ignore
-//         const userFieldConfig = view.fields?.[f.name];
-//         const displayField = view.displayField.field;
-//         const softDeleteField = view.mutation?.softDeleteField;
-
-//         const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
-//         const isDisplayField =
-//           displayField && f.name === displayField ? true : undefined;
-
-//         return {
-//           ...f,
-//           ...userFieldConfig,
-//           isDisplayField,
-//           label: f.label || renderModelName(f.name, t),
-//           hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
-//         } satisfies FieldConfig;
-//       }),
-//     };
-//   });
-// };
-
 export const getViewData = (viewName: string) => {
   const userViews = store$.userViews.get();
 
@@ -117,7 +89,7 @@ const resetStore = () => {
 };
 
 const setStore = (viewName: string, parentViewName?: string) => {
-  store$.state.set('initialized');
+  store$.state.set('pending');
 
   const userViewData = getViewData(viewName);
   const viewConfigManager = createViewConfigManager(viewName);
@@ -131,6 +103,8 @@ const setStore = (viewName: string, parentViewName?: string) => {
     store$.uiViewConfig.set(viewConfigManager.uiViewConfig);
     store$.userViewData.set(userViewData);
     store$.detail.parentViewName.set(parentViewName);
+
+    // store$.filter.filters.set(undef)
 
     const viewFields = viewConfigManager
       .getViewFieldList()
@@ -167,7 +141,7 @@ const setStore = (viewName: string, parentViewName?: string) => {
     }
   });
 
-  //   store$.viewId.set(viewId);
+  store$.state.set('initialized');
 };
 
 const handleQueryData = (data: QueryReturnOrUndefined) => {
@@ -340,8 +314,9 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
     handleQueryData(data);
   } else {
     console.warn('____LOAD SUB VIEW LIST PAGE', action);
-    setStore(viewName, parentViewName);
     resetStore();
+
+    setStore(viewName, parentViewName);
 
     if (data) {
       handleQueryData(data);

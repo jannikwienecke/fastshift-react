@@ -168,6 +168,8 @@ export const applyFilter = (
 
 export const addLocalFiltering = (store$: Observable<LegendStore>) => {
   store$.filter.filters.onChange((changes) => {
+    if (store$.state.get() !== 'initialized') return;
+
     applyFilter(store$, changes.value);
   });
 };

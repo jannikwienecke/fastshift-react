@@ -3,6 +3,7 @@ import {
   convertDisplayOptionsForBackend,
   convertFiltersForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
+  getViewByName,
   Row,
 } from '@apps-next/core';
 import { applyDisplayOptions } from './legend.local.display-options';
@@ -24,11 +25,38 @@ export const filterRowsByShowDeleted = (rows: Row[]) => {
   return filtered;
 };
 
+const filterRowsByParentId = (rows: Row[]) => {
+  const parentId = store$.detail.row.id.get();
+  const parentViewName = store$.detail.parentViewName.get();
+
+  if (!parentId || !parentViewName) return rows;
+  const parentTableName = getViewByName(
+    store$.views.get(),
+    parentViewName
+  )?.tableName;
+
+  if (!parentTableName) return rows;
+
+  return rows.filter((row) => {
+    const value = row.raw?.[parentTableName];
+
+    if (!value) return true;
+    if (!value?.id) return true;
+
+    const id = value.id;
+    if (id === parentId) return true;
+
+    return false;
+  });
+};
+
 export const setGlobalDataModel = (rows: Row[]) => {
   // if (store$.detail.form.dirtyValue.get()) {
   //   console.warn('DOES NOT UPDATE IS DIRY!!', store$.detail.form.get());
   //   return;
   // }
+
+  rows = filterRowsByParentId(rows);
 
   const filteredRows = filterRowsByShowDeleted(rows);
 

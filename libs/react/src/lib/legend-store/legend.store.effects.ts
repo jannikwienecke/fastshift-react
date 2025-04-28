@@ -1,4 +1,10 @@
-import { _log, FilterType, QueryReturnOrUndefined } from '@apps-next/core';
+import {
+  _log,
+  FilterType,
+  getViewByName,
+  makeData,
+  QueryReturnOrUndefined,
+} from '@apps-next/core';
 import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { selectState$, xSelect } from './legend.select-state';
@@ -10,6 +16,7 @@ import {
   queryListViewOptions$,
   querySubListViewOptions$,
 } from './legend.queryProps.derived';
+import { setGlobalDataModel } from './legend.utils.helper';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -120,13 +127,16 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       return;
     }
 
-    if (changes.changes?.[0].path?.[0] === 'isOpen') {
-      return;
-    }
+    const pathKeys = changes.changes?.[0].path.join('');
+    const hasIsOpen = pathKeys.toLowerCase().includes('open');
+    const hasRect = pathKeys.toLowerCase().includes('rect');
 
-    // if (prevAtPath === )
+    const fieldChange = changes.changes.find((c) =>
+      c.path.join('').toLowerCase().includes('field')
+    );
 
-    // if (store$.state.get() === 'pending') return;
+    if (hasIsOpen && !fieldChange) return;
+    if (hasRect && !fieldChange) return;
 
     if (field?.name || grouping?.name || showEmptyGroups || showDeleted) {
       _log.debug(
@@ -335,20 +345,44 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         const queryKey = querySubListViewOptions$.get()?.queryKey;
         const rows = store$.dataModel.rows.get();
 
+        // const parentViewName = store$.detail.parentViewName.get();
+        const rawRows = rows.map((r) => r.raw);
+
+        // if (parentViewName) {
+        //   const view = getViewByName(store$.views.get(), parentViewName);
+
+        //   const currentRow = store$.detail.row.get();
+        //   rawRows = rows
+        //     .filter((r) => {
+        //       const idOfParent = r.raw[view?.tableName]?.id;
+
+        //       if (idOfParent && idOfParent !== currentRow?.id) {
+        //         return false;
+        //       }
+
+        //       return true;
+        //     })
+        //     .map((r) => r.raw);
+        // }
+
         if (!queryKey) return;
+
+        const dataModel = makeData(
+          store$.views.get(),
+          store$.viewConfigManager.getViewName()
+        )(rawRows);
+
+        setGlobalDataModel(dataModel.rows);
 
         store$.api.queryClient.setQueryData(
           queryKey,
           (q: QueryReturnOrUndefined): QueryReturnOrUndefined => {
             return {
               ...q,
-              data: rows.map((r) => r.raw),
+              data: rawRows,
             };
           }
         );
-
-        // next:
-        // in sub list, project -> task: make the contextmenu work
       }
     });
   });

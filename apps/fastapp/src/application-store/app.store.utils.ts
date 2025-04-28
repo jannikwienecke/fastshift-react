@@ -11,7 +11,7 @@ export const wait = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(true);
-    }, 300);
+    }, 0);
   });
 };
 

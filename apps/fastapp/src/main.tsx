@@ -7,7 +7,7 @@ import {
   preloadQuery,
 } from '@apps-next/convex-adapter-app';
 
-import { logger } from '@apps-next/core';
+import { logger, UserViewData } from '@apps-next/core';
 import './i18n';
 import {
   convex,
@@ -46,7 +46,12 @@ const router = createRouter({
     ) => {
       await queryClient.ensureQueryData(getUserViewQuery(viewName));
 
-      const userViewData = getUserViewData(viewName);
+      let userViewData: UserViewData | null | undefined = null;
+      if (parentViewName) {
+        userViewData = null;
+      } else {
+        userViewData = getUserViewData(viewName);
+      }
 
       return await queryClient.ensureQueryData(
         preloadQuery(

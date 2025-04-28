@@ -228,10 +228,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const getRecordsHasIdsAndNotTooBig = () => {
       debug('Convex:getRecordsHasIdsAndNotTooBig');
-      return getRecordsByIds(
-        idsAfterRemove?.slice(position, nextPosition) ?? [],
-        dbQuery
-      );
+
+      return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
     };
 
     const getSortedRecords = () => {
@@ -338,6 +336,22 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   if (allIds === null && data.length) {
     allIds = data.map((r) => r['id']);
   }
+
+  // if (view === 'tasks') {
+  //   console.log(
+  //     'Convex:getData LENGTH',
+
+  //     args.paginateOptions?.cursor,
+  //     { nextPosition, rows: rows.length, sortedRows: sortedRows.length },
+  //     // args.displayOptions,
+  //     // args.filters,
+  //     // args.parentId,
+  //     // args.parentViewName,
+  //     // args.viewId,
+  //     // args.paginateOptions,
+  //     data.length
+  //   );
+  // }
 
   return { data, continueCursor, isDone, allIds };
 };

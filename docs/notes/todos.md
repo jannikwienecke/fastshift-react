@@ -92,8 +92,9 @@ created: 1723444498044
 ## NEW TODOS
 
 - [x] handle e.g. projects -> tasks list in detail
-- [ ] filter in main tasks list -> effects list in projects -> task
-- [ ] when i set the project to a different one and its not in the list anymore -> remove optimistically
+- [x] switching between views when we have a filter on one of the views -> error
+- [x] filter in main tasks list -> effects list in projects -> task
+- [x] when i set the project to a different one and its not in the list anymore -> remove optimistically
 - [ ] projects -> tasks should not be in sidebar of detail, tags should be (config )
 - [ ] not updating when convex db updates in task list view (only task view) (i think worked again)
 - [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
@@ -108,3 +109,10 @@ created: 1723444498044
 - [ ] handle views in sub list
 - [ ] should be "change category" in the combobox for project (we have always just one), update in test as well,
 - [ ] remove tasks from sidebar (with config)
+- [ ] checkmark in combobox list
+- [ ] add back custom commands
+
+<!-- todo tests -->
+
+- [ ] add test for filter not used in sub view
+- [ ] add test for switching between views when one has filter set

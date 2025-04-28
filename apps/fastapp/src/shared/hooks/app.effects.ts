@@ -4,6 +4,9 @@ import { useLocation, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { useViewParams } from './useViewParams';
 import { getUserViews } from '../../query-client';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
+import { api } from '@apps-next/convex';
 
 export const useAppEffects = (viewName: string) => {
   const router = useRouter();
@@ -15,6 +18,13 @@ export const useAppEffects = (viewName: string) => {
   const { pathname } = useLocation();
 
   const view = store$.viewConfigManager.viewConfig.viewName.get();
+
+  const { data: views } = useQuery(convexQuery(api.query.getUserViews, {}));
+
+  React.useEffect(() => {
+    if (!views) return;
+    store$.userViews.set(views);
+  }, [views]);
 
   React.useEffect(() => {
     const isOverview = pathname.includes('/overview');

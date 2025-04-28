@@ -5,6 +5,8 @@ import { store$ } from './legend.store';
 import { LegendStore } from './legend.store.types';
 
 const _sortRows = () => {
+  return store$.dataModel.rows.get();
+
   const rows = store$.dataModel.rows.get().map((r) => r.raw);
 
   const sortedRows = sortRows(
@@ -55,6 +57,8 @@ export const addLocalDisplayOptionsHandling = (
   store$: Observable<LegendStore>
 ) => {
   store$.displayOptions.sorting.field.onChange((changes) => {
+    if (store$.state.get() !== 'initialized') return;
+
     if (!changes.value) return;
 
     const prevAtPath = changes.changes[0].prevAtPath;
@@ -64,6 +68,7 @@ export const addLocalDisplayOptionsHandling = (
   });
   store$.displayOptions.sorting.order.onChange((changes) => {
     if (!changes.value) return;
+    if (store$.state.get() !== 'initialized') return;
     const prevAtPath = changes.changes[0].prevAtPath;
     if (!prevAtPath) return;
 
@@ -71,6 +76,7 @@ export const addLocalDisplayOptionsHandling = (
   });
   store$.displayOptions.showDeleted.onChange((changes) => {
     const prevAtPath = changes.changes[0].prevAtPath;
+    if (store$.state.get() !== 'initialized') return;
     if (!prevAtPath) return;
 
     applyDisplayOptions(store$, store$.displayOptions.get());

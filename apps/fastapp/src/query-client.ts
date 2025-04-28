@@ -49,7 +49,13 @@ export const getQueryKey = (
   parentViewName: string | null,
   parentId: string | null
 ) => {
-  const userViewData = getUserViewData(viewName);
+  // FIXME -> same logic in main.ts
+  let userViewData: UserViewData | null | undefined = null;
+  if (parentViewName) {
+    userViewData = null;
+  } else {
+    userViewData = getUserViewData(viewName);
+  }
 
   return preloadQuery(
     api.query.viewLoader,
