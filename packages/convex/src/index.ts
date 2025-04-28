@@ -88,6 +88,7 @@ export const tasksConfig = createViewConfig(
       },
     },
 
+    // localMode: { enabled: true },
     includeFields: ['tags', 'tasks', 'todos'],
     query: {
       // sort so that the newest tasks are on top

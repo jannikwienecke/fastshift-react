@@ -55,7 +55,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const displayOptionsInfo = getDisplayOptionsInfo(args);
 
-  const localModeEnabled = viewConfigManager.localModeEnabled;
+  const localModeEnabled =
+    viewConfigManager.viewConfig.localMode?.enabled &&
+    !args.viewId &&
+    !args.parentId;
+
   const showDeleted = displayOptionsInfo.showDeleted || localModeEnabled;
 
   // debug('Convex:getData', {
@@ -253,18 +257,19 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       });
     };
 
-    const rowsBeforeFilter =
-      hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
-        ? await getRecordsIfNotSortedAndNoDeletedRows()
-        : !!allIds && !countToBig
-        ? await getRecordsHasIdsAndNotTooBig()
-        : displayOptionsInfo.displaySortingIndexField
-        ? await getSortedRecords()
-        : anyFilter ||
-          (displayOptionsInfo.hasSortingField &&
-            !displayOptionsInfo.displaySortingIndexField)
-        ? await getAll()
-        : await getPaginatedRecords();
+    const rowsBeforeFilter = localModeEnabled
+      ? await getAll() // local mode
+      : hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
+      ? await getRecordsIfNotSortedAndNoDeletedRows()
+      : !!allIds && !countToBig
+      ? await getRecordsHasIdsAndNotTooBig()
+      : displayOptionsInfo.displaySortingIndexField
+      ? await getSortedRecords()
+      : anyFilter ||
+        (displayOptionsInfo.hasSortingField &&
+          !displayOptionsInfo.displaySortingIndexField)
+      ? await getAll()
+      : await getPaginatedRecords();
 
     let rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
@@ -337,21 +342,21 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     allIds = data.map((r) => r['id']);
   }
 
-  // if (view === 'tasks') {
-  //   console.log(
-  //     'Convex:getData LENGTH',
+  if (args.viewName === 'task') {
+    console.log(
+      'Convex:getData LENGTH',
 
-  //     args.paginateOptions?.cursor,
-  //     { nextPosition, rows: rows.length, sortedRows: sortedRows.length },
-  //     // args.displayOptions,
-  //     // args.filters,
-  //     // args.parentId,
-  //     // args.parentViewName,
-  //     // args.viewId,
-  //     // args.paginateOptions,
-  //     data.length
-  //   );
-  // }
+      { nextPosition, rows: rows.length, sortedRows: sortedRows.length },
+      { sortBy: args.displayOptions?.sorting?.field.name },
+      // args.filters,
+      // args.parentId,
+      // args.parentViewName,
+      // args.viewId,
+      // args.paginateOptions,
+      localModeEnabled,
+      data.length
+    );
+  }
 
   return { data, continueCursor, isDone, allIds };
 };

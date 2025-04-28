@@ -8,10 +8,10 @@ import {
   sortRows,
 } from '@apps-next/core';
 import { batch, Observable } from '@legendapp/state';
-import { LegendStore, StoreFn } from './legend.store.types';
-import { setGlobalDataModel } from './legend.utils.helper';
-import { selectState$, xSelect } from './legend.select-state';
 import { ignoreNewData$ } from './legend.mutationts';
+import { xSelect } from './legend.select-state';
+import { LegendStore, StoreFn } from './legend.store.types';
+import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
 
 export const openSpecificModal: StoreFn<'openSpecificModal'> =
   (store$) => (type, openCb) => {
@@ -327,7 +327,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
       data.data?.slice(0, 3).map((d) => d?.['name'])
     );
 
-    if (store$.viewConfigManager.localModeEnabled.get()) {
+    if (localModeEnabled$.get()) {
       _log.debug(`handleIncomingData:debugMode-> Update Data Model`);
       store$.createDataModel(data.data ?? []);
 

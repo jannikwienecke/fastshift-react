@@ -9,6 +9,7 @@ import {
 import { applyDisplayOptions } from './legend.local.display-options';
 import { applyFilter } from './legend.local.filtering';
 import { store$ } from './legend.store';
+import { observable } from '@legendapp/state';
 
 export const filterRowsByShowDeleted = (rows: Row[]) => {
   const showDeleted = store$.displayOptions.showDeleted.get();
@@ -74,7 +75,7 @@ export const setGlobalDataModel = (rows: Row[]) => {
   const isDone_ =
     DEFAULT_FETCH_LIMIT_QUERY > store$.dataModel.rows.get().length;
 
-  if (store$.viewConfigManager.localModeEnabled.get() || isDone_) {
+  if (localModeEnabled$.get() || isDone_) {
     _log.debug('setGlobalDataModel: APPLY FILTER! AND SORT');
     applyFilter(store$, store$.filter.filters.get());
     applyDisplayOptions(store$, store$.displayOptions.get());
@@ -95,3 +96,11 @@ export const getParsedViewSettings = () => {
     displayOptions?: string;
   };
 };
+
+export const localModeEnabled$ = observable(() => {
+  console.warn(
+    'localModeEnabled$',
+    store$.viewConfigManager.viewConfig.localMode.get()
+  );
+  return store$.viewConfigManager.viewConfig.localMode.enabled.get();
+});

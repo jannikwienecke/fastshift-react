@@ -97,8 +97,9 @@ created: 1723444498044
 - [x] when i set the project to a different one and its not in the list anymore -> remove optimistically
 - [x] projects -> tasks should not be in sidebar of detail, tags should be (config )
 - [x] not updating when convex db updates in task list view (only task view) (i think worked again)
-- [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
-- [ ] i am on a custom view -> move to another view, filter etc. stays -> not correct!
+- [x] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
+- [x] i am on a custom view -> move to another view, filter etc. stays -> not correct!
+- [ ] local filtering for sub views not implemented
 - [ ] when setting field from commandbar like email -> will not be validated
 - [ ] not everyting of the contextmenu list item is clickable
 - [ ] cannot filter by tasks -> tasks or tasks->todos

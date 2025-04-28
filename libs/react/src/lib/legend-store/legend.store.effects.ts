@@ -1,22 +1,17 @@
 import {
   _log,
   FilterType,
-  getViewByName,
   makeData,
   QueryReturnOrUndefined,
 } from '@apps-next/core';
 import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
+import { querySubListViewOptions$ } from './legend.queryProps.derived';
 import { selectState$, xSelect } from './legend.select-state';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
-import {
-  queryDetailViewOptions$,
-  queryListViewOptions$,
-  querySubListViewOptions$,
-} from './legend.queryProps.derived';
-import { setGlobalDataModel } from './legend.utils.helper';
+import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -94,13 +89,15 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   // }).onChange(() => null);
 
   store$.filter.filters.onChange((changes) => {
+    if (store$.state.get() === 'pending') return;
+
     const filters = changes.value;
 
     _log.debug('handleFilterChange: ', filters);
 
     store$.state.set('filter-changed');
 
-    if (store$.viewConfigManager.localModeEnabled.get()) {
+    if (localModeEnabled$.get()) {
       _log.debug('handleFilterChange: local mode. No fetchMore');
     } else {
       store$.fetchMore.assign({
@@ -112,6 +109,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   });
 
   store$.displayOptions.onChange((changes) => {
+    if (store$.state.get() === 'pending') return;
+
     const showDeleted = store$.displayOptions.showDeleted.get();
     const field = store$.displayOptions.sorting.field.get();
     const order = store$.displayOptions.sorting.order.get();
@@ -151,7 +150,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     store$.state.set('updating-display-options');
 
-    if (store$.viewConfigManager.localModeEnabled.get()) {
+    if (localModeEnabled$.get()) {
       _log.debug('handleDisplayOptionsChange: local mode. No fetchMore');
     } else {
       store$.fetchMore.assign({
