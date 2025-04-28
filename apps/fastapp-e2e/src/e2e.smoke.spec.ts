@@ -36,6 +36,12 @@ test.describe('Smoke Test', () => {
 
     await detailHeader.getByText(/tasks/i).click();
 
+
+
+
+
+
+    
     await sidebar.getByText(/owner/i).first().click();
 
     const ownerListItem = await taskPage.getListItem(0);

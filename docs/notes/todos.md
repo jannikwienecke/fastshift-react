@@ -94,6 +94,7 @@ created: 1723444498044
 - [x] handle e.g. projects -> tasks list in detail
 - [ ] filter in main tasks list -> effects list in projects -> task
 - [ ] when i set the project to a different one and its not in the list anymore -> remove optimistically
+- [ ] projects -> tasks should not be in sidebar of detail, tags should be (config )
 - [ ] not updating when convex db updates in task list view (only task view) (i think worked again)
 - [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
 - [ ] i am on a custom view -> move to another view, filter etc. stays -> not correct!
@@ -105,3 +106,5 @@ created: 1723444498044
 - [ ] change commandbar item in sublist -> create new task in project. Preselect project.
 - [ ] if we are in projects -task, but create a task in a different project. should not be visible after creation
 - [ ] handle views in sub list
+- [ ] should be "change category" in the combobox for project (we have always just one), update in test as well,
+- [ ] remove tasks from sidebar (with config)

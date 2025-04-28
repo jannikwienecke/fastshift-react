@@ -43,11 +43,34 @@ const FILTER = {
     date: 'due date',
   },
 };
+const OWNER = {
+  values: {
+    johnDoe: 'John Doe',
+    janeSmith: 'Jane Smith',
+  },
+};
+
+const CATEGORY = {
+  values: {
+    work: 'Work',
+    personal: 'Personal',
+  },
+};
+
+const DUEDATE = {
+  values: {
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+  },
+};
 
 export const CON = {
   project: PROJECT,
   tag: TAG,
   priority: PRIORITY,
   task: TASK,
+  owner: OWNER,
+  category: CATEGORY,
   filter: FILTER,
+  dueDate: DUEDATE,
 };
