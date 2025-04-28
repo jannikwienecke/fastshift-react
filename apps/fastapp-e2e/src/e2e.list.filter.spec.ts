@@ -105,6 +105,51 @@ test.describe('List Filter Tests', () => {
     await expect(mainPage.page.getByText(CON.tag.values.longTerm)).toBeHidden();
   });
 
+  test('can filter task list by tag and open filter, update it and change operator in sub projects task list ', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
+
+    const props: PartialFixtures = {
+      mainPage,
+      helper,
+    };
+
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
+    const { getFilterItemBy, selectFilterOption, filterByWithOptions } =
+      listFilter(props);
+
+    await filterByWithOptions(
+      props,
+      CON.filter.options.tag,
+      [CON.tag.values.planning, CON.tag.values.longTerm],
+      CON.tag.values.creative
+    );
+
+    let filterItem = getFilterItemBy(CON.filter.options.tag + 's');
+
+    await filterItem.getByText(/2 tags/i).click();
+
+    await pressEscape(mainPage.page);
+
+    await expect(
+      mainPage.page.getByText(CON.tag.values.longTerm)
+    ).toBeVisible();
+
+    filterItem = getFilterItemBy(CON.filter.options.tag + 's');
+    await filterItem.getByText(/is any of/i).click();
+    await selectFilterOption('is not any of');
+
+    await expect(mainPage.page.getByText(CON.tag.values.creative)).toBeHidden();
+    await expect(mainPage.page.getByText(CON.tag.values.planning)).toBeHidden();
+    await expect(mainPage.page.getByText(CON.tag.values.longTerm)).toBeHidden();
+  });
+
   test('can filter task list by tag AND Project ', async ({
     mainPage,
     helper,

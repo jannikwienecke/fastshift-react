@@ -6,6 +6,7 @@ import {
   filterByProject,
   saveCurrentView,
 } from './helpers/e2e.helper.custom-views';
+import { CON } from './helpers';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
@@ -17,16 +18,16 @@ test.setTimeout(isDev() ? 20000 : 10000);
 test.describe.configure({ mode: 'serial' });
 
 test.describe('Custom Views', () => {
-  test('can sort and save the view', async ({ mainPage: taskPage, page }) => {
-    let firstListItem = await taskPage.getListItem(0);
-    await sortByField(taskPage, /name/i);
+  test('can sort and save the view', async ({ mainPage: mainPage, page }) => {
+    let firstListItem = await mainPage.getListItem(0);
+    await sortByField(mainPage, /name/i);
     await firstListItem.click({ force: true });
 
     await page.getByText(/reset/i).click();
     await expect(page.getByText(/reset/i)).toBeHidden();
     await expect(page.getByText(/save/i)).toBeHidden();
 
-    await sortByField(taskPage, /name/i);
+    await sortByField(mainPage, /name/i);
     await firstListItem.click({ force: true });
     await saveCurrentView(page);
 
@@ -35,12 +36,12 @@ test.describe('Custom Views', () => {
 
     await page.reload();
 
-    firstListItem = await taskPage.getListItem(0);
+    firstListItem = await mainPage.getListItem(0);
     await expect(
       firstListItem.getByText(/Assign launch team role/i)
     ).toBeVisible();
 
-    await groupByField(taskPage, /project/i);
+    await groupByField(mainPage, /project/i);
     await firstListItem.click({ force: true });
     await saveCurrentView(page);
 
@@ -50,10 +51,48 @@ test.describe('Custom Views', () => {
     await expect(page.getByTestId(`group-Website Redesign`)).toBeVisible();
   });
 
-  test('can filter and save the view', async ({ mainPage: taskPage, page }) => {
-    const firstListItem = await taskPage.getListItem(0);
+  test.skip('can sort and save the view in sub list', async ({
+    mainPage,
+    helper,
+    page,
+  }) => {
+    // TODO: After implementing
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
 
-    await filterByProject(taskPage, 'fitness plan');
+    let firstListItem = await mainPage.getListItem(0);
+    await sortByField(mainPage, /name/i);
+    await firstListItem.click({ force: true });
+
+    await saveCurrentView(page);
+
+    await expect(page.getByText(/reset/i)).toBeHidden();
+    await expect(page.getByText(/save/i)).toBeHidden();
+
+    await page.reload();
+
+    firstListItem = await mainPage.getListItem(0);
+    await expect(
+      firstListItem.getByText(/Assign launch team role/i)
+    ).toBeVisible();
+
+    await groupByField(mainPage, /project/i);
+    await firstListItem.click({ force: true });
+    await saveCurrentView(page);
+
+    await waitFor(page, 500);
+    await page.reload();
+
+    await expect(page.getByTestId(`group-Website Redesign`)).toBeVisible();
+  });
+
+  test('can filter and save the view', async ({ mainPage: mainPage, page }) => {
+    const firstListItem = await mainPage.getListItem(0);
+
+    await filterByProject(mainPage, 'fitness plan');
     await firstListItem.click({ force: true });
 
     await expect(page.getByText(/fitness plan/i)).toHaveCount(4);
@@ -64,7 +103,7 @@ test.describe('Custom Views', () => {
     await expect(page.getByText(/save/i)).toBeHidden();
     await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
 
-    await filterByProject(taskPage, 'fitness plan');
+    await filterByProject(mainPage, 'fitness plan');
     await firstListItem.click({ force: true });
     await saveCurrentView(page);
 
@@ -77,9 +116,9 @@ test.describe('Custom Views', () => {
 
   test('can save date filter in a new view, and see it in the list', async ({
     page,
-    mainPage: taskPage,
+    mainPage: mainPage,
   }) => {
-    await filterByDueDate(taskPage, 'today');
+    await filterByDueDate(mainPage, 'today');
     await expect(page.getByText(/today/i).first()).toBeVisible();
 
     await saveCurrentView(page, true, {

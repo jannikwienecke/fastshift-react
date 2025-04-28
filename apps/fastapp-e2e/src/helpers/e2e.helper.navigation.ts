@@ -1,4 +1,5 @@
 import { MainViewPage } from '../view-pom';
+import { waitFor } from './e2e.helper';
 import { ViewName, ViewSlug } from './e2e.helper.types';
 
 export type NavigationE2eHelper = {

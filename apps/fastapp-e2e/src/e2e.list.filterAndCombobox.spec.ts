@@ -57,4 +57,41 @@ test.describe('List Filter / Combobox Test', () => {
 
     expect(textContent).not.toEqual(textContentBefore);
   });
+
+  test('changing the project of a task in sub list of a project, removes the task from the list', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
+
+    const props: PartialFixtures = {
+      mainPage,
+      helper,
+    };
+
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
+
+    const { openListCombobox } = listCombobox(props);
+
+    const firstListItem = await helper.list.getFirstListItem();
+
+    const textContentBefore = await firstListItem.locator.first().textContent();
+
+    await openListCombobox(
+      firstListItem.locator,
+      CON.project.values.websiteRedesign
+    );
+
+    await mainPage.comboboxPopover
+      .getByText(CON.project.values.fitnessPlan)
+      .click();
+
+    const textContent = await firstListItem.locator.first().textContent();
+
+    expect(textContent).not.toEqual(textContentBefore);
+  });
 });

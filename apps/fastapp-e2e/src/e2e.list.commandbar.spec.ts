@@ -17,51 +17,54 @@ test.setTimeout(isDev() ? 20000 : 10000);
 test.describe.configure({ mode: 'serial' });
 
 test.describe('List Commandbar', () => {
-  test('can open and navigate in the commandbar', async ({
+  test('can open and navigate in the commandbar from main task list', async ({
     mainPage,
     helper,
   }) => {
-    await openCommandbar({ helper, mainPage });
+    expect(1).toBe(1);
 
-    // expect to see the commandbar and the text /project/i
-    await expect(
-      mainPage.commandbar.getByText(/project/i).first()
-    ).toBeVisible();
+    await helper.navigation.goToListView('task');
 
-    await search(mainPage, 'rename task');
+    await navigateCommandbar({ mainPage, helper });
+  });
 
-    await hasText(mainPage, 'rename task');
-    await hasText(mainPage, 'rename project', false);
+  test('can open and navigate in the commandbar from sub list of projects->tasks', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
 
-    await search(mainPage, 'create new');
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
 
-    await hasText(mainPage, 'create new task');
-    await hasText(mainPage, 'create new project');
-    await hasText(mainPage, 'create new tag');
-
-    await mainPage.commandbar
-      .getByPlaceholder(/type a command or search/i)
-      .clear();
-
-    await expect(
-      mainPage.commandbar.getByText(/update description/i)
-    ).toBeVisible();
+    await navigateCommandbar({ mainPage, helper });
   });
 
   test('can open commandbar and then toggle completed state', async ({
     mainPage,
     helper,
   }) => {
-    await openCommandbar({ helper, mainPage });
+    expect(1).toBe(1);
 
-    await mainPage.commandbar.getByText(/mark as completed/i).click();
+    await toggleCompletedState({ mainPage, helper });
+  });
 
-    await pressEscape(mainPage.page);
+  test('can open commandbar and then toggle completed state from sub list of project -> tasks', async ({
+    mainPage,
+    helper,
+  }) => {
+    expect(1).toBe(1);
 
-    await expect(mainPage.commandbar).toBeHidden();
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
 
-    const firstListItem = await helper.list.getFirstListItem();
-    await firstListItem.hasText('✅');
+    await toggleCompletedState({ mainPage, helper });
   });
 
   test('can open commandbar and update the project', async ({
@@ -207,12 +210,52 @@ test.describe('List Commandbar', () => {
   });
 });
 
+const navigateCommandbar = async ({ mainPage, helper }: PartialFixtures) => {
+  await openCommandbar({ helper, mainPage });
+
+  // expect to see the commandbar and the text /project/i
+  await expect(mainPage.commandbar.getByText(/project/i).first()).toBeVisible();
+
+  await search(mainPage, 'rename task');
+
+  await hasText(mainPage, 'rename task');
+  await hasText(mainPage, 'rename project', false);
+
+  await search(mainPage, 'create new');
+
+  await hasText(mainPage, 'create new task');
+  await hasText(mainPage, 'create new project');
+  await hasText(mainPage, 'create new tag');
+
+  await mainPage.commandbar
+    .getByPlaceholder(/type a command or search/i)
+    .clear();
+
+  await expect(
+    mainPage.commandbar.getByText(/update description/i)
+  ).toBeVisible();
+};
+
+const toggleCompletedState = async ({ mainPage, helper }: PartialFixtures) => {
+  await openCommandbar({ helper, mainPage });
+
+  await mainPage.commandbar.getByText(/mark as completed/i).click();
+
+  await pressEscape(mainPage.page);
+
+  await expect(mainPage.commandbar).toBeHidden();
+
+  const firstListItem = await helper.list.getFirstListItem();
+  await firstListItem.hasText('✅');
+};
+
 const openCommandbar = async ({ mainPage, helper }: PartialFixtures) => {
   const firstListItem = await helper.list.getFirstListItem();
   await firstListItem.locator
     .getByText(CON.project.values.websiteRedesign)
     .click();
 
+  await waitFor(mainPage.page, 1000);
   await mainPage.page.keyboard.press('Meta+k');
   await expect(mainPage.commandbar).toBeVisible();
 };

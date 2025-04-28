@@ -92,6 +92,8 @@ created: 1723444498044
 ## NEW TODOS
 
 - [x] handle e.g. projects -> tasks list in detail
+- [ ] filter in main tasks list -> effects list in projects -> task
+- [ ] when i set the project to a different one and its not in the list anymore -> remove optimistically
 - [ ] not updating when convex db updates in task list view (only task view) (i think worked again)
 - [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
 - [ ] i am on a custom view -> move to another view, filter etc. stays -> not correct!
@@ -100,3 +102,6 @@ created: 1723444498044
 - [ ] cannot filter by tasks -> tasks or tasks->todos
 - [ ] when i am at projects -> tasks, dont show the filter for projects and the grouping for projects
 - [ ] show deleted in sub view not working
+- [ ] change commandbar item in sublist -> create new task in project. Preselect project.
+- [ ] if we are in projects -task, but create a task in a different project. should not be visible after creation
+- [ ] handle views in sub list
