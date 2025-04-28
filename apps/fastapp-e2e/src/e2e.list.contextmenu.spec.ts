@@ -1,12 +1,11 @@
 import { expect, test } from './fixtures';
 import { CON } from './helpers';
 import { isDev, waitFor } from './helpers/e2e.helper';
-
-// helper to DRY out opening the context menu
-async function openContextMenu(item: any, contextmenu: any) {
-  await item.locator('div').first().click({ force: true, button: 'right' });
-  await expect(contextmenu).toBeVisible();
-}
+import {
+  openContextMenu,
+  openContextMenu2,
+} from './helpers/e2e.helper.contextmenu';
+import { showDeleted } from './helpers/e2e.helper.displayoptions';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
@@ -20,9 +19,12 @@ test.describe.configure({ mode: 'serial' });
 test.describe('List Contextmenu', () => {
   test('can right click on a task and open the context menu', async ({
     mainPage,
+    helper,
   }) => {
     const firstListItem = await mainPage.getListItem(0);
-    await openContextMenu(firstListItem, mainPage.contextmenu);
+    const props = { mainPage, helper };
+    await openContextMenu2(props, 0);
+
     await expect(mainPage.contextmenu.getByText(/rename task/i)).toBeVisible();
     await expect(mainPage.contextmenu.getByText(/copy/i)).toBeVisible();
 
@@ -60,8 +62,10 @@ test.describe('List Contextmenu', () => {
       'Tasks'
     );
 
-    const firstListItem = await mainPage.getListItem(0);
-    await openContextMenu(firstListItem, mainPage.contextmenu);
+    const props = { mainPage, helper };
+    const firstListItem = (await helper.list.getFirstListItem()).locator;
+    await openContextMenu2(props, 0);
+
     await expect(mainPage.contextmenu.getByText(/rename task/i)).toBeVisible();
     await expect(mainPage.contextmenu.getByText(/copy/i)).toBeVisible();
 
@@ -91,11 +95,12 @@ test.describe('List Contextmenu', () => {
 
   test('can right click on a task and toggle completed state', async ({
     mainPage,
+    helper,
   }) => {
-    const firstListItem = await mainPage.getListItem(0);
-    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+    const props = { mainPage, helper };
+    const firstListItem = (await helper.list.getFirstListItem()).locator;
+    await openContextMenu2(props, 0);
 
-    await openContextMenu(firstListItem, mainPage.contextmenu);
     await mainPage.contextmenu.getByText(/mark as completed/i).click();
 
     await expect(firstListItem.getByText(/✅/i)).toBeVisible();
@@ -103,11 +108,12 @@ test.describe('List Contextmenu', () => {
 
   test('can right click on a task and open commandbar by clicking on project', async ({
     mainPage,
+    helper,
   }) => {
-    const firstListItem = await mainPage.getListItem(0);
-    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+    const props = { mainPage, helper };
+    const firstListItem = (await helper.list.getFirstListItem()).locator;
+    await openContextMenu2(props, 0);
 
-    await openContextMenu(firstListItem, mainPage.contextmenu);
     await mainPage.contextmenu.getByText(/project/i).click();
 
     await mainPage.commandbar.getByText(/fitness plan/i).click();
@@ -118,11 +124,12 @@ test.describe('List Contextmenu', () => {
   test('can right click on a task and click edit to open commandform', async ({
     mainPage,
     page,
+    helper,
   }) => {
-    const firstListItem = await mainPage.getListItem(0);
-    await expect(firstListItem.getByText(/❌/i)).toBeVisible();
+    const props = { mainPage, helper };
+    const firstListItem = (await helper.list.getFirstListItem()).locator;
+    await openContextMenu2(props, 0);
 
-    await openContextMenu(firstListItem, mainPage.contextmenu);
     await mainPage.contextmenu.getByText(/edit task/i).click();
 
     await expect(
@@ -169,11 +176,11 @@ test.describe('List Contextmenu', () => {
   test('can right click on a task, and delete the task in the context menu', async ({
     mainPage,
     page,
+    helper,
   }) => {
-    const firstListItem = await mainPage.getListItem(0);
-    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
-
-    await openContextMenu(firstListItem, mainPage.contextmenu);
+    const props = { mainPage, helper };
+    const firstListItem = (await helper.list.getFirstListItem()).locator;
+    await openContextMenu2(props, 0);
 
     await mainPage.contextmenu.getByText(/delete task/i).click();
 
@@ -181,5 +188,30 @@ test.describe('List Contextmenu', () => {
     await page.getByRole('button', { name: 'confirm' }).click();
 
     await expect(firstListItem.getByText(/design mockups/i)).toBeHidden();
+  });
+
+  test('can delete record from contextmenu and show the deleted items', async ({
+    mainPage,
+    page,
+    helper,
+  }) => {
+    const props = { mainPage, helper };
+
+    const firstListItem = (await helper.list.getFirstListItem()).locator;
+    await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
+
+    await openContextMenu2(props, 0);
+
+    await mainPage.contextmenu.getByText(/delete task/i).click();
+
+    await expect(page.getByText(/are you sure/i)).toBeVisible();
+
+    await page.getByRole('button', { name: 'confirm' }).click();
+
+    await expect(firstListItem.getByText(/design mockups/i)).toBeHidden();
+
+    await showDeleted(mainPage);
+
+    await expect(page.getByText(/design mockups/i)).toBeVisible();
   });
 });

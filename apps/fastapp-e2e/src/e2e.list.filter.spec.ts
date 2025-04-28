@@ -1,6 +1,6 @@
 import { expect, PartialFixtures, test } from './fixtures';
 import { CON } from './helpers';
-import { isDev, pressEscape } from './helpers/e2e.helper';
+import { isDev, pressEscape, waitFor } from './helpers/e2e.helper';
 import { listFilter } from './helpers/e2e.helper.filter';
 
 test.beforeEach(async ({ seedDatabase }) => {
@@ -13,13 +13,13 @@ test.describe.configure({ mode: 'serial' });
 
 test.describe('List Filter Tests', () => {
   test('can filter task list by differnt filters', async ({
-    mainPage: taskPage,
+    mainPage: mainPage,
     helper,
   }) => {
     expect(1).toBe(1);
 
     const props: PartialFixtures = {
-      mainPage: taskPage,
+      mainPage: mainPage,
       helper,
     };
 
@@ -165,5 +165,44 @@ test.describe('List Filter Tests', () => {
       CON.tag.values.planning,
       CON.tag.values.creative
     );
+  });
+
+  test('can filter by learn photography (non default loaded project) ', async ({
+    mainPage,
+    page,
+    helper,
+  }) => {
+    await helper.navigation.goToListView('task');
+
+    await mainPage.openFilter(/project/i);
+
+    await mainPage.comboboxPopover
+      .getByPlaceholder(/filter by/i)
+      .fill('learn photography');
+
+    // we select a project which is not in the first 10 projects (key difference here)
+    await mainPage.comboboxPopover.getByText(/learn photo/i).click();
+
+    await mainPage.closePopover();
+
+    await mainPage.openFilter(/project/i);
+
+    await expect(
+      mainPage.comboboxPopover.getByText(/learn photo/i)
+    ).toBeVisible();
+
+    await page.getByText(/save/i).click({ force: true });
+    await page.getByText(/save/i).click();
+    await page.getByText(/save to this/i).click();
+
+    await waitFor(page, 1000);
+
+    await page.reload();
+
+    await mainPage.openFilter(/project/i);
+
+    await expect(
+      mainPage.comboboxPopover.getByText(/learn photo/i)
+    ).toBeVisible();
   });
 });

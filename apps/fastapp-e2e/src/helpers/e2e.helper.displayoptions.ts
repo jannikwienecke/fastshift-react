@@ -27,3 +27,8 @@ export const groupByField = async (taskPage: MainViewPage, name: RegExp) => {
 
   await taskPage.comboboxPopover.getByText(name).click();
 };
+
+export const showDeleted = async (mainPage: MainViewPage) => {
+  await mainPage.displayOptionsButton.click();
+  await mainPage.displayOptions.getByTestId('show-deleted-switch').click();
+};
