@@ -8,7 +8,7 @@ export const de = {
   navigation: {
     projects: 'Projekte',
     tasks: 'Aufgaben',
-    settings: 'Einstellungen',
+    owner: 'Besitzer',
     logout: 'Abmelden',
   },
   projects: {
@@ -63,6 +63,7 @@ export const de = {
     notFound: 'Nicht gefunden',
     unauthorized: 'Nicht autorisiert',
     minCharacters: 'Mindestens {{count}} Zeichen',
+    invalidEmail: 'Ungültige E-Mail-Adresse',
   },
   commands: {
     resetDb: 'Datenbank zurücksetzen',

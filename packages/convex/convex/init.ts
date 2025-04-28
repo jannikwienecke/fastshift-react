@@ -121,7 +121,7 @@ const init = server.mutation({
         description: 'Redesign company website for better user experience',
         categoryId: createdCategories[0],
         ownerId: owners[0],
-        dueDate: new Date('2024-12-31').getTime(),
+        dueDate: new Date('2026-12-31').getTime(),
       },
       {
         label: 'Fitness Plan',

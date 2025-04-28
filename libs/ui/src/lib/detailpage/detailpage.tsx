@@ -16,7 +16,10 @@ import { Button } from '../components';
 const DetailPageHeader = (props: DetailPageProps) => {
   return (
     <>
-      <div className="border-y-[.5px] pl-8 py-3 text-sm flex flex-row gap-4 items-center">
+      <div
+        data-testid="detail-page-header"
+        className="border-y-[.5px] pl-8 py-3 text-sm flex flex-row gap-4 items-center"
+      >
         <div className="flex flex-row items-center">
           <Layers3Icon className="h-4" />
           <ChevronRightIcon className="h-3" />
