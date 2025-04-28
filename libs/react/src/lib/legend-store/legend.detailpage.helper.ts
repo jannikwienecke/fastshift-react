@@ -57,11 +57,33 @@ export const detailFormHelper = () => {
     store$.detail.form.dirtyValue.set(undefined);
   };
 
+  const getPropertiesFields = () => {
+    return helper
+      .getComplexFormFields()
+      .filter(
+        (f) => f.field.showInProperties || !f.field.relation?.manyToManyTable
+      );
+  };
+
+  const getRelationalFields = () => {
+    return (
+      helper
+        .getComplexFormFields()
+        .filter(
+          (f) =>
+            f.field.relation?.manyToManyModelFields?.length &&
+            !f.field.showInProperties
+        ) ?? []
+    );
+  };
+
   return {
     ...helper,
     row,
     view,
     updateRow,
     saveIfDirty,
+    getRelationalFields,
+    getPropertiesFields,
   };
 };

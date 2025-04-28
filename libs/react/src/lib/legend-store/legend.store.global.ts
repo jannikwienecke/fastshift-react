@@ -268,12 +268,8 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
   });
 
   const helper = detailFormHelper();
-  const relationalListFields =
-    helper
-      .getComplexFormFields()
-      .filter((f) => f.field.relation?.manyToManyModelFields?.length) ?? [];
 
-  const firstRelationalListField = relationalListFields?.[0];
+  const firstRelationalListField = helper.getRelationalFields()?.[0];
   const viewConfigOfFirstRelationalListField = getViewByName(
     store$.views.get(),
     firstRelationalListField?.field.name ?? ''

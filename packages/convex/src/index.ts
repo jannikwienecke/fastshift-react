@@ -83,6 +83,9 @@ export const tasksConfig = createViewConfig(
       tasks: {
         hideFromForm: true,
       },
+      tags: {
+        showInProperties: true,
+      },
     },
 
     includeFields: ['tags', 'tasks', 'todos'],
