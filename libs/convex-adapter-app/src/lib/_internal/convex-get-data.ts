@@ -232,7 +232,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
     const getRecordsHasIdsAndNotTooBig = () => {
       debug('Convex:getRecordsHasIdsAndNotTooBig');
-
       return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
     };
 
@@ -342,21 +341,21 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     allIds = data.map((r) => r['id']);
   }
 
-  if (args.viewName === 'task') {
-    console.log(
-      'Convex:getData LENGTH',
+  // if (args.viewName === 'task') {
+  //   console.log(
+  //     'Convex:getData LENGTH',
 
-      { nextPosition, rows: rows.length, sortedRows: sortedRows.length },
-      { sortBy: args.displayOptions?.sorting?.field.name },
-      // args.filters,
-      // args.parentId,
-      // args.parentViewName,
-      // args.viewId,
-      // args.paginateOptions,
-      localModeEnabled,
-      data.length
-    );
-  }
+  //     { nextPosition, rows: rows.length, sortedRows: sortedRows.length },
+  //     { sortBy: args.displayOptions?.sorting?.field.name },
+  //     // args.filters,
+  //     // args.parentId,
+  //     // args.parentViewName,
+  //     // args.viewId,
+  //     // args.paginateOptions,
+  //     localModeEnabled,
+  //     data.length
+  //   );
+  // }
 
   return { data, continueCursor, isDone, allIds };
 };

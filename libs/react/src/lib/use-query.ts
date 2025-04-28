@@ -211,7 +211,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
         // isDone: isDone,
       },
       viewId: null,
-      disabled: localMode ? true : false,
+      // disabled: localMode ? true : false,
       parentViewName,
       parentId,
 

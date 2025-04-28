@@ -98,9 +98,14 @@ export const getParsedViewSettings = () => {
 };
 
 export const localModeEnabled$ = observable(() => {
+  const parentViewName = store$.detail.parentViewName.get();
+
   console.warn(
     'localModeEnabled$',
-    store$.viewConfigManager.viewConfig.localMode.get()
+    store$.viewConfigManager.viewConfig.localMode.get() || parentViewName
   );
-  return store$.viewConfigManager.viewConfig.localMode.enabled.get();
+  return (
+    store$.viewConfigManager.viewConfig.localMode.enabled.get() ||
+    parentViewName
+  );
 });
