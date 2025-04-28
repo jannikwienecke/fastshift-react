@@ -2,7 +2,6 @@ import {
   ADD_NEW_OPTION,
   ContextMenuFieldItem,
   ContextMenuUiOptions,
-  getFieldLabel,
   getTableLabel,
   makeRowFromValue,
   renderModelName,
@@ -42,14 +41,7 @@ const MenuItemContent: React.FC<{
   field: ContextMenuFieldItem;
   renderField: (field: ContextMenuFieldItem) => React.ReactNode;
 }> = ({ field, renderField }) => (
-  <button
-    onClick={(e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      field.onClickOption();
-    }}
-    className="w-full flex flex-row items-center"
-  >
+  <div className="w-full flex flex-row items-center">
     <div className="pr-2">
       <FieldIcon field={field} />
     </div>
@@ -57,7 +49,7 @@ const MenuItemContent: React.FC<{
     <ContextMenuShortcut>
       ⌘{field.name.slice(0, 1).toUpperCase()}
     </ContextMenuShortcut>
-  </button>
+  </div>
 );
 
 const SubMenuContent: React.FC<{
@@ -216,7 +208,14 @@ export const ContextMenuDefault = ({
 
           if (!isEnumDateOrRelationalField) {
             return (
-              <ContextMenuItem key={field.name}>
+              <ContextMenuItem
+                key={field.name}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  field.onClickOption();
+                }}
+              >
                 <MenuItemContent field={field} renderField={renderField} />
               </ContextMenuItem>
             );
@@ -229,7 +228,14 @@ export const ContextMenuDefault = ({
                 field.onHover?.();
               }}
             >
-              <ContextMenuSubTrigger className="w-full">
+              <ContextMenuSubTrigger
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  field.onClickOption();
+                }}
+                className="w-full"
+              >
                 <div className="w-full">
                   <MenuItemContent field={field} renderField={renderField} />
                 </div>

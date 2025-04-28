@@ -104,7 +104,7 @@ created: 1723444498044
 - [x] remove tasks from sidebar (with config)
 
 - [x] when setting field from commandbar like email -> will not be validated
-- [ ] not everyting of the contextmenu list item is clickable
+- [x] not everyting of the contextmenu list item is clickable
 - [ ] deleting "breaks" the app. Nothing is clickable
 - [ ] show deleted in sub view not working
 - [ ] change commandbar item in sublist -> create new task in project. Preselect project.
