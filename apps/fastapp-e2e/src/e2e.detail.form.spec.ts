@@ -40,6 +40,7 @@ test.describe('Detail Page Form Test', () => {
     await updateValue(props, 'label', newLabel);
     await updateValue(props, 'description', newDescription);
 
+    await waitFor(mainPage.page, 500);
     await page.reload();
 
     const labelText = await page.getByPlaceholder(/label/i).inputValue();

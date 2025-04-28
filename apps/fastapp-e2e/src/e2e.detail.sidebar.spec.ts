@@ -62,8 +62,15 @@ test.describe('Detail Page Form Test', () => {
     const day = tommorow.getDate() + 1;
     const day2DigitsTommorow = day.toString().padStart(2, '0');
 
-    await expect(page.getByText(day2DigitsTommorow)).toBeVisible();
+    await expect(page.getByText(day2DigitsTommorow).first()).toBeVisible();
     await expect(page.getByText(CON.category.values.personal)).toBeVisible();
     await expect(page.getByText(CON.owner.values.janeSmith)).toBeVisible();
+
+    await mainPage.sidebar.getByText('projects').first().click();
+
+    const personalItem = (
+      await helper.list.getFirstListItem()
+    ).locator.getByText(CON.category.values.personal);
+    await expect(personalItem).toBeVisible();
   });
 });
