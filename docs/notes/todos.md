@@ -95,8 +95,8 @@ created: 1723444498044
 - [x] switching between views when we have a filter on one of the views -> error
 - [x] filter in main tasks list -> effects list in projects -> task
 - [x] when i set the project to a different one and its not in the list anymore -> remove optimistically
-- [ ] projects -> tasks should not be in sidebar of detail, tags should be (config )
-- [ ] not updating when convex db updates in task list view (only task view) (i think worked again)
+- [x] projects -> tasks should not be in sidebar of detail, tags should be (config )
+- [x] not updating when convex db updates in task list view (only task view) (i think worked again)
 - [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
 - [ ] i am on a custom view -> move to another view, filter etc. stays -> not correct!
 - [ ] when setting field from commandbar like email -> will not be validated
