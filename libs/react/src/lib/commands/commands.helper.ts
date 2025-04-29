@@ -9,6 +9,7 @@ import {
 import { dateUtils, operatorMap } from '../ui-adapter/filter-adapter';
 import { store$ } from '../legend-store';
 import { xSelect } from '../legend-store/legend.select-state';
+import Fuse from 'fuse.js';
 
 type FnArgsOfCommand = Parameters<CommandbarItemHandler>[0];
 
@@ -86,7 +87,9 @@ const getUserStoreCommands = (): CommandbarItem[] => {
 };
 
 const filterCommandGroups = (groups: CommandbarProps['groups']) => {
-  return groups
+  const query = store$.commandbar.query.get() ?? '';
+
+  const filteredGroups = groups
     .map((group) => {
       const query = store$.commandbar.query.get();
       if (!query) return group;
@@ -103,6 +106,45 @@ const filterCommandGroups = (groups: CommandbarProps['groups']) => {
       };
     })
     .filter((g) => g.items.length > 0) satisfies CommandbarProps['groups'];
+
+  // sort the groups based on the score
+
+  const options = {
+    keys: ['label'],
+    threshold: 0.3,
+    distance: 100,
+    includeScore: true,
+  };
+
+  const currentTableName = store$.viewConfigManager.getTableName();
+
+  filteredGroups.sort((a, b) => {
+    if (!query) return 0;
+
+    const aHasCurrentTableName = a.items.some(
+      (item) => item.tablename === currentTableName
+    );
+    const bHasCurrentTableName = b.items.some(
+      (item) => item.tablename === currentTableName
+    );
+
+    if (aHasCurrentTableName && !bHasCurrentTableName) return -1;
+    if (!aHasCurrentTableName && bHasCurrentTableName) return 1;
+
+    const aFuse = new Fuse(a.items, options);
+    const bFuse = new Fuse(b.items, options);
+
+    const aScore = aFuse
+      .search(query)
+      .reduce((acc, item) => acc + (item.score || 0), 0);
+    const bScore = bFuse
+      .search(query)
+      .reduce((acc, item) => acc + (item.score || 0), 0);
+
+    return aScore - bScore;
+  });
+
+  return filteredGroups;
 };
 
 export const commandsHelper = {

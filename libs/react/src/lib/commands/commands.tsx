@@ -6,6 +6,7 @@ import {
   DELETE_OPTION,
   FieldConfig,
   getFieldLabel,
+  getViewByName,
   getViewLabel,
   makeRowFromValue,
   NONE_OPTION,
@@ -61,6 +62,7 @@ const makeSelectModelAttributeCommand = (
     header: '',
     command: 'select-model-attribute',
     getViewName,
+    tablename: item.tablename,
     icon: item.icon,
     handler: ({ row }) => {
       _log.info('makeSelectModelAttributeCommand - handler');
@@ -188,12 +190,32 @@ const makeUpdateRecordAttributeCommand = (
 const makeOpenCreateFormCommand = (view: ViewConfigType): CommandbarItem => {
   const label = getViewLabel(view, true);
 
+  let labelToUse = t('common.createNew' satisfies TranslationKeys, {
+    name: label,
+  });
+
+  const parentViewName = store$.detail.parentViewName.get();
+  if (
+    parentViewName &&
+    view.viewName === store$.viewConfigManager.getViewName()
+  ) {
+    const viewOfParent = getViewByName(store$.views.get(), parentViewName);
+    const tableName = viewOfParent?.tableName;
+    if (!tableName) throw new Error('tableName not found');
+
+    const labelOfParent = getViewLabel(viewOfParent, true) as string;
+
+    labelToUse = t('common.createNewIn' satisfies TranslationKeys, {
+      name: label,
+      field: labelOfParent.toLowerCase(),
+    });
+  }
+
   return {
     id: ADD_NEW_OPTION,
-    label: t('common.createNew' satisfies TranslationKeys, {
-      name: label,
-    }),
+    label: labelToUse,
     icon: PlusIcon,
+    tablename: view.tableName,
     header: () => getViewLabel(view, true),
     command: 'open-view-form',
     getViewName,

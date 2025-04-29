@@ -63,6 +63,8 @@ export const de = {
     yes: 'Ja',
     none: 'Kein',
     createNew: '{{name}} hinzufügen',
+    createNewIn: '{{name}} in {{field}} hinzufügen...',
+
     remove: '{{name}} entfernen',
     copy: '{{name}} kopieren',
     deleted: 'Gelöscht',

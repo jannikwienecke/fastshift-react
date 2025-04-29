@@ -36,6 +36,7 @@ export const CommandDialogList = (props: {
   row?: CommandbarProps['row'];
 }) => {
   const value: string | undefined = useCommandState((state) => state.value);
+  const listRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (!value) return;
@@ -46,10 +47,16 @@ export const CommandDialogList = (props: {
       .find((i) => value.includes(i.label));
 
     item && props.onValueChange(item);
+
+    // Scroll to top whenever value changes
   }, [props, props.groups, value]);
 
+  React.useLayoutEffect(() => {
+    listRef.current?.scrollTo({ top: 0 });
+  }, [value]);
+
   return (
-    <CommandList className="px-3 pb-3 flex flex-col pt-2">
+    <CommandList ref={listRef} className="px-3 pb-3 flex flex-col pt-2">
       {props.groups?.flatMap((group, index) => {
         // const isLast = index === (props.itemGroups?.length ?? 0) - 1;
         const isLast = false;

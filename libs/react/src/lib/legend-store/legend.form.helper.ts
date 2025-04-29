@@ -117,18 +117,24 @@ export const createRow = (recordType: RecordType) => {
   return makeData(store$.views.get(), view.viewName)([recordType]).rows?.[0];
 };
 
-export const getDefaultRow = () => {
+export const getDefaultRow = (defaultRecord?: RecordType) => {
   const viewFields = getViewFields();
 
-  const obj = viewFields.reduce((prev, field) => {
-    return {
-      ...prev,
-      [field.name]:
-        typeof field.defaultValue === 'function'
-          ? field.defaultValue()
-          : field.defaultValue,
-    };
-  }, {} as RecordType);
+  const obj = viewFields.reduce(
+    (prev, field) => {
+      const value = prev[field.name];
+      if (value) return prev;
+
+      return {
+        ...prev,
+        [field.name]:
+          typeof field.defaultValue === 'function'
+            ? field.defaultValue()
+            : field.defaultValue,
+      };
+    },
+    { ...(defaultRecord ?? {}) } as RecordType
+  );
 
   return createRow(obj);
 };
