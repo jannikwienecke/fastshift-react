@@ -117,7 +117,13 @@ const SubMenuContent: React.FC<{
               />
             </div>
           ) : (
-            <div className="h-4 w-4 mr-1" />
+            <>
+              {field.selected?.find((f) => f.id === row.id) ? (
+                <CheckIcon className="w-4 h-4 mr-1" />
+              ) : (
+                <div className="h-4 w-4 mr-1" />
+              )}
+            </>
           )}
           <div>{renderOption(row, field)}</div>
         </ContextMenuItem>

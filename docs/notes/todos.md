@@ -108,12 +108,14 @@ created: 1723444498044
 - [x] show deleted in sub view not working
 - [x] should be "change category" in the combobox for project (we have always just one), update in test as well,
 - [x] change commandbar item in sublist -> create new task in project. Preselect project.
+- [x] if we are in projects -task, but create a task in a different project. should not be visible after creation
+- [x] checkmark in combobox list
 
-- [ ] if we are in projects -task, but create a task in a different project. should not be visible after creation
+- [ ] check query behaviour in commandbar
 - [ ] handle views in sub list
-- [ ] checkmark in combobox list
 - [ ] add back custom commands
 - [ ] cannot filter by tasks -> tasks or tasks->todos
+- [ ] handle click on list item in sub view
 
 <!-- todo tests -->
 

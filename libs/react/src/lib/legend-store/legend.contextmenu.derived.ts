@@ -118,10 +118,20 @@ export const derviedContextMenuOptions = observable(() => {
         ? enumOptions
         : [...(relationalValuesForField?.rows ?? [])];
 
+      const opts =
+        !f.relation?.manyToManyTable && f.relation
+          ? [
+              ...selectedRows,
+              ...(allOptions ?? []).filter(
+                (v) => v.id !== row?.raw?.[f.name]?.id
+              ),
+            ]
+          : allOptions;
+
       return {
         ...f,
         Icon,
-        options: allOptions ?? [],
+        options: opts ?? [],
         noneOptionRow: makeNoneOption(f),
         value: row,
         selected: [...selectedRows].filter((v) => !!v.id),
