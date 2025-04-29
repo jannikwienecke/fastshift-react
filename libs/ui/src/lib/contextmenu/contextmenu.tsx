@@ -143,7 +143,7 @@ const SubMenuContent: React.FC<{
               {/* <div className="flex-1">Create new {field.name}</div> */}
               <div className="flex-1">
                 {t('common.createNew', {
-                  name: renderModelName(field.name, t),
+                  name: field.label,
                 })}
               </div>
             </div>

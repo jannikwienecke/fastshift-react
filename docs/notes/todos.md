@@ -107,10 +107,10 @@ created: 1723444498044
 - [x] deleting "breaks" the app. Nothing is clickable
 - [x] show deleted in sub view not working
 
+- [x] should be "change category" in the combobox for project (we have always just one), update in test as well,
 - [ ] change commandbar item in sublist -> create new task in project. Preselect project.
 - [ ] if we are in projects -task, but create a task in a different project. should not be visible after creation
 - [ ] handle views in sub list
-- [ ] should be "change category" in the combobox for project (we have always just one), update in test as well,
 - [ ] checkmark in combobox list
 - [ ] add back custom commands
 - [ ] cannot filter by tasks -> tasks or tasks->todos

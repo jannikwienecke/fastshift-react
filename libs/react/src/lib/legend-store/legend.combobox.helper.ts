@@ -252,7 +252,7 @@ export const handleRelationalField = (
       };
     }),
     tableName: tableName,
-    multiple: true,
+    multiple: field.relation?.manyToManyTable ? true : false,
     selected: newSelected,
     defaultSelected: defaultSelected,
   };
