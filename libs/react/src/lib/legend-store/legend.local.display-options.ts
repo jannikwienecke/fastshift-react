@@ -78,4 +78,10 @@ export const addLocalDisplayOptionsHandling = (
 
     applyDisplayOptions(store$, store$.displayOptions.get());
   });
+
+  store$.displayOptions.showDeleted.onChange((changes) => {
+    if (store$.state.get() === 'pending') return;
+
+    applyDisplayOptions(store$, store$.displayOptions.get());
+  });
 };

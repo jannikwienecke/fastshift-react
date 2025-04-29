@@ -149,6 +149,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
+  const hasParentFilter = args.parentId && args.parentViewName;
+
   const idsSubView = await getIdsFromParentView(args, ctx, viewConfigManager);
 
   const deletedIndexField = viewConfigManager.getSoftDeleteIndexField();
@@ -160,7 +162,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       ? await filterByNotDeleted(query, deletedIndexField).collect()
       : [];
 
-  const idsNotDeleted = rowsNotDeleted.map((row) => row._id);
+  const idsNotDeleted = hasParentFilter
+    ? null
+    : rowsNotDeleted.map((row) => row._id);
 
   let allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
@@ -168,8 +172,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     isIndexSearch ? idsIndexField : null,
     isSearchFieldSearch ? idsSearchField : null,
     args.query ? idsQuerySearch : null,
-    softDeleteEnabled && !showDeleted ? idsNotDeleted : null,
-    args.parentId && args.parentViewName ? idsSubView : null
+    softDeleteEnabled && !showDeleted && !hasParentFilter
+      ? idsNotDeleted
+      : null,
+    hasParentFilter ? idsSubView : null
   );
 
   if (args.viewId) {
@@ -177,6 +183,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   }
 
   const hasOnlyIdsNotDeleted =
+    idsNotDeleted &&
     idsNotDeleted.length > 0 &&
     !idsManyToManyFilters.length &&
     !idsOneToManyFilters.length &&
@@ -273,8 +280,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     let rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
 
-    if (softDeleteEnabled && !showDeleted) {
-      rows = rows.filter((row) => idsNotDeleted.includes(row?._id));
+    if (softDeleteEnabled && !showDeleted && !hasParentFilter) {
+      rows = rows.filter((row) => idsNotDeleted?.includes(row?._id));
     }
 
     if ('continueCursor' in rowsBeforeFilter) {

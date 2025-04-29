@@ -102,11 +102,11 @@ created: 1723444498044
 - [x] local filtering for sub views not implemented
 - [x] when i am at projects -> tasks, dont show the filter for projects and the grouping for projects
 - [x] remove tasks from sidebar (with config)
-
 - [x] when setting field from commandbar like email -> will not be validated
 - [x] not everyting of the contextmenu list item is clickable
-- [ ] deleting "breaks" the app. Nothing is clickable
-- [ ] show deleted in sub view not working
+- [x] deleting "breaks" the app. Nothing is clickable
+- [x] show deleted in sub view not working
+
 - [ ] change commandbar item in sublist -> create new task in project. Preselect project.
 - [ ] if we are in projects -task, but create a task in a different project. should not be visible after creation
 - [ ] handle views in sub list
@@ -119,3 +119,4 @@ created: 1723444498044
 
 - [ ] add test for filter not used in sub view
 - [ ] add test for switching between views when one has filter set
+- [ ] add test for: when setting field from commandbar like email -> will not be validated
