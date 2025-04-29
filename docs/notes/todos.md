@@ -110,8 +110,8 @@ created: 1723444498044
 - [x] change commandbar item in sublist -> create new task in project. Preselect project.
 - [x] if we are in projects -task, but create a task in a different project. should not be visible after creation
 - [x] checkmark in combobox list
+- [x] check query behaviour in commandbar (use debounced query for viewfield of type relation)
 
-- [ ] check query behaviour in commandbar
 - [ ] handle views in sub list
 - [ ] add back custom commands
 - [ ] cannot filter by tasks -> tasks or tasks->todos

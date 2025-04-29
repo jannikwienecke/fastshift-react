@@ -10,6 +10,7 @@ import { dateUtils, operatorMap } from '../ui-adapter/filter-adapter';
 import { store$ } from '../legend-store';
 import { xSelect } from '../legend-store/legend.select-state';
 import Fuse from 'fuse.js';
+import { comboboxDebouncedQuery$ } from '../legend-store/legend.combobox.helper';
 
 type FnArgsOfCommand = Parameters<CommandbarItemHandler>[0];
 
@@ -87,11 +88,16 @@ const getUserStoreCommands = (): CommandbarItem[] => {
 };
 
 const filterCommandGroups = (groups: CommandbarProps['groups']) => {
-  const query = store$.commandbar.query.get() ?? '';
+  const viewFieldOrUndefined = store$.commandbar.selectedViewField.get();
+  const standardQuery = store$.commandbar.query.get() ?? '';
+  const debouncedQuery = comboboxDebouncedQuery$.get();
+  const query =
+    viewFieldOrUndefined && viewFieldOrUndefined.relation
+      ? debouncedQuery
+      : standardQuery;
 
   const filteredGroups = groups
     .map((group) => {
-      const query = store$.commandbar.query.get();
       if (!query) return group;
 
       const itemsOfGroups = group.items;
