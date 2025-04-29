@@ -12,9 +12,11 @@ import {
 
 function ConfirmationDialogDefault(props: ConfirmationDialogProps) {
   const { t } = useTranslation();
+  if (!props.open) return null;
+
   return (
     <AlertDialog
-      open={!!props.open}
+      open={true}
       onOpenChange={(open) => {
         const removePointerEvents = () => {
           const body = document.querySelector('body');
