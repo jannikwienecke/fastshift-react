@@ -11,6 +11,10 @@ export const pressEscape = async (page: Page) => {
   await page.keyboard.press('Escape');
 };
 
+export const pressEnter = async (page: Page) => {
+  await page.keyboard.press('Enter');
+};
+
 export const isDev = () => {
   return process.env.NODE_ENV === 'development';
 };

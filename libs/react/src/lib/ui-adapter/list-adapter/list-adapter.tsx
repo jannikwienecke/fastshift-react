@@ -328,7 +328,9 @@ export const makeListProps = <T extends RecordType = RecordType>(
     onClick: (item) => {
       store$.navigation.state.set({
         type: 'navigate',
-        view: store$.viewConfigManager.getViewName(),
+        view:
+          store$.userViewData.name.get() ??
+          store$.viewConfigManager.getViewName(),
         id: item.id.toString(),
       });
     },

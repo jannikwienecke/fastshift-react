@@ -115,11 +115,11 @@ created: 1723444498044
 - [x] add back custom commands
 - [x] cannot filter by tasks -> todos
 - [x] handle click on list item in sub view
-
+- [x] placeholder in commandbar for selected view
 <!-- todo tests -->
 
-- [ ] add test for filter not used in sub view
-- [ ] add test for switching between views when one has filter set
-- [ ] add test for: when setting field from commandbar like email -> will not be validated
+- [x] add test for filter not used in sub view
+- [x] add test for switching between views when one has filter set
+- [x] add test for: when setting field from commandbar like email -> will not be validated
 - [ ] tests for saving view config in sub view
 - [ ] check which tests missing from done todos

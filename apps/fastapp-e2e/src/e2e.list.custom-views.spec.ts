@@ -7,6 +7,7 @@ import {
   saveCurrentView,
 } from './helpers/e2e.helper.custom-views';
 import { CON } from './helpers';
+import { listFilter } from './helpers/e2e.helper.filter';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
@@ -89,7 +90,10 @@ test.describe('Custom Views', () => {
     await expect(page.getByTestId(`group-Website Redesign`)).toBeVisible();
   });
 
-  test('can filter and save the view', async ({ mainPage: mainPage, page }) => {
+  test('can filter and save the view and then navigate to another view and back', async ({
+    mainPage: mainPage,
+    page,
+  }) => {
     const firstListItem = await mainPage.getListItem(0);
 
     await filterByProject(mainPage, 'fitness plan');
@@ -112,11 +116,30 @@ test.describe('Custom Views', () => {
 
     await expect(page.getByText(/fitness plan/i)).toHaveCount(4);
     await expect(page.getByText(/design mockups/i)).toBeHidden();
+
+    await mainPage.sidebar
+      .getByText(/projects/i)
+      .first()
+      .click();
+
+    // we are on projects list view -> can see
+    await expect(page.getByText(CON.project.values.fitnessPlan)).toHaveCount(2);
+    await expect(
+      page.getByText(CON.project.values.websiteRedesign)
+    ).toHaveCount(1);
+
+    // go back to tasks list view -> see the filtered tasks again
+    await mainPage.sidebar.getByText(/tasks/i).first().click();
+    await expect(page.getByText(CON.project.values.fitnessPlan)).toHaveCount(4);
+    await expect(
+      page.getByText(CON.project.values.websiteRedesign)
+    ).toHaveCount(0);
   });
 
-  test('can save date filter in a new view, and see it in the list', async ({
+  test('can save date filter in a new view, and see it in the list. But dont see it in sub list of project:tasks', async ({
     page,
-    mainPage: mainPage,
+    mainPage,
+    helper,
   }) => {
     await filterByDueDate(mainPage, 'today');
     await expect(page.getByText(/today/i).first()).toBeVisible();
@@ -136,5 +159,37 @@ test.describe('Custom Views', () => {
       .getByText(day.toString() + '.')
       .first()
       .click();
+
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
+
+    // filter of main list view is not applied to sub list
+    await expect(page.getByText(/today/i).first()).toBeHidden();
+
+    await filterByProject(mainPage, CON.project.values.websiteRedesign);
+
+    await waitFor(page, 500);
+
+    await helper.navigation.goToListView('task');
+
+    // filter of sub list is not applied to main list
+    await expect(
+      page.getByText(CON.project.values.fitnessPlan).first()
+    ).toBeVisible();
+
+    await helper.navigation.goToDetailSubList(
+      'my-projects',
+      CON.project.values.websiteRedesign,
+      'Tasks'
+    );
+
+    await expect(
+      listFilter({ mainPage, helper }).getFilterItemBy(
+        CON.filter.options.project + 's'
+      )
+    ).toBeVisible();
   });
 });

@@ -13,6 +13,7 @@ import {
   convex,
   getUserViewData,
   getUserViewQuery,
+  getUserViews,
   queryClient,
 } from './query-client';
 import { routeTree } from './routeTree.gen';

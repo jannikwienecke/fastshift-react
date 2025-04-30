@@ -68,8 +68,6 @@ export const useAppEffects = (viewName: string) => {
 
       store$.userViews.set(views);
 
-      console.log('CREATED', v.value);
-
       const slug = v.value;
       if (slug) {
         await realPreloadRouteRef.current({

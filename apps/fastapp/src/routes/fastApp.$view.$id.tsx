@@ -1,9 +1,4 @@
-import {
-  _log,
-  getViewByName,
-  QueryReturnOrUndefined,
-  Row,
-} from '@apps-next/core';
+import { _log, QueryReturnOrUndefined, Row } from '@apps-next/core';
 import {
   FormField,
   globalStore,
@@ -11,7 +6,7 @@ import {
   store$,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
+import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
 import { getViewData, wait } from '../application-store/app.store.utils';
 import {
@@ -22,7 +17,7 @@ import {
   queryClient,
 } from '../query-client';
 import { useViewParams } from '../shared/hooks';
-import { getViewParms, pachTheViews } from '../shared/utils/app.helper';
+import { getViewParms } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
@@ -61,8 +56,6 @@ const DetaiViewPage = observer(() => {
   const userViews = getUserViews();
   const { viewData } = getViewData(viewName, userViews);
 
-  const view = getViewByName(pachTheViews(), viewName);
-
   const doOnceForId = React.useRef('');
 
   if (id && id !== doOnceForId.current) {
@@ -79,9 +72,9 @@ const DetaiViewPage = observer(() => {
     });
   }
 
-  if (!view) {
+  if (!viewData.viewConfig) {
     _log.info(`View ${viewName} not found, redirecting to /fastApp`);
-    throw redirect({ to: `/fastApp/${viewName}` });
+    return null;
   }
 
   const row = store$.detail.row.get() as Row | undefined;

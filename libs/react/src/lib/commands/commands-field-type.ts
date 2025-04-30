@@ -30,7 +30,7 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
       viewField && store$.viewConfigManager.validateField(viewField, query);
 
     return {
-      inputPlaceholder: '',
+      inputPlaceholder: getEditLabel(viewField),
       error: {
         showError: !!error,
         message: error ? `Error: ${error}` : '',
