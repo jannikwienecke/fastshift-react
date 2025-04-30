@@ -116,7 +116,6 @@ export const displayOptionsReset: StoreFn<'displayOptionsReset'> =
   (store$) => () => {
     store$.displayOptions.grouping.field.set(undefined);
     store$.displayOptions.sorting.field.set(undefined);
-    console.log('RESET!', store$.displayOptions.viewField.get());
 
     store$.displayOptions.viewField.visible.set(
       store$.viewConfigManager.getViewFieldList?.().map((field) => field.name)

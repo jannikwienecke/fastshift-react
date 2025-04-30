@@ -6,16 +6,20 @@ export type SearchField = {
   name: string;
 };
 
-export const getManyToManyFilters = (filters: FilterType[]) =>
-  filters?.filter((f) => f.field.relation?.manyToManyTable) ?? [];
+export const getManyToManyFilters = (filters: FilterType[]) => {
+  return filters?.filter((f) => f.field.relation?.manyToManyTable) ?? [];
+};
 
-export const getRelationalFilters = (filters: FilterType[]) =>
-  filters?.filter(
-    (f) =>
-      f.type === 'relation' &&
-      !f.field.relation?.manyToManyTable &&
-      !f.field.enum
-  ) ?? [];
+export const getRelationalFilters = (filters: FilterType[]) => {
+  return (
+    filters?.filter(
+      (f) =>
+        f.type === 'relation' &&
+        !f.field.relation?.manyToManyTable &&
+        !f.field.enum
+    ) ?? []
+  );
+};
 
 export const getPrimitiveFilters = (filters: FilterType[]) =>
   filters.filter(
@@ -107,7 +111,9 @@ export const getFilterTypes = (
   const filtersWithIndexField = getFiltersWithIndexOrSearchField(
     filters.filter(
       (f) =>
-        !filtersWithSearchField.map((f) => f.field.name).includes(f.field.name)
+        !filtersWithSearchField
+          .map((f) => f.field.name)
+          .includes(f.field.name) && !f.field.relation?.manyToManyTable
     ),
     indexFields
   );
@@ -115,11 +121,13 @@ export const getFilterTypes = (
   const dateFilters = getDateFilters(filters);
 
   // remove all filter that are either in searchFields or indexFields
-  const _filters = filters.filter(
-    (f) =>
+  const _filters = filters.filter((f) => {
+    if (f.field.relation?.manyToManyTable) return true;
+    return (
       !searchFields?.find((s) => s.field === f.field.name) &&
       !indexFields?.find((i) => i.field === f.field.name)
-  );
+    );
+  });
 
   return {
     filtersWithoutIndexOrSearchField: _filters.filter(

@@ -136,8 +136,6 @@ export const saveSubViewSettings = async () => {
     },
   });
 
-  console.log('saveSubViewSettings', result);
-
   if (result.error) {
     renderErrorToast(`Error saving view: ${result.error.message}`, () => {
       console.error('Error saving view callback' + result.error.message);

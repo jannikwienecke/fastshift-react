@@ -111,10 +111,10 @@ created: 1723444498044
 - [x] if we are in projects -task, but create a task in a different project. should not be visible after creation
 - [x] checkmark in combobox list
 - [x] check query behaviour in commandbar (use debounced query for viewfield of type relation)
+- [x] handle views in sub list
+- [x] add back custom commands
+- [x] cannot filter by tasks -> todos
 
-- [ ] handle views in sub list
-- [ ] add back custom commands
-- [ ] cannot filter by tasks -> tasks or tasks->todos
 - [ ] handle click on list item in sub view
 
 <!-- todo tests -->
@@ -122,4 +122,5 @@ created: 1723444498044
 - [ ] add test for filter not used in sub view
 - [ ] add test for switching between views when one has filter set
 - [ ] add test for: when setting field from commandbar like email -> will not be validated
+- [ ] tests for saving view config in sub view
 - [ ] check which tests missing from done todos

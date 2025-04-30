@@ -312,7 +312,6 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
   const currentParentViewName = store$.detail.parentViewName.get();
   const currentViewName = store$.viewConfigManager.getViewName();
 
-  console.log('LOAD SUB VIEW', viewName);
   if (
     currentId === id &&
     currentParentViewName === parentViewName &&

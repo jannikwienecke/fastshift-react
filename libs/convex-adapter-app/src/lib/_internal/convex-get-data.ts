@@ -26,23 +26,7 @@ import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
 
-const LOG_LEVEL = 'info' as string;
-
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
-  const log = (...props: any[]) => {
-    const view = args.viewConfigManager?.getTableName();
-    if (view !== 'tasks') return;
-    console.log(...props);
-  };
-
-  const debug = (...props: any[]) => {
-    if (LOG_LEVEL !== 'debug') return;
-    // const view = args.viewConfigManager?.getTableName();
-    // if (view !== 'task') return;
-    // _log.debug(...props);
-    console.log(...props);
-  };
-
   const { viewConfigManager, filters, registeredViews } = args;
 
   const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
@@ -199,6 +183,19 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     ])
   );
 
+  if (viewConfigManager.getTableName() === 'tasks') {
+    // console.log({
+    //   idsManyToManyFilters,
+    //   manyToManyFilters,
+    //   // oneToManyFilters,
+    //   // idsManyToManyFilters,
+    //   // idsOneToManyFilters,
+    //   // idsIndexField,
+    //   // idsSearchField,
+    //   // allIds,
+    // });
+  }
+
   const fetchLimit = localModeEnabled
     ? DEFAULT_LOCAL_MODE_LIMIT
     : args.displayOptions?.grouping?.field.name
@@ -230,7 +227,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     }
 
     const getRecordsIfNotSortedAndNoDeletedRows = () => {
-      debug('Convex:getRecordsIfNotSortedAndNoDeletedRows');
       return getRecordsByIds(
         idsAfterRemove?.slice(position, nextPosition) ?? [],
         dbQuery
@@ -238,12 +234,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     };
 
     const getRecordsHasIdsAndNotTooBig = () => {
-      debug('Convex:getRecordsHasIdsAndNotTooBig');
       return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
     };
 
     const getSortedRecords = () => {
-      debug('Convex:getSortedRecords');
       if (!displayOptionsInfo.displaySortingIndexField) return [];
 
       return dbQuery
@@ -256,7 +250,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     };
 
     const getPaginatedRecords = async () => {
-      debug('Convex:getPaginatedRecords');
       return await dbQuery.paginate({
         cursor: args?.paginateOptions?.cursor?.cursor ?? null,
         numItems: fetchLimit + (idsToRemove.length ?? 0),
@@ -309,7 +302,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       `WARNING: Local Mode enabled and limit reached! Consider disabled local mode or addding a defautlt filter`
     );
   } else {
-    debug('Convex:fetchedRows.length', newRows.length);
+    // debug('Convex:fetchedRows.length', newRows.length);
   }
 
   const filtered = newRows?.filter(
@@ -347,22 +340,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   if (allIds === null && data.length) {
     allIds = data.map((r) => r['id']);
   }
-
-  // if (args.viewName === 'task') {
-  //   console.log(
-  //     'Convex:getData LENGTH',
-
-  //     { nextPosition, rows: rows.length, sortedRows: sortedRows.length },
-  //     { sortBy: args.displayOptions?.sorting?.field.name },
-  //     // args.filters,
-  //     // args.parentId,
-  //     // args.parentViewName,
-  //     // args.viewId,
-  //     // args.paginateOptions,
-  //     localModeEnabled,
-  //     data.length
-  //   );
-  // }
 
   return { data, continueCursor, isDone, allIds };
 };

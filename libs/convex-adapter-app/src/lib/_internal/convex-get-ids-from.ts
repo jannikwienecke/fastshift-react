@@ -48,90 +48,141 @@ export const getIdsFromManyToManyFilters = async (
   const idsToRemove = [] as ID[];
 
   const idsLists = await asyncMap(manyToManyFilters, async (filter) => {
-    // e.g.: at TaskView -> tagId
-    const fieldNameFilter =
-      filter?.field.relation?.manyToManyModelFields?.find(
-        (f) => f.name === filter.field.name
-      )?.relation?.fieldName ?? '';
+    if (filter.field.relation?.type === 'oneToMany') {
+      // we are on view task. Task has many todos
+      // but we have no reference of todos in task. Therefore. we need to query by the todos table
+      // const res = await ctx.db
+      // .query('todos')
+      // .withIndex('by_id', (q) =>
+      //   q.eq('_id', 'jx7c4082w1te0gt2nacdre0d297f05h5' as Id<'todos'>)
+      // )
+      // .collect();
+      const tableNameOfManyTable = filter.field.relation.manyToManyTable;
+      if (!tableNameOfManyTable) return;
 
-    // e.g.: at TaskView -> taskId
-    const fieldNameView =
-      filter?.field.relation?.manyToManyModelFields?.find(
-        (f) => f.name === viewConfigManager.getTableName()
-      )?.relation?.fieldName ?? '';
+      const fieldNameView =
+        filter.field.relation.manyToManyModelFields?.find(
+          (f) => f.name === viewConfigManager.getTableName()
+        )?.relation?.fieldName ?? ' ';
 
-    // e.g: TaskTag
-    const manyToManyTable = filter?.field.relation?.manyToManyTable ?? '';
-    // e.g.: ['tagId']
-    const values = filter?.type === 'relation' ? filter.values : [];
+      if (!fieldNameView) throw new Error('fieldNameView Not found');
 
-    const idLists = await asyncMap(values, async (value) => {
-      if (!manyToManyTable || !fieldNameFilter) return null;
+      const client = await queryClient(ctx, tableNameOfManyTable);
+      const values = filter?.type === 'relation' ? filter.values : [];
 
-      if (value.id === NONE_OPTION) {
-        // if we want all the "tasks" that have no tags
-        // (many to many table is "tasks_tags")
-        // we first get all the records from the "tasks" table
-        // then we filter the tasks tags to get all the tasks with a tag
-        // then we find the tasks that have no tags
-        // expensive operation
+      const idLists = await asyncMap(values, async (value) => {
+        const rows = await client
+          .withIndex('by_id', (q) => q.eq('_id', value.id))
+          .collect();
 
-        const viewRecords = await queryClient(
-          ctx,
-          viewConfigManager.getTableName()
-        ).collect();
-
-        const manyToManyRecordIds = await asyncMap(
-          viewRecords,
-          async (record) => {
-            const rows = await getRelationTableRecords({
-              registeredViews,
-              ctx,
-              id: (record as any)._id,
-              fieldName: fieldNameView,
-              relation: manyToManyTable,
-            });
-            return rows[0]?.[fieldNameView];
-          }
-        );
-
-        const recordsWithoutManyToMany = viewRecords.filter(
-          (record) => !manyToManyRecordIds.some((id) => id === record?._id)
-        );
-
-        return recordsWithoutManyToMany.map((r) => r._id);
-      } else {
-        const rows = await getRelationTableRecords({
-          registeredViews,
-          ctx,
-          id: value.id,
-          fieldName: fieldNameFilter,
-          relation: manyToManyTable,
-        });
         if (isRelationNegateOperator(filter.operator)) {
           idsToRemove.push(
             ...rows.map((manyToManyRow) => manyToManyRow[fieldNameView])
           );
           return [];
         } else {
-          return rows?.map((manyToManyRow) => manyToManyRow[fieldNameView]);
+          return rows?.length ? [rows?.[0]?.[fieldNameView]] : [];
         }
-      }
-    });
+      });
 
-    // sort by how many times the id appears
-    const ids = idLists
-      .filter((id) => id !== null)
-      .flat()
-      .sort((a, b) => {
-        return (
-          idLists.filter((id) => id === a).length -
-          idLists.filter((id) => id === b).length
-        );
-      })
-      .reverse();
+      const ids = idLists
+        .filter((id) => id !== null)
+        .flat()
+        .sort((a, b) => {
+          return (
+            idLists.filter((id) => id === a).length -
+            idLists.filter((id) => id === b).length
+          );
+        })
+        .reverse();
 
-    return [...new Set(ids)];
+      return [...new Set(ids)];
+    } else {
+      // e.g.: at TaskView -> tagId
+      const fieldNameFilter =
+        filter?.field.relation?.manyToManyModelFields?.find(
+          (f) => f.name === filter.field.name
+        )?.relation?.fieldName ?? '';
+
+      // e.g.: at TaskView -> taskId
+      const fieldNameView =
+        filter?.field.relation?.manyToManyModelFields?.find(
+          (f) => f.name === viewConfigManager.getTableName()
+        )?.relation?.fieldName ?? '';
+
+      // e.g: TaskTag
+      const manyToManyTable = filter?.field.relation?.manyToManyTable ?? '';
+      // e.g.: ['tagId']
+      const values = filter?.type === 'relation' ? filter.values : [];
+
+      const idLists = await asyncMap(values, async (value) => {
+        if (!manyToManyTable || !fieldNameFilter) return null;
+
+        if (value.id === NONE_OPTION) {
+          // if we want all the "tasks" that have no tags
+          // (many to many table is "tasks_tags")
+          // we first get all the records from the "tasks" table
+          // then we filter the tasks tags to get all the tasks with a tag
+          // then we find the tasks that have no tags
+          // expensive operation
+
+          const viewRecords = await queryClient(
+            ctx,
+            viewConfigManager.getTableName()
+          ).collect();
+
+          const manyToManyRecordIds = await asyncMap(
+            viewRecords,
+            async (record) => {
+              const rows = await getRelationTableRecords({
+                registeredViews,
+                ctx,
+                id: (record as any)._id,
+                fieldName: fieldNameView,
+                relation: manyToManyTable,
+              });
+              return rows[0]?.[fieldNameView];
+            }
+          );
+
+          const recordsWithoutManyToMany = viewRecords.filter(
+            (record) => !manyToManyRecordIds.some((id) => id === record?._id)
+          );
+
+          return recordsWithoutManyToMany.map((r) => r._id);
+        } else {
+          const rows = await getRelationTableRecords({
+            registeredViews,
+            ctx,
+            id: value.id,
+            fieldName: fieldNameFilter,
+            relation: manyToManyTable,
+          });
+          if (isRelationNegateOperator(filter.operator)) {
+            idsToRemove.push(
+              ...rows.map((manyToManyRow) => manyToManyRow[fieldNameView])
+            );
+            return [];
+          } else {
+            return rows?.map((manyToManyRow) => manyToManyRow[fieldNameView]);
+          }
+        }
+      });
+
+      // sort by how many times the id appears
+      const ids = idLists
+        .filter((id) => id !== null)
+        .flat()
+        .sort((a, b) => {
+          return (
+            idLists.filter((id) => id === a).length -
+            idLists.filter((id) => id === b).length
+          );
+        })
+        .reverse();
+
+      return [...new Set(ids)];
+    }
   });
 
   return {

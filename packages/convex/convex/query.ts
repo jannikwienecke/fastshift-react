@@ -18,9 +18,28 @@ export const viewMutation = server.mutation({
   handler: makeViewMutationHandler(views),
 });
 
+export const getTasksByTodoId = server.mutation({
+  async handler(ctx, args_0) {
+    try {
+      const res = await ctx.db
+        .query('todos')
+        .withIndex('by_id', (q) =>
+          q.eq('_id', 'jx7c4082w1te0gt2nacdre0d297f05h5' as Id<'todos'>)
+        )
+        .collect();
+
+      return res;
+    } catch (error) {
+      console.error('testQuery error', { error });
+    }
+  },
+});
+
 export const testQuery = server.mutation({
   async handler(ctx, args_0) {
     try {
+      // ctx.db.query('tasks').withIndex('todos', q => q.eq('todos', ))
+
       const res = await ctx.db.patch(
         'jh71s0zc8vdtxrtppctrjkjdg97c24qs' as Id<'tasks'>,
         {
