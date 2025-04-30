@@ -84,20 +84,20 @@ const DetaiViewPage = observer(() => {
     throw redirect({ to: `/fastApp/${viewName}` });
   }
 
-  const row = store$.detail.row.get() as Row;
-  if (!row) {
-    return <div>No data found</div>;
-  }
+  const row = store$.detail.row.get() as Row | undefined;
+  const viewConfigManager = store$.detail.viewConfigManager.get();
+
+  if (!row || !viewConfigManager) return null;
 
   if (viewData.detail) {
-    return <viewData.detail row={row} />;
+    return <viewData.detail />;
   }
 
   return (
     <DefaultDetailViewTemplate
       formField={FormField}
       complexFormField={RenderDetailComplexValue}
-      detailOptions={{ row }}
+      detailOptions={{}}
     />
   );
 });

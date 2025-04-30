@@ -7,7 +7,9 @@ import { store$ } from './legend.store';
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
 export const derviedDetailPage$ = observable(() => {
-  if (!store$.detail.row.get()) return {} as DetailPageProps;
+  if (!store$.detail.row.get()) {
+    return {} as DetailPageProps;
+  }
 
   const helper = detailFormHelper();
 

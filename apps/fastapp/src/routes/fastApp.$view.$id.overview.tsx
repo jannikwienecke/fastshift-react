@@ -1,5 +1,5 @@
 import { Row } from '@apps-next/core';
-import { FormField, makeHooks, store$ } from '@apps-next/react';
+import { FormField, globalStore, makeHooks, store$ } from '@apps-next/react';
 import { detailPage } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute } from '@tanstack/react-router';
@@ -14,6 +14,10 @@ const DetaiViewPage = observer(() => {
 
   const { makeDetailPageProps } = makeHooks();
   const props = makeDetailPageProps({ row });
+
+  globalStore.dispatch({
+    type: 'LOAD_SUB_VIEW_OVERVIEW_PAGE',
+  });
 
   return (
     <>

@@ -14,8 +14,20 @@ export const useAppEffects = (viewName: string) => {
   const navigateRef = React.useRef(router.navigate);
   const realPreloadRoute = router.preloadRoute;
 
+  const realPreloadRouteRef = React.useRef(realPreloadRoute);
+
   const { id, slug } = useViewParams();
   const { pathname } = useLocation();
+
+  const slugRef = React.useRef(slug);
+  const viewNameRef = React.useRef(viewName);
+  const idRef = React.useRef(id);
+
+  React.useLayoutEffect(() => {
+    slugRef.current = slug;
+    viewNameRef.current = viewName;
+    idRef.current = id;
+  }, [viewName, slug, id]);
 
   const view = store$.viewConfigManager.viewConfig.viewName.get();
 
@@ -38,7 +50,7 @@ export const useAppEffects = (viewName: string) => {
     if (view.toLowerCase() === parentViewName.toLowerCase()) return;
 
     console.warn('____PRELOAD ROUTE INIT');
-    realPreloadRoute({
+    realPreloadRouteRef.current({
       from: '/fastApp/$view/$id/overview',
       to: `/fastApp/${slugHelper().slugify(
         parentViewName
@@ -46,15 +58,21 @@ export const useAppEffects = (viewName: string) => {
     });
   }, [pathname, realPreloadRoute, view]);
 
+  const doOnceRef = React.useRef(false);
   React.useLayoutEffect(() => {
+    if (doOnceRef.current) return;
+    doOnceRef.current = true;
+
     store$.userViewSettings.viewCreated.slug.onChange(async (v) => {
       const views = getUserViews();
 
       store$.userViews.set(views);
 
+      console.log('CREATED', v.value);
+
       const slug = v.value;
       if (slug) {
-        await realPreloadRoute({
+        await realPreloadRouteRef.current({
           from: '/fastApp/$view',
           to: `/fastApp/${slug}`,
         });
@@ -68,7 +86,7 @@ export const useAppEffects = (viewName: string) => {
 
       if (row?.row?.id) {
         _log.debug('Preload row', row.row.id);
-        realPreloadRoute({
+        realPreloadRouteRef.current({
           from: '/fastApp/$view',
           to: `/fastApp/$view/${row.row.id}/overview`,
         });
@@ -87,7 +105,7 @@ export const useAppEffects = (viewName: string) => {
             const parentViewName = store$.detail.parentViewName.get();
 
             if (fieldName && id && parentViewName) {
-              realPreloadRoute({
+              realPreloadRouteRef.current({
                 from: '/fastApp/$view/$id/overview',
                 to: `/fastApp/${slugHelper().slugify(
                   parentViewName
@@ -113,21 +131,21 @@ export const useAppEffects = (viewName: string) => {
 
         case 'switch-detail-view':
           (() => {
-            if (state.state.type === 'model' && id) {
+            if (state.state.type === 'model' && idRef.current) {
               navigateRef.current({
                 to: `/fastApp/$view/$id/${state.state.model}`,
                 params: {
-                  id,
-                  view: slug,
+                  id: idRef.current,
+                  view: slugRef.current,
                   model: state.state.model,
                 },
               });
-            } else if (id) {
+            } else if (idRef.current) {
               navigateRef.current({
                 to: '/fastApp/$view/$id/overview',
                 params: {
-                  id,
-                  view: slug ?? '',
+                  id: idRef.current,
+                  view: slugRef.current ?? '',
                 },
               });
             }
@@ -139,5 +157,5 @@ export const useAppEffects = (viewName: string) => {
           break;
       }
     });
-  }, [id, realPreloadRoute, slug, viewName]);
+  }, []);
 };

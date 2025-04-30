@@ -166,7 +166,7 @@ export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
 };
 
 export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
-  row: Row;
+  //
 };
 
 export type DisplayOptionsProps = {

@@ -113,8 +113,9 @@ const FastAppLayoutComponent = observer(() => {
   const { commands } = useCommands();
 
   const { id } = useParams({ strict: false });
-  let { viewName } = useViewParams();
+  let { viewName, model } = useViewParams();
   viewName = viewName as string;
+  model = model as string | undefined;
 
   useAppEffects(viewName);
 
@@ -137,28 +138,47 @@ const FastAppLayoutComponent = observer(() => {
     (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
     !id
   ) {
-    globalStore.dispatch({ type: 'CHANGE_VIEW', payload: { data, viewName } });
+    globalStore.dispatch({
+      type: 'CHANGE_VIEW',
+      payload: { data, viewName },
+    });
     doOnceForViewRef.current = viewName;
   }
 
   const viewNameRef = React.useRef(viewName);
+  const modelRef = React.useRef(model);
   const dataRef = React.useRef(data);
 
   if (viewNameRef.current !== viewName) {
     viewNameRef.current = viewName;
   }
+
   if (dataRef.current !== data) {
     dataRef.current = data;
+  }
+
+  if (modelRef.current !== model) {
+    modelRef.current = model;
+  }
+
+  const hasNoIdRef = React.useRef(true);
+  if (!id) {
+    hasNoIdRef.current = true;
+  } else {
+    hasNoIdRef.current = false;
   }
 
   React.useEffect(() => {
     return () => {
       if (!id) return;
+      if (modelRef.current) return;
+      if (!hasNoIdRef.current) return;
+
       globalStore.dispatch({
         type: 'CHANGE_VIEW',
         payload: {
           data: dataRef.current,
-          viewName: viewNameRef.current,
+          viewName: modelRef.current || viewNameRef.current,
           resetDetail: true,
         },
       });

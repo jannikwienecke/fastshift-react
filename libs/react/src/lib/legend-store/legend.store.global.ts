@@ -204,6 +204,9 @@ type GlobalStoreAction =
     }
   | {
       type: 'UNLOAD_VIEW_DETAIL_PAGE';
+    }
+  | {
+      type: 'LOAD_SUB_VIEW_OVERVIEW_PAGE';
     };
 
 const dispatch = (action: GlobalStoreAction) => {
@@ -217,6 +220,8 @@ const dispatch = (action: GlobalStoreAction) => {
       return handleLoadSubViewListPage(action);
     case 'LOAD_VIEW_DETAIL_PAGE':
       return handleLoadDetailPage(action);
+    case 'LOAD_SUB_VIEW_OVERVIEW_PAGE':
+      return store$.detail.viewType.set({ type: 'overview' });
 
     default:
       console.warn('Unknown action type', action);
@@ -239,12 +244,10 @@ const handleInitLoadStore = (action: GlobalStoreAction) => {
 };
 
 const handleChangeView = (action: GlobalStoreAction) => {
-  console.debug('____HANDLE CHANGE VIEW', action.type);
   if (action.type !== 'CHANGE_VIEW') return;
   const { viewName, data, resetDetail } = action.payload;
 
   if (viewName !== currentViewName()) {
-    store$.detail.set(undefined);
     resetStore();
     setStore(viewName);
     handleQueryData(data);
@@ -265,8 +268,6 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
 
   const { viewName, id, data } = action.payload;
   if (id === store$.detail.row.id.get()) return;
-
-  console.warn('____LOAD VIEW DETAIL PAGE', action);
 
   const viewConfigManager = createViewConfigManager(viewName);
 
@@ -298,7 +299,6 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
       parentViewName: action.payload.viewName,
     },
   });
-
   // }, 100);
 };
 
