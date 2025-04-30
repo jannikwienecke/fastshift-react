@@ -140,7 +140,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
       rect: null,
     },
     viewField: {
-      hidden: [],
+      visible: [],
       allFields: [],
     },
     grouping: {

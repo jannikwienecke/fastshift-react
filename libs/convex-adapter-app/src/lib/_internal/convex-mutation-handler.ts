@@ -238,7 +238,8 @@ export const userViewMutation = async (
   if (mutation.type !== 'USER_VIEW_MUTATION')
     throw new Error('INVALID MUTATION-5');
 
-  const { displayOptions, filters, name, type, description } = mutation.payload;
+  const { displayOptions, filters, name, type, description, parentModel } =
+    mutation.payload;
 
   const dbMutation = mutationClient(ctx);
   const dbQuery = queryClient(ctx, 'views');
@@ -253,6 +254,7 @@ export const userViewMutation = async (
         baseView: viewConfigManager.getViewName(),
         displayOptions,
         filters,
+        parentModel,
         slug: slugHelper().slugify(name),
       });
     } catch (error) {
@@ -288,6 +290,7 @@ export const userViewMutation = async (
           displayOptions,
           filters,
           name,
+          parentModel,
           description: description ?? '',
         });
         return {
@@ -308,6 +311,7 @@ export const userViewMutation = async (
           baseView,
           displayOptions,
           filters,
+          parentModel,
           name: baseView,
           slug: slugHelper().slugify(name),
           description: description ?? '',

@@ -170,7 +170,7 @@ export const init: StoreFn<'init'> =
       createDataModel(store$)(data);
       createRelationalDataModel(store$)(relationalData);
 
-      const { filters, dispplayOptions } = configManager(
+      const { filters, displayOptions: dispplayOptions } = configManager(
         viewConfigManager.viewConfig
       ).mergeAndCreate(userViewData);
 

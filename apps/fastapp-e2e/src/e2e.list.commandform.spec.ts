@@ -136,7 +136,7 @@ test.describe('List Commandbar', () => {
     await page.getByText(/mike Johnson/i).click();
 
     await mainPage.commandform
-      .getByText(/categories/i)
+      .getByText(/category/i)
       .first()
       .click();
 

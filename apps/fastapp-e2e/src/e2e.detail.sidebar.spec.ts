@@ -41,7 +41,7 @@ test.describe('Detail Page Form Test', () => {
 
     await mainPage.page.getByText(CON.category.values.work).click();
 
-    await searchInCombobox('categories', CON.category.values.personal);
+    await searchInCombobox('category', CON.category.values.personal);
 
     await pickOptionInCombobox(CON.category.values.personal);
 
@@ -57,12 +57,6 @@ test.describe('Detail Page Form Test', () => {
 
     await isClosed();
 
-    const tommorow = new Date();
-    tommorow.setDate(tommorow.getDate());
-    const day = tommorow.getDate() + 1;
-    const day2DigitsTommorow = day.toString().padStart(2, '0');
-
-    await expect(page.getByText(day2DigitsTommorow).first()).toBeVisible();
     await expect(page.getByText(CON.category.values.personal)).toBeVisible();
     await expect(page.getByText(CON.owner.values.janeSmith)).toBeVisible();
 

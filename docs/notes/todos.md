@@ -122,3 +122,4 @@ created: 1723444498044
 - [ ] add test for filter not used in sub view
 - [ ] add test for switching between views when one has filter set
 - [ ] add test for: when setting field from commandbar like email -> will not be validated
+- [ ] check which tests missing from done todos

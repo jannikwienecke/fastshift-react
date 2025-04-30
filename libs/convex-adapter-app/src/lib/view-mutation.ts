@@ -25,8 +25,8 @@ export const viewMutationHandler = async (
 
   const context = {
     ...mutation,
-    type: 'DELETE_RECORD',
     payload: args.mutation.payload,
+    type: mutation.type,
     displayField: viewConfigManager.getDisplayFieldLabel(),
     table: viewConfigManager.getTableName(),
     view: viewConfigManager.getViewName(),

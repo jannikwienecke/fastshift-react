@@ -201,8 +201,8 @@ export const convertDisplayOptionsForBackend = (
     ? `showEmptyGroups=${showEmptyGroups}`
     : '';
 
-  const viewFieldString = viewField?.hidden
-    ? `viewField=${viewField.hidden.join(',')}`
+  const viewFieldString = viewField?.visible
+    ? `viewField=${viewField.visible.join(',')}`
     : '';
 
   const viewTypeString = viewType ? `viewType=${viewType.type}` : '';

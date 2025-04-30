@@ -6,10 +6,11 @@ import {
   getViewByName,
   Row,
 } from '@apps-next/core';
+import { observable } from '@legendapp/state';
+import { renderErrorToast } from '../toast';
 import { applyDisplayOptions } from './legend.local.display-options';
 import { applyFilter } from './legend.local.filtering';
 import { store$ } from './legend.store';
-import { observable } from '@legendapp/state';
 
 export const filterRowsByShowDeleted = (rows: Row[]) => {
   const showDeleted = store$.displayOptions.showDeleted.get();
@@ -109,3 +110,38 @@ export const localModeEnabled$ = observable(() => {
     parentViewName
   );
 });
+
+export const saveSubViewSettings = async () => {
+  const parentView = store$.detail.parentViewName.get();
+  const parentModel =
+    getViewByName(store$.views.get(), parentView ?? '')?.tableName ?? '';
+
+  if (!parentModel) return;
+
+  const name = `${parentModel}|${store$.viewConfigManager.getTableName()}`;
+  const hasView = store$.userViews.find((v) => v.name.get() === name)?.get();
+
+  const result = await store$.api.mutateAsync({
+    query: '',
+    viewName: store$.viewConfigManager.getViewName(),
+    mutation: {
+      type: 'USER_VIEW_MUTATION',
+      payload: {
+        type: hasView ? 'UPDATE_VIEW' : 'CREATE_VIEW',
+        parentModel,
+        name,
+        description: '',
+        ...getParsedViewSettings(),
+      },
+    },
+  });
+
+  console.log('saveSubViewSettings', result);
+
+  if (result.error) {
+    renderErrorToast(`Error saving view: ${result.error.message}`, () => {
+      console.error('Error saving view callback' + result.error.message);
+      store$.errorDialog.error.set(result.error);
+    });
+  }
+};

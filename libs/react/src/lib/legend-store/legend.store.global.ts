@@ -22,9 +22,20 @@ import {
 
 export const getViewData = (viewName: string) => {
   const userViews = store$.userViews.get();
+  const parentView = store$.detail.parentViewName.get();
 
-  const userViewData = userViews.find((view) => view.name === viewName);
-  return userViewData;
+  if (parentView) {
+    const view = getViewByName(store$.views.get(), viewName);
+    const parentModel =
+      getViewByName(store$.views.get(), parentView ?? '')?.tableName ?? '';
+    if (parentModel) {
+      const name = `${parentModel}|${view?.tableName ?? ''}`;
+
+      return userViews.find((view) => view.name === name);
+    }
+  } else {
+    return userViews.find((view) => view.name === viewName);
+  }
 };
 
 export const currentViewName = () =>
@@ -94,7 +105,7 @@ const setStore = (viewName: string, parentViewName?: string) => {
   const userViewData = getViewData(viewName);
   const viewConfigManager = createViewConfigManager(viewName);
 
-  const { filters, dispplayOptions } = configManager(
+  const { filters, displayOptions } = configManager(
     viewConfigManager.viewConfig
   ).mergeAndCreate(userViewData);
 
@@ -104,40 +115,40 @@ const setStore = (viewName: string, parentViewName?: string) => {
     store$.userViewData.set(userViewData);
     store$.detail.parentViewName.set(parentViewName);
 
-    // store$.filter.filters.set(undef)
-
     const viewFields = viewConfigManager
       .getViewFieldList()
       .map((field) => field.name);
 
-    if (!parentViewName) {
-      store$.displayOptions.set({
-        ...dispplayOptions,
+    store$.displayOptions.set({
+      ...displayOptions,
+      viewField: {
+        allFields: viewFields,
+        visible: displayOptions?.viewField?.visible ?? viewFields,
+      },
+      resetted: true,
+    });
+    store$.filter.filters.set(filters);
+
+    const copyOfDisplayOptions = JSON.parse(
+      JSON.stringify({
+        ...displayOptions,
         viewField: {
           allFields: viewFields,
+          visible: displayOptions?.viewField?.visible ?? viewFields,
         },
-        resetted: true,
-      });
-      store$.filter.filters.set(filters);
+      })
+    );
+    const copyOfFilters = JSON.parse(JSON.stringify(filters));
 
-      const displayOptions = store$.displayOptions.get();
-      const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
-      const copyOfFilters = JSON.parse(JSON.stringify(filters));
+    store$.displayOptions.softDeleteEnabled.set(
+      !!viewConfigManager.viewConfig.mutation?.softDelete
+    );
 
+    if (!parentViewName) {
       store$.userViewSettings.initialSettings.set({
         filters: copyOfFilters,
         displayOptions: copyOfDisplayOptions,
       });
-
-      store$.displayOptions.softDeleteEnabled.set(
-        !!viewConfigManager.viewConfig.mutation?.softDelete
-      );
-    } else {
-      store$.displayOptions.viewField.allFields.set(viewFields);
-
-      store$.displayOptions.softDeleteEnabled.set(
-        !!viewConfigManager.viewConfig.mutation?.softDelete
-      );
     }
   });
 
@@ -301,6 +312,7 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
   const currentParentViewName = store$.detail.parentViewName.get();
   const currentViewName = store$.viewConfigManager.getViewName();
 
+  console.log('LOAD SUB VIEW', viewName);
   if (
     currentId === id &&
     currentParentViewName === parentViewName &&

@@ -11,7 +11,11 @@ import { selectState$, xSelect } from './legend.select-state';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
-import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
+import {
+  localModeEnabled$,
+  saveSubViewSettings,
+  setGlobalDataModel,
+} from './legend.utils.helper';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -95,11 +99,11 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     _log.debug('handleFilterChange: ', filters);
 
-    store$.state.set('filter-changed');
-
     if (localModeEnabled$.get()) {
       _log.debug('handleFilterChange: local mode. No fetchMore');
+      saveSubViewSettings();
     } else {
+      store$.state.set('filter-changed');
       store$.fetchMore.assign({
         isDone: false,
         currentCursor: { cursor: null, position: null },
@@ -108,7 +112,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     }
   });
 
-  store$.displayOptions.onChange((changes) => {
+  store$.displayOptions.onChange(async (changes) => {
     if (store$.state.get() === 'pending') return;
 
     const showDeleted = store$.displayOptions.showDeleted.get();
@@ -148,11 +152,12 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       );
     }
 
-    store$.state.set('updating-display-options');
-
     if (localModeEnabled$.get()) {
-      _log.debug('handleDisplayOptionsChange: local mode. No fetchMore');
+      _log.info('handleDisplayOptionsChange: local mode. No fetchMore');
+      saveSubViewSettings();
+      return;
     } else {
+      store$.state.set('updating-display-options');
       store$.fetchMore.assign({
         isDone: false,
         currentCursor: { cursor: null, position: null },
@@ -208,14 +213,14 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const sortingOrder = value.sorting.order;
     const showEmptyGroups = value.showEmptyGroups;
     const showDeleted = value.showDeleted;
-    const selectedViewFields = value.viewField?.hidden;
+    const selectedViewFields = value.viewField?.visible;
 
     const initialGroupingField = initial?.grouping.field?.name;
     const initialSortingField = initial?.sorting.field?.name;
     const initialSortingOrder = initial?.sorting.order;
     const initialShowEmptyGroups = initial?.showEmptyGroups;
     const initialShowDeleted = initial?.showDeleted;
-    const initialSelectedViewFields = initial?.viewField?.hidden;
+    const initialSelectedViewFields = initial?.viewField?.visible;
 
     if (!initial) return;
 
@@ -282,6 +287,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   });
 
   store$.filter.filters.onChange((changes) => {
+    if (!store$.userViewSettings.initialSettings.filters.get()) return;
+
     const initial = normalizeFilters(
       store$.userViewSettings.initialSettings.filters.get() ?? []
     );
@@ -294,8 +301,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
   });
 
   store$.filter.filters.onChange((changes) => {
-    _log.debug('filters: ', changes);
-
     const valuesChanged = changes.changes?.[0].path?.[1] === 'values';
     const index = +changes.changes?.[0].path?.[0];
     const newFilter =
