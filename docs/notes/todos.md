@@ -114,8 +114,7 @@ created: 1723444498044
 - [x] handle views in sub list
 - [x] add back custom commands
 - [x] cannot filter by tasks -> todos
-
-- [ ] handle click on list item in sub view
+- [x] handle click on list item in sub view
 
 <!-- todo tests -->
 
