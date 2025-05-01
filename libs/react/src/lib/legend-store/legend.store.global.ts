@@ -247,12 +247,15 @@ const handleChangeView = (action: GlobalStoreAction) => {
   if (action.type !== 'CHANGE_VIEW') return;
   const { viewName, data, resetDetail } = action.payload;
 
+  if (resetDetail || viewName !== currentViewName()) {
+    store$.detail.set(undefined);
+  }
+
   if (viewName !== currentViewName()) {
     resetStore();
     setStore(viewName);
     handleQueryData(data);
   } else if (resetDetail) {
-    store$.detail.set(undefined);
     resetStore();
     setStore(viewName);
     handleQueryData(data);
