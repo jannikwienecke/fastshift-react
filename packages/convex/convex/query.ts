@@ -21,6 +21,8 @@ export const viewMutation = server.mutation({
 export const testQuery = server.mutation({
   async handler(ctx, args_0) {
     try {
+      // ctx.db.query('tasks').withIndex('todos', q => q.eq('todos', ))
+
       const res = await ctx.db.patch(
         'jh71s0zc8vdtxrtppctrjkjdg97c24qs' as Id<'tasks'>,
         {

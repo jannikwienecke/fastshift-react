@@ -19,8 +19,6 @@ test.describe('Smoke Test', () => {
     const detailHeader = page.getByTestId('detail-page-header');
     await expect(detailHeader).toBeVisible();
 
-    await detailHeader.getByText(/tags/i).click();
-
     await detailHeader.getByText(/todos/i).click();
 
     const sidebar = page.getByTestId('sidebar');
@@ -36,12 +34,6 @@ test.describe('Smoke Test', () => {
 
     await detailHeader.getByText(/tasks/i).click();
 
-
-
-
-
-
-    
     await sidebar.getByText(/owner/i).first().click();
 
     const ownerListItem = await taskPage.getListItem(0);

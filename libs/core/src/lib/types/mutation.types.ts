@@ -60,6 +60,7 @@ export type USER_VIEW_MUTATION = {
     description: string | null;
     filters: string;
     displayOptions: string;
+    parentModel?: string | null;
   };
 };
 

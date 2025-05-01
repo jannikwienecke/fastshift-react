@@ -18,7 +18,7 @@ export const getComponent = ({
 
   const tableName = isDetail
     ? store$.detail.viewConfigManager.getTableName()
-    : store$.viewConfigManager.getTableName();
+    : store$.viewConfigManager?.getTableName();
 
   return uiViewConfig?.[tableName]?.fields?.[fieldName]?.component?.[
     componentType

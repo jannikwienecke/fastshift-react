@@ -1,24 +1,13 @@
-import {
-  BaseConfigInterface,
-  BaseViewConfigManagerInterface,
-  FieldConfig,
-  patchDict,
-  RegisteredViews,
-  renderModelName,
-  t,
-  UiViewConfig,
-  UserStoreCommand,
-  UserViewData,
-} from '@apps-next/core';
+import { UserStoreCommand } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { addEffects, addLocalFiltering } from './legend-store';
 import { addLocalDisplayOptionsHandling } from './legend-store/legend.local.display-options';
 import { store$ } from './legend-store/legend.store';
+import { useApi } from './use-api';
 import { useMutation } from './use-mutation';
 import { useQueryData } from './use-query-data';
-import { useQueryClient } from '@tanstack/react-query';
-import { useApi } from './use-api';
 
 export type QueryProviderConvexProps = {
   commands: UserStoreCommand[];
@@ -26,6 +15,8 @@ export type QueryProviderConvexProps = {
 
 export const ClientViewProviderConvex = (props: QueryProviderConvexProps) => {
   const runOnce = React.useRef(false);
+
+  store$.commands.set(props.commands);
 
   if (!runOnce.current) {
     runOnce.current = true;

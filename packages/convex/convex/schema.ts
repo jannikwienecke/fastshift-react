@@ -15,6 +15,7 @@ const _schema = defineSchema({
     description: v.optional(v.string()),
     displayOptions: v.optional(v.string()),
     filters: v.optional(v.string()),
+    parentModel: v.optional(v.string()),
   })
     .index('baseView', ['baseView'])
     .index('name', ['name']),

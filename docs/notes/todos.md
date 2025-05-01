@@ -92,19 +92,37 @@ created: 1723444498044
 ## NEW TODOS
 
 - [x] handle e.g. projects -> tasks list in detail
-- [ ] filter in main tasks list -> effects list in projects -> task
-- [ ] when i set the project to a different one and its not in the list anymore -> remove optimistically
-- [ ] projects -> tasks should not be in sidebar of detail, tags should be (config )
-- [ ] not updating when convex db updates in task list view (only task view) (i think worked again)
-- [ ] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
-- [ ] i am on a custom view -> move to another view, filter etc. stays -> not correct!
-- [ ] when setting field from commandbar like email -> will not be validated
-- [ ] not everyting of the contextmenu list item is clickable
-- [ ] cannot filter by tasks -> tasks or tasks->todos
-- [ ] when i am at projects -> tasks, dont show the filter for projects and the grouping for projects
-- [ ] show deleted in sub view not working
-- [ ] change commandbar item in sublist -> create new task in project. Preselect project.
-- [ ] if we are in projects -task, but create a task in a different project. should not be visible after creation
-- [ ] handle views in sub list
-- [ ] should be "change category" in the combobox for project (we have always just one), update in test as well,
-- [ ] remove tasks from sidebar (with config)
+- [x] switching between views when we have a filter on one of the views -> error
+- [x] filter in main tasks list -> effects list in projects -> task
+- [x] when i set the project to a different one and its not in the list anymore -> remove optimistically
+- [x] projects -> tasks should not be in sidebar of detail, tags should be (config )
+- [x] not updating when convex db updates in task list view (only task view) (i think worked again)
+- [x] leeren gruppen anzeigen/ausblenden. Blendet nicht alle richtig aus
+- [x] i am on a custom view -> move to another view, filter etc. stays -> not correct!
+- [x] local filtering for sub views not implemented
+- [x] when i am at projects -> tasks, dont show the filter for projects and the grouping for projects
+- [x] remove tasks from sidebar (with config)
+- [x] when setting field from commandbar like email -> will not be validated
+- [x] not everyting of the contextmenu list item is clickable
+- [x] deleting "breaks" the app. Nothing is clickable
+- [x] show deleted in sub view not working
+- [x] should be "change category" in the combobox for project (we have always just one), update in test as well,
+- [x] change commandbar item in sublist -> create new task in project. Preselect project.
+- [x] if we are in projects -task, but create a task in a different project. should not be visible after creation
+- [x] checkmark in combobox list
+- [x] check query behaviour in commandbar (use debounced query for viewfield of type relation)
+- [x] handle views in sub list
+- [x] add back custom commands
+- [x] cannot filter by tasks -> todos
+- [x] handle click on list item in sub view
+- [x] placeholder in commandbar for selected view
+<!-- todo tests -->
+
+- [x] cannot go back from a custom view / sub view to main
+- [ ] does not show tasks of project if we are on a custom project view
+
+- [x] add test for filter not used in sub view
+- [x] add test for switching between views when one has filter set
+- [x] add test for: when setting field from commandbar like email -> will not be validated
+- [ ] tests for saving view config in sub view
+- [ ] check which tests missing from done todos

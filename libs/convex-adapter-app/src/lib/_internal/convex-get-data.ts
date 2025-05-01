@@ -26,23 +26,7 @@ import { parseConvexData } from './convex-utils';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecordType } from './types.convex';
 
-const LOG_LEVEL = 'info' as string;
-
 export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
-  const log = (...props: any[]) => {
-    const view = args.viewConfigManager?.getTableName();
-    if (view !== 'tasks') return;
-    console.log(...props);
-  };
-
-  const debug = (...props: any[]) => {
-    if (LOG_LEVEL !== 'debug') return;
-    // const view = args.viewConfigManager?.getTableName();
-    // if (view !== 'task') return;
-    // _log.debug(...props);
-    console.log(...props);
-  };
-
   const { viewConfigManager, filters, registeredViews } = args;
 
   const softDeleteEnabled = !!viewConfigManager.viewConfig.mutation?.softDelete;
@@ -55,7 +39,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const displayOptionsInfo = getDisplayOptionsInfo(args);
 
-  const localModeEnabled = viewConfigManager.localModeEnabled;
+  const localModeEnabled =
+    viewConfigManager.viewConfig.localMode?.enabled &&
+    !args.viewId &&
+    !args.parentId;
+
   const showDeleted = displayOptionsInfo.showDeleted || localModeEnabled;
 
   // debug('Convex:getData', {
@@ -145,6 +133,8 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     viewConfigManager
   );
 
+  const hasParentFilter = args.parentId && args.parentViewName;
+
   const idsSubView = await getIdsFromParentView(args, ctx, viewConfigManager);
 
   const deletedIndexField = viewConfigManager.getSoftDeleteIndexField();
@@ -156,7 +146,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       ? await filterByNotDeleted(query, deletedIndexField).collect()
       : [];
 
-  const idsNotDeleted = rowsNotDeleted.map((row) => row._id);
+  const idsNotDeleted = hasParentFilter
+    ? null
+    : rowsNotDeleted.map((row) => row._id);
 
   let allIds = arrayIntersection(
     hasManyToManyFilter ? idsManyToManyFilters : null,
@@ -164,8 +156,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     isIndexSearch ? idsIndexField : null,
     isSearchFieldSearch ? idsSearchField : null,
     args.query ? idsQuerySearch : null,
-    softDeleteEnabled && !showDeleted ? idsNotDeleted : null,
-    args.parentId && args.parentViewName ? idsSubView : null
+    softDeleteEnabled && !showDeleted && !hasParentFilter
+      ? idsNotDeleted
+      : null,
+    hasParentFilter ? idsSubView : null
   );
 
   if (args.viewId) {
@@ -173,6 +167,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   }
 
   const hasOnlyIdsNotDeleted =
+    idsNotDeleted &&
     idsNotDeleted.length > 0 &&
     !idsManyToManyFilters.length &&
     !idsOneToManyFilters.length &&
@@ -187,6 +182,19 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       ...idsIndexFieldToRemove,
     ])
   );
+
+  if (viewConfigManager.getTableName() === 'tasks') {
+    // console.log({
+    //   idsManyToManyFilters,
+    //   manyToManyFilters,
+    //   // oneToManyFilters,
+    //   // idsManyToManyFilters,
+    //   // idsOneToManyFilters,
+    //   // idsIndexField,
+    //   // idsSearchField,
+    //   // allIds,
+    // });
+  }
 
   const fetchLimit = localModeEnabled
     ? DEFAULT_LOCAL_MODE_LIMIT
@@ -219,7 +227,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     }
 
     const getRecordsIfNotSortedAndNoDeletedRows = () => {
-      debug('Convex:getRecordsIfNotSortedAndNoDeletedRows');
       return getRecordsByIds(
         idsAfterRemove?.slice(position, nextPosition) ?? [],
         dbQuery
@@ -227,15 +234,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     };
 
     const getRecordsHasIdsAndNotTooBig = () => {
-      debug('Convex:getRecordsHasIdsAndNotTooBig');
-      return getRecordsByIds(
-        idsAfterRemove?.slice(position, nextPosition) ?? [],
-        dbQuery
-      );
+      return getRecordsByIds(idsAfterRemove ?? [], dbQuery);
     };
 
     const getSortedRecords = () => {
-      debug('Convex:getSortedRecords');
       if (!displayOptionsInfo.displaySortingIndexField) return [];
 
       return dbQuery
@@ -248,31 +250,31 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     };
 
     const getPaginatedRecords = async () => {
-      debug('Convex:getPaginatedRecords');
       return await dbQuery.paginate({
         cursor: args?.paginateOptions?.cursor?.cursor ?? null,
         numItems: fetchLimit + (idsToRemove.length ?? 0),
       });
     };
 
-    const rowsBeforeFilter =
-      hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
-        ? await getRecordsIfNotSortedAndNoDeletedRows()
-        : !!allIds && !countToBig
-        ? await getRecordsHasIdsAndNotTooBig()
-        : displayOptionsInfo.displaySortingIndexField
-        ? await getSortedRecords()
-        : anyFilter ||
-          (displayOptionsInfo.hasSortingField &&
-            !displayOptionsInfo.displaySortingIndexField)
-        ? await getAll()
-        : await getPaginatedRecords();
+    const rowsBeforeFilter = localModeEnabled
+      ? await getAll() // local mode
+      : hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
+      ? await getRecordsIfNotSortedAndNoDeletedRows()
+      : !!allIds && !countToBig
+      ? await getRecordsHasIdsAndNotTooBig()
+      : displayOptionsInfo.displaySortingIndexField
+      ? await getSortedRecords()
+      : anyFilter ||
+        (displayOptionsInfo.hasSortingField &&
+          !displayOptionsInfo.displaySortingIndexField)
+      ? await getAll()
+      : await getPaginatedRecords();
 
     let rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;
 
-    if (softDeleteEnabled && !showDeleted) {
-      rows = rows.filter((row) => idsNotDeleted.includes(row?._id));
+    if (softDeleteEnabled && !showDeleted && !hasParentFilter) {
+      rows = rows.filter((row) => idsNotDeleted?.includes(row?._id));
     }
 
     if ('continueCursor' in rowsBeforeFilter) {
@@ -300,7 +302,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       `WARNING: Local Mode enabled and limit reached! Consider disabled local mode or addding a defautlt filter`
     );
   } else {
-    debug('Convex:fetchedRows.length', newRows.length);
+    // debug('Convex:fetchedRows.length', newRows.length);
   }
 
   const filtered = newRows?.filter(

@@ -52,13 +52,15 @@ export const Route = createFileRoute('/fastApp')({
 
     const { viewName, slug, id, model } = getViewParms(props.params);
 
-    if (!viewName) return;
-    if (props.cause !== 'enter') return;
+    globalStore.setViews(views);
+
+    if (!viewName) {
+      return redirect({ to: '/fastApp/task' });
+    }
+
     if (store$.viewConfigManager.viewConfig.get()) {
       return;
     }
-
-    globalStore.setViews(views);
 
     _log.debug(`Loader for view: ${viewName} - slug: ${slug}`);
 
@@ -113,10 +115,28 @@ const FastAppLayoutComponent = observer(() => {
   const { commands } = useCommands();
 
   const { id } = useParams({ strict: false });
-  let { viewName } = useViewParams();
+  let { viewName, model } = useViewParams();
   viewName = viewName as string;
+  model = model as string | undefined;
 
   useAppEffects(viewName);
+
+  React.useEffect(() => {
+    return () => {
+      if (!id) return;
+      if (modelRef.current) return;
+      if (!hasNoIdRef.current) return;
+
+      globalStore.dispatch({
+        type: 'CHANGE_VIEW',
+        payload: {
+          data: dataRef.current,
+          viewName: modelRef.current || viewNameRef.current,
+          resetDetail: true,
+        },
+      });
+    };
+  }, [id]);
 
   const userViews = getUserViews();
   const { viewData, userViewData } = getViewData(viewName, userViews);
@@ -135,35 +155,38 @@ const FastAppLayoutComponent = observer(() => {
 
   if (
     (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
-    !id
+    !id &&
+    data
   ) {
-    globalStore.dispatch({ type: 'CHANGE_VIEW', payload: { data, viewName } });
+    globalStore.dispatch({
+      type: 'CHANGE_VIEW',
+      payload: { data, viewName },
+    });
     doOnceForViewRef.current = viewName;
   }
 
   const viewNameRef = React.useRef(viewName);
+  const modelRef = React.useRef(model);
   const dataRef = React.useRef(data);
 
   if (viewNameRef.current !== viewName) {
     viewNameRef.current = viewName;
   }
+
   if (dataRef.current !== data) {
     dataRef.current = data;
   }
 
-  React.useEffect(() => {
-    return () => {
-      if (!id) return;
-      globalStore.dispatch({
-        type: 'CHANGE_VIEW',
-        payload: {
-          data: dataRef.current,
-          viewName: viewNameRef.current,
-          resetDetail: true,
-        },
-      });
-    };
-  }, [id]);
+  if (modelRef.current !== model) {
+    modelRef.current = model;
+  }
+
+  const hasNoIdRef = React.useRef(true);
+  if (!id) {
+    hasNoIdRef.current = true;
+  } else {
+    hasNoIdRef.current = false;
+  }
 
   return (
     <>

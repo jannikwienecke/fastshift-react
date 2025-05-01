@@ -3,8 +3,11 @@ import {
   convertDisplayOptionsForBackend,
   convertFiltersForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
+  getViewByName,
   Row,
 } from '@apps-next/core';
+import { observable } from '@legendapp/state';
+import { renderErrorToast } from '../toast';
 import { applyDisplayOptions } from './legend.local.display-options';
 import { applyFilter } from './legend.local.filtering';
 import { store$ } from './legend.store';
@@ -24,11 +27,38 @@ export const filterRowsByShowDeleted = (rows: Row[]) => {
   return filtered;
 };
 
+const filterRowsByParentId = (rows: Row[]) => {
+  const parentId = store$.detail.row.id.get();
+  const parentViewName = store$.detail.parentViewName.get();
+
+  if (!parentId || !parentViewName) return rows;
+  const parentTableName = getViewByName(
+    store$.views.get(),
+    parentViewName
+  )?.tableName;
+
+  if (!parentTableName) return rows;
+
+  return rows.filter((row) => {
+    const value = row.raw?.[parentTableName];
+
+    if (!value) return true;
+    if (!value?.id) return true;
+
+    const id = value.id;
+    if (id === parentId) return true;
+
+    return false;
+  });
+};
+
 export const setGlobalDataModel = (rows: Row[]) => {
   // if (store$.detail.form.dirtyValue.get()) {
   //   console.warn('DOES NOT UPDATE IS DIRY!!', store$.detail.form.get());
   //   return;
   // }
+
+  rows = filterRowsByParentId(rows);
 
   const filteredRows = filterRowsByShowDeleted(rows);
 
@@ -46,7 +76,7 @@ export const setGlobalDataModel = (rows: Row[]) => {
   const isDone_ =
     DEFAULT_FETCH_LIMIT_QUERY > store$.dataModel.rows.get().length;
 
-  if (store$.viewConfigManager.localModeEnabled.get() || isDone_) {
+  if (localModeEnabled$.get() || isDone_) {
     _log.debug('setGlobalDataModel: APPLY FILTER! AND SORT');
     applyFilter(store$, store$.filter.filters.get());
     applyDisplayOptions(store$, store$.displayOptions.get());
@@ -66,4 +96,50 @@ export const getParsedViewSettings = () => {
     filters?: string;
     displayOptions?: string;
   };
+};
+
+export const localModeEnabled$ = observable(() => {
+  const parentViewName = store$.detail.parentViewName.get();
+
+  console.warn(
+    'localModeEnabled$',
+    store$.viewConfigManager.viewConfig.localMode.get() || parentViewName
+  );
+  return (
+    store$.viewConfigManager.viewConfig.localMode.enabled.get() ||
+    parentViewName
+  );
+});
+
+export const saveSubViewSettings = async () => {
+  const parentView = store$.detail.parentViewName.get();
+  const parentModel =
+    getViewByName(store$.views.get(), parentView ?? '')?.tableName ?? '';
+
+  if (!parentModel) return;
+
+  const name = `${parentModel}|${store$.viewConfigManager.getTableName()}`;
+  const hasView = store$.userViews.find((v) => v.name.get() === name)?.get();
+
+  const result = await store$.api.mutateAsync({
+    query: '',
+    viewName: store$.viewConfigManager.getViewName(),
+    mutation: {
+      type: 'USER_VIEW_MUTATION',
+      payload: {
+        type: hasView ? 'UPDATE_VIEW' : 'CREATE_VIEW',
+        parentModel,
+        name,
+        description: '',
+        ...getParsedViewSettings(),
+      },
+    },
+  });
+
+  if (result.error) {
+    renderErrorToast(`Error saving view: ${result.error.message}`, () => {
+      console.error('Error saving view callback' + result.error.message);
+      store$.errorDialog.error.set(result.error);
+    });
+  }
 };

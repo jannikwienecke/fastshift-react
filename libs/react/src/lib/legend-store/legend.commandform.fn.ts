@@ -25,7 +25,24 @@ export const commandformOpen: StoreFn<'commandformOpen'> =
       store$.commandform.open.set(true);
       store$.commandform.view.set(view);
 
-      const defaultRow = getDefaultRow();
+      let defaultRow: Row | null = null;
+
+      if (
+        viewName === store$.viewConfigManager.getViewName() &&
+        store$.detail.parentViewName.get()
+      ) {
+        const parentView = getViewByName(
+          store$.views.get(),
+          store$.detail.parentViewName.get() ?? ''
+        );
+
+        const tableName = parentView?.tableName ?? '';
+        defaultRow = getDefaultRow({
+          [tableName]: store$.detail.row.get(),
+        });
+      } else {
+        defaultRow = getDefaultRow();
+      }
       defaultRow && store$.commandform.row.set(row || defaultRow);
 
       store$.commandform.type.set(row?.id ? 'edit' : 'create');

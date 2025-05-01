@@ -166,7 +166,7 @@ export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
 };
 
 export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
-  row: Row;
+  //
 };
 
 export type DisplayOptionsProps = {
@@ -290,7 +290,7 @@ export type DetailPageProps = {
   row: Row;
   icon?: React.FC<any>;
   formState: FormState;
-  complexFields: CommandformItem[];
+  propertyFields: CommandformItem[];
   primitiveFields: CommandformItem[];
   displayField: CommandformItem | undefined;
   type: 'create' | 'edit';

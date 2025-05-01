@@ -32,6 +32,7 @@ export const getOpenCreateModelFormCommands = () => {
     return true;
   });
 
+  const currentTableName = store$.viewConfigManager.getTableName();
   return viewsToUse
     .filter(Boolean)
     .map((view) => {
@@ -44,7 +45,16 @@ export const getOpenCreateModelFormCommands = () => {
 
       return command;
     })
-    .filter((v) => v !== null);
+    .filter((v) => v !== null)
+    .sort((a, b) => {
+      const aIsCurrent = a.tablename === currentTableName;
+      const bIsCurrent = b.tablename === currentTableName;
+
+      if (aIsCurrent && !bIsCurrent) return -1;
+      if (!aIsCurrent && bIsCurrent) return 1;
+
+      return 0;
+    });
 };
 
 const getCommandsForCurrentView = (): CommandbarItem[] => {

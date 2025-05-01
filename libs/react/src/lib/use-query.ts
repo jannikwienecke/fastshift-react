@@ -14,7 +14,10 @@ import {
 } from '@tanstack/react-query';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
-import { getParsedViewSettings } from './legend-store/legend.utils.helper';
+import {
+  getParsedViewSettings,
+  localModeEnabled$,
+} from './legend-store/legend.utils.helper';
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
@@ -177,6 +180,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   const parentId = store$.detail.row.get()?.id ?? null;
   const parentViewName = store$.detail.parentViewName.get() ?? null;
 
+  const localMode = localModeEnabled$.get();
+
   const queryPropsMerged = React.useMemo(() => {
     return {
       ...queryProps,
@@ -189,11 +194,15 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
         queryProps?.viewConfigManager?.viewConfig ||
         viewConfigManager.viewConfig,
       filters:
-        queryProps?.relationQuery || store$.detail.parentViewName.get()
+        queryProps?.relationQuery ||
+        store$.detail.parentViewName.get() ||
+        localMode
           ? ''
           : parsedViewSettings?.filters,
       displayOptions:
-        queryProps?.relationQuery || store$.detail.parentViewName.get()
+        queryProps?.relationQuery ||
+        store$.detail.parentViewName.get() ||
+        localMode
           ? ''
           : parsedViewSettings?.displayOptions,
       paginateOptions: {
@@ -202,12 +211,9 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
         // isDone: isDone,
       },
       viewId: null,
-
+      // disabled: localMode ? true : false,
       parentViewName,
       parentId,
-
-      // parentViewName: store$.detail.parentViewName.get() ?? null,
-      // parentId: store$.detail.row.get()?.id ?? null,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -217,6 +223,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     queryProps,
     query,
     registeredViews,
+    localMode,
     viewConfigManager.modelConfig,
     viewConfigManager.viewConfig,
     parsedViewSettings?.filters,

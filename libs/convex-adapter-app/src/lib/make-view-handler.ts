@@ -8,20 +8,34 @@ import {
   patchViewConfig,
   QueryDto,
   RegisteredViews,
+  UserViewData,
 } from '@apps-next/core';
 import { GenericQueryCtx } from './_internal/convex.server.types';
 import { viewLoaderHandler } from './convex-view-loader';
 import { viewMutationHandler } from './view-mutation';
 
 export const makeViewLoaderHandler =
-  (views: RegisteredViews) => (ctx: GenericQueryCtx, args: any) => {
-    const viewConfig = getViewByName(views, args.viewName);
+  (views: RegisteredViews) => async (ctx: GenericQueryCtx, args: any) => {
+    let viewConfig = getViewByName(views, args.viewName);
 
     if (!args.viewName) return null;
 
     if (!viewConfig) {
-      console.error('viewConfig is not defined', args.viewName);
-      throw new Error(`viewConfig is not defined: ${args.viewName}`);
+      const allUserViews = (await ctx.db
+        .query('views')
+        .collect()) as UserViewData[];
+
+      const parentViewName = allUserViews.find(
+        (v) => v.name === args.viewName
+      )?.baseView;
+
+      // console.log('===', { parentViewName });
+      viewConfig = getViewByName(views, parentViewName ?? '');
+
+      if (!viewConfig) {
+        console.error('viewConfig is not defined', args.viewName);
+        throw new Error(`viewConfig is not defined: ${args.viewName}`);
+      }
     }
 
     const viewConfigManager = new BaseViewConfigManager(

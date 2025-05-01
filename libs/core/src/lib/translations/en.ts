@@ -83,6 +83,7 @@ export const en = {
     yes: 'Yes',
     none: 'No',
     createNew: 'Create new {{name}}',
+    createNewIn: 'Create new {{name}} in {{field}}...',
     remove: 'Remove {{name}}',
     copy: 'Copy {{name}}',
     deleted: 'Deleted',

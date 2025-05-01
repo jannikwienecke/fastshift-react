@@ -82,7 +82,7 @@ export const configManager = (viewConfig: ViewConfigType) => {
       softDeleteEnabled: false,
       viewField: {
         allFields: [],
-        hidden: (config?.selectedViewFields as string[]) ?? null,
+        visible: (config?.selectedViewFields as string[]) ?? null,
       },
       viewType: config?.viewType?.type ? config.viewType : { type: 'list' },
     } satisfies DisplayOptionsUiType;
@@ -108,7 +108,7 @@ export const configManager = (viewConfig: ViewConfigType) => {
 
     const uiDisplayOptions = createUiDisplayOptionsConfig(merged);
     return {
-      dispplayOptions: uiDisplayOptions,
+      displayOptions: uiDisplayOptions,
       filters: userFilters,
     };
   };

@@ -92,7 +92,7 @@ const makeQuery = (
     filters: viewId ? '' : convertFiltersForBackend(mergedConfig.filters),
     displayOptions: viewId
       ? ''
-      : convertDisplayOptionsForBackend(mergedConfig.dispplayOptions),
+      : convertDisplayOptionsForBackend(mergedConfig.displayOptions),
     viewId: viewId ?? null,
     parentId: parentId ?? null,
     parentViewName: parentViewName ?? null,

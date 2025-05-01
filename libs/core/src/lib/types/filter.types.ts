@@ -92,7 +92,7 @@ export type DisplayOptionsUiTypeData = {
     label?: string;
   };
   viewField?: {
-    hidden?: string[] | null;
+    visible?: string[] | null;
     allFields: string[];
   };
 };

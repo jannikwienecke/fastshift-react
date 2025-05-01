@@ -4,6 +4,7 @@ import {
   BaseViewConfigManager,
   ViewConfigType,
   QueryServerProps,
+  UserViewData,
 } from '@apps-next/core';
 import { queryClient } from './convex-client';
 import { getIndexFieldByName } from './convex-utils';
@@ -18,10 +19,19 @@ export const getIdsFromParentView = async (
 
   const handle = async () => {
     if (args.parentId && args.parentViewName && args.viewName) {
-      const parentView = getViewByName(
-        args.registeredViews,
-        args.parentViewName
-      );
+      let parentView = getViewByName(args.registeredViews, args.parentViewName);
+
+      if (!parentView) {
+        const allUserViews = (await ctx.db
+          .query('views')
+          .collect()) as UserViewData[];
+        const parentViewName = allUserViews.find(
+          (v) => v.name === args.parentViewName
+        )?.baseView;
+
+        parentView = getViewByName(args.registeredViews, parentViewName ?? '');
+      }
+
       const childView = getViewByName(args.registeredViews, args.viewName);
 
       const { manyToManyTable, manyToManyModelFields } =

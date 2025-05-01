@@ -55,15 +55,17 @@ export const addLocalDisplayOptionsHandling = (
   store$: Observable<LegendStore>
 ) => {
   store$.displayOptions.sorting.field.onChange((changes) => {
+    if (store$.state.get() === 'pending') return;
+
     if (!changes.value) return;
 
-    const prevAtPath = changes.changes[0].prevAtPath;
-    if (!prevAtPath) return;
+    // const prevAtPath = changes.changes[0].prevAtPath;
 
     applyDisplayOptions(store$, store$.displayOptions.get());
   });
   store$.displayOptions.sorting.order.onChange((changes) => {
     if (!changes.value) return;
+    if (store$.state.get() === 'pending') return;
     const prevAtPath = changes.changes[0].prevAtPath;
     if (!prevAtPath) return;
 
@@ -71,7 +73,14 @@ export const addLocalDisplayOptionsHandling = (
   });
   store$.displayOptions.showDeleted.onChange((changes) => {
     const prevAtPath = changes.changes[0].prevAtPath;
+    if (store$.state.get() === 'pending') return;
     if (!prevAtPath) return;
+
+    applyDisplayOptions(store$, store$.displayOptions.get());
+  });
+
+  store$.displayOptions.showDeleted.onChange((changes) => {
+    if (store$.state.get() === 'pending') return;
 
     applyDisplayOptions(store$, store$.displayOptions.get());
   });

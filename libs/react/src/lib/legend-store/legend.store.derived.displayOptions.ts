@@ -35,6 +35,8 @@ export const derviedDisplayOptions = observable(() => {
   const softDeleteField =
     store$.viewConfigManager.viewConfig.mutation.softDeleteField.get();
 
+  const visibleFields = store$.displayOptions.viewField.visible.get();
+
   return {
     ...props,
 
@@ -69,11 +71,10 @@ export const derviedDisplayOptions = observable(() => {
         return show;
       })
       .map((field) => {
-        const selectedFields = store$.displayOptions.viewField.hidden.get();
         const selected =
-          selectedFields === null
+          visibleFields === null || visibleFields === undefined
             ? true
-            : selectedFields?.includes?.(field.name) ?? false;
+            : visibleFields?.includes?.(field.name) ?? false;
         return {
           ...field,
           id: field.name,
@@ -104,7 +105,7 @@ export const derviedDisplayOptions = observable(() => {
     showResetButton:
       !!sorting.field ||
       !!grouping.field ||
-      store$.displayOptions.viewField.hidden.length !==
+      store$.displayOptions.viewField.visible.length !==
         store$.displayOptions.viewField.allFields.length,
 
     sorting: {

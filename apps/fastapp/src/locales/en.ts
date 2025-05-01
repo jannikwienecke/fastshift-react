@@ -21,6 +21,10 @@ export const en = {
     one: 'Tag',
     other: 'Tags',
   },
+  categories: {
+    one: 'Category',
+    other: 'Categories',
+  },
   tasks: {
     one: 'Task',
     other: 'Tasks',

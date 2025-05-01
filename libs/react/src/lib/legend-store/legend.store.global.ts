@@ -20,39 +20,32 @@ import {
   handleIncomingDetailData,
 } from './legend.store.fn.global';
 
-// const patchAllViews = (views: RegisteredViews) => {
-//   return patchDict(views ?? {}, (view) => {
-//     if (!view) return view;
-//     return {
-//       ...view,
-//       viewFields: patchDict(view.viewFields, (f) => {
-//         // eslint-disable-next-line
-//         // @ts-ignore
-//         const userFieldConfig = view.fields?.[f.name];
-//         const displayField = view.displayField.field;
-//         const softDeleteField = view.mutation?.softDeleteField;
-
-//         const hideFieldFromForm = softDeleteField && softDeleteField === f.name;
-//         const isDisplayField =
-//           displayField && f.name === displayField ? true : undefined;
-
-//         return {
-//           ...f,
-//           ...userFieldConfig,
-//           isDisplayField,
-//           label: f.label || renderModelName(f.name, t),
-//           hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
-//         } satisfies FieldConfig;
-//       }),
-//     };
-//   });
-// };
-
 export const getViewData = (viewName: string) => {
   const userViews = store$.userViews.get();
+  const parentView = store$.detail.parentViewName.get();
 
-  const userViewData = userViews.find((view) => view.name === viewName);
-  return userViewData;
+  if (parentView) {
+    const view = getViewByName(store$.views.get(), viewName);
+    const parentModel =
+      getViewByName(store$.views.get(), parentView ?? '')?.tableName ?? '';
+
+    if (parentModel) {
+      const name = `${parentModel}|${view?.tableName ?? ''}`;
+
+      return userViews.find((view) => view.name === name);
+    } else {
+      const parentViewName = userViews.find(
+        (view) => view.name === parentView
+      )?.baseView;
+      const parentModel =
+        getViewByName(store$.views.get(), parentViewName ?? '')?.tableName ??
+        '';
+      const name = `${parentModel}|${view?.tableName ?? ''}`;
+      return userViews.find((view) => view.name === name);
+    }
+  } else {
+    return userViews.find((view) => view.name === viewName);
+  }
 };
 
 export const currentViewName = () =>
@@ -117,12 +110,12 @@ const resetStore = () => {
 };
 
 const setStore = (viewName: string, parentViewName?: string) => {
-  store$.state.set('initialized');
+  store$.state.set('pending');
 
   const userViewData = getViewData(viewName);
   const viewConfigManager = createViewConfigManager(viewName);
 
-  const { filters, dispplayOptions } = configManager(
+  const { filters, displayOptions } = configManager(
     viewConfigManager.viewConfig
   ).mergeAndCreate(userViewData);
 
@@ -136,38 +129,40 @@ const setStore = (viewName: string, parentViewName?: string) => {
       .getViewFieldList()
       .map((field) => field.name);
 
-    if (!parentViewName) {
-      store$.displayOptions.set({
-        ...dispplayOptions,
+    store$.displayOptions.set({
+      ...displayOptions,
+      viewField: {
+        allFields: viewFields,
+        visible: displayOptions?.viewField?.visible ?? viewFields,
+      },
+      resetted: true,
+    });
+    store$.filter.filters.set(filters);
+
+    const copyOfDisplayOptions = JSON.parse(
+      JSON.stringify({
+        ...displayOptions,
         viewField: {
           allFields: viewFields,
+          visible: displayOptions?.viewField?.visible ?? viewFields,
         },
-        resetted: true,
-      });
-      store$.filter.filters.set(filters);
+      })
+    );
+    const copyOfFilters = JSON.parse(JSON.stringify(filters));
 
-      const displayOptions = store$.displayOptions.get();
-      const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
-      const copyOfFilters = JSON.parse(JSON.stringify(filters));
+    store$.displayOptions.softDeleteEnabled.set(
+      !!viewConfigManager.viewConfig.mutation?.softDelete
+    );
 
+    if (!parentViewName) {
       store$.userViewSettings.initialSettings.set({
         filters: copyOfFilters,
         displayOptions: copyOfDisplayOptions,
       });
-
-      store$.displayOptions.softDeleteEnabled.set(
-        !!viewConfigManager.viewConfig.mutation?.softDelete
-      );
-    } else {
-      store$.displayOptions.viewField.allFields.set(viewFields);
-
-      store$.displayOptions.softDeleteEnabled.set(
-        !!viewConfigManager.viewConfig.mutation?.softDelete
-      );
     }
   });
 
-  //   store$.viewId.set(viewId);
+  store$.state.set('initialized');
 };
 
 const handleQueryData = (data: QueryReturnOrUndefined) => {
@@ -219,6 +214,9 @@ type GlobalStoreAction =
     }
   | {
       type: 'UNLOAD_VIEW_DETAIL_PAGE';
+    }
+  | {
+      type: 'LOAD_SUB_VIEW_OVERVIEW_PAGE';
     };
 
 const dispatch = (action: GlobalStoreAction) => {
@@ -232,6 +230,8 @@ const dispatch = (action: GlobalStoreAction) => {
       return handleLoadSubViewListPage(action);
     case 'LOAD_VIEW_DETAIL_PAGE':
       return handleLoadDetailPage(action);
+    case 'LOAD_SUB_VIEW_OVERVIEW_PAGE':
+      return store$.detail.viewType.set({ type: 'overview' });
 
     default:
       console.warn('Unknown action type', action);
@@ -254,17 +254,18 @@ const handleInitLoadStore = (action: GlobalStoreAction) => {
 };
 
 const handleChangeView = (action: GlobalStoreAction) => {
-  console.debug('____HANDLE CHANGE VIEW', action.type);
   if (action.type !== 'CHANGE_VIEW') return;
   const { viewName, data, resetDetail } = action.payload;
 
-  if (viewName !== currentViewName()) {
+  if (resetDetail || viewName !== currentViewName()) {
     store$.detail.set(undefined);
+  }
+
+  if (viewName !== currentViewName()) {
     resetStore();
     setStore(viewName);
     handleQueryData(data);
   } else if (resetDetail) {
-    store$.detail.set(undefined);
     resetStore();
     setStore(viewName);
     handleQueryData(data);
@@ -281,8 +282,6 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
   const { viewName, id, data } = action.payload;
   if (id === store$.detail.row.id.get()) return;
 
-  console.warn('____LOAD VIEW DETAIL PAGE', action);
-
   const viewConfigManager = createViewConfigManager(viewName);
 
   store$.detail.viewConfigManager.set(viewConfigManager);
@@ -294,12 +293,8 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
   });
 
   const helper = detailFormHelper();
-  const relationalListFields =
-    helper
-      .getComplexFormFields()
-      .filter((f) => f.field.relation?.manyToManyModelFields?.length) ?? [];
 
-  const firstRelationalListField = relationalListFields?.[0];
+  const firstRelationalListField = helper.getRelationalFields()?.[0];
   const viewConfigOfFirstRelationalListField = getViewByName(
     store$.views.get(),
     firstRelationalListField?.field.name ?? ''
@@ -317,7 +312,6 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
       parentViewName: action.payload.viewName,
     },
   });
-
   // }, 100);
 };
 
@@ -340,8 +334,9 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
     handleQueryData(data);
   } else {
     console.warn('____LOAD SUB VIEW LIST PAGE', action);
-    setStore(viewName, parentViewName);
     resetStore();
+
+    setStore(viewName, parentViewName);
 
     if (data) {
       handleQueryData(data);

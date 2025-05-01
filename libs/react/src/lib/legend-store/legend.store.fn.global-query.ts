@@ -33,7 +33,7 @@ export const globalFetchMore: StoreFn<'globalFetchMore'> = (store$) => () => {
   }
 
   batch(() => {
-    _log.debug('Fetch more!');
+    _log.info('Fetch more!');
 
     store$.fetchMore.set((prev) => ({
       ...prev,

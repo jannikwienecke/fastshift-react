@@ -45,7 +45,7 @@ const handleRelationFilter = (
   const fieldName = filter.field.name;
 
   return rows.filter((row) => {
-    const value = row.getValue(fieldName);
+    const value = row.raw?.[fieldName];
 
     if (filter.field.enum) {
       return filter.values.some((v) => v.raw === value);
@@ -168,6 +168,8 @@ export const applyFilter = (
 
 export const addLocalFiltering = (store$: Observable<LegendStore>) => {
   store$.filter.filters.onChange((changes) => {
+    if (store$.state.get() === 'pending') return;
+
     applyFilter(store$, changes.value);
   });
 };

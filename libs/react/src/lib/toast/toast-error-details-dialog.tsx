@@ -41,13 +41,13 @@ export const ErrorDetailsDialog = observer(() => {
         }
       }}
     >
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md lg:max-w-lg overflow-scroll">
         <DialogHeader>
           <DialogTitle>Error Details</DialogTitle>
           <DialogDescription>Status: {status}</DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4 py-4 w-full">
           <div>
             <h3 className="font-medium">Message</h3>
             <p className="text-sm text-muted-foreground mt-1">{message}</p>
@@ -86,9 +86,9 @@ export const ErrorDetailsDialog = observer(() => {
             </div>
             <div className="mt-2">
               <h4 className="text-sm font-medium">Payload</h4>
-              <div className="bg-slate-100 p-2 rounded-md mt-1 overflow-auto max-h-40">
-                <pre className="text-xs whitespace-pre-wrap">
-                  {JSON.stringify(context.payload, null, 2)}
+              <div className="bg-slate-100 p-2 rounded-md mt-1 overflow-scroll max-h-40">
+                <pre className="text-xs whitespace-pre-wrap wrap">
+                  {JSON.stringify(context.payload, null, 2).replace(';', '; ')}
                 </pre>
               </div>
             </div>

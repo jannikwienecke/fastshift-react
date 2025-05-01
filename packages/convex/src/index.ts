@@ -83,8 +83,12 @@ export const tasksConfig = createViewConfig(
       tasks: {
         hideFromForm: true,
       },
+      tags: {
+        showInProperties: true,
+      },
     },
 
+    // localMode: { enabled: true },
     includeFields: ['tags', 'tasks', 'todos'],
     query: {
       // sort so that the newest tasks are on top

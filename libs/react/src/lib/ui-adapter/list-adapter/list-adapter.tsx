@@ -89,8 +89,8 @@ const renderFields = <T extends RecordType>(
       ?.filter((fieldName) => {
         const viewFieldDisplayOptions = store$.displayOptions.viewField.get();
 
-        const fields = viewFieldDisplayOptions?.hidden
-          ? viewFieldDisplayOptions.hidden
+        const fields = viewFieldDisplayOptions?.visible
+          ? viewFieldDisplayOptions.visible
           : viewFieldDisplayOptions?.allFields;
         const shouldDisplay = fields?.includes(fieldName.toString());
 
@@ -110,11 +110,11 @@ const renderFields = <T extends RecordType>(
           field = item.field;
         } catch (error) {
           if (index === 0) {
-            console.warn('[-------fieldName---------]');
-            console.warn(fieldName);
-            console.warn(row);
-            console.warn(viewConfigManager.viewConfig.viewName);
-            console.warn('----');
+            // console.warn('[-------fieldName---------]');
+            // console.warn(fieldName);
+            // console.warn(row);
+            // console.warn(viewConfigManager.viewConfig.viewName);
+            // console.warn('----');
           }
 
           _log.error(
@@ -174,6 +174,9 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
   const sorting = store$.displayOptions.sorting.get();
 
+  const showEmptyGroups = store$.displayOptions.showEmptyGroups.get();
+  listGrouping.groups = [];
+
   if (groupingIsRelationalField && grouping.field?.name) {
     listGrouping.groupByTableName = grouping.field.relation?.tableName ?? '';
     listGrouping.groupByField = grouping.field?.relation?.fieldName ?? '';
@@ -183,7 +186,26 @@ export const makeListProps = <T extends RecordType = RecordType>(
     listGrouping.groups =
       store$.relationalDataModel[grouping.field.name]
         ?.get()
-        .rows.map((row) => ({
+        .rows.filter((row) => {
+          if (showEmptyGroups) return true;
+
+          const has = dataModel.rows.find((r) => {
+            const projectValue = r?.raw?.[grouping.field?.name ?? ''];
+
+            if (projectValue?.id === row.id) {
+              return true;
+            }
+
+            return false;
+          });
+
+          if (!has) {
+            return false;
+          }
+
+          return true;
+        })
+        .map((row) => ({
           groupById: row.id,
           groupByLabel: row.label,
         })) ?? [];
@@ -230,6 +252,11 @@ export const makeListProps = <T extends RecordType = RecordType>(
       groupByLabel: `No ${listGrouping.groupLabel}`,
     });
   }
+
+  // listGrouping.groups = listGrouping.groups.filter((group) => {
+  //   const;
+  //   return true;
+  // });
 
   const items =
     dataModel?.rows?.map((item) => {
@@ -301,7 +328,9 @@ export const makeListProps = <T extends RecordType = RecordType>(
     onClick: (item) => {
       store$.navigation.state.set({
         type: 'navigate',
-        view: store$.viewConfigManager.getViewName(),
+        view:
+          store$.userViewData.name.get() ??
+          store$.viewConfigManager.getViewName(),
         id: item.id.toString(),
       });
     },

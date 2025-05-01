@@ -1,6 +1,6 @@
 import { expect, PartialFixtures, test } from './fixtures';
 import { CON } from './helpers';
-import { isDev, pressEscape, waitFor } from './helpers/e2e.helper';
+import { isDev, pressEnter, pressEscape, waitFor } from './helpers/e2e.helper';
 import { openContextMenu2 } from './helpers/e2e.helper.contextmenu';
 import { sortByField } from './helpers/e2e.helper.displayoptions';
 import { MainViewPage } from './view-pom';
@@ -207,6 +207,48 @@ test.describe('List Commandbar', () => {
 
     await mainPage.commandbar.getByText(/urgent/i).click();
     await expect(firstListItem.getByText(/urgent/i)).toBeHidden();
+  });
+
+  test('can open commandbar, and update the email with validation', async ({
+    mainPage,
+    helper,
+  }) => {
+    await helper.list.getFirstListItem();
+
+    await openCommandbar({ mainPage, helper });
+
+    await mainPage.page
+      .getByPlaceholder(/type a command/i)
+      .fill('change email');
+
+    await expect(mainPage.commandbar.getByText(/change email/i)).toBeVisible();
+
+    await mainPage.commandbar.getByText(/change email/i).click();
+
+    await mainPage.commandbar.getByPlaceholder(/change email/i).fill('test@');
+
+    await expect(
+      mainPage.commandbar.getByText(/invalid email address/i)
+    ).toBeVisible();
+
+    await pressEnter(mainPage.page);
+
+    await expect(
+      mainPage.commandbar.getByText(/invalid email address/i)
+    ).toBeVisible();
+
+    await mainPage.commandbar
+      .getByPlaceholder(/change email/i)
+      .fill('test@test.de');
+
+    await expect(
+      mainPage.commandbar.getByText(/invalid email address/i)
+    ).toBeHidden();
+
+    await pressEnter(mainPage.page);
+
+    // commandbar is closed
+    await expect(mainPage.commandbar).toBeHidden();
   });
 });
 
