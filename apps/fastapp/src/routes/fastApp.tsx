@@ -52,13 +52,15 @@ export const Route = createFileRoute('/fastApp')({
 
     const { viewName, slug, id, model } = getViewParms(props.params);
 
-    if (!viewName) return;
-    if (props.cause !== 'enter') return;
+    globalStore.setViews(views);
+
+    if (!viewName) {
+      return redirect({ to: '/fastApp/task' });
+    }
+
     if (store$.viewConfigManager.viewConfig.get()) {
       return;
     }
-
-    globalStore.setViews(views);
 
     _log.debug(`Loader for view: ${viewName} - slug: ${slug}`);
 
@@ -119,6 +121,23 @@ const FastAppLayoutComponent = observer(() => {
 
   useAppEffects(viewName);
 
+  React.useEffect(() => {
+    return () => {
+      if (!id) return;
+      if (modelRef.current) return;
+      if (!hasNoIdRef.current) return;
+
+      globalStore.dispatch({
+        type: 'CHANGE_VIEW',
+        payload: {
+          data: dataRef.current,
+          viewName: modelRef.current || viewNameRef.current,
+          resetDetail: true,
+        },
+      });
+    };
+  }, [id]);
+
   const userViews = getUserViews();
   const { viewData, userViewData } = getViewData(viewName, userViews);
 
@@ -136,7 +155,8 @@ const FastAppLayoutComponent = observer(() => {
 
   if (
     (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
-    !id
+    !id &&
+    data
   ) {
     globalStore.dispatch({
       type: 'CHANGE_VIEW',
@@ -167,23 +187,6 @@ const FastAppLayoutComponent = observer(() => {
   } else {
     hasNoIdRef.current = false;
   }
-
-  React.useEffect(() => {
-    return () => {
-      if (!id) return;
-      if (modelRef.current) return;
-      if (!hasNoIdRef.current) return;
-
-      globalStore.dispatch({
-        type: 'CHANGE_VIEW',
-        payload: {
-          data: dataRef.current,
-          viewName: modelRef.current || viewNameRef.current,
-          resetDetail: true,
-        },
-      });
-    };
-  }, [id]);
 
   return (
     <>

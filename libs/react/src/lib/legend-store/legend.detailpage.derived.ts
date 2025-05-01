@@ -22,7 +22,10 @@ export const derviedDetailPage$ = observable(() => {
 
     displayField: helper.displayField,
     type: store$.commandform.type.get() ?? 'create',
-    viewName: store$.userViewData.name.get() ?? helper.view.viewName,
+    viewName:
+      store$.detail.parentViewName.get() ??
+      store$.userViewData.name.get() ??
+      helper.view.viewName,
     tableName: helper.view.tableName,
     relationalListFields: helper.getRelationalFields(),
     currentRelationalListField: null,

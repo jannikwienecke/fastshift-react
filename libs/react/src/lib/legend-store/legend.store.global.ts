@@ -28,12 +28,20 @@ export const getViewData = (viewName: string) => {
     const view = getViewByName(store$.views.get(), viewName);
     const parentModel =
       getViewByName(store$.views.get(), parentView ?? '')?.tableName ?? '';
+
     if (parentModel) {
       const name = `${parentModel}|${view?.tableName ?? ''}`;
 
       return userViews.find((view) => view.name === name);
     } else {
-      return undefined;
+      const parentViewName = userViews.find(
+        (view) => view.name === parentView
+      )?.baseView;
+      const parentModel =
+        getViewByName(store$.views.get(), parentViewName ?? '')?.tableName ??
+        '';
+      const name = `${parentModel}|${view?.tableName ?? ''}`;
+      return userViews.find((view) => view.name === name);
     }
   } else {
     return userViews.find((view) => view.name === viewName);
