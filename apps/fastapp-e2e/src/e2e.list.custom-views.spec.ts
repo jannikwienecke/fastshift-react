@@ -192,4 +192,78 @@ test.describe('Custom Views', () => {
       )
     ).toBeVisible();
   });
+
+  test('can save date filter in a new view, see the sub todos and navigate around', async ({
+    page,
+    mainPage,
+    helper,
+  }) => {
+    await filterByDueDate(mainPage, 'tomorrow');
+    await expect(page.getByText(/tomorrow/i).first()).toBeVisible();
+
+    await saveCurrentView(page, true, {
+      name: 'tommorrow-view',
+      description: 'tommorrow view desc',
+    });
+
+    await expect(page).toHaveURL(/.*tommorrow-view/);
+
+    let firstListItem = await helper.list.getFirstListItem();
+    await firstListItem.locator.click();
+
+    await mainPage.detailHeader.getByText(/todos/i).click();
+
+    firstListItem = await helper.list.getFirstListItem();
+
+    // we had a bug where the sub list would not show any results for a view with a custom name
+    await expect(
+      firstListItem.locator.getByText(/todo 1/i).first()
+    ).toBeVisible();
+
+    await mainPage.page.goBack();
+
+    await expect(page).toHaveURL(/.*tommorrow-view/);
+    await expect(page).toHaveURL(/.overview/);
+
+    await mainPage.page.goBack();
+
+    await expect(page).toHaveURL(/.*tommorrow-view/);
+    await expect(page).not.toHaveURL(/.*overview/);
+
+    firstListItem = await helper.list.getFirstListItem();
+    await expect(
+      firstListItem.locator.getByText(CON.task.values.designMockups)
+    ).toBeVisible();
+
+    await firstListItem.locator.click();
+
+    await mainPage.detailHeader.getByText(/todos/i).click();
+
+    await expect(page).toHaveURL(/.todos/);
+
+    await mainPage.sidebar.getByText(/tasks/i).first().click();
+
+    await expect(page).toHaveURL(/.*task/i);
+
+    // we had a bug when
+    // we are on a custom view with a custom name
+    // we navigate to it, then go to a different view, and back to the overview and then the detail page, app would break
+
+    await mainPage.page.goBack();
+
+    await mainPage.page.goBack();
+
+    await mainPage.page.goBack();
+
+    await expect(page).toHaveURL(/.*tommorrow-view/);
+    await expect(page).not.toHaveURL(/.*Task/);
+
+    firstListItem = await helper.list.getFirstListItem();
+
+    await expect(
+      firstListItem.locator.getByText(CON.task.values.designMockups)
+    ).toBeVisible();
+
+    //
+  });
 });
