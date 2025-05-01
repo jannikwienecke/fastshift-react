@@ -32,6 +32,8 @@ export const getViewData = (viewName: string) => {
       const name = `${parentModel}|${view?.tableName ?? ''}`;
 
       return userViews.find((view) => view.name === name);
+    } else {
+      return undefined;
     }
   } else {
     return userViews.find((view) => view.name === viewName);
