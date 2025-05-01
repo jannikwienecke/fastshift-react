@@ -87,10 +87,6 @@ created: 1723444498044
 - when we undelete the project, the task will show the project again
 - same for projects when we "delete" a task (just filters out all the tasks that were deleted)
 
-<!-- HIER WEITER MACHEN -->
-
-## NEW TODOS
-
 - [x] handle e.g. projects -> tasks list in detail
 - [x] switching between views when we have a filter on one of the views -> error
 - [x] filter in main tasks list -> effects list in projects -> task
@@ -124,5 +120,11 @@ created: 1723444498044
 - [x] add test for filter not used in sub view
 - [x] add test for switching between views when one has filter set
 - [x] add test for: when setting field from commandbar like email -> will not be validated
-- [ ] tests for saving view config in sub view
-- [ ] check which tests missing from done todos
+- [x] tests for saving view config in sub view
+
+<!--  -->
+
+## NEW TODOS
+
+- [ ] use shadcn breadcrumbs in detailpage header
+- [ ]

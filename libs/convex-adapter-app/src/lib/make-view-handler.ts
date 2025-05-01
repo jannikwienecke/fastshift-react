@@ -29,7 +29,6 @@ export const makeViewLoaderHandler =
         (v) => v.name === args.viewName
       )?.baseView;
 
-      // console.log('===', { parentViewName });
       viewConfig = getViewByName(views, parentViewName ?? '');
 
       if (!viewConfig) {

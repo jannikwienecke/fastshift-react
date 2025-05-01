@@ -3,6 +3,7 @@ import { observable } from '@legendapp/state';
 import { detailFormHelper } from './legend.detailpage.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { store$ } from './legend.store';
+import { detailTabsHelper } from './legend.detailtabs.helper';
 
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
@@ -11,28 +12,38 @@ export const derviedDetailPage$ = observable(() => {
     return {} as DetailPageProps;
   }
 
-  const helper = detailFormHelper();
+  const detailHelper = detailFormHelper();
+  const tabsProps = detailTabsHelper();
 
   return {
-    row: helper.row,
-    icon: helper.view.icon,
-    formState: helper.formState,
-    primitiveFields: helper.getPrimitiveFormFields(),
-    propertyFields: helper.getPropertiesFields(),
+    row: detailHelper.row,
+    icon: detailHelper.view.icon,
+    formState: detailHelper.formState,
+    primitiveFields: detailHelper.getPrimitiveFormFields(),
+    propertyFields: detailHelper.getPropertiesFields(),
 
-    displayField: helper.displayField,
+    displayField: detailHelper.displayField,
     type: store$.commandform.type.get() ?? 'create',
     viewName:
       store$.detail.parentViewName.get() ??
       store$.userViewData.name.get() ??
-      helper.view.viewName,
-    tableName: helper.view.tableName,
-    relationalListFields: helper.getRelationalFields(),
+      detailHelper.view.viewName,
+    tableName: detailHelper.view.tableName,
+    relationalListFields: detailHelper.getRelationalFields(),
     currentRelationalListField: null,
     viewTypeState: store$.detail.viewType.get() ?? { type: 'overview' },
+
+    tabs: tabsProps
+      ? {
+          ...tabsProps,
+          onSelectTab(field) {
+            store$.detail.activeTabField.set(field);
+          },
+        }
+      : null,
     onClick: (field, rect: DOMRect) => {
       if (field.field) {
-        xSelect.open(helper.row, field.field, true);
+        xSelect.open(detailHelper.row, field.field, true);
         selectState$.rect.set(rect);
       }
     },

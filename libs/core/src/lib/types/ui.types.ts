@@ -299,6 +299,15 @@ export type DetailPageProps = {
   relationalListFields: CommandformItem[];
   currentRelationalListField: CommandformItem | null;
   viewTypeState: DetailViewTypeState;
+
+  tabs: {
+    detailTabsFields: CommandformItem[];
+    activeTabField: CommandformItem | null | undefined;
+    activeTabPrimitiveFields: CommandformItem[];
+    activeTabComplexFields: CommandformItem[];
+    onSelectTab: (field: CommandformItem) => void;
+  } | null;
+
   onSelectView: (props: DetailViewTypeState) => void;
   onHoverRelationalListField: (field: CommandformItem) => void;
 } & FormFieldMethod;

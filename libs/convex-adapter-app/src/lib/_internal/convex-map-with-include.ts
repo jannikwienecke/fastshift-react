@@ -1,4 +1,5 @@
 import {
+  BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   FieldConfig,
   getViewByName,
@@ -19,7 +20,7 @@ export const mapWithInclude = async (
   const { viewConfigManager, registeredViews } = args;
   const include = viewConfigManager.getIncludeFields();
 
-  return await asyncMap(rows, async (recordWithoutRelations) => {
+  const result = await asyncMap(rows, async (recordWithoutRelations) => {
     const extendedRecord = await include.reduce(async (acc, key) => {
       const field = viewConfigManager.getFieldBy(key);
 
@@ -74,6 +75,47 @@ export const mapWithInclude = async (
 
     return extendedRecord;
   });
+
+  if (args.viewId && rows.length === 1) {
+    const task = result[0];
+
+    const fields = viewConfigManager
+      .getIncludeFields()
+      .map((f) => viewConfigManager.getFieldBy(f))
+      .filter((f) => {
+        if (!f) return false;
+
+        return (
+          f.isList === false && f.relation && f.relation.type !== 'manyToMany'
+        );
+      });
+
+    await asyncMap(fields, async (field) => {
+      const record = task[field.name];
+      if (!record) {
+        console.error('no record');
+        return null;
+      }
+
+      const viewConfig = getViewByName(registeredViews, field.name);
+
+      if (!viewConfig) {
+        console.error('no viewConfig');
+        return null;
+      }
+
+      args.viewId = null;
+      args.viewConfigManager = new BaseViewConfigManager(viewConfig);
+
+      const withInclude = await mapWithInclude([record], ctx, args);
+
+      task[field.name] = withInclude.length ? withInclude[0] : record;
+    });
+
+    result[0] = task;
+  }
+
+  return result;
 };
 
 type HelperProps = {

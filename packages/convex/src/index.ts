@@ -205,8 +205,18 @@ export const todosConfig = createViewConfig(
   config.config
 );
 
+export const usersConfig = createViewConfig(
+  'users',
+  {
+    icon: PersonIcon,
+    displayField: { field: 'email' },
+  },
+  config.config
+);
+
 export const views = makeViews(config.config, [
   tasksConfig,
+  usersConfig,
   projectsConfig,
   todosConfig,
   tagsConfig,

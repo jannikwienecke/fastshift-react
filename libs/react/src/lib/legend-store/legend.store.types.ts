@@ -439,6 +439,7 @@ export type LegendStore = {
     };
     parentViewName: string;
     viewType?: DetailViewTypeState;
+    activeTabField?: CommandformItem | null;
   };
 
   detailpageChangeInput: (

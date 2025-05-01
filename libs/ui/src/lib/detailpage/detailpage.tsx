@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Checkbox } from '../components/checkbox';
 import { Button } from '../components';
+import { cn } from '../utils';
 
 const DetailPageHeader = (props: DetailPageProps) => {
   return (
@@ -171,10 +172,82 @@ const DetailPagePropertiesList = (
   );
 };
 
+const DetailTabs = (
+  props: DetailPageProps & {
+    FormField: React.FC<FormFieldProps>;
+    ComplexFormField: React.FC<FormFieldProps>;
+  }
+) => {
+  if (!props.tabs) return null;
+
+  const {
+    activeTabComplexFields,
+    activeTabField,
+    activeTabPrimitiveFields,
+    detailTabsFields,
+    onSelectTab,
+  } = props.tabs;
+
+  return (
+    <div className="text-sm">
+      <div className="flex flex-row gap-0">
+        <div className="border-b-[.5px] w-20"></div>
+
+        {detailTabsFields.map((tab) => {
+          const isActive = activeTabField?.field?.name === tab.field?.name;
+
+          return (
+            <button
+              key={tab.field?.name}
+              onClick={() => onSelectTab(tab)}
+              className={cn(
+                'border-[.5px] py-2 px-4',
+                isActive ? ' border-b-0 ' : ''
+              )}
+            >
+              {tab.field?.name}
+            </button>
+          );
+        })}
+        <div className="flex-grow border-b-[.5px]" />
+      </div>
+
+      <div className="pl-24 pt-8 text-sm">
+        {activeTabPrimitiveFields.map((field) => {
+          return (
+            <>
+              <props.FormField
+                key={field.field?.name}
+                {...props}
+                field={field}
+              />
+            </>
+          );
+        })}
+      </div>
+
+      <div className="pl-24 pt-8 text-sm">
+        {activeTabComplexFields.map((field) => {
+          return (
+            <>
+              <props.ComplexFormField
+                key={field.field?.name}
+                {...props}
+                field={field}
+              />
+            </>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export const detailPage = {
   header: DetailPageHeader,
   formFields: DetailPageFormFields,
   icon: DetailPageIcon,
   propertiesHeader: DetailPagePropertiesHeader,
   propertiesList: DetailPagePropertiesList,
+  tabs: DetailTabs,
 };

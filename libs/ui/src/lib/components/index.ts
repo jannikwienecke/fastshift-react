@@ -8,3 +8,6 @@ export * from './switch';
 export * from './context-menu';
 export * from './alert-dialog';
 export * from './dropdown';
+export * from './tabs';
+export * from './card';
+export * from './label';
