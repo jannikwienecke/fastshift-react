@@ -34,8 +34,8 @@ const getParentRow = () => {
 
   return row;
 };
-const getCurrentRows = () => {
-  const field = selectState$.field.get();
+const getCurrentRows = (_field?: FieldConfig) => {
+  const field = _field ?? selectState$.field.get();
 
   if (!field) return [];
 
@@ -70,12 +70,11 @@ const getState = () => {
 };
 
 export const open = (row: Row, field: FieldConfig, isDetail?: boolean) => {
-  selectState$.isDetail.set(!!isDetail);
-
   selectState$.parentRow.set(row);
-  selectState$.field.set(field);
+  const initalRows = getCurrentRows(field);
 
-  const initalRows = getCurrentRows();
+  selectState$.field.set(field);
+  selectState$.isDetail.set(!!isDetail);
 
   selectState$.initalRows.set(initalRows);
   selectState$.newRows.set([]);

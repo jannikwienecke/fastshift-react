@@ -226,7 +226,7 @@ const DetailTabs = (
         })}
       </div>
 
-      <div className="pl-24 pt-8 text-sm">
+      <div className="pl-24 pt-4 text-sm border-t-[.5px]">
         {activeTabComplexFields.map((field) => {
           return (
             <>
@@ -234,6 +234,7 @@ const DetailTabs = (
                 key={field.field?.name}
                 {...props}
                 field={field}
+                tabFormField={true}
               />
             </>
           );

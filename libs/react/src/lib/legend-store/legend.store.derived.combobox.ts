@@ -3,29 +3,28 @@ import { dateUtils } from '../ui-adapter/filter-adapter';
 import {
   getDefaultSelectedFilter,
   getDefaultSelectedList,
+  getSharedStateCommandbar,
+  getSharedStateCommandForm,
   getSharedStateFilter,
+  getSharedStateGrouping,
   getSharedStateList,
+  getSharedStateSelectState,
+  getSharedStateSorting,
+  handleRelationalField,
   makeComboboxStateFilterOptions,
   makeComboboxStateFilterValuesBoolean,
   makeComboboxStateFilterValuesDate,
   makeComboboxStateFilterValuesDatePicker,
   makeComboboxStateFilterValuesEnum,
-  makeComboboxStateFilterValuesOperator,
-  handleRelationalField,
-  makeComboboxStateSortingOptions,
-  getSharedStateSorting,
-  makeComboboxStateGroupingOptions,
-  getSharedStateGrouping,
   makeComboboxStateFilterValuesNumber,
-  getSharedStateCommandbar,
-  getSharedStateCommandForm,
-  getSharedStateSelectState,
-  getSharedStateDetailPage,
+  makeComboboxStateFilterValuesOperator,
+  makeComboboxStateGroupingOptions,
+  makeComboboxStateSortingOptions,
 } from './legend.combobox.helper';
+import { selectState$ } from './legend.select-state';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
 import { ComboboxState, MakeComboboxStateProps } from './legend.store.types';
-import { selectState$ } from './legend.select-state';
 
 export const comboboxStore$ = observable<ComboboxState>(() => {
   const filterIsOpen = store$.filter.open.get();

@@ -1,15 +1,20 @@
 import {
   BaseViewConfigManager,
+  BaseViewConfigManagerInterface,
   CommandformItem,
-  DetailPageProps,
+  FieldConfig,
   getFieldLabel,
   getViewByName,
   makeData,
+  makeRowFromValue,
   RecordType,
+  Row,
 } from '@apps-next/core';
 import { viewRegistry } from './legend.app.registry';
-import { store$ } from './legend.store';
 import { detailFormHelper } from './legend.detailpage.helper';
+import { formHelper } from './legend.form.helper';
+import { store$ } from './legend.store';
+import { copyRow } from './legend.utils';
 
 const getDetailTabsFields = () => {
   return detailFormHelper()
@@ -38,19 +43,32 @@ export const detailTabsHelper = () => {
     activeTabField?.field?.name ?? ''
   );
 
-  const row = store$.detail.row.raw.get()?.[
+  const record = store$.detail.row.raw.get()?.[
     activeTabField?.field?.name ?? ''
   ] as RecordType | undefined;
 
+  const row = record
+    ? makeData(store$.views.get(), activeTabField?.field?.name ?? '')([record])
+        .rows?.[0]
+    : undefined;
+
+  const form = store$.detail.form.get();
+
+  const view = getViewByName(
+    store$.views.get(),
+    activeTabField.field?.name ?? ''
+  );
+
   if (!activeTabViewConfig) return null;
   if (!row) return null;
+  if (!view) throw new Error('Tabs Helper: No view found');
 
   const viewConfigManager = new BaseViewConfigManager(activeTabViewConfig);
 
   const viewFields =
     viewConfigManager
       ?.getViewFieldList?.()
-      .filter((f) => f.hideFromForm !== true) ?? [];
+      .filter((f) => f.hideFromForm !== true && !f.isList) ?? [];
 
   const { uiViewConfig } = viewRegistry.getView(
     viewConfigManager.getViewName()
@@ -62,7 +80,7 @@ export const detailTabsHelper = () => {
         uiViewConfig?.[viewConfigManager.getTableName()].fields?.[field.name]
           ?.component?.icon;
 
-      const value = row ? row?.[field.name] : undefined;
+      const value = row ? row?.raw?.[field.name] : undefined;
 
       const label = getFieldLabel(field, true) ?? '';
       return {
@@ -85,7 +103,7 @@ export const detailTabsHelper = () => {
         uiViewConfig?.[viewConfigManager.getTableName()].fields?.[field.name]
           ?.component?.icon;
 
-      let value = row ? row?.[field.name] : undefined;
+      let value = row ? row?.raw?.[field.name] : undefined;
       const label = Array.isArray(value) ? '' : value?.id ? value.label : value;
 
       const asRows =
@@ -114,10 +132,86 @@ export const detailTabsHelper = () => {
     });
   };
 
+  const _updateRowValue = (field: FieldConfig, value: unknown) => {
+    if (!row) return;
+
+    const data = makeData(
+      store$.views.get(),
+      activeTabField.field?.name ?? ''
+    )([{ ...row.raw, [field.name]: value }]);
+
+    const updatedRow = data.rows?.[0];
+
+    return updatedRow as Row;
+  };
+
+  const updateRow = (field: FieldConfig, value: unknown) => {
+    const rowOfSub = _updateRowValue(field, value);
+
+    if (!rowOfSub || !activeTabField.field?.name) return;
+
+    const updatedRowData = {
+      ...store$.detail.row.raw.get(),
+      [activeTabField.field.name]: rowOfSub.raw,
+    };
+
+    const row = makeData(
+      store$.views.get(),
+      store$.detail.viewConfigManager.getViewName()
+    )([updatedRowData]).rows?.[0];
+
+    store$.detail.row.set(row);
+
+    row &&
+      store$.detail.row.set(
+        copyRow(
+          row,
+          store$.detail.viewConfigManager.get() as BaseViewConfigManagerInterface
+        )
+      );
+
+    store$.detail.form.dirtyField.set(field);
+    store$.detail.form.dirtyValue.set(value as string | number);
+  };
+
+  const helper = formHelper(view, row, true);
+
+  const saveIfDirty = (field: FieldConfig) => {
+    const { dirtyField, dirtyValue } = form ?? {};
+
+    if (field.name !== dirtyField?.name || !dirtyField.name) return;
+
+    if (field.isRequired && dirtyValue === undefined) {
+      throw new Error(`Field ${field.name} is required`);
+    }
+
+    if (!helper.formState.isFieldReady(field)) return;
+
+    store$.updateRecordMutation({
+      field,
+      row,
+      valueRow: makeRowFromValue(dirtyValue?.toString() || '', field),
+    });
+
+    store$.detail.form.dirtyField.set(undefined);
+    store$.detail.form.dirtyValue.set(undefined);
+  };
+
   return {
+    updateRow,
+    saveIfDirty,
     activeTabField,
     detailTabsFields,
     activeTabPrimitiveFields: getAllPrimitiveFormFields(),
     activeTabComplexFields: getComplexFormFields(),
-  } satisfies Omit<DetailPageProps['tabs'], 'onSelectTab'>;
+    row,
+  } satisfies {
+    row: Row;
+    updateRow: (field: FieldConfig, value: unknown) => void;
+    saveIfDirty: (field: FieldConfig) => void;
+    activeTabField: CommandformItem;
+    detailTabsFields: CommandformItem[];
+    activeTabPrimitiveFields: CommandformItem[];
+    activeTabComplexFields: CommandformItem[];
+  };
 };

@@ -41,24 +41,28 @@ export const derviedDetailPage$ = observable(() => {
           },
         }
       : null,
-    onClick: (field, rect: DOMRect) => {
-      if (field.field) {
+    onClick: (field, rect, tabFormField) => {
+      if (tabFormField && field.field && tabsProps?.row) {
+        store$.detail.useTabsForComboboxQuery.set(true);
+        xSelect.open(tabsProps?.row, field.field, true);
+        selectState$.rect.set(rect);
+      } else if (field.field) {
         xSelect.open(detailHelper.row, field.field, true);
         selectState$.rect.set(rect);
       }
     },
-    onInputChange(field, value) {
-      store$.detailpageChangeInput(field, value);
+    onInputChange(...props) {
+      store$.detailpageChangeInput(...props);
     },
-    onBlurInput(field) {
-      store$.detailpageBlurInput(field);
+    onBlurInput(...props) {
+      store$.detailpageBlurInput(...props);
     },
-    onCheckedChange: (field, value) => {
-      store$.commandformChangeInput(field, value);
+    onCheckedChange: (...props) => {
+      store$.commandformChangeInput(...props);
     },
     onSubmit: () => store$.commandformSubmit(),
 
-    onEnter: (field) => store$.detailpageEnter(field),
+    onEnter: (...props) => store$.detailpageEnter(...props),
 
     onHoverRelationalListField: (field) => {
       store$.navigation.state.set({

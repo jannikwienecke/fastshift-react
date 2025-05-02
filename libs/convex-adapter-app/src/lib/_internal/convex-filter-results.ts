@@ -21,7 +21,7 @@ export const filterResults = (
 
   const filterByQuery = (row: ConvexRecord) => {
     if (!query) return true;
-    if (!searchFields?.length) return true;
+    // if (!searchFields?.length) return true;
 
     const value = row[filterField].toLowerCase();
     return value.includes(query?.toLowerCase() ?? '');

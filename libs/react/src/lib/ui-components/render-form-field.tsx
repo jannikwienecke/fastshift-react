@@ -3,8 +3,12 @@ import { cn } from '@apps-next/ui';
 import { AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-type Element = HTMLInputElement | HTMLTextAreaElement;
-const onKeyDown = (e: React.KeyboardEvent<Element>, props: FormFieldProps) => {
+export type Element = HTMLInputElement | HTMLTextAreaElement;
+export const onKeyDown = (
+  e: React.KeyboardEvent<Element>,
+  props: FormFieldProps,
+  isTabField?: boolean
+) => {
   const isEnter = e.key === 'Enter';
   const isTab = e.key === 'Tab';
 
@@ -12,13 +16,14 @@ const onKeyDown = (e: React.KeyboardEvent<Element>, props: FormFieldProps) => {
     isEnter ||
     (isTab && !props.formState.errors?.[props.field.field?.name ?? ''])
   ) {
-    props.onEnter(props.field);
+    props.onEnter(props.field, isTabField);
   }
 };
 
 const onKeyDownTextare = (
   e: React.KeyboardEvent<Element>,
-  props: FormFieldProps
+  props: FormFieldProps,
+  isTabField?: boolean
 ) => {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -32,23 +37,31 @@ const onKeyDownTextare = (
     props.onInputChange(props.field, e.currentTarget.value);
 
     setTimeout(() => {
-      props.onEnter(props.field);
+      props.onEnter(props.field, isTabField);
     }, 200);
   }
 };
 
-const onBlur = (e: React.FocusEvent<Element>, props: FormFieldProps) => {
+export const onBlur = (
+  e: React.FocusEvent<Element>,
+  props: FormFieldProps,
+  isTabField?: boolean
+) => {
   const error = props.formState.errors?.[props.field.field?.name ?? ''];
 
   if (error) {
     e.currentTarget.focus();
   }
 
-  props.onBlurInput(props.field);
+  props.onBlurInput(props.field, isTabField);
 };
 
-const onChange = (e: React.ChangeEvent<Element>, props: FormFieldProps) => {
-  props.onInputChange(props.field, e.currentTarget.value);
+export const onChange = (
+  e: React.ChangeEvent<Element>,
+  props: FormFieldProps,
+  isTabField?: boolean
+) => {
+  props.onInputChange(props.field, e.currentTarget.value, isTabField);
 };
 
 const TextAreaFormField = (props: FormFieldProps) => {
@@ -92,7 +105,7 @@ const StringFormField = (props: FormFieldProps) => {
           value={(props.field.value as string) || ''}
           className={cn(
             'outline-none focus:border-b-[1px] w-full',
-            props.field.field?.isDisplayField ? 'text-2x' : 'text-base'
+            props.field.field?.isDisplayField ? 'text-2xl' : 'text-base'
           )}
           onKeyDown={(e) => onKeyDown(e, props)}
           onBlur={(e) => onBlur(e, props)}

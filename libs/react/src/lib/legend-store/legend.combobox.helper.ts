@@ -139,7 +139,9 @@ export const handleRelationalField = (
 ): MakeComboboxStateProps | null => {
   const debouncedQuery = comboboxDebouncedQuery$.get();
   const tableName = getRelationTableName(field);
-  const defaultData = store$.relationalDataModel[tableName]?.get();
+  const defaultData = store$.relationalDataModel[tableName]?.get() ?? {
+    rows: [],
+  };
 
   const valuesQuery = store$.combobox.values.get();
 

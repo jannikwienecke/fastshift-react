@@ -87,11 +87,13 @@ export const viewLoaderHandler = async (
 
   const { data, continueCursor, isDone, allIds } = getDataRes;
 
+  const relationalData = await getRelationalData(ctx, serverProps);
+
   return {
     allIds: allIds?.map((id) => id.toString()) ?? [],
     continueCursor,
     isDone,
     data,
-    relationalData: await getRelationalData(ctx, serverProps),
+    relationalData,
   };
 };

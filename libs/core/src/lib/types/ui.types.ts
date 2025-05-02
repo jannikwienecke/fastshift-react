@@ -241,17 +241,30 @@ export type CommandformItem = ComboxboxItem & {
 };
 
 export type FormFieldMethod = {
-  onClick: (field: CommandformItem, rect: DOMRect) => void;
-  onInputChange: (field: CommandformItem, value: string) => void;
-  onBlurInput: (field: CommandformItem) => void;
+  onClick: (
+    field: CommandformItem,
+    rect: DOMRect,
+    tabFormField?: boolean
+  ) => void;
+  onInputChange: (
+    field: CommandformItem,
+    value: string,
+    isTabField?: boolean
+  ) => void;
+  onBlurInput: (field: CommandformItem, isTabField?: boolean) => void;
   onSubmit: () => void;
-  onCheckedChange: (field: CommandformItem, checked: boolean) => void;
-  onEnter: (field: CommandformItem) => void;
+  onCheckedChange: (
+    field: CommandformItem,
+    checked: boolean,
+    isTabField?: boolean
+  ) => void;
+  onEnter: (field: CommandformItem, isTabField?: boolean) => void;
 };
 
 export type FormFieldProps = {
   field: CommandformItem;
   formState: FormState;
+  tabFormField?: boolean;
 } & FormFieldMethod;
 
 export type RecordErrors = { [fieldName: string]: { error: string } };

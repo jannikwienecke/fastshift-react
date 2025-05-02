@@ -5,6 +5,7 @@ import {
   makeHooks,
   RenderDetailComplexValue,
   store$,
+  TabsFormField,
 } from '@apps-next/react';
 import { detailPage } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
@@ -29,14 +30,16 @@ const DetaiViewPage = observer(() => {
     <>
       <div data-testid="detail-form" className="pt-12 flex flex-col gap-4">
         <div className="pl-20">
-          <detailPage.icon {...props} />
+          <div className="pb-4">
+            <detailPage.icon {...props} />
+          </div>
           <detailPage.formFields {...props} FormField={FormField} />
         </div>
 
         <div className="mt-12">
           <detailPage.tabs
             {...props}
-            FormField={FormField}
+            FormField={TabsFormField}
             ComplexFormField={RenderDetailComplexValue}
           />
         </div>

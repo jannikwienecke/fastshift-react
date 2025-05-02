@@ -373,7 +373,8 @@ export type LegendStore = {
   commanformSelectRelationalValue: (row: Row) => void;
   commandformChangeInput: (
     field: CommandformItem,
-    value: string | boolean
+    value: string | boolean,
+    isTabField?: boolean
   ) => void;
   commandformSubmit: () => void;
 
@@ -440,14 +441,17 @@ export type LegendStore = {
     parentViewName: string;
     viewType?: DetailViewTypeState;
     activeTabField?: CommandformItem | null;
+    useTabsForComboboxQuery?: boolean;
+    useTabsFormField?: boolean;
   };
 
   detailpageChangeInput: (
     field: CommandformItem,
-    value: string | boolean
+    value: string | boolean,
+    isTabField?: boolean
   ) => void;
-  detailpageBlurInput: (field: CommandformItem) => void;
-  detailpageEnter: (field: CommandformItem) => void;
+  detailpageBlurInput: (field: CommandformItem, isTabField?: boolean) => void;
+  detailpageEnter: (field: CommandformItem, isTabField?: boolean) => void;
 };
 
 export type StoreFn<T extends keyof LegendStore> = (

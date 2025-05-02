@@ -6,7 +6,7 @@ import {
   Row,
   useTranslation,
 } from '@apps-next/core';
-import { BubbleItem } from '@apps-next/ui';
+import { BubbleItem, Label } from '@apps-next/ui';
 import { CubeIcon } from '@radix-ui/react-icons';
 import { store$ } from '../legend-store';
 import { getComponent } from './ui-components.helper';
@@ -87,9 +87,58 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
   const view = getViewByName(store$.views.get(), fieldConfig.name ?? '');
   const Icon = field.icon ?? view?.icon;
 
+  if (props.tabFormField) {
+    return (
+      <div className="flex flex-col gap-1">
+        <div className="flex flex-row gap-2 items-center pb-4">
+          <>
+            {props.field.icon ? (
+              <props.field.icon className="h-3 w-3 text-foreground" />
+            ) : null}
+          </>
+
+          <Label className="max-w-[16rem] min-w-[16rem]">
+            {getFieldLabel(fieldConfig)}
+          </Label>
+
+          <button
+            onClick={(e) =>
+              props.onClick(
+                field,
+                e.currentTarget.getBoundingClientRect(),
+                true
+              )
+            }
+            className="cursor-pointer"
+          >
+            {Component ? (
+              <>
+                <Component data={store$.detail.row.get()?.raw} />
+              </>
+            ) : (
+              <div className="text-sm flex flex-row items-center gap-2 flex-wrap">
+                <div>
+                  {Icon ? (
+                    <Icon className="h-4 w-4" />
+                  ) : (
+                    <CubeIcon className="h-4 w-4 invisible" />
+                  )}
+                </div>
+
+                {renderRow?.()}
+
+                <div></div>
+              </div>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      <div key={`complex-field-${field.field?.name}`}>
+      <div className="" key={`complex-field-${field.field?.name}`}>
         <FieldLabel />
 
         <button
@@ -108,7 +157,7 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
                 {Icon ? (
                   <Icon className="h-4 w-4" />
                 ) : (
-                  <CubeIcon className="h-4 w-4" />
+                  <CubeIcon className="h-4 w-4 invisible" />
                 )}
               </div>
 
