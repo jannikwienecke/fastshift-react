@@ -59,7 +59,7 @@ const router = createRouter({
           api.query.viewLoader,
           viewConfig,
           userViewData ?? null,
-          viewId ?? null,
+          !viewId ? null : viewId === '#' ? null : viewId,
           parentViewName ?? null,
           parentId ?? null
         )

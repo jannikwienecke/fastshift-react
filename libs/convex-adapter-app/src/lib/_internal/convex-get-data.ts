@@ -297,6 +297,29 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const newRows = await fetch();
 
+  // if (newRows?.[0] === null) {
+  //   // hasManyToManyFilter ? idsManyToManyFilters : null,
+  //   // hasOneToManyFilter ? idsOneToManyFilters : null,
+  //   // isIndexSearch ? idsIndexField : null,
+  //   // isSearchFieldSearch ? idsSearchField : null,
+  //   // args.query ? idsQuerySearch : null,
+  //   // softDeleteEnabled && !showDeleted && !hasParentFilter
+  //   //   ? idsNotDeleted
+  //   //   : null,
+  //   // hasParentFilter ? idsSubView : null
+  //   console.log('HIER', {
+  //     allIds,
+  //     idsManyToManyFilters,
+  //     idsOneToManyFilters,
+  //     idsIndexField,
+  //     idsSearchField,
+  //     idsQuerySearch,
+  //     idsNotDeleted,
+  //     idsSubView,
+  //     viewId: args.viewId,
+  //   });
+  // }
+
   if (localModeEnabled && newRows.length === DEFAULT_LOCAL_MODE_LIMIT) {
     _log.warn(
       `WARNING: Local Mode enabled and limit reached! Consider disabled local mode or addding a defautlt filter`

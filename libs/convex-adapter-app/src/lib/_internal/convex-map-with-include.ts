@@ -20,6 +20,7 @@ export const mapWithInclude = async (
   const { viewConfigManager, registeredViews } = args;
   const include = viewConfigManager.getIncludeFields();
 
+  if (!rows) return [];
   const result = await asyncMap(rows, async (recordWithoutRelations) => {
     const extendedRecord = await include.reduce(async (acc, key) => {
       const field = viewConfigManager.getFieldBy(key);
@@ -28,6 +29,12 @@ export const mapWithInclude = async (
 
       if (!field.relation || !view) {
         return acc;
+      }
+
+      if (!recordWithoutRelations) {
+        // console.trace();
+        // console.log(rows);
+        // console.log('NO RECORDS', recordWithoutRelations);
       }
 
       const accResolved = await acc;
