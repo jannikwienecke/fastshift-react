@@ -31,6 +31,10 @@ export const en = {
     create: 'Create Task',
     delete: 'Delete Task',
   },
+  owner: {
+    one: 'Owner',
+    other: 'Owners',
+  },
   priority: {
     one: 'Priority',
     other: 'Priorities',

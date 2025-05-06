@@ -28,6 +28,12 @@ export const de = {
   name: {
     edit: 'Aufgabe umbenennen',
   },
+
+  owner: {
+    one: 'Besitzer',
+    other: 'Besitzer',
+  },
+
   priority: {
     one: 'Priorität',
     other: 'Prioritäten',

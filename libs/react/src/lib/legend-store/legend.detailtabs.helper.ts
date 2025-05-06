@@ -59,8 +59,12 @@ export const detailTabsHelper = () => {
     activeTabField.field?.name ?? ''
   );
 
-  if (!activeTabViewConfig) return null;
-  if (!row) return null;
+  if (!activeTabViewConfig) {
+    return null;
+  }
+  if (!row) {
+    return null;
+  }
   if (!view) throw new Error('Tabs Helper: No view found');
 
   const viewConfigManager = new BaseViewConfigManager(activeTabViewConfig);

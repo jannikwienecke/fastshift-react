@@ -205,7 +205,7 @@ const DetailTabs = (
                 isActive ? ' border-b-0 ' : ''
               )}
             >
-              {tab.field?.name}
+              {tab.field?.label}
             </button>
           );
         })}

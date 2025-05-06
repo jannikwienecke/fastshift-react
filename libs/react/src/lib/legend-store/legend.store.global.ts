@@ -96,6 +96,8 @@ const resetStore = () => {
   store$.displayOptionsClose();
   store$.contextMenuClose();
 
+  store$.detail.activeTabField.set(null);
+
   store$.fetchMore.assign({
     isDone: false,
     currentCursor: {
