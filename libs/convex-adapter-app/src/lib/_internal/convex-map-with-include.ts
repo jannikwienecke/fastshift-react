@@ -93,15 +93,13 @@ export const mapWithInclude = async (
     await asyncMap(fields, async (field) => {
       const record = task[field.name];
       if (!record) {
-        console.error('no record');
-        return null;
+        return;
       }
 
       const viewConfig = getViewByName(registeredViews, field.name);
 
       if (!viewConfig) {
-        console.error('no viewConfig');
-        return null;
+        return;
       }
 
       args.viewId = null;
@@ -110,6 +108,8 @@ export const mapWithInclude = async (
       const withInclude = await mapWithInclude([record], ctx, args);
 
       task[field.name] = withInclude.length ? withInclude[0] : record;
+
+      return;
     });
 
     result[0] = task;
