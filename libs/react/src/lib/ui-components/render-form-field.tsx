@@ -1,5 +1,5 @@
 import { FormFieldProps } from '@apps-next/core';
-import { cn } from '@apps-next/ui';
+import { cn, Label } from '@apps-next/ui';
 import { AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -69,13 +69,15 @@ const TextAreaFormField = (props: FormFieldProps) => {
 
   const field = props.field;
   return (
-    <>
+    <div className="flex flex-col gap-1 pt-8">
+      <Label className="text-foreground/60">{props.field.label}</Label>
+
       <div key={`primitive-textarea-field-${field.field?.name}`}>
         <textarea
           placeholder={t('richEditor.placeholder', {
             name: field.label,
           })}
-          className="text-base outline-none border-none w-full pb-12 pt-8"
+          className="text-base outline-none border-none w-full"
           cols={3}
           onChange={(e) => onChange(e, props)}
           onBlur={(e) => onBlur(e, props)}
@@ -83,7 +85,7 @@ const TextAreaFormField = (props: FormFieldProps) => {
           onKeyDown={(e) => onKeyDownTextare(e, props)}
         />
       </div>
-    </>
+    </div>
   );
 };
 
@@ -91,7 +93,8 @@ const StringFormField = (props: FormFieldProps) => {
   const error = props.formState.errors?.[props.field.field?.name ?? ''];
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 pt-2">
+      <Label className="text-foreground/60">{props.field.label}</Label>
       <div className="flex flex-row gap-2 items-center pb-4">
         <>
           {props.field.icon ? (
