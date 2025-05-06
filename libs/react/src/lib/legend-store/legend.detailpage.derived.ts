@@ -14,7 +14,6 @@ export const derviedDetailPage$ = observable(() => {
 
   const detailHelper = detailFormHelper();
   const tabsProps = detailTabsHelper();
-
   return {
     row: detailHelper.row,
     icon: detailHelper.view.icon,
@@ -47,6 +46,7 @@ export const derviedDetailPage$ = observable(() => {
         xSelect.open(tabsProps?.row, field.field, true);
         selectState$.rect.set(rect);
       } else if (field.field) {
+        selectState$.isDetail.set(true);
         xSelect.open(detailHelper.row, field.field, true);
         selectState$.rect.set(rect);
       }
