@@ -189,7 +189,7 @@ const DetailTabs = (
   } = props.tabs;
 
   return (
-    <div className="text-sm">
+    <div className="text-sm" data-testid="detail-tabs">
       <div className="flex flex-row gap-0">
         <div className="border-b-[.5px] w-20"></div>
 

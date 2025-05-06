@@ -79,22 +79,24 @@ export const detailTabsHelper = () => {
   );
 
   const getAllPrimitiveFormFields = () => {
-    return viewFields.map((field) => {
-      const icon =
-        uiViewConfig?.[viewConfigManager.getTableName()].fields?.[field.name]
-          ?.component?.icon;
+    return viewFields
+      .filter((f) => !f.relation && !f.enum && !f.isDateField)
+      .map((field) => {
+        const icon =
+          uiViewConfig?.[viewConfigManager.getTableName()].fields?.[field.name]
+            ?.component?.icon;
 
-      const value = row ? row?.raw?.[field.name] : undefined;
+        const value = row ? row?.raw?.[field.name] : undefined;
 
-      const label = getFieldLabel(field, true) ?? '';
-      return {
-        label,
-        field,
-        id: field.name,
-        icon: icon ? icon : undefined,
-        value: row ? value : undefined,
-      } satisfies CommandformItem;
-    });
+        const label = getFieldLabel(field, true) ?? '';
+        return {
+          label,
+          field,
+          id: field.name,
+          icon: icon ? icon : undefined,
+          value: row ? value : undefined,
+        } satisfies CommandformItem;
+      });
   };
 
   const complexFields = viewFields

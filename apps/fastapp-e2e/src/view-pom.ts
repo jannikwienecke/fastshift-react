@@ -14,6 +14,7 @@ export class MainViewPage {
   readonly commandform: Locator;
   readonly detailHeader: Locator;
   readonly sidebar: Locator;
+  readonly detailTabs: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -28,6 +29,7 @@ export class MainViewPage {
     this.commandform = page.getByTestId('commandform');
     this.detailHeader = page.getByTestId('detail-page-header');
     this.sidebar = page.getByTestId('sidebar');
+    this.detailTabs = page.getByTestId('detail-tabs');
   }
 
   async goto() {

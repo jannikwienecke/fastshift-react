@@ -31,6 +31,14 @@ export const en = {
     create: 'Create Task',
     delete: 'Delete Task',
   },
+  firstname: {
+    one: 'First Name',
+    other: 'First Name',
+  },
+  lastname: {
+    one: 'Last Name',
+    other: 'Last Name',
+  },
   owner: {
     one: 'Owner',
     other: 'Owners',

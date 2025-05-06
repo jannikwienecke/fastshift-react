@@ -63,6 +63,12 @@ const DUEDATE = {
     tomorrow: 'Tomorrow',
   },
 };
+const USER = {
+  values: {
+    johnDoe: 'john.doe@example.com',
+    janeSmith: 'jane.smith@example.com',
+  },
+};
 
 export const CON = {
   project: PROJECT,
@@ -73,4 +79,5 @@ export const CON = {
   category: CATEGORY,
   filter: FILTER,
   dueDate: DUEDATE,
+  user: USER,
 };

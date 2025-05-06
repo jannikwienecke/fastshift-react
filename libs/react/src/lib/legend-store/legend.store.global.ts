@@ -356,5 +356,23 @@ export const globalStore = {
   dispatch,
   setViews: (views: RegisteredViews) => {
     store$.views.set(patchAllViews(views));
+    if (!store$.viewConfigManager.viewConfig.get()) return;
+
+    const viewConfigManager = createViewConfigManager(
+      store$.viewConfigManager.getViewName()
+    );
+
+    if (
+      store$.detail.viewConfigManager.get() &&
+      store$.detail.viewConfigManager.getViewName()
+    ) {
+      const detailViewConfigManager = createViewConfigManager(
+        store$.detail.viewConfigManager.getViewName()
+      );
+
+      store$.detail.viewConfigManager.set(detailViewConfigManager);
+    }
+
+    store$.viewConfigManager.set(viewConfigManager);
   },
 };
