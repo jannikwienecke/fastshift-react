@@ -89,11 +89,13 @@ export const useAppEffects = (viewName: string) => {
     store$.list.rowInFocus.onChange((changes) => {
       const row = changes.value;
 
+      const view = store$.viewConfigManager.getViewName();
+      const userViewData = store$.userViewData.get();
+      const slug = userViewData?.slug ?? view;
       if (row?.row?.id) {
-        _log.debug('Preload row', row.row.id);
         realPreloadRouteRef.current({
           from: '/fastApp/$view',
-          to: `/fastApp/$view/${row.row.id}/overview`,
+          to: `/fastApp/${slug}/${row.row.id}/overview`,
         });
       }
     });

@@ -36,6 +36,7 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
     const userViews = getUserViews();
     const { viewData } = getViewData(viewName, userViews);
 
+    console.log('Preload', viewName);
     await props.context.preloadQuery(
       viewData.viewConfig,
       viewName,
@@ -43,6 +44,7 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
       null,
       null
     );
+    console.log('Preload done', viewName);
   },
   component: () => <DetaiViewPage />,
 });

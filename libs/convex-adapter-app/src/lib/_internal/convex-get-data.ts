@@ -298,25 +298,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const newRows = await fetch();
 
   // if (newRows?.[0] === null) {
-  //   // hasManyToManyFilter ? idsManyToManyFilters : null,
-  //   // hasOneToManyFilter ? idsOneToManyFilters : null,
-  //   // isIndexSearch ? idsIndexField : null,
-  //   // isSearchFieldSearch ? idsSearchField : null,
-  //   // args.query ? idsQuerySearch : null,
-  //   // softDeleteEnabled && !showDeleted && !hasParentFilter
-  //   //   ? idsNotDeleted
-  //   //   : null,
-  //   // hasParentFilter ? idsSubView : null
   //   console.log('HIER', {
   //     allIds,
-  //     idsManyToManyFilters,
-  //     idsOneToManyFilters,
-  //     idsIndexField,
-  //     idsSearchField,
-  //     idsQuerySearch,
-  //     idsNotDeleted,
-  //     idsSubView,
   //     viewId: args.viewId,
+  //     view: args.viewName,
+  //     parent: args.parentViewName,
   //   });
   // }
 
@@ -349,7 +335,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
         sortedRows
       : sortedRows.slice(position, nextPosition);
 
-  sortedRows = await mapWithInclude(sortedRows, ctx, args);
+  sortedRows = await mapWithInclude(
+    sortedRows.filter((r) => r !== null),
+    ctx,
+    args
+  );
 
   if (allIds !== null || isGetAll) {
     const newItemsLength = allIds !== null ? allIds.length : newRows.length;

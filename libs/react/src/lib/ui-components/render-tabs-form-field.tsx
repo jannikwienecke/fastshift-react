@@ -9,11 +9,11 @@ const StringFormField = (props: FormFieldProps) => {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-row gap-2 items-center pb-4">
-        <>
+        <div className="min-w-6 h-4">
           {props.field.icon ? (
             <props.field.icon className="h-3 w-3 text-foreground" />
           ) : null}
-        </>
+        </div>
 
         <Label className="max-w-[16rem] min-w-[16rem]">
           {props.field.label}
