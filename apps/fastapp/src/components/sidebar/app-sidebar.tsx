@@ -215,6 +215,17 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  // todo add language switcher
+  // const { i18n } = useTranslation();
+  // const currentLanguage = i18n.language;
+  // const allLanguages = ['de', 'en'];
+
+  // const open = pinned ? true : _open;
+
+  // const handleLanguageChange = (lang: string) => {
+  //   i18n.changeLanguage(lang);
+  // };
+
   return (
     <Sidebar data-testid="sidebar" collapsible="icon" {...props}>
       <SidebarHeader>

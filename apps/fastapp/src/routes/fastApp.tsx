@@ -1,7 +1,6 @@
 import { SidebarInset, SidebarProvider } from '@apps-next/ui';
 
-import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { views } from '@apps-next/convex';
 import { _log, QueryReturnOrUndefined } from '@apps-next/core';
@@ -13,22 +12,13 @@ import {
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import {
-  CircleIcon,
-  DotIcon,
-  IconJarLogoIcon,
-  MixIcon,
-  SunIcon,
-} from '@radix-ui/react-icons';
-import {
   createFileRoute,
   ErrorComponent,
-  Link,
   Outlet,
   redirect,
   useParams,
 } from '@tanstack/react-router';
 import { LoaderIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
 import { resettingDb$ } from '../application-store/app.store';
 import { getViewData, wait } from '../application-store/app.store.utils';
@@ -193,6 +183,7 @@ const FastAppLayoutComponent = observer(() => {
     <ClientViewProviderConvex commands={commands}>
       <SidebarProvider>
         <AppSidebar />
+
         <SidebarInset>
           <Outlet />
         </SidebarInset>
@@ -211,97 +202,3 @@ const FastAppLayoutComponent = observer(() => {
     </ClientViewProviderConvex>
   );
 });
-
-export function Layout({ children }: { children: React.ReactNode }) {
-  const { t } = useTranslation();
-
-  const links = [
-    {
-      label: t('navigation.projects'),
-      href: '/fastApp/my-projects',
-      icon: (
-        <DotIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
-      ),
-    },
-    {
-      label: t('navigation.tasks'),
-      href: '/fastApp/Task',
-      icon: (
-        <CircleIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
-      ),
-    },
-    {
-      label: t('navigation.owner'),
-      href: '/fastApp/owner',
-      icon: (
-        <MixIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
-      ),
-    },
-    {
-      label: t('navigation.logout'),
-      href: '#',
-      icon: (
-        <SunIcon className="text-neutral-700 dark:text-neutral-200 h-4 w-4 flex-shrink-0" />
-      ),
-    },
-  ];
-  const [_open, setOpen] = useState(false);
-  const [pinned, setPinned] = useState(true);
-
-  const { i18n } = useTranslation();
-  const currentLanguage = i18n.language;
-  const allLanguages = ['de', 'en'];
-
-  const open = pinned ? true : _open;
-
-  const handleLanguageChange = (lang: string) => {
-    i18n.changeLanguage(lang);
-  };
-
-  return null;
-}
-
-export const Logo = ({
-  onTogglePin,
-  pinned,
-}: {
-  onTogglePin: () => void;
-  pinned: boolean;
-}) => {
-  return (
-    <Link
-      to="/fastApp"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-medium text-black dark:text-white whitespace-pre"
-      >
-        <div className="flex flex-row items-center gap-2">
-          <div>Acet Labs</div>
-          <div className="cursor-pointer" onClick={onTogglePin}>
-            {/* close icon */}
-            {pinned ? (
-              <IconJarLogoIcon className="text-black dark:text-white h-4 w-4" />
-            ) : (
-              <IconJarLogoIcon className="text-black dark:text-white h-4 w-4" />
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </Link>
-  );
-};
-export const LogoIcon = () => {
-  return (
-    <Link
-      href="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-    </Link>
-  );
-};
