@@ -252,6 +252,10 @@ test.describe('Custom Views', () => {
     await expect(page).toHaveURL(/.todos/);
 
     await mainPage.sidebar.getByText(/tasks/i).first().click();
+    await mainPage.sidebar
+      .getByText(/all tasks/i)
+      .first()
+      .click();
 
     await expect(page).toHaveURL(/.*task/i);
 
