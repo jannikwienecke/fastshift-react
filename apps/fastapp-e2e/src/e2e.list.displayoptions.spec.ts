@@ -5,7 +5,7 @@ import { groupByField, sortByField } from './helpers/e2e.helper.displayoptions';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
-  await helper.navigation.goToListView('task');
+  await helper.navigation.goToListView('all-tasks');
 });
 
 test.setTimeout(isDev() ? 20000 : 10000);
@@ -66,7 +66,7 @@ test.describe('List Display Options', () => {
     helper,
   }) => {
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );

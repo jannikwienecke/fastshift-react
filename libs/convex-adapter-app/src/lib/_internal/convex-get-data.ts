@@ -297,15 +297,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const newRows = await fetch();
 
-  // if (newRows?.[0] === null) {
-  //   console.log('HIER', {
-  //     allIds,
-  //     viewId: args.viewId,
-  //     view: args.viewName,
-  //     parent: args.parentViewName,
-  //   });
-  // }
-
   if (localModeEnabled && newRows.length === DEFAULT_LOCAL_MODE_LIMIT) {
     _log.warn(
       `WARNING: Local Mode enabled and limit reached! Consider disabled local mode or addding a defautlt filter`

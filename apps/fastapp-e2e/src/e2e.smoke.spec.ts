@@ -28,6 +28,11 @@ test.describe('Smoke Test', () => {
       .first()
       .click();
 
+    await sidebar
+      .getByText(/sorted projects/i)
+      .first()
+      .click();
+
     const projectListItem = await taskPage.getListItem(0);
 
     await projectListItem.click();

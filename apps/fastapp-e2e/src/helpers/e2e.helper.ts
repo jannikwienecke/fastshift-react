@@ -21,7 +21,7 @@ export const isDev = () => {
 
 export const goToProjectsTask = ({ helper }: PartialFixtures) => {
   helper.navigation.goToDetailSubList(
-    'my-projects',
+    'all-projects',
     CON.project.values.websiteRedesign,
     'Tasks'
   );

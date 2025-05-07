@@ -7,7 +7,7 @@ import { sortByField } from './helpers/e2e.helper.displayoptions';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
-  await helper.navigation.goToListView('task');
+  await helper.navigation.goToListView('all-tasks');
 });
 
 test.setTimeout(isDev() ? 20000 : 10000);

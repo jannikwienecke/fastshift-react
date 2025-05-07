@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
   SidebarMenuAction,
   useShadCnSidebar,
+  cn,
 } from '@apps-next/ui';
 import { Link } from '@tanstack/react-router';
 import {
@@ -33,6 +34,7 @@ import { getUserViews } from '../../query-client';
 import { views } from '@apps-next/convex';
 import { GetTableName } from '@apps-next/core';
 import { viewRegistry } from '@apps-next/react';
+import React from 'react';
 
 type Nav = {
   items: {
@@ -87,6 +89,7 @@ export function NavMain() {
 }
 
 export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
+  const [hover, setHover] = React.useState('');
   const { t } = useTranslation();
   const { isMobile } = useShadCnSidebar();
 
@@ -123,46 +126,61 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
         <CollapsibleContent>
           <SidebarMenuSub>
             {item.items?.map((subItem) => (
-              <SidebarMenuSubItem key={subItem.title}>
-                <SidebarMenuSubButton asChild>
-                  <Link to={subItem.url} className="">
-                    <span>{subItem.title}</span>
+              <SidebarMenuSubItem
+                key={subItem.title}
+                className="flex flex-row items-center justify-between hover:bg-sidebar-accent"
+              >
+                <SidebarMenuSubButton className="w-full" asChild>
+                  <Link
+                    onMouseOver={() => setHover(subItem.title)}
+                    to={subItem.url}
+                    className="flex-grow"
+                  >
+                    <span className="">{subItem.title}</span>
                   </Link>
                 </SidebarMenuSubButton>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild className="right-4">
-                    <SidebarMenuAction showOnHover>
-                      <MoreHorizontal />
-                      <span className="sr-only">More</span>
-                    </SidebarMenuAction>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-56 rounded-lg"
-                    side={isMobile ? 'bottom' : 'right'}
-                    align={isMobile ? 'end' : 'start'}
-                  >
-                    <DropdownMenuItem>
-                      <PencilIcon className="text-muted-foreground" />
-                      <span>{t('common.edit')}</span>
-                    </DropdownMenuItem>
+                <div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      asChild
+                      className={cn(
+                        'relative -left-1 top-0 invisible',
+                        hover === subItem.title ? 'visible' : ''
+                      )}
+                    >
+                      <SidebarMenuAction>
+                        <MoreHorizontal className="" />
+                        <span className="sr-only">More</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-56 rounded-lg"
+                      side={isMobile ? 'bottom' : 'right'}
+                      align={isMobile ? 'end' : 'start'}
+                    >
+                      <DropdownMenuItem>
+                        <PencilIcon className="text-muted-foreground" />
+                        <span>{t('common.edit')}</span>
+                      </DropdownMenuItem>
 
-                    <DropdownMenuItem>
-                      <Trash2 className="text-muted-foreground" />
-                      <span>{t('common.delete', { name: '' })}</span>
-                    </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Trash2 className="text-muted-foreground" />
+                        <span>{t('common.delete', { name: '' })}</span>
+                      </DropdownMenuItem>
 
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Link className="text-muted-foreground" />
-                      <span>{t('copy.url')}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <ArrowUpRight className="text-muted-foreground" />
-                      <span>{t('common.openInNewTab')}</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <Link className="text-muted-foreground" />
+                        <span>{t('copy.url')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <ArrowUpRight className="text-muted-foreground" />
+                        <span>{t('common.openInNewTab')}</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </SidebarMenuSubItem>
             ))}
           </SidebarMenuSub>

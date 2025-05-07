@@ -6,7 +6,7 @@ test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
 
   await helper.navigation.goToDetail(
-    'my-projects',
+    'all-projects',
     CON.project.values.websiteRedesign
   );
 });
@@ -32,7 +32,7 @@ test.describe('Detail Page Form Test', () => {
     const newDescription = 'New Description';
 
     await helper.navigation.goToDetail(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign
     );
 
@@ -68,7 +68,7 @@ test.describe('Detail Page Form Test', () => {
     const newDescription = 'New Description';
 
     await helper.navigation.goToDetail(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign
     );
 
@@ -78,6 +78,11 @@ test.describe('Detail Page Form Test', () => {
 
     await mainPage.sidebar
       .getByText(/projects/i)
+      .first()
+      .click();
+
+    await mainPage.sidebar
+      .getByText(/all projects/i)
       .first()
       .click();
 

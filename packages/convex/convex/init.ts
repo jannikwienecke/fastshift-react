@@ -48,11 +48,29 @@ const init = server.mutation({
       {
         baseView: 'task',
         description: '',
+        slug: 'all-tasks',
+        name: 'All Tasks',
+        displayOptions: '',
+        filters: '',
+      },
+
+      {
+        baseView: 'task',
+        description: '',
         slug: 'urgent-tasks',
         name: 'Urgent Tasks',
         displayOptions: '',
         filters: 'filter[]=priority:is:5||5:relation;true',
       },
+      {
+        baseView: 'projects',
+        description: '',
+        slug: 'all-projects',
+        name: 'All Projects',
+        displayOptions: '',
+        filters: '',
+      },
+
       {
         baseView: 'projects',
         description: '',

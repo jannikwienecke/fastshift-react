@@ -3,7 +3,7 @@ import { isDev, waitFor } from './helpers/e2e.helper';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
-  await helper.navigation.goToListView('task');
+  await helper.navigation.goToListView('all-tasks');
 });
 
 test.setTimeout(isDev() ? 20000 : 10000);

@@ -11,7 +11,7 @@ import { listFilter } from './helpers/e2e.helper.filter';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
-  await helper.navigation.goToListView('task');
+  await helper.navigation.goToListView('all-tasks');
 });
 
 test.setTimeout(isDev() ? 20000 : 10000);
@@ -59,7 +59,7 @@ test.describe('Custom Views', () => {
   }) => {
     // TODO: After implementing
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -122,6 +122,11 @@ test.describe('Custom Views', () => {
       .first()
       .click();
 
+    await mainPage.sidebar
+      .getByText(/all projects/i)
+      .first()
+      .click();
+
     // we are on projects list view -> can see
     await expect(page.getByText(CON.project.values.fitnessPlan)).toHaveCount(2);
     await expect(
@@ -130,6 +135,11 @@ test.describe('Custom Views', () => {
 
     // go back to tasks list view -> see the filtered tasks again
     await mainPage.sidebar.getByText(/tasks/i).first().click();
+    await mainPage.sidebar
+      .getByText(/all tasks/i)
+      .first()
+      .click();
+
     await expect(page.getByText(CON.project.values.fitnessPlan)).toHaveCount(4);
     await expect(
       page.getByText(CON.project.values.websiteRedesign)
@@ -161,7 +171,7 @@ test.describe('Custom Views', () => {
       .click();
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -173,7 +183,7 @@ test.describe('Custom Views', () => {
 
     await waitFor(page, 500);
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     // filter of sub list is not applied to main list
     await expect(
@@ -181,7 +191,7 @@ test.describe('Custom Views', () => {
     ).toBeVisible();
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );

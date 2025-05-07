@@ -6,7 +6,7 @@ import { listCombobox } from './helpers/e2e.helper.list-combobox';
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
   await helper.navigation.goToDetail(
-    'my-projects',
+    'all-projects',
     CON.project.values.websiteRedesign
   );
 });
