@@ -97,6 +97,7 @@ export const en = {
     markAs: 'Mark as {{field}}',
     unmarkAs: 'Unmark as {{field}}',
     resetDb: 'Reset Database',
+    openInNewTab: 'Open in new tab',
   },
 
   datePicker: {

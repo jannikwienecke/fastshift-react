@@ -1,12 +1,13 @@
+import { api, views } from '@apps-next/convex';
 import { _log, slugHelper } from '@apps-next/core';
-import { store$ } from '@apps-next/react';
+import { globalStore, store$ } from '@apps-next/react';
+import { convexQuery } from '@convex-dev/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useLocation, useRouter } from '@tanstack/react-router';
 import React from 'react';
-import { useViewParams } from './useViewParams';
+import { useTranslation as useTranslationReact } from 'react-i18next';
 import { getUserViews } from '../../query-client';
-import { useQuery } from '@tanstack/react-query';
-import { convexQuery } from '@convex-dev/react-query';
-import { api } from '@apps-next/convex';
+import { useViewParams } from './useViewParams';
 
 export const useAppEffects = (viewName: string) => {
   const router = useRouter();
@@ -31,12 +32,18 @@ export const useAppEffects = (viewName: string) => {
 
   const view = store$.viewConfigManager.viewConfig.viewName.get();
 
-  const { data: views } = useQuery(convexQuery(api.query.getUserViews, {}));
+  const { data: userViews } = useQuery(convexQuery(api.query.getUserViews, {}));
 
   React.useEffect(() => {
-    if (!views) return;
-    store$.userViews.set(views);
-  }, [views]);
+    if (!userViews) return;
+    store$.userViews.set(userViews);
+  }, [userViews]);
+
+  const [_, i18n] = useTranslationReact();
+
+  React.useEffect(() => {
+    globalStore.setViews(views);
+  }, [i18n.language]);
 
   React.useEffect(() => {
     const isOverview = pathname.includes('/overview');
@@ -82,11 +89,13 @@ export const useAppEffects = (viewName: string) => {
     store$.list.rowInFocus.onChange((changes) => {
       const row = changes.value;
 
+      const view = store$.viewConfigManager.getViewName();
+      const userViewData = store$.userViewData.get();
+      const slug = userViewData?.slug ?? view;
       if (row?.row?.id) {
-        _log.debug('Preload row', row.row.id);
         realPreloadRouteRef.current({
           from: '/fastApp/$view',
-          to: `/fastApp/$view/${row.row.id}/overview`,
+          to: `/fastApp/${slug}/${row.row.id}/overview`,
         });
       }
     });

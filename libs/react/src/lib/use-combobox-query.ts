@@ -4,10 +4,12 @@ import { useQuery } from './use-query';
 import {
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  getViewByName,
   ViewConfigType,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { isDetail } from './legend-store/legend.utils';
+import { derviedDetailPage$ } from './legend-store/legend.detailpage.derived';
 
 const viewConfigManager$ = observable(() => {
   const view = store$.commandform.view.get();
@@ -25,6 +27,13 @@ export const useComboboxQuery = () => {
   const store = comboboxStore$.get();
   const viewConfigManager = viewConfigManager$.get();
 
+  const activeTabField = derviedDetailPage$.tabs.activeTabField.get();
+  const useTabsForComboboxQuery = store$.detail.useTabsForComboboxQuery.get();
+  const activeTabViewName = useTabsForComboboxQuery
+    ? getViewByName(store$.views.get(), activeTabField?.field?.name ?? '')
+        ?.viewName
+    : null;
+
   const disabled =
     !store.field ||
     !store.query ||
@@ -36,7 +45,9 @@ export const useComboboxQuery = () => {
   const { data } = useQuery({
     viewName:
       // TODO DETAIL BRANCHING
-      store$.commandform.view.get()?.viewName ?? isDetail()
+      activeTabViewName
+        ? activeTabViewName
+        : store$.commandform.view.get()?.viewName ?? isDetail()
         ? store$.detail.parentViewName.get()
         : undefined,
     viewConfigManager: viewConfigManager ?? undefined,

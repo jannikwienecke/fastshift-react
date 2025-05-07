@@ -30,7 +30,7 @@ function RootComponent() {
     <div className="">
       <Outlet />
 
-      <TanStackRouterDevtools position="bottom-left" />
+      <TanStackRouterDevtools position="bottom-right" />
       <ReactQueryDevtools initialIsOpen={false} />
     </div>
   );

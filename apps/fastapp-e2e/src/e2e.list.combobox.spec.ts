@@ -23,7 +23,7 @@ test.describe('List Combobox', () => {
       helper,
     };
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     const list = helper.list;
 
@@ -56,7 +56,7 @@ test.describe('List Combobox', () => {
     const props: PartialFixtures = { mainPage: taskPage, helper };
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -94,7 +94,7 @@ test.describe('List Combobox', () => {
   }) => {
     expect(1).toBe(1);
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     await selectAndDeselectTag({ mainPage, helper });
   });
@@ -107,7 +107,7 @@ test.describe('List Combobox', () => {
     expect(1).toBe(1);
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -120,7 +120,7 @@ test.describe('List Combobox', () => {
     helper,
   }) => {
     expect(1).toBe(1);
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     await selectPriority({ mainPage, helper });
   });
@@ -131,7 +131,7 @@ test.describe('List Combobox', () => {
   }) => {
     expect(1).toBe(1);
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -145,7 +145,7 @@ test.describe('List Combobox', () => {
   }) => {
     expect(1).toBe(1);
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     await selectCompletedStatus({ mainPage, helper });
   });
@@ -157,7 +157,7 @@ test.describe('List Combobox', () => {
     expect(1).toBe(1);
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -171,7 +171,7 @@ test.describe('List Combobox', () => {
   }) => {
     expect(1).toBe(1);
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     const firstListItem = await helper.list.getFirstListItem();
 
@@ -201,7 +201,7 @@ test.describe('List Combobox', () => {
     await firstListItem.hasText(day2Digits3DaysFromNow);
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -225,7 +225,7 @@ test.describe('List Combobox', () => {
   }) => {
     expect(1).toBe(1);
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     let firstListItem = await helper.list.getFirstListItem();
 
@@ -266,7 +266,7 @@ test.describe('List Combobox', () => {
     await firstListItem.hasText(oneOfOne);
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );

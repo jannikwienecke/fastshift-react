@@ -1,5 +1,4 @@
 import {
-  BaseViewConfigManager,
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
   QueryServerProps,
   relationalViewHelper,
@@ -69,13 +68,15 @@ export const handleRelationalTableQuery = async ({
         ? await filterByNotDeleted(dbQuery, indexFieldDeleted).collect()
         : await dbQuery.collect();
 
-      return filterResults(
+      const rowsAfterFilter = filterResults(
         rows,
         relationalViewManager.getDisplayFieldLabel(),
         args.query ?? '',
         [],
         searchFields
       ).slice(0, DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+
+      return rowsAfterFilter;
     }
   };
 

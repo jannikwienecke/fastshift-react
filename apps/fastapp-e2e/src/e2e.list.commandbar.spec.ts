@@ -9,7 +9,7 @@ import { MainViewPage } from './view-pom';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
-  await helper.navigation.goToListView('task');
+  await helper.navigation.goToListView('all-tasks');
 });
 
 test.setTimeout(isDev() ? 20000 : 10000);
@@ -23,7 +23,7 @@ test.describe('List Commandbar', () => {
   }) => {
     expect(1).toBe(1);
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     await navigateCommandbar({ mainPage, helper });
   });
@@ -35,7 +35,7 @@ test.describe('List Commandbar', () => {
     expect(1).toBe(1);
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -59,7 +59,7 @@ test.describe('List Commandbar', () => {
     expect(1).toBe(1);
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );

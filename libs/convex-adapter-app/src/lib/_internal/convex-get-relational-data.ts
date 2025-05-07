@@ -17,7 +17,7 @@ export const getRelationalData = async (
   ctx: GenericQueryCtx,
   args: QueryServerProps
 ) => {
-  const { viewConfigManager, viewId } = args;
+  const { viewConfigManager } = args;
 
   const displayField = viewConfigManager.getDisplayFieldLabel();
 

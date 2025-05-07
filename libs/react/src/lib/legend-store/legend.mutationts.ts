@@ -14,7 +14,12 @@ import { renderErrorToast, renderSuccessToast } from '../toast';
 import { createRow } from './legend.form.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
-import { copyRow, getViewConfigManager, isDetail } from './legend.utils';
+import {
+  copyRow,
+  getViewConfigManager,
+  isDetail,
+  isTabs,
+} from './legend.utils';
 import { setGlobalDataModel } from './legend.utils.helper';
 
 // Temporary states
@@ -95,7 +100,6 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
   async ({ field, valueRow, row }, onSuccess, onError) => {
     const viewConfigManager = getViewConfigManager();
 
-    console.warn('Starting updateRecordMutation');
     const patchValue = field.relation
       ? ifNoneNullElseValue(valueRow.id)
       : ifNoneNullElseValue(valueRow.raw);
@@ -367,8 +371,24 @@ export const optimisticUpdateStore = ({
     }
 
     // TODO DETAIL BRANCHING
-    if (store$.detail.row.get() && isDetail()) {
+    if (store$.detail.row.get() && isDetail() && !isTabs()) {
       store$.detail.row.set(updatedRow);
+    }
+
+    if (store$.detail.row.get() && isTabs()) {
+      const activeTabField = store$.detail.activeTabField.get();
+
+      const updatedRowData = {
+        ...store$.detail.row.raw.get(),
+        [activeTabField?.field?.name ?? '']: updatedRow.raw,
+      };
+
+      const row = makeData(
+        store$.views.get(),
+        store$.detail.viewConfigManager.getViewName()
+      )([updatedRowData]).rows?.[0];
+
+      store$.detail.row.set(row);
     }
 
     if (updateGlobalDataModel && !isDetail()) {

@@ -470,4 +470,10 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       }
     );
   });
+
+  selectState$.parentRow.onChange((changes) => {
+    if (!changes.value) {
+      store$.detail.useTabsForComboboxQuery.set(false);
+    }
+  });
 };

@@ -17,7 +17,7 @@ test.describe('List Filter Date Tests', () => {
     const list = helper.list;
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -68,7 +68,7 @@ test.describe('List Filter Date Tests', () => {
     page,
     helper,
   }) => {
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     await mainPage.openFilter(/due Date/i);
     const input = page.getByPlaceholder(/filter/i);
@@ -126,7 +126,7 @@ test.describe('List Filter Date Tests', () => {
     mainPage,
     helper,
   }) => {
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     await mainPage.openFilter(/due Date/i);
     await mainPage.comboboxPopover.getByText(/today/i).click();

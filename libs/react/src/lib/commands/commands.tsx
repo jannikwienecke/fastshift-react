@@ -199,7 +199,14 @@ const makeOpenCreateFormCommand = (view: ViewConfigType): CommandbarItem => {
     parentViewName &&
     view.viewName === store$.viewConfigManager.getViewName()
   ) {
-    const viewOfParent = getViewByName(store$.views.get(), parentViewName);
+    const userView = store$.userViews
+      .find((v) => v.name.get().toLowerCase() === parentViewName.toLowerCase())
+      ?.get();
+
+    const viewOfParent = getViewByName(
+      store$.views.get(),
+      userView?.baseView ?? parentViewName ?? ''
+    );
     const tableName = viewOfParent?.tableName;
     if (!tableName) throw new Error('tableName not found');
 

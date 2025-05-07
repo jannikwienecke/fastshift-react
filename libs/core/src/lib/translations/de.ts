@@ -78,6 +78,7 @@ export const de = {
     reset: 'Zurücksetzen',
     setValue: '{{field}} setzen',
     addMany: '{{field}} hinzufügen',
+    openInNewTab: 'In neuem Tab öffnen',
   },
   datePicker: {
     description: 'Bitte wählen Sie ein Datum aus dem Kalender.',

@@ -25,8 +25,9 @@ export const getIdsFromParentView = async (
         const allUserViews = (await ctx.db
           .query('views')
           .collect()) as UserViewData[];
+
         const parentViewName = allUserViews.find(
-          (v) => v.name === args.parentViewName
+          (v) => v.name.toLowerCase() === args.parentViewName?.toLowerCase()
         )?.baseView;
 
         parentView = getViewByName(args.registeredViews, parentViewName ?? '');

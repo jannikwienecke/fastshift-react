@@ -326,7 +326,11 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
         sortedRows
       : sortedRows.slice(position, nextPosition);
 
-  sortedRows = await mapWithInclude(sortedRows, ctx, args);
+  sortedRows = await mapWithInclude(
+    sortedRows.filter((r) => r !== null),
+    ctx,
+    args
+  );
 
   if (allIds !== null || isGetAll) {
     const newItemsLength = allIds !== null ? allIds.length : newRows.length;

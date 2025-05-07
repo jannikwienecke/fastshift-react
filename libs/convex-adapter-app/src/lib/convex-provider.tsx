@@ -86,7 +86,7 @@ const makeQuery = (
     });
   }
 
-  return convexQuery(viewLoader, {
+  const query = convexQuery(viewLoader, {
     viewName: viewConfig.viewName,
     query: '',
     filters: viewId ? '' : convertFiltersForBackend(mergedConfig.filters),
@@ -103,6 +103,8 @@ const makeQuery = (
           numItems: DEFAULT_FETCH_LIMIT_QUERY,
         },
   });
+
+  return query;
 };
 
 export const preloadQuery = (

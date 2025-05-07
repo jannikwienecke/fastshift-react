@@ -47,7 +47,11 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
 
   React.useEffect(() => {
     if (!relationalQueryReturn.relationalData) return;
-    if (!store$.commandform.view.get()) return;
+    if (
+      !store$.commandform.view.get() &&
+      !store$.detail.useTabsForComboboxQuery.get()
+    )
+      return;
 
     store$.handleIncomingRelationalData(relationalQueryReturnRef.current);
   }, [relationalQueryReturn.relationalData]);

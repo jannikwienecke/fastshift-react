@@ -2,6 +2,8 @@ import { FieldConfig, Row } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
 import { a } from 'framer-motion/dist/types.d-B50aGbjN';
+import { derviedDetailPage$ } from './legend.detailpage.derived';
+import { detailTabsHelper } from './legend.detailtabs.helper';
 
 export const selectState$ = observable({
   parentRow: null as Row | null,
@@ -26,7 +28,13 @@ const getParentRow = () => {
   const detailRow = store$.detail.row.get();
 
   // TODO DETAIL BRANCHING
-  if (detailRow && selectState$.isDetail.get()) return detailRow as Row;
+  if (detailRow && selectState$.isDetail.get()) {
+    return detailRow as Row;
+  }
+
+  if (store$.detail.useTabsForComboboxQuery.get()) {
+    return detailTabsHelper()?.row;
+  }
 
   const row = store$.dataModel.rows
     .get()
@@ -34,14 +42,15 @@ const getParentRow = () => {
 
   return row;
 };
-const getCurrentRows = () => {
-  const field = selectState$.field.get();
+const getCurrentRows = (_field?: FieldConfig) => {
+  const field = _field ?? selectState$.field.get();
 
   if (!field) return [];
 
   const parentRow = getParentRow();
 
   const rows = parentRow?.getValue?.(field.name);
+
   if ((rows as Row)?.id) return [rows];
   if (!Array.isArray(rows)) return [];
   return rows;
@@ -70,12 +79,11 @@ const getState = () => {
 };
 
 export const open = (row: Row, field: FieldConfig, isDetail?: boolean) => {
-  selectState$.isDetail.set(!!isDetail);
-
   selectState$.parentRow.set(row);
-  selectState$.field.set(field);
+  const initalRows = getCurrentRows(field);
 
-  const initalRows = getCurrentRows();
+  selectState$.field.set(field);
+  selectState$.isDetail.set(!!isDetail);
 
   selectState$.initalRows.set(initalRows);
   selectState$.newRows.set([]);

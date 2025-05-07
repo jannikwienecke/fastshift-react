@@ -7,7 +7,7 @@ test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
 
   await helper.navigation.goToDetail(
-    'my-projects',
+    'all-projects',
     CON.project.values.websiteRedesign
   );
 });
@@ -61,6 +61,7 @@ test.describe('Detail Page Form Test', () => {
     await expect(page.getByText(CON.owner.values.janeSmith)).toBeVisible();
 
     await mainPage.sidebar.getByText('projects').first().click();
+    await mainPage.sidebar.getByText('all projects').first().click();
 
     const personalItem = (
       await helper.list.getFirstListItem()

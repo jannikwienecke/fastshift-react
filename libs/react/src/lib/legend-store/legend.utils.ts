@@ -1,13 +1,14 @@
 import {
+  BaseViewConfigManager,
   BaseViewConfigManagerInterface,
+  getViewByName,
   makeData,
-  QueryReturnOrUndefined,
   Row,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { store$ } from './legend.store';
+import { derviedDetailPage$ } from './legend.detailpage.derived';
 import { selectState$ } from './legend.select-state';
-import { queryListViewOptions$ } from './legend.queryProps.derived';
+import { store$ } from './legend.store';
 
 export const copyRow = (
   row: Row,
@@ -49,7 +50,26 @@ export const isDetail = () => {
   );
 };
 
+export const isTabs = () => {
+  const useTabs = store$.detail.useTabsForComboboxQuery.get();
+  const useTabsFormField = store$.detail.useTabsFormField.get();
+
+  return !!useTabs || !!useTabsFormField;
+};
+
 export const getViewConfigManager = (): BaseViewConfigManagerInterface => {
+  const activeTabField = derviedDetailPage$.tabs.activeTabField.get();
+  if (isTabs() && activeTabField) {
+    const activeTabViewName = getViewByName(
+      store$.views.get(),
+      activeTabField?.field?.name ?? ''
+    );
+    if (!activeTabViewName) throw new Error('No active tab view name found');
+
+    return new BaseViewConfigManager(
+      activeTabViewName
+    ) as BaseViewConfigManagerInterface;
+  }
   if (isDetail()) {
     const viewConfigDetail = store$.detail.viewConfigManager.get();
 

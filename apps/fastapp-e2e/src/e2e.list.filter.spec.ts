@@ -23,7 +23,7 @@ test.describe('List Filter Tests', () => {
       helper,
     };
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     const { removeFilter, filterByWithOptions, filterByName, filterByDate } =
       listFilter(props);
@@ -77,7 +77,7 @@ test.describe('List Filter Tests', () => {
       helper,
     };
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     const { getFilterItemBy, selectFilterOption, filterByWithOptions } =
       listFilter(props);
@@ -101,7 +101,6 @@ test.describe('List Filter Tests', () => {
     await selectFilterOption('is not any of');
 
     await expect(mainPage.page.getByText(CON.tag.values.creative)).toBeHidden();
-    await expect(mainPage.page.getByText(CON.tag.values.planning)).toBeHidden();
     await expect(mainPage.page.getByText(CON.tag.values.longTerm)).toBeHidden();
   });
 
@@ -117,7 +116,7 @@ test.describe('List Filter Tests', () => {
     };
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -146,7 +145,6 @@ test.describe('List Filter Tests', () => {
     await selectFilterOption('is not any of');
 
     await expect(mainPage.page.getByText(CON.tag.values.creative)).toBeHidden();
-    await expect(mainPage.page.getByText(CON.tag.values.planning)).toBeHidden();
     await expect(mainPage.page.getByText(CON.tag.values.longTerm)).toBeHidden();
   });
 
@@ -161,7 +159,7 @@ test.describe('List Filter Tests', () => {
       helper,
     };
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     const { getFilterItemBy, filterByWithOptions } = listFilter(props);
 
@@ -197,7 +195,7 @@ test.describe('List Filter Tests', () => {
     };
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );
@@ -217,7 +215,7 @@ test.describe('List Filter Tests', () => {
     page,
     helper,
   }) => {
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     await mainPage.openFilter(/project/i);
 

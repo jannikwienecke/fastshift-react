@@ -12,7 +12,7 @@ import { makeViewFieldsConfig, viewRegistry } from '@apps-next/react';
 
 type ProjectViewDataType = DataType<
   'projects',
-  { categories: Categories; owner: Owner; tasks: Tasks }
+  { categories: Categories; owner: Owner; tasks?: Tasks }
 >;
 
 const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
@@ -27,7 +27,7 @@ const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
     tasks: {
       component: {
         list: ({ data }) => {
-          const tasks = data.tasks.length;
+          const tasks = data.tasks?.length;
           return (
             <div className="flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
               {tasks}

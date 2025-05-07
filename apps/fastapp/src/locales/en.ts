@@ -8,6 +8,8 @@ export const en = {
     tasks: 'Tasks',
     owner: 'Owner',
     logout: 'Logout',
+    categories: 'Categories',
+    tags: 'Tags',
   },
   projects: {
     one: 'Project',
@@ -30,6 +32,18 @@ export const en = {
     other: 'Tasks',
     create: 'Create Task',
     delete: 'Delete Task',
+  },
+  firstname: {
+    one: 'First Name',
+    other: 'First Name',
+  },
+  lastname: {
+    one: 'Last Name',
+    other: 'Last Name',
+  },
+  owner: {
+    one: 'Owner',
+    other: 'Owners',
   },
   priority: {
     one: 'Priority',

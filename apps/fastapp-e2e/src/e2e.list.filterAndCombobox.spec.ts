@@ -26,7 +26,7 @@ test.describe('List Filter / Combobox Test', () => {
       helper,
     };
 
-    await helper.navigation.goToListView('task');
+    await helper.navigation.goToListView('all-tasks');
 
     const { filterByWithOptions } = listFilter(props);
 
@@ -70,7 +70,7 @@ test.describe('List Filter / Combobox Test', () => {
     };
 
     await helper.navigation.goToDetailSubList(
-      'my-projects',
+      'all-projects',
       CON.project.values.websiteRedesign,
       'Tasks'
     );

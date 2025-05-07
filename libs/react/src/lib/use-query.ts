@@ -21,6 +21,7 @@ import {
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
+import { derviedDetailPage$ } from './legend-store/legend.detailpage.derived';
 
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const queryOptions = api.makeQueryOptions
@@ -91,15 +92,19 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
 
   const { registeredViews, viewConfigManager } = useView();
 
-  const view = store$.commandform.view.get();
+  const activeTabField = derviedDetailPage$.tabs.activeTabField.get();
+  const useTabsForComboboxQuery = store$.detail.useTabsForComboboxQuery.get();
+  const activeTabView = useTabsForComboboxQuery
+    ? getViewByName(store$.views.get(), activeTabField?.field?.name ?? '')
+    : null;
+
+  const view = store$.commandform.view.get() ?? activeTabView;
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
     useStableQuery(prisma, {
       registeredViews: queryProps?.registeredViews ?? registeredViews,
       query: '',
-      modelConfig:
-        queryProps?.viewConfigManager?.modelConfig ||
-        viewConfigManager.modelConfig,
+      modelConfig: undefined,
       viewConfig: getViewByName(
         registeredViews,
         view?.viewName ?? viewConfigManager?.viewConfig?.viewName ?? ''

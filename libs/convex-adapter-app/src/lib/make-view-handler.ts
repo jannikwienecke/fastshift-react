@@ -25,12 +25,12 @@ export const makeViewLoaderHandler =
         .query('views')
         .collect()) as UserViewData[];
 
-      const parentViewName = allUserViews.find(
-        (v) => v.name === args.viewName
-      )?.baseView;
+      // TODO REFACTOR AND USE SAME IN ALL PLACES
+      const userView = allUserViews.find(
+        (v) => v.name.toLowerCase() === args.viewName.toLowerCase()
+      );
 
-      // console.log('===', { parentViewName });
-      viewConfig = getViewByName(views, parentViewName ?? '');
+      viewConfig = getViewByName(views, userView?.baseView ?? '');
 
       if (!viewConfig) {
         console.error('viewConfig is not defined', args.viewName);
@@ -44,12 +44,14 @@ export const makeViewLoaderHandler =
 
     const registeredViews = patchAllViews(views);
 
-    return viewLoaderHandler(ctx, {
+    const result = await viewLoaderHandler(ctx, {
       ...(args as QueryDto),
       viewConfig,
       viewConfigManager,
       registeredViews,
     } satisfies QueryDto);
+
+    return result;
   };
 
 export const makeViewMutationHandler =

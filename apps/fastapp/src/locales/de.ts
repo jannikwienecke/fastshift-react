@@ -10,6 +10,8 @@ export const de = {
     tasks: 'Aufgaben',
     owner: 'Besitzer',
     logout: 'Abmelden',
+    categories: 'Kategorien',
+    tags: 'Tags',
   },
   projects: {
     one: 'Projekt',
@@ -28,6 +30,21 @@ export const de = {
   name: {
     edit: 'Aufgabe umbenennen',
   },
+
+  owner: {
+    one: 'Besitzer',
+    other: 'Besitzer',
+  },
+
+  firstname: {
+    one: 'Vorname',
+    other: 'Vorname',
+  },
+  lastname: {
+    one: 'Nachname',
+    other: 'Nachname',
+  },
+
   priority: {
     one: 'Priorität',
     other: 'Prioritäten',
