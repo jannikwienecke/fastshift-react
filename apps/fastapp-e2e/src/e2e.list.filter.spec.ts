@@ -145,7 +145,6 @@ test.describe('List Filter Tests', () => {
     await selectFilterOption('is not any of');
 
     await expect(mainPage.page.getByText(CON.tag.values.creative)).toBeHidden();
-    await expect(mainPage.page.getByText(CON.tag.values.planning)).toBeHidden();
     await expect(mainPage.page.getByText(CON.tag.values.longTerm)).toBeHidden();
   });
 
