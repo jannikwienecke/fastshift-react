@@ -1,5 +1,5 @@
 import * as server from './_generated/server';
-import { Id } from './_generated/dataModel';
+import { Id, Doc } from './_generated/dataModel';
 import { _log } from '@apps-next/core';
 
 const init = server.mutation({
@@ -18,11 +18,55 @@ const init = server.mutation({
       'todos',
       'views',
     ];
+
     for (const table of tables) {
       const ids = await ctx.db.query(table as any).collect();
       for (const { _id } of ids) {
         await ctx.db.delete(_id);
       }
+    }
+
+    const views: Pick<
+      Doc<'views'>,
+      | 'baseView'
+      | 'description'
+      | 'slug'
+      | 'name'
+      | 'displayOptions'
+      | 'filters'
+    >[] = [
+      {
+        baseView: 'task',
+        description: '',
+        slug: 'this-weeks-tasks',
+        name: "This Week's Tasks",
+        displayOptions:
+          'viewField=name,completed,description,tags,projects,email,telefon,priority,dueDate,tasks,todos;viewType=list',
+        filters:
+          'filter[]=dueDate:within:This%20week||This%20week:primitive;false',
+      },
+      {
+        baseView: 'task',
+        description: '',
+        slug: 'urgent-tasks',
+        name: 'Urgent Tasks',
+        displayOptions: '',
+        filters: 'filter[]=priority:is:5||5:relation;true',
+      },
+      {
+        baseView: 'projects',
+        description: '',
+        slug: 'sorted-projects',
+        name: 'Sorted Projects',
+        displayOptions:
+          'sorting=label:asc;viewField=label,owner,dueDate,description,categories,tasks;viewType=list',
+        filters: '',
+      },
+    ];
+
+    // ctx.db.insert('views', x);
+    for (const view of views) {
+      await ctx.db.insert('views', view);
     }
 
     // Create users and owners

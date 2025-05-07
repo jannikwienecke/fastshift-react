@@ -11,3 +11,8 @@ export * from './dropdown';
 export * from './tabs';
 export * from './card';
 export * from './label';
+export * from './sidebar';
+export * from './skeleton';
+export * from './tooltip';
+export * from './collapsible';
+export * from './avatar';

@@ -149,7 +149,7 @@ export const tasksConfig = createViewConfig(
 export const projectsConfig = createViewConfig(
   'projects',
   {
-    viewName: 'My Projects',
+    viewName: 'projects',
     icon: TokensIcon,
     includeFields: ['tasks'],
     displayField: {

@@ -51,7 +51,8 @@ const router = createRouter({
       if (parentViewName) {
         userViewData = null;
       } else {
-        userViewData = getUserViewData(viewName);
+        const userViews = getUserViews();
+        userViewData = userViews.find((u) => u.name === viewName);
       }
 
       return await queryClient.ensureQueryData(

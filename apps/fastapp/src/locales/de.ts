@@ -10,6 +10,8 @@ export const de = {
     tasks: 'Aufgaben',
     owner: 'Besitzer',
     logout: 'Abmelden',
+    categories: 'Kategorien',
+    tags: 'Tags',
   },
   projects: {
     one: 'Projekt',

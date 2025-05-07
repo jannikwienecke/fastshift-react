@@ -54,7 +54,9 @@ export const getQueryKey = (
   if (parentViewName) {
     userViewData = null;
   } else {
-    userViewData = getUserViewData(viewName);
+    // TODO REFACTOR AND USE SAME AS IN MAIN
+    const userViews = getUserViews();
+    userViewData = userViews.find((u) => u.name === viewName);
   }
 
   return preloadQuery(

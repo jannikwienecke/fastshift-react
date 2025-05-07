@@ -215,13 +215,9 @@ const DetailTabs = (
       <div className="pl-24 pt-8 text-sm">
         {activeTabPrimitiveFields.map((field) => {
           return (
-            <>
-              <props.FormField
-                key={field.field?.name}
-                {...props}
-                field={field}
-              />
-            </>
+            <div key={field.field?.name + 'primitive'}>
+              <props.FormField {...props} field={field} />
+            </div>
           );
         })}
       </div>
@@ -229,14 +225,13 @@ const DetailTabs = (
       <div className="pl-24 pt-4 text-sm border-t-[.5px]">
         {activeTabComplexFields.map((field) => {
           return (
-            <>
+            <div key={field.field?.name + 'complex'}>
               <props.ComplexFormField
-                key={field.field?.name}
                 {...props}
                 field={field}
                 tabFormField={true}
               />
-            </>
+            </div>
           );
         })}
       </div>

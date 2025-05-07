@@ -8,6 +8,8 @@ export const en = {
     tasks: 'Tasks',
     owner: 'Owner',
     logout: 'Logout',
+    categories: 'Categories',
+    tags: 'Tags',
   },
   projects: {
     one: 'Project',

@@ -29,7 +29,7 @@ export const useSidebar = () => {
   return context;
 };
 
-export const SidebarProvider = ({
+export const SidebarProviderOwn = ({
   children,
   open: openProp,
   setOpen: setOpenProp,
@@ -57,7 +57,7 @@ export const SidebarProvider = ({
   );
 };
 
-export const Sidebar = ({
+export const SidebarCustom = ({
   children,
   open,
   setOpen,
@@ -71,14 +71,14 @@ export const Sidebar = ({
   isPinned: boolean;
 }) => {
   return (
-    <SidebarProvider
+    <SidebarProviderOwn
       open={open}
       setOpen={setOpen}
       isPinned={isPinned}
       animate={animate}
     >
       {children}
-    </SidebarProvider>
+    </SidebarProviderOwn>
   );
 };
 

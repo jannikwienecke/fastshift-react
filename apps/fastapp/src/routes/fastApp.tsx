@@ -1,4 +1,12 @@
-import { Button, cn, Sidebar, SidebarBody, SidebarLink } from '@apps-next/ui';
+import {
+  Button,
+  cn,
+  SidebarBody,
+  SidebarCustom,
+  SidebarInset,
+  SidebarLink,
+  SidebarProvider,
+} from '@apps-next/ui';
 
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
@@ -32,6 +40,7 @@ import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
 import { resettingDb$ } from '../application-store/app.store';
 import { getViewData, wait } from '../application-store/app.store.utils';
+import { AppSidebar } from '../components/sidebar/app-sidebar';
 import {
   getQueryKey,
   getUserViews,
@@ -189,24 +198,25 @@ const FastAppLayoutComponent = observer(() => {
   }
 
   return (
-    <>
-      <ClientViewProviderConvex commands={commands}>
-        <Layout>
+    <ClientViewProviderConvex commands={commands}>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
           <Outlet />
-        </Layout>
+        </SidebarInset>
+      </SidebarProvider>
 
-        {resettingDb$.get() ? (
-          <div className="fixed top-0 left-0 h-screen w-screen bg-black/50 flex items-center justify-center z-50">
-            <LoaderIcon className="animate-spin h-10 w-10 text-white" />
-          </div>
-        ) : (
-          <></>
-        )}
+      {resettingDb$.get() ? (
+        <div className="fixed top-0 left-0 h-screen w-screen bg-black/50 flex items-center justify-center z-50">
+          <LoaderIcon className="animate-spin h-10 w-10 text-white" />
+        </div>
+      ) : (
+        <></>
+      )}
 
-        <ErrorDetailsDialog />
-        <Toaster richColors duration={2000} />
-      </ClientViewProviderConvex>
-    </>
+      <ErrorDetailsDialog />
+      <Toaster richColors duration={2000} />
+    </ClientViewProviderConvex>
   );
 });
 
@@ -263,7 +273,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         'h-[99vh]'
       )}
     >
-      <Sidebar open={open} setOpen={setOpen} isPinned={pinned}>
+      <SidebarCustom open={open} setOpen={setOpen} isPinned={pinned}>
         <SidebarBody className="justify-between gap-10 mt-2  w-full border-r-[.5px]">
           <div className="flex flex-col flex-1 w-full overflow-y-auto">
             {open ? (
@@ -321,7 +331,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             />
           </div>
         </SidebarBody>
-      </Sidebar>
+      </SidebarCustom>
 
       {children}
     </div>
