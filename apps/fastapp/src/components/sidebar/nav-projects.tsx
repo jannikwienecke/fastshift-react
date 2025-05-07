@@ -12,7 +12,7 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useShadCnSidebar,
+  useSidebar,
 } from '@apps-next/ui';
 import {
   Folder,
@@ -31,7 +31,7 @@ export function NavProjects({
     icon: LucideIcon;
   }[];
 }) {
-  const { isMobile } = useShadCnSidebar();
+  const { isMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">

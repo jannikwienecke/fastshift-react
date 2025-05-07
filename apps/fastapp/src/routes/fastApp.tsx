@@ -1,12 +1,4 @@
-import {
-  Button,
-  cn,
-  SidebarBody,
-  SidebarCustom,
-  SidebarInset,
-  SidebarLink,
-  SidebarProvider,
-} from '@apps-next/ui';
+import { SidebarInset, SidebarProvider } from '@apps-next/ui';
 
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
@@ -266,76 +258,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     i18n.changeLanguage(lang);
   };
 
-  return (
-    <div
-      className={cn(
-        'rounded-md flex flex-col md:flex-row w-full flex-1  mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden',
-        'h-[99vh]'
-      )}
-    >
-      <SidebarCustom open={open} setOpen={setOpen} isPinned={pinned}>
-        <SidebarBody className="justify-between gap-10 mt-2  w-full border-r-[.5px]">
-          <div className="flex flex-col flex-1 w-full overflow-y-auto">
-            {open ? (
-              <Logo
-                pinned={pinned}
-                onTogglePin={() => {
-                  setPinned((prev) => !prev);
-                }}
-              />
-            ) : (
-              <LogoIcon />
-            )}
-
-            <div
-              className={cn('mt-8 flex flex-col gap-2 ', open ? '' : 'items')}
-            >
-              {links.map((link, idx) => (
-                <SidebarLink className="pl-4" key={idx} link={link} />
-              ))}
-            </div>
-          </div>
-
-          <div className="w-full flex flex-col gap-2">
-            <div className="flex flex-wrap gap-2 text-sm text-neutral-500">
-              {allLanguages.map((lang) => (
-                <Button
-                  key={lang}
-                  variant={i18n.language === lang ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleLanguageChange(lang)}
-                  className={cn(
-                    'px-2 py-1 text-xs',
-                    currentLanguage === lang
-                      ? 'bg-primary text-primary-foreground'
-                      : 'hover:bg-secondary'
-                  )}
-                >
-                  {lang.toUpperCase()}
-                </Button>
-              ))}
-            </div>
-
-            <SidebarLink
-              link={{
-                label: 'Manu Arora',
-                href: '#',
-                icon: (
-                  <img
-                    src="https://assets.aceternity.com/manu.png"
-                    className="h-8 w-8 rounded-full fit object-fill"
-                    alt="Avatar"
-                  />
-                ),
-              }}
-            />
-          </div>
-        </SidebarBody>
-      </SidebarCustom>
-
-      {children}
-    </div>
-  );
+  return null;
 }
 
 export const Logo = ({

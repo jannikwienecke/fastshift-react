@@ -1,10 +1,14 @@
 'use client';
 
-import * as React from 'react';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+} from '@apps-next/ui';
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
   Command,
   Frame,
   GalleryVerticalEnd,
@@ -13,24 +17,15 @@ import {
   Map,
   PieChart,
   Search,
-  Settings2,
   Sparkles,
-  SquareTerminal,
 } from 'lucide-react';
-import {
-  SidebarCustom,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-  Sidebar,
-} from '@apps-next/ui';
-import { NavUser } from './nav-user';
-import { NavMain } from './nav-main';
-import { NavProjects } from './nav-projects';
-import { TeamSwitcher } from './team-switcher';
+import * as React from 'react';
 import { NavCommon } from './nav-common';
 import { NavFavorites } from './nav-favorites';
+import { NavMain } from './nav-main';
+import { NavProjects } from './nav-projects';
+import { NavUser } from './nav-user';
+import { TeamSwitcher } from './team-switcher';
 
 // This is sample data.
 const data = {

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ChevronsUpDown, Plus } from 'lucide-react';
 import {
   SidebarMenu,
-  useShadCnSidebar,
+  useSidebar,
   SidebarMenuItem,
   SidebarMenuButton,
   DropdownMenuTrigger,
@@ -23,7 +23,7 @@ export function TeamSwitcher({
     plan: string;
   }[];
 }) {
-  const { isMobile } = useShadCnSidebar();
+  const { isMobile } = useSidebar();
   const [activeTeam, setActiveTeam] = React.useState(teams[0]);
 
   if (!activeTeam) {

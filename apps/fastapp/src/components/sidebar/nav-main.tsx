@@ -1,23 +1,25 @@
+import { views } from '@apps-next/convex';
+import { GetTableName } from '@apps-next/core';
 import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
+  cn,
   Collapsible,
-  CollapsibleTrigger,
   CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
   SidebarMenuAction,
-  useShadCnSidebar,
-  cn,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  useSidebar,
 } from '@apps-next/ui';
 import { Link } from '@tanstack/react-router';
 import {
@@ -25,16 +27,11 @@ import {
   ChevronRight,
   MoreHorizontal,
   PencilIcon,
-  StarOff,
   Trash2,
-  type LucideIcon,
 } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getUserViews } from '../../query-client';
-import { views } from '@apps-next/convex';
-import { GetTableName } from '@apps-next/core';
-import { viewRegistry } from '@apps-next/react';
-import React from 'react';
 
 type Nav = {
   items: {
@@ -91,7 +88,7 @@ export function NavMain() {
 export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
   const [hover, setHover] = React.useState('');
   const { t } = useTranslation();
-  const { isMobile } = useShadCnSidebar();
+  const { isMobile } = useSidebar();
 
   const hasSubItems = item.items && item.items.length > 0;
 

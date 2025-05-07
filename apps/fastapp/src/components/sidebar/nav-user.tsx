@@ -14,7 +14,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useShadCnSidebar,
+  useSidebar,
 } from '@apps-next/ui';
 import {
   BadgeCheck,
@@ -34,7 +34,7 @@ export function NavUser({
     avatar: string;
   };
 }) {
-  const { isMobile } = useShadCnSidebar();
+  const { isMobile } = useSidebar();
 
   return (
     <SidebarMenu>

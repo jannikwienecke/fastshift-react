@@ -13,7 +13,7 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useShadCnSidebar,
+  useSidebar,
 } from '@apps-next/ui';
 import {
   ArrowUpRight,
@@ -34,7 +34,7 @@ export function NavFavorites({
     emoji: string;
   }[];
 }) {
-  const { isMobile } = useShadCnSidebar();
+  const { isMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">

@@ -761,7 +761,6 @@ const SidebarMenuSubButton = React.forwardRef<
 });
 SidebarMenuSubButton.displayName = 'SidebarMenuSubButton';
 
-export const useShadCnSidebar = useSidebar;
 export {
   Sidebar,
   SidebarContent,
