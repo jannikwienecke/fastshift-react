@@ -112,13 +112,25 @@ export const localModeEnabled$ = observable(() => {
 });
 
 export const saveSubViewSettings = async () => {
-  const parentView = store$.detail.parentViewName.get();
-  const parentModel =
-    getViewByName(store$.views.get(), parentView ?? '')?.tableName ?? '';
+  const parentViewName = store$.detail.parentViewName.get();
+  let parentTablename =
+    getViewByName(store$.views.get(), parentViewName ?? '')?.tableName ?? '';
 
-  if (!parentModel) return;
+  if (!parentTablename) {
+    const userView = store$.userViews
+      .find((u) => u.name.get().toLowerCase() === parentViewName?.toLowerCase())
+      ?.get();
+    parentTablename =
+      getViewByName(store$.views.get(), userView?.baseView ?? '')?.tableName ??
+      '';
 
-  const name = `${parentModel}|${store$.viewConfigManager.getTableName()}`;
+    if (!parentTablename) {
+      console.warn('No parent table name found');
+      return;
+    }
+  }
+
+  const name = `${parentTablename}|${store$.viewConfigManager.getTableName()}`;
   const hasView = store$.userViews.find((v) => v.name.get() === name)?.get();
 
   const result = await store$.api.mutateAsync({
@@ -128,7 +140,7 @@ export const saveSubViewSettings = async () => {
       type: 'USER_VIEW_MUTATION',
       payload: {
         type: hasView ? 'UPDATE_VIEW' : 'CREATE_VIEW',
-        parentModel,
+        parentModel: parentTablename,
         name,
         description: '',
         ...getParsedViewSettings(),

@@ -59,7 +59,7 @@ export function NavMain() {
   const mainViews = tablesToShow.map((key) => {
     const view = Object.values(views).find((v) => v?.tableName === key);
     const viewsOf = userViews.filter(
-      (v) => v.baseView === view?.viewName && v.name !== key
+      (v) => v.baseView === view?.viewName && v.name !== key && !v.parentModel
     );
 
     return {

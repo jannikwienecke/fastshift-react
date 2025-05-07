@@ -60,7 +60,6 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
     if (!detailQueryReturn.data || detailQueryReturn.data.length !== 1) return;
     if (!store$.detail.row.get()) return;
 
-    console.log('detailQueryReturn.data', detailQueryReturn.data);
     store$.handleIncomingDetailData(detailQueryReturnRef.current);
   }, [detailQueryReturn.data]);
 
