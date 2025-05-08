@@ -24,7 +24,9 @@ import {
 import { Link } from '@tanstack/react-router';
 import {
   ArrowUpRight,
+  ChevronDownIcon,
   ChevronRight,
+  ChevronRightIcon,
   MoreHorizontal,
   PencilIcon,
   Trash2,
@@ -33,7 +35,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getUserViews } from '../../query-client';
 
-type Nav = {
+export type Nav = {
   items: {
     title: string;
     url?: string;
@@ -51,9 +53,34 @@ export function NavMain() {
 
   const userViews = getUserViews();
 
-  const tablesToShow: GetTableName[] = ['projects', 'tasks', 'tags', 'owner'];
+  const viewsTables: GetTableName[] = ['projects', 'tasks'];
+  const coreDataTables: GetTableName[] = [
+    'tags',
+    'categories',
+    'owner',
+    'users',
+  ];
 
-  const mainViews = tablesToShow.map((key) => {
+  const mainViews = viewsTables.map((key) => {
+    const view = Object.values(views).find((v) => v?.tableName === key);
+    const viewsOf = userViews.filter(
+      (v) => v.baseView === view?.viewName && v.name !== key && !v.parentModel
+    );
+
+    return {
+      title: t(`navigation.${key}` as any),
+      url: `/fastApp/${key}`,
+      isActive: false,
+      icon: view?.icon,
+      items: viewsOf.map((view) => ({
+        title: view.name,
+        url: `/fastApp/${view.slug}`,
+      })),
+      // icon:
+    } satisfies Nav['items'][number];
+  });
+
+  const coreData = coreDataTables.map((key) => {
     const view = Object.values(views).find((v) => v?.tableName === key);
     const viewsOf = userViews.filter(
       (v) => v.baseView === view?.viewName && v.name !== key && !v.parentModel
@@ -73,15 +100,37 @@ export function NavMain() {
   });
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Views</SidebarGroupLabel>
+    <>
+      <SidebarGroup>
+        <SidebarGroupLabel>Views</SidebarGroupLabel>
 
-      <SidebarMenu>
-        {mainViews.map((view) => (
-          <NavItem key={view.title} item={view} />
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
+        <SidebarMenu>
+          {mainViews.map((view) => (
+            <NavItem key={view.title} item={view} />
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+        <Collapsible defaultOpen={false} className="group/collapsible">
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton>
+              <SidebarGroupLabel className="p-0">Core Data</SidebarGroupLabel>
+              <ChevronRightIcon className="ml-auto group-data-[state=open]/collapsible:hidden" />
+              <ChevronDownIcon className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <SidebarMenu>
+              {coreData.map((view) => (
+                <NavItem key={view.title} item={view} />
+              ))}
+            </SidebarMenu>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarGroup>
+    </>
   );
 }
 

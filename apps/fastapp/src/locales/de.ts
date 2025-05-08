@@ -12,6 +12,7 @@ export const de = {
     logout: 'Abmelden',
     categories: 'Kategorien',
     tags: 'Tags',
+    users: 'Benutzer',
   },
   projects: {
     one: 'Projekt',
@@ -54,6 +55,12 @@ export const de = {
     high: 'Hoch',
     urgent: 'Dringend',
   },
+
+  categories: {
+    one: 'Kategorie',
+    other: 'Kategorien',
+  },
+
   description: {
     one: 'Beschreibung',
     other: 'Beschreibungen',
