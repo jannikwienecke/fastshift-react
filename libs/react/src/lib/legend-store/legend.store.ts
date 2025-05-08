@@ -99,6 +99,11 @@ import {
   detailpageChangeInput,
   detailpageEnter,
 } from './legend.detailpage.fn';
+import {
+  createViewMutation,
+  saveSubUserView,
+  updateViewMutation,
+} from './legend.mutations.views';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -214,4 +219,8 @@ export const store$ = observable<LegendStore>({
   detailpageChangeInput: (...props) => detailpageChangeInput(store$)(...props),
   detailpageBlurInput: (...props) => detailpageBlurInput(store$)(...props),
   detailpageEnter: (...props) => detailpageEnter(store$)(...props),
+
+  updateViewMutation: (...props) => updateViewMutation(store$)(...props),
+  createViewMutation: (...props) => createViewMutation(store$)(...props),
+  saveSubUserView: (...props) => saveSubUserView(store$)(...props),
 });

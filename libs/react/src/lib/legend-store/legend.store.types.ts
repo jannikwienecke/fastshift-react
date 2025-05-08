@@ -359,6 +359,14 @@ export type LegendStore = {
     onError?: (message: string) => void
   ) => void;
 
+  // views mutations
+  updateViewMutation: (
+    props: Partial<UserViewData>,
+    onSuccess?: () => void
+  ) => void;
+  createViewMutation: (onSuccess?: () => void) => void;
+  saveSubUserView: () => void;
+
   // commandbar
   commandbarOpen: (row: Row | undefined | null) => void;
   commandbarClose: () => void;

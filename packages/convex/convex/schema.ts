@@ -16,9 +16,12 @@ const _schema = defineSchema({
     displayOptions: v.optional(v.string()),
     filters: v.optional(v.string()),
     parentModel: v.optional(v.string()),
+    starred: v.optional(v.boolean()),
   })
     .index('baseView', ['baseView'])
-    .index('name', ['name']),
+    .index('name', ['name'])
+    .index('slug', ['slug'])
+    .index('starred', ['starred']),
 
   owner: defineTable({
     userId: v.id('users'),

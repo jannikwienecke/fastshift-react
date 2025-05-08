@@ -36,21 +36,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
           },
 
           onSave: async () => {
-            const result = await store$.api.mutateAsync({
-              query: '',
-              viewName: store$.viewConfigManager.getViewName(),
-              mutation: {
-                type: 'USER_VIEW_MUTATION',
-                payload: {
-                  type: 'CREATE_VIEW',
-                  name: form.viewName,
-                  description: form.viewDescription,
-                  ...getParsedViewSettings(),
-                },
-              },
-            });
-
-            if (result.success) {
+            store$.createViewMutation(() => {
               store$.userViewSettings.form.set(undefined);
               store$.userViewSettings.open.set(false);
               store$.userViewSettings.hasChanged.set(false);
@@ -70,7 +56,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
                 displayOptions: copyOfDisplayOptions,
                 filters: copyOfFilters,
               });
-            }
+            });
           },
         }
       : undefined,
@@ -99,50 +85,28 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
       }
     },
     async onSave() {
-      const filters = store$.filter.filters.get();
-
-      const filtersConverted = convertFiltersForBackend(filters);
-
-      const result = await store$.api.mutateAsync({
-        query: '',
-        viewName: store$.viewConfigManager.getViewName(),
-        mutation: {
-          type: 'USER_VIEW_MUTATION',
-          payload: {
-            type: 'UPDATE_VIEW',
-            description: form?.viewDescription ?? null,
-
-            name:
-              store$.userViewData.get()?.name ??
-              store$.viewConfigManager.getViewName(),
-
-            ...getParsedViewSettings(),
-            filters: filtersConverted,
-          },
+      store$.updateViewMutation(
+        {
+          ...getParsedViewSettings(),
         },
-      });
+        () => {
+          const displayOptions = store$.displayOptions.get();
+          const filters = store$.filter.filters.get();
+          const copyOfDisplayOptions = JSON.parse(
+            JSON.stringify(displayOptions)
+          );
+          const copyOfFilters = JSON.parse(JSON.stringify(filters));
 
-      if (result.error) {
-        renderErrorToast(`Error saving view: ${result.error.message}`, () => {
-          _log.error('Error saving view callback');
-        });
-      }
+          store$.userViewSettings.form.set(undefined);
+          store$.userViewSettings.open.set(false);
+          store$.userViewSettings.hasChanged.set(false);
 
-      if (result.success) {
-        const displayOptions = store$.displayOptions.get();
-        const filters = store$.filter.filters.get();
-        const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
-        const copyOfFilters = JSON.parse(JSON.stringify(filters));
-
-        store$.userViewSettings.form.set(undefined);
-        store$.userViewSettings.open.set(false);
-        store$.userViewSettings.hasChanged.set(false);
-
-        store$.userViewSettings.initialSettings.set({
-          displayOptions: copyOfDisplayOptions,
-          filters: copyOfFilters,
-        });
-      }
+          store$.userViewSettings.initialSettings.set({
+            displayOptions: copyOfDisplayOptions,
+            filters: copyOfFilters,
+          });
+        }
+      );
     },
     async onSaveAsNewView() {
       store$.userViewSettings.form.set({

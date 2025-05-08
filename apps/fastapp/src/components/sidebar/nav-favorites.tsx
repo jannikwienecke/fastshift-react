@@ -24,17 +24,18 @@ import {
   StarOff,
   Trash2,
 } from 'lucide-react';
+import { getUserViews } from '../../query-client';
+import { observer } from '@legendapp/state/react';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
+import { api } from '@apps-next/convex';
 
-export function NavFavorites({
-  favorites,
-}: {
-  favorites: {
-    name: string;
-    url: string;
-    emoji: string;
-  }[];
-}) {
+export const NavFavorites = observer(() => {
   const { isMobile } = useSidebar();
+  const { data: allViews } = useQuery(convexQuery(api.query.getUserViews, {}));
+  const starredViews = allViews?.filter((view) => view.starred);
+
+  console.log('starredViews', starredViews);
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -53,11 +54,11 @@ export function NavFavorites({
 
         <CollapsibleContent>
           <SidebarMenu>
-            {favorites.map((item) => (
+            {starredViews?.map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild>
-                  <a href={item.url} title={item.name}>
-                    <span>{item.emoji}</span>
+                  <a href={item.slug} title={item.name}>
+                    {/* <span>{item.emoji}</span> */}
                     <span>{item.name}</span>
                   </a>
                 </SidebarMenuButton>
@@ -106,4 +107,4 @@ export function NavFavorites({
       </Collapsible>
     </SidebarGroup>
   );
-}
+});

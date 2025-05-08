@@ -61,12 +61,27 @@ export type ContinueCursor = {
 };
 
 export type UserViewData = {
+  id: string;
   baseView: string;
-  displayOptions?: string | null;
-  filters?: string | null;
+  displayOptions: string;
+  filters: string;
   name: string;
   slug: string;
+  description: string | null;
   parentModel?: string;
+  starred?: boolean;
+};
+
+export type UserViewDataDto = {
+  id?: string;
+  baseView: string;
+  displayOptions: string;
+  filters: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  parentModel?: string;
+  starred?: boolean;
 };
 
 export type QueryReturnDto<T extends RecordType = RecordType> = {

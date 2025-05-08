@@ -11,11 +11,7 @@ import { selectState$, xSelect } from './legend.select-state';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
-import {
-  localModeEnabled$,
-  saveSubViewSettings,
-  setGlobalDataModel,
-} from './legend.utils.helper';
+import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -101,7 +97,9 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     if (localModeEnabled$.get()) {
       _log.debug('handleFilterChange: local mode. No fetchMore');
-      saveSubViewSettings();
+
+      console.log('saveSubViewSettings!!!');
+      store$.saveSubUserView();
     } else {
       store$.state.set('filter-changed');
       store$.fetchMore.assign({
@@ -154,7 +152,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     if (localModeEnabled$.get()) {
       _log.info('handleDisplayOptionsChange: local mode. No fetchMore');
-      saveSubViewSettings();
+      console.log('saveSubViewSettings!!!');
+      store$.saveSubUserView();
       return;
     } else {
       store$.state.set('updating-display-options');
@@ -165,10 +164,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       });
     }
   });
-
-  // observable(function handleDisplayOptionsChange() {
-
-  // }).onChange(() => null);
 
   _hasOpenDialog$.onChange((state) => {
     clearTimeout(timeout$.get() ?? 0);

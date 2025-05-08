@@ -34,6 +34,7 @@ const init = server.mutation({
       | 'name'
       | 'displayOptions'
       | 'filters'
+      | 'starred'
     >[] = [
       {
         baseView: 'task',
@@ -44,6 +45,7 @@ const init = server.mutation({
           'viewField=name,completed,description,tags,projects,email,telefon,priority,dueDate,tasks,todos;viewType=list',
         filters:
           'filter[]=dueDate:within:This%20week||This%20week:primitive;false',
+        starred: false,
       },
       {
         baseView: 'task',
@@ -52,6 +54,7 @@ const init = server.mutation({
         name: 'All Tasks',
         displayOptions: '',
         filters: '',
+        starred: false,
       },
 
       {
@@ -61,6 +64,7 @@ const init = server.mutation({
         name: 'Urgent Tasks',
         displayOptions: '',
         filters: 'filter[]=priority:is:5||5:relation;true',
+        starred: true,
       },
       {
         baseView: 'projects',
@@ -69,6 +73,7 @@ const init = server.mutation({
         name: 'All Projects',
         displayOptions: '',
         filters: '',
+        starred: false,
       },
 
       {
@@ -79,6 +84,7 @@ const init = server.mutation({
         displayOptions:
           'sorting=label:asc;viewField=label,owner,dueDate,description,categories,tasks;viewType=list',
         filters: '',
+        starred: false,
       },
     ];
 

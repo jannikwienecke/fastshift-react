@@ -37,7 +37,12 @@ export const testQuery = server.mutation({
 
 export const getUserViews = server.query({
   handler: async (ctx, args) => {
-    return await ctx.db.query('views').collect();
+    const views = await ctx.db.query('views').collect();
+
+    return views.map((view) => ({
+      ...view,
+      id: view._id,
+    }));
   },
 });
 
@@ -59,9 +64,11 @@ export const userViewData = server.query({
 
     return {
       ...view,
+      id: view._id,
       name: view.name,
-      displayOptions: view.displayOptions ?? null,
-      filters: view.filters ?? null,
+      description: view.description ?? '',
+      displayOptions: view.displayOptions ?? '',
+      filters: view.filters ?? '',
     } satisfies UserViewData;
   },
 });

@@ -169,6 +169,10 @@ export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
   //
 };
 
+export type MakePageHeaderPropsOption<T extends RecordType = RecordType> = {
+  //
+};
+
 export type DisplayOptionsProps = {
   label: string;
   onOpen: (rect: DOMRect) => void;
@@ -223,6 +227,13 @@ export type SaveViewDropdownProps = {
     onNameChange: (name: string) => void;
     onDescriptionChange: (description: string) => void;
   };
+};
+
+export type PageHeaderProps = {
+  onToggleFavorite: () => void;
+  starred: boolean;
+  viewName: string;
+  icon?: React.FC<any>;
 };
 
 export type ConfirmationDialogProps = {

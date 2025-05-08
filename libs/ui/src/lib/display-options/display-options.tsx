@@ -40,7 +40,7 @@ const DisplayOptionsButton = (props: {
   return (
     <span
       // variant={'outline'}
-      className="justify-center whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 py-0 h-7 px-2 flex flex-row items-center gap-2 text-xs border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground"
+      className="justify-center whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 py-0 h-7 px-2 flex flex-row items-center gap-2 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground"
       onClick={(e) => {
         props.onOpen(e.currentTarget.getBoundingClientRect());
       }}
