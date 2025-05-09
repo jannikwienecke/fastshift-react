@@ -241,7 +241,7 @@ export const userViewMutation = async (
 
   const dbMutation = mutationClient(ctx);
 
-  if (mutation.payload.type === 'CREATE_THE_VIEW') {
+  if (mutation.payload.type === 'CREATE_NEW_VIEW') {
     try {
       await dbMutation.insert('views', {
         ...mutation.payload.record,
@@ -255,7 +255,7 @@ export const userViewMutation = async (
     }
   }
 
-  if (mutation.payload.type === 'UPDATE_THE_VIEW') {
+  if (mutation.payload.type === 'UPDATE_VIEW') {
     try {
       await dbMutation.patch(
         mutation.payload.userViewId as Id<any>,

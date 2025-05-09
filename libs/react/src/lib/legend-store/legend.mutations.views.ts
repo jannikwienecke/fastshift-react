@@ -24,7 +24,7 @@ export const createViewMutation: StoreFn<'createViewMutation'> =
       mutation: {
         type: 'NEW_USER_VIEW_MUTATION',
         payload: {
-          type: 'CREATE_THE_VIEW',
+          type: 'CREATE_NEW_VIEW',
           record: {
             ...getParsedViewSettings(),
             baseView: currentView$.viewName.get(),
@@ -68,7 +68,7 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
       mutation: {
         type: 'NEW_USER_VIEW_MUTATION',
         payload: {
-          type: 'UPDATE_THE_VIEW',
+          type: 'UPDATE_VIEW',
           record,
           userViewId: userViewData.id,
         },
@@ -154,7 +154,7 @@ export const updateDetailViewMutation: StoreFn<'updateDetailViewMutation'> =
         mutation: {
           type: 'NEW_USER_VIEW_MUTATION',
           payload: {
-            type: 'UPDATE_THE_VIEW',
+            type: 'UPDATE_VIEW',
             record,
             userViewId: view.id,
           },

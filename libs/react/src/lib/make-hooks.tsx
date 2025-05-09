@@ -11,9 +11,9 @@ import { makeConfirmationAlertProps } from './ui-adapter/confirmation-alert-adap
 import { makeCommandbarProps } from './ui-adapter/commandbar-adapter';
 import { makeDatePickerDialogProps } from './ui-adapter/adapter.datepickerdialog';
 import { makeCommandformProps } from './ui-adapter/commandform-adapter';
-import { makeSaveViewDropdownProps } from './legend-store/legend.saveViewDropdown.adapter.tsx';
 import { makeDetailPageProps } from './legend-store/legend.detail.adapter';
 import { makePageHeaderProps } from './legend-store/legend.pageheader.adapter';
+import { makeSaveViewDropdownProps } from './legend-store/legend.saveViewDropdown.adapter';
 
 export const makeHooks = <T extends DataType | ViewConfigType>(
   viewConfig?: T

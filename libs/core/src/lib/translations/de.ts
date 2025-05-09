@@ -79,7 +79,16 @@ export const de = {
     setValue: '{{field}} setzen',
     addMany: '{{field}} hinzufügen',
     openInNewTab: 'In neuem Tab öffnen',
+    more: 'Mehr',
+    overview: 'Übersicht',
+    saveTo: 'Speichern in',
   },
+
+  userViewForm: {
+    enterDescription: 'Beschreibung eingeben...',
+    enterName: 'Name eingeben...',
+  },
+
   datePicker: {
     description: 'Bitte wählen Sie ein Datum aus dem Kalender.',
   },
