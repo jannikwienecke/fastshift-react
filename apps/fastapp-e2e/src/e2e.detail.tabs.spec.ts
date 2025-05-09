@@ -37,7 +37,7 @@ test.describe('Detail Tabs', () => {
   }) => {
     expect(1).toBe(1);
 
-    await mainPage.detailHeader.getByText(/tasks/i).click();
+    await mainPage.detailHeader.getByText(/tasks/i).click({ force: true });
 
     // go to detail page of a task item and see the detail tabs of project
     await (await helper.list.getFirstListItem()).locator

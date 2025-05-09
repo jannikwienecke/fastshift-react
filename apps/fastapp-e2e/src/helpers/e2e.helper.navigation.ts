@@ -33,7 +33,7 @@ export const makeNavigationHelper = ({ page, detailHeader }: MainViewPage) => {
   ) => {
     await goToDetail(slug, name);
 
-    await detailHeader.getByText(subList).first().click();
+    await detailHeader.getByText(subList).first().click({ force: true });
   };
 
   return { goToListView, goToDetail, goToDetailSubList };

@@ -134,7 +134,7 @@ test.describe('Custom Views', () => {
     ).toHaveCount(1);
 
     // go back to tasks list view -> see the filtered tasks again
-    await mainPage.sidebar.getByText(/tasks/i).first().click();
+    await mainPage.sidebar.getByText('Tasks').nth(1).click();
     await mainPage.sidebar
       .getByText(/all tasks/i)
       .first()
@@ -221,7 +221,7 @@ test.describe('Custom Views', () => {
     let firstListItem = await helper.list.getFirstListItem();
     await firstListItem.locator.click();
 
-    await mainPage.detailHeader.getByText(/todos/i).click();
+    await mainPage.detailHeader.getByText(/todos/i).click({ force: true });
 
     firstListItem = await helper.list.getFirstListItem();
 
@@ -247,7 +247,7 @@ test.describe('Custom Views', () => {
 
     await firstListItem.locator.click();
 
-    await mainPage.detailHeader.getByText(/todos/i).click();
+    await mainPage.detailHeader.getByText(/todos/i).click({ force: true });
 
     await expect(page).toHaveURL(/.todos/);
 

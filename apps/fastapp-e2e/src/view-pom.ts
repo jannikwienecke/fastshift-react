@@ -33,7 +33,7 @@ export class MainViewPage {
   }
 
   async goto() {
-    await this.page.goto('/fastApp/Task', { timeout: 5000 });
+    await this.page.goto('/fastApp/tasks', { timeout: 5000 });
   }
 
   async gotoPage(name: string) {

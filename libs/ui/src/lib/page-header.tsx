@@ -30,7 +30,10 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-row items-center justify-between">
+    <div
+      data-testid="main-page-header"
+      className="flex flex-row items-center justify-between"
+    >
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem className="text-sm">
@@ -111,7 +114,10 @@ const DefaultPageHeaderDetail = (props: PageHeaderProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-row items-center justify-between">
+    <div
+      data-testid="detail-page-header"
+      className="flex flex-row items-center justify-between"
+    >
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem className="text-sm">
