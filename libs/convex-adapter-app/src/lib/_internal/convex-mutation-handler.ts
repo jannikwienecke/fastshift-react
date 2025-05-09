@@ -4,6 +4,7 @@ import {
   MutationHandlerReturnType,
   MutationPropsServer,
   slugHelper,
+  UserViewData,
 } from '@apps-next/core';
 import { mutationClient, queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
@@ -229,7 +230,7 @@ export const selectRecordsMutation = async (
   };
 };
 
-export const newUserViewMutation = async (
+export const userViewMutation = async (
   ctx: GenericMutationCtx,
   props: MutationPropsServer
 ) => {
@@ -300,6 +301,23 @@ export const newUserViewMutation = async (
     }
   }
 
+  if (mutation.payload.type === 'CREATE_DETAIL_VIEW') {
+    console.log('CREATE_DETAIL_VIEW:::', mutation.payload);
+    try {
+      await dbMutation.insert('views', {
+        ...mutation.payload.userViewData,
+        slug: mutation.payload.userViewData.name,
+      } satisfies Partial<UserViewData>);
+    } catch (error) {
+      console.log('CREATE_DETAIL_VIEW ERROR', error);
+      return {
+        status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+        message: `Error updating detail view. name=${mutation.payload.type}`,
+        error: getErrorMessage(error),
+      };
+    }
+  }
+
   return {
     message: 'User view created successfully',
     status: 201 as const,
@@ -311,5 +329,5 @@ export const mutationHandlers: MUTATION_HANDLER_CONVEX = {
   DELETE_RECORD: deleteMutation,
   UPDATE_RECORD: updateMutation,
   SELECT_RECORDS: selectRecordsMutation,
-  NEW_USER_VIEW_MUTATION: newUserViewMutation,
+  NEW_USER_VIEW_MUTATION: userViewMutation,
 };

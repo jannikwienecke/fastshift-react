@@ -131,6 +131,12 @@ export const useAppEffects = (viewName: string) => {
                   state.view
                 )}/${id}/overview`,
               });
+            } else {
+              navigateRef.current({
+                to: `/fastApp/${slugHelper().slugify(
+                  state.slug ?? state.view
+                )}`,
+              });
             }
           })();
 

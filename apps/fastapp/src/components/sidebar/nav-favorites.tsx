@@ -1,3 +1,4 @@
+import { api } from '@apps-next/convex';
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,27 +16,26 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@apps-next/ui';
+import { convexQuery } from '@convex-dev/react-query';
+import { observer } from '@legendapp/state/react';
+import { useQuery } from '@tanstack/react-query';
 import {
   ArrowUpRight,
   ChevronDownIcon,
   ChevronRightIcon,
-  Link,
+  Link as LinkIcon,
   MoreHorizontal,
   StarOff,
   Trash2,
 } from 'lucide-react';
-import { getUserViews } from '../../query-client';
-import { observer } from '@legendapp/state/react';
-import { useQuery } from '@tanstack/react-query';
-import { convexQuery } from '@convex-dev/react-query';
-import { api } from '@apps-next/convex';
+import { Link } from '@tanstack/react-router';
 
 export const NavFavorites = observer(() => {
   const { isMobile } = useSidebar();
   const { data: allViews } = useQuery(convexQuery(api.query.getUserViews, {}));
-  const starredViews = allViews?.filter((view) => view.starred);
-
-  console.log('starredViews', starredViews);
+  const starredViews = allViews?.filter(
+    (view) => view.starred && !view._deleted
+  );
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -57,10 +57,14 @@ export const NavFavorites = observer(() => {
             {starredViews?.map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild>
-                  <a href={item.slug} title={item.name}>
+                  <Link
+                    preload="viewport"
+                    to={`/fastApp/${item.slug}`}
+                    title={item.name}
+                  >
                     {/* <span>{item.emoji}</span> */}
                     <span>{item.name}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -80,7 +84,7 @@ export const NavFavorites = observer(() => {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                      <Link className="text-muted-foreground" />
+                      <LinkIcon className="text-muted-foreground" />
                       <span>Copy Link</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>

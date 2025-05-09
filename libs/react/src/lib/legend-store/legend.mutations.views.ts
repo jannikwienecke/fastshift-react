@@ -1,6 +1,11 @@
 import { _log, slugHelper } from '@apps-next/core';
 import { renderErrorToast } from '../toast';
-import { currentView$, parentView$ } from './legend.shared.derived';
+import {
+  currentView$,
+  detailUserView$,
+  detailView$,
+  parentView$,
+} from './legend.shared.derived';
 import { StoreFn } from './legend.store.types';
 import { getParsedViewSettings } from './legend.utils.helper';
 
@@ -44,11 +49,15 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
   (store$) => async (record, onSuccess) => {
     const userViewData = store$.userViewData.get();
 
+    console.log('UPDATE VIEW', userViewData);
+
     if (!userViewData) {
       throw new Error('User view data is required');
     }
 
     const userViewId = store$.userViewData.id.get() ?? '';
+
+    console.log('userViewId', userViewId);
 
     if (!userViewId) {
       throw new Error('User view ID is required');
@@ -83,6 +92,7 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
         store$.errorDialog.error.set(result.error);
       });
     } else {
+      console.log('View updated successfully');
       onSuccess?.();
     }
   };
@@ -101,7 +111,6 @@ export const saveSubUserView: StoreFn<'saveSubUserView'> =
       ?.get();
 
     if (!existingSubView) {
-      console.log('CREATE NEW SUB VIEW');
       await store$.api.mutateAsync({
         query: '',
         viewName: currentView$.viewName.get(),
@@ -135,4 +144,50 @@ export const saveSubUserView: StoreFn<'saveSubUserView'> =
         },
       });
     }
+  };
+
+export const updateDetailViewMutation: StoreFn<'updateDetailViewMutation'> =
+  (store$) => async (record) => {
+    const baseView = parentView$.get()?.viewName;
+
+    const view = detailUserView$.get();
+
+    if (view) {
+      console.log('UPDATE DETAIL VIEW', view);
+
+      const result = await store$.api.mutateAsync({
+        query: '',
+        viewName: currentView$.viewName.get(),
+        mutation: {
+          type: 'NEW_USER_VIEW_MUTATION',
+          payload: {
+            type: 'UPDATE_THE_VIEW',
+            record,
+            userViewId: view.id,
+          },
+        },
+      });
+
+      return;
+    }
+
+    await store$.api.mutateAsync({
+      query: '',
+      viewName: currentView$.viewName.get(),
+      mutation: {
+        type: 'NEW_USER_VIEW_MUTATION',
+        payload: {
+          type: 'CREATE_DETAIL_VIEW',
+          userViewData: {
+            ...record,
+            name: store$.detail.row.label.get(),
+            slug: store$.detail.row.id.get(),
+            rowId: store$.detail.row.id.get(),
+            rowLabelFieldName:
+              detailView$.get()?.displayField.field.toString() ?? '',
+            baseView,
+          },
+        },
+      },
+    });
   };

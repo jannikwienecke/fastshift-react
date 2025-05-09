@@ -234,6 +234,15 @@ export type PageHeaderProps = {
   starred: boolean;
   viewName: string;
   icon?: React.FC<any>;
+  detail?: {
+    label: string;
+    onClickParentView: () => void;
+  } & DetailPageProps;
+  options: {
+    header?: string;
+    items: (CommandbarItem & ComboxboxItem)[];
+  }[];
+  onSelectOption: (item: CommandbarItem) => void;
 };
 
 export type ConfirmationDialogProps = {

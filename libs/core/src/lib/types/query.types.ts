@@ -69,7 +69,10 @@ export type UserViewData = {
   slug: string;
   description: string | null;
   parentModel?: string;
+  rowId?: string;
+  rowLabelFieldName?: string;
   starred?: boolean;
+  _deleted?: boolean;
 };
 
 export type UserViewDataDto = {

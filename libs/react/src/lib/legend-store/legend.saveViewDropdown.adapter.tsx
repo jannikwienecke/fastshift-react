@@ -1,14 +1,13 @@
 import {
-  _log,
-  convertFiltersForBackend,
-  FilterType,
   RecordType,
   SaveViewDropdownProps,
   slugHelper,
+  FilterType,
 } from '@apps-next/core';
-import { store$ } from '../legend-store';
-import { getParsedViewSettings } from '../legend-store/legend.utils.helper';
-import { renderErrorToast } from '../toast';
+import { store$ } from '.';
+import { updateExisitingView } from './legend.saveViewDropdown.helper';
+import { userView$ } from './legend.shared.derived';
+import { getParsedViewSettings } from './legend.utils.helper';
 
 type Props<T> = {
   // Add any specific properties for the Props type here
@@ -24,7 +23,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
     form: form
       ? {
           ...form,
-          viewName: store$.userViewSettings.form.viewName.get() ?? '',
+          viewName: form.viewName ?? '',
           onCancel: () => {
             store$.userViewSettings.form.set(undefined);
           },
@@ -36,10 +35,13 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
           },
 
           onSave: async () => {
-            store$.createViewMutation(() => {
+            const formType = form.type;
+
+            const onSuccess = () => {
               store$.userViewSettings.form.set(undefined);
               store$.userViewSettings.open.set(false);
               store$.userViewSettings.hasChanged.set(false);
+
               store$.userViewSettings.viewCreated.set({
                 name: form.viewName,
                 slug: slugHelper().slugify(form.viewName),
@@ -56,7 +58,26 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
                 displayOptions: copyOfDisplayOptions,
                 filters: copyOfFilters,
               });
-            });
+            };
+
+            if (formType === 'edit') {
+              const { queryData, queryKey } = updateExisitingView() ?? {};
+
+              store$.updateViewMutation(
+                {
+                  name: form.viewName,
+                  description: form.viewDescription,
+                  slug: slugHelper().slugify(form.viewName),
+                },
+                () => {
+                  store$.api.queryClient.setQueryData(queryKey, queryData);
+
+                  onSuccess();
+                }
+              );
+            } else {
+              store$.createViewMutation(onSuccess);
+            }
           },
         }
       : undefined,

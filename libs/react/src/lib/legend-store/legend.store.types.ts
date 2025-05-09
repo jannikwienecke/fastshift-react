@@ -152,7 +152,7 @@ export type LegendStore = {
   navigation?: {
     state:
       | { type: 'ready' }
-      | { type: 'navigate'; id?: string; view: string }
+      | { type: 'navigate'; id?: string; view: string; slug?: string }
       | {
           type: 'switch-detail-view';
           state: DetailViewTypeState;
@@ -186,6 +186,7 @@ export type LegendStore = {
     mutateAsync?: (args: MutationDto) => Promise<MutationReturnDto>;
     queryClient?: QueryClient;
     makeQueryOptions: MakeQueryOptions;
+    getUserViewQueryKey?: any[];
   };
 
   globalQuery: string;
@@ -364,6 +365,7 @@ export type LegendStore = {
     props: Partial<UserViewData>,
     onSuccess?: () => void
   ) => void;
+  updateDetailViewMutation: (props: Partial<UserViewData>) => void;
   createViewMutation: (onSuccess?: () => void) => void;
   saveSubUserView: () => void;
 
@@ -430,6 +432,10 @@ export type LegendStore = {
     open: boolean;
     form?: UserViewForm;
     viewCreated?: {
+      name: string;
+      slug: string;
+    };
+    viewUpdated?: {
       name: string;
       slug: string;
     };

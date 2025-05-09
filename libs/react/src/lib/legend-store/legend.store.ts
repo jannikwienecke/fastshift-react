@@ -102,6 +102,7 @@ import {
 import {
   createViewMutation,
   saveSubUserView,
+  updateDetailViewMutation,
   updateViewMutation,
 } from './legend.mutations.views';
 
@@ -221,6 +222,8 @@ export const store$ = observable<LegendStore>({
   detailpageEnter: (...props) => detailpageEnter(store$)(...props),
 
   updateViewMutation: (...props) => updateViewMutation(store$)(...props),
+  updateDetailViewMutation: (...props) =>
+    updateDetailViewMutation(store$)(...props),
   createViewMutation: (...props) => createViewMutation(store$)(...props),
   saveSubUserView: (...props) => saveSubUserView(store$)(...props),
 });

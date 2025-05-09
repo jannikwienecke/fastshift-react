@@ -8,7 +8,7 @@ import { _log, UserViewData } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
 import { v } from 'convex/values';
 import { views } from '../src/index';
-import { Id } from './_generated/dataModel';
+import { Doc, Id } from './_generated/dataModel';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -36,13 +36,25 @@ export const testQuery = server.mutation({
 });
 
 export const getUserViews = server.query({
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<Partial<UserViewData>[]> => {
     const views = await ctx.db.query('views').collect();
 
-    return views.map((view) => ({
-      ...view,
-      id: view._id,
-    }));
+    return asyncMap(views, async (view) => {
+      if (!view.rowId || !view.rowLabelFieldName)
+        return {
+          ...view,
+          id: view._id,
+        };
+
+      const row = await ctx.db.get(view.rowId as Id<any>);
+      const label = row[view.rowLabelFieldName as keyof Doc<any>];
+
+      return {
+        ...view,
+        id: view._id,
+        name: label,
+      };
+    });
   },
 });
 

@@ -20,6 +20,7 @@ export const Route = createFileRoute('/fastApp/$view')({
     if (!viewName) return;
 
     const userViews = getUserViews();
+
     const { viewData, userViewData } = getViewData(viewName, userViews);
 
     await props.context.preloadQuery(

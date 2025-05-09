@@ -71,6 +71,10 @@ export type NEW_UserViewMutationPayload =
       type: 'UPDATE_SUB_VIEW';
       userViewData: Partial<UserViewData>;
       userViewId: string;
+    }
+  | {
+      type: 'CREATE_DETAIL_VIEW';
+      userViewData: Partial<UserViewData>;
     };
 
 export type NEW_USER_VIEW_MUTATION = {

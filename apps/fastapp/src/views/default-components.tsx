@@ -219,7 +219,8 @@ export const RenderUserViewForm = observer(
     //
   }) => {
     const { makeSaveViewDropdownProps } = makeHooks<TaskViewDataType>();
-    _log.info('Render RenderUserViewForm');
+    // FIXME -> This rerenders on input change??
+    // _log.info('Render RenderUserViewForm');
 
     const props = makeSaveViewDropdownProps({
       show: false,
@@ -246,5 +247,15 @@ export const RenderPageHeader = observer(
     const { makePageHeaderProps } = makeHooks();
 
     return <pageHeader.default {...makePageHeaderProps(props)} />;
+  }
+);
+
+export const RenderPageHeaderDetail = observer(
+  (props: {
+    //
+  }) => {
+    const { makePageHeaderProps } = makeHooks();
+
+    return <pageHeader.defaultDetail {...makePageHeaderProps(props)} />;
   }
 );

@@ -34,6 +34,10 @@ import {
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getUserViews } from '../../query-client';
+import { observable } from '@legendapp/state';
+import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/local-storage';
+import { syncObservable } from '@legendapp/state/sync';
+import { observer } from '@legendapp/state/react';
 
 export type Nav = {
   items: {
@@ -48,7 +52,15 @@ export type Nav = {
   }[];
 };
 
-export function NavMain() {
+const open$ = observable(false);
+syncObservable(open$, {
+  persist: {
+    name: 'store-global',
+    plugin: ObservablePersistLocalStorage,
+  },
+});
+
+export const NavMain = observer(() => {
   const { t } = useTranslation();
 
   const userViews = getUserViews();
@@ -112,7 +124,11 @@ export function NavMain() {
       </SidebarGroup>
 
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-        <Collapsible defaultOpen={false} className="group/collapsible">
+        <Collapsible
+          onOpenChange={(open) => open$.set(open)}
+          open={open$.get()}
+          className="group/collapsible"
+        >
           <CollapsibleTrigger asChild>
             <SidebarMenuButton>
               <SidebarGroupLabel className="p-0">Core Data</SidebarGroupLabel>
@@ -132,7 +148,7 @@ export function NavMain() {
       </SidebarGroup>
     </>
   );
-}
+});
 
 export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
   const [hover, setHover] = React.useState('');
@@ -180,6 +196,7 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
                   <Link
                     onMouseOver={() => setHover(subItem.title)}
                     to={subItem.url}
+                    preload="intent"
                     className="flex-grow"
                   >
                     <span className="">{subItem.title}</span>
