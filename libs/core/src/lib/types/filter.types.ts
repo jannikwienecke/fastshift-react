@@ -1,5 +1,6 @@
 import { Row } from '../data-model';
 import { FieldConfig, RecordType } from './base.types';
+import { Emoji } from './ui.types';
 
 type Icon = React.FC<any>;
 export type FilterOperatorType = {
@@ -69,6 +70,7 @@ export type UserViewForm = {
   viewName: string;
   viewDescription: string;
   iconName?: string;
+  emoji?: Emoji;
 };
 
 export type DisplayOptionsUiTypeData = {

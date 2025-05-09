@@ -19,7 +19,12 @@ const _schema = defineSchema({
     rowId: v.optional(v.string()),
     rowLabelFieldName: v.optional(v.string()),
     starred: v.optional(v.boolean()),
-    emoji: v.optional(v.string()),
+    emoji: v.optional(
+      v.object({
+        emoji: v.string(),
+        label: v.string(),
+      })
+    ),
   })
     .index('baseView', ['baseView'])
     .index('name', ['name'])

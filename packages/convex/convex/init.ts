@@ -37,7 +37,7 @@ const init = server.mutation({
       | 'starred'
     >[] = [
       {
-        baseView: 'task',
+        baseView: 'tasks',
         description: '',
         slug: 'this-weeks-tasks',
         name: "This Week's Tasks",
@@ -48,7 +48,7 @@ const init = server.mutation({
         starred: false,
       },
       {
-        baseView: 'task',
+        baseView: 'tasks',
         description: '',
         slug: 'all-tasks',
         name: 'All Tasks',
@@ -58,7 +58,7 @@ const init = server.mutation({
       },
 
       {
-        baseView: 'task',
+        baseView: 'tasks',
         description: '',
         slug: 'urgent-tasks',
         name: 'Urgent Tasks',

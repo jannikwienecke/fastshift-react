@@ -1,5 +1,5 @@
-import { views } from '@apps-next/convex';
-import { GetTableName } from '@apps-next/core';
+import { api, views } from '@apps-next/convex';
+import { Emoji, GetTableName } from '@apps-next/core';
 import {
   cn,
   Collapsible,
@@ -38,16 +38,20 @@ import { observable } from '@legendapp/state';
 import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/local-storage';
 import { syncObservable } from '@legendapp/state/sync';
 import { observer } from '@legendapp/state/react';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 
 export type Nav = {
   items: {
     title: string;
     url?: string;
     icon?: React.FC<any>;
+    emoji?: Emoji;
     isActive?: boolean;
     items?: {
       title: string;
       url: string;
+      emoji?: Emoji;
     }[];
   }[];
 };
@@ -63,7 +67,12 @@ syncObservable(open$, {
 export const NavMain = observer(() => {
   const { t } = useTranslation();
 
-  const userViews = getUserViews();
+  const { data: allUserViews } = useQuery(
+    convexQuery(api.query.getUserViews, {})
+  );
+  const userViews = allUserViews?.filter((view) => !view._deleted);
+
+  if (!userViews) return null;
 
   const viewsTables: GetTableName[] = ['projects', 'tasks'];
   const coreDataTables: GetTableName[] = [
@@ -75,8 +84,12 @@ export const NavMain = observer(() => {
 
   const mainViews = viewsTables.map((key) => {
     const view = Object.values(views).find((v) => v?.tableName === key);
+
     const viewsOf = userViews.filter(
-      (v) => v.baseView === view?.viewName && v.name !== key && !v.parentModel
+      (v) =>
+        v.baseView?.toLowerCase() === view?.viewName.toLowerCase() &&
+        v.name !== key &&
+        !v.parentModel
     );
 
     return {
@@ -84,9 +97,11 @@ export const NavMain = observer(() => {
       url: `/fastApp/${key}`,
       isActive: false,
       icon: view?.icon,
+
       items: viewsOf.map((view) => ({
-        title: view.name,
+        title: view.name ?? '',
         url: `/fastApp/${view.slug}`,
+        emoji: view.emoji,
       })),
       // icon:
     } satisfies Nav['items'][number];
@@ -104,8 +119,9 @@ export const NavMain = observer(() => {
       isActive: false,
       icon: view?.icon,
       items: viewsOf.map((view) => ({
-        title: view.name,
+        title: view.name ?? '',
         url: `/fastApp/${view.slug}`,
+        emoji: view.emoji,
       })),
       // icon:
     } satisfies Nav['items'][number];
@@ -200,6 +216,11 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
                     className="flex-grow"
                   >
                     <span className="">{subItem.title}</span>
+                    {subItem.emoji ? (
+                      <div className="w-4">{subItem.emoji?.emoji}</div>
+                    ) : (
+                      <div className="w-4"></div>
+                    )}
                   </Link>
                 </SidebarMenuSubButton>
 

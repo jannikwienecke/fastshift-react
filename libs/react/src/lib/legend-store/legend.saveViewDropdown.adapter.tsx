@@ -1,8 +1,8 @@
 import {
+  FilterType,
   RecordType,
   SaveViewDropdownProps,
   slugHelper,
-  FilterType,
 } from '@apps-next/core';
 import { store$ } from '.';
 import { updateExisitingView } from './legend.saveViewDropdown.helper';
@@ -23,6 +23,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
     form: form
       ? {
           ...form,
+          emoji: form.emoji ?? undefined,
           viewName: form.viewName ?? '',
           onCancel: () => {
             store$.userViewSettings.form.set(undefined);
@@ -32,6 +33,10 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
           },
           onDescriptionChange: (description: string) => {
             store$.userViewSettings.form.viewDescription.set(description);
+          },
+
+          onEmojiChange(emoji) {
+            store$.userViewSettings.form.emoji.set(emoji);
           },
 
           onSave: async () => {
@@ -60,7 +65,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
               });
             };
 
-            if (formType === 'edit') {
+            if (formType === 'edit' && userView$.get()) {
               const { queryData, queryKey } = updateExisitingView() ?? {};
 
               store$.updateViewMutation(
@@ -68,6 +73,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
                   id: userView$.get()?.id ?? '',
                   name: form.viewName,
                   description: form.viewDescription,
+                  emoji: form.emoji,
                   slug: slugHelper().slugify(form.viewName),
                 },
                 () => {
@@ -77,6 +83,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
                 }
               );
             } else {
+              console.log('create new view');
               store$.createViewMutation(onSuccess);
             }
           },

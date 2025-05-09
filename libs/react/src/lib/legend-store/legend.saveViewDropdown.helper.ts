@@ -28,6 +28,7 @@ export const updateExisitingView = () => {
               ...view,
               name: form.viewName,
               description: form.viewDescription,
+              emoji: form.emoji,
               slug: slugHelper().slugify(form.viewName),
             },
           ];

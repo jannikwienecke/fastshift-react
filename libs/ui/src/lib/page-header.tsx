@@ -41,7 +41,15 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
           <BreadcrumbItem className="text-sm">
             <BreadcrumbPage className="flex flex-row gap-4 items-center">
               <div className="flex flex-row gap-2 items-center">
-                {props.icon ? <props.icon className="w-4 h-4" /> : null}
+                <div>
+                  {props.emoji?.emoji ? (
+                    <>{props.emoji.emoji}</>
+                  ) : (
+                    <>
+                      {props.icon ? <props.icon className="w-4 h-4" /> : null}
+                    </>
+                  )}
+                </div>
                 {props.viewName}
               </div>
 
@@ -120,7 +128,15 @@ const DefaultPageHeaderDetail = (props: PageHeaderProps) => {
               onClick={() => props.detail?.onClickParentView()}
             >
               <div className="flex flex-row gap-2 items-center">
-                {props.icon ? <props.icon className="w-4 h-4" /> : null}
+                <div>
+                  {props.emoji?.emoji ? (
+                    <>{props.emoji.emoji}</>
+                  ) : (
+                    <>
+                      {props.icon ? <props.icon className="w-4 h-4" /> : null}
+                    </>
+                  )}
+                </div>
                 {props.viewName}
               </div>
             </BreadcrumbLink>

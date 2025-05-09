@@ -6,6 +6,7 @@ import { RecordType } from './base.types';
 import { DisplayOptionsType } from './displayOptions.types';
 import { FilterType } from './filter.types';
 import { MutationDto, MutationReturnDto } from './mutation.types';
+import { Emoji } from './ui.types';
 import { RegisteredViews, ViewConfigType } from './view-config.types';
 
 export type QueryProps = {
@@ -73,7 +74,7 @@ export type UserViewData = {
   rowLabelFieldName?: string;
   starred?: boolean;
   _deleted?: boolean;
-  emoji?: string;
+  emoji?: Emoji;
 };
 
 export type UserViewDataDto = {

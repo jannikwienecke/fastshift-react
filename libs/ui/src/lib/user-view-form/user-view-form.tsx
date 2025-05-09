@@ -1,6 +1,7 @@
 import { SaveViewDropdownProps, useTranslation } from '@apps-next/core';
 import { InboxIcon, TerminalIcon } from 'lucide-react';
 import { Button } from '../components';
+import { EmojiPickerDialog } from '../emoji-picker-dialog';
 
 export const UserViewForm = (props: SaveViewDropdownProps) => {
   const { t } = useTranslation();
@@ -10,9 +11,19 @@ export const UserViewForm = (props: SaveViewDropdownProps) => {
     <div className="">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row gap-4 flex-grow">
-          <div className="bg-foreground/10 rounded-md h-7 w-7 grid place-items-center">
-            <InboxIcon className="text-foreground/30 h-4" />
-          </div>
+          <EmojiPickerDialog
+            onSelectEmoji={(emoji) => {
+              props.form?.onEmojiChange?.(emoji);
+            }}
+          >
+            <button className="bg-foreground/10 rounded-md h-7 w-7 grid place-items-center">
+              {props.form?.emoji ? (
+                props.form.emoji.emoji
+              ) : (
+                <InboxIcon className="text-foreground/30 h-4" />
+              )}
+            </button>
+          </EmojiPickerDialog>
 
           <div className="flex flex-col w-full">
             <input

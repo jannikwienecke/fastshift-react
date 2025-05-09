@@ -35,7 +35,7 @@ type TaskViewDataType = DataType<
 export const tasksConfig = createViewConfig(
   'tasks',
   {
-    viewName: 'task',
+    viewName: 'Tasks',
     icon: CubeIcon,
     displayField: {
       field: 'name',

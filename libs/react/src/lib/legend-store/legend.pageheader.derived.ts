@@ -1,18 +1,17 @@
 import { MakePageHeaderPropsOption, PageHeaderProps, t } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { PencilIcon } from 'lucide-react';
+import { derviedDetailPage$ } from './legend.detailpage.derived';
 import {
   currentView$,
   detailLabel$,
   detailUserView$,
-  detailView$,
   parentUserView$,
   parentView$,
   parentViewName$,
   userView$,
 } from './legend.shared.derived';
 import { store$ } from './legend.store';
-import { derviedDetailPage$ } from './legend.detailpage.derived';
 
 export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
   {}
@@ -25,14 +24,21 @@ export const derivedPageHeaderProps$ = observable(() => {
       options: [],
       starred: detailUserView$.get()?.starred ?? false,
       icon: parentView$.get()?.icon,
+      emoji: parentUserView$.get()?.emoji,
       viewName: parentViewName$.get() ?? '',
       detail: {
         label: detailLabel$.get(),
         onClickParentView: () => {
           store$.navigation.set({
             state: {
-              view: parentUserView$.get()?.name ?? '',
-              slug: parentUserView$.get()?.slug ?? '',
+              view:
+                parentUserView$.get()?.name ??
+                parentView$.get()?.viewName ??
+                '',
+              slug:
+                parentUserView$.get()?.slug ??
+                parentView$.get()?.viewName ??
+                '',
               id: undefined,
               type: 'navigate',
             },
@@ -68,6 +74,7 @@ export const derivedPageHeaderProps$ = observable(() => {
       currentView$.viewName.get().firstUpper() ??
       '',
     icon: currentView$.get().icon,
+    emoji: userView$.get()?.emoji,
     starred: store$.userViewData.starred.get() ?? false,
 
     // TODO: MAKE THIS GENEERIC AND REUSABLE -> Like commands
@@ -99,8 +106,9 @@ export const derivedPageHeaderProps$ = observable(() => {
       if (option.command === 'create-new-view') {
         store$.userViewSettings.form.set({
           type: 'edit',
-          viewName: userView$.get()?.name ?? '',
+          viewName: userView$.get()?.name ?? currentView$.viewName.get(),
           viewDescription: userView$.get()?.description ?? '',
+          emoji: userView$.get()?.emoji,
           iconName: undefined,
         });
       }

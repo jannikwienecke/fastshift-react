@@ -222,9 +222,11 @@ export type SaveViewDropdownProps = {
   onReset: () => void;
   show: boolean;
   form?: UserViewForm & {
+    emoji?: Emoji | null;
     onSave: () => void;
     onCancel: () => void;
     onNameChange: (name: string) => void;
+    onEmojiChange: (emoji: Emoji) => void;
     onDescriptionChange: (description: string) => void;
   };
 };
@@ -234,6 +236,7 @@ export type PageHeaderProps = {
   starred: boolean;
   viewName: string;
   icon?: React.FC<any>;
+  emoji?: Emoji | null;
   detail?: {
     label: string;
     onClickParentView: () => void;
@@ -332,6 +335,7 @@ export type DetailPageProps = {
   relationalListFields: CommandformItem[];
   currentRelationalListField: CommandformItem | null;
   viewTypeState: DetailViewTypeState;
+  emoji: Emoji | null;
 
   tabs: {
     detailTabsFields: CommandformItem[];
@@ -341,6 +345,7 @@ export type DetailPageProps = {
     onSelectTab: (field: CommandformItem) => void;
   } | null;
 
+  onSelectEmoji: (emoji: Emoji) => void;
   onSelectView: (props: DetailViewTypeState) => void;
   onHoverRelationalListField: (field: CommandformItem) => void;
 } & FormFieldMethod;
@@ -430,4 +435,9 @@ export type DatePickerProps = {
   rect: DOMRect | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+};
+
+export type Emoji = {
+  label: string;
+  emoji: string;
 };

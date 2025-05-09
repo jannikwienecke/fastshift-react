@@ -50,19 +50,14 @@ export const tasksUiViewConfig = makeViewFieldsConfig<TaskViewDataType>(
             const label = totalTodos === 0 ? '0' : `${todos} / ${totalTodos}`;
 
             return (
-              <div className="w-[4.5rem] flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
+              <div className="w-[4.5rem] whitespace-nowrap flex flex-row items-center gap-1 px-3 border border-gray-200 rounded-md">
                 <span className="">{label}</span>
 
                 <todosConfig.icon className="w-4 h-4" />
               </div>
             );
           },
-          // commandbarFieldItem: () => {
-          //   return '123';
-          // },
-          // contextmenuFieldOption: () => {
-          //   return '123';
-          // },
+
           comboboxListValue: ({ data, row }) => {
             const todo = data as unknown as Todos & {
               tasks?: Tasks;

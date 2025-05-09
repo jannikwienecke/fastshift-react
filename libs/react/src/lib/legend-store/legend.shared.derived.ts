@@ -62,7 +62,7 @@ export const parentUserView$ = observable(() => {
 });
 
 export const parentViewName$ = observable(() => {
-  return parentUserView$.get()?.name ?? store$.detail.parentViewName.get();
+  return parentUserView$.get()?.name ?? parentView$.get()?.viewName;
 });
 
 export const detailRow$ = observable(() => {
