@@ -4,7 +4,7 @@ import {
 } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
 
-import { _log, UserViewData } from '@apps-next/core';
+import { _log, slugHelper, UserViewData } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
 import { v } from 'convex/values';
 import { views } from '../src/index';
@@ -53,6 +53,7 @@ export const getUserViews = server.query({
         ...view,
         id: view._id,
         name: label,
+        slug: slugHelper().slugify(label as string),
       };
     });
   },

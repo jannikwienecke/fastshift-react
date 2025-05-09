@@ -65,6 +65,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
 
               store$.updateViewMutation(
                 {
+                  id: userView$.get()?.id ?? '',
                   name: form.viewName,
                   description: form.viewDescription,
                   slug: slugHelper().slugify(form.viewName),
@@ -108,6 +109,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
     async onSave() {
       store$.updateViewMutation(
         {
+          id: userView$.get()?.id ?? '',
           ...getParsedViewSettings(),
         },
         () => {

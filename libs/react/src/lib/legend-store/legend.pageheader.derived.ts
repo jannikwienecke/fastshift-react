@@ -90,6 +90,7 @@ export const derivedPageHeaderProps$ = observable(() => {
       if (!userViewData) return;
 
       store$.updateViewMutation({
+        id: userViewData.id,
         starred: !userViewData.starred,
       });
     },

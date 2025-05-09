@@ -73,6 +73,7 @@ export type UserViewData = {
   rowLabelFieldName?: string;
   starred?: boolean;
   _deleted?: boolean;
+  emoji?: string;
 };
 
 export type UserViewDataDto = {

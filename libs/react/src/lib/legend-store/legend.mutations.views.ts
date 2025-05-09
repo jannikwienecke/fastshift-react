@@ -5,6 +5,7 @@ import {
   detailUserView$,
   detailView$,
   parentView$,
+  userViews$,
 } from './legend.shared.derived';
 import { StoreFn } from './legend.store.types';
 import { getParsedViewSettings } from './legend.utils.helper';
@@ -46,21 +47,13 @@ export const createViewMutation: StoreFn<'createViewMutation'> =
   };
 
 export const updateViewMutation: StoreFn<'updateViewMutation'> =
-  (store$) => async (record, onSuccess) => {
-    const userViewData = store$.userViewData.get();
+  (store$) => async (_record, onSuccess) => {
+    const { id, ...record } = _record;
 
-    console.log('UPDATE VIEW', userViewData);
+    const userViewData = userViews$.find((v) => v.id.get() === id)?.get();
 
     if (!userViewData) {
       throw new Error('User view data is required');
-    }
-
-    const userViewId = store$.userViewData.id.get() ?? '';
-
-    console.log('userViewId', userViewId);
-
-    if (!userViewId) {
-      throw new Error('User view ID is required');
     }
 
     const copyOfOriginal = {
@@ -77,7 +70,7 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
         payload: {
           type: 'UPDATE_THE_VIEW',
           record,
-          userViewId,
+          userViewId: userViewData.id,
         },
       },
     });
