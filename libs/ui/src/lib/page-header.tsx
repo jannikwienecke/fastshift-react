@@ -94,6 +94,7 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
               </DropdownMenu>
 
               <StarIcon
+                data-testid={props.starred ? 'starred' : 'unstarred'}
                 className={cn(
                   'h-4 w-4 cursor-pointer',
                   props.starred ? 'text-yellow-500' : 'text-foreground'
@@ -193,6 +194,7 @@ const DefaultPageHeaderDetail = (props: PageHeaderProps) => {
               </DropdownMenu>
 
               <StarIcon
+                data-testid={props.starred ? 'starred' : 'unstarred'}
                 className={cn(
                   'h-4 w-4 cursor-pointer',
                   props.starred ? 'text-yellow-500' : 'text-foreground'

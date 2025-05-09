@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures';
-import { isDev, waitFor } from './helpers/e2e.helper';
+import { isDev, pressEnter, waitFor } from './helpers/e2e.helper';
 import { groupByField, sortByField } from './helpers/e2e.helper.displayoptions';
 import {
   filterByDueDate,
@@ -279,5 +279,107 @@ test.describe('Custom Views', () => {
     ).toBeVisible();
 
     //
+  });
+
+  test("can update an existing view's name and description", async ({
+    mainPage,
+  }) => {
+    expect(1).toBe(1);
+
+    await mainPage.pageHeader.getByText(/more/i).click({ force: true });
+    await mainPage.page.getByText(/edit/i).click();
+
+    const page = mainPage.page;
+    await page.getByPlaceholder(/enter view name/i).fill('NEW NAME');
+    await page
+      .getByPlaceholder(/enter view description/i)
+      .fill('NEW DESCRIPTION');
+
+    await page.getByRole('button', { name: 'save' }).click();
+
+    await page.waitForURL(/.*new-name/);
+  });
+
+  test('can update an existing view and set an emoji', async ({ mainPage }) => {
+    await mainPage.pageHeader.getByText(/more/i).click({ force: true });
+    await mainPage.page.getByText(/edit/i).click();
+
+    const page = mainPage.page;
+
+    await page.getByRole('button', { name: 'emoji-picker-button' }).click();
+
+    await page.getByPlaceholder(/search/i).fill('laugh');
+
+    await waitFor(page, 300);
+
+    await pressEnter(page);
+
+    await page.getByRole('button', { name: 'save' }).click();
+
+    await waitFor(page, 300);
+
+    await expect(page.getByText('🤣')).toBeVisible();
+
+    await mainPage.sidebar.getByText('Tasks').nth(1).click();
+    await expect(mainPage.sidebar.getByText('🤣')).toBeVisible();
+  });
+
+  test('can star and unstar a view', async ({ mainPage }) => {
+    const page = mainPage.page;
+
+    await page.getByTestId('unstarred').click({ force: true });
+    await expect(mainPage.sidebar.getByText(/all tasks/i)).toHaveCount(2);
+    await page.getByTestId('starred').click({ force: true });
+    await expect(mainPage.sidebar.getByText(/all tasks/i)).toHaveCount(0);
+    await page.getByTestId('unstarred').click({ force: true });
+
+    await mainPage.sidebar.getByText(/all tasks more/i).click();
+
+    await expect(mainPage.sidebar.getByText(/all tasks/i)).toHaveCount(2);
+    await page.getByText(/remove from favorites/i).click();
+    await expect(mainPage.sidebar.getByText(/all tasks/i)).toHaveCount(0);
+  });
+
+  test('can star and unstar a detail view', async ({ mainPage, helper }) => {
+    const page = mainPage.page;
+
+    expect(1).toBe(1);
+    await helper.navigation.goToDetail(
+      'all-tasks',
+      CON.task.values.designMockups
+    );
+
+    await waitFor(page, 500);
+    await page.getByTestId('unstarred').click({ force: true });
+
+    // expect to see the name in the sidebar
+    await expect(
+      mainPage.sidebar.getByText(CON.task.values.designMockups)
+    ).toHaveCount(2);
+
+    await mainPage.sidebar
+      .getByText(CON.task.values.designMockups + ' more')
+      .click();
+    await expect(
+      mainPage.sidebar.getByText(CON.task.values.designMockups)
+    ).toHaveCount(2);
+
+    // remove from favorites
+    await page.getByText(/remove from favorites/i).click();
+    await expect(
+      mainPage.sidebar.getByText(CON.task.values.designMockups)
+    ).toHaveCount(0);
+
+    await page.getByTestId('unstarred').click({ force: true });
+
+    await mainPage.page
+      .getByPlaceholder(/name/i)
+      .fill(CON.task.values.designMockups + 'UPDATED');
+
+    await pressEnter(page);
+
+    await expect(
+      mainPage.sidebar.getByText(CON.task.values.designMockups + 'UPDATED')
+    ).toHaveCount(2);
   });
 });

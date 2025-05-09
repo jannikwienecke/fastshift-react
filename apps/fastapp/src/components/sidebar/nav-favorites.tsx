@@ -38,8 +38,6 @@ export const NavFavorites = observer(() => {
     (view) => view.starred && !view._deleted
   );
 
-  console.log('Starred Views', starredViews);
-
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <Collapsible
@@ -92,7 +90,7 @@ export const NavFavorites = observer(() => {
                     <DropdownMenuTrigger asChild>
                       <SidebarMenuAction showOnHover>
                         <MoreHorizontal />
-                        <span className="sr-only">More</span>
+                        <span className="sr-only">{item.name + ' more'}</span>
                       </SidebarMenuAction>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent

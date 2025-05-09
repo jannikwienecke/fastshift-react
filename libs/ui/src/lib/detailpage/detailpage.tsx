@@ -138,13 +138,13 @@ const DetailPageIcon = (props: DetailPageProps) => {
         props.onSelectEmoji(emoji);
       }}
     >
-      <button className="p-2 bg-gray-100 w-12 grid place-items-center rounded-md">
+      <div className="p-2 bg-gray-100 w-12 grid place-items-center rounded-md">
         {props.emoji ? (
           props.emoji.emoji
         ) : (
           <Icon className="h-5 w-5 text-gray-600" />
         )}
-      </button>
+      </div>
     </EmojiPickerDialog>
   );
 };

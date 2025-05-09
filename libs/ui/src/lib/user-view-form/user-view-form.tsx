@@ -16,13 +16,13 @@ export const UserViewForm = (props: SaveViewDropdownProps) => {
               props.form?.onEmojiChange?.(emoji);
             }}
           >
-            <button className="bg-foreground/10 rounded-md h-7 w-7 grid place-items-center">
+            <div className="bg-foreground/10 rounded-md h-7 w-7 grid place-items-center">
               {props.form?.emoji ? (
                 props.form.emoji.emoji
               ) : (
                 <InboxIcon className="text-foreground/30 h-4" />
               )}
-            </button>
+            </div>
           </EmojiPickerDialog>
 
           <div className="flex flex-col w-full">

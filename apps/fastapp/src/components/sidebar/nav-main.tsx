@@ -70,7 +70,9 @@ export const NavMain = observer(() => {
   const { data: allUserViews } = useQuery(
     convexQuery(api.query.getUserViews, {})
   );
-  const userViews = allUserViews?.filter((view) => !view._deleted);
+  const userViews = allUserViews?.filter(
+    (view) => !view._deleted && !view.rowId
+  );
 
   if (!userViews) return null;
 

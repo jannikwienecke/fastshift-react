@@ -37,8 +37,8 @@ test.describe('Detail Page Form Test', () => {
     );
 
     // getby label "label"
-    await updateValue(props, 'label', newLabel);
-    await updateValue(props, 'description', newDescription);
+    await updateDetailFormValue(props, 'label', newLabel);
+    await updateDetailFormValue(props, 'description', newDescription);
 
     await waitFor(mainPage.page, 500);
     await page.reload();
@@ -73,8 +73,8 @@ test.describe('Detail Page Form Test', () => {
     );
 
     // getby label "label"
-    await updateValue(props, 'label', newLabel);
-    await updateValue(props, 'description', newDescription);
+    await updateDetailFormValue(props, 'label', newLabel);
+    await updateDetailFormValue(props, 'description', newDescription);
 
     await mainPage.sidebar
       .getByText(/projects/i)
@@ -95,7 +95,7 @@ test.describe('Detail Page Form Test', () => {
   });
 });
 
-const updateValue = async (
+export const updateDetailFormValue = async (
   props: PartialFixtures,
   field: string,
   value: string

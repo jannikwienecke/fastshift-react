@@ -26,7 +26,12 @@ export const EmojiPickerDialog = (props: {
       }}
     >
       <PopoverTrigger asChild>
-        <button>{props.children}</button>
+        <button
+          data-testid="emoji-picker-button"
+          aria-label="emoji-picker-button"
+        >
+          {props.children}
+        </button>
       </PopoverTrigger>
 
       <PopoverContent
