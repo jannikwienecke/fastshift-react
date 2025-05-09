@@ -134,7 +134,7 @@ test.describe('Custom Views', () => {
     ).toHaveCount(1);
 
     // go back to tasks list view -> see the filtered tasks again
-    await mainPage.sidebar.getByText('Tasks').nth(1).click();
+    await mainPage.sidebar.getByText('Tasks').nth(2).click();
     await mainPage.sidebar
       .getByText(/all tasks/i)
       .first()
