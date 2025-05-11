@@ -1,3 +1,5 @@
+import { api } from '@apps-next/convex';
+import { getView, store$ } from '@apps-next/react';
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,26 +17,26 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@apps-next/ui';
+import { convexQuery } from '@convex-dev/react-query';
+import { observer } from '@legendapp/state/react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import {
   ArrowUpRight,
   ChevronDownIcon,
   ChevronRightIcon,
-  Link,
+  Link as LinkIcon,
   MoreHorizontal,
   StarOff,
   Trash2,
 } from 'lucide-react';
 
-export function NavFavorites({
-  favorites,
-}: {
-  favorites: {
-    name: string;
-    url: string;
-    emoji: string;
-  }[];
-}) {
+export const NavFavorites = observer(() => {
   const { isMobile } = useSidebar();
+  const { data: allViews } = useQuery(convexQuery(api.query.getUserViews, {}));
+  const starredViews = allViews?.filter(
+    (view) => view.starred && !view._deleted
+  );
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -53,48 +55,91 @@ export function NavFavorites({
 
         <CollapsibleContent>
           <SidebarMenu>
-            {favorites.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url} title={item.name}>
-                    <span>{item.emoji}</span>
-                    <span>{item.name}</span>
-                  </a>
-                </SidebarMenuButton>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuAction showOnHover>
-                      <MoreHorizontal />
-                      <span className="sr-only">More</span>
-                    </SidebarMenuAction>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-56 rounded-lg"
-                    side={isMobile ? 'bottom' : 'right'}
-                    align={isMobile ? 'end' : 'start'}
-                  >
-                    <DropdownMenuItem>
-                      <StarOff className="text-muted-foreground" />
-                      <span>Remove from Favorites</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Link className="text-muted-foreground" />
-                      <span>Copy Link</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <ArrowUpRight className="text-muted-foreground" />
-                      <span>Open in New Tab</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Trash2 className="text-muted-foreground" />
-                      <span>Delete</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            ))}
+            {starredViews?.map((item) => {
+              const view = getView(item.baseView ?? '');
+
+              return (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild>
+                    <Link
+                      preload="viewport"
+                      to={
+                        item.rowId
+                          ? `/fastApp/${item.baseView ?? ''}/${
+                              item.rowId
+                            }/overview`
+                          : `/fastApp/${item.slug}`
+                      }
+                      title={item.name}
+                    >
+                      {item.emoji ? (
+                        <> {item.emoji.emoji}</>
+                      ) : (
+                        <>
+                          {view?.icon ? (
+                            <view.icon className="w-4 h-4" />
+                          ) : (
+                            <span className="w-4 h-4" />
+                          )}
+                        </>
+                      )}
+                      <span>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction showOnHover>
+                        <MoreHorizontal />
+                        <span className="sr-only">{item.name + ' more'}</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-56 rounded-lg"
+                      side={isMobile ? 'bottom' : 'right'}
+                      align={isMobile ? 'end' : 'start'}
+                    >
+                      <DropdownMenuItem
+                        onClick={() => {
+                          store$.updateViewMutation({
+                            id: item.id,
+                            starred: !item.starred,
+                          });
+                        }}
+                      >
+                        <StarOff className="text-muted-foreground" />
+                        <span>Remove from Favorites</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          console.log(item);
+                          navigator.clipboard.writeText(
+                            `${window.location.origin}/fastApp/${item.slug}`
+                          );
+                        }}
+                      >
+                        <LinkIcon className="text-muted-foreground" />
+                        <span>Copy Link</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          console.log('Open in new tab', item);
+                          window.open(`/fastApp/${item.slug}`, '_blank');
+                        }}
+                      >
+                        <ArrowUpRight className="text-muted-foreground" />
+                        <span>Open in New Tab</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <Trash2 className="text-muted-foreground" />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </SidebarMenuItem>
+              );
+            })}
             <SidebarMenuItem>
               <SidebarMenuButton className="text-sidebar-foreground/70">
                 <MoreHorizontal />
@@ -106,4 +151,4 @@ export function NavFavorites({
       </Collapsible>
     </SidebarGroup>
   );
-}
+});

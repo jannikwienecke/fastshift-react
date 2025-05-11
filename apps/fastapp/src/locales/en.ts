@@ -10,6 +10,7 @@ export const en = {
     logout: 'Logout',
     categories: 'Categories',
     tags: 'Tags',
+    users: 'Users',
   },
   projects: {
     one: 'Project',

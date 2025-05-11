@@ -1,4 +1,13 @@
-import { SidebarInset, SidebarProvider } from '@apps-next/ui';
+import {
+  Button,
+  EmojiPicker,
+  EmojiPickerDialog,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  SidebarInset,
+  SidebarProvider,
+} from '@apps-next/ui';
 
 import React from 'react';
 
@@ -37,13 +46,15 @@ export const Route = createFileRoute('/fastApp')({
   loader: async (props) => {
     await wait();
 
-    await queryClient.ensureQueryData(getUserViewsQuery());
+    const userViewsQuery = getUserViewsQuery();
+    await queryClient.ensureQueryData(userViewsQuery);
 
     const userViews = getUserViews();
 
     const { viewName, slug, id, model } = getViewParms(props.params);
 
     globalStore.setViews(views);
+    store$.api.getUserViewQueryKey.set(userViewsQuery.queryKey);
 
     if (!viewName) {
       return redirect({ to: '/fastApp/task' });
@@ -130,6 +141,7 @@ const FastAppLayoutComponent = observer(() => {
   }, [id]);
 
   const userViews = getUserViews();
+
   const { viewData, userViewData } = getViewData(viewName, userViews);
 
   const data = queryClient.getQueryData(

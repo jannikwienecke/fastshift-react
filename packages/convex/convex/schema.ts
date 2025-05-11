@@ -16,9 +16,22 @@ const _schema = defineSchema({
     displayOptions: v.optional(v.string()),
     filters: v.optional(v.string()),
     parentModel: v.optional(v.string()),
+    rowId: v.optional(v.string()),
+    rowLabelFieldName: v.optional(v.string()),
+    starred: v.optional(v.boolean()),
+    emoji: v.optional(
+      v.object({
+        emoji: v.string(),
+        label: v.string(),
+      })
+    ),
   })
     .index('baseView', ['baseView'])
-    .index('name', ['name']),
+    .index('name', ['name'])
+    .index('slug', ['slug'])
+    .index('starred', ['starred'])
+    .index('parentModel', ['parentModel'])
+    .index('rowId', ['rowId']),
 
   owner: defineTable({
     userId: v.id('users'),

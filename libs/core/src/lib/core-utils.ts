@@ -7,6 +7,7 @@ import {
   QUERY_KEY_PREFIX,
   RecordType,
   RegisteredViews,
+  UserViewData,
   ViewConfigType,
 } from './types';
 import { DisplayOptionsType } from './types/displayOptions.types';
@@ -300,6 +301,13 @@ export const getViewByName = (
   }
 
   return viewConfigByTableName;
+};
+
+export const getUserViewByName = (
+  userViewsList: UserViewData[],
+  name: string
+) => {
+  return userViewsList.find((u) => u.name.toLowerCase() === name.toLowerCase());
 };
 
 export const makeDayMonthString = (date: Date | undefined) => {

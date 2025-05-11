@@ -4,13 +4,14 @@ import {
   MutationHandlerReturnType,
   MutationPropsServer,
   slugHelper,
+  UserViewData,
 } from '@apps-next/core';
 import { mutationClient, queryClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
 import { deleteIds, insertIds } from './convex-mutation-helper';
 import { getErrorMessage } from './convex-utils';
 import { ConvexContext } from './convex.db.type';
-import { GenericMutationCtx } from './convex.server.types';
+import { GenericMutationCtx, Id } from './convex.server.types';
 import { ConvexRecord, ID } from './types.convex';
 import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
 
@@ -233,106 +234,94 @@ export const userViewMutation = async (
   ctx: GenericMutationCtx,
   props: MutationPropsServer
 ) => {
-  const { mutation, viewConfigManager } = props;
+  const { mutation } = props;
 
-  if (mutation.type !== 'USER_VIEW_MUTATION')
+  if (mutation.type !== 'NEW_USER_VIEW_MUTATION')
     throw new Error('INVALID MUTATION-5');
 
-  const { displayOptions, filters, name, type, description, parentModel } =
-    mutation.payload;
-
   const dbMutation = mutationClient(ctx);
-  const dbQuery = queryClient(ctx, 'views');
 
-  const viewName = mutation.payload.name;
-
-  if (type === 'CREATE_VIEW') {
+  if (mutation.payload.type === 'CREATE_NEW_VIEW') {
     try {
       await dbMutation.insert('views', {
-        name: name,
-        description,
-        baseView: viewConfigManager.getViewName(),
-        displayOptions,
-        filters,
-        parentModel,
-        slug: slugHelper().slugify(name),
+        ...mutation.payload.record,
       });
     } catch (error) {
       return {
         status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
-        message: `Error creating user view. name=${name}`,
+        message: `Error creating user view. name=${mutation.payload.record.name}`,
         error: getErrorMessage(error),
       };
     }
-    return {
-      message: 'User view created successfully',
-      status: 201 as const,
-    } as const;
   }
 
-  if (type === 'UPDATE_VIEW') {
-    let view: ConvexRecord | null = null;
+  if (mutation.payload.type === 'UPDATE_VIEW') {
     try {
-      view = await dbQuery
-        .withIndex('name', (q) => q.eq('name', viewName))
-        .first();
+      await dbMutation.patch(
+        mutation.payload.userViewId as Id<any>,
+        mutation.payload.record
+      );
     } catch (error) {
       return {
         status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
-        message: `Error fetching user view. name=${name}`,
+        message: `Error updating user view. View ID: ${mutation.payload.userViewId}`,
         error: getErrorMessage(error),
       };
     }
+  }
 
-    if (view) {
-      try {
-        await dbMutation.patch(view._id, {
-          displayOptions,
-          filters,
-          name,
-          parentModel,
-          description: description ?? '',
-        });
-        return {
-          message: 'User view updated successfully',
-          status: 200 as const,
-        };
-      } catch (error) {
-        return {
-          status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
-          message: `Error updating user view. name=${name}`,
-          error: getErrorMessage(error),
-        };
-      }
-    } else {
-      try {
-        const baseView = viewConfigManager.getViewName();
-        await dbMutation.insert('views', {
-          baseView,
-          displayOptions,
-          filters,
-          parentModel,
-          name: baseView,
-          slug: slugHelper().slugify(name),
-          description: description ?? '',
-        });
-        return {
-          message: 'User view created successfully',
-          status: 201 as const,
-        };
-      } catch (error) {
-        return {
-          status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
-          message: `Error creating user view. name=${name}`,
-          error: getErrorMessage(error),
-        };
-      }
+  if (mutation.payload.type === 'CREATE_SUB_VIEW') {
+    console.log('CREATE SUB VIEW', mutation.payload);
+    try {
+      await dbMutation.insert('views', {
+        ...mutation.payload.userViewData,
+      });
+    } catch (error) {
+      return {
+        status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+        message: `Error creating sub view. name=${mutation.payload.userViewData.name}`,
+        error: getErrorMessage(error),
+      };
     }
   }
 
-  throw new Error(
-    `Invalid mutation type for user view. type=${type} name=${name}`
-  );
+  if (mutation.payload.type === 'UPDATE_SUB_VIEW') {
+    console.log('UPDATE SUB VIEW', mutation.payload);
+    try {
+      await dbMutation.patch(
+        mutation.payload.userViewId as Id<any>,
+        mutation.payload.userViewData
+      );
+    } catch (error) {
+      return {
+        status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+        message: `Error updating sub view. name=${mutation.payload.userViewId}`,
+        error: getErrorMessage(error),
+      };
+    }
+  }
+
+  if (mutation.payload.type === 'CREATE_DETAIL_VIEW') {
+    console.log('CREATE_DETAIL_VIEW:::', mutation.payload);
+    try {
+      await dbMutation.insert('views', {
+        ...mutation.payload.userViewData,
+        slug: mutation.payload.userViewData.name,
+      } satisfies Partial<UserViewData>);
+    } catch (error) {
+      console.log('CREATE_DETAIL_VIEW ERROR', error);
+      return {
+        status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
+        message: `Error updating detail view. name=${mutation.payload.type}`,
+        error: getErrorMessage(error),
+      };
+    }
+  }
+
+  return {
+    message: 'User view created successfully',
+    status: 201 as const,
+  };
 };
 
 export const mutationHandlers: MUTATION_HANDLER_CONVEX = {
@@ -340,5 +329,5 @@ export const mutationHandlers: MUTATION_HANDLER_CONVEX = {
   DELETE_RECORD: deleteMutation,
   UPDATE_RECORD: updateMutation,
   SELECT_RECORDS: selectRecordsMutation,
-  USER_VIEW_MUTATION: userViewMutation,
+  NEW_USER_VIEW_MUTATION: userViewMutation,
 };

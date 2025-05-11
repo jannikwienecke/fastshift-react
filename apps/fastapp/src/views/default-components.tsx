@@ -27,6 +27,7 @@ import {
   List,
   SaveViewDropdown,
   UserViewForm,
+  pageHeader,
 } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { TaskViewDataType } from '../views/tasks.components';
@@ -218,7 +219,8 @@ export const RenderUserViewForm = observer(
     //
   }) => {
     const { makeSaveViewDropdownProps } = makeHooks<TaskViewDataType>();
-    _log.info('Render RenderUserViewForm');
+    // FIXME -> This rerenders on input change??
+    // _log.info('Render RenderUserViewForm');
 
     const props = makeSaveViewDropdownProps({
       show: false,
@@ -235,5 +237,25 @@ export const RenderUserViewForm = observer(
       //   }}
       // </Memo>
     );
+  }
+);
+
+export const RenderPageHeader = observer(
+  (props: {
+    //
+  }) => {
+    const { makePageHeaderProps } = makeHooks();
+
+    return <pageHeader.default {...makePageHeaderProps(props)} />;
+  }
+);
+
+export const RenderPageHeaderDetail = observer(
+  (props: {
+    //
+  }) => {
+    const { makePageHeaderProps } = makeHooks();
+
+    return <pageHeader.defaultDetail {...makePageHeaderProps(props)} />;
   }
 );

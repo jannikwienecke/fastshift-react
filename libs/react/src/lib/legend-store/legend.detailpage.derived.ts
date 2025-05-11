@@ -4,6 +4,7 @@ import { detailFormHelper } from './legend.detailpage.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { store$ } from './legend.store';
 import { detailTabsHelper } from './legend.detailtabs.helper';
+import { detailUserView$, detailView$ } from './legend.shared.derived';
 
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
@@ -14,6 +15,8 @@ export const derviedDetailPage$ = observable(() => {
 
   const detailHelper = detailFormHelper();
   const tabsProps = detailTabsHelper();
+
+  console.log(detailUserView$.get());
   return {
     row: detailHelper.row,
     icon: detailHelper.view.icon,
@@ -31,7 +34,7 @@ export const derviedDetailPage$ = observable(() => {
     relationalListFields: detailHelper.getRelationalFields(),
     currentRelationalListField: null,
     viewTypeState: store$.detail.viewType.get() ?? { type: 'overview' },
-
+    emoji: detailUserView$.get()?.emoji ?? null,
     tabs: tabsProps
       ? {
           ...tabsProps,
@@ -50,6 +53,11 @@ export const derviedDetailPage$ = observable(() => {
         xSelect.open(detailHelper.row, field.field, true);
         selectState$.rect.set(rect);
       }
+    },
+    onSelectEmoji(emoji) {
+      store$.updateDetailViewMutation({
+        emoji,
+      });
     },
     onInputChange(...props) {
       store$.detailpageChangeInput(...props);

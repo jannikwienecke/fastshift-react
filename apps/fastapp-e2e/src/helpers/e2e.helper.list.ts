@@ -9,7 +9,7 @@ export type ListE2eHelper = {
     hasTestId: (name: string) => Promise<void>;
   }>;
   getFirstListItem: () => ReturnType<ListE2eHelper['getListItem']>;
-  hasLSizeOf: (size: number, timeout?: number) => Promise<void>;
+  hasListSizeOf: (size: number, timeout?: number) => Promise<void>;
 };
 
 export const makeListHelper = (mainPage: MainViewPage): ListE2eHelper => {
@@ -41,6 +41,6 @@ export const makeListHelper = (mainPage: MainViewPage): ListE2eHelper => {
   return {
     getListItem,
     getFirstListItem,
-    hasLSizeOf,
+    hasListSizeOf: hasLSizeOf,
   };
 };

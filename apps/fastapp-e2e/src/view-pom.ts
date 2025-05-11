@@ -13,6 +13,7 @@ export class MainViewPage {
   readonly commandbar: Locator;
   readonly commandform: Locator;
   readonly detailHeader: Locator;
+  readonly pageHeader: Locator;
   readonly sidebar: Locator;
   readonly detailTabs: Locator;
 
@@ -28,12 +29,13 @@ export class MainViewPage {
     this.commandbar = page.getByTestId('commandbar');
     this.commandform = page.getByTestId('commandform');
     this.detailHeader = page.getByTestId('detail-page-header');
+    this.pageHeader = page.getByTestId('main-page-header');
     this.sidebar = page.getByTestId('sidebar');
     this.detailTabs = page.getByTestId('detail-tabs');
   }
 
   async goto() {
-    await this.page.goto('/fastApp/Task', { timeout: 5000 });
+    await this.page.goto('/fastApp/tasks', { timeout: 5000 });
   }
 
   async gotoPage(name: string) {

@@ -4,11 +4,11 @@ import {
 } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
 
-import { _log, UserViewData } from '@apps-next/core';
+import { _log, slugHelper, UserViewData } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
 import { v } from 'convex/values';
 import { views } from '../src/index';
-import { Id } from './_generated/dataModel';
+import { Doc, Id } from './_generated/dataModel';
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -36,8 +36,26 @@ export const testQuery = server.mutation({
 });
 
 export const getUserViews = server.query({
-  handler: async (ctx, args) => {
-    return await ctx.db.query('views').collect();
+  handler: async (ctx, args): Promise<Partial<UserViewData>[]> => {
+    const views = await ctx.db.query('views').collect();
+
+    return asyncMap(views, async (view) => {
+      if (!view.rowId || !view.rowLabelFieldName)
+        return {
+          ...view,
+          id: view._id,
+        };
+
+      const row = await ctx.db.get(view.rowId as Id<any>);
+      const label = row[view.rowLabelFieldName as keyof Doc<any>];
+
+      return {
+        ...view,
+        id: view._id,
+        name: label,
+        slug: slugHelper().slugify(label as string),
+      };
+    });
   },
 });
 
@@ -59,9 +77,11 @@ export const userViewData = server.query({
 
     return {
       ...view,
+      id: view._id,
       name: view.name,
-      displayOptions: view.displayOptions ?? null,
-      filters: view.filters ?? null,
+      description: view.description ?? '',
+      displayOptions: view.displayOptions ?? '',
+      filters: view.filters ?? '',
     } satisfies UserViewData;
   },
 });

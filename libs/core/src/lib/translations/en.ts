@@ -98,6 +98,9 @@ export const en = {
     unmarkAs: 'Unmark as {{field}}',
     resetDb: 'Reset Database',
     openInNewTab: 'Open in new tab',
+    saveTo: 'Save to',
+    more: 'More',
+    overview: 'Overview',
   },
 
   datePicker: {
@@ -124,6 +127,11 @@ export const en = {
     id: 'Copy ID',
     url: 'Copy URL',
     json: 'Copy as JSON',
+  },
+
+  userViewForm: {
+    enterName: 'Enter view name',
+    enterDescription: 'Enter view description',
   },
 
   confirmationAlert: {

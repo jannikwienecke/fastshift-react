@@ -58,7 +58,7 @@ const createViewConfigManager = (viewName: string) => {
 
   const viewData = getViewData(viewName);
 
-  const viewConfig = getViewByName(views, viewData?.baseView ?? viewName);
+  const viewConfig = getViewByName(views, viewData?.baseView || viewName);
 
   if (!viewConfig) {
     console.warn('____', viewName, views);
@@ -80,6 +80,8 @@ const createViewConfigManager = (viewName: string) => {
 };
 
 const resetStore = () => {
+  store$.state.set('pending');
+
   store$.userViewSettings.initialSettings.set(null);
   store$.userViewSettings.hasChanged.set(false);
 
@@ -336,8 +338,8 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
     handleQueryData(data);
   } else {
     console.warn('____LOAD SUB VIEW LIST PAGE', action);
-    resetStore();
 
+    resetStore();
     setStore(viewName, parentViewName);
 
     if (data) {

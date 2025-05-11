@@ -6,6 +6,7 @@ import { RecordType } from './base.types';
 import { DisplayOptionsType } from './displayOptions.types';
 import { FilterType } from './filter.types';
 import { MutationDto, MutationReturnDto } from './mutation.types';
+import { Emoji } from './ui.types';
 import { RegisteredViews, ViewConfigType } from './view-config.types';
 
 export type QueryProps = {
@@ -61,12 +62,31 @@ export type ContinueCursor = {
 };
 
 export type UserViewData = {
+  id: string;
   baseView: string;
-  displayOptions?: string | null;
-  filters?: string | null;
+  displayOptions: string;
+  filters: string;
   name: string;
   slug: string;
+  description: string | null;
   parentModel?: string;
+  rowId?: string;
+  rowLabelFieldName?: string;
+  starred?: boolean;
+  _deleted?: boolean;
+  emoji?: Emoji;
+};
+
+export type UserViewDataDto = {
+  id?: string;
+  baseView: string;
+  displayOptions: string;
+  filters: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  parentModel?: string;
+  starred?: boolean;
 };
 
 export type QueryReturnDto<T extends RecordType = RecordType> = {

@@ -1,14 +1,13 @@
 import {
-  _log,
-  convertFiltersForBackend,
   FilterType,
   RecordType,
   SaveViewDropdownProps,
   slugHelper,
 } from '@apps-next/core';
-import { store$ } from '../legend-store';
-import { getParsedViewSettings } from '../legend-store/legend.utils.helper';
-import { renderErrorToast } from '../toast';
+import { store$ } from '.';
+import { updateExisitingView } from './legend.saveViewDropdown.helper';
+import { userView$ } from './legend.shared.derived';
+import { getParsedViewSettings } from './legend.utils.helper';
 
 type Props<T> = {
   // Add any specific properties for the Props type here
@@ -24,7 +23,8 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
     form: form
       ? {
           ...form,
-          viewName: store$.userViewSettings.form.viewName.get() ?? '',
+          emoji: form.emoji ?? undefined,
+          viewName: form.viewName ?? '',
           onCancel: () => {
             store$.userViewSettings.form.set(undefined);
           },
@@ -35,25 +35,18 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
             store$.userViewSettings.form.viewDescription.set(description);
           },
 
-          onSave: async () => {
-            const result = await store$.api.mutateAsync({
-              query: '',
-              viewName: store$.viewConfigManager.getViewName(),
-              mutation: {
-                type: 'USER_VIEW_MUTATION',
-                payload: {
-                  type: 'CREATE_VIEW',
-                  name: form.viewName,
-                  description: form.viewDescription,
-                  ...getParsedViewSettings(),
-                },
-              },
-            });
+          onEmojiChange(emoji) {
+            store$.userViewSettings.form.emoji.set(emoji);
+          },
 
-            if (result.success) {
+          onSave: async () => {
+            const formType = form.type;
+
+            const onSuccess = () => {
               store$.userViewSettings.form.set(undefined);
               store$.userViewSettings.open.set(false);
               store$.userViewSettings.hasChanged.set(false);
+
               store$.userViewSettings.viewCreated.set({
                 name: form.viewName,
                 slug: slugHelper().slugify(form.viewName),
@@ -70,6 +63,28 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
                 displayOptions: copyOfDisplayOptions,
                 filters: copyOfFilters,
               });
+            };
+
+            if (formType === 'edit' && userView$.get()) {
+              const { queryData, queryKey } = updateExisitingView() ?? {};
+
+              store$.updateViewMutation(
+                {
+                  id: userView$.get()?.id ?? '',
+                  name: form.viewName,
+                  description: form.viewDescription,
+                  emoji: form.emoji,
+                  slug: slugHelper().slugify(form.viewName),
+                },
+                () => {
+                  store$.api.queryClient.setQueryData(queryKey, queryData);
+
+                  onSuccess();
+                }
+              );
+            } else {
+              console.log('create new view');
+              store$.createViewMutation(onSuccess);
             }
           },
         }
@@ -99,50 +114,29 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
       }
     },
     async onSave() {
-      const filters = store$.filter.filters.get();
-
-      const filtersConverted = convertFiltersForBackend(filters);
-
-      const result = await store$.api.mutateAsync({
-        query: '',
-        viewName: store$.viewConfigManager.getViewName(),
-        mutation: {
-          type: 'USER_VIEW_MUTATION',
-          payload: {
-            type: 'UPDATE_VIEW',
-            description: form?.viewDescription ?? null,
-
-            name:
-              store$.userViewData.get()?.name ??
-              store$.viewConfigManager.getViewName(),
-
-            ...getParsedViewSettings(),
-            filters: filtersConverted,
-          },
+      store$.updateViewMutation(
+        {
+          id: userView$.get()?.id ?? '',
+          ...getParsedViewSettings(),
         },
-      });
+        () => {
+          const displayOptions = store$.displayOptions.get();
+          const filters = store$.filter.filters.get();
+          const copyOfDisplayOptions = JSON.parse(
+            JSON.stringify(displayOptions)
+          );
+          const copyOfFilters = JSON.parse(JSON.stringify(filters));
 
-      if (result.error) {
-        renderErrorToast(`Error saving view: ${result.error.message}`, () => {
-          _log.error('Error saving view callback');
-        });
-      }
+          store$.userViewSettings.form.set(undefined);
+          store$.userViewSettings.open.set(false);
+          store$.userViewSettings.hasChanged.set(false);
 
-      if (result.success) {
-        const displayOptions = store$.displayOptions.get();
-        const filters = store$.filter.filters.get();
-        const copyOfDisplayOptions = JSON.parse(JSON.stringify(displayOptions));
-        const copyOfFilters = JSON.parse(JSON.stringify(filters));
-
-        store$.userViewSettings.form.set(undefined);
-        store$.userViewSettings.open.set(false);
-        store$.userViewSettings.hasChanged.set(false);
-
-        store$.userViewSettings.initialSettings.set({
-          displayOptions: copyOfDisplayOptions,
-          filters: copyOfFilters,
-        });
-      }
+          store$.userViewSettings.initialSettings.set({
+            displayOptions: copyOfDisplayOptions,
+            filters: copyOfFilters,
+          });
+        }
+      );
     },
     async onSaveAsNewView() {
       store$.userViewSettings.form.set({

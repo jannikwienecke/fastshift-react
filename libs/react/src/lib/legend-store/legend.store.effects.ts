@@ -11,11 +11,8 @@ import { selectState$, xSelect } from './legend.select-state';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
-import {
-  localModeEnabled$,
-  saveSubViewSettings,
-  setGlobalDataModel,
-} from './legend.utils.helper';
+import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
+import { parentView$ } from './legend.shared.derived';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -101,7 +98,11 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     if (localModeEnabled$.get()) {
       _log.debug('handleFilterChange: local mode. No fetchMore');
-      saveSubViewSettings();
+
+      if (parentView$.get()) {
+        console.log('saveSubViewSettings!!!');
+        store$.saveSubUserView();
+      }
     } else {
       store$.state.set('filter-changed');
       store$.fetchMore.assign({
@@ -154,7 +155,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     if (localModeEnabled$.get()) {
       _log.info('handleDisplayOptionsChange: local mode. No fetchMore');
-      saveSubViewSettings();
+      console.log('saveSubViewSettings!!!');
+      store$.saveSubUserView();
       return;
     } else {
       store$.state.set('updating-display-options');
@@ -165,10 +167,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       });
     }
   });
-
-  // observable(function handleDisplayOptionsChange() {
-
-  // }).onChange(() => null);
 
   _hasOpenDialog$.onChange((state) => {
     clearTimeout(timeout$.get() ?? 0);
@@ -349,25 +347,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         const queryKey = querySubListViewOptions$.get()?.queryKey;
         const rows = store$.dataModel.rows.get();
 
-        // const parentViewName = store$.detail.parentViewName.get();
         const rawRows = rows.map((r) => r.raw);
-
-        // if (parentViewName) {
-        //   const view = getViewByName(store$.views.get(), parentViewName);
-
-        //   const currentRow = store$.detail.row.get();
-        //   rawRows = rows
-        //     .filter((r) => {
-        //       const idOfParent = r.raw[view?.tableName]?.id;
-
-        //       if (idOfParent && idOfParent !== currentRow?.id) {
-        //         return false;
-        //       }
-
-        //       return true;
-        //     })
-        //     .map((r) => r.raw);
-        // }
 
         if (!queryKey) return;
 

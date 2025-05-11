@@ -13,6 +13,9 @@ import {
 import { Checkbox } from '../components/checkbox';
 import { Button } from '../components';
 import { cn } from '../utils';
+import { EmojiPicker } from 'frimousse';
+import { EmojiPickerDialog } from '../emoji-picker-dialog';
+import React from 'react';
 
 const DetailPageHeader = (props: DetailPageProps) => {
   return (
@@ -130,9 +133,19 @@ const DetailPageFormFields = (
 const DetailPageIcon = (props: DetailPageProps) => {
   const Icon = props.icon ?? CubeIcon;
   return (
-    <div className="p-2 bg-gray-100 w-12 grid place-items-center rounded-md">
-      <Icon className="h-5 w-5 text-gray-600" />
-    </div>
+    <EmojiPickerDialog
+      onSelectEmoji={(emoji) => {
+        props.onSelectEmoji(emoji);
+      }}
+    >
+      <div className="p-2 bg-gray-100 w-12 grid place-items-center rounded-md">
+        {props.emoji ? (
+          props.emoji.emoji
+        ) : (
+          <Icon className="h-5 w-5 text-gray-600" />
+        )}
+      </div>
+    </EmojiPickerDialog>
   );
 };
 

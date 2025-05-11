@@ -1,22 +1,35 @@
-import { SaveViewDropdownProps } from '@apps-next/core';
+import { SaveViewDropdownProps, useTranslation } from '@apps-next/core';
 import { InboxIcon, TerminalIcon } from 'lucide-react';
 import { Button } from '../components';
+import { EmojiPickerDialog } from '../emoji-picker-dialog';
 
 export const UserViewForm = (props: SaveViewDropdownProps) => {
+  const { t } = useTranslation();
   const viewName = props.form?.viewName;
 
   return (
-    <div>
+    <div className="">
       <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-row gap-4">
-          <div className="bg-foreground/10 rounded-md h-7 w-7 grid place-items-center">
-            <InboxIcon className="text-foreground/30 h-4" />
-          </div>
+        <div className="flex flex-row gap-4 flex-grow">
+          <EmojiPickerDialog
+            onSelectEmoji={(emoji) => {
+              props.form?.onEmojiChange?.(emoji);
+            }}
+          >
+            <div className="bg-foreground/10 rounded-md h-7 w-7 grid place-items-center">
+              {props.form?.emoji ? (
+                props.form.emoji.emoji
+              ) : (
+                <InboxIcon className="text-foreground/30 h-4" />
+              )}
+            </div>
+          </EmojiPickerDialog>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col w-full">
             <input
-              placeholder="Enter View Name"
-              className="text-[17px] h-8 placeholder:text-foreground/30 border-none shadow-none outline-none focus:ring-0"
+              placeholder={t('userViewForm.enterName')}
+              className="text-[17px] h-8 w-full placeholder:text-foreground/30 border-none shadow-none outline-none focus:ring-0"
+              defaultValue={props.form?.viewName ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
                 props.form?.onNameChange?.(value);
@@ -24,8 +37,9 @@ export const UserViewForm = (props: SaveViewDropdownProps) => {
             />
           </div>
         </div>
+
         <div className="flex flex-row gap-2 text-xs items-center">
-          <div>Save to </div>
+          <div>{t('common.saveTo')}</div>
           <div className="flex flex-row gap-1 items-center border p-1 border-foreground/10 rounded-md">
             <div className="bg-yellow-600 py-[1px] px-0 rounded-sm">
               <TerminalIcon className="h-[10px] text-white w-4" />
@@ -39,7 +53,7 @@ export const UserViewForm = (props: SaveViewDropdownProps) => {
               variant={'ghost'}
               className="h-7 px-2 text-xs font-light"
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
 
             <Button
@@ -48,7 +62,7 @@ export const UserViewForm = (props: SaveViewDropdownProps) => {
               variant={'default'}
               className="h-7 px-2 text-xs font-normal"
             >
-              Save
+              {t('common.save')}
             </Button>
           </div>
         </div>
@@ -57,8 +71,9 @@ export const UserViewForm = (props: SaveViewDropdownProps) => {
       <div className="flex flex-row gap-4">
         <div className="p-1 py-2 rounded-md h-7 w-7" />
         <input
-          placeholder="Enter View Description"
-          className="text-[13px]  h-8 placeholder:text-foreground/30 border-none shadow-none outline-none focus:ring-0"
+          placeholder={t('userViewForm.enterDescription')}
+          className="text-[13px] w-full  h-8 placeholder:text-foreground/30 border-none shadow-none outline-none focus:ring-0"
+          defaultValue={props.form?.viewDescription ?? ''}
           onChange={(e) => {
             const value = e.target.value;
             props.form?.onDescriptionChange?.(value);

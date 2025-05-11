@@ -1,5 +1,5 @@
-import { views } from '@apps-next/convex';
-import { GetTableName } from '@apps-next/core';
+import { api, views } from '@apps-next/convex';
+import { Emoji, GetTableName } from '@apps-next/core';
 import {
   cn,
   Collapsible,
@@ -24,7 +24,9 @@ import {
 import { Link } from '@tanstack/react-router';
 import {
   ArrowUpRight,
+  ChevronDownIcon,
   ChevronRight,
+  ChevronRightIcon,
   MoreHorizontal,
   PencilIcon,
   Trash2,
@@ -32,28 +34,82 @@ import {
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getUserViews } from '../../query-client';
+import { observable } from '@legendapp/state';
+import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/local-storage';
+import { syncObservable } from '@legendapp/state/sync';
+import { observer } from '@legendapp/state/react';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 
-type Nav = {
+export type Nav = {
   items: {
     title: string;
     url?: string;
     icon?: React.FC<any>;
+    emoji?: Emoji;
     isActive?: boolean;
     items?: {
       title: string;
       url: string;
+      emoji?: Emoji;
     }[];
   }[];
 };
 
-export function NavMain() {
+const open$ = observable(false);
+syncObservable(open$, {
+  persist: {
+    name: 'store-global',
+    plugin: ObservablePersistLocalStorage,
+  },
+});
+
+export const NavMain = observer(() => {
   const { t } = useTranslation();
 
-  const userViews = getUserViews();
+  const { data: allUserViews } = useQuery(
+    convexQuery(api.query.getUserViews, {})
+  );
+  const userViews = allUserViews?.filter(
+    (view) => !view._deleted && !view.rowId
+  );
 
-  const tablesToShow: GetTableName[] = ['projects', 'tasks', 'tags', 'owner'];
+  if (!userViews) return null;
 
-  const mainViews = tablesToShow.map((key) => {
+  const viewsTables: GetTableName[] = ['projects', 'tasks'];
+  const coreDataTables: GetTableName[] = [
+    'tags',
+    'categories',
+    'owner',
+    'users',
+  ];
+
+  const mainViews = viewsTables.map((key) => {
+    const view = Object.values(views).find((v) => v?.tableName === key);
+
+    const viewsOf = userViews.filter(
+      (v) =>
+        v.baseView?.toLowerCase() === view?.viewName.toLowerCase() &&
+        v.name !== key &&
+        !v.parentModel
+    );
+
+    return {
+      title: t(`navigation.${key}` as any),
+      url: `/fastApp/${key}`,
+      isActive: false,
+      icon: view?.icon,
+
+      items: viewsOf.map((view) => ({
+        title: view.name ?? '',
+        url: `/fastApp/${view.slug}`,
+        emoji: view.emoji,
+      })),
+      // icon:
+    } satisfies Nav['items'][number];
+  });
+
+  const coreData = coreDataTables.map((key) => {
     const view = Object.values(views).find((v) => v?.tableName === key);
     const viewsOf = userViews.filter(
       (v) => v.baseView === view?.viewName && v.name !== key && !v.parentModel
@@ -65,25 +121,52 @@ export function NavMain() {
       isActive: false,
       icon: view?.icon,
       items: viewsOf.map((view) => ({
-        title: view.name,
+        title: view.name ?? '',
         url: `/fastApp/${view.slug}`,
+        emoji: view.emoji,
       })),
       // icon:
     } satisfies Nav['items'][number];
   });
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Views</SidebarGroupLabel>
+    <>
+      <SidebarGroup>
+        <SidebarGroupLabel>Views</SidebarGroupLabel>
 
-      <SidebarMenu>
-        {mainViews.map((view) => (
-          <NavItem key={view.title} item={view} />
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
+        <SidebarMenu>
+          {mainViews.map((view) => (
+            <NavItem key={view.title} item={view} />
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+        <Collapsible
+          onOpenChange={(open) => open$.set(open)}
+          open={open$.get()}
+          className="group/collapsible"
+        >
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton>
+              <SidebarGroupLabel className="p-0">Core Data</SidebarGroupLabel>
+              <ChevronRightIcon className="ml-auto group-data-[state=open]/collapsible:hidden" />
+              <ChevronDownIcon className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <SidebarMenu>
+              {coreData.map((view) => (
+                <NavItem key={view.title} item={view} />
+              ))}
+            </SidebarMenu>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarGroup>
+    </>
   );
-}
+});
 
 export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
   const [hover, setHover] = React.useState('');
@@ -131,9 +214,15 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
                   <Link
                     onMouseOver={() => setHover(subItem.title)}
                     to={subItem.url}
+                    preload="intent"
                     className="flex-grow"
                   >
                     <span className="">{subItem.title}</span>
+                    {subItem.emoji ? (
+                      <div className="w-4">{subItem.emoji?.emoji}</div>
+                    ) : (
+                      <div className="w-4"></div>
+                    )}
                   </Link>
                 </SidebarMenuSubButton>
 

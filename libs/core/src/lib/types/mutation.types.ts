@@ -1,5 +1,6 @@
 import { BaseViewConfigManagerInterface } from '../base-view-config';
 import { FieldConfig, ID } from './base.types';
+import { UserViewData, UserViewDataDto } from './query.types';
 import { RegisteredViews } from './view-config.types';
 
 type MutationRecord = Record<string, any>;
@@ -24,7 +25,7 @@ export type MutationPayload =
   | MutationRecordPayload
   | MutationWithoutRecordPayload
   | MutationSelectRecordsPayload
-  | USER_VIEW_MUTATION['payload'];
+  | UserViewMutationPayload;
 
 export type CREATE_RECORD = {
   type: 'CREATE_RECORD';
@@ -52,16 +53,33 @@ export type DELETE_RECORD = {
 
 export type UserViewMutationType = 'UPDATE_VIEW' | 'CREATE_VIEW';
 
-export type USER_VIEW_MUTATION = {
-  type: 'USER_VIEW_MUTATION';
-  payload: {
-    type: UserViewMutationType;
-    name: string;
-    description: string | null;
-    filters: string;
-    displayOptions: string;
-    parentModel?: string | null;
-  };
+export type UserViewMutationPayload =
+  | {
+      type: 'UPDATE_VIEW';
+      record: Partial<UserViewData>;
+      userViewId: string;
+    }
+  | {
+      type: 'CREATE_NEW_VIEW';
+      record: UserViewDataDto;
+    }
+  | {
+      type: 'CREATE_SUB_VIEW';
+      userViewData: UserViewDataDto;
+    }
+  | {
+      type: 'UPDATE_SUB_VIEW';
+      userViewData: Partial<UserViewData>;
+      userViewId: string;
+    }
+  | {
+      type: 'CREATE_DETAIL_VIEW';
+      userViewData: Partial<UserViewData>;
+    };
+
+export type NEW_USER_VIEW_MUTATION = {
+  type: 'NEW_USER_VIEW_MUTATION';
+  payload: UserViewMutationPayload;
 };
 
 export type Mutation =
@@ -69,7 +87,7 @@ export type Mutation =
   | UPDATE_RECORD
   | SELECT_RECORDS
   | DELETE_RECORD
-  | USER_VIEW_MUTATION;
+  | NEW_USER_VIEW_MUTATION;
 
 export type MutationDto = {
   viewName: string;

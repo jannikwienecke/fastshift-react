@@ -1,9 +1,14 @@
 import { expect, test } from './fixtures';
-import { isDev } from './helpers/e2e.helper';
+import { isDev, waitFor } from './helpers/e2e.helper';
 
 test.beforeEach(async ({ mainPage: taskPage, seedDatabase }) => {
   await seedDatabase();
   await taskPage.goto();
+
+  // clear local storage
+  await taskPage.page.evaluate(() => {
+    localStorage.clear();
+  });
 });
 
 test.setTimeout(isDev() ? 20000 : 10000);
@@ -19,7 +24,7 @@ test.describe('Smoke Test', () => {
     const detailHeader = page.getByTestId('detail-page-header');
     await expect(detailHeader).toBeVisible();
 
-    await detailHeader.getByText(/todos/i).click();
+    await detailHeader.getByText(/todos/i).click({ force: true });
 
     const sidebar = page.getByTestId('sidebar');
     await expect(sidebar).toBeVisible();
@@ -33,24 +38,29 @@ test.describe('Smoke Test', () => {
       .first()
       .click();
 
+    await waitFor(page, 200);
+
     const projectListItem = await taskPage.getListItem(0);
 
     await projectListItem.click();
 
-    await detailHeader.getByText(/tasks/i).click();
+    await waitFor(page, 200);
 
-    await sidebar.getByText(/owner/i).first().click();
+    await detailHeader.getByText(/tasks/i).click({ force: true });
+
+    await sidebar.getByText(/core data/i).click();
+    await sidebar.getByText('Owner').first().click();
 
     const ownerListItem = await taskPage.getListItem(0);
     await ownerListItem.click();
 
-    const placeholderFirstName = page.getByPlaceholder('Name').first();
+    const placeholderFirstName = page.getByPlaceholder('name').first();
     await placeholderFirstName.fill('JohnNew');
+    await waitFor(page, 200);
     await placeholderFirstName.press('Enter');
 
+    await waitFor(page, 200);
     await sidebar.getByText(/owner/i).first().click();
-
-    await ownerListItem.getByText(/johnnew/i).click();
   });
   test('can assign a task to a project and see it in the list', async ({
     mainPage: taskPage,

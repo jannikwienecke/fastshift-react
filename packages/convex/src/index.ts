@@ -35,7 +35,7 @@ type TaskViewDataType = DataType<
 export const tasksConfig = createViewConfig(
   'tasks',
   {
-    viewName: 'task',
+    viewName: 'Tasks',
     icon: CubeIcon,
     displayField: {
       field: 'name',
@@ -171,6 +171,7 @@ export const tagsConfig = createViewConfig(
   'tags',
   {
     icon: TagIcon,
+    viewName: 'Tags',
     displayField: { field: 'name' },
     colorField: { field: 'color' },
   },
@@ -181,6 +182,7 @@ export const ownerConfig = createViewConfig(
   'owner',
   {
     icon: PersonIcon,
+    viewName: 'Owner',
     displayField: { field: 'name' },
     // onInsert
     mutation: {
@@ -200,6 +202,7 @@ export const todosConfig = createViewConfig(
   'todos',
   {
     icon: CheckCheckIcon,
+    viewName: 'Todos',
     displayField: { field: 'name' },
   },
   config.config
@@ -209,6 +212,7 @@ export const usersConfig = createViewConfig(
   'users',
   {
     icon: PersonIcon,
+    viewName: 'Users',
     displayField: { field: 'email' },
   },
   config.config
