@@ -67,7 +67,7 @@ test.describe('List Combobox', () => {
 
     const { openListCombobox, searchInCombobox } = listCombobox(props);
 
-    await list.hasLSizeOf(3);
+    await list.hasListSizeOf(3);
 
     await openListCombobox(
       firstListItem.locator,
@@ -84,7 +84,7 @@ test.describe('List Combobox', () => {
       .getByText(CON.project.values.fitnessPlan)
       .click();
 
-    await list.hasLSizeOf(2, 750);
+    await list.hasListSizeOf(2, 750);
   });
 
   test('Can add and remove tags from a task in main list', async ({

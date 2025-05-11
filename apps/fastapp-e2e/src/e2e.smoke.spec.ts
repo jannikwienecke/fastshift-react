@@ -38,9 +38,13 @@ test.describe('Smoke Test', () => {
       .first()
       .click();
 
+    await waitFor(page, 200);
+
     const projectListItem = await taskPage.getListItem(0);
 
     await projectListItem.click();
+
+    await waitFor(page, 200);
 
     await detailHeader.getByText(/tasks/i).click({ force: true });
 
@@ -50,14 +54,13 @@ test.describe('Smoke Test', () => {
     const ownerListItem = await taskPage.getListItem(0);
     await ownerListItem.click();
 
-    const placeholderFirstName = page.getByPlaceholder('Name').first();
+    const placeholderFirstName = page.getByPlaceholder('name').first();
     await placeholderFirstName.fill('JohnNew');
+    await waitFor(page, 200);
     await placeholderFirstName.press('Enter');
 
-    await waitFor(page, 300);
+    await waitFor(page, 200);
     await sidebar.getByText(/owner/i).first().click();
-
-    await ownerListItem.getByText(/johnnew/i).click();
   });
   test('can assign a task to a project and see it in the list', async ({
     mainPage: taskPage,

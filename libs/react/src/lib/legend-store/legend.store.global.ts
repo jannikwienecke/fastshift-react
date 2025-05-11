@@ -58,7 +58,7 @@ const createViewConfigManager = (viewName: string) => {
 
   const viewData = getViewData(viewName);
 
-  const viewConfig = getViewByName(views, viewData?.baseView ?? viewName);
+  const viewConfig = getViewByName(views, viewData?.baseView || viewName);
 
   if (!viewConfig) {
     console.warn('____', viewName, views);

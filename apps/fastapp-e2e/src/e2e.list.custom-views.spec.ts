@@ -251,7 +251,7 @@ test.describe('Custom Views', () => {
 
     await expect(page).toHaveURL(/.todos/);
 
-    await mainPage.sidebar.getByText(/tasks/i).first().click();
+    await mainPage.sidebar.getByText(/tasks/i).nth(2).click();
     await mainPage.sidebar
       .getByText(/all tasks/i)
       .first()
@@ -320,7 +320,7 @@ test.describe('Custom Views', () => {
 
     await expect(page.getByText('🤣')).toBeVisible();
 
-    await mainPage.sidebar.getByText('Tasks').nth(1).click();
+    await mainPage.sidebar.getByText('Tasks').nth(2).click();
     await expect(mainPage.sidebar.getByText('🤣')).toBeVisible();
   });
 
