@@ -47,33 +47,31 @@ export const handleInsertTrigger: TriggerFn = async ({
   if (getIsManyToMany()) {
     const { field1, field2, fieldName1, fieldName2 } = getManyToManyFields();
 
-    try {
-      await ctx.db.insert('history', {
-        entityId: newData[fieldName1 as keyof typeof newData],
-        changeType: 'insert',
-        change: {
-          field: field2?.name,
-          oldValue: null,
-          newValue: newData[fieldName2 as keyof typeof newData],
-        },
-        userId: user?.['_id'],
-        timestamp: Date.now(),
-      });
+    await ctx.db.insert('history', {
+      entityId: newData[fieldName1 as keyof typeof newData],
+      changeType: 'insert',
+      change: {
+        field: field2?.name,
+        oldValue: null,
+        newValue: newData[fieldName2 as keyof typeof newData],
+      },
+      userId: user?.['_id'],
+      timestamp: Date.now(),
+      tableName,
+    });
 
-      await ctx.db.insert('history', {
-        entityId: newData[fieldName2 as keyof typeof newData],
-        changeType: 'insert',
-        change: {
-          field: field1?.name,
-          oldValue: null,
-          newValue: newData[fieldName1 as keyof typeof newData],
-        },
-        userId: user?.['_id'],
-        timestamp: Date.now(),
-      });
-    } catch (error) {
-      console.log('COULD NOT INSERT HISTORY');
-    }
+    await ctx.db.insert('history', {
+      entityId: newData[fieldName2 as keyof typeof newData],
+      changeType: 'insert',
+      change: {
+        field: field1?.name,
+        oldValue: null,
+        newValue: newData[fieldName1 as keyof typeof newData],
+      },
+      userId: user?.['_id'],
+      timestamp: Date.now(),
+      tableName,
+    });
   } else {
     await ctx.db.insert('history', {
       entityId: newData._id,
@@ -85,6 +83,7 @@ export const handleInsertTrigger: TriggerFn = async ({
       },
       userId: user?.['_id'],
       timestamp: Date.now(),
+      tableName,
     });
   }
 };
@@ -114,6 +113,7 @@ export const handleDeleteTrigger: TriggerFn = async ({
     },
     userId: user?.['_id'],
     timestamp: Date.now(),
+    tableName,
   });
 
   await ctx.db.insert('history', {
@@ -126,6 +126,7 @@ export const handleDeleteTrigger: TriggerFn = async ({
     },
     userId: user?.['_id'],
     timestamp: Date.now(),
+    tableName,
   });
 };
 
@@ -141,7 +142,7 @@ export const handleUpdateTrigger: TriggerFn = async ({
   const newData = change.newDoc;
   const oldData = change.oldDoc;
 
-  if (!getIsManyToMany()) return;
+  if (getIsManyToMany()) return;
 
   const changedFields = Object.keys(newData).filter((key) => {
     const oldFieldData = oldData ? oldData[key as keyof typeof oldData] : null;
@@ -185,6 +186,7 @@ export const handleUpdateTrigger: TriggerFn = async ({
       },
       userId: user?.['_id'],
       timestamp: Date.now(),
+      tableName,
     });
   }
 };
@@ -197,8 +199,6 @@ export const handleTriggerChanges = async (props: TriggerFnProps) => {
     console.error('No user found');
     return;
   }
-
-  console.log('handleTriggerChanges', change);
 
   const dict: TriggerOperationFnDict = {
     insert: handleInsertTrigger,

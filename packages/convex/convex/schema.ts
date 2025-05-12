@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { Doc, TableNames } from './_generated/dataModel';
+import { table } from 'console';
 
 const tableMetaFields = {
   updatedAt_: v.optional(v.number()),
@@ -18,6 +19,8 @@ const _schema = defineSchema({
 
   history: defineTable({
     // Referenz auf das geänderte Dokument (z.B. "teams")
+    tableName: v.string(),
+
     entityId: v.union(
       v.id('users'),
       v.id('tasks'),

@@ -17,6 +17,7 @@ const init = server.mutation({
       'categories',
       'todos',
       'views',
+      'history',
     ];
 
     for (const table of tables) {

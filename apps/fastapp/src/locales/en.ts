@@ -11,6 +11,7 @@ export const en = {
     categories: 'Categories',
     tags: 'Tags',
     users: 'Users',
+    history: 'History',
   },
   projects: {
     one: 'Project',

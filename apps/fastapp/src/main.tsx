@@ -11,7 +11,6 @@ import { logger, UserViewData } from '@apps-next/core';
 import './i18n';
 import {
   convex,
-  getUserViewData,
   getUserViewQuery,
   getUserViews,
   queryClient,

@@ -82,6 +82,7 @@ export const NavMain = observer(() => {
     'categories',
     'owner',
     'users',
+    'history',
   ];
 
   const mainViews = viewsTables.map((key) => {

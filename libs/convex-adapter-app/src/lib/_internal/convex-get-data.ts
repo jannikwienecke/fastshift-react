@@ -339,10 +339,22 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     continueCursor.position = isDone ? position : nextPosition;
   }
 
-  const data = parseConvexData(sortedRows);
+  let data = parseConvexData(sortedRows);
 
   if (allIds === null && data.length) {
     allIds = data.map((r) => r['id']);
+  }
+
+  const postLoaderHook =
+    args.viewConfigManager.viewConfig.loader?.postLoaderHook;
+
+  if (postLoaderHook) {
+    try {
+      data = await postLoaderHook(ctx, args, data);
+    } catch (error) {
+      _log.error('Error in postLoaderHook', error);
+      throw error;
+    }
   }
 
   return { data, continueCursor, isDone, allIds };
