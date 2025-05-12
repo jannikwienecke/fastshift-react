@@ -60,6 +60,7 @@ export type ViewConfigType<T extends GetTableName = any> =
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;
     };
+    isManyToMany?: boolean;
 
     mutation?: {
       softDelete?: boolean;

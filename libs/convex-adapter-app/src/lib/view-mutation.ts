@@ -30,6 +30,7 @@ export const viewMutationHandler = async (
     displayField: viewConfigManager.getDisplayFieldLabel(),
     table: viewConfigManager.getTableName(),
     view: viewConfigManager.getViewName(),
+    user: args.user,
   } as const;
 
   let mutationRes: MutationHandlerReturnType | undefined = undefined;
@@ -38,6 +39,7 @@ export const viewMutationHandler = async (
       mutation,
       viewConfigManager,
       registeredViews,
+      user: args.user,
     });
   } catch (error) {
     return {

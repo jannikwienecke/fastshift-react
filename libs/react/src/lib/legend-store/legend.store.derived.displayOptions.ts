@@ -1,7 +1,7 @@
 import {
   DisplayOptionsProps,
   FieldConfig,
-  INTERNAL_FIELDS,
+  isSystemField,
   MakeDisplayOptionsPropsOptions,
   NO_GROUPING_FIELD,
   NO_SORTING_FIELD,
@@ -56,7 +56,7 @@ export const derviedDisplayOptions = observable(() => {
     ]
       .filter((field) => {
         return (
-          field.name !== INTERNAL_FIELDS.creationTime.fieldName &&
+          !isSystemField(field.name) &&
           displayOptionsProps.displayFieldsToShow.get()?.length &&
           displayOptionsProps.displayFieldsToShow.get()?.includes(field.name)
         );

@@ -10,6 +10,7 @@ export const relationalViewHelper = (
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const relationalView = getViewByName(views, relationalTableName);
+
     if (!relationalView) {
       throw new Error(
         `relationalViewHelper: view not found for ${relationalTableName}`

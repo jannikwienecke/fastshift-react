@@ -1,4 +1,5 @@
 import { BaseViewConfigManagerInterface } from './base-view-config';
+import { INTERNAL_FIELDS } from './core.constants';
 import { makeRow, Row } from './data-model';
 import { t, TranslationKeys } from './translations';
 import {
@@ -637,4 +638,12 @@ export const slugHelper = () => {
   };
 
   return { slugify, unslugify };
+};
+
+export const isSystemField = (field: string) => {
+  const isInternalField = Object.values(INTERNAL_FIELDS).some(
+    (internalField) => internalField.fieldName === field
+  );
+
+  return isInternalField;
 };

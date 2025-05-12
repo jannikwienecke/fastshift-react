@@ -75,7 +75,8 @@ export const tasksConfig = createViewConfig(
       description: {
         richEditor: true,
       },
-      deleted: { defaultValue: false },
+      deleted_: { defaultValue: false },
+
       todos: {
         // hideFromForm: true,
         // showCheckboxInList: false,
@@ -103,7 +104,7 @@ export const tasksConfig = createViewConfig(
     },
     mutation: {
       softDelete: true,
-      softDeleteField: 'deleted',
+      softDeleteField: 'deleted_',
 
       beforeInsert: (data) => {
         return {
@@ -161,7 +162,7 @@ export const projectsConfig = createViewConfig(
     },
     mutation: {
       softDelete: true,
-      softDeleteField: 'deleted',
+      softDeleteField: 'deleted_',
     },
   },
   config.config
@@ -218,6 +219,17 @@ export const usersConfig = createViewConfig(
   config.config
 );
 
+const tasksTags = createViewConfig(
+  'tasks_tags',
+  {
+    icon: PersonIcon,
+    viewName: 'Tasks Tags',
+    displayField: { field: 'tagId' },
+    isManyToMany: true,
+  },
+  config.config
+);
+
 export const views = makeViews(config.config, [
   tasksConfig,
   usersConfig,
@@ -225,4 +237,5 @@ export const views = makeViews(config.config, [
   todosConfig,
   tagsConfig,
   ownerConfig,
+  tasksTags,
 ]);

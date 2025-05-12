@@ -1,5 +1,5 @@
 import { BaseViewConfigManagerInterface } from '../base-view-config';
-import { FieldConfig, ID } from './base.types';
+import { FieldConfig, ID, RecordType } from './base.types';
 import { UserViewData, UserViewDataDto } from './query.types';
 import { RegisteredViews } from './view-config.types';
 
@@ -100,6 +100,7 @@ export type MutationPropsServer = {
   registeredViews: RegisteredViews;
   mutation: Mutation;
   viewId?: null | undefined;
+  user?: RecordType;
 };
 
 export const SUCCESS_STATUS = {

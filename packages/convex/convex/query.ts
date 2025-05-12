@@ -1,20 +1,55 @@
 import {
+  handleTriggerChanges,
   makeViewLoaderHandler,
   makeViewMutationHandler,
 } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
 
-import { _log, slugHelper, UserViewData } from '@apps-next/core';
+import { GetTableName, UserViewData, _log, slugHelper } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
+import {
+  customCtx,
+  customMutation,
+} from 'convex-helpers/server/customFunctions';
+import { Triggers } from 'convex-helpers/server/triggers';
 import { v } from 'convex/values';
 import { views } from '../src/index';
-import { Doc, Id } from './_generated/dataModel';
+import { DataModel, Doc, Id } from './_generated/dataModel';
+import { mutation as rawMutation } from './_generated/server';
+
+export const triggers = new Triggers<DataModel>();
+
+const tables: GetTableName[] = [
+  'categories',
+  'projects',
+  'tasks',
+  'todos',
+  'owner',
+  'views',
+  'users',
+  'tags',
+  'tasks_tags',
+];
+
+tables.forEach((tableName) => {
+  triggers.register(tableName, async (ctx, change) => {
+    console.log('trigger', { tableName, change });
+    await handleTriggerChanges({
+      change,
+      ctx,
+      tableName,
+      views,
+    });
+  });
+});
+
+export const mutation = customMutation(rawMutation, customCtx(triggers.wrapDB));
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
 });
 
-export const viewMutation = server.mutation({
+export const viewMutation = mutation({
   handler: makeViewMutationHandler(views),
 });
 

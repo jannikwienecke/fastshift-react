@@ -335,7 +335,7 @@ const init = server.mutation({
           label: project.label,
           description: project.description,
           dueDate: project.dueDate,
-          deleted: false,
+          deleted_: false,
         });
         projects.push(projectId);
       }
@@ -627,7 +627,7 @@ const init = server.mutation({
         completed: false,
         projectId: projects[13],
         priority: 2,
-        deleted: false,
+        deleted_: false,
       },
       {
         name: 'Plan daily itineraries',
@@ -769,7 +769,7 @@ const init = server.mutation({
           priority: task.priority as any,
           description: task.description,
           dueDate: task.dueDate,
-          deleted: false,
+          deleted_: false,
           email: task.email,
           telefon: task.telfon,
           tasks,

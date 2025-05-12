@@ -5,6 +5,7 @@ import {
   generateIncludeFields,
   generateViewFields,
   getTableNamesFromSchema,
+  isSystemField,
   ModelSchema,
 } from '@apps-next/core';
 import { Infer } from 'convex/values';
@@ -47,7 +48,20 @@ export const createConfigFromConvexSchema = <T extends ConvexSchemaType>(
   let viewFields = generateViewFields(normalizedSchema);
 
   viewFields = Object.keys(viewFields).reduce((acc, key) => {
-    const fields = viewFields[key];
+    let fields = viewFields[key] as unknown as {
+      [key: string]: FieldConfig;
+    };
+
+    fields = Object.values(fields).reduce((acc, field: FieldConfig) => {
+      return {
+        ...acc,
+        [field.name]: {
+          ...field,
+          isSystemField: isSystemField(field.name),
+        } satisfies FieldConfig,
+      };
+    }, fields);
+
     return {
       ...acc,
       [key]: {
