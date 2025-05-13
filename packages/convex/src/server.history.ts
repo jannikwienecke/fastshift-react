@@ -81,59 +81,6 @@ export const historyConfig = createViewConfig(
 
           const view = getViewByName(props.registeredViews, item.tableName);
 
-          if (view?.isManyToMany && item.changeType !== 'update' && entity) {
-            const viewOfChangedField = getViewByName(
-              props.registeredViews,
-              item.change.field ?? ''
-            );
-
-            // const
-            const value = await convex.db.get(
-              item.changeType === 'insert' ? newValue : oldValue
-            );
-
-            const row = view
-              ? makeData(
-                  props.registeredViews,
-                  item.change.field ?? ''
-                )([entity]).rows?.[0]
-              : null;
-
-            const rowOfChanged =
-              view && value
-                ? makeData(
-                    props.registeredViews,
-                    item.change.field ?? ''
-                  )([value]).rows?.[0]
-                : null;
-
-            const relatedField = Object.values(view.viewFields).find(
-              (field) =>
-                field.name !== viewOfChangedField?.tableName &&
-                !field.isSystemField
-            );
-
-            return {
-              ...item,
-              changeType: 'update',
-              entity,
-              owner,
-              users: (item as any).users,
-              record: entity,
-              label: row?.label,
-              tableName: relatedField?.name ?? '',
-
-              parsedChange: {
-                isManyToMany: true,
-                modelLabel: viewOfChangedField?.tableName,
-                oldRecord: item.changeType === 'delete' ? entity : undefined,
-                newRecord: item.changeType === 'insert' ? entity : undefined,
-                oldLabel: '',
-                newLabel: rowOfChanged?.label,
-              },
-            } satisfies HistoryViewDataType;
-          }
-
           // j976ya2h0zmdmtdjvdejbaqq9x7frgrh
           const newIsId =
             typeof newValue === 'string' && newValue.length === 32;
@@ -141,9 +88,9 @@ export const historyConfig = createViewConfig(
             typeof oldValue === 'string' && oldValue.length === 32;
 
           if (entity && view) {
-            const field = Object.values(view.viewFields).find(
-              (field) => field.relation?.fieldName === item.change.field
-            );
+            const field = Object.values(view.viewFields).find((field) => {
+              return field.relation?.fieldName === item.change.field;
+            });
 
             const oldRecord =
               item.change.oldValue && oldIsId
@@ -180,11 +127,12 @@ export const historyConfig = createViewConfig(
                   .rows?.[0]
               : null;
 
-            return {
+            const parsedData = {
               ...item,
               owner,
               entity: entity,
-              record: row?.raw,
+              record: row?.raw ?? {},
+              users: (item as any).users,
               label: row?.label,
               parsedChange: {
                 modelLabel: viewOfChangedField?.viewName,
@@ -193,7 +141,38 @@ export const historyConfig = createViewConfig(
                 oldLabel: oldRow?.label,
                 newLabel: newRow?.label,
               },
-            };
+            } satisfies HistoryViewDataType;
+
+            if (item.change.isManyToMany) {
+              const addedEntity = await convex.db.get(item.change.newValue);
+              const addedRow =
+                addedEntity && item.change.field
+                  ? makeData(
+                      props.registeredViews,
+                      item.change.field
+                    )([
+                      {
+                        ...addedEntity,
+                        id: addedEntity._id,
+                      },
+                    ]).rows?.[0]
+                  : null;
+
+              return {
+                ...parsedData,
+                changeType: 'update',
+                tableName: parsedData.tableName,
+                parsedChange: {
+                  ...parsedData.parsedChange,
+                  newRecord: addedRow?.raw,
+                  oldRecord: undefined,
+                  newLabel: addedRow?.label,
+                  isManyToMany: true,
+                },
+              } satisfies HistoryViewDataType;
+            }
+
+            return parsedData;
           }
 
           throw new Error('No data found');

@@ -19,7 +19,17 @@ const _schema = defineSchema({
 
   history: defineTable({
     // Referenz auf das geänderte Dokument (z.B. "teams")
-    tableName: v.string(),
+    tableName: v.union(
+      v.literal('users'),
+      v.literal('tasks'),
+      v.literal('projects'),
+      v.literal('todos'),
+      v.literal('tags'),
+      v.literal('categories'),
+      v.literal('views'),
+      v.literal('owner'),
+      v.literal('tasks_tags')
+    ),
 
     entityId: v.union(
       v.id('users'),
@@ -43,13 +53,16 @@ const _schema = defineSchema({
       field: v.optional(v.string()),
       oldValue: v.optional(v.any()),
       newValue: v.optional(v.any()),
+      isManyToMany: v.optional(v.boolean()),
+      manyToManyOf: v.optional(v.string()),
     }),
     userId: v.id('users'),
     timestamp: v.number(),
   })
     // Schnelle Abfragen nach Entity
     .index('by_entity', ['entityId'])
-    .index('by_user', ['userId']),
+    .index('by_user', ['userId'])
+    .index('by_table', ['tableName']),
 
   views: defineTable({
     ...tableMetaFields,

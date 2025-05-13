@@ -53,11 +53,15 @@ export const handleInsertTrigger: TriggerFn = async ({
       change: {
         field: field2?.name,
         oldValue: null,
+
+        isManyToMany: true,
+        manyToManyOf: tableName,
+
         newValue: newData[fieldName2 as keyof typeof newData],
       },
       userId: user?.['_id'],
       timestamp: Date.now(),
-      tableName,
+      tableName: field1?.name,
     });
 
     await ctx.db.insert('history', {
@@ -67,10 +71,12 @@ export const handleInsertTrigger: TriggerFn = async ({
         field: field1?.name,
         oldValue: null,
         newValue: newData[fieldName1 as keyof typeof newData],
+        isManyToMany: true,
+        manyToManyOf: tableName,
       },
       userId: user?.['_id'],
       timestamp: Date.now(),
-      tableName,
+      tableName: field2?.name,
     });
   } else {
     await ctx.db.insert('history', {

@@ -119,7 +119,8 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
           }
 
           if (data.parsedChange?.isManyToMany) {
-            const label = data.parsedChange?.modelLabel || change.field;
+            const label =
+              data.parsedChange?.modelLabel?.toLowerCase() || change.field;
             const color = newData ? 'text-green-500' : 'text-red-500';
             return (
               <div className="flex flex-row text-xs items-center gap-2 py-1 px-2 bg-foreground/10 border border-gray-300 rounded-md shadow-sm">
@@ -130,7 +131,7 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
                 </span>
 
                 <span className={cn('text-foreground font-bold', color)}>
-                  {data.parsedChange?.newLabel ?? change?.newValue}
+                  {data.parsedChange?.newLabel}
                 </span>
               </div>
             );
