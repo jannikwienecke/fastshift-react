@@ -53,7 +53,7 @@ export const makeFilterProps = <T extends RecordType>(
 
       return (
         <RenderComponent
-          componentType="default"
+          componentType="filterValue"
           field={field}
           value={makeRowFromValue(filterValue.value, field)}
         />

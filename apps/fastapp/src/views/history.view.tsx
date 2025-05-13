@@ -44,6 +44,24 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
     },
     tableName: {
       component: {
+        filterValue: ({ data }) => {
+          return <>{t(`navigation.${data}` as any)}</>;
+        },
+        comboboxListValue: ({ data }) => {
+          const Icon = getView(data)?.icon;
+          return (
+            <div className="text-foreground flex flex-col">
+              <div className="text-sm text-mono text-foreground/60 flex flex-row gap-2 items-center">
+                {Icon ? (
+                  <Icon className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4" />
+                )}
+                <div>{t(`navigation.${data}` as any)}</div>
+              </div>
+            </div>
+          );
+        },
         list: ({ data }) => {
           const Icon = getView(data.tableName)?.icon;
           return (

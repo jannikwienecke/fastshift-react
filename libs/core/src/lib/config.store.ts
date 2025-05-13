@@ -7,6 +7,7 @@ export type ComponentType =
   | 'comboboxListValue'
   | 'contextmenuFieldItem'
   | 'contextmenuFieldOption'
+  | 'filterValue'
   | 'commandbarFieldItem'
   | 'detailValue'
   // | 'filterValue'
@@ -32,6 +33,17 @@ export type UiViewConfig<
           detailValue: (props: { data: U }) => React.ReactNode;
 
           comboboxListValue: (props: {
+            data: NonNullable<U[key]> extends Array<unknown>
+              ? NonNullable<U[key]>[0]
+              : U[key] extends RecordType
+              ? U[key]
+              : U[key] extends boolean
+              ? boolean
+              : string;
+            row: U;
+          }) => React.ReactNode;
+
+          filterValue: (props: {
             data: NonNullable<U[key]> extends Array<unknown>
               ? NonNullable<U[key]>[0]
               : U[key] extends RecordType

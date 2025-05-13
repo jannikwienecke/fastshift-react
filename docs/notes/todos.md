@@ -134,7 +134,11 @@ created: 1723444498044
 - [x] add config to disable go to in relation field on click
 - [x] click on relation in list to go to
 - [x] fix owner (firstname, lastname, name)
-- [ ] can filter history by tablename
+- [x] can filter history by tablename
+- [x] handle many to many history items with type "delete"
+- [x] fix translation strings for filtering
+- [ ] can filter by timestamp
+- [ ] can filter by change type
 - [ ] adjst the detail view -> custom one -> yes
 - [ ] can navigate from detail view to detail of changed model
 
