@@ -134,6 +134,11 @@ created: 1723444498044
 - [x] add config to disable go to in relation field on click
 - [x] click on relation in list to go to
 - [x] fix owner (firstname, lastname, name)
-- [ ] make everything read only
-- [ ] adjst the detail view -> custom one?
+- [ ] can filter history by tablename
+- [ ] adjst the detail view -> custom one -> yes
 - [ ] can navigate from detail view to detail of changed model
+
+## Fixes found
+
+- [ ] when navigate to tasks from history. Click on tags. Not showing correctly
+- [ ] when we add a tag, the order changes as soon as the mutation is done

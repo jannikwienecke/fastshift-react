@@ -1,48 +1,25 @@
 import {
   historyConfig,
-  Owner,
-  usersConfig,
+  HistoryViewDataType,
   ownerConfig,
-  Users,
 } from '@apps-next/convex';
-import {
-  DataType,
-  makeDayMonthStringWithTime,
-  RecordType,
-} from '@apps-next/core';
+import { makeDayMonthStringWithTime } from '@apps-next/core';
 import {
   getView,
   makeViewFieldsConfig,
   store$,
   viewRegistry,
 } from '@apps-next/react';
-import { BubbleItem } from '@apps-next/ui';
+import { BubbleItem, cn } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
 import { Link } from '@tanstack/react-router';
 import { t } from 'i18next';
 import { LinkIcon } from 'lucide-react';
-import { DefaultViewTemplate } from './default-view-template';
 import {
   DefaultDetailOverviewTemplate,
   DefaultDetailViewTemplate,
 } from './default-detail-view-template';
-
-type HistoryViewDataType = DataType<
-  'history',
-  {
-    record?: RecordType;
-    label?: string;
-    owner?: Owner;
-    users?: Users;
-    parsedChange?: {
-      oldRecord?: RecordType;
-      newRecord?: RecordType;
-      oldLabel?: string;
-      newLabel?: string;
-      modelLabel?: string;
-    };
-  }
->;
+import { DefaultViewTemplate } from './default-view-template';
 
 const colorMap: Record<string, string> = {
   insert: 'bg-green-100 text-green-700 border-green-300',
@@ -134,11 +111,27 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
           const newIsObject = typeof newData === 'object';
           const oldIsObject = typeof oldData === 'object';
 
-          if (newIsObject || oldIsObject) {
-            // render as JSON
+          if (
+            (newIsObject && newData !== null) ||
+            (oldIsObject && oldData !== null)
+          ) {
+            return null;
+          }
+
+          if (data.parsedChange?.isManyToMany) {
+            const label = data.parsedChange?.modelLabel || change.field;
+            const color = newData ? 'text-green-500' : 'text-red-500';
             return (
               <div className="flex flex-row text-xs items-center gap-2 py-1 px-2 bg-foreground/10 border border-gray-300 rounded-md shadow-sm">
-                JSON Object
+                <div className={color}>{newData ? 'Added' : 'Removed'}</div>
+
+                <span className="font-medium text-gray-700 px-2 py-1 border-foreground/30 border-[1px] rounded-md">
+                  {t(`${label}.one` as any)}
+                </span>
+
+                <span className={cn('text-foreground font-bold', color)}>
+                  {data.parsedChange?.newLabel ?? change?.newValue}
+                </span>
               </div>
             );
           }

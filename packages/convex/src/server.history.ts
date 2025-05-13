@@ -1,10 +1,26 @@
-import { getViewByName, makeData } from '@apps-next/core';
+import { getViewByName, makeData, RecordType } from '@apps-next/core';
 import { createViewConfig } from '@apps-next/react';
 import { asyncMap } from 'convex-helpers';
 import { GenericQueryCtx } from 'convex/server';
 import { HistoryIcon } from 'lucide-react';
 import { DataModel, Doc } from '../convex/_generated/dataModel';
 import { config } from './server.config';
+
+export type HistoryViewDataType = Doc<'history'> & {
+  owner: Doc<'owner'>;
+  users: Doc<'users'>;
+  entity: RecordType;
+  record: RecordType;
+  label?: string;
+  parsedChange: {
+    isManyToMany?: boolean;
+    modelLabel?: string;
+    oldRecord?: RecordType;
+    newRecord?: RecordType;
+    oldLabel?: string;
+    newLabel?: string;
+  };
+};
 
 export const historyConfig = createViewConfig(
   'history',
@@ -21,11 +37,31 @@ export const historyConfig = createViewConfig(
 
         const allItems = items as Doc<'history'>[];
 
+        let lastInsertItem: Doc<'history'> | null = null;
         const filteredItems = allItems.filter((item) => {
           const view = getViewByName(props.registeredViews, item.tableName);
-          if (view?.isManyToMany) {
+
+          if (item.changeType === 'insert' && !view?.isManyToMany) {
+            lastInsertItem = item;
+            return true;
+          }
+
+          if (
+            view?.isManyToMany &&
+            item.entityId === lastInsertItem?.entityId
+          ) {
+            const secondsDiff =
+              (new Date(item.timestamp).getTime() -
+                new Date(lastInsertItem.timestamp).getTime()) /
+              1000;
+
+            if (Math.abs(secondsDiff) > 2) {
+              return true;
+            }
+
             return false;
           }
+
           return true;
         });
 
@@ -41,9 +77,62 @@ export const historyConfig = createViewConfig(
             throw new Error('postLoaderHook: No owner found');
           }
 
+          const { newValue, oldValue } = item.change;
+
           const view = getViewByName(props.registeredViews, item.tableName);
 
-          const { newValue, oldValue } = item.change;
+          if (view?.isManyToMany && item.changeType !== 'update' && entity) {
+            const viewOfChangedField = getViewByName(
+              props.registeredViews,
+              item.change.field ?? ''
+            );
+
+            // const
+            const value = await convex.db.get(
+              item.changeType === 'insert' ? newValue : oldValue
+            );
+
+            const row = view
+              ? makeData(
+                  props.registeredViews,
+                  item.change.field ?? ''
+                )([entity]).rows?.[0]
+              : null;
+
+            const rowOfChanged =
+              view && value
+                ? makeData(
+                    props.registeredViews,
+                    item.change.field ?? ''
+                  )([value]).rows?.[0]
+                : null;
+
+            const relatedField = Object.values(view.viewFields).find(
+              (field) =>
+                field.name !== viewOfChangedField?.tableName &&
+                !field.isSystemField
+            );
+
+            return {
+              ...item,
+              changeType: 'update',
+              entity,
+              owner,
+              users: (item as any).users,
+              record: entity,
+              label: row?.label,
+              tableName: relatedField?.name ?? '',
+
+              parsedChange: {
+                isManyToMany: true,
+                modelLabel: viewOfChangedField?.tableName,
+                oldRecord: item.changeType === 'delete' ? entity : undefined,
+                newRecord: item.changeType === 'insert' ? entity : undefined,
+                oldLabel: '',
+                newLabel: rowOfChanged?.label,
+              },
+            } satisfies HistoryViewDataType;
+          }
 
           // j976ya2h0zmdmtdjvdejbaqq9x7frgrh
           const newIsId =
