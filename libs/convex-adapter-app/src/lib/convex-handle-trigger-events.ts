@@ -116,10 +116,12 @@ export const handleDeleteTrigger: TriggerFn = async ({
       field: field1?.name,
       oldValue: oldData[fieldName1 as keyof typeof oldData],
       newValue: null,
+      isManyToMany: true,
+      manyToManyOf: tableName,
     },
     userId: user?.['_id'],
     timestamp: Date.now(),
-    tableName,
+    tableName: field2?.name,
   });
 
   await ctx.db.insert('history', {
@@ -129,10 +131,12 @@ export const handleDeleteTrigger: TriggerFn = async ({
       field: field2?.name,
       newValue: null,
       oldValue: oldData[fieldName2 as keyof typeof oldData],
+      isManyToMany: true,
+      manyToManyOf: tableName,
     },
     userId: user?.['_id'],
     timestamp: Date.now(),
-    tableName,
+    tableName: field1?.name,
   });
 };
 

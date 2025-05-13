@@ -41,7 +41,7 @@ export const historyConfig = createViewConfig(
         const filteredItems = allItems.filter((item) => {
           const view = getViewByName(props.registeredViews, item.tableName);
 
-          if (item.changeType === 'insert' && !view?.isManyToMany) {
+          if (item.changeType !== 'update' && !view?.isManyToMany) {
             lastInsertItem = item;
             return true;
           }
@@ -144,7 +144,13 @@ export const historyConfig = createViewConfig(
             } satisfies HistoryViewDataType;
 
             if (item.change.isManyToMany) {
-              const addedEntity = await convex.db.get(item.change.newValue);
+              const isInsert = item.changeType === 'insert';
+              const value = isInsert
+                ? item.change.newValue
+                : item.change.oldValue;
+
+              const addedEntity = await convex.db.get(value);
+
               const addedRow =
                 addedEntity && item.change.field
                   ? makeData(
@@ -164,8 +170,8 @@ export const historyConfig = createViewConfig(
                 tableName: parsedData.tableName,
                 parsedChange: {
                   ...parsedData.parsedChange,
-                  newRecord: addedRow?.raw,
-                  oldRecord: undefined,
+                  newRecord: isInsert ? addedRow?.raw : undefined,
+                  oldRecord: isInsert ? undefined : addedRow?.raw,
                   newLabel: addedRow?.label,
                   isManyToMany: true,
                 },
