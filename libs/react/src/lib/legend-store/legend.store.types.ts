@@ -459,6 +459,9 @@ export type LegendStore = {
     activeTabField?: CommandformItem | null;
     useTabsForComboboxQuery?: boolean;
     useTabsFormField?: boolean;
+    onClickRelation?: {
+      fn: (field: FieldConfig, row: Row, cb: () => void) => void;
+    };
   };
 
   detailpageChangeInput: (

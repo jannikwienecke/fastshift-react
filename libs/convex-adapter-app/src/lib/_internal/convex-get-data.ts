@@ -183,19 +183,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     ])
   );
 
-  if (viewConfigManager.getTableName() === 'tasks') {
-    // console.log({
-    //   idsManyToManyFilters,
-    //   manyToManyFilters,
-    //   // oneToManyFilters,
-    //   // idsManyToManyFilters,
-    //   // idsOneToManyFilters,
-    //   // idsIndexField,
-    //   // idsSearchField,
-    //   // allIds,
-    // });
-  }
-
   const fetchLimit = localModeEnabled
     ? DEFAULT_LOCAL_MODE_LIMIT
     : args.displayOptions?.grouping?.field.name
@@ -326,6 +313,10 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
         sortedRows
       : sortedRows.slice(position, nextPosition);
 
+  // need to be created because in the mapWithInclude - we override some values
+  const postLoaderHook =
+    args.viewConfigManager.viewConfig.loader?.postLoaderHook;
+
   sortedRows = await mapWithInclude(
     sortedRows.filter((r) => r !== null),
     ctx,
@@ -344,9 +335,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   if (allIds === null && data.length) {
     allIds = data.map((r) => r['id']);
   }
-
-  const postLoaderHook =
-    args.viewConfigManager.viewConfig.loader?.postLoaderHook;
 
   if (postLoaderHook) {
     try {

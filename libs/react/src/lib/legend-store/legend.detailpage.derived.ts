@@ -1,10 +1,10 @@
-import { DetailPageProps, MakeDetailPropsOption } from '@apps-next/core';
+import { DetailPageProps, MakeDetailPropsOption, Row } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { detailFormHelper } from './legend.detailpage.helper';
-import { selectState$, xSelect } from './legend.select-state';
-import { store$ } from './legend.store';
 import { detailTabsHelper } from './legend.detailtabs.helper';
-import { detailUserView$, detailView$ } from './legend.shared.derived';
+import { selectState$, xSelect } from './legend.select-state';
+import { detailUserView$ } from './legend.shared.derived';
+import { store$ } from './legend.store';
 
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
@@ -16,7 +16,6 @@ export const derviedDetailPage$ = observable(() => {
   const detailHelper = detailFormHelper();
   const tabsProps = detailTabsHelper();
 
-  console.log(detailUserView$.get());
   return {
     row: detailHelper.row,
     icon: detailHelper.view.icon,
@@ -44,6 +43,13 @@ export const derviedDetailPage$ = observable(() => {
         }
       : null,
     onClick: (field, rect, tabFormField) => {
+      if (store$.detail.onClickRelation.get() && field.field) {
+        store$.detail.onClickRelation
+          .get()
+          ?.fn?.(field.field, store$.detail.row.get() as Row, () => null);
+        return;
+      }
+
       if (tabFormField && field.field && tabsProps?.row) {
         store$.detail.useTabsForComboboxQuery.set(true);
         xSelect.open(tabsProps?.row, field.field, true);

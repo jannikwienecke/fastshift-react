@@ -167,7 +167,7 @@ export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
 };
 
 export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
-  //
+  onClickRelation?: (field: FieldConfig, row: Row, cb: () => void) => void;
 };
 
 export type MakePageHeaderPropsOption<T extends RecordType = RecordType> = {

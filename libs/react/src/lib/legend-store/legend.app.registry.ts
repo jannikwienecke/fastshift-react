@@ -26,6 +26,7 @@ const addView = (config: ViewConfigType) => {
   const addComponents = (components: {
     main?: (props: { isSubView?: boolean }) => React.ReactNode;
     detail?: (options: MakeDetailPropsOption) => React.ReactNode;
+    overView?: (options: MakeDetailPropsOption) => React.ReactNode;
   }) => {
     viewsConfigStore.set({
       ...viewsConfigStore.get(),

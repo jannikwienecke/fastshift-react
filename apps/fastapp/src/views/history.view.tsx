@@ -22,6 +22,10 @@ import { Link } from '@tanstack/react-router';
 import { t } from 'i18next';
 import { LinkIcon } from 'lucide-react';
 import { DefaultViewTemplate } from './default-view-template';
+import {
+  DefaultDetailOverviewTemplate,
+  DefaultDetailViewTemplate,
+} from './default-detail-view-template';
 
 type HistoryViewDataType = DataType<
   'history',
@@ -40,8 +44,27 @@ type HistoryViewDataType = DataType<
   }
 >;
 
+const colorMap: Record<string, string> = {
+  insert: 'bg-green-100 text-green-700 border-green-300',
+  update: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+  delete: 'bg-red-100 text-red-700 border-red-300',
+};
+
 const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
   fields: {
+    entityId: {
+      component: {
+        detailValue: ({ data }) => {
+          const Icon = getView(data.tableName)?.icon;
+          return (
+            <BubbleItem
+              label={data.label ?? ''}
+              icon={() => (Icon ? <Icon className="w-4 h-4" /> : null)}
+            />
+          );
+        },
+      },
+    },
     tableName: {
       component: {
         list: ({ data }) => {
@@ -82,6 +105,14 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
     },
     users: {
       component: {
+        detailValue: ({ data }) => {
+          return (
+            <BubbleItem
+              label={data.owner?.name ?? 'Set User Email'}
+              icon={() => <ownerConfig.icon className="w-4 h-4" />}
+            />
+          );
+        },
         list: ({ data }) => {
           return (
             <BubbleItem
@@ -132,14 +163,24 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
     },
     changeType: {
       component: {
-        list: ({ data }) => {
-          const colorMap: Record<string, string> = {
-            insert: 'bg-green-100 text-green-700 border-green-300',
-            update: 'bg-yellow-100 text-yellow-700 border-yellow-300',
-            delete: 'bg-red-100 text-red-700 border-red-300',
-          };
+        detailValue: ({ data }) => {
           const colorClass =
             colorMap[data.changeType] || 'bg-gray-100 text-gray-700';
+
+          return (
+            <div
+              className={`flex mr-2 flex-row items-center gap-2 px-3 py-1 border border-gray-300 rounded-md shadow-sm ${colorClass}`}
+            >
+              <span className="font-semibold text-xs h-7 grid place-items-center w-10">
+                {t(`history.${data.changeType}`)}
+              </span>
+            </div>
+          );
+        },
+        list: ({ data }) => {
+          const colorClass =
+            colorMap[data.changeType] || 'bg-gray-100 text-gray-700';
+
           return (
             <div
               className={`flex mr-2 flex-row items-center gap-2 px-3 py-1 border border-gray-300 rounded-md shadow-sm ${colorClass}`}
@@ -177,7 +218,47 @@ const HistoryMainPage = observer(() => {
   );
 });
 
+const HistoryDetailPage = observer(() => {
+  return (
+    <>
+      <DefaultDetailViewTemplate
+        detailOptions={{
+          onClickRelation(field, row, cb) {
+            const fieldName =
+              field.name === 'entityId'
+                ? 'id'
+                : field.name === 'users'
+                ? 'owner'
+                : field.name;
+
+            store$.navigation.state.set({
+              type: 'navigate',
+              view: field.name === 'entityId' ? row.raw.tableName : fieldName,
+              id:
+                field.name === 'entityId'
+                  ? row.raw[field.name]
+                  : row.raw?.[fieldName]._id,
+            });
+          },
+        }}
+      />
+    </>
+  );
+});
+
+const HistoryOverviewPage = observer(() => {
+  return (
+    <>
+      <DefaultDetailOverviewTemplate />
+    </>
+  );
+});
+
 viewRegistry
   .addView(historyConfig)
-  .addComponents({ main: HistoryMainPage })
+  .addComponents({
+    main: HistoryMainPage,
+    detail: HistoryDetailPage,
+    overView: HistoryOverviewPage,
+  })
   .addUiConfig(uiViewConfig);
