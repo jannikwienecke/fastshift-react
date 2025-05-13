@@ -195,7 +195,6 @@ export const updateMutation = async (
         recordBefore,
         recordWithSystemFields
       );
-      console.log('RECORD WITH SYSTEM FIELDS', recordWithSystemFields);
     }
 
     await ctx.db.patch(mutation.payload['id'], recordWithSystemFields);
@@ -306,7 +305,6 @@ export const userViewMutation = async (
   }
 
   if (mutation.payload.type === 'CREATE_SUB_VIEW') {
-    console.log('CREATE SUB VIEW', mutation.payload);
     try {
       await dbMutation.insert('views', {
         ...mutation.payload.userViewData,
@@ -321,7 +319,6 @@ export const userViewMutation = async (
   }
 
   if (mutation.payload.type === 'UPDATE_SUB_VIEW') {
-    console.log('UPDATE SUB VIEW', mutation.payload);
     try {
       await dbMutation.patch(
         mutation.payload.userViewId as Id<any>,
@@ -337,14 +334,12 @@ export const userViewMutation = async (
   }
 
   if (mutation.payload.type === 'CREATE_DETAIL_VIEW') {
-    console.log('CREATE_DETAIL_VIEW:::', mutation.payload);
     try {
       await dbMutation.insert('views', {
         ...mutation.payload.userViewData,
         slug: mutation.payload.userViewData.name,
       } satisfies Partial<UserViewData>);
     } catch (error) {
-      console.log('CREATE_DETAIL_VIEW ERROR', error);
       return {
         status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
         message: `Error updating detail view. name=${mutation.payload.type}`,

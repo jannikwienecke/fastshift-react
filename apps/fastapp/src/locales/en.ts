@@ -21,6 +21,15 @@ export const en = {
     edit: 'Rename Task',
     // changeField: 'Update description',
   },
+  tableName: {
+    one: 'Model',
+    other: 'Models',
+  },
+
+  entityId: {
+    one: 'Entity ID',
+    other: 'Entity IDs',
+  },
 
   tags: {
     one: 'Tag',

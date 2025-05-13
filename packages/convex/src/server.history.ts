@@ -3,12 +3,12 @@ import { createViewConfig } from '@apps-next/react';
 import { asyncMap } from 'convex-helpers';
 import { GenericQueryCtx } from 'convex/server';
 import { HistoryIcon } from 'lucide-react';
-import { DataModel, Doc } from '../convex/_generated/dataModel';
+import { DataModel, Doc, Id } from '../convex/_generated/dataModel';
 import { config } from './server.config';
 
 export type HistoryViewDataType = Doc<'history'> & {
   owner: Doc<'owner'>;
-  users: Doc<'users'>;
+
   entity: RecordType;
   record: RecordType;
   label?: string;
@@ -29,8 +29,9 @@ export const historyConfig = createViewConfig(
     viewName: 'History',
     displayField: { field: 'entityId' },
     fields: {
-      userId: {},
+      timestamp: { isDateField: true },
     },
+
     loader: {
       postLoaderHook: async (ctx, props, items) => {
         const convex = ctx as GenericQueryCtx<DataModel>;
@@ -58,24 +59,14 @@ export const historyConfig = createViewConfig(
             if (Math.abs(secondsDiff) > 2) {
               return true;
             }
-
             return false;
           }
 
           return true;
         });
 
-        return await asyncMap(filteredItems, async (item) => {
-          const entity = await convex.db.get(item.entityId);
-
-          const owner = await convex.db
-            .query('owner')
-            .withIndex('userId', (q) => q.eq('userId', item.userId))
-            .first();
-
-          if (!owner) {
-            throw new Error('postLoaderHook: No owner found');
-          }
+        const values = await asyncMap(filteredItems, async (item) => {
+          const entity = await convex.db.get(item.entityId as Id<any>);
 
           const { newValue, oldValue } = item.change;
 
@@ -129,10 +120,9 @@ export const historyConfig = createViewConfig(
 
             const parsedData = {
               ...item,
-              owner,
+              owner: (item as any).owner,
               entity: entity,
               record: row?.raw ?? {},
-              users: (item as any).users,
               label: row?.label,
               parsedChange: {
                 modelLabel: viewOfChangedField?.viewName,
@@ -183,6 +173,8 @@ export const historyConfig = createViewConfig(
 
           throw new Error('No data found');
         });
+
+        return values;
       },
     },
   },

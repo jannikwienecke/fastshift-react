@@ -3,7 +3,7 @@ import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
 import { getFilterValue } from '../ui-adapter/filter-adapter';
 
-export const makeFilterPropsOptions = observable(
+export const filterPropsOptions$ = observable(
   {} as MakeFilterPropsOptions | undefined
 );
 

@@ -8,11 +8,7 @@ import {
   renderModelName,
   t,
 } from '@apps-next/core';
-import {
-  filterItems$,
-  makeFilterPropsOptions,
-  store$,
-} from '../../legend-store';
+import { filterItems$, filterPropsOptions$, store$ } from '../../legend-store';
 import { RenderComponent } from '../../ui-components/render-component';
 
 export const getFilterValue = (f: FilterType): string => {
@@ -34,7 +30,7 @@ const getFilter = (name: string) => {
 export const makeFilterProps = <T extends RecordType>(
   options?: MakeFilterPropsOptions<T>
 ): FilterProps => {
-  makeFilterPropsOptions.set(options);
+  filterPropsOptions$.set(options);
 
   return {
     onOpen: store$.filterOpen,

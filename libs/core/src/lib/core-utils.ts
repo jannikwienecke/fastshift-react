@@ -269,6 +269,7 @@ export const parseDisplayOptionsStringForServer = (
 
 export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] | null {
   if (arrays.filter((a) => a != null).length === 0) return null;
+  // if (arrays.length)
 
   const allIds = [...new Set(arrays.filter((a) => a != null).flat())];
 

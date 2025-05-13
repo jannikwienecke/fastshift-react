@@ -31,16 +31,7 @@ const _schema = defineSchema({
       v.literal('tasks_tags')
     ),
 
-    entityId: v.union(
-      v.id('users'),
-      v.id('tasks'),
-      v.id('projects'),
-      v.id('todos'),
-      v.id('tags'),
-      v.id('categories'),
-      v.id('views'),
-      v.id('owner')
-    ),
+    entityId: v.string(),
     // Typ der Änderung
     changeType: v.union(
       v.literal('insert'),
@@ -56,13 +47,15 @@ const _schema = defineSchema({
       isManyToMany: v.optional(v.boolean()),
       manyToManyOf: v.optional(v.string()),
     }),
-    userId: v.id('users'),
+    ownerId: v.id('owner'),
     timestamp: v.number(),
   })
     // Schnelle Abfragen nach Entity
     .index('by_entity', ['entityId'])
-    .index('by_user', ['userId'])
-    .index('by_table', ['tableName']),
+    .index('by_owner', ['ownerId'])
+    .index('by_table', ['tableName'])
+    .index('by_timestamp', ['timestamp'])
+    .index('by_changeType', ['changeType']),
 
   views: defineTable({
     ...tableMetaFields,

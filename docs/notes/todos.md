@@ -137,8 +137,8 @@ created: 1723444498044
 - [x] can filter history by tablename
 - [x] handle many to many history items with type "delete"
 - [x] fix translation strings for filtering
-- [ ] can filter by timestamp
-- [ ] can filter by change type
+- [x] can filter by timestamp
+- [x] can filter by id
 - [ ] adjst the detail view -> custom one -> yes
 - [ ] can navigate from detail view to detail of changed model
 

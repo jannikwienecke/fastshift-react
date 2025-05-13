@@ -31,6 +31,9 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
   fields: {
     entityId: {
       component: {
+        comboboxListValue: ({ data }) => {
+          return <>hier</>;
+        },
         detailValue: ({ data }) => {
           const Icon = getView(data.tableName)?.icon;
           return (
@@ -98,7 +101,7 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
         },
       },
     },
-    users: {
+    owner: {
       component: {
         detailValue: ({ data }) => {
           return (
@@ -211,9 +214,10 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
 const HistoryMainPage = observer(() => {
   return (
     <DefaultViewTemplate<HistoryViewDataType>
+      filterOptions={{ hideFields: ['changeType', 'change'] }}
       listOptions={{
         fieldsLeft: ['changeType', 'tableName'],
-        fieldsRight: ['change', 'users'],
+        fieldsRight: ['change', 'owner'],
         onClickRelation(field, row, cb) {
           if (field.name === 'users') {
             store$.navigation.state.set({

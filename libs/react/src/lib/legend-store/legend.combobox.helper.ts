@@ -22,7 +22,7 @@ import { filterUtil, operator } from '../ui-adapter/filter-adapter';
 import { selectState$ } from './legend.select-state';
 import { store$ } from './legend.store';
 import { DEFAULT_COMBOBOX_STATE } from './legend.store.constants';
-import { makeFilterPropsOptions } from './legend.store.derived.filter';
+import { filterPropsOptions$ } from './legend.store.derived.filter';
 import {
   ComboboxStateCommonType,
   MakeComboboxStateProps,
@@ -129,7 +129,17 @@ export const makeComboboxStateGroupingOptions =
 
 export const makeComboboxStateFilterOptions =
   (): MakeComboboxStateProps | null => {
-    return getViewFieldsOptions();
+    const options = getViewFieldsOptions();
+    const hideFields = filterPropsOptions$.hideFields.get();
+    if (!hideFields || hideFields.length === 0) return options;
+    if (!options) return null;
+
+    return {
+      ...options,
+      values:
+        options?.values?.filter((v) => v.id && !hideFields.includes(v.id)) ??
+        [],
+    };
   };
 
 export const handleRelationalField = (
@@ -272,6 +282,7 @@ export const makeComboboxStateFilterValuesEnum = (
 
   const filteredValues = fuse.search(query).map((r) => r.item);
   const values = query.length ? filteredValues : field.enum.values;
+
   const enumValues = values.map((v) => makeRowFromValue(v.name, field));
 
   return {
@@ -397,8 +408,7 @@ export const getSharedStateSorting = (): ComboboxStateCommonType => {
     selected: [],
     row: null,
     placeholder:
-      makeFilterPropsOptions.placeholder.get() ??
-      t('filter.button.placeholder'),
+      filterPropsOptions$.placeholder.get() ?? t('filter.button.placeholder'),
   };
 
   return stateShared;
@@ -420,8 +430,7 @@ export const getSharedStateGrouping = (): ComboboxStateCommonType => {
     selected: [],
     row: null,
     placeholder:
-      makeFilterPropsOptions.placeholder.get() ??
-      t('filter.button.placeholder'),
+      filterPropsOptions$.placeholder.get() ?? t('filter.button.placeholder'),
   };
 
   return stateShared;
@@ -443,8 +452,7 @@ export const getSharedStateFilter = (): ComboboxStateCommonType => {
     selected: selectedOfFilter,
     row: null,
     placeholder:
-      makeFilterPropsOptions.placeholder.get() ??
-      t('filter.button.placeholder'),
+      filterPropsOptions$.placeholder.get() ?? t('filter.button.placeholder'),
   };
 
   return stateShared;
@@ -467,8 +475,7 @@ export const getSharedStateCommandForm = (): ComboboxStateCommonType => {
     selected: Array.isArray(value) ? value : [],
     row: null,
     placeholder:
-      makeFilterPropsOptions.placeholder.get() ??
-      t('filter.button.placeholder'),
+      filterPropsOptions$.placeholder.get() ?? t('filter.button.placeholder'),
   };
 
   return stateShared;
@@ -491,8 +498,7 @@ export const getSharedStateDetailPage = (): ComboboxStateCommonType => {
     selected: Array.isArray(value) ? value : [],
     row: null,
     placeholder:
-      makeFilterPropsOptions.placeholder.get() ??
-      t('filter.button.placeholder'),
+      filterPropsOptions$.placeholder.get() ?? t('filter.button.placeholder'),
   };
 
   return stateShared;
@@ -512,8 +518,7 @@ export const getSharedStateCommandbar = (): ComboboxStateCommonType => {
     selected: [],
     row: null,
     placeholder:
-      makeFilterPropsOptions.placeholder.get() ??
-      t('filter.button.placeholder'),
+      filterPropsOptions$.placeholder.get() ?? t('filter.button.placeholder'),
   };
 
   return stateShared;

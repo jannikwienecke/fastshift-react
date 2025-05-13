@@ -85,7 +85,6 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
         store$.errorDialog.error.set(result.error);
       });
     } else {
-      console.log('View updated successfully');
       onSuccess?.();
     }
   };
@@ -146,8 +145,6 @@ export const updateDetailViewMutation: StoreFn<'updateDetailViewMutation'> =
     const view = detailUserView$.get();
 
     if (view) {
-      console.log('UPDATE DETAIL VIEW', view);
-
       const result = await store$.api.mutateAsync({
         query: '',
         viewName: currentView$.viewName.get(),

@@ -38,7 +38,6 @@ export const parentView$ = observable(() => {
   const userView = getUserView(parentViewName);
 
   if (!userView) {
-    console.log('PARENT VIEW NOT FOUND', parentViewName);
     return null;
   }
 

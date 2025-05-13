@@ -193,7 +193,6 @@ export const ownerConfig = createViewConfig(
         // FIXME -> also need to apply to update functions
       },
       beforeUpdate: (data, newData) => {
-        console.log('beforeUpdate', data, newData);
         const newRecord = { ...data, ...newData };
         return {
           ...newRecord,

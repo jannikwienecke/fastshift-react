@@ -1,5 +1,5 @@
 import { api, views } from '@apps-next/convex';
-import { _log, slugHelper } from '@apps-next/core';
+import { _log, GetTableName, slugHelper } from '@apps-next/core';
 import { globalStore, store$ } from '@apps-next/react';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
@@ -92,6 +92,13 @@ export const useAppEffects = (viewName: string) => {
       const view = store$.viewConfigManager.getViewName();
       const userViewData = store$.userViewData.get();
       const slug = userViewData?.slug ?? view;
+      const viewsNotPreload: GetTableName[] = ['history'];
+
+      const isInNotPreload = viewsNotPreload.find((v) =>
+        v.includes(store$.viewConfigManager.getTableName())
+      );
+      if (isInNotPreload) return;
+
       if (row?.row?.id) {
         realPreloadRouteRef.current({
           from: '/fastApp/$view',

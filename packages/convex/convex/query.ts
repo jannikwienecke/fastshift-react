@@ -33,7 +33,6 @@ const tables: GetTableName[] = [
 
 tables.forEach((tableName) => {
   triggers.register(tableName, async (ctx, change) => {
-    console.log('trigger', { tableName, change });
     await handleTriggerChanges({
       change,
       ctx,

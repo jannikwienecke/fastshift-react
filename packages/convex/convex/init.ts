@@ -6,10 +6,10 @@ import { _log } from '@apps-next/core';
 const initTaskHistory = async (
   ctx: GenericMutationCtx<DataModel>,
   {
-    userId,
+    ownerId,
     task,
   }: {
-    userId: Id<'users'>;
+    ownerId: Id<'owner'>;
     task: Doc<'tasks'>;
   }
 ) => {
@@ -22,9 +22,9 @@ const initTaskHistory = async (
     },
     changeType: 'insert' as const,
     entityId: task._id,
-    tableName: 'tasks',
+    tableName: 'tasks' as const,
     timestamp: Date.now(),
-    userId: userId,
+    ownerId: ownerId,
   };
 
   await ctx.db.insert('history', entry);
@@ -37,9 +37,9 @@ const initTaskHistory = async (
     },
     changeType: 'update' as const,
     entityId: task._id,
-    tableName: 'tasks',
+    tableName: 'tasks' as const,
     timestamp: Date.now(),
-    userId: userId,
+    ownerId: ownerId,
   };
 
   await ctx.db.insert('history', changeEntry);
@@ -176,7 +176,7 @@ const init = server.mutation({
       },
     ];
 
-    let someUserId: Id<'users'> | undefined;
+    let someOwnerId: Id<'owner'> | undefined;
 
     const owners: Id<'owner'>[] = [];
     for (const data of userData) {
@@ -184,9 +184,6 @@ const init = server.mutation({
         email: data.email,
         password: data.password,
       });
-      if (userId) {
-        someUserId = userId;
-      }
 
       const ownerId = await ctx.db.insert('owner', {
         userId,
@@ -196,6 +193,8 @@ const init = server.mutation({
         name: `${data.firstname} ${data.lastname}`,
       });
       owners.push(ownerId);
+
+      someOwnerId = ownerId;
     }
 
     // Create categories
@@ -847,9 +846,9 @@ const init = server.mutation({
     if (firstTaskId) {
       const firstTask = await ctx.db.get(firstTaskId);
 
-      if (firstTask && someUserId) {
+      if (firstTask && someOwnerId) {
         await initTaskHistory(ctx, {
-          userId: someUserId,
+          ownerId: someOwnerId,
           task: {
             ...firstTask,
           },
