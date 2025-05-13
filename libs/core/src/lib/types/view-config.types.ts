@@ -91,12 +91,7 @@ export type ViewConfigType<T extends GetTableName = any> =
           };
     };
     ui?: {
-      list?: {
-        showIcon?: boolean;
-        useLabel?: boolean;
-        fieldsLeft: (keyof GetTableDataType<T>)[];
-        fieldsRight: (keyof GetTableDataType<T>)[];
-      };
+      showComboboxOnClickRelation?: boolean;
     };
   };
 

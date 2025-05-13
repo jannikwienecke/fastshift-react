@@ -92,6 +92,12 @@ export const de = {
   commands: {
     resetDb: 'Datenbank zurücksetzen',
   },
+
+  history: {
+    insert: 'Einfügen',
+    update: 'Update',
+    delete: 'Löschen',
+  },
 } satisfies typeof en;
 
 export default de;

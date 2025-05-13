@@ -162,6 +162,10 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
   const selected = store$.list.selected.get();
 
+  if (options?.onClickRelation) {
+    store$.list.onClickRelation.set({ fn: options?.onClickRelation });
+  }
+
   const fieldsLeft = options?.fieldsLeft ?? [];
   const fieldsRight = options?.fieldsRight ?? [];
 

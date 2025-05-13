@@ -1,6 +1,49 @@
 import * as server from './_generated/server';
-import { Id, Doc } from './_generated/dataModel';
+import { Id, Doc, DataModel } from './_generated/dataModel';
+import { GenericMutationCtx } from 'convex/server';
 import { _log } from '@apps-next/core';
+
+const initTaskHistory = async (
+  ctx: GenericMutationCtx<DataModel>,
+  {
+    userId,
+    task,
+  }: {
+    userId: Id<'users'>;
+    task: Doc<'tasks'>;
+  }
+) => {
+  const entry = {
+    change: {
+      newValue: {
+        ...task,
+      },
+      oldValue: null,
+    },
+    changeType: 'insert' as const,
+    entityId: task._id,
+    tableName: 'tasks',
+    timestamp: Date.now(),
+    userId: userId,
+  };
+
+  await ctx.db.insert('history', entry);
+
+  const changeEntry = {
+    change: {
+      field: 'description',
+      oldValue: task.description,
+      newValue: task.description + '.',
+    },
+    changeType: 'update' as const,
+    entityId: task._id,
+    tableName: 'tasks',
+    timestamp: Date.now(),
+    userId: userId,
+  };
+
+  await ctx.db.insert('history', changeEntry);
+};
 
 const init = server.mutation({
   handler: async (ctx) => {
@@ -133,12 +176,18 @@ const init = server.mutation({
       },
     ];
 
+    let someUserId: Id<'users'> | undefined;
+
     const owners: Id<'owner'>[] = [];
     for (const data of userData) {
       const userId = await ctx.db.insert('users', {
         email: data.email,
         password: data.password,
       });
+      if (userId) {
+        someUserId = userId;
+      }
+
       const ownerId = await ctx.db.insert('owner', {
         userId,
         firstname: data.firstname,
@@ -796,6 +845,17 @@ const init = server.mutation({
     }
 
     if (firstTaskId) {
+      const firstTask = await ctx.db.get(firstTaskId);
+
+      if (firstTask && someUserId) {
+        await initTaskHistory(ctx, {
+          userId: someUserId,
+          task: {
+            ...firstTask,
+          },
+        });
+      }
+
       const todo = {
         name: 'Todo 1',
         completed: true,

@@ -49,8 +49,7 @@ const _schema = defineSchema({
   })
     // Schnelle Abfragen nach Entity
     .index('by_entity', ['entityId'])
-    // Chronologische Sortierung
-    .index('by_timestamp', ['timestamp']),
+    .index('by_user', ['userId']),
 
   views: defineTable({
     ...tableMetaFields,
@@ -85,9 +84,11 @@ const _schema = defineSchema({
     lastname: v.string(),
     name: v.optional(v.string()),
     age: v.number(),
-  }).searchIndex('name', {
-    searchField: 'name',
-  }),
+  })
+    .searchIndex('name', {
+      searchField: 'name',
+    })
+    .index('userId', ['userId']),
 
   tasks: defineTable({
     ...tableMetaFields,

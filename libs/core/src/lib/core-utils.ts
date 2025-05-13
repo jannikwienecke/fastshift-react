@@ -322,6 +322,17 @@ export const makeDayMonthString = (date: Date | undefined) => {
   return formatter.format(date);
 };
 
+export const makeDayMonthStringWithTime = (date: Date | undefined) => {
+  if (!date) return '';
+  const formatter = new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  return formatter.format(date);
+};
+
 export const renderModelName = (
   modelName: string,
   t: (key: any, options?: Record<string, unknown>) => string,

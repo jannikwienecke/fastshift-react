@@ -1,16 +1,35 @@
-import { historyConfig, Users, usersConfig } from '@apps-next/convex';
-import { DataType, getViewByName, RecordType } from '@apps-next/core';
-import { getView, makeViewFieldsConfig, viewRegistry } from '@apps-next/react';
+import {
+  historyConfig,
+  Owner,
+  usersConfig,
+  ownerConfig,
+  Users,
+} from '@apps-next/convex';
+import {
+  DataType,
+  makeDayMonthStringWithTime,
+  RecordType,
+} from '@apps-next/core';
+import {
+  getView,
+  makeViewFieldsConfig,
+  store$,
+  viewRegistry,
+} from '@apps-next/react';
 import { BubbleItem } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
+import { Link } from '@tanstack/react-router';
+import { t } from 'i18next';
+import { LinkIcon } from 'lucide-react';
 import { DefaultViewTemplate } from './default-view-template';
 
 type HistoryViewDataType = DataType<
   'history',
   {
-    users?: Users;
     record?: RecordType;
     label?: string;
+    owner?: Owner;
+    users?: Users;
     parsedChange?: {
       oldRecord?: RecordType;
       newRecord?: RecordType;
@@ -35,9 +54,27 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
                 ) : (
                   <div className="w-4 h-4" />
                 )}
-                <div>{data.tableName}</div>
+                <div>
+                  {data.tableName}{' '}
+                  {makeDayMonthStringWithTime(new Date(data.timestamp))}
+                </div>
               </div>
-              <div className="text-sm">{data.label}</div>
+
+              <Link
+                to={'/fastApp/$view/$id/overview'}
+                preload="intent"
+                params={{
+                  view: data.tableName,
+                  id: data.entityId,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                className="text-sm flex flex-row gap-2 items-center cursor-pointer hover:underline hover:text-blue-400"
+              >
+                <div>{data.label}</div>
+                <LinkIcon className="w-4 h-4 text-foreground/60 text-blue-500 " />
+              </Link>
             </div>
           );
         },
@@ -48,8 +85,8 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
         list: ({ data }) => {
           return (
             <BubbleItem
-              label={data.users?.email ?? 'Set User Email'}
-              icon={() => <usersConfig.icon className="w-4 h-4" />}
+              label={data.owner?.name ?? 'Set User Email'}
+              icon={() => <ownerConfig.icon className="w-4 h-4" />}
             />
           );
         },
@@ -70,13 +107,7 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
             // render as JSON
             return (
               <div className="flex flex-row text-xs items-center gap-2 py-1 px-2 bg-foreground/10 border border-gray-300 rounded-md shadow-sm">
-                <span className="font-medium text-gray-700">
-                  {data.parsedChange?.modelLabel || change.field}
-                </span>
-                <span className="text-foreground/80">:</span>
-                <span className="text-gray-500">
-                  {JSON.stringify(change, null, 2)}
-                </span>
+                JSON Object
               </div>
             );
           }
@@ -111,9 +142,11 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
             colorMap[data.changeType] || 'bg-gray-100 text-gray-700';
           return (
             <div
-              className={`flex flex-row items-center gap-2 px-3 py-1 border border-gray-300 rounded-md shadow-sm ${colorClass}`}
+              className={`flex mr-2 flex-row items-center gap-2 px-3 py-1 border border-gray-300 rounded-md shadow-sm ${colorClass}`}
             >
-              <span className="font-semibold text-xs">{data.changeType}</span>
+              <span className="font-semibold text-xs h-7 grid place-items-center w-10">
+                {t(`history.${data.changeType}`)}
+              </span>
             </div>
           );
         },
@@ -128,6 +161,17 @@ const HistoryMainPage = observer(() => {
       listOptions={{
         fieldsLeft: ['changeType', 'tableName'],
         fieldsRight: ['change', 'users'],
+        onClickRelation(field, row, cb) {
+          if (field.name === 'users') {
+            store$.navigation.state.set({
+              type: 'navigate',
+              view: 'owner',
+              id: row.raw?.['owner']._id,
+            });
+          } else {
+            cb();
+          }
+        },
       }}
     />
   );

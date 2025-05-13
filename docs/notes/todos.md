@@ -124,7 +124,17 @@ created: 1723444498044
 
 <!--  -->
 
-## NEW TODOS
+## NEW TODOS History
 
-- [ ] use shadcn breadcrumbs in detailpage header
-- [ ]
+- [x] set updated at when create new entry
+- [x] add test data entries in init script
+- [x] show date in list view
+- [x] click on history item (e.g. right click) -> go to detail view of it
+- [x] show owner and not the user
+- [x] add config to disable go to in relation field on click
+- [ ] click on relation in list to go to
+- [ ] for new created history entry -> show a preview by hovering over it
+- [ ] make everything read only
+- [ ] adjst the detail view -> custom one?
+- [ ] can navigate from detail view to detail of changed model
+- [ ] fix owner (firstname, lastname, name)

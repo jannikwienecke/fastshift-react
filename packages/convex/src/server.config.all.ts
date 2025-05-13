@@ -89,6 +89,9 @@ export const tasksConfig = createViewConfig(
       // sorting: { field: 'projectId', direction: 'asc' },
       // grouping: { field: 'projectId' },
     },
+    ui: {
+      showComboboxOnClickRelation: true,
+    },
     mutation: {
       softDelete: true,
       softDeleteField: 'deleted_',
@@ -150,6 +153,9 @@ export const projectsConfig = createViewConfig(
     mutation: {
       softDelete: true,
       softDeleteField: 'deleted_',
+    },
+    ui: {
+      showComboboxOnClickRelation: true,
     },
   },
   config.config

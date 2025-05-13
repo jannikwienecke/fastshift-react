@@ -44,6 +44,7 @@ export const createMutation = async (
     ...record,
     [INTERNAL_FIELDS.deleted.fieldName]: false,
     [INTERNAL_FIELDS.createdBy.fieldName]: props.user?.['_id'],
+    [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
   };
 
   try {

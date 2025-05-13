@@ -21,6 +21,7 @@ export const en = {
     edit: 'Rename Task',
     // changeField: 'Update description',
   },
+
   tags: {
     one: 'Tag',
     other: 'Tags',
@@ -88,6 +89,12 @@ export const en = {
   },
   commands: {
     resetDb: 'Reset database',
+  },
+
+  history: {
+    insert: 'Insert',
+    update: 'Update',
+    delete: 'Delete',
   },
 };
 

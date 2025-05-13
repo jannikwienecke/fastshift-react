@@ -12,6 +12,9 @@ export const historyConfig = createViewConfig(
     icon: HistoryIcon,
     viewName: 'History',
     displayField: { field: 'entityId' },
+    fields: {
+      userId: {},
+    },
     loader: {
       postLoaderHook: async (ctx, props, items) => {
         const convex = ctx as GenericQueryCtx<DataModel>;
@@ -27,7 +30,16 @@ export const historyConfig = createViewConfig(
         });
 
         return await asyncMap(filteredItems, async (item) => {
-          const x = await convex.db.get(item.entityId);
+          const entity = await convex.db.get(item.entityId);
+
+          const owner = await convex.db
+            .query('owner')
+            .withIndex('userId', (q) => q.eq('userId', item.userId))
+            .first();
+
+          if (!owner) {
+            throw new Error('postLoaderHook: No owner found');
+          }
 
           const view = getViewByName(props.registeredViews, item.tableName);
 
@@ -39,7 +51,7 @@ export const historyConfig = createViewConfig(
           const oldIsId =
             typeof oldValue === 'string' && oldValue.length === 32;
 
-          if (x && view) {
+          if (entity && view) {
             const field = Object.values(view.viewFields).find(
               (field) => field.relation?.fieldName === item.change.field
             );
@@ -75,13 +87,14 @@ export const historyConfig = createViewConfig(
                 : null;
 
             const row = view
-              ? makeData(props.registeredViews, view?.viewName ?? '')([x])
+              ? makeData(props.registeredViews, view?.viewName ?? '')([entity])
                   .rows?.[0]
               : null;
 
             return {
               ...item,
-              entity: x,
+              owner,
+              entity: entity,
               record: row?.raw,
               label: row?.label,
               parsedChange: {
