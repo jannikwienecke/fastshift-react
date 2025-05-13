@@ -178,6 +178,11 @@ export const ownerConfig = createViewConfig(
     icon: PersonIcon,
     viewName: 'Owner',
     displayField: { field: 'name' },
+    fields: {
+      name: {
+        hideFromForm: true,
+      },
+    },
     // onInsert
     mutation: {
       beforeInsert: (data) => {
@@ -186,6 +191,14 @@ export const ownerConfig = createViewConfig(
           name: data.firstname + ' ' + data.lastname,
         };
         // FIXME -> also need to apply to update functions
+      },
+      beforeUpdate: (data, newData) => {
+        console.log('beforeUpdate', data, newData);
+        const newRecord = { ...data, ...newData };
+        return {
+          ...newRecord,
+          name: newRecord.firstname + ' ' + newRecord.lastname,
+        };
       },
     },
   },

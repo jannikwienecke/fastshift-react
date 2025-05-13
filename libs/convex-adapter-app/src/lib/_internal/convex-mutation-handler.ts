@@ -181,11 +181,22 @@ export const updateMutation = async (
       };
     }
 
-    const recordWithSystemFields = {
+    let recordWithSystemFields = {
       ...record,
       [INTERNAL_FIELDS.updatedBy.fieldName]: props.user?.['_id'],
       [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
     };
+
+    const beforeUpdate = viewConfigManager.viewConfig.mutation?.beforeUpdate;
+
+    if (beforeUpdate) {
+      const recordBefore = await ctx.db.get(mutation.payload.id);
+      recordWithSystemFields = beforeUpdate(
+        recordBefore,
+        recordWithSystemFields
+      );
+      console.log('RECORD WITH SYSTEM FIELDS', recordWithSystemFields);
+    }
 
     await ctx.db.patch(mutation.payload['id'], recordWithSystemFields);
     return {

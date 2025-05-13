@@ -132,9 +132,8 @@ created: 1723444498044
 - [x] click on history item (e.g. right click) -> go to detail view of it
 - [x] show owner and not the user
 - [x] add config to disable go to in relation field on click
-- [ ] click on relation in list to go to
-- [ ] for new created history entry -> show a preview by hovering over it
+- [x] click on relation in list to go to
+- [x] fix owner (firstname, lastname, name)
 - [ ] make everything read only
 - [ ] adjst the detail view -> custom one?
 - [ ] can navigate from detail view to detail of changed model
-- [ ] fix owner (firstname, lastname, name)

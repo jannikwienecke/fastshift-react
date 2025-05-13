@@ -73,6 +73,10 @@ export type ViewConfigType<T extends GetTableName = any> =
       softDelete?: boolean;
       softDeleteField?: keyof GetTableDataType<T>;
       beforeInsert?: (data: GetTableDataType<T>) => GetTableDataType<T>;
+      beforeUpdate?: (
+        data: GetTableDataType<T>,
+        newData: GetTableDataType<T>
+      ) => GetTableDataType<T>;
       beforeSelect?: (
         data: GetTableDataType<T>,
         options: {
