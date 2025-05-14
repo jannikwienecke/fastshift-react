@@ -17,6 +17,26 @@ export const INTERNAL_FIELDS = {
   creationTime: {
     fieldName: '_creationTime',
   },
+  updatedAt: {
+    fieldName: 'updatedAt_',
+    label: 'Updated At',
+  },
+  updatedBy: {
+    fieldName: 'updatedBy_',
+    label: 'Updated By',
+  },
+  deletedAt: {
+    fieldName: 'deletedAt_',
+    label: 'Deleted At',
+  },
+  deleted: {
+    fieldName: 'deleted_',
+    label: 'Deleted',
+  },
+  createdBy: {
+    fieldName: 'createdBy_',
+    label: 'Created By',
+  },
 };
 
 export const NO_GROUPING_FIELD: FieldConfig = {

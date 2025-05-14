@@ -1,4 +1,5 @@
 import { BaseViewConfigManagerInterface } from './base-view-config';
+import { INTERNAL_FIELDS } from './core.constants';
 import { makeRow, Row } from './data-model';
 import { t, TranslationKeys } from './translations';
 import {
@@ -268,6 +269,7 @@ export const parseDisplayOptionsStringForServer = (
 
 export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] | null {
   if (arrays.filter((a) => a != null).length === 0) return null;
+  // if (arrays.length)
 
   const allIds = [...new Set(arrays.filter((a) => a != null).flat())];
 
@@ -318,6 +320,17 @@ export const makeDayMonthString = (date: Date | undefined) => {
     month: 'short',
   });
 
+  return formatter.format(date);
+};
+
+export const makeDayMonthStringWithTime = (date: Date | undefined) => {
+  if (!date) return '';
+  const formatter = new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
   return formatter.format(date);
 };
 
@@ -637,4 +650,12 @@ export const slugHelper = () => {
   };
 
   return { slugify, unslugify };
+};
+
+export const isSystemField = (field: string) => {
+  const isInternalField = Object.values(INTERNAL_FIELDS).some(
+    (internalField) => internalField.fieldName === field
+  );
+
+  return isInternalField;
 };

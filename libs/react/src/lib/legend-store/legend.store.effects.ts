@@ -100,7 +100,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       _log.debug('handleFilterChange: local mode. No fetchMore');
 
       if (parentView$.get()) {
-        console.log('saveSubViewSettings!!!');
         store$.saveSubUserView();
       }
     } else {
@@ -155,7 +154,6 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     if (localModeEnabled$.get()) {
       _log.info('handleDisplayOptionsChange: local mode. No fetchMore');
-      console.log('saveSubViewSettings!!!');
       store$.saveSubUserView();
       return;
     } else {

@@ -11,7 +11,6 @@ import React from 'react';
 import { getViewData, wait } from '../application-store/app.store.utils';
 import {
   getQueryKey,
-  getUserViewQuery,
   getUserViews,
   getUserViewsQuery,
   queryClient,
@@ -22,16 +21,12 @@ import { DefaultDetailViewTemplate } from '../views/default-detail-view-template
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   loader: async (props) => {
-    await wait();
-
     await queryClient.ensureQueryData(getUserViewsQuery());
 
     const { id, viewName } = getViewParms(props.params);
     if (!viewName) return;
 
     if (!id) throw new Error('ID is required');
-
-    await queryClient.ensureQueryData(getUserViewQuery(viewName));
 
     const userViews = getUserViews();
     const { viewData } = getViewData(viewName, userViews);

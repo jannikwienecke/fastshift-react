@@ -26,6 +26,13 @@ export const RenderComponent = ({
       componentType,
       fieldName,
     });
+
+    if (!ComponentToRender) {
+      ComponentToRender = getComponent({
+        componentType: 'default',
+        fieldName,
+      });
+    }
   }
 
   const raw =

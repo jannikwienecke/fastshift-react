@@ -45,6 +45,8 @@ test.describe('Detail Tabs', () => {
       .click();
 
     await expect(mainPage.detailTabs).toBeVisible();
+    await mainPage.detailTabs.getByText(/project/i).click();
+
     await expect(mainPage.detailTabs.getByText(/label/i)).toBeVisible();
     await expect(mainPage.detailTabs.getByText(/desc/i)).toBeVisible();
     await expect(mainPage.detailTabs.getByText(/owner/i)).toBeVisible();
@@ -55,6 +57,8 @@ test.describe('Detail Tabs', () => {
     helper,
   }) => {
     await expect(mainPage.detailTabs).toBeVisible();
+
+    await mainPage.detailTabs.getByText(/owner/i).click();
 
     await mainPage.detailTabs
       .getByPlaceholder(/first name/i)
@@ -78,6 +82,9 @@ test.describe('Detail Tabs', () => {
     await waitFor(mainPage.page, 500);
 
     await mainPage.page.reload();
+
+    await expect(mainPage.detailTabs).toBeVisible();
+    await mainPage.detailTabs.getByText(/owner/i).click();
 
     await expect(
       mainPage.detailTabs.getByPlaceholder(/first name/i)

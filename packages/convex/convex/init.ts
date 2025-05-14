@@ -1,6 +1,49 @@
 import * as server from './_generated/server';
-import { Id, Doc } from './_generated/dataModel';
+import { Id, Doc, DataModel } from './_generated/dataModel';
+import { GenericMutationCtx } from 'convex/server';
 import { _log } from '@apps-next/core';
+
+const initTaskHistory = async (
+  ctx: GenericMutationCtx<DataModel>,
+  {
+    ownerId,
+    task,
+  }: {
+    ownerId: Id<'owner'>;
+    task: Doc<'tasks'>;
+  }
+) => {
+  const entry = {
+    change: {
+      newValue: {
+        ...task,
+      },
+      oldValue: null,
+    },
+    changeType: 'insert' as const,
+    entityId: task._id,
+    tableName: 'tasks' as const,
+    timestamp: Date.now(),
+    ownerId: ownerId,
+  };
+
+  await ctx.db.insert('history', entry);
+
+  const changeEntry = {
+    change: {
+      field: 'description',
+      oldValue: task.description,
+      newValue: task.description + '.',
+    },
+    changeType: 'update' as const,
+    entityId: task._id,
+    tableName: 'tasks' as const,
+    timestamp: Date.now(),
+    ownerId: ownerId,
+  };
+
+  await ctx.db.insert('history', changeEntry);
+};
 
 const init = server.mutation({
   handler: async (ctx) => {
@@ -17,6 +60,7 @@ const init = server.mutation({
       'categories',
       'todos',
       'views',
+      'history',
     ];
 
     for (const table of tables) {
@@ -132,12 +176,15 @@ const init = server.mutation({
       },
     ];
 
+    let someOwnerId: Id<'owner'> | undefined;
+
     const owners: Id<'owner'>[] = [];
     for (const data of userData) {
       const userId = await ctx.db.insert('users', {
         email: data.email,
         password: data.password,
       });
+
       const ownerId = await ctx.db.insert('owner', {
         userId,
         firstname: data.firstname,
@@ -146,6 +193,8 @@ const init = server.mutation({
         name: `${data.firstname} ${data.lastname}`,
       });
       owners.push(ownerId);
+
+      someOwnerId = ownerId;
     }
 
     // Create categories
@@ -335,7 +384,7 @@ const init = server.mutation({
           label: project.label,
           description: project.description,
           dueDate: project.dueDate,
-          deleted: false,
+          deleted_: false,
         });
         projects.push(projectId);
       }
@@ -627,7 +676,7 @@ const init = server.mutation({
         completed: false,
         projectId: projects[13],
         priority: 2,
-        deleted: false,
+        deleted_: false,
       },
       {
         name: 'Plan daily itineraries',
@@ -769,7 +818,7 @@ const init = server.mutation({
           priority: task.priority as any,
           description: task.description,
           dueDate: task.dueDate,
-          deleted: false,
+          deleted_: false,
           email: task.email,
           telefon: task.telfon,
           tasks,
@@ -795,6 +844,17 @@ const init = server.mutation({
     }
 
     if (firstTaskId) {
+      const firstTask = await ctx.db.get(firstTaskId);
+
+      if (firstTask && someOwnerId) {
+        await initTaskHistory(ctx, {
+          ownerId: someOwnerId,
+          task: {
+            ...firstTask,
+          },
+        });
+      }
+
       const todo = {
         name: 'Todo 1',
         completed: true,

@@ -1,6 +1,7 @@
 import {
   _log,
   arrayIntersection,
+  BaseViewConfigManager,
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
   DEFAULT_LOCAL_MODE_LIMIT,
@@ -183,19 +184,6 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     ])
   );
 
-  if (viewConfigManager.getTableName() === 'tasks') {
-    // console.log({
-    //   idsManyToManyFilters,
-    //   manyToManyFilters,
-    //   // oneToManyFilters,
-    //   // idsManyToManyFilters,
-    //   // idsOneToManyFilters,
-    //   // idsIndexField,
-    //   // idsSearchField,
-    //   // allIds,
-    // });
-  }
-
   const fetchLimit = localModeEnabled
     ? DEFAULT_LOCAL_MODE_LIMIT
     : args.displayOptions?.grouping?.field.name
@@ -326,10 +314,19 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
         sortedRows
       : sortedRows.slice(position, nextPosition);
 
+  // need to be created because in the mapWithInclude - we override some values
+  const postLoaderHook =
+    args.viewConfigManager.viewConfig.loader?.postLoaderHook;
+
   sortedRows = await mapWithInclude(
     sortedRows.filter((r) => r !== null),
     ctx,
-    args
+    {
+      ...args,
+      viewConfigManager: new BaseViewConfigManager(
+        args.viewConfigManager.viewConfig
+      ),
+    }
   );
 
   if (allIds !== null || isGetAll) {
@@ -339,10 +336,19 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     continueCursor.position = isDone ? position : nextPosition;
   }
 
-  const data = parseConvexData(sortedRows);
+  let data = parseConvexData(sortedRows);
 
   if (allIds === null && data.length) {
     allIds = data.map((r) => r['id']);
+  }
+
+  if (postLoaderHook) {
+    try {
+      data = await postLoaderHook(ctx, args, data);
+    } catch (error) {
+      _log.error('Error in postLoaderHook', error);
+      throw error;
+    }
   }
 
   return { data, continueCursor, isDone, allIds };

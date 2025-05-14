@@ -1,7 +1,7 @@
 import {
   DisplayOptionsProps,
   FieldConfig,
-  INTERNAL_FIELDS,
+  isSystemField,
   MakeDisplayOptionsPropsOptions,
   NO_GROUPING_FIELD,
   NO_SORTING_FIELD,
@@ -37,6 +37,40 @@ export const derviedDisplayOptions = observable(() => {
 
   const visibleFields = store$.displayOptions.viewField.visible.get();
 
+  const viewFields = [
+    ...store$.viewConfigManager.getViewFieldList({
+      includeSystemFields: false,
+    }),
+  ]
+    .filter((field) => {
+      return (
+        !isSystemField(field.name) &&
+        (!displayOptionsProps.displayFieldsToShow.get() ||
+          displayOptionsProps.displayFieldsToShow.get()?.includes(field.name))
+      );
+    })
+    .filter((field) => {
+      const show = showDeleted
+        ? true
+        : field.name === softDeleteField
+        ? false
+        : true;
+
+      return show;
+    })
+    .map((field) => {
+      const selected =
+        visibleFields === null || visibleFields === undefined
+          ? true
+          : visibleFields?.includes?.(field.name) ?? false;
+      return {
+        ...field,
+        id: field.name,
+        label: field.label ?? field.name,
+        selected,
+      };
+    });
+
   return {
     ...props,
 
@@ -49,39 +83,7 @@ export const derviedDisplayOptions = observable(() => {
       options?.label ??
       ('displayOptions.button.label' satisfies TranslationKeys),
 
-    viewFields: [
-      ...store$.viewConfigManager.getViewFieldList({
-        includeSystemFields: false,
-      }),
-    ]
-      .filter((field) => {
-        return (
-          field.name !== INTERNAL_FIELDS.creationTime.fieldName &&
-          displayOptionsProps.displayFieldsToShow.get()?.length &&
-          displayOptionsProps.displayFieldsToShow.get()?.includes(field.name)
-        );
-      })
-      .filter((field) => {
-        const show = showDeleted
-          ? true
-          : field.name === softDeleteField
-          ? false
-          : true;
-
-        return show;
-      })
-      .map((field) => {
-        const selected =
-          visibleFields === null || visibleFields === undefined
-            ? true
-            : visibleFields?.includes?.(field.name) ?? false;
-        return {
-          ...field,
-          id: field.name,
-          label: field.label ?? field.name,
-          selected,
-        };
-      }),
+    viewFields,
 
     onSelectViewField: (...props) =>
       store$.displayOptionsSelectViewField(...props),

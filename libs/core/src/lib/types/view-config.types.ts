@@ -5,10 +5,12 @@ import {
   GetTableName,
   ID,
   IndexField,
+  RecordType,
   SearchableField,
 } from './base.types';
 import { IncludeConfig } from './config.types';
 import { DisplayOptionsUiType } from './filter.types';
+import { QueryServerProps } from './query.types';
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
 export type ViewConfigBaseInfo<T extends GetTableName> = {
@@ -59,12 +61,22 @@ export type ViewConfigType<T extends GetTableName = any> =
     query?: ViewConfigQueryOptions<T>;
     loader?: {
       _prismaLoaderExtension?: Record<string, unknown>;
+      postLoaderHook?: (
+        ctx: unknown,
+        props: QueryServerProps,
+        items: GetTableDataType<T>[]
+      ) => Promise<GetTableDataType<T>[]>;
     };
+    isManyToMany?: boolean;
 
     mutation?: {
       softDelete?: boolean;
       softDeleteField?: keyof GetTableDataType<T>;
       beforeInsert?: (data: GetTableDataType<T>) => GetTableDataType<T>;
+      beforeUpdate?: (
+        data: GetTableDataType<T>,
+        newData: GetTableDataType<T>
+      ) => GetTableDataType<T>;
       beforeSelect?: (
         data: GetTableDataType<T>,
         options: {
@@ -83,12 +95,7 @@ export type ViewConfigType<T extends GetTableName = any> =
           };
     };
     ui?: {
-      list?: {
-        showIcon?: boolean;
-        useLabel?: boolean;
-        fieldsLeft: (keyof GetTableDataType<T>)[];
-        fieldsRight: (keyof GetTableDataType<T>)[];
-      };
+      showComboboxOnClickRelation?: boolean;
     };
   };
 

@@ -1,6 +1,15 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { Doc, TableNames } from './_generated/dataModel';
+import { table } from 'console';
+
+const tableMetaFields = {
+  updatedAt_: v.optional(v.number()),
+  updatedBy_: v.optional(v.id('users')),
+  createdBy_: v.optional(v.id('users')),
+  deleted_: v.optional(v.boolean()),
+  deletedAt_: v.optional(v.number()),
+};
 
 const _schema = defineSchema({
   users: defineTable({
@@ -8,7 +17,48 @@ const _schema = defineSchema({
     password: v.string(),
   }),
 
+  history: defineTable({
+    // Referenz auf das geänderte Dokument (z.B. "teams")
+    tableName: v.union(
+      v.literal('users'),
+      v.literal('tasks'),
+      v.literal('projects'),
+      v.literal('todos'),
+      v.literal('tags'),
+      v.literal('categories'),
+      v.literal('views'),
+      v.literal('owner'),
+      v.literal('tasks_tags')
+    ),
+
+    entityId: v.string(),
+    // Typ der Änderung
+    changeType: v.union(
+      v.literal('insert'),
+      v.literal('update'),
+      v.literal('delete')
+    ),
+    // Detail des Änderungen-Patches (beliebiges JSON-Objekt)
+    change: v.object({
+      // hier nach Bedarf Felder definieren, z.B.:
+      field: v.optional(v.string()),
+      oldValue: v.optional(v.any()),
+      newValue: v.optional(v.any()),
+      isManyToMany: v.optional(v.boolean()),
+      manyToManyOf: v.optional(v.string()),
+    }),
+    ownerId: v.id('owner'),
+    timestamp: v.number(),
+  })
+    // Schnelle Abfragen nach Entity
+    .index('by_entity', ['entityId'])
+    .index('by_owner', ['ownerId'])
+    .index('by_table', ['tableName'])
+    .index('by_timestamp', ['timestamp'])
+    .index('by_changeType', ['changeType']),
+
   views: defineTable({
+    ...tableMetaFields,
     baseView: v.string(),
     name: v.string(),
     slug: v.string(),
@@ -34,16 +84,20 @@ const _schema = defineSchema({
     .index('rowId', ['rowId']),
 
   owner: defineTable({
+    ...tableMetaFields,
     userId: v.id('users'),
     firstname: v.string(),
     lastname: v.string(),
     name: v.optional(v.string()),
     age: v.number(),
-  }).searchIndex('name', {
-    searchField: 'name',
-  }),
+  })
+    .searchIndex('name', {
+      searchField: 'name',
+    })
+    .index('userId', ['userId']),
 
   tasks: defineTable({
+    ...tableMetaFields,
     name: v.string(),
     completed: v.boolean(),
     description: v.optional(v.string()),
@@ -59,7 +113,6 @@ const _schema = defineSchema({
       v.literal(5)
     ),
 
-    deleted: v.optional(v.boolean()),
     dueDate: v.optional(v.number()),
     tasks: v.optional(v.union(v.array(v.id('tasks')), v.null())),
     todos: v.optional(v.array(v.id('todos'))),
@@ -70,7 +123,7 @@ const _schema = defineSchema({
     .index('completed', ['completed'])
     .index('tasks', ['tasks'])
     .index('todos', ['todos'])
-    .index('deleted', ['deleted'])
+    .index('deleted', ['deleted_'])
     .searchIndex('name_search', {
       searchField: 'name',
     })
@@ -80,12 +133,13 @@ const _schema = defineSchema({
       searchField: 'description',
     }),
 
-  tags: defineTable({ name: v.string(), color: v.string() }).searchIndex(
-    'name',
-    {
-      searchField: 'name',
-    }
-  ),
+  tags: defineTable({
+    ...tableMetaFields,
+    name: v.string(),
+    color: v.string(),
+  }).searchIndex('name', {
+    searchField: 'name',
+  }),
 
   tasks_tags: defineTable({
     taskId: v.id('tasks'),
@@ -95,20 +149,21 @@ const _schema = defineSchema({
     .index('tagId', ['tagId']),
 
   projects: defineTable({
+    ...tableMetaFields,
     label: v.string(),
     ownerId: v.id('owner'),
     dueDate: v.number(),
     description: v.string(),
-    deleted: v.optional(v.boolean()),
     categoryId: v.id('categories'),
     tasks: v.optional(v.array(v.id('tasks'))),
   })
     .searchIndex('label', {
       searchField: 'label',
     })
-    .index('deleted', ['deleted']),
+    .index('deleted', ['deleted_']),
 
   categories: defineTable({
+    ...tableMetaFields,
     label: v.string(),
     color: v.string(),
   }).searchIndex('label', {
@@ -116,6 +171,8 @@ const _schema = defineSchema({
   }),
 
   todos: defineTable({
+    ...tableMetaFields,
+
     name: v.string(),
     completed: v.boolean(),
     taskId: v.optional(v.id('tasks')),

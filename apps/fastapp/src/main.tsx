@@ -9,13 +9,7 @@ import {
 
 import { logger, UserViewData } from '@apps-next/core';
 import './i18n';
-import {
-  convex,
-  getUserViewData,
-  getUserViewQuery,
-  getUserViews,
-  queryClient,
-} from './query-client';
+import { convex, getUserViews, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
 
 import './views';
@@ -45,8 +39,6 @@ const router = createRouter({
       parentViewName,
       parentId
     ) => {
-      await queryClient.ensureQueryData(getUserViewQuery(viewName));
-
       let userViewData: UserViewData | null | undefined = null;
       if (parentViewName) {
         userViewData = null;

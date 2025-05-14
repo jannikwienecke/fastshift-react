@@ -16,12 +16,6 @@ export const convex = new ConvexReactClient(VITE_CONVEX_URL);
 
 const convexQueryClient = new ConvexQueryClient(convex);
 
-export const getUserViewQuery = (viewName: string) => {
-  return convexQuery(api.query.userViewData, {
-    viewName: viewName ?? null,
-  });
-};
-
 export const getUserViewsQuery = () => {
   return convexQuery(api.query.getUserViews, {});
 };
@@ -32,14 +26,6 @@ export const getUserViews = () => {
   ) as UserViewData[];
 
   return userViews;
-};
-
-export const getUserViewData = (viewName: string) => {
-  const userViewData = queryClient.getQueryData(
-    getUserViewQuery(viewName).queryKey
-  ) as UserViewData | undefined;
-
-  return userViewData;
 };
 
 export const getQueryKey = (

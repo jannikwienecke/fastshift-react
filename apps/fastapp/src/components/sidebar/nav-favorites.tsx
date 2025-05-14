@@ -62,7 +62,7 @@ export const NavFavorites = observer(() => {
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <Link
-                      preload="viewport"
+                      preload="intent"
                       to={
                         item.rowId
                           ? `/fastApp/${item.baseView ?? ''}/${
@@ -112,7 +112,6 @@ export const NavFavorites = observer(() => {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => {
-                          console.log(item);
                           navigator.clipboard.writeText(
                             `${window.location.origin}/fastApp/${item.slug}`
                           );
@@ -123,7 +122,6 @@ export const NavFavorites = observer(() => {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          console.log('Open in new tab', item);
                           window.open(`/fastApp/${item.slug}`, '_blank');
                         }}
                       >

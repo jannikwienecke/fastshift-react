@@ -55,7 +55,7 @@ export const makeViewLoaderHandler =
   };
 
 export const makeViewMutationHandler =
-  (views: RegisteredViews) => (ctx: any, args: MutationDto) => {
+  (views: RegisteredViews) => async (ctx: any, args: MutationDto) => {
     const viewConfig = getViewByName(views, args.viewName);
 
     if (!viewConfig) throw new Error('viewConfig22 is not defined');
@@ -64,6 +64,7 @@ export const makeViewMutationHandler =
       patchViewConfig(viewConfig)
     );
 
+    const user = await ctx.db.query('users').first();
     const registeredViews = patchAllViews(views);
 
     return viewMutationHandler(ctx, {
@@ -72,5 +73,6 @@ export const makeViewMutationHandler =
       viewConfigManager,
       registeredViews,
       viewId: null,
+      user: user,
     } satisfies MutationPropsServer);
   };

@@ -72,6 +72,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
 export type MakeListPropsOptions<T = RecordType> = {
   fieldsLeft: (keyof T)[];
   fieldsRight: (keyof T)[];
+  onClickRelation?: (field: FieldConfig, row: Row, cb: () => void) => void;
 };
 
 export type ListAdapter<T extends RecordType> = <
@@ -166,7 +167,7 @@ export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
 };
 
 export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
-  //
+  onClickRelation?: (field: FieldConfig, row: Row, cb: () => void) => void;
 };
 
 export type MakePageHeaderPropsOption<T extends RecordType = RecordType> = {

@@ -11,6 +11,7 @@ export const en = {
     categories: 'Categories',
     tags: 'Tags',
     users: 'Users',
+    history: 'History',
   },
   projects: {
     one: 'Project',
@@ -20,6 +21,16 @@ export const en = {
     edit: 'Rename Task',
     // changeField: 'Update description',
   },
+  tableName: {
+    one: 'Model',
+    other: 'Models',
+  },
+
+  entityId: {
+    one: 'Entity ID',
+    other: 'Entity IDs',
+  },
+
   tags: {
     one: 'Tag',
     other: 'Tags',
@@ -87,6 +98,16 @@ export const en = {
   },
   commands: {
     resetDb: 'Reset database',
+  },
+
+  history: {
+    insert: 'Insert',
+    update: 'Update',
+    delete: 'Delete',
+    detail: {
+      headerInsert: 'Inserted Record',
+      headerUpdate: 'Update of Record',
+    },
   },
 };
 

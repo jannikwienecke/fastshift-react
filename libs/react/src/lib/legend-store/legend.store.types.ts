@@ -1,18 +1,20 @@
 import {
   BaseViewConfigManagerInterface,
   ComboxboxItem,
-  UserStoreCommand,
   CommandbarProps,
   CommandformItem,
   ContextMenuState,
   ContextMenuUiOptions,
   ContinueCursor,
   DataModelNew,
+  DetailRow,
+  DetailViewTypeState,
   DisplayOptionsUiType,
   DisplayOptionsUiTypeData,
   DisplayOptionsViewField,
   FieldConfig,
   FilterType,
+  MakeListPropsOptions,
   MutationDto,
   MutationHandlerErrorType,
   MutationReturnDto,
@@ -24,13 +26,12 @@ import {
   Row,
   TranslationKeys,
   UiViewConfig,
+  UserStoreCommand,
   UserViewData,
   UserViewForm,
   ViewConfigType,
-  DetailRow,
-  DetailViewTypeState,
 } from '@apps-next/core';
-import { observable, Observable } from '@legendapp/state';
+import { Observable } from '@legendapp/state';
 import { QueryClient } from '@tanstack/react-query';
 import { PaginationOptions } from 'convex/server';
 import { MakeQueryOptions } from '../query-context';
@@ -203,6 +204,7 @@ export type LegendStore = {
       hover: boolean;
       focus: boolean;
     };
+    onClickRelation?: { fn: MakeListPropsOptions['onClickRelation'] };
     selected: RecordType[];
     selectedRelationField?: {
       field: FieldConfig;
@@ -366,7 +368,7 @@ export type LegendStore = {
     onSuccess?: () => void
   ) => void;
   updateDetailViewMutation: (props: Partial<UserViewData>) => void;
-  createViewMutation: (onSuccess?: () => void) => void;
+  createViewMutation: (form: UserViewForm, onSuccess?: () => void) => void;
   saveSubUserView: () => void;
 
   // commandbar
@@ -457,6 +459,9 @@ export type LegendStore = {
     activeTabField?: CommandformItem | null;
     useTabsForComboboxQuery?: boolean;
     useTabsFormField?: boolean;
+    onClickRelation?: {
+      fn: (field: FieldConfig, row: Row, cb: () => void) => void;
+    };
   };
 
   detailpageChangeInput: (

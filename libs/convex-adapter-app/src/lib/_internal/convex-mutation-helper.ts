@@ -1,6 +1,7 @@
 import {
   BaseViewConfigManagerInterface,
   FieldConfig,
+  INTERNAL_FIELDS,
   MutationPropsServer,
 } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
@@ -11,7 +12,12 @@ import { ConvexRecordType, ID, RecordType } from './types.convex';
 
 export const deleteIds = async (
   ids: ID[],
-  { viewConfigManager, registeredViews, mutation }: MutationPropsServer,
+  {
+    viewConfigManager,
+    registeredViews,
+    mutation,
+    ...props
+  }: MutationPropsServer,
   ctx: GenericMutationCtx,
   field: FieldConfig
 ) => {
@@ -35,6 +41,8 @@ export const deleteIds = async (
 
     await ctx.db.patch(mutation.payload['id'], {
       [tableFieldName]: after,
+      [INTERNAL_FIELDS.updatedBy.fieldName]: props.user?.['_id'],
+      [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
     });
 
     return;
@@ -65,7 +73,7 @@ export const deleteIds = async (
 
 export const insertIds = async (
   ids: ID[],
-  { viewConfigManager, mutation }: MutationPropsServer,
+  { viewConfigManager, mutation, ...props }: MutationPropsServer,
   ctx: GenericMutationCtx,
   field: FieldConfig,
   record: RecordType
@@ -80,6 +88,8 @@ export const insertIds = async (
 
     await ctx.db.patch(mutation.payload['id'], {
       [tableFieldName]: [...(existingIds || []), ...ids],
+      [INTERNAL_FIELDS.updatedBy.fieldName]: props.user?.['_id'],
+      [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
     });
 
     return;
@@ -90,7 +100,11 @@ export const insertIds = async (
   )?.relation?.fieldName;
   await asyncMap(ids, async (value) => {
     if (field.relation?.type === 'oneToMany' && tableFieldName) {
-      await ctx.db.patch(value, { [tableFieldName]: mutation.payload['id'] });
+      await ctx.db.patch(value, {
+        [tableFieldName]: mutation.payload['id'],
+        [INTERNAL_FIELDS.updatedBy.fieldName]: props.user?.['_id'],
+        [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
+      });
     } else if (
       field.relation?.manyToManyTable &&
       tableFieldName &&
@@ -101,6 +115,8 @@ export const insertIds = async (
         {
           [tableFieldName]: mutation.payload['id'],
           [relationFieldName]: value,
+          // [INTERNAL_FIELDS.deleted.fieldName]: false,
+          // [INTERNAL_FIELDS.createdBy.fieldName]: props.user?.["_id"],
         }
       );
     }

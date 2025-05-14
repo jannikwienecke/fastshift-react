@@ -22,8 +22,6 @@ import {
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
-    await wait();
-
     console.warn('____LOAD SUB MODEL', ctx.params.model);
     await queryClient.ensureQueryData(getUserViewsQuery());
 

@@ -1,5 +1,4 @@
 import { _log } from '@apps-next/core';
-import { viewRegistry } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import React from 'react';

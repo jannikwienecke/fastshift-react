@@ -1,20 +1,54 @@
 import {
+  handleTriggerChanges,
   makeViewLoaderHandler,
   makeViewMutationHandler,
 } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
 
-import { _log, slugHelper, UserViewData } from '@apps-next/core';
+import { GetTableName, UserViewData, _log, slugHelper } from '@apps-next/core';
 import { asyncMap } from 'convex-helpers';
+import {
+  customCtx,
+  customMutation,
+} from 'convex-helpers/server/customFunctions';
+import { Triggers } from 'convex-helpers/server/triggers';
 import { v } from 'convex/values';
 import { views } from '../src/index';
-import { Doc, Id } from './_generated/dataModel';
+import { DataModel, Doc, Id } from './_generated/dataModel';
+import { mutation as rawMutation } from './_generated/server';
+
+export const triggers = new Triggers<DataModel>();
+
+const tables: GetTableName[] = [
+  'categories',
+  'projects',
+  'tasks',
+  'todos',
+  'owner',
+  'views',
+  'users',
+  'tags',
+  'tasks_tags',
+];
+
+tables.forEach((tableName) => {
+  triggers.register(tableName, async (ctx, change) => {
+    await handleTriggerChanges({
+      change,
+      ctx,
+      tableName,
+      views,
+    });
+  });
+});
+
+export const mutation = customMutation(rawMutation, customCtx(triggers.wrapDB));
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
 });
 
-export const viewMutation = server.mutation({
+export const viewMutation = mutation({
   handler: makeViewMutationHandler(views),
 });
 
@@ -47,6 +81,11 @@ export const getUserViews = server.query({
         };
 
       const row = await ctx.db.get(view.rowId as Id<any>);
+
+      if (!row) {
+        return view;
+      }
+
       const label = row[view.rowLabelFieldName as keyof Doc<any>];
 
       return {
@@ -56,33 +95,6 @@ export const getUserViews = server.query({
         slug: slugHelper().slugify(label as string),
       };
     });
-  },
-});
-
-export const userViewData = server.query({
-  args: { viewName: v.union(v.string(), v.null()) },
-
-  handler: async (ctx, args) => {
-    if (!args.viewName) return null;
-
-    const viewName = args.viewName as string;
-    const view = await ctx.db
-      .query('views')
-      .withIndex('name', (q) => q.eq('name', viewName.toLowerCase()))
-      .first();
-
-    _log.debug('userViewData', { view });
-
-    if (!view) return null;
-
-    return {
-      ...view,
-      id: view._id,
-      name: view.name,
-      description: view.description ?? '',
-      displayOptions: view.displayOptions ?? '',
-      filters: view.filters ?? '',
-    } satisfies UserViewData;
   },
 });
 

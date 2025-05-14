@@ -1,9 +1,14 @@
 import { FormFieldProps, MakeDetailPropsOption } from '@apps-next/core';
-import { makeHooks, RenderDetailComplexValue } from '@apps-next/react';
+import {
+  FormField,
+  makeHooks,
+  RenderDetailComplexValue,
+  TabsFormField,
+} from '@apps-next/react';
 import { detailPage } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
 import { Outlet } from '@tanstack/react-router';
-import { RenderPageHeader, RenderPageHeaderDetail } from './default-components';
+import { RenderPageHeaderDetail } from './default-components';
 
 export const DefaultDetailViewTemplate = observer(
   ({
@@ -42,6 +47,44 @@ export const DefaultDetailViewTemplate = observer(
           </div>
         </div>
       </div>
+    );
+  }
+);
+
+export const DefaultDetailOverviewTemplate = observer(
+  ({
+    detailOptions,
+    ...templateProps
+  }: {
+    detailOptions?: MakeDetailPropsOption;
+    FormField?: React.FC<FormFieldProps>;
+  }) => {
+    const { makeDetailPageProps } = makeHooks();
+
+    const props = makeDetailPageProps(detailOptions);
+
+    return (
+      <>
+        <div data-testid="detail-form" className="pt-12 flex flex-col gap-4">
+          <div className="pl-20">
+            <div className="pb-4">
+              <detailPage.icon {...props} />
+            </div>
+            <detailPage.formFields
+              {...props}
+              FormField={templateProps.FormField ?? FormField}
+            />
+          </div>
+
+          <div className="mt-12">
+            <detailPage.tabs
+              {...props}
+              FormField={TabsFormField}
+              ComplexFormField={RenderDetailComplexValue}
+            />
+          </div>
+        </div>
+      </>
     );
   }
 );

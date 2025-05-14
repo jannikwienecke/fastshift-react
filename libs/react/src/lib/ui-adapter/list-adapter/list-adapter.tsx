@@ -92,6 +92,7 @@ const renderFields = <T extends RecordType>(
         const fields = viewFieldDisplayOptions?.visible
           ? viewFieldDisplayOptions.visible
           : viewFieldDisplayOptions?.allFields;
+
         const shouldDisplay = fields?.includes(fieldName.toString());
 
         return shouldDisplay;
@@ -162,7 +163,12 @@ export const makeListProps = <T extends RecordType = RecordType>(
 
   const selected = store$.list.selected.get();
 
+  if (options?.onClickRelation) {
+    store$.list.onClickRelation.set({ fn: options?.onClickRelation });
+  }
+
   const fieldsLeft = options?.fieldsLeft ?? [];
+
   const fieldsRight = options?.fieldsRight ?? [];
 
   const _renderLabel = fieldsLeft.length === 0;

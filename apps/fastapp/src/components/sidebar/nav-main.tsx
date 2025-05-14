@@ -21,6 +21,12 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@apps-next/ui';
+import { convexQuery } from '@convex-dev/react-query';
+import { observable } from '@legendapp/state';
+import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/local-storage';
+import { observer } from '@legendapp/state/react';
+import { syncObservable } from '@legendapp/state/sync';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import {
   ArrowUpRight,
@@ -33,13 +39,6 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { getUserViews } from '../../query-client';
-import { observable } from '@legendapp/state';
-import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/local-storage';
-import { syncObservable } from '@legendapp/state/sync';
-import { observer } from '@legendapp/state/react';
-import { useQuery } from '@tanstack/react-query';
-import { convexQuery } from '@convex-dev/react-query';
 
 export type Nav = {
   items: {
@@ -82,6 +81,7 @@ export const NavMain = observer(() => {
     'categories',
     'owner',
     'users',
+    'history',
   ];
 
   const mainViews = viewsTables.map((key) => {
@@ -179,7 +179,7 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
     return (
       <SidebarMenuItem key={item.title}>
         <SidebarMenuButton asChild isActive={item.isActive}>
-          <Link to={item.url ?? ''}>
+          <Link preload="intent" to={item.url ?? ''}>
             {item.icon && <item.icon />}
             <span>{item.title}</span>
           </Link>

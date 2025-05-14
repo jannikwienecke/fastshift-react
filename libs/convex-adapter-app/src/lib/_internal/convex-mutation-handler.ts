@@ -1,18 +1,18 @@
 import {
   ERROR_STATUS,
   FieldConfig,
+  INTERNAL_FIELDS,
   MutationHandlerReturnType,
   MutationPropsServer,
-  slugHelper,
   UserViewData,
 } from '@apps-next/core';
-import { mutationClient, queryClient } from './convex-client';
+import { mutationClient } from './convex-client';
 import { mapWithInclude } from './convex-map-with-include';
 import { deleteIds, insertIds } from './convex-mutation-helper';
 import { getErrorMessage } from './convex-utils';
 import { ConvexContext } from './convex.db.type';
 import { GenericMutationCtx, Id } from './convex.server.types';
-import { ConvexRecord, ID } from './types.convex';
+import { ID } from './types.convex';
 import { MUTATION_HANDLER_CONVEX } from './types.convex.mutation';
 
 export const createMutation = async (
@@ -40,8 +40,15 @@ export const createMutation = async (
     record = beforeInsert(record);
   }
 
+  const recordWithSystemFields = {
+    ...record,
+    [INTERNAL_FIELDS.deleted.fieldName]: false,
+    [INTERNAL_FIELDS.createdBy.fieldName]: props.user?.['_id'],
+    [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
+  };
+
   try {
-    const errors = viewConfigManager.validateRecord(record);
+    const errors = viewConfigManager.validateRecord(recordWithSystemFields);
     if (errors) {
       return {
         status: ERROR_STATUS.INVALID_RECORD,
@@ -53,7 +60,10 @@ export const createMutation = async (
       };
     }
 
-    const res = await ctx.db.insert(viewConfigManager.getTableName(), record);
+    const res = await ctx.db.insert(
+      viewConfigManager.getTableName(),
+      recordWithSystemFields
+    );
 
     for (const index in manyToManyFields) {
       const field = manyToManyFields[index];
@@ -63,6 +73,7 @@ export const createMutation = async (
 
       await selectRecordsMutation(ctx, {
         ...props,
+
         mutation: {
           type: 'SELECT_RECORDS',
           payload: { newIds: ids, idsToDelete: [], table: field.name, id: res },
@@ -87,7 +98,7 @@ export const createMutation = async (
 
 export const deleteMutation = async (
   ctx: ConvexContext,
-  { mutation, viewConfigManager }: MutationPropsServer
+  { mutation, viewConfigManager, ...props }: MutationPropsServer
 ): Promise<MutationHandlerReturnType> => {
   if (mutation.type !== 'DELETE_RECORD') throw new Error('INVALID MUTATION-2');
 
@@ -99,9 +110,16 @@ export const deleteMutation = async (
   let errorMsg = '';
   if (softDeleteField) {
     errorMsg = `Error soft deleting record. softDeleteField=${softDeleteField.toString()} ID="${id}:`;
+
+    const recordWithSystemFields = {
+      [INTERNAL_FIELDS.updatedBy.fieldName]: props.user?.['_id'],
+      [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
+      [softDeleteField]: true,
+    };
+
     mutationFn = () =>
       ctx.db.patch(mutation.payload['id'], {
-        [softDeleteField]: true,
+        ...recordWithSystemFields,
       });
   } else {
     errorMsg = `Error deleting record. ID="${id}:`;
@@ -163,7 +181,23 @@ export const updateMutation = async (
       };
     }
 
-    await ctx.db.patch(mutation.payload['id'], record);
+    let recordWithSystemFields = {
+      ...record,
+      [INTERNAL_FIELDS.updatedBy.fieldName]: props.user?.['_id'],
+      [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
+    };
+
+    const beforeUpdate = viewConfigManager.viewConfig.mutation?.beforeUpdate;
+
+    if (beforeUpdate) {
+      const recordBefore = await ctx.db.get(mutation.payload.id);
+      recordWithSystemFields = beforeUpdate(
+        recordBefore,
+        recordWithSystemFields
+      );
+    }
+
+    await ctx.db.patch(mutation.payload['id'], recordWithSystemFields);
     return {
       message: 'Record updated successfully',
       status: 200 as const,
@@ -271,7 +305,6 @@ export const userViewMutation = async (
   }
 
   if (mutation.payload.type === 'CREATE_SUB_VIEW') {
-    console.log('CREATE SUB VIEW', mutation.payload);
     try {
       await dbMutation.insert('views', {
         ...mutation.payload.userViewData,
@@ -286,7 +319,6 @@ export const userViewMutation = async (
   }
 
   if (mutation.payload.type === 'UPDATE_SUB_VIEW') {
-    console.log('UPDATE SUB VIEW', mutation.payload);
     try {
       await dbMutation.patch(
         mutation.payload.userViewId as Id<any>,
@@ -302,14 +334,12 @@ export const userViewMutation = async (
   }
 
   if (mutation.payload.type === 'CREATE_DETAIL_VIEW') {
-    console.log('CREATE_DETAIL_VIEW:::', mutation.payload);
     try {
       await dbMutation.insert('views', {
         ...mutation.payload.userViewData,
         slug: mutation.payload.userViewData.name,
       } satisfies Partial<UserViewData>);
     } catch (error) {
-      console.log('CREATE_DETAIL_VIEW ERROR', error);
       return {
         status: ERROR_STATUS.INTERNAL_SERVER_ERROR,
         message: `Error updating detail view. name=${mutation.payload.type}`,

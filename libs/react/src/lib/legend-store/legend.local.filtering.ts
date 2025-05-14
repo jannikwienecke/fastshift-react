@@ -68,20 +68,14 @@ const handleStringFilter = (
   rows: Row<RecordType>[],
   filter: FilterPrimitiveType
 ) => {
-  const rowValues = rows.map((r) => r.getValue(filter.field.name));
-  const result = _filter(rowValues, [filter.field.name]).withQuery(
-    filter.value.id as string
-  );
+  const filteredRawRows = _filter(
+    rows.map((r) => r.raw),
+    [filter.field.name]
+  ).withQuery(filter.value.id as string);
 
-  return getFilteredRowsByIds(
-    rows,
-    result.map((r) => {
-      const row = rows.find(
-        (row) => row.getValue(filter.field.name) === r
-      ) as Row;
-      return row.id;
-    })
-  );
+  return filteredRawRows.map((r) => {
+    return rows.find((row) => row.id === r['id']) as Row;
+  });
 };
 
 const handleBooleanFilter = (

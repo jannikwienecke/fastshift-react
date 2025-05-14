@@ -78,7 +78,6 @@ export const setGlobalDataModel = (rows: Row[]) => {
 
   if (localModeEnabled$.get() || isDone_) {
     _log.debug('setGlobalDataModel: APPLY FILTER! AND SORT');
-    applyFilter(store$, store$.filter.filters.get());
     applyDisplayOptions(store$, store$.displayOptions.get());
   }
 };
