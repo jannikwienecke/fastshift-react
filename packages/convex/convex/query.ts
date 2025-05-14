@@ -81,6 +81,11 @@ export const getUserViews = server.query({
         };
 
       const row = await ctx.db.get(view.rowId as Id<any>);
+
+      if (!row) {
+        return view;
+      }
+
       const label = row[view.rowLabelFieldName as keyof Doc<any>];
 
       return {

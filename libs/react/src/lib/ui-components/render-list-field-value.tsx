@@ -27,7 +27,6 @@ export const ListFieldValue = ({
           return null;
         }
 
-        e.stopPropagation();
         e.preventDefault();
 
         const rect = e.currentTarget.getBoundingClientRect();
@@ -36,23 +35,28 @@ export const ListFieldValue = ({
           field.relation?.type === 'manyToMany' ||
           currentView$.get().ui?.showComboboxOnClickRelation
         ) {
+          e.stopPropagation();
           store$.selectRelationField({
             field,
             row,
             rect,
           });
-        } else if (
-          !field.isDateField &&
-          !field.enum &&
-          field.relation &&
-          !field.relation.manyToManyModelFields?.length
-        ) {
+        } else if (!field.relation?.manyToManyModelFields?.length) {
           const defaultFn = () => {
-            store$.navigation.state.set({
-              type: 'navigate',
-              view: field.relation?.tableName ?? '',
-              id: row.raw?.[field.name].id,
-            });
+            if (field.relation) {
+              e.stopPropagation();
+              store$.navigation.state.set({
+                type: 'navigate',
+                view: field.relation?.tableName ?? '',
+                id: row.raw?.[field.name].id,
+              });
+            } else {
+              store$.selectRelationField({
+                field,
+                row,
+                rect,
+              });
+            }
           };
 
           if (store$.list.onClickRelation.get()) {
@@ -63,6 +67,7 @@ export const ListFieldValue = ({
             defaultFn();
           }
         } else {
+          e.stopPropagation();
           store$.selectRelationField({
             field,
             row,

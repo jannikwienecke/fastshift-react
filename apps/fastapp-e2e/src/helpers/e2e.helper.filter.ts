@@ -33,7 +33,7 @@ export const listFilter = ({ mainPage }: PartialFixtures) => {
     await selectFilterOption(filterName);
 
     if (typeof name === 'string') {
-      await mainPage.comboboxPopover.getByText(name).click();
+      await mainPage.comboboxPopover.getByText(name).first().click();
       await expect(mainPage.page.getByText(name).first()).toBeVisible();
     } else if (Array.isArray(name)) {
       for (const n of name) {

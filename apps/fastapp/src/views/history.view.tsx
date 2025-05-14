@@ -390,15 +390,11 @@ const HistoryMainPage = observer(() => {
         fieldsLeft: ['changeType', 'tableName'],
         fieldsRight: ['change', 'owner'],
         onClickRelation(field, row, cb) {
-          if (field.name === 'users') {
-            store$.navigation.state.set({
-              type: 'navigate',
-              view: 'owner',
-              id: row.raw?.['owner']._id,
-            });
-          } else {
-            cb();
+          if (field.name === 'tableName' || field.name === 'changeType') {
+            return;
           }
+
+          cb();
         },
       }}
     />
@@ -411,21 +407,24 @@ const HistoryDetailPage = observer(() => {
       <DefaultDetailViewTemplate
         detailOptions={{
           onClickRelation(field, row, cb) {
-            const fieldName =
-              field.name === 'entityId'
-                ? 'id'
-                : field.name === 'users'
-                ? 'owner'
-                : field.name;
+            if (field.name === 'tableName' || field.name === 'changeType') {
+              return;
+            }
 
-            store$.navigation.state.set({
-              type: 'navigate',
-              view: field.name === 'entityId' ? row.raw.tableName : fieldName,
-              id:
-                field.name === 'entityId'
-                  ? row.raw[field.name]
-                  : row.raw?.[fieldName]._id,
-            });
+            if (field.name === 'entityId' || field.name === 'owner') {
+              const fieldName = field.name === 'entityId' ? 'id' : field.name;
+
+              store$.navigation.state.set({
+                type: 'navigate',
+                view: field.name === 'entityId' ? row.raw.tableName : fieldName,
+                id:
+                  field.name === 'entityId'
+                    ? row.raw[field.name]
+                    : row.raw?.[fieldName]._id,
+              });
+            } else {
+              cb();
+            }
           },
         }}
       />

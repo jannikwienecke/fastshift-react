@@ -144,5 +144,6 @@ created: 1723444498044
 
 ## Fixes found
 
-- [ ] when navigate to tasks from history. Click on tags. Not showing correctly
-- [ ] when we add a tag, the order changes as soon as the mutation is done
+- [x] when navigate to tasks from history. Click on tags. Not showing correctly
+- [x] when we add a tag, the order changes as soon as the mutation is done
+- [x] display options in history not shown

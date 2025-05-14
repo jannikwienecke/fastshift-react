@@ -3,4 +3,5 @@ export type ViewSlug =
   | 'all-projects'
   | 'owner'
   | 'sorted-projects'
-  | 'all-tasks';
+  | 'all-tasks'
+  | 'history';
