@@ -1,6 +1,7 @@
 import {
   _log,
   arrayIntersection,
+  BaseViewConfigManager,
   ContinueCursor,
   DEFAULT_FETCH_LIMIT_QUERY,
   DEFAULT_LOCAL_MODE_LIMIT,
@@ -320,7 +321,12 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   sortedRows = await mapWithInclude(
     sortedRows.filter((r) => r !== null),
     ctx,
-    args
+    {
+      ...args,
+      viewConfigManager: new BaseViewConfigManager(
+        args.viewConfigManager.viewConfig
+      ),
+    }
   );
 
   if (allIds !== null || isGetAll) {

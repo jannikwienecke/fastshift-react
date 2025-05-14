@@ -10,7 +10,7 @@ export type TriggerFnProps = {
 };
 
 export type TriggerFn = (
-  props: TriggerFnProps & { user: RecordType }
+  props: TriggerFnProps & { owner: RecordType }
 ) => Promise<void>;
 
 export type TriggerOperationFnDict = {

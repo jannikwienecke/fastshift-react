@@ -11,9 +11,7 @@ import { StoreFn } from './legend.store.types';
 import { getParsedViewSettings } from './legend.utils.helper';
 
 export const createViewMutation: StoreFn<'createViewMutation'> =
-  (store$) => async (onSuccess) => {
-    const form = store$.userViewSettings.form.get();
-
+  (store$) => async (form, onSuccess) => {
     if (!form) {
       throw new Error('Form is required');
     }
@@ -53,7 +51,14 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
     const userViewData = userViews$.find((v) => v.id.get() === id)?.get();
 
     if (!userViewData) {
-      throw new Error('User view data is required');
+      return store$.createViewMutation(
+        {
+          viewName: currentView$.viewName.get(),
+          viewDescription: '',
+          type: 'create',
+        },
+        onSuccess
+      );
     }
 
     const copyOfOriginal = {

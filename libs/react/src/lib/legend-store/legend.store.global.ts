@@ -290,6 +290,8 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
 
   store$.detail.viewConfigManager.set(viewConfigManager);
 
+  createRelationalDataModel(store$)(data.relationalData ?? {});
+
   batch(() => {
     store$.detail.viewType.set({ type: 'overview' });
     store$.detail.parentViewName.set(viewName);

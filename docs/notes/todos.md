@@ -139,8 +139,8 @@ created: 1723444498044
 - [x] fix translation strings for filtering
 - [x] can filter by timestamp
 - [x] can filter by id
-- [ ] adjst the detail view -> custom one -> yes
-- [ ] can navigate from detail view to detail of changed model
+- [x] adjst the detail view -> custom one -> yes
+- [x] can navigate from detail view to detail of changed model
 
 ## Fixes found
 

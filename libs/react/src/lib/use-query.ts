@@ -24,6 +24,8 @@ import { useView } from './use-view';
 import { derviedDetailPage$ } from './legend-store/legend.detailpage.derived';
 
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
+  const viewName = args.viewName ?? args.viewConfig?.viewName ?? '';
+
   const queryOptions = api.makeQueryOptions
     ? api.makeQueryOptions({
         ...args,
@@ -34,7 +36,7 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         disabled: undefined as any,
         viewConfigManager: undefined,
-        viewName: args.viewName ?? args.viewConfig?.viewName ?? '',
+        viewName,
         relationQuery: args.relationQuery,
         filters: args.relationQuery?.tableName ? '' : args.filters ?? '',
       })
@@ -52,13 +54,15 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
       };
 
   const result = useTanstackQuery({
-    ...queryOptions,
-    enabled: !args.viewConfig
+    ...(queryOptions ?? {}),
+    enabled: !viewName
+      ? false
+      : args.disabled
+      ? false
+      : !args.viewConfig
       ? false
       : // @ts-expect-error ---
       args.paginateOptions?.isDone
-      ? false
-      : args.disabled === true
       ? false
       : true,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -255,7 +259,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       'First:',
       queryReturn?.data?.data?.[0]
     );
-  }, [queryReturn?.data?.data]);
+  }, [queryReturn?.data?.data, queryReturn?.data?.relationalData]);
 
   return {
     ...queryReturn,

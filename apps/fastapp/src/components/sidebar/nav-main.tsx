@@ -180,7 +180,7 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
     return (
       <SidebarMenuItem key={item.title}>
         <SidebarMenuButton asChild isActive={item.isActive}>
-          <Link to={item.url ?? ''}>
+          <Link preload="intent" to={item.url ?? ''}>
             {item.icon && <item.icon />}
             <span>{item.title}</span>
           </Link>

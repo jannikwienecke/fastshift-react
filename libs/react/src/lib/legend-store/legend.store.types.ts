@@ -368,7 +368,7 @@ export type LegendStore = {
     onSuccess?: () => void
   ) => void;
   updateDetailViewMutation: (props: Partial<UserViewData>) => void;
-  createViewMutation: (onSuccess?: () => void) => void;
+  createViewMutation: (form: UserViewForm, onSuccess?: () => void) => void;
   saveSubUserView: () => void;
 
   // commandbar

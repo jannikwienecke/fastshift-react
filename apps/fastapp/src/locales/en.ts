@@ -104,6 +104,10 @@ export const en = {
     insert: 'Insert',
     update: 'Update',
     delete: 'Delete',
+    detail: {
+      headerInsert: 'Inserted Record',
+      headerUpdate: 'Update of Record',
+    },
   },
 };
 

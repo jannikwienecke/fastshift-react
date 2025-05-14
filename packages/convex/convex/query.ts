@@ -93,33 +93,6 @@ export const getUserViews = server.query({
   },
 });
 
-export const userViewData = server.query({
-  args: { viewName: v.union(v.string(), v.null()) },
-
-  handler: async (ctx, args) => {
-    if (!args.viewName) return null;
-
-    const viewName = args.viewName as string;
-    const view = await ctx.db
-      .query('views')
-      .withIndex('name', (q) => q.eq('name', viewName.toLowerCase()))
-      .first();
-
-    _log.debug('userViewData', { view });
-
-    if (!view) return null;
-
-    return {
-      ...view,
-      id: view._id,
-      name: view.name,
-      description: view.description ?? '',
-      displayOptions: view.displayOptions ?? '',
-      filters: view.filters ?? '',
-    } satisfies UserViewData;
-  },
-});
-
 export const displayOptions = server.query({
   handler: async (ctx) => {
     const all = await ctx.db.query('tasks').withIndex('priority').collect();

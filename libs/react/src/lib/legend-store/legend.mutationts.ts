@@ -331,7 +331,7 @@ export const optimisticUpdateStore = ({
   // Merge updated row data
   const updatedRowData = {
     ...row.raw,
-    ...record,
+    ...(sortedRecord ?? record),
   };
   // Generate updated data rows
   const updatedRawRows = originalRows.map((r) =>
@@ -372,6 +372,7 @@ export const optimisticUpdateStore = ({
 
     // TODO DETAIL BRANCHING
     if (store$.detail.row.get() && isDetail() && !isTabs()) {
+      console.log('UPDATE dettail', updatedRow);
       store$.detail.row.set(updatedRow);
     }
 
@@ -418,7 +419,9 @@ export const optimisticUpdateStore = ({
       if (store$.contextMenuState.row.get())
         store$.contextMenuState.row.set(copyRow(originalRow));
 
-      if (store$.detail.row.get()) store$.detail.row.set(copyRow(originalRow));
+      if (store$.detail.row.get()) {
+        store$.detail.row.set(copyRow(originalRow));
+      }
 
       if (store$.commandbar.activeRow.get())
         store$.commandbar.activeRow.set(copyRow(originalRow));

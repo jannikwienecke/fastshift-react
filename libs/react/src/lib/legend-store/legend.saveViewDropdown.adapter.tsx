@@ -83,7 +83,9 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
                 }
               );
             } else {
-              store$.createViewMutation(onSuccess);
+              const form = store$.userViewSettings.form.get();
+              if (!form) return;
+              store$.createViewMutation(form, onSuccess);
             }
           },
         }

@@ -39,7 +39,7 @@ export const handleInsertTrigger: TriggerFn = async ({
   views,
   ctx,
   change,
-  user,
+  owner,
 }) => {
   const { getManyToManyFields, getIsManyToMany } = helper(views, tableName);
   const newData = change.newDoc;
@@ -59,7 +59,7 @@ export const handleInsertTrigger: TriggerFn = async ({
 
         newValue: newData[fieldName2 as keyof typeof newData],
       },
-      userId: user?.['_id'],
+      ownerId: owner._id,
       timestamp: Date.now(),
       tableName: field1?.name,
     });
@@ -74,7 +74,7 @@ export const handleInsertTrigger: TriggerFn = async ({
         isManyToMany: true,
         manyToManyOf: tableName,
       },
-      userId: user?.['_id'],
+      ownerId: owner._id,
       timestamp: Date.now(),
       tableName: field2?.name,
     });
@@ -87,7 +87,7 @@ export const handleInsertTrigger: TriggerFn = async ({
         oldValue: null,
         newValue: newData,
       },
-      userId: user?.['_id'],
+      ownerId: owner._id,
       timestamp: Date.now(),
       tableName,
     });
@@ -99,7 +99,7 @@ export const handleDeleteTrigger: TriggerFn = async ({
   views,
   ctx,
   change,
-  user,
+  owner,
 }) => {
   const { getManyToManyFields, getIsManyToMany } = helper(views, tableName);
 
@@ -119,7 +119,7 @@ export const handleDeleteTrigger: TriggerFn = async ({
       isManyToMany: true,
       manyToManyOf: tableName,
     },
-    userId: user?.['_id'],
+    ownerId: owner._id,
     timestamp: Date.now(),
     tableName: field2?.name,
   });
@@ -134,7 +134,7 @@ export const handleDeleteTrigger: TriggerFn = async ({
       isManyToMany: true,
       manyToManyOf: tableName,
     },
-    userId: user?.['_id'],
+    ownerId: owner._id,
     timestamp: Date.now(),
     tableName: field1?.name,
   });
@@ -145,7 +145,7 @@ export const handleUpdateTrigger: TriggerFn = async ({
   views,
   ctx,
   change,
-  user,
+  owner,
 }) => {
   const { getIsManyToMany } = helper(views, tableName);
 
@@ -194,7 +194,7 @@ export const handleUpdateTrigger: TriggerFn = async ({
         oldValue,
         newValue,
       },
-      userId: user?.['_id'],
+      ownerId: owner._id,
       timestamp: Date.now(),
       tableName,
     });
@@ -205,8 +205,14 @@ export const handleTriggerChanges = async (props: TriggerFnProps) => {
   const { ctx, change } = props;
 
   const user = await ctx.db.query('users').first();
-  if (!user) {
-    console.error('No user found');
+
+  const owner = await ctx.db
+    .query('owner')
+    .withIndex('userId', (q) => q.eq('userId', user._id))
+    .first();
+
+  if (!owner) {
+    console.error('No owner found');
     return;
   }
 
@@ -223,7 +229,7 @@ export const handleTriggerChanges = async (props: TriggerFnProps) => {
   }
 
   try {
-    await fnToRun({ ...props, user });
+    await fnToRun({ ...props, owner });
   } catch (error) {
     console.error('Error handling trigger change:', error);
     throw error;

@@ -1,13 +1,4 @@
-import {
-  Button,
-  EmojiPicker,
-  EmojiPickerDialog,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  SidebarInset,
-  SidebarProvider,
-} from '@apps-next/ui';
+import { SidebarInset, SidebarProvider } from '@apps-next/ui';
 
 import React from 'react';
 
@@ -158,7 +149,7 @@ const FastAppLayoutComponent = observer(() => {
 
   if (
     (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
-    !id &&
+    // !id &&
     data
   ) {
     globalStore.dispatch({
