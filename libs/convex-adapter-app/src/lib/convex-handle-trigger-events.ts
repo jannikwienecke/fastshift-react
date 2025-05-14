@@ -59,7 +59,7 @@ export const handleInsertTrigger: TriggerFn = async ({
 
         newValue: newData[fieldName2 as keyof typeof newData],
       },
-      ownerId: owner._id,
+      ownerId: owner?.['_id'],
       timestamp: Date.now(),
       tableName: field1?.name,
     });
@@ -74,7 +74,7 @@ export const handleInsertTrigger: TriggerFn = async ({
         isManyToMany: true,
         manyToManyOf: tableName,
       },
-      ownerId: owner._id,
+      ownerId: owner?.['_id'],
       timestamp: Date.now(),
       tableName: field2?.name,
     });
@@ -87,7 +87,7 @@ export const handleInsertTrigger: TriggerFn = async ({
         oldValue: null,
         newValue: newData,
       },
-      ownerId: owner._id,
+      ownerId: owner?.['_id'],
       timestamp: Date.now(),
       tableName,
     });
@@ -119,7 +119,7 @@ export const handleDeleteTrigger: TriggerFn = async ({
       isManyToMany: true,
       manyToManyOf: tableName,
     },
-    ownerId: owner._id,
+    ownerId: owner?.['_id'],
     timestamp: Date.now(),
     tableName: field2?.name,
   });
@@ -134,7 +134,7 @@ export const handleDeleteTrigger: TriggerFn = async ({
       isManyToMany: true,
       manyToManyOf: tableName,
     },
-    ownerId: owner._id,
+    ownerId: owner?.['_id'],
     timestamp: Date.now(),
     tableName: field1?.name,
   });
@@ -194,7 +194,7 @@ export const handleUpdateTrigger: TriggerFn = async ({
         oldValue,
         newValue,
       },
-      ownerId: owner._id,
+      ownerId: owner?.['_id'],
       timestamp: Date.now(),
       tableName,
     });

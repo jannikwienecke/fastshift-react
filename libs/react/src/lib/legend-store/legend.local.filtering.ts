@@ -74,7 +74,7 @@ const handleStringFilter = (
   ).withQuery(filter.value.id as string);
 
   return filteredRawRows.map((r) => {
-    return rows.find((row) => row.id === r.id) as Row;
+    return rows.find((row) => row.id === r['id']) as Row;
   });
 };
 

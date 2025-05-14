@@ -10,12 +10,9 @@ import {
 import {
   AudioWaveform,
   Command,
-  Frame,
   GalleryVerticalEnd,
   Home,
   Inbox,
-  Map,
-  PieChart,
   Search,
   Sparkles,
 } from 'lucide-react';
@@ -23,11 +20,10 @@ import * as React from 'react';
 import { NavCommon } from './nav-common';
 import { NavFavorites } from './nav-favorites';
 import { NavMain } from './nav-main';
-import { NavProjects } from './nav-projects';
+import { NavSettings } from './nav-settings';
 import { NavUser } from './nav-user';
 import { TeamSwitcher } from './team-switcher';
 
-// This is sample data.
 const data = {
   user: {
     name: 'shadcn',
@@ -49,24 +45,6 @@ const data = {
       name: 'Evil Corp.',
       logo: Command,
       plan: 'Free',
-    },
-  ],
-
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
     },
   ],
   navCommon: [
@@ -93,18 +71,7 @@ const data = {
       badge: '10',
     },
   ],
-  favorites: [
-    {
-      name: 'Project Management & Task Tracking',
-      url: '#',
-      emoji: '📊',
-    },
-    {
-      name: 'Family Recipe Collection & Meal Planning',
-      url: '#',
-      emoji: '🍳',
-    },
-  ],
+
   workspaces: [
     {
       name: 'Personal Life Management',
@@ -222,11 +189,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavCommon items={data.navCommon} />
-        <NavFavorites favorites={data.favorites} />
+        <NavFavorites />
         <NavMain />
       </SidebarContent>
       <SidebarFooter>
-        <NavProjects />
+        <NavSettings />
 
         <NavUser user={data.user} />
       </SidebarFooter>

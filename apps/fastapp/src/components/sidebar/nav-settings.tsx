@@ -4,7 +4,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   SidebarGroup,
   SidebarMenu,
@@ -13,19 +12,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@apps-next/ui';
-import {
-  FlagIcon,
-  Folder,
-  Forward,
-  LanguagesIcon,
-  MoreHorizontal,
-  Settings2Icon,
-  Trash2,
-} from 'lucide-react';
-import { Nav } from './nav-main';
+import { LanguagesIcon, MoreHorizontal, Settings2Icon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Nav } from './nav-main';
 
-export function NavProjects() {
+export function NavSettings() {
   const { isMobile } = useSidebar();
 
   const nav: Nav = {
