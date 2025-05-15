@@ -124,7 +124,7 @@ created: 1723444498044
 
 <!--  -->
 
-## NEW TODOS History
+## History
 
 - [x] set updated at when create new entry
 - [x] add test data entries in init script
@@ -141,9 +141,10 @@ created: 1723444498044
 - [x] can filter by id
 - [x] adjst the detail view -> custom one -> yes
 - [x] can navigate from detail view to detail of changed model
-
-## Fixes found
-
 - [x] when navigate to tasks from history. Click on tags. Not showing correctly
 - [x] when we add a tag, the order changes as soon as the mutation is done
 - [x] display options in history not shown
+
+<!-- Toos activity tab -->
+
+- [ ] add a go to button next to the relational value in detail

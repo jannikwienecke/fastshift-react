@@ -257,6 +257,8 @@ export const getIdsFromIndexFilters = async (
   viewConfigManager: BaseViewConfigManagerInterface
 ): Promise<{ ids: ID[]; idsToRemove: ID[] }> => {
   if (!indexFields) return { ids: [], idsToRemove: [] };
+  if (!filtersWithIndexField) return { ids: [], idsToRemove: [] };
+  if (!filtersWithIndexField.length) return { ids: [], idsToRemove: [] };
 
   const idsIndexFieldToRemove: ID[] = [];
 

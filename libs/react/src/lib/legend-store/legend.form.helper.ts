@@ -57,7 +57,7 @@ export const getFormState = () => {
   const errors = viewConfigManager.validateRecord(row?.raw);
 
   if (errors) {
-    _log.warn('Form State Errors: ', errors);
+    _log.debug('Form State Errors: ', errors);
   }
 
   return {
@@ -194,10 +194,11 @@ export const formHelper = (
   const viewConfigManager = new BaseViewConfigManager(view);
 
   const getFormState = () => {
+    if (!row?.id) return null;
     const errors = viewConfigManager.validateRecord(row?.raw);
 
     if (errors) {
-      _log.warn('Form State Errors: ', errors);
+      _log.info('Form State Errors: ', errors);
     }
 
     return {
@@ -223,11 +224,11 @@ export const formHelper = (
 
   const getValueOfRow = (fieldName: string) => {
     try {
-      return row ? row?.getValue?.(fieldName) : undefined;
+      return row && row.id ? row?.getValue?.(fieldName) : undefined;
     } catch (error) {
-      console.warn('___GET VALUE OF ROW ERROR', error);
-      console.warn(row);
-      console.warn(fieldName);
+      console.error('___GET VALUE OF ROW ERROR', error);
+      console.error(row);
+      console.error(fieldName);
     }
   };
 

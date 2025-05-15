@@ -1,4 +1,9 @@
-import { EnumType, ModelField, ModelSchema } from '@apps-next/core';
+import {
+  EnumType,
+  isSystemField,
+  ModelField,
+  ModelSchema,
+} from '@apps-next/core';
 import { ConvexSchema } from './_internal/convex-schema.types';
 
 const typeMapping: Record<string, string> = {
@@ -82,6 +87,8 @@ function parseConvexSchemaToModelSchema<T extends Record<string, any>>(
 
       const field: ModelField = {
         name: isManyToManyField
+          ? fieldName
+          : isSystemField(fieldName)
           ? fieldName
           : fieldSchema.tableName ?? fieldName,
         relationFromFields: isManyToManyField

@@ -13,6 +13,7 @@ const tableMetaFields = {
 
 const _schema = defineSchema({
   users: defineTable({
+    ...tableMetaFields,
     email: v.string(),
     password: v.string(),
   }),

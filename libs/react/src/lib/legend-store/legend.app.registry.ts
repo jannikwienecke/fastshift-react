@@ -68,11 +68,11 @@ const getView = (name: string): ViewRegistryEntry => {
   });
 
   if (!found) {
-    const config = getViewByName(store$.views.get(), name);
+    const config = getViewByName(store$.views.get(), name.toLowerCase());
     if (!config) {
-      // console.log('NOT FOUND ');
-      // console.log({ views: store$.views.get(), name });
-      // console.trace();
+      console.log('NOT FOUND ');
+      console.log(store$.views.get());
+      console.trace();
 
       throw new Error(`View not found: :${name}`);
     }

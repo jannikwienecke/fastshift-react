@@ -116,20 +116,20 @@ export const select = (row: Row) => {
     .some((r) => r.id === row.id);
 
   if (isInRemovedRows) {
-    console.warn('___ADD BACK');
+    console.debug('___ADD BACK');
     selectState$.removedRows.set((prev) => prev.filter((r) => r.id !== row.id));
     selectState$.newRows.set((prev) => [...prev, row]);
     selectState$.toInsertRow.set(row);
   } else if (isInInitialRows) {
-    console.warn('___REMOVE');
+    console.debug('___REMOVE');
     selectState$.toRemoveRow.set(row);
     selectState$.removedRows.set((prev) => [...prev, row]);
   } else if (isInNewRows) {
-    console.warn('___REMOVE FROM NEW ROWS');
+    console.debug('___REMOVE FROM NEW ROWS');
     selectState$.newRows.set((prev) => prev.filter((r) => r.id !== row.id));
     selectState$.toRemoveRow.set(row);
   } else {
-    console.warn('___ADD');
+    console.debug('___ADD');
     selectState$.newRows.set((prev) => [...prev, row]);
     selectState$.toInsertRow.set(row);
   }
@@ -138,7 +138,7 @@ export const select = (row: Row) => {
 const onError = () => {
   const { toInsert, toRemove, existingRows, removedRows, newRows } = getState();
 
-  console.warn('___ROLLBACK', {
+  console.debug('___ROLLBACK', {
     toInsert,
     toRemove,
     existingRows,
@@ -171,7 +171,7 @@ export const xSelect = {
 };
 
 selectState$.toRemoveRow.onChange((state) => {
-  console.warn('___TO REMOVE: ', state.value);
+  console.debug('___TO REMOVE: ', state.value);
   if (!state.value) return;
 
   const { field, parentRow, existingRows } = getState();

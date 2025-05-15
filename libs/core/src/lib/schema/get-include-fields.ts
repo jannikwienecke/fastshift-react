@@ -1,9 +1,11 @@
+import { isSystemField } from '../core-utils';
 import { ModelSchema } from '../types';
 import { schemaHelper } from './schema-helper';
 
 export const generateIncludeFields = (modelSchema: ModelSchema) => {
   const includeDict = modelSchema.models.reduce((acc, model) => {
     const includeFieldsModel = model?.fields
+      .filter((f) => !isSystemField(f.name))
       .map((fieldData) => {
         const { isIdField, relation, isManyToManyRelation, isList } =
           schemaHelper(fieldData, model, modelSchema);

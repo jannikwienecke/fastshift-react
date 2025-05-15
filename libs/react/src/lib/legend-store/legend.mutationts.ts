@@ -41,7 +41,7 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   }) => {
     const viewConfigManager = getViewConfigManager();
 
-    _log.warn('___RUN Mutation', { newRows, idsToDelete, newIds });
+    _log.debug('___RUN Mutation', { newRows, idsToDelete, newIds });
 
     // Perform optimistic update
     const rollback = optimisticUpdateStore({
@@ -86,7 +86,6 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
         store$.errorDialog.error.set(error);
       });
     } else {
-      console.warn('Rows selected successfully');
       checkedRows$.set([]);
       idsToDelete$.set([]);
       isRunning$.set(false);
@@ -107,7 +106,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
     const record = {
       [field.relation?.fieldName ?? field.name]: patchValue,
     };
-    console.warn('Record to update:', record);
+    console.debug('Record to update:', record);
 
     const fieldName =
       viewConfigManager.getFieldBy(field.name).relation?.fieldName ?? '';
@@ -125,7 +124,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
         record,
       },
     };
-    console.warn('Mutation payload:', mutation);
+    console.debug('Mutation payload:', mutation);
 
     const { error } = await store$.api.mutateAsync({
       mutation,
@@ -141,7 +140,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
         store$.errorDialog.error.set(error);
       });
     } else {
-      console.warn('Record updated successfully');
+      console.debug('Record updated successfully');
       onSuccess?.();
     }
   };
@@ -150,7 +149,7 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
   (store$) =>
   async ({ record, row }, onSuccess, onError) => {
     const viewConfigManager = getViewConfigManager();
-    console.warn('Starting FULL updateRecordMutation');
+    console.debug('Starting FULL updateRecordMutation');
 
     const rollback = optimisticUpdateStore({
       store$,
@@ -166,7 +165,7 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
       },
     };
 
-    console.warn('Mutation payload:', mutation);
+    console.debug('Mutation payload:', mutation);
 
     const { error } = await store$.api.mutateAsync({
       mutation,
@@ -183,7 +182,7 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
       });
     } else {
       onSuccess?.();
-      console.warn('Record updated successfully');
+      console.debug('Record updated successfully');
     }
   };
 
@@ -219,7 +218,7 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
 
         store$.dataModel.rows.set(rollbackRows);
       } else {
-        console.warn('Record deleted successfully');
+        console.debug('Record deleted successfully');
         onSuccess?.();
       }
     };
@@ -294,7 +293,7 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
           renderSuccessToast('');
         }
 
-        console.warn('Record created successfully');
+        console.debug('Record created successfully');
         onSuccess?.();
       }
     };
@@ -393,7 +392,7 @@ export const optimisticUpdateStore = ({
     }
 
     if (updateGlobalDataModel && !isDetail()) {
-      console.warn('____UPDATE GLOBAL DATA MODEL');
+      console.debug('____UPDATE GLOBAL DATA MODEL');
 
       updatedRows.map((r) => {
         const hasRow = r.id === updatedRow.id;
@@ -411,7 +410,7 @@ export const optimisticUpdateStore = ({
   // Return rollback function
   return () => {
     setTimeout(() => {
-      _log.warn('Rolling back optimistic update', originalRows);
+      _log.debug('Rolling back optimistic update', originalRows);
       isRunning$.set(false);
 
       setGlobalDataModel(originalRows);

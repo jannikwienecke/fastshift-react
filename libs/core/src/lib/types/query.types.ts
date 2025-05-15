@@ -92,6 +92,7 @@ export type UserViewDataDto = {
 export type QueryReturnDto<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   relationalData?: QueryRelationalData;
+  historyData?: RecordType[] | undefined;
   error?: unknown;
   continueCursor: ContinueCursor;
   isDone: boolean;
@@ -114,6 +115,7 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
   error: QueryError | undefined | null;
   allIds: string[];
   view?: UserViewData;
+  historyData?: RecordType[] | undefined;
   // isFetching: boolean;
   // isFetched: boolean;
   refetch: () => void;

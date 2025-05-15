@@ -111,11 +111,11 @@ const renderFields = <T extends RecordType>(
           field = item.field;
         } catch (error) {
           if (index === 0) {
-            // console.warn('[-------fieldName---------]');
-            // console.warn(fieldName);
-            // console.warn(row);
-            // console.warn(viewConfigManager.viewConfig.viewName);
-            // console.warn('----');
+            // console.debug('[-------fieldName---------]');
+            // console.debug(fieldName);
+            // console.debug(row);
+            // console.debug(viewConfigManager.viewConfig.viewName);
+            // console.debug('----');
           }
 
           _log.error(
@@ -235,7 +235,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
         })) ?? [];
   } else if (grouping.field?.enum) {
     // IMPROVEMENT: [LATER] Implement grouping by enum
-    console.warn('Grouping by enum is not implemented yet');
+    console.debug('Grouping by enum is not implemented yet');
     alert('Grouping by enum is not implemented yet');
   }
 

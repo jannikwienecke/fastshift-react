@@ -33,6 +33,8 @@ import { useCommands, useViewParams } from '../shared/hooks';
 import { useAppEffects } from '../shared/hooks/app.effects';
 import { getViewParms } from '../shared/utils/app.helper';
 
+globalStore.setViews(views);
+
 export const Route = createFileRoute('/fastApp')({
   loader: async (props) => {
     await wait();
@@ -44,7 +46,6 @@ export const Route = createFileRoute('/fastApp')({
 
     const { viewName, slug, id, model } = getViewParms(props.params);
 
-    globalStore.setViews(views);
     store$.api.getUserViewQueryKey.set(userViewsQuery.queryKey);
 
     if (!viewName) {
@@ -147,17 +148,19 @@ const FastAppLayoutComponent = observer(() => {
 
   const doOnceForViewRef = React.useRef('');
 
-  if (
-    (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
-    // !id &&
-    data
-  ) {
-    globalStore.dispatch({
-      type: 'CHANGE_VIEW',
-      payload: { data, viewName },
-    });
-    doOnceForViewRef.current = viewName;
-  }
+  React.useLayoutEffect(() => {
+    if (
+      (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
+      // !id &&
+      data
+    ) {
+      globalStore.dispatch({
+        type: 'CHANGE_VIEW',
+        payload: { data, viewName },
+      });
+      doOnceForViewRef.current = viewName;
+    }
+  }, [data, viewName]);
 
   const viewNameRef = React.useRef(viewName);
   const modelRef = React.useRef(model);

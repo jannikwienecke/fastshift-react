@@ -81,7 +81,7 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
     });
 
     if (result.error && copyOfOriginal) {
-      _log.warn(
+      _log.debug(
         `Error updating view: Rollbaclk to original state. Error: ${result.error.message}`
       );
       store$.userViewData.set(copyOfOriginal);

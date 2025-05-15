@@ -1,10 +1,13 @@
 import {
+  BaseViewConfigManager,
+  getViewByName,
   invarant,
   parseDisplayOptionsStringForServer,
   parseFilterStringForServer,
   QueryDto,
   QueryReturnDto,
   QueryServerProps,
+  RecordType,
 } from '@apps-next/core';
 import { getData } from './_internal/convex-get-data';
 import { getRelationalData } from './_internal/convex-get-relational-data';
@@ -75,6 +78,29 @@ export const viewLoaderHandler = async (
 
   invarant(Boolean(viewConfigManager), 'viewConfig.... is not defined');
 
+  // let historyDataForView:
+  let historyData: RecordType[] | undefined = undefined;
+  const viewConfig = getViewByName(serverProps.registeredViews, 'history');
+  if (args.viewId && viewConfig) {
+    const filter = `filter[]=entityId:contains:${args.viewId}||${args.viewId}:primitive;false`;
+
+    const viewConfigManager = new BaseViewConfigManager({
+      ...viewConfig,
+      localMode: { enabled: true },
+    });
+    const parsedFilters = parseFilterStringForServer(filter, viewConfigManager);
+
+    const res = await getData(ctx, {
+      ...serverProps,
+      filters: parsedFilters,
+      viewName: 'history',
+      viewConfigManager,
+      viewId: null,
+    });
+
+    historyData = res.data;
+  }
+
   const getDataRes =
     args.onlyRelationalData === true
       ? {
@@ -95,5 +121,6 @@ export const viewLoaderHandler = async (
     isDone,
     data,
     relationalData,
+    historyData,
   };
 };
