@@ -24,15 +24,6 @@ export const getViewData = (
 } => {
   const userViewData = userViews.find((view) => view.name === viewName);
 
-  if (viewName.includes('urgent')) {
-    console.log(
-      '_______ get view',
-      viewName,
-      userViews.length,
-      userViewData?.name
-    );
-  }
-
   const viewData = viewRegistry.getView(userViewData?.baseView ?? viewName);
 
   return { viewData, userViewData };

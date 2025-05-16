@@ -261,12 +261,13 @@ const handleChangeView = (action: GlobalStoreAction) => {
   if (action.type !== 'CHANGE_VIEW') return;
   const { viewName, data, resetDetail } = action.payload;
 
-  // || viewName !== currentViewName()
-  // if (resetDetail) {
-  //   console.log('RESET DETAIL');
-  // }
+  if (resetDetail) {
+    store$.detail.set(undefined);
+  }
 
-  if (viewName !== currentViewName() && !store$.detail.row.id.get()) {
+  if (viewName !== currentViewName()) {
+    store$.detail.set(undefined);
+
     resetStore();
     setStore(viewName);
     handleQueryData(data);
@@ -278,9 +279,6 @@ const handleChangeView = (action: GlobalStoreAction) => {
   } else if (viewName === currentViewName()) {
     return;
   }
-  // else {
-  //   // throw new Error(`This should not happen: ${viewName}`);
-  // }
 };
 
 const handleLoadDetailPage = (action: GlobalStoreAction) => {
@@ -292,6 +290,7 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
   const viewConfigManager = createViewConfigManager(viewName);
 
   store$.detail.viewConfigManager.set(viewConfigManager);
+  store$.detail.activityData.set(data.historyData ?? []);
 
   createRelationalDataModel(store$)(data.relationalData ?? {});
 

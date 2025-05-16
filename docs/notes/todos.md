@@ -147,4 +147,21 @@ created: 1723444498044
 
 <!-- Toos activity tab -->
 
+- [x] in tasks lis view, change tags, click on create new tag. nothing happens
+- [x] test: in detail task view -> go to create tag commandform
+- [x] test: in detail task view -> try to add or remove tags
+- [x] test: in detail task view -> have 3 tags, remove one, add a different one, add back the first thta were removed
+
+Small Bugs to fix
+
+- [ ] in add task in project, project is not selected...
+- [ ] in add task in project, priority is not rendered correctly
+- [ ] the due date field in project detail, has no icon shown
+
+Small Features to add
+
+- [ ] activity list, we need to add a useActivity hook for real time updates.
+- [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task
 - [ ] add a go to button next to the relational value in detail
+- [ ] color picker and color indicator for fields with type "color" or something like this
+- [ ] scrollable list for acitivty

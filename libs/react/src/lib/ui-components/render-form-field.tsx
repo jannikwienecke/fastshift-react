@@ -14,7 +14,7 @@ export const onKeyDown = (
 
   if (
     isEnter ||
-    (isTab && !props.formState.errors?.[props.field.field?.name ?? ''])
+    (isTab && !props.formState?.errors?.[props.field.field?.name ?? ''])
   ) {
     props.onEnter(props.field, isTabField);
   }
@@ -47,7 +47,7 @@ export const onBlur = (
   props: FormFieldProps,
   isTabField?: boolean
 ) => {
-  const error = props.formState.errors?.[props.field.field?.name ?? ''];
+  const error = props.formState?.errors?.[props.field.field?.name ?? ''];
 
   if (error) {
     e.currentTarget.focus();
@@ -90,7 +90,7 @@ const TextAreaFormField = (props: FormFieldProps) => {
 };
 
 const StringFormField = (props: FormFieldProps) => {
-  const error = props.formState.errors?.[props.field.field?.name ?? ''];
+  const error = props.formState?.errors?.[props.field.field?.name ?? ''];
 
   return (
     <div className="flex flex-col gap-1 pt-2">

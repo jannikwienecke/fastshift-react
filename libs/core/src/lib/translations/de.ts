@@ -20,6 +20,18 @@ export const de = {
       [operatorLabels.WITHIN]: 'Innerhalb',
     },
   },
+
+  __history: {
+    changed: {
+      'added-to': 'hinzugefügt zu',
+      'removed-from': 'entfernt von',
+      added: 'hinzugefügt',
+      changed: 'geändert',
+      created: 'erstellt',
+      removed: 'entfernt',
+    },
+  },
+
   commandform: {
     create: '{{name}} erstellen',
     edit: '{{name}} aktualisieren',

@@ -1,4 +1,5 @@
 import { operatorLabels } from '../filters';
+import { HistoryType } from '../types';
 import { CommandHeader as commandHeaders } from '../types/commands';
 
 export const headers: {
@@ -6,6 +7,17 @@ export const headers: {
 } = {
   view: 'View',
   admin: 'Admin',
+};
+
+export const historyChangedTypes: {
+  [key in HistoryType['changed']['type']]: string;
+} = {
+  added: 'added',
+  'added-to': 'added to',
+  changed: 'changed',
+  created: 'created',
+  removed: 'removed',
+  'removed-from': 'removed from',
 };
 
 export const en = {
@@ -27,6 +39,7 @@ export const en = {
       [operatorLabels.WITHIN]: 'Within',
     },
   },
+
   commandform: {
     create: 'Create {{name}}',
     edit: 'Update {{name}}',
@@ -143,6 +156,11 @@ export const en = {
         'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
     },
   },
+
+  __history: {
+    changed: historyChangedTypes,
+  },
+
   saveViewDropdown: {
     saveToThisView: 'Save to this view',
     createNewView: 'Create new view...',

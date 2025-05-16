@@ -1,5 +1,6 @@
 import {
   _log,
+  BaseViewConfigManagerInterface,
   getRelationTableName,
   ifNoneNullElseValue,
   INTERNAL_FIELDS,
@@ -320,6 +321,14 @@ export const optimisticUpdateStore = ({
   _log.debug('Starting optimistic update', { updateGlobalDataModel, record });
 
   const originalRow = copyRow(row);
+  let originalRowDetail: Row | null = null;
+  const viewConfigManagerDetail = store$.detail.viewConfigManager.get();
+  if (store$.detail.row.get() && viewConfigManagerDetail) {
+    originalRowDetail = copyRow(
+      store$.detail.row.get() as Row,
+      viewConfigManagerDetail as BaseViewConfigManagerInterface
+    );
+  }
 
   record = patchRecord(record, store$);
 
@@ -371,7 +380,6 @@ export const optimisticUpdateStore = ({
 
     // TODO DETAIL BRANCHING
     if (store$.detail.row.get() && isDetail() && !isTabs()) {
-      console.log('UPDATE dettail', updatedRow);
       store$.detail.row.set(updatedRow);
     }
 
@@ -410,20 +418,34 @@ export const optimisticUpdateStore = ({
   // Return rollback function
   return () => {
     setTimeout(() => {
-      _log.debug('Rolling back optimistic update', originalRows);
+      console.debug('Rolling back optimistic update', originalRows);
       isRunning$.set(false);
 
       setGlobalDataModel(originalRows);
 
+      const copyRowDetail = (row: Row) => {
+        const raw = { ...row.raw };
+        return makeData(
+          store$.views.get(),
+          store$.detail.viewConfigManager.getViewName()
+        )([raw]).rows?.[0];
+      };
+
       if (store$.contextMenuState.row.get())
         store$.contextMenuState.row.set(copyRow(originalRow));
 
-      if (store$.detail.row.get()) {
-        store$.detail.row.set(copyRow(originalRow));
+      if (
+        isDetail() &&
+        originalRowDetail
+        // !selectState$.parentRow.get()
+      ) {
+        store$.detail.row.set(originalRowDetail);
       }
 
       if (store$.commandbar.activeRow.get())
-        store$.commandbar.activeRow.set(copyRow(originalRow));
+        store$.commandbar.activeRow.set(
+          isDetail() ? originalRowDetail : copyRow(originalRow)
+        );
 
       if (store$.list.rowInFocus.row.get())
         store$.list.rowInFocus.row.set(copyRow(originalRow));
@@ -433,7 +455,9 @@ export const optimisticUpdateStore = ({
       }
 
       if (selectState$.parentRow.get()) {
-        selectState$.parentRow.set(copyRow(originalRow));
+        selectState$.parentRow.set(
+          isDetail() ? originalRowDetail : copyRow(originalRow)
+        );
       }
 
       if (selectState$.parentRow.get()) {

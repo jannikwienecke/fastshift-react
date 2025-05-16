@@ -5,6 +5,7 @@ import {
 import { RecordType } from './base.types';
 import { DisplayOptionsType } from './displayOptions.types';
 import { FilterType } from './filter.types';
+import { HistoryType } from './history.types';
 import { MutationDto, MutationReturnDto } from './mutation.types';
 import { Emoji } from './ui.types';
 import { RegisteredViews, ViewConfigType } from './view-config.types';
@@ -92,7 +93,7 @@ export type UserViewDataDto = {
 export type QueryReturnDto<T extends RecordType = RecordType> = {
   data: T[] | undefined;
   relationalData?: QueryRelationalData;
-  historyData?: RecordType[] | undefined;
+  historyData?: HistoryType[] | undefined;
   error?: unknown;
   continueCursor: ContinueCursor;
   isDone: boolean;
@@ -115,7 +116,7 @@ export type QueryReturnType<T extends RecordType = RecordType> = {
   error: QueryError | undefined | null;
   allIds: string[];
   view?: UserViewData;
-  historyData?: RecordType[] | undefined;
+  historyData?: HistoryType[] | undefined;
   // isFetching: boolean;
   // isFetched: boolean;
   refetch: () => void;

@@ -20,7 +20,7 @@ import { copyRow } from './legend.utils';
 const getDetailTabsFields = () => {
   const row = store$.detail.row.raw.get();
 
-  return detailFormHelper()
+  const fields = detailFormHelper()
     .getComplexFormFields()
     .filter(
       (f) =>
@@ -30,9 +30,12 @@ const getDetailTabsFields = () => {
     )
     .filter((f) => {
       const value = row?.[f.field.name];
+
       if (!value?.id) return false;
       return true;
     });
+
+  return fields;
 };
 
 export const detailTabsHelper = () => {
@@ -40,6 +43,7 @@ export const detailTabsHelper = () => {
 
   if (!store$.detail.activeTabField.get()) {
     store$.detail.activeTabField.set(detailTabsFields[0]);
+    store$.detail.isActivityTab.set(true);
   }
 
   const activeTabField = store$.detail.activeTabField.get();

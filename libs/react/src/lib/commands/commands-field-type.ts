@@ -143,41 +143,22 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
   };
 
   const manyToManyType = () => {
-    const { values, defaultSelected } = comboboxStore$.get() ?? {};
+    const { values } = comboboxStore$.get() ?? {};
 
-    const filteredExistingRows =
-      defaultSelected?.map((row) => ({
-        id: row.id,
-        label: row.label,
-      })) ?? [];
+    const view = store$.viewConfigManager.getViewByFieldName(
+      viewField.name,
+      store$.views.get()
+    );
 
-    const optionsWithoutExistingRows =
-      values
-        ?.filter((row) => {
-          return !defaultSelected?.some((r) => r.id === row.id);
-        })
-        .map((row) => ({
-          id: row.id,
-          label: row.label,
-        })) ?? [];
+    if (!view)
+      throw new Error('getCommandbarPropsForFieldType - view not found');
 
-    const createNewCommand = [
-      {
-        id: CREATE_NEW_OPTION,
-        label: t('common.createNew' satisfies TranslationKeys, {
-          name: getFieldLabel(viewField, true),
-        }),
-      },
-    ];
+    const createNewCommand = [commands.makeOpenCreateFormCommand(view)];
 
-    const groups = [
-      createNewCommand,
-      filteredExistingRows,
-      optionsWithoutExistingRows,
-    ]
+    const groups = [values?.filter((v) => v !== null && v !== undefined)]
       .flatMap((g) => g)
-      .filter(Boolean)
-      .map((g) => commands.makeSelectRelationalOptionCommand(g));
+      .map((g) => g && commands.makeSelectRelationalOptionCommand(g))
+      .filter((v) => !!v);
 
     return {
       inputPlaceholder: t('common.changeOrAdd', {
@@ -186,7 +167,7 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
       groups: [
         {
           header: '',
-          items: groups,
+          items: [...createNewCommand, ...groups],
         },
       ],
     } satisfies PropsType;

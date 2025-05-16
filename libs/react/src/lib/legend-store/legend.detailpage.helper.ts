@@ -45,7 +45,7 @@ export const detailFormHelper = () => {
       throw new Error(`Field ${field.name} is required`);
     }
 
-    if (!helper.formState.isFieldReady(field)) return;
+    if (!helper.formState?.isFieldReady(field)) return;
 
     store$.updateRecordMutation({
       field,

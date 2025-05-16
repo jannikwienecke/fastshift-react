@@ -1,9 +1,7 @@
 import { FieldConfig, Row } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { store$ } from './legend.store';
-import { a } from 'framer-motion/dist/types.d-B50aGbjN';
-import { derviedDetailPage$ } from './legend.detailpage.derived';
 import { detailTabsHelper } from './legend.detailtabs.helper';
+import { store$ } from './legend.store';
 
 export const selectState$ = observable({
   parentRow: null as Row | null,
@@ -40,7 +38,7 @@ const getParentRow = () => {
     .get()
     .find((r) => r.id === selectState$.parentRow.get()?.id);
 
-  return row;
+  return row ?? (selectState$.parentRow.get() as Row);
 };
 const getCurrentRows = (_field?: FieldConfig) => {
   const field = _field ?? selectState$.field.get();
@@ -65,11 +63,18 @@ const getState = () => {
   const removedRows = selectState$.removedRows.get() as Row[];
   const newRows = selectState$.newRows.get() as Row[];
 
-  if (!field || !parentRow || !removedRows) throw new Error('Invalid state');
+  if (!field || !parentRow || !removedRows) {
+    console.debug('___Invalid state', {
+      field,
+      parentRow,
+      existingRows,
+    });
+    throw new Error('Invalid state');
+  }
 
   return {
     field,
-    parentRow,
+    parentRow: parentRow as Row,
     existingRows,
     toInsert,
     toRemove,
@@ -158,6 +163,15 @@ const onError = () => {
     selectState$.newRows.set((prev) =>
       prev.filter((r) => r.id !== toInsert.id)
     );
+
+    const isInInitialRows = selectState$.initalRows
+      .get()
+      .some((r) => r.id === toInsert.id);
+
+    // if is in initial, add to removedRows
+    if (isInInitialRows) {
+      selectState$.removedRows.set((prev) => [...prev, toInsert]);
+    }
 
     selectState$.toInsertRow.set(null);
   }

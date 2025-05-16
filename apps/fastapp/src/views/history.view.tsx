@@ -99,14 +99,14 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
                 preload="intent"
                 params={{
                   view: data.tableName,
-                  id: data.entityId,
+                  id: data.record.id,
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
                 className="text-sm flex flex-row gap-2 items-center cursor-pointer hover:underline hover:text-blue-400"
               >
-                <div>{data.label}</div>
+                <div>{data.recordLabel}11</div>
                 <LinkIcon className="w-4 h-4 text-foreground/60 text-blue-500 " />
               </Link>
             </div>
@@ -119,7 +119,7 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
         detailValue: ({ data }) => {
           return (
             <BubbleItem
-              label={data.owner?.name ?? 'Set User Email'}
+              label={data.creator.label ?? 'Set User Email'}
               icon={() => <ownerConfig.icon className="w-4 h-4" />}
             />
           );
@@ -127,7 +127,7 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
         list: ({ data }) => {
           return (
             <BubbleItem
-              label={data.owner?.name ?? 'Set User Email'}
+              label={data.creator.label ?? ''}
               icon={() => <ownerConfig.icon className="w-4 h-4" />}
             />
           );
@@ -137,84 +137,94 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
     change: {
       component: {
         list: ({ data }) => {
-          const change = data.change;
-
-          const newData = change.newValue;
-          const oldData = change.oldValue;
-
-          const newIsObject = typeof newData === 'object';
-          const oldIsObject = typeof oldData === 'object';
-
           if (
-            (newIsObject && newData !== null) ||
-            (oldIsObject && oldData !== null)
+            data.changed.type === 'added' ||
+            data.changed.type === 'removed'
           ) {
-            return null;
-          }
-
-          if (data.parsedChange?.isManyToMany) {
-            const label =
-              data.parsedChange?.modelLabel?.toLowerCase() || change.field;
-            const color = newData ? 'text-green-500' : 'text-red-500';
+            const color =
+              data.changed.type === 'added' ? 'text-green-500' : 'text-red-500';
             return (
               <div className="flex flex-row text-xs items-center gap-2 py-1 px-2 bg-foreground/10 border border-gray-300 rounded-md shadow-sm">
-                <div className={color}>{newData ? 'Added' : 'Removed'}</div>
+                <div className={color}>
+                  {data.changed.type === 'added' ? 'Added' : 'Removed'}
+                </div>
 
                 <span className="font-medium text-gray-700 px-2 py-1 border-foreground/30 border-[1px] rounded-md">
-                  {t(`${label}.one` as any)}
+                  {t(`${data.changed.fieldName}.one` as any)}
                 </span>
 
                 <span className={cn('text-foreground font-bold', color)}>
-                  {data.parsedChange?.newLabel}
+                  {data.changed.label}
                 </span>
               </div>
             );
           }
 
-          return (
-            <div className="flex flex-row text-xs items-center gap-2 py-1 px-2 bg-foreground/10 border border-gray-300 rounded-md shadow-sm">
-              <span className="font-medium text-gray-700">
-                {data.parsedChange?.modelLabel || change.field}
-              </span>
-              <span className="text-foreground/80">:</span>
-              <span className="text-red-400 line-through max-w-[200px] truncate ">
-                {data.parsedChange?.oldLabel ?? change?.oldValue}
-              </span>
-              <span className="text-gray-500">{'->'}</span>
-              <span className="text-green-500 max-w-[200px] truncate">
-                {data.parsedChange?.newLabel ?? change?.newValue}
-              </span>
-            </div>
-          );
+          if (
+            data.changed.type === 'changed' ||
+            data.changed.type === 'added-to' ||
+            data.changed.type === 'removed-from'
+          ) {
+            return (
+              <div className="flex flex-row text-xs items-center gap-2 py-1 px-2 bg-foreground/10 border border-gray-300 rounded-md shadow-sm">
+                <span className="font-medium text-gray-700">
+                  {/* data.changed.fieldName */}
+                  {t(`${data.changed.fieldName}.one` as any)}
+                </span>
+                <span className="text-foreground/80">:</span>
+                <span className="text-red-400 line-through max-w-[200px] truncate ">
+                  {data.changed.oldValue?.toString()}
+                </span>
+
+                {data.changed.newValue && data.changed.oldValue ? (
+                  <>
+                    <span className="text-gray-500">{'->'}</span>
+                  </>
+                ) : data.changed.newValue ? (
+                  <>Added</>
+                ) : (
+                  <>Removed</>
+                )}
+
+                {data.changed.newValue ? (
+                  <>
+                    <span className="text-green-500 max-w-[200px] truncate">
+                      {data.changed.newValue?.toString() || 'null'}
+                    </span>
+                  </>
+                ) : null}
+              </div>
+            );
+          }
         },
       },
     },
     changeType: {
       component: {
         detailValue: ({ data }) => {
-          const colorClass =
-            colorMap[data.changeType] || 'bg-gray-100 text-gray-700';
+          const type = data.changed.type === 'created' ? 'insert' : 'update';
+          const colorClass = colorMap[type] || 'bg-gray-100 text-gray-700';
 
           return (
             <div
               className={`flex mr-2 flex-row items-center gap-2 px-3 py-1 border border-gray-300 rounded-md shadow-sm ${colorClass}`}
             >
               <span className="font-semibold text-xs h-7 grid place-items-center w-10">
-                {t(`history.${data.changeType}`)}
+                {t(`history.${type}`)}
               </span>
             </div>
           );
         },
         list: ({ data }) => {
-          const colorClass =
-            colorMap[data.changeType] || 'bg-gray-100 text-gray-700';
+          const type = data.changed.type === 'created' ? 'insert' : 'update';
+          const colorClass = colorMap[type] || 'bg-gray-100 text-gray-700';
 
           return (
             <div
               className={`flex mr-2 flex-row items-center gap-2 px-3 py-1 border border-gray-300 rounded-md shadow-sm ${colorClass}`}
             >
               <span className="font-semibold text-xs h-7 grid place-items-center w-10">
-                {t(`history.${data.changeType}`)}
+                {t(`history.${type}`)}
               </span>
             </div>
           );
@@ -224,8 +234,8 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
   },
 });
 
-const PrettyJson = ({ data }: { data: any }) => {
-  if (!data) return null;
+const PrettyJson = ({ record }: HistoryViewDataType) => {
+  if (!record) return null;
 
   const renderValue = (value: any): React.ReactNode => {
     if (value === null) return <span className="text-gray-500">null</span>;
@@ -278,38 +288,38 @@ const PrettyJson = ({ data }: { data: any }) => {
 
   return (
     <div className="font-mono text-sm bg-background w-full p-4 rounded-lg border border-gray-200 overflow-auto max-h-[500px]">
-      {renderValue(data)}
+      {renderValue(record)}
     </div>
   );
 };
 
 // Add this component to display field updates nicely
 const PrettyUpdateChange = ({
-  change,
-  parsedChange,
+  change: changed,
 }: {
-  change: HistoryViewDataType['change'];
-  parsedChange: HistoryViewDataType['parsedChange'];
+  change: HistoryViewDataType['changed'];
 }) => {
-  const { field, oldValue, newValue } = change;
+  const field = changed.fieldName;
   const { t } = useTranslation();
 
   // Get the translated field name if available
   const fieldLabel = t(`${field}.one` as any, { defaultValue: field });
 
-  // Function to determine if the value is a primitive or complex type
-  const isPrimitive = (val: any) => {
-    return (
-      val === null ||
-      val === undefined ||
-      typeof val !== 'object' ||
-      (Array.isArray(val) &&
-        val.every((item) => typeof item !== 'object' || item === null))
-    );
-  };
+  // const isPrimitive = (val: any) => {
+  //   return (
+  //     val === null ||
+  //     val === undefined ||
+  //     typeof val !== 'object' ||
+  //     (Array.isArray(val) &&
+  //       val.every((item) => typeof item !== 'object' || item === null))
+  //   );
+  // };
 
-  // For primitive values, show a direct comparison
-  if (isPrimitive(oldValue) && isPrimitive(newValue)) {
+  if (
+    changed.type === 'changed' ||
+    changed.type === 'added-to' ||
+    changed.type === 'removed-from'
+  ) {
     return (
       <div className="bg-white rounded-lg border border-foreground/10 p-4 text-sm">
         <div className="font-medium text-gray-700 mb-2">
@@ -324,14 +334,10 @@ const PrettyUpdateChange = ({
               Old:
             </span>
             <span className="bg-red-50 text-red-800 p-2 rounded border border-red-200 line-through">
-              {oldValue === '' ? (
+              {changed.oldValue === '' ? (
                 <em className="text-red-400">empty</em>
               ) : (
-                <>
-                  {parsedChange.newLabel && oldValue
-                    ? parsedChange.newLabel ?? String(oldValue)
-                    : String(oldValue)}
-                </>
+                <>{changed.oldValue}</>
               )}
             </span>
           </div>
@@ -340,46 +346,60 @@ const PrettyUpdateChange = ({
               New:
             </span>
             <span className="bg-green-50 text-green-800 p-2 rounded border border-green-200">
-              {newValue === '' ? (
+              {changed.newValue === '' ? (
                 <em className="text-green-400">empty</em>
               ) : (
-                <>
-                  {parsedChange.newLabel && newValue
-                    ? parsedChange.newLabel ?? String(newValue)
-                    : String(newValue)}
-                </>
+                <>{changed.newValue}</>
               )}
             </span>
           </div>
         </div>
       </div>
     );
+  } else if (changed.type === 'added' || changed.type === 'removed') {
+    const label = changed.label;
+    const fieldName = changed.fieldName;
+    const color = changed.type === 'added' ? 'text-green-500' : 'text-red-500';
+
+    return (
+      <div className="flex flex-row text-xs items-center gap-2 py-1 rounded-md shadow-sm">
+        <span className={color}>
+          {changed.type === 'added' ? 'Added' : 'Removed'}
+        </span>
+
+        <span className="font-medium text-gray-700 px-2 py-1 border-foreground/30 border-[1px] rounded-md">
+          {t(`${fieldName}.one` as any)}
+        </span>
+
+        <span className={cn('text-foreground font-bold', color)}>{label}</span>
+      </div>
+    );
   }
 
-  // For complex objects, show the full object for both old and new
-  return (
-    <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-      <div className="font-medium text-gray-700 mb-2">{fieldLabel}</div>
-      <div className="flex flex-col gap-4">
-        <div>
-          <div className="text-sm text-red-600 font-medium mb-1">
-            Old Value:
-          </div>
-          <div className="bg-red-50 border border-red-200 rounded-md p-2">
-            <PrettyJson data={oldValue} />
-          </div>
-        </div>
-        <div>
-          <div className="text-sm text-green-600 font-medium mb-1">
-            New Value:
-          </div>
-          <div className="bg-green-50 border border-green-200 rounded-md p-2">
-            <PrettyJson data={newValue} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // // For complex objects, show the full object for both old and new
+  // return (
+  //   <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+  //     <div className="font-medium text-gray-700 mb-2">{fieldLabel}</div>
+  //     <div className="flex flex-col gap-4">
+  //       <div>
+  //         <div className="text-sm text-red-600 font-medium mb-1">
+  //           Old Value:
+  //         </div>
+  //         <div className="bg-red-50 border border-red-200 rounded-md p-2">
+  //           <PrettyJson data={oldValue} />
+  //         </div>
+  //       </div>
+  //       <div>
+  //         <div className="text-sm text-green-600 font-medium mb-1">
+  //           New Value:
+  //         </div>
+  //         <div className="bg-green-50 border border-green-200 rounded-md p-2">
+  //           <PrettyJson data={newValue} />
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 };
 
 const HistoryMainPage = observer(() => {
@@ -439,14 +459,18 @@ const HistoryOverviewPage = observer(() => {
 
   const row = store$.detail.row.get() as Row<HistoryViewDataType>;
 
-  const isInsert = row.raw.changeType === 'insert';
-  const headerLabel =
-    row.raw.changeType === 'insert'
-      ? t('history.detail.headerInsert')
-      : t('history.detail.headerUpdate');
+  const isInsert = row.raw.changed.type === 'created';
+  const headerLabel = isInsert
+    ? t('history.detail.headerInsert')
+    : t('history.detail.headerUpdate');
 
-  console.log('row', row);
-
+  const changeType = row.raw.changed.type;
+  const isValueChange =
+    changeType === 'changed' ||
+    changeType === 'added-to' ||
+    changeType === 'removed-from' ||
+    changeType === 'added' ||
+    changeType === 'removed';
   return (
     <div data-testid="detail-form" className="pt-12">
       <div className="pl-20">
@@ -467,7 +491,7 @@ const HistoryOverviewPage = observer(() => {
             }}
           >
             <BubbleItem
-              label={row.raw.label ?? ''}
+              label={row.raw.recordLabel ?? ''}
               icon={getView(row.raw.tableName)?.icon}
             />
           </button>
@@ -481,19 +505,15 @@ const HistoryOverviewPage = observer(() => {
         >
           {isInsert ? (
             <>
-              <PrettyJson data={row.raw.change.newValue} />
+              <PrettyJson {...row.raw} />
             </>
-          ) : row.raw.changeType === 'update' ? (
+          ) : isValueChange ? (
             <div className="space-y-0">
-              <PrettyUpdateChange
-                change={row.raw.change}
-                parsedChange={row.raw.parsedChange}
-              />
+              <PrettyUpdateChange change={row.raw.changed} />
             </div>
           ) : (
             <div className="bg-red-50 text-red-800 p-4 rounded border border-red-200">
               <div className="font-medium mb-2">Deleted Data</div>
-              <PrettyJson data={row.raw.change.oldValue} />
             </div>
           )}
         </div>

@@ -224,16 +224,17 @@ export const formHelper = (
 
   const getValueOfRow = (fieldName: string) => {
     try {
-      return row && row.id ? row?.getValue?.(fieldName) : undefined;
+      return row && row.raw ? row?.getValue(fieldName) : undefined;
     } catch (error) {
       console.error('___GET VALUE OF ROW ERROR', error);
-      console.error(row);
-      console.error(fieldName);
+      console.debug(row);
+      console.debug(fieldName);
+      throw new Error('HIER!!!!');
     }
   };
 
   const viewFields =
-    getViewConfigManager()
+    viewConfigManager
       ?.getViewFieldList?.()
       .filter((f) => f.hideFromForm !== true) ?? [];
 

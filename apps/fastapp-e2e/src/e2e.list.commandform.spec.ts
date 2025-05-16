@@ -4,6 +4,8 @@ import { isDev, pressEscape, waitFor } from './helpers/e2e.helper';
 import { commandbar } from './helpers/e2e.helper.commandbar';
 import { openContextMenu2 } from './helpers/e2e.helper.contextmenu';
 import { sortByField } from './helpers/e2e.helper.displayoptions';
+import { listCombobox } from './helpers/e2e.helper.list-combobox';
+import { MainViewPage } from './view-pom';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
@@ -213,6 +215,50 @@ test.describe('List Commandbar', () => {
     await expect(page.getByText(/_error_/i)).toBeHidden();
     await expect(mainPage.commandform).toBeHidden();
   });
+
+  test('can create a new tag inside the task overview detail page', async ({
+    mainPage,
+    page,
+    helper,
+  }) => {
+    const props = { mainPage, helper };
+
+    await helper.navigation.goToDetail(
+      'all-tasks',
+      CON.task.values.firstListItem
+    );
+
+    await expect(page.getByText(/new tag/i)).toBeHidden();
+
+    await mainPage.page.keyboard.press('Meta+k');
+    await expect(mainPage.commandbar).toBeVisible();
+
+    await search(mainPage, 'new tag');
+
+    await mainPage.commandbar.getByText(/new tag/i).click();
+
+    await mainPage.commandform.getByPlaceholder(/name/i).fill('new tag');
+    await mainPage.commandform.getByPlaceholder(/color/i).fill('orange');
+
+    await mainPage.commandform.getByText(/create tag/i).click();
+
+    await waitFor(mainPage.page, 500);
+
+    await mainPage.page.getByText(/add tag.../i).click();
+
+    await waitFor(mainPage.page, 300);
+
+    const input = mainPage.comboboxPopover.getByPlaceholder(`Change tags`);
+
+    await input.fill('new tag');
+    await mainPage.comboboxPopover.getByText('new tag').click();
+
+    await pressEscape(mainPage.page);
+
+    await listCombobox(props).isClosed();
+
+    await expect(page.getByText(/new tag/i)).toBeVisible();
+  });
 });
 
 const openComboboxOf = async (
@@ -227,4 +273,15 @@ const selectComboboxOption = async (
   option: string
 ) => {
   await mainPage.comboboxPopover.getByText(option).click();
+};
+
+// TODO Duplicated code with e2e.helper.commandbar.ts
+const search = async (mainPage: MainViewPage, text: string) => {
+  await mainPage.commandbar
+    .getByPlaceholder(/type a command or search/i)
+    .clear();
+
+  await mainPage.commandbar
+    .getByPlaceholder(/type a command or search/i)
+    .fill(text);
 };

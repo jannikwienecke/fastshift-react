@@ -148,19 +148,19 @@ const FastAppLayoutComponent = observer(() => {
 
   const doOnceForViewRef = React.useRef('');
 
-  React.useLayoutEffect(() => {
-    if (
-      (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
-      // !id &&
-      data
-    ) {
-      globalStore.dispatch({
-        type: 'CHANGE_VIEW',
-        payload: { data, viewName },
-      });
-      doOnceForViewRef.current = viewName;
-    }
-  }, [data, viewName]);
+  // React.useLayoutEffect(() => {
+  if (
+    (!doOnceForViewRef.current || doOnceForViewRef.current !== viewName) &&
+    // !id &&
+    data
+  ) {
+    globalStore.dispatch({
+      type: 'CHANGE_VIEW',
+      payload: { data, viewName },
+    });
+    doOnceForViewRef.current = viewName;
+  }
+  // }, [data, viewName]);
 
   const viewNameRef = React.useRef(viewName);
   const modelRef = React.useRef(model);
