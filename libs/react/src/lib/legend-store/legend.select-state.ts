@@ -141,20 +141,25 @@ export const select = (row: Row) => {
 };
 
 const onError = () => {
-  const { toInsert, toRemove, existingRows, removedRows, newRows } = getState();
+  const { toInsert, toRemove } = getState();
 
   console.debug('___ROLLBACK', {
-    toInsert,
-    toRemove,
-    existingRows,
-    removedRows,
-    newRows,
+    selectState$: selectState$.get(),
   });
 
   if (toRemove) {
+    console.log(toRemove);
     selectState$.removedRows.set((prev) =>
       prev.filter((r) => r.id !== toRemove.id)
     );
+
+    const isInInitialRows = selectState$.initalRows
+      .get()
+      .some((r) => r.id === toRemove.id);
+
+    if (!isInInitialRows) {
+      selectState$.newRows.set((prev) => [...prev, toRemove]);
+    }
 
     selectState$.toRemoveRow.set(null);
   }

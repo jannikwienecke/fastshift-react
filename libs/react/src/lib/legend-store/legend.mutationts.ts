@@ -323,6 +323,7 @@ export const optimisticUpdateStore = ({
   const originalRow = copyRow(row);
   let originalRowDetail: Row | null = null;
   const viewConfigManagerDetail = store$.detail.viewConfigManager.get();
+
   if (store$.detail.row.get() && viewConfigManagerDetail) {
     originalRowDetail = copyRow(
       store$.detail.row.get() as Row,

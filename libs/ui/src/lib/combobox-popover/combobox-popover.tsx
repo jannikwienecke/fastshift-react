@@ -123,6 +123,11 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
 
                         <div className="flex items-center gap-2">
                           <CheckIcon
+                            aria-label={
+                              isSelected
+                                ? 'combobox-checked'
+                                : 'combobox-not-checked'
+                            }
                             className={cn(
                               'w-5 h-5 font-bold invisible',
                               isSelected ? 'visible' : ''

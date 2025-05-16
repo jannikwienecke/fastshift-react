@@ -46,11 +46,13 @@ const groupSimilarActivities = (
 
 export const RenderActivityList = (props: { historyData: HistoryType[] }) => {
   const { t } = useTranslation();
-  const groupedActivities = groupSimilarActivities(props.historyData);
+  const groupedActivities = groupSimilarActivities(
+    props.historyData.sort((a, b) => b.timestamp - a.timestamp)
+  );
 
   return (
     <div className="">
-      <div className="flex flex-col-reverse">
+      <div className="flex flex-col max-h-[500px] overflow-y-auto">
         {groupedActivities.map((group) => {
           // We take the first item for common data like timestamp, creator, and change type
           const firstItem = group[0];

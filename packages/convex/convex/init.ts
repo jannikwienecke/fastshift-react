@@ -23,7 +23,8 @@ const initTaskHistory = async (
     changeType: 'insert' as const,
     entityId: task._id,
     tableName: 'tasks' as const,
-    timestamp: Date.now(),
+    // minus 5 minutes
+    timestamp: Date.now() - 1000 * 60 * 5,
     ownerId: ownerId,
   };
 
@@ -38,7 +39,7 @@ const initTaskHistory = async (
     changeType: 'update' as const,
     entityId: task._id,
     tableName: 'tasks' as const,
-    timestamp: Date.now(),
+    timestamp: Date.now() - 1000 * 60 * 2,
     ownerId: ownerId,
   };
 

@@ -290,7 +290,7 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
   const viewConfigManager = createViewConfigManager(viewName);
 
   store$.detail.viewConfigManager.set(viewConfigManager);
-  store$.detail.activityData.set(data.historyData ?? []);
+  store$.detail.historyDataOfRow.set(data.historyData ?? []);
 
   createRelationalDataModel(store$)(data.relationalData ?? {});
 

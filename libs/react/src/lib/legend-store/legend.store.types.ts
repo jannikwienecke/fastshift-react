@@ -447,7 +447,7 @@ export type LegendStore = {
   detail?: {
     viewConfigManager: BaseViewConfigManagerInterface;
     row?: Row;
-    activityData?: HistoryType[];
+    historyDataOfRow?: HistoryType[];
 
     detailRow?: DetailRow;
     selectedField?: FieldConfig;

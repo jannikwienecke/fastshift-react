@@ -404,6 +404,8 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
       return;
     }
 
+    store$.detail.historyDataOfRow.set(data.historyData);
+
     if (rows?.length === 1) {
       if (ignoreNext > 1) {
         store$.ignoreNextQueryDict[key].set(ignoreNext - 1);
