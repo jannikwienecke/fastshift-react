@@ -2,6 +2,9 @@
 
 A comprehensive monorepo for truck driver applications, built with React Native, TypeScript, and modern web technologies.
 
+## Long Term Todos
+- [ ] Pagination for history/activity data in detail view
+
 ## Project Structure
 
 hamann-monorepo/
