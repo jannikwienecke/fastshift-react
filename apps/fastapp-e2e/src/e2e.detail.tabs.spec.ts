@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures';
 import { CON } from './helpers';
-import { isDev, waitFor } from './helpers/e2e.helper';
+import { isDev, pressEnter, pressEscape, waitFor } from './helpers/e2e.helper';
 import { listCombobox } from './helpers/e2e.helper.list-combobox';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
@@ -95,6 +95,39 @@ test.describe('Detail Tabs', () => {
 
     await expect(
       mainPage.detailTabs.getByText(CON.user.values.janeSmith)
+    ).toBeVisible();
+  });
+
+  test('tab activity works correctly ', async ({
+    mainPage: mainPage,
+    helper,
+  }) => {
+    await expect(mainPage.detailTabs).toBeVisible();
+
+    await helper.navigation.goToDetail(
+      'all-tasks',
+      CON.task.values.designMockups
+    );
+
+    await mainPage.detailTabs.getByText(/Acitivty/i).click();
+
+    await mainPage.page.getByPlaceholder(/name/i).fill('NEW NAME');
+    await pressEnter(mainPage.page);
+
+    await expect(mainPage.detailTabs.getByText(/new name/i)).toBeVisible();
+
+    await mainPage.page.getByText(/add tag/i).click();
+    await mainPage.comboboxPopover.getByText(/urgent/i).click();
+    await pressEscape(mainPage.page);
+
+    await expect(mainPage.detailTabs.getByText(/urgent/i)).toBeVisible();
+
+    await mainPage.detailProperties.getByText(/urgent/i).click();
+    await mainPage.comboboxPopover.getByText(/important/i).click();
+    await pressEscape(mainPage.page);
+
+    await expect(
+      mainPage.detailTabs.getByText(/important and urgent/i)
     ).toBeVisible();
   });
 });

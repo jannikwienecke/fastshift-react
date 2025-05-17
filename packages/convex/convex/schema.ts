@@ -13,6 +13,7 @@ const tableMetaFields = {
 
 const _schema = defineSchema({
   users: defineTable({
+    ...tableMetaFields,
     email: v.string(),
     password: v.string(),
   }),
@@ -86,6 +87,7 @@ const _schema = defineSchema({
   owner: defineTable({
     ...tableMetaFields,
     userId: v.id('users'),
+    history: v.optional(v.array(v.id('history'))),
     firstname: v.string(),
     lastname: v.string(),
     name: v.optional(v.string()),

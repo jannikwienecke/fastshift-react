@@ -100,8 +100,6 @@ export const getUserViews = server.query({
 
 export const displayOptions = server.query({
   handler: async (ctx) => {
-    const all = await ctx.db.query('tasks').withIndex('priority').collect();
-
     const tasks = await ctx.db.query('tasks').collect();
 
     const start = new Date().getTime();

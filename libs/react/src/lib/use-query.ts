@@ -166,6 +166,7 @@ export const useDetailQuery = <
     ...queryReturn,
     allIds: queryReturn.data?.allIds ?? [],
     data: queryReturn.data?.data ?? [],
+    historyData: queryReturn.data?.historyData ?? [],
     relationalData: queryReturn.data?.relationalData ?? {},
     continueCursor: queryReturn.data?.continueCursor,
     isDone: queryReturn.data?.isDone,
@@ -253,7 +254,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
   React.useEffect(() => {
     if (!queryReturn?.data?.data) return;
 
-    console.warn(
+    console.debug(
       '____USE QUERY NORMAL:: ',
       queryReturn?.data.data.length,
       'First:',

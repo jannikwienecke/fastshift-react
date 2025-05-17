@@ -1,8 +1,10 @@
 import {
+  _log,
   BaseViewConfigManager,
   BaseViewConfigManagerInterface,
   CommandformItem,
   FieldConfig,
+  FormState,
   getFieldLabel,
   getViewByName,
   makeData,
@@ -12,19 +14,28 @@ import {
 } from '@apps-next/core';
 import { viewRegistry } from './legend.app.registry';
 import { detailFormHelper } from './legend.detailpage.helper';
-import { formHelper } from './legend.form.helper';
 import { store$ } from './legend.store';
 import { copyRow } from './legend.utils';
 
 const getDetailTabsFields = () => {
-  return detailFormHelper()
+  const row = store$.detail.row.raw.get();
+
+  const fields = detailFormHelper()
     .getComplexFormFields()
     .filter(
       (f) =>
         (f.field.relation?.type === 'oneToOne' ||
           f.field.relation?.type === 'oneToMany') &&
         f.field.isList !== true
-    );
+    )
+    .filter((f) => {
+      const value = row?.[f.field.name];
+
+      if (!value?.id) return false;
+      return true;
+    });
+
+  return fields;
 };
 
 export const detailTabsHelper = () => {
@@ -32,6 +43,7 @@ export const detailTabsHelper = () => {
 
   if (!store$.detail.activeTabField.get()) {
     store$.detail.activeTabField.set(detailTabsFields[0]);
+    store$.detail.isActivityTab.set(true);
   }
 
   const activeTabField = store$.detail.activeTabField.get();
@@ -54,7 +66,7 @@ export const detailTabsHelper = () => {
 
   const form = store$.detail.form.get();
 
-  const view = getViewByName(
+  const activeTabView = getViewByName(
     store$.views.get(),
     activeTabField.field?.name ?? ''
   );
@@ -65,7 +77,7 @@ export const detailTabsHelper = () => {
   if (!row) {
     return null;
   }
-  if (!view) throw new Error('Tabs Helper: No view found');
+  if (!activeTabView) throw new Error('Tabs Helper: No view found');
 
   const viewConfigManager = new BaseViewConfigManager(activeTabViewConfig);
 
@@ -180,7 +192,25 @@ export const detailTabsHelper = () => {
     store$.detail.form.dirtyValue.set(value as string | number);
   };
 
-  const helper = formHelper(view, row, true);
+  // TODO Remove duplicated code
+  const getFormState = () => {
+    if (!row?.raw) return null;
+    const errors = viewConfigManager.validateRecord(row?.raw);
+
+    if (errors) {
+      _log.debug('Form State Errors: ', errors);
+    }
+
+    return {
+      isReady: !errors,
+      isFieldReady: (field: FieldConfig) => {
+        const fieldErrors = errors?.[field.name];
+        if (!fieldErrors) return true;
+        return false;
+      },
+      errors: errors ?? {},
+    } satisfies FormState;
+  };
 
   const saveIfDirty = (field: FieldConfig) => {
     const { dirtyField, dirtyValue } = form ?? {};
@@ -191,7 +221,9 @@ export const detailTabsHelper = () => {
       throw new Error(`Field ${field.name} is required`);
     }
 
-    if (!helper.formState.isFieldReady(field)) return;
+    if (!getFormState()?.isFieldReady(field)) {
+      throw new Error(`Field ${field.name} is not ready`);
+    }
 
     store$.updateRecordMutation({
       field,

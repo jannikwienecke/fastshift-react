@@ -154,7 +154,10 @@ export const handleUpdateTrigger: TriggerFn = async ({
 
   if (getIsManyToMany()) return;
 
-  const changedFields = Object.keys(newData).filter((key) => {
+  const changedFields = Object.keys({
+    ...newData,
+    ...oldData,
+  }).filter((key) => {
     const oldFieldData = oldData ? oldData[key as keyof typeof oldData] : null;
     const newFieldData = newData[key as keyof typeof newData];
 
@@ -165,8 +168,11 @@ export const handleUpdateTrigger: TriggerFn = async ({
 
     if (isArrayField) return false;
     if (isInternalField) return false;
-    if (!oldFieldData && !newFieldData) return false;
 
+    if (!newFieldData && oldFieldData) {
+      return true;
+    }
+    if (!oldFieldData && !newFieldData) return false;
     if (isObjectField && !oldFieldData) return true;
 
     if (isObjectField) {
@@ -191,8 +197,8 @@ export const handleUpdateTrigger: TriggerFn = async ({
       changeType: 'update',
       change: {
         field,
-        oldValue,
-        newValue,
+        oldValue: oldValue ?? null,
+        newValue: newValue ?? null,
       },
       ownerId: owner?.['_id'],
       timestamp: Date.now(),

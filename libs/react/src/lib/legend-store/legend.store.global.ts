@@ -61,7 +61,7 @@ const createViewConfigManager = (viewName: string) => {
   const viewConfig = getViewByName(views, viewData?.baseView || viewName);
 
   if (!viewConfig) {
-    console.warn('____', viewName, views);
+    console.debug('____', viewName, views);
     console.error('viewConfig is not defined::', viewName);
     throw new Error(`viewConfig is not defined: ${viewName}`);
   }
@@ -171,7 +171,7 @@ const setStore = (viewName: string, parentViewName?: string) => {
 
 const handleQueryData = (data: QueryReturnOrUndefined) => {
   const isDone = DEFAULT_FETCH_LIMIT_QUERY > (data.data?.length ?? 0);
-  console.warn('____Receive Data: Length: ', data.data?.length, { isDone });
+  console.debug('____Receive Data: Length: ', data.data?.length, { isDone });
   store$.fetchMore.isDone.set(isDone);
 
   createDataModel(store$)(data.data ?? []);
@@ -238,7 +238,7 @@ const dispatch = (action: GlobalStoreAction) => {
       return store$.detail.viewType.set({ type: 'overview' });
 
     default:
-      console.warn('Unknown action type', action);
+      console.debug('Unknown action type', action);
       throw new Error('Unknown action type');
   }
 };
@@ -261,22 +261,23 @@ const handleChangeView = (action: GlobalStoreAction) => {
   if (action.type !== 'CHANGE_VIEW') return;
   const { viewName, data, resetDetail } = action.payload;
 
-  if (resetDetail || viewName !== currentViewName()) {
+  if (resetDetail) {
     store$.detail.set(undefined);
   }
 
   if (viewName !== currentViewName()) {
+    store$.detail.set(undefined);
+
     resetStore();
     setStore(viewName);
     handleQueryData(data);
   } else if (resetDetail) {
+    store$.detail.set(undefined);
     resetStore();
     setStore(viewName);
     handleQueryData(data);
   } else if (viewName === currentViewName()) {
     return;
-  } else {
-    throw new Error(`This should not happen: ${viewName}`);
   }
 };
 
@@ -289,6 +290,7 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
   const viewConfigManager = createViewConfigManager(viewName);
 
   store$.detail.viewConfigManager.set(viewConfigManager);
+  store$.detail.historyDataOfRow.set(data.historyData ?? []);
 
   createRelationalDataModel(store$)(data.relationalData ?? {});
 
@@ -339,7 +341,7 @@ const handleLoadSubViewListPage = (action: GlobalStoreAction) => {
   ) {
     handleQueryData(data);
   } else {
-    console.warn('____LOAD SUB VIEW LIST PAGE', action);
+    console.debug('____LOAD SUB VIEW LIST PAGE', action);
 
     resetStore();
     setStore(viewName, parentViewName);

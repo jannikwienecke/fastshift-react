@@ -201,7 +201,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
     const getAll = () => {
       isGetAll = true;
       console.warn(
-        'Querying complete table. Use Index or search index if possible.'
+        `Querying complete table. Use Index or search index if possible. Table: ${viewConfigManager.getTableName()}`
       );
       return dbQuery.collect();
     };
@@ -244,19 +244,20 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
       });
     };
 
-    const rowsBeforeFilter = localModeEnabled
-      ? await getAll() // local mode
-      : hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
-      ? await getRecordsIfNotSortedAndNoDeletedRows()
-      : !!allIds && !countToBig
-      ? await getRecordsHasIdsAndNotTooBig()
-      : displayOptionsInfo.displaySortingIndexField
-      ? await getSortedRecords()
-      : anyFilter ||
-        (displayOptionsInfo.hasSortingField &&
-          !displayOptionsInfo.displaySortingIndexField)
-      ? await getAll()
-      : await getPaginatedRecords();
+    const rowsBeforeFilter =
+      localModeEnabled && !allIds
+        ? await getAll() // local mode
+        : hasOnlyIdsNotDeleted && !displayOptionsInfo.displaySortingIndexField
+        ? await getRecordsIfNotSortedAndNoDeletedRows()
+        : !!allIds && !countToBig
+        ? await getRecordsHasIdsAndNotTooBig()
+        : displayOptionsInfo.displaySortingIndexField
+        ? await getSortedRecords()
+        : anyFilter ||
+          (displayOptionsInfo.hasSortingField &&
+            !displayOptionsInfo.displaySortingIndexField)
+        ? await getAll()
+        : await getPaginatedRecords();
 
     let rows =
       'page' in rowsBeforeFilter ? rowsBeforeFilter.page : rowsBeforeFilter;

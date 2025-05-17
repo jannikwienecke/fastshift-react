@@ -18,6 +18,7 @@ import {
   MutationDto,
   MutationHandlerErrorType,
   MutationReturnDto,
+  HistoryType,
   QueryRelationalData,
   QueryReturnOrUndefined,
   RecordType,
@@ -446,9 +447,12 @@ export type LegendStore = {
   detail?: {
     viewConfigManager: BaseViewConfigManagerInterface;
     row?: Row;
+    historyDataOfRow?: HistoryType[];
+
     detailRow?: DetailRow;
     selectedField?: FieldConfig;
     rect?: DOMRect;
+    isActivityTab?: boolean;
     form: {
       dirtyField?: FieldConfig;
       dirtyValue?: string | number;

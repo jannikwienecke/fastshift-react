@@ -65,7 +65,7 @@ const makeSelectModelAttributeCommand = (
     tablename: item.tablename,
     icon: item.icon,
     handler: ({ row }) => {
-      _log.info('makeSelectModelAttributeCommand - handler');
+      _log.debug('makeSelectModelAttributeCommand - handler');
 
       // TODO DETAIL BRANCHING
       const field = getViewConfigManager().getFieldBy(item.id.toString());
@@ -110,7 +110,7 @@ const makeSelectRelationalOptionCommand = (
     getViewName,
     handler: ({ row, field, value }) => {
       if (!row || !field) return;
-      _log.info('makeSelectRelationalOptionCommand - handler');
+      _log.debug('makeSelectRelationalOptionCommand - handler');
 
       if (field.relation?.manyToManyTable) {
         if ((item as Row | undefined)?.raw) {

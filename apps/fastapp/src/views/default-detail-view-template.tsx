@@ -1,7 +1,12 @@
-import { FormFieldProps, MakeDetailPropsOption } from '@apps-next/core';
+import {
+  FormFieldProps,
+  MakeDetailPropsOption,
+  HistoryType,
+} from '@apps-next/core';
 import {
   FormField,
   makeHooks,
+  RenderActivityList,
   RenderDetailComplexValue,
   TabsFormField,
 } from '@apps-next/react';
@@ -18,6 +23,7 @@ export const DefaultDetailViewTemplate = observer(
     detailOptions: MakeDetailPropsOption;
     formField?: React.FC<FormFieldProps>;
     complexFormField?: React.FC<FormFieldProps>;
+    activityList?: React.FC<{ historyData: HistoryType[] }>;
   }) => {
     const { makeDetailPageProps } = makeHooks();
     const props = makeDetailPageProps(detailOptions);
@@ -57,6 +63,7 @@ export const DefaultDetailOverviewTemplate = observer(
     ...templateProps
   }: {
     detailOptions?: MakeDetailPropsOption;
+    activityList?: React.FC<{ historyData: HistoryType[] }>;
     FormField?: React.FC<FormFieldProps>;
   }) => {
     const { makeDetailPageProps } = makeHooks();
@@ -79,6 +86,9 @@ export const DefaultDetailOverviewTemplate = observer(
           <div className="mt-12">
             <detailPage.tabs
               {...props}
+              RenderActivityList={
+                templateProps.activityList ?? RenderActivityList
+              }
               FormField={TabsFormField}
               ComplexFormField={RenderDetailComplexValue}
             />

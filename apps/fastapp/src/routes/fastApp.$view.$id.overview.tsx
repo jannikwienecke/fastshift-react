@@ -1,5 +1,10 @@
 import { Row } from '@apps-next/core';
-import { FormField, globalStore, store$ } from '@apps-next/react';
+import {
+  FormField,
+  globalStore,
+  RenderActivityList,
+  store$,
+} from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { getViewData } from '../application-store/app.store.utils';
@@ -30,6 +35,10 @@ const DetaiViewPage = observer(() => {
   }
 
   return (
-    <DefaultDetailOverviewTemplate detailOptions={{}} FormField={FormField} />
+    <DefaultDetailOverviewTemplate
+      activityList={RenderActivityList}
+      detailOptions={{}}
+      FormField={FormField}
+    />
   );
 });

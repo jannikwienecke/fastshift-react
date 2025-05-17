@@ -7,6 +7,7 @@ import {
   FilterItemType,
   UserViewForm,
 } from './filter.types';
+import { HistoryType } from './history.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
@@ -287,7 +288,7 @@ export type FormFieldMethod = {
 
 export type FormFieldProps = {
   field: CommandformItem;
-  formState: FormState;
+  formState?: FormState | null;
   tabFormField?: boolean;
 } & FormFieldMethod;
 
@@ -326,7 +327,7 @@ export type DetailViewTypeState =
 export type DetailPageProps = {
   row: Row;
   icon?: React.FC<any>;
-  formState: FormState;
+  formState?: FormState | null;
   propertyFields: CommandformItem[];
   primitiveFields: CommandformItem[];
   displayField: CommandformItem | undefined;
@@ -343,7 +344,10 @@ export type DetailPageProps = {
     activeTabField: CommandformItem | null | undefined;
     activeTabPrimitiveFields: CommandformItem[];
     activeTabComplexFields: CommandformItem[];
+    isHistoryTab: boolean;
+    historyData: HistoryType[];
     onSelectTab: (field: CommandformItem) => void;
+    onSelectHistoryTab: () => void;
   } | null;
 
   onSelectEmoji: (emoji: Emoji) => void;

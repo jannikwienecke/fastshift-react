@@ -1,4 +1,10 @@
-import { getViewByName, makeData, RecordType } from '@apps-next/core';
+import {
+  getViewByName,
+  makeData,
+  HistoryType,
+  Row,
+  ViewConfigType,
+} from '@apps-next/core';
 import { createViewConfig } from '@apps-next/react';
 import { asyncMap } from 'convex-helpers';
 import { GenericQueryCtx } from 'convex/server';
@@ -6,21 +12,8 @@ import { HistoryIcon } from 'lucide-react';
 import { DataModel, Doc, Id } from '../convex/_generated/dataModel';
 import { config } from './server.config';
 
-export type HistoryViewDataType = Doc<'history'> & {
-  owner: Doc<'owner'>;
-
-  entity: RecordType;
-  record: RecordType;
-  label?: string;
-  parsedChange: {
-    isManyToMany?: boolean;
-    modelLabel?: string;
-    oldRecord?: RecordType;
-    newRecord?: RecordType;
-    oldLabel?: string;
-    newLabel?: string;
-  };
-};
+export type HistoryViewDataType = HistoryType &
+  Doc<'history'> & { owner: Doc<'owner'> };
 
 export const historyConfig = createViewConfig(
   'history',
@@ -102,7 +95,12 @@ export const historyConfig = createViewConfig(
                 ? makeData(
                     props.registeredViews,
                     viewOfChangedField?.viewName ?? ''
-                  )([oldRecord]).rows?.[0]
+                  )([
+                    {
+                      ...oldRecord,
+                      id: oldRecord._id,
+                    },
+                  ]).rows?.[0]
                 : null;
 
             const newRow =
@@ -110,7 +108,12 @@ export const historyConfig = createViewConfig(
                 ? makeData(
                     props.registeredViews,
                     viewOfChangedField?.viewName ?? ''
-                  )([newRecord]).rows?.[0]
+                  )([
+                    {
+                      ...newRecord,
+                      id: newRecord._id,
+                    },
+                  ]).rows?.[0]
                 : null;
 
             const row = view
@@ -118,20 +121,28 @@ export const historyConfig = createViewConfig(
                   .rows?.[0]
               : null;
 
+            const owner = (item as any).owner as Doc<'owner'>;
+            const changed = getChangeValue(item, { oldRow, newRow, view });
+
+            let newHistoryData = {
+              creator: {
+                id: owner._id,
+                label: owner.name ?? owner.firstname,
+              },
+              record: {
+                ...entity,
+                id: entity._id,
+              },
+              recordLabel: row?.label ?? '',
+              tableName: item.tableName,
+              timestamp: item.timestamp,
+              changed,
+            } satisfies HistoryType;
+
             const parsedData = {
               ...item,
-              owner: (item as any).owner,
-              entity: entity,
-              record: row?.raw ?? {},
-              label: row?.label,
-              parsedChange: {
-                modelLabel: viewOfChangedField?.viewName,
-                oldRecord: oldRow?.raw,
-                newRecord: newRow?.raw,
-                oldLabel: oldRow?.label,
-                newLabel: newRow?.label,
-              },
-            } satisfies HistoryViewDataType;
+              ...newHistoryData,
+            } satisfies HistoryType & Doc<'history'>;
 
             if (item.change.isManyToMany) {
               const isInsert = item.changeType === 'insert';
@@ -154,18 +165,21 @@ export const historyConfig = createViewConfig(
                     ]).rows?.[0]
                   : null;
 
+              if (!addedRow) throw new Error('No added row found');
+
+              const changed = getChangeValue(item, { relatedRow: addedRow });
+
+              newHistoryData = {
+                ...newHistoryData,
+                changed: {
+                  ...changed,
+                },
+              };
+
               return {
                 ...parsedData,
-                changeType: 'update',
-                tableName: parsedData.tableName,
-                parsedChange: {
-                  ...parsedData.parsedChange,
-                  newRecord: isInsert ? addedRow?.raw : undefined,
-                  oldRecord: isInsert ? undefined : addedRow?.raw,
-                  newLabel: addedRow?.label,
-                  isManyToMany: true,
-                },
-              } satisfies HistoryViewDataType;
+                ...newHistoryData,
+              } satisfies HistoryType & Doc<'history'>;
             }
 
             return parsedData;
@@ -180,3 +194,103 @@ export const historyConfig = createViewConfig(
   },
   config.config
 );
+
+export const getChangeValue = (
+  value: Doc<'history'>,
+  {
+    relatedRow,
+    oldRow,
+    newRow,
+    view,
+  }: {
+    relatedRow?: Row | null;
+    oldRow?: Row | null;
+    newRow?: Row | null;
+    view?: ViewConfigType;
+  }
+): HistoryType['changed'] => {
+  const defaultData = {
+    oldValue: null,
+    newValue: null,
+    label: '',
+    fieldName: '',
+    id: '',
+  } as const;
+
+  const fieldName = value.change.field ?? '';
+
+  if (!relatedRow && !oldRow && !newRow) {
+    if (value.changeType === 'insert') {
+      return {
+        ...defaultData,
+        type: 'created',
+      };
+    }
+
+    if (value.changeType === 'update') {
+      return {
+        ...defaultData,
+        type: 'changed',
+        fieldName,
+        newValue: value.change.newValue,
+        oldValue: value.change.oldValue,
+      };
+    }
+  }
+
+  if (relatedRow) {
+    if (value.changeType === 'insert') {
+      return {
+        ...defaultData,
+        type: 'added',
+        fieldName,
+        label: relatedRow.label,
+        id: relatedRow.id,
+      };
+    }
+
+    if (value.changeType === 'delete') {
+      return {
+        ...defaultData,
+        type: 'removed',
+        fieldName,
+        label: relatedRow.label,
+        id: relatedRow.id,
+      };
+    }
+  }
+
+  if (newRow || oldRow) {
+    const field = Object.values(view?.viewFields ?? {}).find((field) => {
+      return field.relation?.fieldName === value.change.field;
+    });
+
+    if (value.changeType === 'update' && newRow) {
+      return {
+        type: 'added-to',
+        fieldName: field?.name ?? '',
+        label: newRow.label,
+        oldValue: oldRow?.label ?? '',
+        newValue: newRow.label,
+        id: newRow.id,
+      };
+    }
+
+    if (value.changeType === 'update' && !newRow && oldRow) {
+      return {
+        type: 'removed-from',
+        fieldName: field?.name ?? '',
+        label: oldRow.label,
+        oldValue: oldRow.label,
+        newValue: '',
+        id: oldRow.id,
+      };
+    }
+  }
+
+  return {
+    ...defaultData,
+    type: 'created',
+    fieldName: '',
+  };
+};

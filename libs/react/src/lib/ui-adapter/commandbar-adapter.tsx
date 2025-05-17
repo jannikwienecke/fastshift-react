@@ -2,7 +2,6 @@ import {
   CommandbarProps,
   CREATE_NEW_OPTION,
   DELETE_OPTION,
-  getValue,
   MakeCommandbarPropsOption,
   makeDayMonthString,
   makeRow,
@@ -155,11 +154,13 @@ export const makeCommandbarProps = <T extends RecordType>(
           </div>
         );
       } else if (viewField && viewField.relation) {
-        const currentValue = getValue(activeRow, viewField.name) as
-          | Row[]
-          | undefined;
+        // const currentValue = getValue(activeRow, viewField.name) as
+        //   | Row[]
+        //   | undefined;
 
         const values = comboboxStore$.values.get();
+        const selected = comboboxStore$.selected.get();
+
         const rowValue = values?.find((v) => v.id === item.id) ?? (item as Row);
 
         const rowValueId = rowValue?.id ?? '';
@@ -169,8 +170,7 @@ export const makeCommandbarProps = <T extends RecordType>(
 
         const createNewOption = rowValue.id === CREATE_NEW_OPTION;
 
-        const isChecked =
-          currentValue && currentValue?.some((v) => v.id === rowValue.id);
+        const isChecked = !!selected?.find((s) => s.id === rowValueId);
 
         return (
           <div className="flex flex-row items-center justify-between w-full">

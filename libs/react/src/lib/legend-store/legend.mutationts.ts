@@ -1,5 +1,6 @@
 import {
   _log,
+  BaseViewConfigManagerInterface,
   getRelationTableName,
   ifNoneNullElseValue,
   INTERNAL_FIELDS,
@@ -41,7 +42,7 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   }) => {
     const viewConfigManager = getViewConfigManager();
 
-    _log.warn('___RUN Mutation', { newRows, idsToDelete, newIds });
+    _log.debug('___RUN Mutation', { newRows, idsToDelete, newIds });
 
     // Perform optimistic update
     const rollback = optimisticUpdateStore({
@@ -86,7 +87,6 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
         store$.errorDialog.error.set(error);
       });
     } else {
-      console.warn('Rows selected successfully');
       checkedRows$.set([]);
       idsToDelete$.set([]);
       isRunning$.set(false);
@@ -107,7 +107,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
     const record = {
       [field.relation?.fieldName ?? field.name]: patchValue,
     };
-    console.warn('Record to update:', record);
+    console.debug('Record to update:', record);
 
     const fieldName =
       viewConfigManager.getFieldBy(field.name).relation?.fieldName ?? '';
@@ -125,7 +125,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
         record,
       },
     };
-    console.warn('Mutation payload:', mutation);
+    console.debug('Mutation payload:', mutation);
 
     const { error } = await store$.api.mutateAsync({
       mutation,
@@ -141,7 +141,7 @@ export const updateRecordMutation: StoreFn<'updateRecordMutation'> =
         store$.errorDialog.error.set(error);
       });
     } else {
-      console.warn('Record updated successfully');
+      console.debug('Record updated successfully');
       onSuccess?.();
     }
   };
@@ -150,7 +150,7 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
   (store$) =>
   async ({ record, row }, onSuccess, onError) => {
     const viewConfigManager = getViewConfigManager();
-    console.warn('Starting FULL updateRecordMutation');
+    console.debug('Starting FULL updateRecordMutation');
 
     const rollback = optimisticUpdateStore({
       store$,
@@ -166,7 +166,7 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
       },
     };
 
-    console.warn('Mutation payload:', mutation);
+    console.debug('Mutation payload:', mutation);
 
     const { error } = await store$.api.mutateAsync({
       mutation,
@@ -183,7 +183,7 @@ export const updateFullRecordMutation: StoreFn<'updateFullRecordMutation'> =
       });
     } else {
       onSuccess?.();
-      console.warn('Record updated successfully');
+      console.debug('Record updated successfully');
     }
   };
 
@@ -219,7 +219,7 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
 
         store$.dataModel.rows.set(rollbackRows);
       } else {
-        console.warn('Record deleted successfully');
+        console.debug('Record deleted successfully');
         onSuccess?.();
       }
     };
@@ -294,7 +294,7 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
           renderSuccessToast('');
         }
 
-        console.warn('Record created successfully');
+        console.debug('Record created successfully');
         onSuccess?.();
       }
     };
@@ -321,6 +321,15 @@ export const optimisticUpdateStore = ({
   _log.debug('Starting optimistic update', { updateGlobalDataModel, record });
 
   const originalRow = copyRow(row);
+  let originalRowDetail: Row | null = null;
+  const viewConfigManagerDetail = store$.detail.viewConfigManager.get();
+
+  if (store$.detail.row.get() && viewConfigManagerDetail) {
+    originalRowDetail = copyRow(
+      store$.detail.row.get() as Row,
+      viewConfigManagerDetail as BaseViewConfigManagerInterface
+    );
+  }
 
   record = patchRecord(record, store$);
 
@@ -372,7 +381,6 @@ export const optimisticUpdateStore = ({
 
     // TODO DETAIL BRANCHING
     if (store$.detail.row.get() && isDetail() && !isTabs()) {
-      console.log('UPDATE dettail', updatedRow);
       store$.detail.row.set(updatedRow);
     }
 
@@ -393,7 +401,7 @@ export const optimisticUpdateStore = ({
     }
 
     if (updateGlobalDataModel && !isDetail()) {
-      console.warn('____UPDATE GLOBAL DATA MODEL');
+      console.debug('____UPDATE GLOBAL DATA MODEL');
 
       updatedRows.map((r) => {
         const hasRow = r.id === updatedRow.id;
@@ -411,20 +419,34 @@ export const optimisticUpdateStore = ({
   // Return rollback function
   return () => {
     setTimeout(() => {
-      _log.warn('Rolling back optimistic update', originalRows);
+      console.debug('Rolling back optimistic update', originalRows);
       isRunning$.set(false);
 
       setGlobalDataModel(originalRows);
 
+      const copyRowDetail = (row: Row) => {
+        const raw = { ...row.raw };
+        return makeData(
+          store$.views.get(),
+          store$.detail.viewConfigManager.getViewName()
+        )([raw]).rows?.[0];
+      };
+
       if (store$.contextMenuState.row.get())
         store$.contextMenuState.row.set(copyRow(originalRow));
 
-      if (store$.detail.row.get()) {
-        store$.detail.row.set(copyRow(originalRow));
+      if (
+        isDetail() &&
+        originalRowDetail
+        // !selectState$.parentRow.get()
+      ) {
+        store$.detail.row.set(originalRowDetail);
       }
 
       if (store$.commandbar.activeRow.get())
-        store$.commandbar.activeRow.set(copyRow(originalRow));
+        store$.commandbar.activeRow.set(
+          isDetail() ? originalRowDetail : copyRow(originalRow)
+        );
 
       if (store$.list.rowInFocus.row.get())
         store$.list.rowInFocus.row.set(copyRow(originalRow));
@@ -434,7 +456,9 @@ export const optimisticUpdateStore = ({
       }
 
       if (selectState$.parentRow.get()) {
-        selectState$.parentRow.set(copyRow(originalRow));
+        selectState$.parentRow.set(
+          isDetail() ? originalRowDetail : copyRow(originalRow)
+        );
       }
 
       if (selectState$.parentRow.get()) {

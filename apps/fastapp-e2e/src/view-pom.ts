@@ -16,6 +16,7 @@ export class MainViewPage {
   readonly pageHeader: Locator;
   readonly sidebar: Locator;
   readonly detailTabs: Locator;
+  readonly detailProperties: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -32,6 +33,7 @@ export class MainViewPage {
     this.pageHeader = page.getByTestId('main-page-header');
     this.sidebar = page.getByTestId('sidebar');
     this.detailTabs = page.getByTestId('detail-tabs');
+    this.detailProperties = page.getByTestId('detail-properties');
   }
 
   async goto() {

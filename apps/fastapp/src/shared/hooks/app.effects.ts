@@ -1,5 +1,5 @@
 import { api, views } from '@apps-next/convex';
-import { _log, GetTableName, slugHelper } from '@apps-next/core';
+import { GetTableName, slugHelper } from '@apps-next/core';
 import { globalStore, store$ } from '@apps-next/react';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
@@ -36,7 +36,21 @@ export const useAppEffects = (viewName: string) => {
 
   React.useEffect(() => {
     if (!userViews) return;
-    store$.userViews.set(userViews);
+    store$.userViews.set(
+      userViews.map((v) => {
+        // Fixme -> combine both types from db and ui to one in core
+        return {
+          ...v,
+          id: v.id ?? '',
+          baseView: v.baseView ?? '',
+          displayOptions: v.displayOptions ?? '',
+          filters: v.filters ?? '',
+          name: v.name ?? '',
+          slug: v.slug ?? '',
+          description: v.description ?? '',
+        };
+      })
+    );
   }, [userViews]);
 
   const [_, i18n] = useTranslationReact();
@@ -56,7 +70,6 @@ export const useAppEffects = (viewName: string) => {
     if (!config || !parentViewName || !parentId) return;
     if (view.toLowerCase() === parentViewName.toLowerCase()) return;
 
-    console.warn('____PRELOAD ROUTE INIT');
     realPreloadRouteRef.current({
       from: '/fastApp/$view/$id/overview',
       to: `/fastApp/${slugHelper().slugify(

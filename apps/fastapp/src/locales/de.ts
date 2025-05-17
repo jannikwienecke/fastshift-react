@@ -13,6 +13,7 @@ export const de = {
     categories: 'Kategorien',
     tags: 'Tags',
     users: 'Benutzer',
+    history: 'Verlauf',
   },
   projects: {
     one: 'Projekt',
@@ -92,11 +93,14 @@ export const de = {
   commands: {
     resetDb: 'Datenbank zurücksetzen',
   },
+  entityId: { one: 'ID', other: 'IDs' },
+  tableName: { one: 'Tabelle', other: 'Tabellen' },
 
   history: {
     insert: 'Einfügen',
     update: 'Update',
     delete: 'Löschen',
+    detail: { headerInsert: '', headerUpdate: '' },
   },
 } satisfies typeof en;
 

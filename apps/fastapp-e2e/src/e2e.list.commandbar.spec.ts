@@ -1,3 +1,4 @@
+import { Locator } from '@playwright/test';
 import { expect, PartialFixtures, test } from './fixtures';
 import { CON } from './helpers';
 import { isDev, pressEnter, pressEscape, waitFor } from './helpers/e2e.helper';
@@ -209,6 +210,54 @@ test.describe('List Commandbar', () => {
     await expect(firstListItem.getByText(/urgent/i)).toBeHidden();
   });
 
+  test('can add and remove a tag (special case)', async ({
+    mainPage,
+    helper,
+  }) => {
+    // NOTE: This was a bug. Removing an existing tag, and add it back as the 4th tag.
+
+    const props = { mainPage, helper };
+    const firstListItem = (await helper.list.getListItem(3)).locator;
+
+    await expect(firstListItem.getByText(/create workout/i)).toBeVisible();
+    await expect(firstListItem.getByText(/creative/i)).toBeVisible();
+    await expect(firstListItem.getByText(/colla/i)).toBeVisible();
+    await expect(firstListItem.getByText(/quick/i)).toBeVisible();
+
+    // move mouse on first list item
+    await firstListItem.hover();
+    await waitFor(mainPage.page, 300);
+
+    await openCommandbar({
+      ...props,
+      cb: () => firstListItem.getByText(/fitness/i).click(),
+    });
+    await search(mainPage, 'change or add tags');
+
+    await mainPage.commandbar.getByText(/change or add tags/i).click();
+
+    await mainPage.commandbar.getByText(/colla/i).click();
+
+    await waitFor(mainPage.page, 200);
+
+    await mainPage.commandbar.getByText(/urgent/i).click();
+
+    await waitFor(mainPage.page, 200);
+
+    await mainPage.commandbar.getByText(/colla/i).click();
+
+    await waitFor(mainPage.page, 200);
+
+    await pressEscape(mainPage.page);
+
+    await expect(firstListItem.getByText(/creative/i)).toBeVisible();
+    await expect(firstListItem.getByText(/quick/i)).toBeVisible();
+    await expect(firstListItem.getByText(/urgent/i)).toBeVisible();
+
+    // the 4. tag should be hidden because we can always have 3 tags at max
+    await expect(firstListItem.getByText(/colla/i)).toBeHidden();
+  });
+
   test('can open commandbar, and update the email with validation', async ({
     mainPage,
     helper,
@@ -249,6 +298,40 @@ test.describe('List Commandbar', () => {
 
     // commandbar is closed
     await expect(mainPage.commandbar).toBeHidden();
+  });
+
+  test('can select tags inside the task overview detail page', async ({
+    mainPage,
+    page,
+    helper,
+  }) => {
+    await helper.navigation.goToDetail(
+      'all-tasks',
+      CON.task.values.firstListItem
+    );
+
+    await expect(
+      mainPage.page.getByText(/collaborative/i).first()
+    ).toBeHidden();
+
+    await mainPage.page.keyboard.press('Meta+k');
+    await expect(mainPage.commandbar).toBeVisible();
+
+    await search(mainPage, 'change or add tags');
+
+    await mainPage.commandbar.getByText(/change or add tags/i).click();
+
+    await mainPage.commandbar.getByText(/colla/i).click();
+
+    await waitFor(mainPage.page, 200);
+
+    await pressEscape(mainPage.page);
+
+    await expect(mainPage.commandbar).toBeHidden();
+
+    await expect(
+      mainPage.page.getByText(/collaborative/i).first()
+    ).toBeVisible();
   });
 });
 
@@ -291,13 +374,21 @@ const toggleCompletedState = async ({ mainPage, helper }: PartialFixtures) => {
   await firstListItem.hasText('✅');
 };
 
-const openCommandbar = async ({ mainPage, helper }: PartialFixtures) => {
+const openCommandbar = async ({
+  mainPage,
+  helper,
+  cb,
+}: PartialFixtures & { cb?: () => Promise<void> }) => {
   const firstListItem = await helper.list.getFirstListItem();
-  await firstListItem.locator
-    .getByText(CON.project.values.websiteRedesign)
-    .click();
+  if (cb) {
+    await cb();
+  } else {
+    await firstListItem.locator
+      .getByText(CON.project.values.websiteRedesign)
+      .click();
+  }
 
-  await waitFor(mainPage.page, 1000);
+  await waitFor(mainPage.page, 700);
   await mainPage.page.keyboard.press('Meta+k');
   await expect(mainPage.commandbar).toBeVisible();
 };

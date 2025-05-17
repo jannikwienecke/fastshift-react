@@ -4,7 +4,7 @@ import { AlertCircle } from 'lucide-react';
 import { onBlur, onChange, onKeyDown } from './render-form-field';
 
 const StringFormField = (props: FormFieldProps) => {
-  const error = props.formState.errors?.[props.field.field?.name ?? ''];
+  const error = props.formState?.errors?.[props.field.field?.name ?? ''];
 
   return (
     <div className="flex flex-col gap-1">

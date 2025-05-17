@@ -392,7 +392,7 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
     const rows = data.data;
 
     const viewName = store$.detail.viewConfigManager.getViewName();
-    _log.warn('____handleIncomingDetailData: ', rows?.length, viewName);
+    _log.debug('____handleIncomingDetailData: ', rows?.length, viewName);
 
     const key = `detail-${store$.detail.row.get()?.id}`;
     const ignoreNext = store$.ignoreNextQueryDict?.[key].get();
@@ -403,6 +403,8 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
       ignoreNewData$.set((prev) => prev - 1);
       return;
     }
+
+    store$.detail.historyDataOfRow.set(data.historyData);
 
     if (rows?.length === 1) {
       if (ignoreNext > 1) {

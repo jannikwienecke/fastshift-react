@@ -1,9 +1,7 @@
 import { FieldConfig, Row } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { store$ } from './legend.store';
-import { a } from 'framer-motion/dist/types.d-B50aGbjN';
-import { derviedDetailPage$ } from './legend.detailpage.derived';
 import { detailTabsHelper } from './legend.detailtabs.helper';
+import { store$ } from './legend.store';
 
 export const selectState$ = observable({
   parentRow: null as Row | null,
@@ -40,7 +38,7 @@ const getParentRow = () => {
     .get()
     .find((r) => r.id === selectState$.parentRow.get()?.id);
 
-  return row;
+  return row ?? (selectState$.parentRow.get() as Row);
 };
 const getCurrentRows = (_field?: FieldConfig) => {
   const field = _field ?? selectState$.field.get();
@@ -65,11 +63,18 @@ const getState = () => {
   const removedRows = selectState$.removedRows.get() as Row[];
   const newRows = selectState$.newRows.get() as Row[];
 
-  if (!field || !parentRow || !removedRows) throw new Error('Invalid state');
+  if (!field || !parentRow || !removedRows) {
+    console.debug('___Invalid state', {
+      field,
+      parentRow,
+      existingRows,
+    });
+    throw new Error('Invalid state');
+  }
 
   return {
     field,
-    parentRow,
+    parentRow: parentRow as Row,
     existingRows,
     toInsert,
     toRemove,
@@ -116,40 +121,45 @@ export const select = (row: Row) => {
     .some((r) => r.id === row.id);
 
   if (isInRemovedRows) {
-    console.warn('___ADD BACK');
+    console.debug('___ADD BACK');
     selectState$.removedRows.set((prev) => prev.filter((r) => r.id !== row.id));
     selectState$.newRows.set((prev) => [...prev, row]);
     selectState$.toInsertRow.set(row);
   } else if (isInInitialRows) {
-    console.warn('___REMOVE');
+    console.debug('___REMOVE');
     selectState$.toRemoveRow.set(row);
     selectState$.removedRows.set((prev) => [...prev, row]);
   } else if (isInNewRows) {
-    console.warn('___REMOVE FROM NEW ROWS');
+    console.debug('___REMOVE FROM NEW ROWS');
     selectState$.newRows.set((prev) => prev.filter((r) => r.id !== row.id));
     selectState$.toRemoveRow.set(row);
   } else {
-    console.warn('___ADD');
+    console.debug('___ADD');
     selectState$.newRows.set((prev) => [...prev, row]);
     selectState$.toInsertRow.set(row);
   }
 };
 
 const onError = () => {
-  const { toInsert, toRemove, existingRows, removedRows, newRows } = getState();
+  const { toInsert, toRemove } = getState();
 
-  console.warn('___ROLLBACK', {
-    toInsert,
-    toRemove,
-    existingRows,
-    removedRows,
-    newRows,
+  console.debug('___ROLLBACK', {
+    selectState$: selectState$.get(),
   });
 
   if (toRemove) {
+    console.log(toRemove);
     selectState$.removedRows.set((prev) =>
       prev.filter((r) => r.id !== toRemove.id)
     );
+
+    const isInInitialRows = selectState$.initalRows
+      .get()
+      .some((r) => r.id === toRemove.id);
+
+    if (!isInInitialRows) {
+      selectState$.newRows.set((prev) => [...prev, toRemove]);
+    }
 
     selectState$.toRemoveRow.set(null);
   }
@@ -158,6 +168,15 @@ const onError = () => {
     selectState$.newRows.set((prev) =>
       prev.filter((r) => r.id !== toInsert.id)
     );
+
+    const isInInitialRows = selectState$.initalRows
+      .get()
+      .some((r) => r.id === toInsert.id);
+
+    // if is in initial, add to removedRows
+    if (isInInitialRows) {
+      selectState$.removedRows.set((prev) => [...prev, toInsert]);
+    }
 
     selectState$.toInsertRow.set(null);
   }
@@ -171,7 +190,7 @@ export const xSelect = {
 };
 
 selectState$.toRemoveRow.onChange((state) => {
-  console.warn('___TO REMOVE: ', state.value);
+  console.debug('___TO REMOVE: ', state.value);
   if (!state.value) return;
 
   const { field, parentRow, existingRows } = getState();

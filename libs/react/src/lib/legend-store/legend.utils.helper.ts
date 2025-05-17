@@ -54,7 +54,7 @@ const filterRowsByParentId = (rows: Row[]) => {
 
 export const setGlobalDataModel = (rows: Row[]) => {
   // if (store$.detail.form.dirtyValue.get()) {
-  //   console.warn('DOES NOT UPDATE IS DIRY!!', store$.detail.form.get());
+  //   console.debug('DOES NOT UPDATE IS DIRY!!', store$.detail.form.get());
   //   return;
   // }
 
@@ -100,10 +100,6 @@ export const getParsedViewSettings = () => {
 export const localModeEnabled$ = observable(() => {
   const parentViewName = store$.detail.parentViewName.get();
 
-  console.warn(
-    'localModeEnabled$',
-    store$.viewConfigManager.viewConfig.localMode.get() || parentViewName
-  );
   return (
     store$.viewConfigManager.viewConfig.localMode.enabled.get() ||
     parentViewName

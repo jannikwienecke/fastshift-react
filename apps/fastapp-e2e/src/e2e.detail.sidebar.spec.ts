@@ -5,11 +5,6 @@ import { listCombobox } from './helpers/e2e.helper.list-combobox';
 
 test.beforeEach(async ({ seedDatabase, helper }) => {
   await seedDatabase();
-
-  await helper.navigation.goToDetail(
-    'all-projects',
-    CON.project.values.websiteRedesign
-  );
 });
 
 test.setTimeout(isDev() ? 20000 : 10000);
@@ -21,6 +16,11 @@ test.describe('Detail Page Form Test', () => {
     mainPage: mainPage,
     helper,
   }) => {
+    await helper.navigation.goToDetail(
+      'all-projects',
+      CON.project.values.websiteRedesign
+    );
+
     const page = mainPage.page;
     expect(1).toBe(1);
 
@@ -33,6 +33,7 @@ test.describe('Detail Page Form Test', () => {
 
     const { searchInCombobox, pickOptionInCombobox, isClosed } =
       listCombobox(props);
+
     await searchInCombobox('owner', CON.owner.values.janeSmith);
 
     await pickOptionInCombobox(CON.owner.values.janeSmith);
@@ -57,8 +58,8 @@ test.describe('Detail Page Form Test', () => {
 
     await isClosed();
 
-    await expect(page.getByText(CON.category.values.personal)).toBeVisible();
-    await expect(page.getByText(CON.owner.values.janeSmith)).toBeVisible();
+    await expect(mainPage.page.getByText(/personal/i).first()).toBeVisible();
+    await expect(page.getByText(/jane smith/i).first()).toBeVisible();
 
     await mainPage.sidebar.getByText('projects').first().click();
     await mainPage.sidebar.getByText('all projects').first().click();
@@ -67,5 +68,49 @@ test.describe('Detail Page Form Test', () => {
       await helper.list.getFirstListItem()
     ).locator.getByText(CON.category.values.personal);
     await expect(personalItem).toBeVisible();
+  });
+
+  test('Can update tags in tasks detail ', async ({
+    mainPage: mainPage,
+    helper,
+  }) => {
+    await helper.navigation.goToDetail(
+      'all-tasks',
+      CON.task.values.designMockups
+    );
+
+    const props: PartialFixtures = {
+      mainPage: mainPage,
+      helper,
+    };
+
+    await mainPage.page.getByText(/add tag.../i).click();
+
+    // we dont have any tag yet
+    await expect(
+      mainPage.comboboxPopover.getByLabel('combobox-checked')
+    ).toBeHidden();
+
+    const { searchInCombobox } = listCombobox(props);
+
+    await searchInCombobox('tags', CON.tag.values.creative);
+
+    // we select a tag.
+    await mainPage.comboboxPopover.getByText(CON.tag.values.creative).click();
+
+    await waitFor(mainPage.page, 500);
+
+    // we try to deselect the tag -> will fail because we need at least one tag
+    await mainPage.comboboxPopover.getByText(CON.tag.values.creative).click();
+
+    // await to see Oops! Something went wrong
+    await expect(
+      mainPage.page.getByText('Oops! Something went wrong')
+    ).toBeVisible();
+
+    // expect to see an aria label    aria-label='combobox-checked'
+    await expect(
+      mainPage.comboboxPopover.getByLabel('combobox-checked')
+    ).toBeVisible();
   });
 });

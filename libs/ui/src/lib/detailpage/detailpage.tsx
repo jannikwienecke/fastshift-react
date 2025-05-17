@@ -2,20 +2,20 @@ import {
   DetailPageProps,
   FormFieldProps,
   getFieldLabel,
+  HistoryType,
 } from '@apps-next/core';
 import { CubeIcon, DotsHorizontalIcon } from '@radix-ui/react-icons';
 import {
-  Layers3Icon,
   ChevronRightIcon,
-  StarIcon,
+  Layers3Icon,
   ShareIcon,
+  StarIcon,
 } from 'lucide-react';
-import { Checkbox } from '../components/checkbox';
-import { Button } from '../components';
-import { cn } from '../utils';
-import { EmojiPicker } from 'frimousse';
-import { EmojiPickerDialog } from '../emoji-picker-dialog';
 import React from 'react';
+import { Button } from '../components';
+import { Checkbox } from '../components/checkbox';
+import { EmojiPickerDialog } from '../emoji-picker-dialog';
+import { cn } from '../utils';
 
 const DetailPageHeader = (props: DetailPageProps) => {
   return (
@@ -168,7 +168,10 @@ const DetailPagePropertiesList = (
   }
 ) => {
   return (
-    <div className="flex flex-col gap-6 pt-8 text-sm">
+    <div
+      className="flex flex-col gap-6 pt-8 text-sm"
+      data-testid="detail-properties"
+    >
       {props.propertyFields.map((field) => {
         const fieldConfig = field.field;
         if (!fieldConfig) return null;
@@ -189,6 +192,7 @@ const DetailTabs = (
   props: DetailPageProps & {
     FormField: React.FC<FormFieldProps>;
     ComplexFormField: React.FC<FormFieldProps>;
+    RenderActivityList: React.FC<{ historyData: HistoryType[] }>;
   }
 ) => {
   if (!props.tabs) return null;
@@ -199,6 +203,7 @@ const DetailTabs = (
     activeTabPrimitiveFields,
     detailTabsFields,
     onSelectTab,
+    onSelectHistoryTab,
   } = props.tabs;
 
   return (
@@ -206,8 +211,20 @@ const DetailTabs = (
       <div className="flex flex-row gap-0">
         <div className="border-b-[.5px] w-20"></div>
 
+        <button
+          onClick={() => onSelectHistoryTab()}
+          className={cn(
+            'border-[.5px] py-2 px-4',
+            props.tabs.isHistoryTab ? ' border-b-0 ' : ''
+          )}
+        >
+          {'Acitivty'}
+        </button>
+
         {detailTabsFields.map((tab) => {
-          const isActive = activeTabField?.field?.name === tab.field?.name;
+          const isActive =
+            activeTabField?.field?.name === tab.field?.name &&
+            props.tabs?.isHistoryTab !== true;
 
           return (
             <button
@@ -222,32 +239,41 @@ const DetailTabs = (
             </button>
           );
         })}
+
         <div className="flex-grow border-b-[.5px]" />
       </div>
 
-      <div className="pl-24 pt-8 text-sm">
-        {activeTabPrimitiveFields.map((field) => {
-          return (
-            <div key={field.field?.name + 'primitive'}>
-              <props.FormField {...props} field={field} />
-            </div>
-          );
-        })}
-      </div>
+      {props.tabs.isHistoryTab ? (
+        <div className="pl-24 pt-8 text-sm flex flex-col">
+          <props.RenderActivityList historyData={props.tabs.historyData} />
+        </div>
+      ) : (
+        <>
+          <div className="pl-24 pt-8 text-sm">
+            {activeTabPrimitiveFields.map((field) => {
+              return (
+                <div key={field.field?.name + 'primitive'}>
+                  <props.FormField {...props} field={field} />
+                </div>
+              );
+            })}
+          </div>
 
-      <div className="pl-24 pt-4 text-sm border-t-[.5px]">
-        {activeTabComplexFields.map((field) => {
-          return (
-            <div key={field.field?.name + 'complex'}>
-              <props.ComplexFormField
-                {...props}
-                field={field}
-                tabFormField={true}
-              />
-            </div>
-          );
-        })}
-      </div>
+          <div className="pl-24 pt-4 text-sm border-t-[.5px]">
+            {activeTabComplexFields.map((field) => {
+              return (
+                <div key={field.field?.name + 'complex'}>
+                  <props.ComplexFormField
+                    {...props}
+                    field={field}
+                    tabFormField={true}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 };

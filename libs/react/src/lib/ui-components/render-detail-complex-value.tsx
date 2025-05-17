@@ -85,7 +85,14 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
     : null;
 
   const view = getViewByName(store$.views.get(), fieldConfig.name ?? '');
-  const Icon = field.icon ?? view?.icon;
+  const IconComponent = getComponent({
+    fieldName: fieldConfig.name,
+    componentType: 'icon',
+    isDetail: true,
+  });
+
+  // TODO: This is in several places, clean up and make it easier
+  const Icon = IconComponent ?? field.icon ?? view?.icon;
 
   if (props.tabFormField) {
     return (

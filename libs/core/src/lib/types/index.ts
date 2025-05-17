@@ -8,3 +8,4 @@ export * from './ui.types';
 export * from './react.types';
 export * from './displayOptions.types';
 export * from './commands';
+export * from './history.types';

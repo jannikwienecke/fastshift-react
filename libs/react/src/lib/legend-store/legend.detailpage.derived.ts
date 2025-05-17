@@ -37,7 +37,13 @@ export const derviedDetailPage$ = observable(() => {
     tabs: tabsProps
       ? {
           ...tabsProps,
+          isHistoryTab: store$.detail.isActivityTab.get(),
+          historyData: store$.detail.historyDataOfRow.get() ?? [],
+          onSelectHistoryTab: () => {
+            store$.detail.isActivityTab.set(true);
+          },
           onSelectTab(field) {
+            store$.detail.isActivityTab.set(false);
             store$.detail.activeTabField.set(field);
           },
         }
