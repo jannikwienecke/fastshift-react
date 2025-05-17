@@ -503,6 +503,7 @@ const HistoryOverviewPage = observer(() => {
             colorMap[row.raw.changeType]
           )}
         >
+          {/* TODO use the HistoryChangeRenderer for this whole view */}
           {isInsert ? (
             <>
               <PrettyJson {...row.raw} />

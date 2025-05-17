@@ -168,7 +168,10 @@ const DetailPagePropertiesList = (
   }
 ) => {
   return (
-    <div className="flex flex-col gap-6 pt-8 text-sm">
+    <div
+      className="flex flex-col gap-6 pt-8 text-sm"
+      data-testid="detail-properties"
+    >
       {props.propertyFields.map((field) => {
         const fieldConfig = field.field;
         if (!fieldConfig) return null;

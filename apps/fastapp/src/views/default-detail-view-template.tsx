@@ -1,7 +1,7 @@
 import {
   FormFieldProps,
   MakeDetailPropsOption,
-  NewHistoryType,
+  HistoryType,
 } from '@apps-next/core';
 import {
   FormField,
@@ -23,7 +23,7 @@ export const DefaultDetailViewTemplate = observer(
     detailOptions: MakeDetailPropsOption;
     formField?: React.FC<FormFieldProps>;
     complexFormField?: React.FC<FormFieldProps>;
-    activityList?: React.FC<{ historyData: NewHistoryType[] }>;
+    activityList?: React.FC<{ historyData: HistoryType[] }>;
   }) => {
     const { makeDetailPageProps } = makeHooks();
     const props = makeDetailPageProps(detailOptions);
@@ -63,7 +63,7 @@ export const DefaultDetailOverviewTemplate = observer(
     ...templateProps
   }: {
     detailOptions?: MakeDetailPropsOption;
-    activityList?: React.FC<{ historyData: NewHistoryType[] }>;
+    activityList?: React.FC<{ historyData: HistoryType[] }>;
     FormField?: React.FC<FormFieldProps>;
   }) => {
     const { makeDetailPageProps } = makeHooks();
