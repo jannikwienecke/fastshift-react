@@ -1,5 +1,5 @@
 import { ComponentType } from '@apps-next/core';
-import { store$ } from '../legend-store';
+import { store$, viewRegistry } from '../legend-store';
 
 export const getComponent = ({
   fieldName,
@@ -20,7 +20,12 @@ export const getComponent = ({
     ? store$.detail.viewConfigManager.getTableName()
     : store$.viewConfigManager?.getTableName();
 
-  return uiViewConfig?.[tableName]?.fields?.[fieldName]?.component?.[
-    componentType
-  ];
+  const component =
+    uiViewConfig?.[tableName]?.fields?.[fieldName]?.component?.[componentType];
+
+  if (component) {
+    return component;
+  }
+
+  return undefined;
 };

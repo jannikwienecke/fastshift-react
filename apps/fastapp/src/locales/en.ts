@@ -18,7 +18,7 @@ export const en = {
     other: 'Projects',
   },
   name: {
-    edit: 'Rename Task',
+    edit: 'Rename {{model}}',
     // changeField: 'Update description',
   },
   tableName: {
@@ -75,7 +75,7 @@ export const en = {
     one: 'Completed',
     other: 'Completed',
     markAs: 'Mark as completed ✅',
-    unMarkAs: 'Mark task as not completed',
+    unMarkAs: 'Mark as not completed',
   },
 
   dueDate: {

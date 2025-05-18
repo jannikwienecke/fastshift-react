@@ -11,6 +11,7 @@ import {
   getFormState,
   getRecordTypeFromRow,
 } from './legend.form.helper';
+import { parentView$ } from './legend.shared.derived';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { StoreFn } from './legend.store.types';
 import { copyRow } from './legend.utils';
@@ -31,10 +32,7 @@ export const commandformOpen: StoreFn<'commandformOpen'> =
         viewName === store$.viewConfigManager.getViewName() &&
         store$.detail.parentViewName.get()
       ) {
-        const parentView = getViewByName(
-          store$.views.get(),
-          store$.detail.parentViewName.get() ?? ''
-        );
+        const parentView = parentView$.get();
 
         const tableName = parentView?.tableName ?? '';
         defaultRow = getDefaultRow({
@@ -43,6 +41,7 @@ export const commandformOpen: StoreFn<'commandformOpen'> =
       } else {
         defaultRow = getDefaultRow();
       }
+
       defaultRow && store$.commandform.row.set(row || defaultRow);
 
       store$.commandform.type.set(row?.id ? 'edit' : 'create');

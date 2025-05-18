@@ -65,7 +65,7 @@ const makeSelectModelAttributeCommand = (
     tablename: item.tablename,
     icon: item.icon,
     handler: ({ row }) => {
-      _log.debug('makeSelectModelAttributeCommand - handler');
+      console.debug('makeSelectModelAttributeCommand - handler');
 
       // TODO DETAIL BRANCHING
       const field = getViewConfigManager().getFieldBy(item.id.toString());
@@ -147,7 +147,7 @@ const makeUpdateRecordAttributeCommand = (
       const { field, row } = options;
       if (!field || !row) return;
 
-      _log.info('makeUpdateRecordAttributeCommand - handler', item);
+      console.debug('makeUpdateRecordAttributeCommand - handler', item);
 
       let value = makeRowFromValue(
         field.relation ? item.id.toString() : (item as Row)?.raw ?? item.label,

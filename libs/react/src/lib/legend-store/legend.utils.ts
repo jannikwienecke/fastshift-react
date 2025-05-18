@@ -44,9 +44,15 @@ export const isDetail = () => {
   const selectStateIsDetail = selectState$.isDetail.get();
   const isDetailOverview = store$.detail.viewType.type.get() === 'overview';
 
+  const commandformView = store$.commandform.view.viewName.get();
+  const commandViewIsDetail = !commandformView
+    ? true
+    : commandformView === viewConfigDetail?.getViewName?.();
+
   return !!(
     (detailForm || selectStateIsDetail || isDetailOverview) &&
-    viewConfigDetail
+    viewConfigDetail &&
+    commandViewIsDetail
   );
 };
 

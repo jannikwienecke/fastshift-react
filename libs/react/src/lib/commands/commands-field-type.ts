@@ -1,17 +1,16 @@
 import {
   CommandbarItem,
   CommandbarProps,
-  CREATE_NEW_OPTION,
   FieldConfig,
   getEditLabel,
   getFieldLabel,
   makeRowFromValue,
   NONE_OPTION,
   Row,
-  TranslationKeys,
 } from '@apps-next/core';
 import { t } from 'i18next';
 import { comboboxStore$, store$ } from '../legend-store';
+import { getViewConfigManager } from '../legend-store/legend.utils';
 import { commands } from './commands';
 import { commandsHelper } from './commands.helper';
 
@@ -30,7 +29,10 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
       viewField && store$.viewConfigManager.validateField(viewField, query);
 
     return {
-      inputPlaceholder: getEditLabel(viewField),
+      inputPlaceholder: getEditLabel(
+        viewField,
+        getViewConfigManager().viewConfig
+      ),
       error: {
         showError: !!error,
         message: error ? `Error: ${error}` : '',
@@ -41,7 +43,7 @@ export const getCommandbarPropsForFieldType = (): PropsType | null => {
           items: [
             commands.makeUpdateRecordAttributeCommand({
               id: viewField.name,
-              label: getEditLabel(viewField),
+              label: getEditLabel(viewField, getViewConfigManager().viewConfig),
             }),
           ],
         },

@@ -158,8 +158,8 @@ Next Bigger Feature
 
 Small Bugs to fix
 
-- [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
-- [ ] in add task in project, project is not selected...
+- [x] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
+- [x] in add task in project, project is not selected...
 - [ ] in add task in project, priority is not rendered correctly
 - [ ] the due date field in project detail, has no icon shown
 
@@ -170,3 +170,7 @@ Small Features to add
 - [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task
 - [ ] add a go to button next to the relational value in detail
 - [ ] color picker and color indicator for fields with type "color" or something like this
+
+Add tests
+
+- [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)

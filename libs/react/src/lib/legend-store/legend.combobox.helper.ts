@@ -47,7 +47,7 @@ export const getViewFieldsOptions = (options?: {
 
   filterOptions = viewFields.map((field) => {
     const label = options?.useEditLabel
-      ? getEditLabel(field, options.row)
+      ? getEditLabel(field, getViewConfigManager().viewConfig, options.row)
       : getFieldLabel(field);
 
     return makeRow(field.name, label || field.name, field, field);

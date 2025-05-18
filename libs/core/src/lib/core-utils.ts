@@ -1,3 +1,4 @@
+import { table } from 'console';
 import { BaseViewConfigManagerInterface } from './base-view-config';
 import { INTERNAL_FIELDS } from './core.constants';
 import { makeRow, Row } from './data-model';
@@ -425,13 +426,20 @@ export const getTableLabel = (tableName: string, singular?: true) => {
   return fieldLabelToUse;
 };
 
-export const getEditLabel = (field: FieldConfig, row?: Row | null) => {
+export const getEditLabel = (
+  field: FieldConfig,
+  viewConfig: ViewConfigType,
+  row?: Row | null
+) => {
   const label = field.editLabel;
 
   const isMany =
     field.relation?.type === 'manyToMany' || field.relation?.manyToManyRelation;
 
-  let translated = t(label || field.name);
+  let translated = t(label || field.name, {
+    model: getViewLabel(viewConfig, true),
+  });
+
   let customTranslationToUse: null | string = null;
   const noTranslation = translated === label;
 
