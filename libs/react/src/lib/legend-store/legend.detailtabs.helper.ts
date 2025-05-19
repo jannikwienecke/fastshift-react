@@ -16,6 +16,7 @@ import { viewRegistry } from './legend.app.registry';
 import { detailFormHelper } from './legend.detailpage.helper';
 import { store$ } from './legend.store';
 import { copyRow } from './legend.utils';
+import { perstistedStore$ } from './legend.store.persisted';
 
 const getDetailTabsFields = () => {
   const row = store$.detail.row.raw.get();
@@ -41,9 +42,25 @@ const getDetailTabsFields = () => {
 export const detailTabsHelper = () => {
   const detailTabsFields = getDetailTabsFields();
 
+  const activeTabFieldName = perstistedStore$.activeTabFieldName.get();
+
   if (!store$.detail.activeTabField.get()) {
-    store$.detail.activeTabField.set(detailTabsFields?.[0]);
-    store$.detail.isActivityTab.set(true);
+    let defaultField = detailTabsFields?.[0];
+
+    if (activeTabFieldName) {
+      const field = detailTabsFields.find(
+        (f) => f.field.name === activeTabFieldName
+      );
+      if (field) {
+        defaultField = field;
+        store$.detail.activeTabField.set(defaultField);
+      } else {
+        perstistedStore$.activeTabFieldName.set(undefined);
+        perstistedStore$.isActivityTab.set(true);
+      }
+    } else {
+      store$.detail.activeTabField.set(defaultField);
+    }
   }
 
   const activeTabField = store$.detail.activeTabField.get();

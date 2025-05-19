@@ -19,6 +19,7 @@ import {
   createRelationalDataModel,
   handleIncomingDetailData,
 } from './legend.store.fn.global';
+import { perstistedStore$ } from './legend.store.persisted';
 
 export const getViewData = (viewName: string) => {
   const userViews = store$.userViews.get();
@@ -271,8 +272,12 @@ const handleChangeView = (action: GlobalStoreAction) => {
     resetStore();
     setStore(viewName);
     handleQueryData(data);
+    perstistedStore$.activeTabFieldName.set(undefined);
+    perstistedStore$.isActivityTab.set(true);
   } else if (resetDetail) {
     store$.detail.set(undefined);
+    perstistedStore$.activeTabFieldName.set(undefined);
+    perstistedStore$.isActivityTab.set(true);
     resetStore();
     setStore(viewName);
     handleQueryData(data);
@@ -310,7 +315,6 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
 
   if (!viewConfigOfFirstRelationalListField) return;
 
-  // setTimeout(() => {
   handleLoadSubViewListPage({
     type: 'LOAD_SUB_VIEW_LIST_PAGE',
     payload: {
@@ -320,7 +324,6 @@ const handleLoadDetailPage = (action: GlobalStoreAction) => {
       parentViewName: action.payload.viewName,
     },
   });
-  // }, 100);
 };
 
 const handleLoadSubViewListPage = (action: GlobalStoreAction) => {

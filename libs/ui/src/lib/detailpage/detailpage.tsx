@@ -267,11 +267,12 @@ const DetailTabs = (
                 <div className="flex group flex-row items-center rounded-sm italic">
                   <div className="flex flex-row items-center">
                     <div className="flex flex-row gap-1 items-center">
-                      {/* TODO FIX translation */}
                       <div className="text-foreground/70">Go to</div>
                       <div className="pl-1">
                         {props.tabs?.activeTabField?.icon ? (
-                          <props.tabs.activeTabField.icon />
+                          <>
+                            <props.tabs.activeTabField.icon />
+                          </>
                         ) : null}
                       </div>
                       <div>{props.tabs?.activeTabField?.field?.label}</div>
@@ -285,7 +286,6 @@ const DetailTabs = (
 
               {activeTabPrimitiveFields.map((field) => {
                 if (field.field?.isDisplayField) {
-                  const x = activeTabField?.icon;
                   return (
                     <>
                       <div key={field.field?.name + 'primitive'}>

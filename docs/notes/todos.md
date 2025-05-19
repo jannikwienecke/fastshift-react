@@ -171,7 +171,7 @@ Small Features to add
 - [x] add a go to button next to the relational value in detail
 - [x] in tab header -> show icon
 - [x] in tab content. show the display field more prominent and add a go to button
-- [ ] in combobox popover, if not found -> show create
+- [x] in combobox popover, if not found -> show create
 - [ ] create sepearte store for values that should be persisted on local storage and the synced
 - [ ] color picker and color indicator for fields with type "color" or something like this
 

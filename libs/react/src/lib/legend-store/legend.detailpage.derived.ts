@@ -5,6 +5,7 @@ import { detailTabsHelper } from './legend.detailtabs.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { detailUserView$ } from './legend.shared.derived';
 import { store$ } from './legend.store';
+import { perstistedStore$ } from './legend.store.persisted';
 
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
@@ -37,13 +38,13 @@ export const derviedDetailPage$ = observable(() => {
     tabs: tabsProps
       ? {
           ...tabsProps,
-          isHistoryTab: store$.detail.isActivityTab.get(),
+          isHistoryTab: perstistedStore$.isActivityTab.get(),
           historyData: store$.detail.historyDataOfRow.get() ?? [],
           onSelectHistoryTab: () => {
-            store$.detail.isActivityTab.set(true);
+            perstistedStore$.isActivityTab.set(true);
           },
           onSelectTab(field) {
-            store$.detail.isActivityTab.set(false);
+            perstistedStore$.isActivityTab.set(false);
             store$.detail.activeTabField.set(field);
           },
           onClickGoToRelation: () => {

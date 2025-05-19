@@ -13,6 +13,7 @@ import { convex, getUserViews, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
 
 import './views';
+import './shared/hooks/app.persist';
 
 // syncObservable(store$, {
 //   persist: {

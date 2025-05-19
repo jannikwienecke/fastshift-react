@@ -8,6 +8,7 @@ import {
   ClientViewProviderConvex,
   ErrorDetailsDialog,
   globalStore,
+  perstistedStore$,
   store$,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
@@ -32,6 +33,7 @@ import {
 import { useCommands, useViewParams } from '../shared/hooks';
 import { useAppEffects } from '../shared/hooks/app.effects';
 import { getViewParms } from '../shared/utils/app.helper';
+import { hydradatedStore$, localStore$ } from '../shared/hooks/app.persist';
 
 globalStore.setViews(views);
 
@@ -97,6 +99,10 @@ export const Route = createFileRoute('/fastApp')({
         userView: userViewData,
       },
     });
+
+    const persistedState = localStore$.get();
+    perstistedStore$.set(persistedState);
+    hydradatedStore$.set(true);
   },
 
   component: () => <FastAppLayoutComponent />,

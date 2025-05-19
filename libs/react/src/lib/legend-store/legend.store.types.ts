@@ -456,7 +456,6 @@ export type LegendStore = {
     detailRow?: DetailRow;
     selectedField?: FieldConfig;
     rect?: DOMRect;
-    isActivityTab?: boolean;
     form: {
       dirtyField?: FieldConfig;
       dirtyValue?: string | number;
