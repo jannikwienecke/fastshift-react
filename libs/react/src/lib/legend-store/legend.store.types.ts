@@ -381,7 +381,11 @@ export type LegendStore = {
   commandbarSetValue: (value: ComboxboxItem) => void;
 
   // commandform
-  commandformOpen: (viewName: string, row?: Row) => void;
+  commandformOpen: (
+    viewName: string,
+    row?: Row,
+    defaultRecord?: RecordType
+  ) => void;
   commandformClose: () => void;
   commanformSelectRelationalValue: (row: Row) => void;
   commandformChangeInput: (

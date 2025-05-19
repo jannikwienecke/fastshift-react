@@ -17,7 +17,7 @@ import { StoreFn } from './legend.store.types';
 import { copyRow, getIsManyRelationView } from './legend.utils';
 
 export const commandformOpen: StoreFn<'commandformOpen'> =
-  (store$) => (viewName, row) => {
+  (store$) => (viewName, row, defaultRecord) => {
     store$.openSpecificModal('commandform', () => {
       const view = getViewByName(store$.views.get(), viewName);
 
@@ -44,7 +44,7 @@ export const commandformOpen: StoreFn<'commandformOpen'> =
             : store$.detail.row.get(),
         });
       } else {
-        defaultRow = getDefaultRow();
+        defaultRow = getDefaultRow(defaultRecord ?? {});
       }
 
       defaultRow && store$.commandform.row.set(row || defaultRow);

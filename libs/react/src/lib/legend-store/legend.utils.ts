@@ -25,6 +25,7 @@ export const _hasOpenDialog$ = observable(() => {
   const commandformIsOpen = store$.commandform.open.get();
   const contextmenuIsOpen = store$.contextMenuState.rect.get() !== null;
   const filterIsOpen = store$.filter.open.get();
+  const selectStateIsOpen = selectState$.parentRow.get() !== null;
   const displayOptionsIsOpen = store$.displayOptions.isOpen.get();
 
   return (
@@ -32,6 +33,7 @@ export const _hasOpenDialog$ = observable(() => {
     commandformIsOpen ||
     contextmenuIsOpen ||
     filterIsOpen ||
+    selectStateIsOpen ||
     displayOptionsIsOpen
   );
 });

@@ -163,7 +163,14 @@ export const handleRelationalField = (
     valuesToUse = valuesQuery ?? [];
   }
 
-  if (isOptional && (!isManyToMany || isFilter)) {
+  if (
+    (isOptional &&
+      (!isManyToMany || isFilter) &&
+      debouncedQuery.length === 0) ||
+    debouncedQuery.toLowerCase() === 'n' ||
+    debouncedQuery.toLowerCase() === 'none' ||
+    debouncedQuery.toLowerCase() === 'no'
+  ) {
     valuesToUse = [noneOption, ...valuesToUse];
   }
 

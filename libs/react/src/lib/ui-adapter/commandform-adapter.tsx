@@ -75,6 +75,7 @@ export const makeCommandformProps = <T extends RecordType>(
                 />
               </>
             ) : (
+              // TODO Render own ocmponent like commandform-selected-item
               <ComboboxFieldValue
                 row={newRow as Row}
                 field={field}

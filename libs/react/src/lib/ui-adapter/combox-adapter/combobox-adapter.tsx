@@ -6,9 +6,15 @@ import {
   Row,
 } from '@apps-next/core';
 import React from 'react';
-import { comboboxStore$, store$ } from '../../legend-store';
+import { comboboxStore$, getView, store$ } from '../../legend-store';
 import { ComboboxFieldValue } from '../../ui-components/render-combobox-field-value';
 import { ComboboxNoneValue } from '../../ui-components/render-combobox-none-value';
+import { xSelect } from '../../legend-store/legend.select-state';
+import {
+  getViewConfigManager,
+  isDetailOverview,
+} from '../../legend-store/legend.utils';
+import { comboboxClose } from '../../legend-store/legend.store.fn.combobox';
 
 export type MakeComboboxPropsOptions<T extends RecordType = RecordType> = {
   onClose?: () => void;
@@ -81,6 +87,33 @@ export const makeComboboxProps = <T extends RecordType = RecordType>(
       },
       onSelect: store$.comboboxSelectDate,
       selected: comboboxStore$.datePickerProps.selected.get(),
+    },
+    onClickCreateNew: (query) => {
+      const field = store.field;
+      const view = getView(store.field?.name ?? '');
+      const displayField = view?.displayField ?? '';
+      store$.comboboxUpdateQuery('');
+      xSelect.close();
+      store$.comboboxClose();
+
+      const row = isDetailOverview()
+        ? store$.detail.row.get()
+        : store$.list.rowInFocus.row.get();
+      const currentTableName = getViewConfigManager().getTableName();
+      const relatedIsList = view?.viewFields?.[currentTableName].isList;
+
+      store$.commandformOpen(
+        field?.name ?? '',
+        undefined,
+        displayField
+          ? {
+              [displayField.field.toString()]: query,
+              [getViewConfigManager().getTableName()]: relatedIsList
+                ? [row]
+                : row,
+            }
+          : undefined
+      );
     },
   } satisfies ComboboxPopoverProps<Row>;
 };

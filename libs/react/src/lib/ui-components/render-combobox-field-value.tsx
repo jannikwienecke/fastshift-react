@@ -4,6 +4,7 @@ import { FilterValue } from './render-filter-value';
 import { Icon } from './render-icon';
 import { getComponent } from './ui-components.helper';
 import { isDetail } from '../legend-store/legend.utils';
+import { store$ } from '../legend-store';
 
 export const DefaultComboboxFieldValue = (props: {
   row?: Row;
@@ -64,7 +65,7 @@ export const ComboboxFieldValue = ({
       ? value.raw === 'true'
         ? true
         : false
-      : value.raw;
+      : value.raw ?? value;
 
   return (
     <>

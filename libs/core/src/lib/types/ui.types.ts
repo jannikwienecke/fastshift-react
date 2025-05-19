@@ -119,6 +119,7 @@ export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> = {
   name: string;
   datePickerProps?: DatePickerProps;
   showCheckboxInList?: boolean;
+  onClickCreateNew: (value: string) => void;
 };
 
 export type ComboboxAdapterOptions<T extends ComboxboxItem> = {

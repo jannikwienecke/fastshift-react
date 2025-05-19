@@ -30,17 +30,20 @@ export const tasksUiViewConfig = makeViewFieldsConfig<TaskViewDataType>(
         component: {
           comboboxListValue: ({ data, row }) => {
             const task = data as unknown as TaskViewDataType;
-
+            if (!task) {
+              console.debug('task is null');
+              console.debug({ data, row });
+              return null;
+            }
             return (
               <div className="flex flex-row items-center gap-3">
                 <div>{task.name} </div>
-                <BubbleItem label={task.projects.label}></BubbleItem>
+                <BubbleItem label={task.projects?.label ?? ''} />
               </div>
             );
           },
         },
       },
-
       todos: {
         component: {
           list: ({ data }) => {

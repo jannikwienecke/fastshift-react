@@ -19,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../components/popover';
 import { cn } from '../utils';
 import { DatePicker } from '../date-picker';
 import { useTranslation } from 'react-i18next';
+import { PlusIcon } from 'lucide-react';
 
 export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
   props: ComboboxPopoverProps<T> & { children?: React.ReactNode }
@@ -98,49 +99,80 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
             </div>
 
             <CommandList>
-              <CommandGroup>
-                {comboboxProps.values.map((value, index) => {
-                  const isSelected = comboboxProps.selected?.find(
-                    (s) => s.id === value.id
-                  );
+              <>
+                <CommandGroup>
+                  {comboboxProps.values.map((value, index) => {
+                    const isSelected = comboboxProps.selected?.find(
+                      (s) => s.id === value.id
+                    );
 
-                  return (
-                    <div key={value.id.toString()} className="">
-                      <CommandItem
-                        className="flex items-center justify-between whitespace-nowrap gap-3 text-[13px]"
-                        value={value.id.toString()}
-                        onSelect={() => {
-                          comboboxProps.onChange(value);
-                        }}
-                      >
-                        <div className="flex items-center gap-4">
-                          {comboboxProps.showCheckboxInList ? (
-                            <Checkbox checked={isSelected ? true : false} />
-                          ) : null}
+                    return (
+                      <div key={value.id.toString()} className="">
+                        <CommandItem
+                          className="flex items-center justify-between whitespace-nowrap gap-3 text-[13px]"
+                          value={value.id.toString()}
+                          onSelect={() => {
+                            comboboxProps.onChange(value);
+                          }}
+                        >
+                          <div className="flex items-center gap-4">
+                            {comboboxProps.showCheckboxInList ? (
+                              <Checkbox checked={isSelected ? true : false} />
+                            ) : null}
 
-                          <div>{comboboxProps.render(value)}</div>
-                        </div>
+                            <div>{comboboxProps.render(value)}</div>
+                          </div>
 
-                        <div className="flex items-center gap-2">
-                          <CheckIcon
-                            aria-label={
-                              isSelected
-                                ? 'combobox-checked'
-                                : 'combobox-not-checked'
-                            }
-                            className={cn(
-                              'w-5 h-5 font-bold invisible',
-                              isSelected ? 'visible' : ''
-                            )}
-                          />
+                          <div className="flex items-center gap-2">
+                            <CheckIcon
+                              aria-label={
+                                isSelected
+                                  ? 'combobox-checked'
+                                  : 'combobox-not-checked'
+                              }
+                              className={cn(
+                                'w-5 h-5 font-bold invisible',
+                                isSelected ? 'visible' : ''
+                              )}
+                            />
 
-                          <span className="text-[11px]">{index}</span>
-                        </div>
-                      </CommandItem>
+                            <span className="text-[11px]">{index}</span>
+                          </div>
+                        </CommandItem>
+                      </div>
+                    );
+                  })}
+                </CommandGroup>
+
+                <CommandGroup>
+                  <CommandItem
+                    // onEnter
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        props.onClickCreateNew(input.query);
+                      }
+                    }}
+                    onSelect={() => {
+                      props.onClickCreateNew(input.query);
+                    }}
+                    className={
+                      comboboxProps.values.length === 0 ? 'bg-slate-100' : ''
+                    }
+                  >
+                    <div>
+                      <PlusIcon />
                     </div>
-                  );
-                })}
-              </CommandGroup>
+                    <div className="text-sm">
+                      {'Create new label:'}{' '}
+                      <span className="text-muted-foreground">
+                        {input.query}
+                      </span>
+                    </div>
+                  </CommandItem>
+                </CommandGroup>
+              </>
             </CommandList>
           </Command>
         </PopoverContent>

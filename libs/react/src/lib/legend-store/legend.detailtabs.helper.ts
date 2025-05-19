@@ -42,13 +42,31 @@ export const detailTabsHelper = () => {
   const detailTabsFields = getDetailTabsFields();
 
   if (!store$.detail.activeTabField.get()) {
-    store$.detail.activeTabField.set(detailTabsFields[0]);
+    store$.detail.activeTabField.set(detailTabsFields?.[0]);
     store$.detail.isActivityTab.set(true);
   }
 
   const activeTabField = store$.detail.activeTabField.get();
 
-  if (!activeTabField) return null;
+  if (!activeTabField) {
+    return {
+      updateRow: () => null,
+      saveIfDirty: () => null,
+      activeTabField: null,
+      detailTabsFields: [],
+      activeTabPrimitiveFields: [],
+      activeTabComplexFields: [],
+      row: null,
+    } satisfies {
+      row: Row | null;
+      updateRow: (field: FieldConfig, value: unknown) => void;
+      saveIfDirty: (field: FieldConfig) => void;
+      activeTabField: CommandformItem | null;
+      detailTabsFields: CommandformItem[];
+      activeTabPrimitiveFields: CommandformItem[];
+      activeTabComplexFields: CommandformItem[];
+    };
+  }
 
   const activeTabViewConfig = getViewByName(
     store$.views.get(),

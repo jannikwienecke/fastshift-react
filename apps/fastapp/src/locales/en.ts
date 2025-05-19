@@ -17,6 +17,14 @@ export const en = {
     one: 'User',
     other: 'Users',
   },
+  color: {
+    one: 'Color',
+    other: 'Colors',
+  },
+  label: {
+    one: 'Label',
+    other: 'Labels',
+  },
   projects: {
     one: 'Project',
     other: 'Projects',
