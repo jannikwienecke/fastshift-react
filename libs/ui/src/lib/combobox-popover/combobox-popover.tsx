@@ -144,34 +144,38 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
                   })}
                 </CommandGroup>
 
-                <CommandGroup>
-                  <CommandItem
-                    // onEnter
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        e.stopPropagation();
+                {comboboxProps.values.length === 0 ? (
+                  <CommandGroup>
+                    <CommandItem
+                      // onEnter
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          props.onClickCreateNew(input.query);
+                        }
+                      }}
+                      onSelect={() => {
                         props.onClickCreateNew(input.query);
+                      }}
+                      className={
+                        comboboxProps.values.length === 0 ? 'bg-slate-100' : ''
                       }
-                    }}
-                    onSelect={() => {
-                      props.onClickCreateNew(input.query);
-                    }}
-                    className={
-                      comboboxProps.values.length === 0 ? 'bg-slate-100' : ''
-                    }
-                  >
-                    <div>
-                      <PlusIcon />
-                    </div>
-                    <div className="text-sm">
-                      {'Create new label:'}{' '}
-                      <span className="text-muted-foreground">
-                        {input.query}
-                      </span>
-                    </div>
-                  </CommandItem>
-                </CommandGroup>
+                    >
+                      <div>
+                        <PlusIcon />
+                      </div>
+                      <div className="text-sm">
+                        {/* TODO: fix should be create new {field} or something an dtranslated */}
+                        {/* {should not be visible for enum etc.} */}
+                        {'Create new label:'}{' '}
+                        <span className="text-muted-foreground">
+                          {input.query}
+                        </span>
+                      </div>
+                    </CommandItem>
+                  </CommandGroup>
+                ) : null}
               </>
             </CommandList>
           </Command>

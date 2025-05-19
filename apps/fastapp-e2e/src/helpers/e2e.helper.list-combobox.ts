@@ -40,7 +40,7 @@ export const listCombobox = ({ mainPage: taskPage }: PartialFixtures) => {
   };
 
   const pickOptionInCombobox = async (value: string) => {
-    await taskPage.comboboxPopover.getByText(value).click();
+    await taskPage.comboboxPopover.getByText(value).first().click();
     await expect(taskPage.comboboxPopover).toBeHidden();
   };
 
