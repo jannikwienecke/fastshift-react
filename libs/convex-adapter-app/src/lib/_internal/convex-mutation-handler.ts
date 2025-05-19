@@ -71,29 +71,6 @@ export const createMutation = async (
     for (const index in manyToManyFields) {
       const field = manyToManyFields[index];
 
-      const viewOfField = getViewByName(props.registeredViews, field.name);
-
-      if (!viewOfField?.isManyToMany) {
-        // TODO: todoId:1
-        const manyToMany = Object.values(props.registeredViews).find(
-          (v) =>
-            v?.isManyToMany &&
-            [viewOfField?.tableName, viewConfigManager.getTableName()].every(
-              (t) => Object.keys(v.viewFields).includes(t)
-            )
-        );
-
-        if (!manyToMany) {
-          console.error(
-            'Field is not many to many',
-            field.name,
-            viewOfField?.isManyToMany
-          );
-          console.error('No many to many found');
-          continue;
-        }
-      }
-
       if (!field?.relation?.fieldName) continue;
 
       const ids = record[field?.relation?.fieldName];
