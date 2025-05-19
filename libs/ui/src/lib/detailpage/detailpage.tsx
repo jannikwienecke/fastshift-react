@@ -6,6 +6,7 @@ import {
 } from '@apps-next/core';
 import { CubeIcon, DotsHorizontalIcon } from '@radix-ui/react-icons';
 import {
+  ActivityIcon,
   ChevronRightIcon,
   Layers3Icon,
   ShareIcon,
@@ -214,10 +215,14 @@ const DetailTabs = (
         <button
           onClick={() => onSelectHistoryTab()}
           className={cn(
-            'border-[.5px] py-2 px-4',
-            props.tabs.isHistoryTab ? ' border-b-0 ' : ''
+            'border-[.5px] py-2 px-4 flex flex-row gap-2 items-center',
+            props.tabs.isHistoryTab
+              ? ' border-b-0 text-foreground'
+              : 'text-foreground/70'
           )}
         >
+          {/* TODO Fix translation */}
+          <ActivityIcon className="h-4 w-4" />
           {'Acitivty'}
         </button>
 
@@ -231,10 +236,11 @@ const DetailTabs = (
               key={tab.field?.name}
               onClick={() => onSelectTab(tab)}
               className={cn(
-                'border-[.5px] py-2 px-4',
-                isActive ? ' border-b-0 ' : ''
+                'border-[.5px] py-2 px-4 flex flex-row gap-2 items-center',
+                isActive ? ' border-b-0 text-foreground' : 'text-foreground/70'
               )}
             >
+              {tab.icon ? <tab.icon className="h-4 w-4" /> : null}
               {tab.field?.label}
             </button>
           );

@@ -160,17 +160,22 @@ Small Bugs to fix
 
 - [x] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
 - [x] in add task in project, project is not selected...
-- [ ] in add task in project, priority is not rendered correctly
-- [ ] the due date field in project detail, has no icon shown
+- [x] in add task in project, priority is not rendered correctly
+- [x] the due date field in project detail, has no icon shown
 
 Small Features to add
 
 - [x] activity list, we need to add a useActivity hook for real time updates.
 - [x] scrollable list for acitivty
-- [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task
-- [ ] add a go to button next to the relational value in detail
+- [x] when we create a tag inside a task detail view, we need to directly add this tag to this task
+- [x] add a go to button next to the relational value in detail
+- [ ] in tab header -> show icon
+- [ ] in tab content. show the display field more prominent and add a go to button
 - [ ] color picker and color indicator for fields with type "color" or something like this
+- [ ] in combobox popover, if not found -> show create
+- [ ] create sepearte store for values that should be persisted on local storage and the synced
 
 Add tests
 
 - [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
+- [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task

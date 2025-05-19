@@ -16,11 +16,21 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import { Layers3Icon, PlusIcon } from 'lucide-react';
-import { comboboxStore$, store$ } from '../legend-store';
+import {
+  comboboxStore$,
+  getView,
+  parentView$,
+  parentViewName$,
+  store$,
+} from '../legend-store';
 import { xSelect } from '../legend-store/legend.select-state';
 import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
 import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
-import { getViewConfigManager } from '../legend-store/legend.utils';
+import {
+  getIsManyRelationView,
+  getViewConfigManager,
+  isDetailOverview,
+} from '../legend-store/legend.utils';
 
 const getViewName = () => store$.viewConfigManager.getViewName();
 
@@ -194,27 +204,17 @@ const makeOpenCreateFormCommand = (view: ViewConfigType): CommandbarItem => {
     name: label,
   });
 
-  const parentViewName = store$.detail.parentViewName.get();
+  const parentView = parentView$.get();
+
   if (
-    parentViewName &&
-    view.viewName === store$.viewConfigManager.getViewName()
+    isDetailOverview() &&
+    parentView &&
+    getIsManyRelationView(view.tableName)
   ) {
-    const userView = store$.userViews
-      .find((v) => v.name.get().toLowerCase() === parentViewName.toLowerCase())
-      ?.get();
-
-    const viewOfParent = getViewByName(
-      store$.views.get(),
-      userView?.baseView ?? parentViewName ?? ''
-    );
-    const tableName = viewOfParent?.tableName;
-    if (!tableName) throw new Error('tableName not found');
-
-    const labelOfParent = getViewLabel(viewOfParent, true) as string;
-
+    const parentLabel = getViewLabel(parentView, true) as string;
     labelToUse = t('common.createNewIn' satisfies TranslationKeys, {
       name: label,
-      field: labelOfParent.toLowerCase(),
+      field: parentLabel.toLowerCase(),
     });
   }
 

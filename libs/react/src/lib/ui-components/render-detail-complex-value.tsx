@@ -8,6 +8,7 @@ import {
 } from '@apps-next/core';
 import { BubbleItem, Label } from '@apps-next/ui';
 import { CubeIcon } from '@radix-ui/react-icons';
+import { ChevronRightIcon } from 'lucide-react';
 import { store$ } from '../legend-store';
 import { getComponent } from './ui-components.helper';
 
@@ -27,7 +28,21 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
   };
 
   const renderSingleRelation = (value: Row) => {
-    return <>{value?.label}</>;
+    return (
+      <div className="flex flex-row gap-2 items-center group">
+        <div>{value?.label}</div>
+
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            props.onClickGoToRelation(field, value);
+          }}
+          className="group-hover:opacity-100 opacity-0 transition-opacity hover:bg-foreground/5"
+        >
+          <ChevronRightIcon className="h-4 w-4 text-foreground/70 hover:text-foreground" />
+        </div>
+      </div>
+    );
   };
 
   const renderManyRelation = (value: Row[]) => {

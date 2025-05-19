@@ -16,6 +16,7 @@ import {
 import { getTimeValueFromDateString } from '../ui-adapter/filter-adapter';
 import { getComponent } from '../ui-components/ui-components.helper';
 import { store$ } from './legend.store';
+import { getView } from './legend.shared.derived';
 
 export const getViewConfigManager = () => {
   const defaultView = store$.viewConfigManager.get();
@@ -57,7 +58,7 @@ export const getFormState = () => {
   const errors = viewConfigManager.validateRecord(row?.raw);
 
   if (errors) {
-    _log.debug('Form State Errors: ', errors);
+    console.debug('Form State Errors: ', errors);
   }
 
   return {
@@ -198,7 +199,7 @@ export const formHelper = (
     const errors = viewConfigManager.validateRecord(row?.raw);
 
     if (errors) {
-      _log.info('Form State Errors: ', errors);
+      console.debug('Form State Errors: ', errors);
     }
 
     return {
@@ -247,12 +248,16 @@ export const formHelper = (
     .filter((field) => field.relation || field.enum || field.type === 'Date');
 
   const getComplexFormFields = () => {
+    console.log('getComplexFormFields', complexFields);
+
     return complexFields.map((field) => {
-      const icon = getComponent({
-        fieldName: field.name,
-        componentType: 'icon',
-        isDetail,
-      });
+      const icon =
+        getComponent({
+          fieldName: field.name,
+          componentType: 'icon',
+          isDetail,
+          // TODO refactor this
+        }) ?? getView(field.name)?.icon;
 
       const value = getValueOfRow(field.name);
       const label = Array.isArray(value) ? '' : value?.id ? value.label : value;
@@ -268,6 +273,8 @@ export const formHelper = (
       } satisfies CommandformItem;
     });
   };
+
+  console.log(getComplexFormFields());
 
   const getAllPrimitiveFormFields = () => {
     return primitiveFields.map((field) => {

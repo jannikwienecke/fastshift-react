@@ -136,7 +136,9 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
 
   const hasParentFilter = args.parentId && args.parentViewName;
 
-  const idsSubView = await getIdsFromParentView(args, ctx, viewConfigManager);
+  const idsSubView = hasParentFilter
+    ? await getIdsFromParentView(args, ctx, viewConfigManager)
+    : [];
 
   const deletedIndexField = viewConfigManager.getSoftDeleteIndexField();
 

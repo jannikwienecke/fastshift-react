@@ -66,6 +66,14 @@ export const derviedDetailPage$ = observable(() => {
         selectState$.rect.set(rect);
       }
     },
+    onClickGoToRelation: (field, tabFormField) => {
+      // TODO Abstract this function to a helper
+      store$.navigation.state.assign({
+        type: 'navigate',
+        id: tabFormField.id,
+        view: field.field?.name,
+      });
+    },
     onSelectEmoji(emoji) {
       store$.updateDetailViewMutation({
         emoji,

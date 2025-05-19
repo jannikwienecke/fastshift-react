@@ -269,8 +269,10 @@ export type FormFieldMethod = {
   onClick: (
     field: CommandformItem,
     rect: DOMRect,
-    tabFormField?: boolean
+    tabFormField?: boolean,
+    isGoToClicked?: boolean
   ) => void;
+  onClickGoToRelation: (field: CommandformItem, row: Row) => void;
   onInputChange: (
     field: CommandformItem,
     value: string,

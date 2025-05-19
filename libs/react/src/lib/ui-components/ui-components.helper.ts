@@ -16,16 +16,32 @@ export const getComponent = ({
     ...(store$.detail?.viewConfigManager.uiViewConfig.get() ?? {}),
   };
 
-  const tableName = isDetail
-    ? store$.detail.viewConfigManager.getTableName()
-    : store$.viewConfigManager?.getTableName();
+  const tableNameDetail = store$.detail.viewConfigManager.get()
+    ? store$.detail?.viewConfigManager?.getTableName?.()
+    : '';
 
-  const component =
+  const tableNameConfig = store$.viewConfigManager.getTableName?.();
+
+  const tableName = isDetail ? tableNameDetail ?? '' : tableNameConfig ?? '';
+
+  const fallbackTableName = isDetail ? tableNameConfig : tableNameDetail;
+
+  let component =
     uiViewConfig?.[tableName]?.fields?.[fieldName]?.component?.[componentType];
 
-  if (component) {
-    return component;
+  if (!component && componentType === 'icon') {
+    component =
+      uiViewConfig?.[fallbackTableName]?.fields?.[fieldName]?.component?.[
+        componentType
+      ];
   }
 
-  return undefined;
+  // if (fieldName === 'tasks' && componentType === 'comboboxListValue') {
+  //   console.log('getComponent', fieldName, componentType, isDetail);
+  //   console.log(uiViewConfig);
+  //   console.log({ tableName });
+  //   console.log('getComponent', component);
+  // }
+
+  return component;
 };

@@ -14,7 +14,7 @@ import {
 import { parentView$ } from './legend.shared.derived';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { StoreFn } from './legend.store.types';
-import { copyRow } from './legend.utils';
+import { copyRow, getIsManyRelationView } from './legend.utils';
 
 export const commandformOpen: StoreFn<'commandformOpen'> =
   (store$) => (viewName, row) => {
@@ -28,15 +28,20 @@ export const commandformOpen: StoreFn<'commandformOpen'> =
 
       let defaultRow: Row | null = null;
 
-      if (
-        viewName === store$.viewConfigManager.getViewName() &&
-        store$.detail.parentViewName.get()
-      ) {
+      const isMany = getIsManyRelationView(view.tableName);
+
+      if (isMany) {
         const parentView = parentView$.get();
+        // create tag in tasks. New Tag. That has a many to many relation to tasks
+        // in comparison, create task in project. New Task. That has a one to many relation to project
+        const parentIsListRelation =
+          view.viewFields[parentView?.tableName].isList;
 
         const tableName = parentView?.tableName ?? '';
         defaultRow = getDefaultRow({
-          [tableName]: store$.detail.row.get(),
+          [tableName]: parentIsListRelation
+            ? [store$.detail.row.get()]
+            : store$.detail.row.get(),
         });
       } else {
         defaultRow = getDefaultRow();

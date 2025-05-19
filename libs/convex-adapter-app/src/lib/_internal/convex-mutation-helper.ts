@@ -80,10 +80,10 @@ export const insertIds = async (
 ) => {
   if (mutation.type !== 'SELECT_RECORDS') throw new Error('INVALID MUTATION-4');
 
-  const tableFieldName = getTableFieldName(viewConfigManager, field);
   if (!ids || ids.length === 0) return;
 
-  if (field.isRecursive && tableFieldName) {
+  if (field.isRecursive) {
+    const tableFieldName = getTableFieldName(viewConfigManager, field) ?? '';
     const existingIds = record[tableFieldName] as ID[] | undefined | null;
 
     await ctx.db.patch(mutation.payload['id'], {
@@ -95,30 +95,41 @@ export const insertIds = async (
     return;
   }
 
-  const relationFieldName = field.relation?.manyToManyModelFields?.find(
-    (f) => f.relation?.tableName === field.name
-  )?.relation?.fieldName;
+  // TODO: todoId:1
+  const manyToMany = Object.values(props.registeredViews).find(
+    (v) =>
+      v?.isManyToMany &&
+      [field.name, viewConfigManager.getTableName()].every((t) =>
+        Object.keys(v.viewFields).includes(t)
+      )
+  );
+
   await asyncMap(ids, async (value) => {
-    if (field.relation?.type === 'oneToMany' && tableFieldName) {
+    if (!manyToMany) {
+      const tableFieldName = getTableFieldName(viewConfigManager, field) ?? '';
+
       await ctx.db.patch(value, {
         [tableFieldName]: mutation.payload['id'],
         [INTERNAL_FIELDS.updatedBy.fieldName]: props.user?.['_id'],
         [INTERNAL_FIELDS.updatedAt.fieldName]: Date.now(),
       });
-    } else if (
-      field.relation?.manyToManyTable &&
-      tableFieldName &&
-      relationFieldName
-    ) {
-      await mutationClient(ctx).insert(
-        field.relation.manyToManyTable as string,
-        {
-          [tableFieldName]: mutation.payload['id'],
-          [relationFieldName]: value,
-          // [INTERNAL_FIELDS.deleted.fieldName]: false,
-          // [INTERNAL_FIELDS.createdBy.fieldName]: props.user?.["_id"],
-        }
-      );
+    } else if (manyToMany) {
+      const tableFieldName_ =
+        manyToMany.viewFields[viewConfigManager.getTableName()]?.relation
+          ?.fieldName;
+      const relationFieldName_ =
+        manyToMany.viewFields[field.name]?.relation?.fieldName;
+
+      if (!tableFieldName_ || !relationFieldName_) {
+        throw new Error('tableFieldName_ or relationFieldName_ is undefined');
+      }
+
+      await mutationClient(ctx).insert(manyToMany.tableName, {
+        [tableFieldName_]: mutation.payload['id'],
+        [relationFieldName_]: value,
+        // [INTERNAL_FIELDS.deleted.fieldName]: false,
+        // [INTERNAL_FIELDS.createdBy.fieldName]: props.user?.["_id"],
+      });
     }
   });
 };

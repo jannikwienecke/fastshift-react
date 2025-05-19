@@ -88,3 +88,18 @@ export const getViewConfigManager = (): BaseViewConfigManagerInterface => {
 export const isDetailOverview = () => {
   return store$.detail.viewType.type.get() === 'overview';
 };
+
+export const getIsManyRelationView = (tableOrFieldName: string) => {
+  const detailViewConfigFields =
+    store$.detail.viewConfigManager.viewConfig.viewFields.get();
+
+  const viewThatHasAManyRelation = Object.values(
+    detailViewConfigFields ?? {}
+  ).find(
+    (f) =>
+      f.name === tableOrFieldName &&
+      (f.isList || f.relation?.type === 'manyToMany')
+  );
+
+  return viewThatHasAManyRelation;
+};

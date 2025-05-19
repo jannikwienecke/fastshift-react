@@ -13,7 +13,7 @@ export const historyChangedTypes: {
   [key in HistoryType['changed']['type']]: string;
 } = {
   added: 'added',
-  'added-to': 'added to',
+  'added-to': 'added',
   changed: 'changed',
   created: 'created',
   removed: 'removed',

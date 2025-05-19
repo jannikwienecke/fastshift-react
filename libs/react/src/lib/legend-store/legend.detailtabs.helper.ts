@@ -198,7 +198,7 @@ export const detailTabsHelper = () => {
     const errors = viewConfigManager.validateRecord(row?.raw);
 
     if (errors) {
-      _log.debug('Form State Errors: ', errors);
+      console.debug('Form State Errors: ', errors);
     }
 
     return {

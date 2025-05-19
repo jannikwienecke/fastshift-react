@@ -148,7 +148,6 @@ const onError = () => {
   });
 
   if (toRemove) {
-    console.log(toRemove);
     selectState$.removedRows.set((prev) =>
       prev.filter((r) => r.id !== toRemove.id)
     );

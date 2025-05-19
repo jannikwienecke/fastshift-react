@@ -1,6 +1,8 @@
 import {
+  BaseViewConfigManager,
   ERROR_STATUS,
   FieldConfig,
+  getViewByName,
   INTERNAL_FIELDS,
   MutationHandlerReturnType,
   MutationPropsServer,
@@ -23,6 +25,7 @@ export const createMutation = async (
   if (mutation.type !== 'CREATE_RECORD') throw new Error('INVALID MUTATION-1');
 
   let { record } = mutation.payload;
+
   const displayField = viewConfigManager.getDisplayFieldLabel();
   const displayValue = record?.[displayField];
 
@@ -67,6 +70,30 @@ export const createMutation = async (
 
     for (const index in manyToManyFields) {
       const field = manyToManyFields[index];
+
+      const viewOfField = getViewByName(props.registeredViews, field.name);
+
+      if (!viewOfField?.isManyToMany) {
+        // TODO: todoId:1
+        const manyToMany = Object.values(props.registeredViews).find(
+          (v) =>
+            v?.isManyToMany &&
+            [viewOfField?.tableName, viewConfigManager.getTableName()].every(
+              (t) => Object.keys(v.viewFields).includes(t)
+            )
+        );
+
+        if (!manyToMany) {
+          console.error(
+            'Field is not many to many',
+            field.name,
+            viewOfField?.isManyToMany
+          );
+          console.error('No many to many found');
+          continue;
+        }
+      }
+
       if (!field?.relation?.fieldName) continue;
 
       const ids = record[field?.relation?.fieldName];
@@ -76,7 +103,12 @@ export const createMutation = async (
 
         mutation: {
           type: 'SELECT_RECORDS',
-          payload: { newIds: ids, idsToDelete: [], table: field.name, id: res },
+          payload: {
+            newIds: ids,
+            idsToDelete: [],
+            table: field.name,
+            id: res,
+          },
         },
       });
     }
