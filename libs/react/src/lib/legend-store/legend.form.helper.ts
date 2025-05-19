@@ -248,8 +248,6 @@ export const formHelper = (
     .filter((field) => field.relation || field.enum || field.type === 'Date');
 
   const getComplexFormFields = () => {
-    console.log('getComplexFormFields', complexFields);
-
     return complexFields.map((field) => {
       const icon =
         getComponent({
@@ -273,8 +271,6 @@ export const formHelper = (
       } satisfies CommandformItem;
     });
   };
-
-  console.log(getComplexFormFields());
 
   const getAllPrimitiveFormFields = () => {
     return primitiveFields.map((field) => {

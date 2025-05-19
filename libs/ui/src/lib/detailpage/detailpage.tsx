@@ -260,7 +260,6 @@ const DetailTabs = (
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => {
-                  console.log('clicked');
                   props.tabs?.onClickGoToRelation?.();
                 }}
                 className="max-w-fit pl-8 pb-2"

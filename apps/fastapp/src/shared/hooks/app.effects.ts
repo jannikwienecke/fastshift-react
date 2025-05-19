@@ -146,7 +146,6 @@ export const useAppEffects = (viewName: string) => {
           (() => {
             const id = state.id;
             if (id) {
-              console.log(state);
               navigateRef.current({
                 to: `/fastApp/${slugHelper().slugify(
                   state.view

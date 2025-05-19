@@ -36,12 +36,5 @@ export const getComponent = ({
       ];
   }
 
-  // if (fieldName === 'tasks' && componentType === 'comboboxListValue') {
-  //   console.log('getComponent', fieldName, componentType, isDetail);
-  //   console.log(uiViewConfig);
-  //   console.log({ tableName });
-  //   console.log('getComponent', component);
-  // }
-
   return component;
 };

@@ -106,7 +106,7 @@ export const getIdsFromParentView = async (
     const res = await handle();
     return res;
   } catch (error) {
-    console.log('Error in getIdsFromParentView');
+    console.error('Error in getIdsFromParentView');
     throw error;
   }
 };
