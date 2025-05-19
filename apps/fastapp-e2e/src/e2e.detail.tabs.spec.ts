@@ -75,7 +75,7 @@ test.describe('Detail Tabs', () => {
       helper,
     });
 
-    await searchInCombobox('users', CON.user.values.janeSmith);
+    await searchInCombobox('user', CON.user.values.janeSmith);
 
     await pickOptionInCombobox(CON.user.values.janeSmith);
 

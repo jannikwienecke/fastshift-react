@@ -72,7 +72,8 @@ export const detailFormHelper = () => {
         .filter(
           (f) =>
             f.field.relation?.manyToManyModelFields?.length &&
-            !f.field.showInProperties
+            !f.field.showInProperties &&
+            !f.field.hide
         ) ?? []
     );
   };

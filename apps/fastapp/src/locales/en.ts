@@ -13,14 +13,21 @@ export const en = {
     users: 'Users',
     history: 'History',
   },
+  users: {
+    one: 'User',
+    other: 'Users',
+  },
   projects: {
     one: 'Project',
     other: 'Projects',
   },
   name: {
+    one: 'Name',
+    other: 'Names',
     edit: 'Rename {{model}}',
     // changeField: 'Update description',
   },
+
   tableName: {
     one: 'Model',
     other: 'Models',

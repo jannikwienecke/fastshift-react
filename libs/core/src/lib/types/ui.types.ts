@@ -349,6 +349,7 @@ export type DetailPageProps = {
     isHistoryTab: boolean;
     historyData: HistoryType[];
     onSelectTab: (field: CommandformItem) => void;
+    onClickGoToRelation: () => void;
     onSelectHistoryTab: () => void;
   } | null;
 

@@ -45,6 +45,7 @@ export const detailTabsHelper = () => {
     store$.detail.activeTabField.set(detailTabsFields[0]);
     store$.detail.isActivityTab.set(true);
   }
+  console.log(store$.detail.activeTabField.get());
 
   const activeTabField = store$.detail.activeTabField.get();
 

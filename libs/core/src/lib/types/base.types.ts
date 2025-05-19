@@ -51,6 +51,7 @@ export type FieldConfigOptions<
   // defaultValue?: unknown;
   defaultValue?: GetTableDataType<T>[F] | (() => GetTableDataType<T>[F]);
   hideFromForm?: boolean;
+  hide?: boolean;
   isDisplayField?: true;
   richEditor?: boolean;
   isDateField?: boolean;

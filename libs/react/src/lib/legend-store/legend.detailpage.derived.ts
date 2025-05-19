@@ -46,6 +46,16 @@ export const derviedDetailPage$ = observable(() => {
             store$.detail.isActivityTab.set(false);
             store$.detail.activeTabField.set(field);
           },
+          onClickGoToRelation: () => {
+            const tab = store$.detail.activeTabField.get();
+            if (!tab?.field?.name || !tab.rowValue) return;
+
+            store$.navigation.state.set({
+              type: 'navigate',
+              id: tab?.rowValue.id,
+              view: tab.field.name,
+            });
+          },
         }
       : null,
     onClick: (field, rect, tabFormField) => {

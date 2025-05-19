@@ -1,5 +1,5 @@
 import { FormFieldProps } from '@apps-next/core';
-import { cn, Label } from '@apps-next/ui';
+import { BubbleItem, cn, Label } from '@apps-next/ui';
 import { AlertCircle } from 'lucide-react';
 import { onBlur, onChange, onKeyDown } from './render-form-field';
 

@@ -179,6 +179,9 @@ export const ownerConfig = createViewConfig(
     viewName: 'Owner',
     displayField: { field: 'name' },
     fields: {
+      history: {
+        hide: true,
+      },
       name: {
         hideFromForm: true,
       },
