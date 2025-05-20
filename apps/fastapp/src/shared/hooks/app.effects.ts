@@ -55,7 +55,13 @@ export const useAppEffects = (viewName: string) => {
 
   const [_, i18n] = useTranslationReact();
 
+  const ignoreFirstRef = React.useRef(true);
   React.useEffect(() => {
+    if (ignoreFirstRef.current) {
+      ignoreFirstRef.current = false;
+      return;
+    }
+
     globalStore.setViews(views);
   }, [i18n.language]);
 
@@ -104,7 +110,7 @@ export const useAppEffects = (viewName: string) => {
 
       const view = store$.viewConfigManager.getViewName();
       const userViewData = store$.userViewData.get();
-      const slug = userViewData?.slug ?? view;
+      const slug = userViewData?.slug || view;
       const viewsNotPreload: GetTableName[] = ['history'];
 
       const isInNotPreload = viewsNotPreload.find((v) =>

@@ -77,7 +77,11 @@ test.describe('Detail Tabs', () => {
 
     await searchInCombobox('user', CON.user.values.janeSmith);
 
+    await waitFor(mainPage.page, 500);
+
     await pickOptionInCombobox(CON.user.values.janeSmith);
+
+    await pressEscape(mainPage.page);
 
     await waitFor(mainPage.page, 500);
 

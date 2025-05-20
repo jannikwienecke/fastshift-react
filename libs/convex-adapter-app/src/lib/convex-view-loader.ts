@@ -32,6 +32,17 @@ export const viewLoaderHandler = async (
     };
   }
 
+  if (args.onlyRelationalData) {
+    //
+  } else {
+    console.log('Convex:VIEW LOADER START', {
+      viewName: args.viewName,
+      viewId: args.viewId,
+      parentViewName: args.parentViewName,
+      parentId: args.parentId,
+    });
+  }
+
   // console.warn('____'VIEW LOADER START', {
   //   ...args,
   //   modelConfig: undefined,

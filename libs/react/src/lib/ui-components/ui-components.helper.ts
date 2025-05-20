@@ -15,7 +15,9 @@ export const getComponent = ({
     ? store$.detail?.viewConfigManager?.getTableName?.()
     : '';
 
-  const tableNameConfig = store$.viewConfigManager.getTableName?.();
+  const viewConfigManger = store$.viewConfigManager.get() ?? {};
+
+  const tableNameConfig = viewConfigManger?.getTableName?.();
   const commanformTablename = store$.commandform.view.tableName.get();
 
   const tableName = isDetail

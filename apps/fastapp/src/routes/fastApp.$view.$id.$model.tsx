@@ -1,17 +1,9 @@
 import { views } from '@apps-next/convex';
-import { _log, getViewByName, QueryReturnOrUndefined } from '@apps-next/core';
-import { globalStore } from '@apps-next/react';
+import { getViewByName } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
-import React from 'react';
-import { getViewData, wait } from '../application-store/app.store.utils';
-import {
-  getQueryKey,
-  getUserViews,
-  getUserViewsQuery,
-  queryClient,
-} from '../query-client';
-import { useViewParams } from '../shared/hooks';
+import { createFileRoute, useParams } from '@tanstack/react-router';
+import { getViewData } from '../application-store/app.store.utils';
+import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
 import { getViewParms } from '../shared/utils/app.helper';
 import {
   RenderDisplayOptions,
@@ -22,7 +14,6 @@ import {
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
-    console.warn('____LOAD SUB MODEL', ctx.params.model);
     await queryClient.ensureQueryData(getUserViewsQuery());
 
     const model = ctx.params.model;
@@ -37,11 +28,6 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
     const userViews = getUserViews();
     const { viewData } = getViewData(view.viewName, userViews);
 
-    if (!viewData) {
-      _log.info(`View ${view.viewName} not found, redirecting to /fastApp`);
-      return redirect({ to: '/fastApp' });
-    }
-
     await ctx.context.preloadQuery(
       viewData.viewConfig,
       view.viewName,
@@ -50,45 +36,18 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
       ctx.params.id
     );
   },
+
   component: () => <DetailModelListViewPage />,
 });
 
 const DetailModelListViewPage = observer(() => {
-  const { model, id } = useParams({ from: '/fastApp/$view/$id/$model' });
-  const { viewName: parentViewName } = useViewParams();
+  const { model } = useParams({ from: '/fastApp/$view/$id/$model' });
 
   const view = getViewByName(views, model);
 
   const userViews = getUserViews();
 
   const { viewData } = getViewData(view?.viewName ?? '', userViews);
-
-  const doOnceForModelID = React.useRef('');
-
-  const modelId = model + id;
-  if (model && id && modelId !== doOnceForModelID.current && view?.viewName) {
-    doOnceForModelID.current = modelId;
-
-    const data = queryClient.getQueryData(
-      getQueryKey(
-        viewData.viewConfig,
-        view?.viewName ?? '',
-        null,
-        parentViewName ?? null,
-        id ?? null
-      )
-    ) as QueryReturnOrUndefined;
-
-    globalStore.dispatch({
-      type: 'LOAD_SUB_VIEW_LIST_PAGE',
-      payload: {
-        id,
-        viewName: view?.viewName ?? '',
-        parentViewName: parentViewName ?? '',
-        data,
-      },
-    });
-  }
 
   if (viewData.main) {
     return <viewData.main isSubView={true} />;

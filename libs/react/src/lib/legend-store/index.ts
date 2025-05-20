@@ -9,3 +9,4 @@ export * from './legend.app.registry';
 export * from './legend.queryProps.derived';
 export * from './legend.shared.derived';
 export * from './legend.store.persisted';
+export * from './new-handler';

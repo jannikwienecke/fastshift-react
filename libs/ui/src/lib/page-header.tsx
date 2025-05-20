@@ -65,7 +65,7 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="w-56 rounded-lg text-sm">
-                  {props.options.map((option, index) => {
+                  {props.options?.map((option, index) => {
                     return (
                       <div key={index}>
                         {option.items.map((item) => {

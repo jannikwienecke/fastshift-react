@@ -1,7 +1,7 @@
 import { UserViewData, ViewRegistryEntry } from '@apps-next/core';
 import { viewRegistry } from '@apps-next/react';
 
-const isDev = import.meta.env.MODE === 'development';
+export const isDev = import.meta.env.MODE === 'development';
 export const wait = () => {
   if (!isDev) {
     console.warn('wait() is only for development purposes');
