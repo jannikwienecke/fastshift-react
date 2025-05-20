@@ -7,9 +7,6 @@ import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
-  // onEnter: (props) => {
-  //   console.log('/fastApp/view/$id::onEnter');
-  // },
   loader: async (props) => {
     await props.parentMatchPromise;
   },
@@ -17,7 +14,7 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
 });
 
 const DetaiViewPage = observer(() => {
-  React.useEffect(() => console.log(':: Render:DetaiViewPage'), []);
+  React.useEffect(() => console.debug('Render:DetaiViewPage'), []);
 
   const params = useParams({ strict: false });
   const { viewData, viewName } = getView({ params });

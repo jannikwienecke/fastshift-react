@@ -2,7 +2,9 @@ import {
   BaseViewConfigManager,
   configManager,
   DEFAULT_FETCH_LIMIT_QUERY,
+  patchAllViews,
   QueryReturnOrUndefined,
+  RegisteredViews,
   UserViewData,
   ViewRegistryEntry,
 } from '@apps-next/core';
@@ -25,6 +27,7 @@ type Action =
       userViewData: UserViewData | undefined | null;
       viewData: ViewRegistryEntry;
       id?: string | null | undefined;
+      isLoader?: boolean;
     }
   | {
       type: 'LOAD_DETAIL_OVERVIEW';
@@ -34,6 +37,7 @@ type Action =
       viewData: ViewRegistryEntry;
       id: string;
       model: string | undefined;
+      isLoader?: boolean;
     }
   | {
       type: 'LOAD_DETAIL_SUB_VIEW';
@@ -43,13 +47,10 @@ type Action =
       userViewData: UserViewData | undefined | null;
       viewData: ViewRegistryEntry;
       id: string;
+      isLoader?: boolean;
     };
 
-export const state$ = observable({
-  detailData: {} as QueryReturnOrUndefined,
-});
-
-export const dispatch = (action: Action) => {
+export const dispatchViewAction = (action: Action) => {
   switch (action.type) {
     case 'LOAD_VIEW':
       handleLoadView(action);
@@ -70,16 +71,15 @@ const handleLoadDetailSubView = (action: Action) => {
   if (action.type !== 'LOAD_DETAIL_SUB_VIEW') return;
   const key = `load-view-${action.parentViewName}-${action.id}-model-${action.viewName}`;
 
-  if (loadDetailSubViewKey$.get() === key) {
-    return;
-  }
-
+  if (loadDetailSubViewKey$.get() === key) return;
   loadDetailSubViewKey$.set(key);
+  store$.state.set('pending');
 
-  console.log('ACTION: LOAD_DETAIL_SUB_VIEW:: ', action);
+  console.debug('ACTION: LOAD_DETAIL_SUB_VIEW:: ', action);
 
   const view = getView(action.viewData.viewConfig.viewName);
   if (!view) throw new Error('NO VIEW !!');
+
   const viewConfigManager = new BaseViewConfigManager(
     view,
     action.viewData.uiViewConfig
@@ -106,40 +106,40 @@ const handleLoadDetailOverview = (action: Action) => {
 
   loadDetailOverviewKey$.set(key);
   loadViewKey$.set('');
-  console.log('ACTION: LOAD_DETAIL_OVERVIEW:: ', action);
+  store$.state.set('pending');
+
+  console.debug('ACTION: LOAD_DETAIL_OVERVIEW:: ', action);
 
   const view = getView(action.viewData.viewConfig.viewName);
 
-  if (!view) {
-    throw new Error('NOT VALID VIEW');
-  }
+  if (!view) throw new Error('handleLoadDetailOverview: View not found.');
 
   const viewConfigManager = new BaseViewConfigManager(
     view,
     action.viewData.uiViewConfig
   );
 
+  batch(() => {
+    !action.model && resetStore();
+
+    store$.detail.viewConfigManager.set(viewConfigManager);
+    store$.detail.historyDataOfRow.set(action.data.historyData ?? []);
+    store$.detail.viewType.set(
+      action.model
+        ? {
+            type: action.model ? 'model' : 'overview',
+            model: action.model,
+          }
+        : { type: 'overview' }
+    );
+    store$.detail.parentViewName.set(action.viewName);
+    createRelationalDataModel(store$)(action.data.relationalData ?? {});
+    handleIncomingDetailData(store$)(action.data);
+  });
+
   if (!action.model) {
-    resetStore();
+    console.debug('handleLoadDetailOverview: Pre setup model sub view.');
 
-    batch(() => {
-      store$.detail.viewConfigManager.set(viewConfigManager);
-      store$.detail.historyDataOfRow.set(action.data.historyData ?? []);
-      store$.detail.viewType.set(
-        action.model
-          ? {
-              type: action.model ? 'model' : 'overview',
-              model: action.model,
-            }
-          : { type: 'overview' }
-      );
-      store$.detail.parentViewName.set(action.viewName);
-      createRelationalDataModel(store$)(action.data.relationalData ?? {});
-      handleIncomingDetailData(store$)(action.data);
-    });
-
-    console.log('SET UP SUB VIEW FOR DETAIL OVERVIEW');
-    // load sub view...
     const helper = detailFormHelper();
 
     const firstRelationalListField = helper.getRelationalFields()?.[0];
@@ -163,23 +163,9 @@ const handleLoadDetailOverview = (action: Action) => {
       parentViewName: action.viewName,
     });
     loadDetailSubViewKey$.set('');
-  } else {
-    batch(() => {
-      store$.detail.viewConfigManager.set(viewConfigManager);
-      store$.detail.historyDataOfRow.set(action.data.historyData ?? []);
-      store$.detail.viewType.set(
-        action.model
-          ? {
-              type: action.model ? 'model' : 'overview',
-              model: action.model,
-            }
-          : { type: 'overview' }
-      );
-      store$.detail.parentViewName.set(action.viewName);
-      createRelationalDataModel(store$)(action.data.relationalData ?? {});
-      handleIncomingDetailData(store$)(action.data);
-    });
   }
+
+  store$.state.set('initialized');
 };
 
 const loadViewKey$ = observable('');
@@ -195,15 +181,13 @@ const handleLoadView = (action: Action) => {
     action.viewData.uiViewConfig
   );
 
-  if (loadViewKey$.get() === key) return;
+  //   perstistedStore$.activeTabFieldName.set(undefined);
+  // perstistedStore$.isActivityTab.set(true);
 
-  console.log('ACTION: LOAD_VIEW:: ', action.viewName);
-  resetStore();
-  setStore({
-    viewConfigManager,
-    parentViewName: undefined,
-    userViewData: action.userViewData ?? undefined,
-  });
+  if (loadViewKey$.get() === key && !action.isLoader) return;
+
+  loadViewKey$.set(key);
+  store$.state.set('pending');
 
   if (!action.id) {
     loadDetailOverviewKey$.set('');
@@ -211,7 +195,15 @@ const handleLoadView = (action: Action) => {
     store$.detail.set(undefined);
   }
 
-  loadViewKey$.set(key);
+  console.debug('ACTION: LOAD_VIEW:: ', action.viewName);
+
+  resetStore();
+
+  setStore({
+    viewConfigManager,
+    parentViewName: undefined,
+    userViewData: action.userViewData ?? undefined,
+  });
 
   handleQueryData(action.data);
 
@@ -316,4 +308,36 @@ const setStore = ({
       });
     }
   });
+};
+
+export const globalStore = {
+  dispatchViewAction,
+  setViews: (views: RegisteredViews) => {
+    store$.views.set(patchAllViews(views));
+    if (!store$.viewConfigManager.viewConfig.get()) return;
+
+    console.log('HIER');
+
+    const current = store$.viewConfigManager.get();
+    const viewConfig = getView(current.getViewName());
+    if (!viewConfig) return;
+
+    const updatedViewConfigManager = new BaseViewConfigManager(
+      viewConfig,
+      current.uiViewConfig
+    );
+    store$.viewConfigManager.set(updatedViewConfigManager);
+
+    const currentDetail = store$.detail.viewConfigManager.get();
+    if (currentDetail?.viewConfig.viewName) {
+      const viewConfig = getView(currentDetail.viewConfig.viewName);
+      if (!viewConfig) return;
+
+      const updatedViewConfigManager = new BaseViewConfigManager(
+        viewConfig,
+        current.uiViewConfig
+      );
+      store$.detail.viewConfigManager.set(updatedViewConfigManager);
+    }
+  },
 };

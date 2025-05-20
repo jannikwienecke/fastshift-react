@@ -99,7 +99,7 @@ export const saveSubUserView: StoreFn<'saveSubUserView'> =
     const parentTablename = parentView$.get()?.tableName;
     const view = currentView$.get();
 
-    console.log('===', { view, parentTablename });
+    console.log('save sub', { view, parentTablename });
     if (!parentTablename) return;
 
     const name = `${parentTablename}|${view.tableName}`;

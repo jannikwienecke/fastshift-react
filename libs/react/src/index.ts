@@ -21,7 +21,7 @@ export * from './lib/legend-store';
 export * from './lib/create-view-config';
 export * from './lib/use-combobox-query';
 export * from './lib/toast';
-export * from './lib/legend-store/legend.store.global';
+// export * from './lib/legend-store/legend.store.global';
 
 export const makeViewFieldsConfig = <T extends RecordType>(
   table: keyof RegisteredRouter['config']['_datamodel'],

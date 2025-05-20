@@ -35,21 +35,16 @@ export const viewLoaderHandler = async (
   if (args.onlyRelationalData) {
     //
   } else {
-    console.log('Convex:VIEW LOADER START', {
-      viewName: args.viewName,
-      viewId: args.viewId,
-      parentViewName: args.parentViewName,
-      parentId: args.parentId,
-    });
+    if (args.viewId) {
+      console.debug(`Loader:Detail:${args.viewName}`);
+    } else if (args.parentViewName) {
+      console.debug(
+        `Loader:SubView:${args.viewName}:Of:${args.parentViewName}`
+      );
+    } else if (args.viewName) {
+      console.debug(`Loder:View:${args.viewName}`);
+    }
   }
-
-  // console.warn('____'VIEW LOADER START', {
-  //   ...args,
-  //   modelConfig: undefined,
-  //   viewConfigManager: undefined,
-  //   registeredViews: undefined,
-  //   viewConfig: undefined,
-  // });
 
   const viewConfigManager = args.viewConfigManager;
   if (!viewConfigManager) throw new Error('viewConfigManager is not defined');

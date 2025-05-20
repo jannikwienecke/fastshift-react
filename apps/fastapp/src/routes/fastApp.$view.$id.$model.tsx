@@ -2,35 +2,35 @@ import { views } from '@apps-next/convex';
 import { getViewByName } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';
-import { getViewData } from '../application-store/app.store.utils';
+import {
+  getSubModelViewData,
+  getViewData,
+} from '../application-store/app.store.utils';
 import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
-import { getViewParms } from '../shared/utils/app.helper';
+import { getView } from '../shared/utils/app.helper';
 import {
   RenderDisplayOptions,
   RenderFilter,
   RenderInputDialog,
   RenderList,
 } from '../views/default-components';
+import React from 'react';
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
     await queryClient.ensureQueryData(getUserViewsQuery());
 
     const model = ctx.params.model;
-    const view = getViewByName(views, model);
+    const { viewData: parentViewData, viewName: parentViewName } = getView(ctx);
 
-    if (!view) throw new Error('NOT VALID MODEL');
-
-    const { viewName: parentViewName } = getViewParms(ctx.params);
-
-    if (!parentViewName) throw new Error('NOT VALID VIEW');
-
-    const userViews = getUserViews();
-    const { viewData } = getViewData(view.viewName, userViews);
+    const { viewData: viewDataModel } = getSubModelViewData(
+      model,
+      parentViewData.viewConfig.tableName
+    );
 
     await ctx.context.preloadQuery(
-      viewData.viewConfig,
-      view.viewName,
+      viewDataModel.viewConfig,
+      viewDataModel.viewConfig.viewName,
       null,
       parentViewName,
       ctx.params.id
@@ -41,6 +41,8 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
 });
 
 const DetailModelListViewPage = observer(() => {
+  React.useEffect(() => console.debug('Render:SubList'));
+
   const { model } = useParams({ from: '/fastApp/$view/$id/$model' });
 
   const view = getViewByName(views, model);

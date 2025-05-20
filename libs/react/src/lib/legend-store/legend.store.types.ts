@@ -230,19 +230,6 @@ export type LegendStore = {
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'
   >;
 
-  //   METHODS
-  init: (
-    data: RecordType[],
-    relationalData: QueryRelationalData,
-    continueCursor: ContinueCursor | null,
-    isDone: boolean,
-    viewConfigManager: BaseViewConfigManagerInterface,
-    uiViewConfig: UiViewConfig | undefined,
-    commands: UserStoreCommand[],
-    userView: UserViewData | undefined,
-    viewId: string | null
-  ) => void;
-
   createDataModel: (data: RecordType[], tablename?: string) => void;
   createRelationalDataModel: (data: QueryRelationalData) => void;
 

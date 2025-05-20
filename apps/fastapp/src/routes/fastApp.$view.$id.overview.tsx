@@ -9,9 +9,6 @@ import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailOverviewTemplate } from '../views/default-detail-view-template';
 
 export const Route = createFileRoute('/fastApp/$view/$id/overview')({
-  // onEnter: () => {
-  //   console.log('/fastApp/view/$id/overview::onEnter');
-  // },
   loader: async (props) => {
     await queryClient.ensureQueryData(getUserViewsQuery());
 
@@ -19,7 +16,6 @@ export const Route = createFileRoute('/fastApp/$view/$id/overview')({
 
     const { viewData, userViewData, viewName } = getView(props);
 
-    console.log('PRELOAD OVERVIEW!!');
     await props.context.preloadQuery(
       viewData.viewConfig,
       userViewData?.name ?? viewName,
@@ -27,18 +23,13 @@ export const Route = createFileRoute('/fastApp/$view/$id/overview')({
       null,
       null
     );
-    console.log('PRELOAD OVERVIEW!! DONE');
   },
 
   component: () => <DetaiViewPage />,
 });
 
 const DetaiViewPage = observer(() => {
-  React.useEffect(() => console.log(':: Render:DetailOverView'));
-
-  globalStore.dispatch({
-    type: 'LOAD_SUB_VIEW_OVERVIEW_PAGE',
-  });
+  React.useEffect(() => console.debug('Render:DetailOverView'));
 
   let { viewName } = useViewParams();
   viewName = viewName as string;
