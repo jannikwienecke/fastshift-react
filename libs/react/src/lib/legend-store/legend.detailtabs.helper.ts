@@ -70,9 +70,9 @@ export const detailTabsHelper = () => {
       updateRow: () => null,
       saveIfDirty: () => null,
       activeTabField: null,
-      detailTabsFields: [],
-      activeTabPrimitiveFields: [],
-      activeTabComplexFields: [],
+      detailTabsFields: [] as CommandformItem[],
+      activeTabPrimitiveFields: [] as CommandformItem[],
+      activeTabComplexFields: [] as CommandformItem[],
       row: null,
     } satisfies {
       row: Row | null;
