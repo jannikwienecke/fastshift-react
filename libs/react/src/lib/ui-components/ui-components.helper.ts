@@ -1,5 +1,5 @@
 import { ComponentType } from '@apps-next/core';
-import { store$ } from '../legend-store';
+import { store$, viewRegistry } from '../legend-store';
 
 export const getComponent = ({
   fieldName,
@@ -8,19 +8,43 @@ export const getComponent = ({
 }: {
   fieldName: string;
   componentType: ComponentType;
-  // TODO DETAIL BRANCHING
+  //  DETAIL BRANCHING
   isDetail?: boolean;
 }) => {
+  const tableNameDetail = store$.detail.viewConfigManager.get()
+    ? store$.detail?.viewConfigManager?.getTableName?.()
+    : '';
+
+  const viewConfigManger = store$.viewConfigManager.get() ?? {};
+
+  const tableNameConfig = viewConfigManger?.getTableName?.();
+  const commanformTablename = store$.commandform.view.tableName.get();
+
+  const tableName = isDetail
+    ? tableNameDetail
+    : commanformTablename ?? tableNameConfig ?? '';
+
+  const uiConfigActiveTable = viewRegistry.getView(tableName) ?? {};
+
   const uiViewConfig = {
+    ...uiConfigActiveTable.uiViewConfig,
     ...store$.uiViewConfig.get(),
     ...(store$.detail?.viewConfigManager.uiViewConfig.get() ?? {}),
   };
 
-  const tableName = isDetail
-    ? store$.detail.viewConfigManager.getTableName()
-    : store$.viewConfigManager?.getTableName();
+  const fallbackTableName = isDetail
+    ? tableNameConfig
+    : commanformTablename ?? tableNameDetail;
 
-  return uiViewConfig?.[tableName]?.fields?.[fieldName]?.component?.[
-    componentType
-  ];
+  let component =
+    uiViewConfig?.[tableName]?.fields?.[fieldName]?.component?.[componentType];
+
+  if (!component && componentType === 'icon') {
+    component =
+      uiViewConfig?.[fallbackTableName]?.fields?.[fieldName]?.component?.[
+        componentType
+      ];
+  }
+
+  return component;
 };

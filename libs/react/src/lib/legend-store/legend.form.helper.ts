@@ -16,6 +16,7 @@ import {
 import { getTimeValueFromDateString } from '../ui-adapter/filter-adapter';
 import { getComponent } from '../ui-components/ui-components.helper';
 import { store$ } from './legend.store';
+import { getView } from './legend.shared.derived';
 
 export const getViewConfigManager = () => {
   const defaultView = store$.viewConfigManager.get();
@@ -57,7 +58,7 @@ export const getFormState = () => {
   const errors = viewConfigManager.validateRecord(row?.raw);
 
   if (errors) {
-    _log.debug('Form State Errors: ', errors);
+    console.debug('Form State Errors: ', errors);
   }
 
   return {
@@ -198,7 +199,7 @@ export const formHelper = (
     const errors = viewConfigManager.validateRecord(row?.raw);
 
     if (errors) {
-      _log.info('Form State Errors: ', errors);
+      console.debug('Form State Errors: ', errors);
     }
 
     return {
@@ -248,11 +249,13 @@ export const formHelper = (
 
   const getComplexFormFields = () => {
     return complexFields.map((field) => {
-      const icon = getComponent({
-        fieldName: field.name,
-        componentType: 'icon',
-        isDetail,
-      });
+      const icon =
+        getComponent({
+          fieldName: field.name,
+          componentType: 'icon',
+          isDetail,
+          // TODO refactor this
+        }) ?? getView(field.name)?.icon;
 
       const value = getValueOfRow(field.name);
       const label = Array.isArray(value) ? '' : value?.id ? value.label : value;

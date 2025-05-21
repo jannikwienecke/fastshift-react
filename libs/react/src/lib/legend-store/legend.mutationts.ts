@@ -379,7 +379,7 @@ export const optimisticUpdateStore = ({
       selectState$.parentRow.raw.set(updatedRow.raw);
     }
 
-    // TODO DETAIL BRANCHING
+    //  DETAIL BRANCHING
     if (store$.detail.row.get() && isDetail() && !isTabs()) {
       store$.detail.row.set(updatedRow);
     }

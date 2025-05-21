@@ -3,11 +3,13 @@ import {
   FieldConfig,
   getViewByName,
   patchDict,
+  RecordType,
   renderModelName,
   slugHelper,
   t,
 } from '@apps-next/core';
 import { getUserViews } from '../../query-client';
+import { getViewData } from '../../application-store/app.store.utils';
 
 export const getViewParms = (params: {
   id?: string;
@@ -71,4 +73,15 @@ export const pachTheViews = () => {
       }),
     };
   });
+};
+
+export const getView = (props: { params: RecordType }) => {
+  if (!props.params) throw new Error('View name is required');
+
+  const { viewName } = getViewParms(props.params);
+
+  if (!viewName) throw new Error('View name is required');
+
+  const { viewData, userViewData } = getViewData(viewName);
+  return { viewData, userViewData, viewName };
 };

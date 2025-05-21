@@ -13,14 +13,29 @@ export const en = {
     users: 'Users',
     history: 'History',
   },
+  users: {
+    one: 'User',
+    other: 'Users',
+  },
+  color: {
+    one: 'Color',
+    other: 'Colors',
+  },
+  label: {
+    one: 'Label',
+    other: 'Labels',
+  },
   projects: {
     one: 'Project',
     other: 'Projects',
   },
   name: {
-    edit: 'Rename Task',
+    one: 'Name',
+    other: 'Names',
+    edit: 'Rename {{model}}',
     // changeField: 'Update description',
   },
+
   tableName: {
     one: 'Model',
     other: 'Models',
@@ -75,7 +90,7 @@ export const en = {
     one: 'Completed',
     other: 'Completed',
     markAs: 'Mark as completed ✅',
-    unMarkAs: 'Mark task as not completed',
+    unMarkAs: 'Mark as not completed',
   },
 
   dueDate: {

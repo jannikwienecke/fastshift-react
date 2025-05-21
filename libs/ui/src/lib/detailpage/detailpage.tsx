@@ -6,6 +6,7 @@ import {
 } from '@apps-next/core';
 import { CubeIcon, DotsHorizontalIcon } from '@radix-ui/react-icons';
 import {
+  ActivityIcon,
   ChevronRightIcon,
   Layers3Icon,
   ShareIcon,
@@ -16,6 +17,7 @@ import { Button } from '../components';
 import { Checkbox } from '../components/checkbox';
 import { EmojiPickerDialog } from '../emoji-picker-dialog';
 import { cn } from '../utils';
+import { BubbleItem } from '../standard-components';
 
 const DetailPageHeader = (props: DetailPageProps) => {
   return (
@@ -214,10 +216,14 @@ const DetailTabs = (
         <button
           onClick={() => onSelectHistoryTab()}
           className={cn(
-            'border-[.5px] py-2 px-4',
-            props.tabs.isHistoryTab ? ' border-b-0 ' : ''
+            'border-[.5px] py-2 px-4 flex flex-row gap-2 items-center',
+            props.tabs.isHistoryTab
+              ? ' border-b-0 text-foreground'
+              : 'text-foreground/70'
           )}
         >
+          {/* TODO Fix translation */}
+          <ActivityIcon className="h-4 w-4" />
           {'Acitivty'}
         </button>
 
@@ -231,11 +237,12 @@ const DetailTabs = (
               key={tab.field?.name}
               onClick={() => onSelectTab(tab)}
               className={cn(
-                'border-[.5px] py-2 px-4',
-                isActive ? ' border-b-0 ' : ''
+                'border-[.5px] py-2 px-4 flex flex-row gap-2 items-center',
+                isActive ? ' border-b-0 text-foreground' : 'text-foreground/70'
               )}
             >
-              {tab.field?.label}
+              {tab.icon ? <tab.icon className="h-4 w-4" /> : null}
+              <div>{tab.field?.label}</div>
             </button>
           );
         })}
@@ -250,13 +257,51 @@ const DetailTabs = (
       ) : (
         <>
           <div className="pl-24 pt-8 text-sm">
-            {activeTabPrimitiveFields.map((field) => {
-              return (
-                <div key={field.field?.name + 'primitive'}>
-                  <props.FormField {...props} field={field} />
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => {
+                  props.tabs?.onClickGoToRelation?.();
+                }}
+                className="max-w-fit pl-8 pb-2"
+              >
+                <div className="flex group flex-row items-center rounded-sm italic">
+                  <div className="flex flex-row items-center">
+                    <div className="flex flex-row gap-1 items-center">
+                      <div className="text-foreground/70">Go to</div>
+                      <div className="pl-1">
+                        {props.tabs?.activeTabField?.icon ? (
+                          <>
+                            <props.tabs.activeTabField.icon />
+                          </>
+                        ) : null}
+                      </div>
+                      <div>{props.tabs?.activeTabField?.field?.label}</div>
+                    </div>
+                    <div className="relative w-4 opacity-0 group-hover:opacity-100 transition-all duration-200 -translate-x-2 group-hover:translate-x-0">
+                      <ChevronRightIcon className="h-3 transition-transform duration-200" />
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
+              </button>
+
+              {activeTabPrimitiveFields.map((field) => {
+                if (field.field?.isDisplayField) {
+                  return (
+                    <>
+                      <div key={field.field?.name + 'primitive'}>
+                        <props.FormField {...props} field={field} />
+                      </div>
+                    </>
+                  );
+                }
+
+                return (
+                  <div key={field.field?.name + 'primitive'}>
+                    <props.FormField {...props} field={field} />
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           <div className="pl-24 pt-4 text-sm border-t-[.5px]">

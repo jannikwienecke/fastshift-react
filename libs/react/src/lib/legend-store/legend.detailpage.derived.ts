@@ -5,6 +5,7 @@ import { detailTabsHelper } from './legend.detailtabs.helper';
 import { selectState$, xSelect } from './legend.select-state';
 import { detailUserView$ } from './legend.shared.derived';
 import { store$ } from './legend.store';
+import { perstistedStore$ } from './legend.store.persisted';
 
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
@@ -37,14 +38,25 @@ export const derviedDetailPage$ = observable(() => {
     tabs: tabsProps
       ? {
           ...tabsProps,
-          isHistoryTab: store$.detail.isActivityTab.get(),
+          isHistoryTab: perstistedStore$.isActivityTab.get(),
           historyData: store$.detail.historyDataOfRow.get() ?? [],
           onSelectHistoryTab: () => {
-            store$.detail.isActivityTab.set(true);
+            perstistedStore$.isActivityTab.set(true);
           },
           onSelectTab(field) {
-            store$.detail.isActivityTab.set(false);
+            perstistedStore$.isActivityTab.set(false);
             store$.detail.activeTabField.set(field);
+            perstistedStore$.activeTabFieldName.set(field.field?.name);
+          },
+          onClickGoToRelation: () => {
+            const tab = store$.detail.activeTabField.get();
+            if (!tab?.field?.name || !tab.rowValue) return;
+
+            store$.navigation.state.set({
+              type: 'navigate',
+              id: tab?.rowValue.id,
+              view: tab.field.name,
+            });
           },
         }
       : null,
@@ -65,6 +77,14 @@ export const derviedDetailPage$ = observable(() => {
         xSelect.open(detailHelper.row, field.field, true);
         selectState$.rect.set(rect);
       }
+    },
+    onClickGoToRelation: (field, tabFormField) => {
+      // TODO Abstract this function to a helper
+      store$.navigation.state.assign({
+        type: 'navigate',
+        id: tabFormField.id,
+        view: field.field?.name,
+      });
     },
     onSelectEmoji(emoji) {
       store$.updateDetailViewMutation({

@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 export type TaskViewDataType = DataType<
   'tasks',
   {
-    projects: Projects;
+    projects?: Projects;
     tags?: Tags[];
     tasks?: Tasks[];
     todos?: Todos[];

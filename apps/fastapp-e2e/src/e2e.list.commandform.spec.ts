@@ -230,6 +230,8 @@ test.describe('List Commandbar', () => {
 
     await expect(page.getByText(/new tag/i)).toBeHidden();
 
+    await waitFor(mainPage.page, 100);
+
     await mainPage.page.keyboard.press('Meta+k');
     await expect(mainPage.commandbar).toBeVisible();
 
@@ -244,7 +246,8 @@ test.describe('List Commandbar', () => {
 
     await waitFor(mainPage.page, 500);
 
-    await mainPage.page.getByText(/add tag.../i).click();
+    // new tag was assigned to the task
+    await mainPage.detailProperties.getByText(/new tag/i).click();
 
     await waitFor(mainPage.page, 300);
 
@@ -256,8 +259,6 @@ test.describe('List Commandbar', () => {
     await pressEscape(mainPage.page);
 
     await listCombobox(props).isClosed();
-
-    await expect(page.getByText(/new tag/i)).toBeVisible();
   });
 });
 

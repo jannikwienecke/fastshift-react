@@ -70,16 +70,6 @@ created: 1723444498044
 - [x] add tests for validation rules frontend and backend
 - [x] in combobox render field names, label should be aligned (with or without icon), maybe default icon
 
-<!-- FEATURE -->
-
-- [ ] Commandform -> extract field input components into own components
-- [ ] when created a new task -> click on notifiaction -> open task
-- [ ] open after creation, in config
-- [ ] update design / message / icon of success notification
-- [ ] way to show what fields are missing / errors in form
-- [ ] add tipTap
-- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
-
 ## How we handle Deletes with soft delete
 
 - project has many tasks, task has one project
@@ -152,21 +142,37 @@ created: 1723444498044
 - [x] test: in detail task view -> try to add or remove tags
 - [x] test: in detail task view -> have 3 tags, remove one, add a different one, add back the first thta were removed
 
-Next Bigger Feature
-
-- [ ] add -> user can comment on an model, inside the acitivty list
-
 Small Bugs to fix
 
-- [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
-- [ ] in add task in project, project is not selected...
-- [ ] in add task in project, priority is not rendered correctly
-- [ ] the due date field in project detail, has no icon shown
+- [x] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
+- [x] in add task in project, project is not selected...
+- [x] in add task in project, priority is not rendered correctly
+- [x] the due date field in project detail, has no icon shown
 
 Small Features to add
 
 - [x] activity list, we need to add a useActivity hook for real time updates.
 - [x] scrollable list for acitivty
-- [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task
-- [ ] add a go to button next to the relational value in detail
+- [x] when we create a tag inside a task detail view, we need to directly add this tag to this task
+- [x] add a go to button next to the relational value in detail
+- [x] in tab header -> show icon
+- [x] in tab content. show the display field more prominent and add a go to button
+- [x] in combobox popover, if not found -> show create
+- [x] create sepearte store for values that should be persisted on local storage and the synced
+
+### Next Feature to add:
+
+- [ ] add -> user can comment on an model, inside the acitivty list
+
+### Small Feature:
+
 - [ ] color picker and color indicator for fields with type "color" or something like this
+- [ ] when created a new task -> click on notifiaction -> open task
+- [ ] open after creation, in config
+- [ ] add tipTap
+- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
+
+### Add tests
+
+- [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
+- [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task

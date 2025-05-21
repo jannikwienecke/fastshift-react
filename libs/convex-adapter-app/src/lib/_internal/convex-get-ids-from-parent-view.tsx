@@ -35,33 +35,33 @@ export const getIdsFromParentView = async (
 
       const childView = getViewByName(args.registeredViews, args.viewName);
 
-      const { manyToManyTable, manyToManyModelFields } =
-        parentView?.viewFields?.[childView?.tableName]?.relation ?? {};
-
-      const fieldnameSubView = manyToManyModelFields?.find(
-        (f) => f.name === args.viewName
-      )?.relation?.fieldName;
-
-      const fieldName2 = manyToManyModelFields?.find(
-        (f) => f.name === parentView?.tableName
+      // TODO Refactor and remove duplicated code todoId:1
+      const manyToMany = Object.values(args.registeredViews).find(
+        (v) =>
+          v?.isManyToMany &&
+          [parentView?.tableName, childView?.tableName].every((t) =>
+            Object.keys(v.viewFields).includes(t)
+          )
       );
 
-      if (
-        manyToManyTable &&
-        fieldnameSubView &&
-        fieldName2?.relation?.fieldName
-      ) {
-        const manyManyView = getViewByName(
-          args.registeredViews,
-          manyToManyTable
+      const manyToManyTable = manyToMany?.tableName;
+
+      if (manyToManyTable && manyToMany) {
+        const relationalViewConfig = new BaseViewConfigManager(
+          manyToMany as unknown as ViewConfigType
         );
 
-        const relationalViewConfig = new BaseViewConfigManager(
-          manyManyView as unknown as ViewConfigType
-        );
+        const fieldNameParent = Object.values(manyToMany.viewFields).find(
+          (f) => f.name === parentView?.tableName
+        )?.relation?.fieldName;
+
+        const fieldNameChild = Object.values(manyToMany.viewFields).find(
+          (f) => f.name === childView?.tableName
+        )?.relation?.fieldName;
+
         const indexField = getIndexFieldByName(
           relationalViewConfig,
-          fieldName2.relation.fieldName
+          fieldNameParent ?? ''
         );
 
         const query = queryClient(ctx, manyToManyTable);
@@ -73,7 +73,7 @@ export const getIdsFromParentView = async (
           .collect();
 
         if (records.length) {
-          idsSubView = records.map((r) => r[fieldnameSubView]);
+          idsSubView = records.map((r) => r[fieldNameChild ?? '']);
         }
       } else if (childView && parentView) {
         const query = queryClient(ctx, childView.tableName);
@@ -103,9 +103,10 @@ export const getIdsFromParentView = async (
   };
 
   try {
-    return await handle();
+    const res = await handle();
+    return res;
   } catch (error) {
-    console.warn('Error in getIdsFromParentView', error);
+    console.error('Error in getIdsFromParentView');
     throw error;
   }
 };

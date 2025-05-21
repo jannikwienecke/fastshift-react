@@ -139,6 +139,7 @@ const _schema = defineSchema({
     ...tableMetaFields,
     name: v.string(),
     color: v.string(),
+    tasks: v.optional(v.array(v.id('tasks'))),
   }).searchIndex('name', {
     searchField: 'name',
   }),

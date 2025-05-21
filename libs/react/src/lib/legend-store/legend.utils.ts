@@ -4,6 +4,7 @@ import {
   getViewByName,
   makeData,
   Row,
+  ViewConfigType,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { derviedDetailPage$ } from './legend.detailpage.derived';
@@ -25,6 +26,7 @@ export const _hasOpenDialog$ = observable(() => {
   const commandformIsOpen = store$.commandform.open.get();
   const contextmenuIsOpen = store$.contextMenuState.rect.get() !== null;
   const filterIsOpen = store$.filter.open.get();
+  const selectStateIsOpen = selectState$.parentRow.get() !== null;
   const displayOptionsIsOpen = store$.displayOptions.isOpen.get();
 
   return (
@@ -32,6 +34,7 @@ export const _hasOpenDialog$ = observable(() => {
     commandformIsOpen ||
     contextmenuIsOpen ||
     filterIsOpen ||
+    selectStateIsOpen ||
     displayOptionsIsOpen
   );
 });
@@ -44,9 +47,15 @@ export const isDetail = () => {
   const selectStateIsDetail = selectState$.isDetail.get();
   const isDetailOverview = store$.detail.viewType.type.get() === 'overview';
 
+  const commandformView = store$.commandform.view.viewName.get();
+  const commandViewIsDetail = !commandformView
+    ? true
+    : commandformView === viewConfigDetail?.getViewName?.();
+
   return !!(
     (detailForm || selectStateIsDetail || isDetailOverview) &&
-    viewConfigDetail
+    viewConfigDetail &&
+    commandViewIsDetail
   );
 };
 
@@ -81,4 +90,39 @@ export const getViewConfigManager = (): BaseViewConfigManagerInterface => {
 
 export const isDetailOverview = () => {
   return store$.detail.viewType.type.get() === 'overview';
+};
+
+export const getIsManyRelationView = (tableOrFieldName: string) => {
+  const detailViewConfigFields =
+    store$.detail.viewConfigManager.viewConfig.viewFields.get();
+
+  const viewThatHasAManyRelation = Object.values(
+    detailViewConfigFields ?? {}
+  ).find(
+    (f) =>
+      f.name === tableOrFieldName &&
+      (f.isList || f.relation?.type === 'manyToMany')
+  );
+
+  return viewThatHasAManyRelation;
+};
+
+export const getSubUserView = (subConfig: ViewConfigType) => {
+  const viewConfigParent = store$.detail.viewConfigManager.viewConfig.get();
+  if (!viewConfigParent) return null;
+
+  const userViews = store$.userViews.get();
+
+  const name = `${viewConfigParent.tableName}|${subConfig.tableName}`;
+
+  return userViews.find((v) => v.name === name);
+};
+
+export const createSubViewName = (
+  parentView: ViewConfigType,
+  subView: ViewConfigType
+) => {
+  const name = `${parentView.tableName}|${subView.tableName}`;
+
+  return name;
 };

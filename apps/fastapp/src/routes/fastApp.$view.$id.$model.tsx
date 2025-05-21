@@ -1,94 +1,53 @@
 import { views } from '@apps-next/convex';
-import { _log, getViewByName, QueryReturnOrUndefined } from '@apps-next/core';
-import { globalStore } from '@apps-next/react';
+import { getViewByName } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
-import React from 'react';
-import { getViewData, wait } from '../application-store/app.store.utils';
+import { createFileRoute, useParams } from '@tanstack/react-router';
 import {
-  getQueryKey,
-  getUserViews,
-  getUserViewsQuery,
-  queryClient,
-} from '../query-client';
-import { useViewParams } from '../shared/hooks';
-import { getViewParms } from '../shared/utils/app.helper';
+  getSubModelViewData,
+  getViewData,
+} from '../application-store/app.store.utils';
+import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
+import { getView } from '../shared/utils/app.helper';
 import {
   RenderDisplayOptions,
   RenderFilter,
   RenderInputDialog,
   RenderList,
 } from '../views/default-components';
+import React from 'react';
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
-    console.warn('____LOAD SUB MODEL', ctx.params.model);
     await queryClient.ensureQueryData(getUserViewsQuery());
 
     const model = ctx.params.model;
-    const view = getViewByName(views, model);
+    const { viewData: parentViewData, viewName: parentViewName } = getView(ctx);
 
-    if (!view) throw new Error('NOT VALID MODEL');
-
-    const { viewName: parentViewName } = getViewParms(ctx.params);
-
-    if (!parentViewName) throw new Error('NOT VALID VIEW');
-
-    const userViews = getUserViews();
-    const { viewData } = getViewData(view.viewName, userViews);
-
-    if (!viewData) {
-      _log.info(`View ${view.viewName} not found, redirecting to /fastApp`);
-      return redirect({ to: '/fastApp' });
-    }
+    const { viewData: viewDataModel } = getSubModelViewData(
+      model,
+      parentViewData.viewConfig.tableName
+    );
 
     await ctx.context.preloadQuery(
-      viewData.viewConfig,
-      view.viewName,
+      viewDataModel.viewConfig,
+      viewDataModel.viewConfig.viewName,
       null,
       parentViewName,
       ctx.params.id
     );
   },
+
   component: () => <DetailModelListViewPage />,
 });
 
 const DetailModelListViewPage = observer(() => {
-  const { model, id } = useParams({ from: '/fastApp/$view/$id/$model' });
-  const { viewName: parentViewName } = useViewParams();
+  React.useEffect(() => console.debug('Render:SubList'));
+
+  const { model } = useParams({ from: '/fastApp/$view/$id/$model' });
 
   const view = getViewByName(views, model);
 
-  const userViews = getUserViews();
-
-  const { viewData } = getViewData(view?.viewName ?? '', userViews);
-
-  const doOnceForModelID = React.useRef('');
-
-  const modelId = model + id;
-  if (model && id && modelId !== doOnceForModelID.current && view?.viewName) {
-    doOnceForModelID.current = modelId;
-
-    const data = queryClient.getQueryData(
-      getQueryKey(
-        viewData.viewConfig,
-        view?.viewName ?? '',
-        null,
-        parentViewName ?? null,
-        id ?? null
-      )
-    ) as QueryReturnOrUndefined;
-
-    globalStore.dispatch({
-      type: 'LOAD_SUB_VIEW_LIST_PAGE',
-      payload: {
-        id,
-        viewName: view?.viewName ?? '',
-        parentViewName: parentViewName ?? '',
-        data,
-      },
-    });
-  }
+  const { viewData } = getViewData(view?.viewName ?? '');
 
   if (viewData.main) {
     return <viewData.main isSubView={true} />;

@@ -1,71 +1,23 @@
-import { _log, QueryReturnOrUndefined, Row } from '@apps-next/core';
-import {
-  FormField,
-  globalStore,
-  RenderDetailComplexValue,
-  store$,
-} from '@apps-next/react';
+import { _log, Row } from '@apps-next/core';
+import { FormField, RenderDetailComplexValue, store$ } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
-import { getViewData, wait } from '../application-store/app.store.utils';
-import {
-  getQueryKey,
-  getUserViews,
-  getUserViewsQuery,
-  queryClient,
-} from '../query-client';
-import { useViewParams } from '../shared/hooks';
-import { getViewParms } from '../shared/utils/app.helper';
+import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   loader: async (props) => {
-    await queryClient.ensureQueryData(getUserViewsQuery());
-
-    const { id, viewName } = getViewParms(props.params);
-    if (!viewName) return;
-
-    if (!id) throw new Error('ID is required');
-
-    const userViews = getUserViews();
-    const { viewData } = getViewData(viewName, userViews);
-
-    await props.context.preloadQuery(
-      viewData.viewConfig,
-      viewName,
-      id,
-      null,
-      null
-    );
+    await props.parentMatchPromise;
   },
   component: () => <DetaiViewPage />,
 });
 
 const DetaiViewPage = observer(() => {
-  const { id } = useParams({ from: '/fastApp/$view/$id' });
+  React.useEffect(() => console.debug('Render:DetaiViewPage'), []);
 
-  let { viewName } = useViewParams();
-  viewName = viewName as string;
-
-  const userViews = getUserViews();
-  const { viewData } = getViewData(viewName, userViews);
-
-  const doOnceForId = React.useRef('');
-
-  if (id && id !== doOnceForId.current) {
-    doOnceForId.current = id;
-
-    const queryKey = getQueryKey(viewData.viewConfig, viewName, id, null, null);
-    const detailQueryData = queryClient.getQueryData(
-      queryKey
-    ) as QueryReturnOrUndefined;
-
-    globalStore.dispatch({
-      type: 'LOAD_VIEW_DETAIL_PAGE',
-      payload: { id, viewName, data: detailQueryData },
-    });
-  }
+  const params = useParams({ strict: false });
+  const { viewData, viewName } = getView({ params });
 
   if (!viewData.viewConfig) {
     _log.info(`View ${viewName} not found, redirecting to /fastApp`);
@@ -75,7 +27,7 @@ const DetaiViewPage = observer(() => {
   const row = store$.detail.row.get() as Row | undefined;
   const viewConfigManager = store$.detail.viewConfigManager.get();
 
-  if (!row || !viewConfigManager) return null;
+  if (!row || !viewConfigManager) return <>NULL</>;
 
   if (viewData.detail) {
     return <viewData.detail />;

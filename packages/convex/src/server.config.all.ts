@@ -29,9 +29,6 @@ export const tasksConfig = createViewConfig(
     },
 
     fields: {
-      // IMPROVEMENT: [LATER] add smart feature..
-      // dueDate (date in the name -> date field)
-      // dueDate (date with upper case D -> Due Date)
       dueDate: {
         isDateField: true,
         defaultValue: () => {
@@ -179,6 +176,9 @@ export const ownerConfig = createViewConfig(
     viewName: 'Owner',
     displayField: { field: 'name' },
     fields: {
+      history: {
+        hide: true,
+      },
       name: {
         hideFromForm: true,
       },

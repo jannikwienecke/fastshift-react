@@ -8,3 +8,7 @@ export * from './legend.local.filtering';
 export * from './legend.app.registry';
 export * from './legend.queryProps.derived';
 export * from './legend.shared.derived';
+export * from './legend.store.persisted';
+export * from './legend.view-actions';
+export * from './legend.utils';
+export * from './legend.utils.helper';

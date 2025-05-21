@@ -119,6 +119,7 @@ export type ComboboxPopoverProps<T extends ComboxboxItem = ComboxboxItem> = {
   name: string;
   datePickerProps?: DatePickerProps;
   showCheckboxInList?: boolean;
+  onClickCreateNew: (value: string) => void;
 };
 
 export type ComboboxAdapterOptions<T extends ComboxboxItem> = {
@@ -269,8 +270,10 @@ export type FormFieldMethod = {
   onClick: (
     field: CommandformItem,
     rect: DOMRect,
-    tabFormField?: boolean
+    tabFormField?: boolean,
+    isGoToClicked?: boolean
   ) => void;
+  onClickGoToRelation: (field: CommandformItem, row: Row) => void;
   onInputChange: (
     field: CommandformItem,
     value: string,
@@ -347,6 +350,7 @@ export type DetailPageProps = {
     isHistoryTab: boolean;
     historyData: HistoryType[];
     onSelectTab: (field: CommandformItem) => void;
+    onClickGoToRelation: () => void;
     onSelectHistoryTab: () => void;
   } | null;
 

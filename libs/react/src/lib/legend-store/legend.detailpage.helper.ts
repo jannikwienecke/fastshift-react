@@ -19,7 +19,7 @@ export const detailFormHelper = () => {
     throw new Error('View is not set');
   }
 
-  // TODO DETAIL BRANCHING
+  //  DETAIL BRANCHING
   const helper = formHelper(view, row, true);
   const form = store$.detail.form.get();
 
@@ -72,7 +72,8 @@ export const detailFormHelper = () => {
         .filter(
           (f) =>
             f.field.relation?.manyToManyModelFields?.length &&
-            !f.field.showInProperties
+            !f.field.showInProperties &&
+            !f.field.hide
         ) ?? []
     );
   };

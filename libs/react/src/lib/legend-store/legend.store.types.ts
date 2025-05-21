@@ -179,7 +179,7 @@ export type LegendStore = {
   views: RegisteredViews;
   userViews: UserViewData[];
   commands: UserStoreCommand[];
-  userViewData: UserViewData | undefined;
+  userViewData: UserViewData | undefined | null;
 
   viewId: string | null;
 
@@ -229,19 +229,6 @@ export type LegendStore = {
     CommandbarProps,
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'
   >;
-
-  //   METHODS
-  init: (
-    data: RecordType[],
-    relationalData: QueryRelationalData,
-    continueCursor: ContinueCursor | null,
-    isDone: boolean,
-    viewConfigManager: BaseViewConfigManagerInterface,
-    uiViewConfig: UiViewConfig | undefined,
-    commands: UserStoreCommand[],
-    userView: UserViewData | undefined,
-    viewId: string | null
-  ) => void;
 
   createDataModel: (data: RecordType[], tablename?: string) => void;
   createRelationalDataModel: (data: QueryRelationalData) => void;
@@ -381,7 +368,11 @@ export type LegendStore = {
   commandbarSetValue: (value: ComboxboxItem) => void;
 
   // commandform
-  commandformOpen: (viewName: string, row?: Row) => void;
+  commandformOpen: (
+    viewName: string,
+    row?: Row,
+    defaultRecord?: RecordType
+  ) => void;
   commandformClose: () => void;
   commanformSelectRelationalValue: (row: Row) => void;
   commandformChangeInput: (
@@ -452,7 +443,6 @@ export type LegendStore = {
     detailRow?: DetailRow;
     selectedField?: FieldConfig;
     rect?: DOMRect;
-    isActivityTab?: boolean;
     form: {
       dirtyField?: FieldConfig;
       dirtyValue?: string | number;

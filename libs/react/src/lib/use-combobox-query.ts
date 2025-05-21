@@ -42,14 +42,18 @@ export const useComboboxQuery = () => {
     store.field.type === 'Boolean' ||
     (store$.filter.open.get() && !store.field);
 
+  const formViewName = store$.commandform.view.get()?.viewName;
+  const viewName = //  DETAIL BRANCHING
+    activeTabViewName
+      ? activeTabViewName
+      : formViewName
+      ? formViewName
+      : isDetail()
+      ? store$.detail.parentViewName.get()
+      : undefined;
+
   const { data } = useQuery({
-    viewName:
-      // TODO DETAIL BRANCHING
-      activeTabViewName
-        ? activeTabViewName
-        : store$.commandform.view.get()?.viewName ?? isDetail()
-        ? store$.detail.parentViewName.get()
-        : undefined,
+    viewName,
     viewConfigManager: viewConfigManager ?? undefined,
     query: store.query,
     relationQuery: {

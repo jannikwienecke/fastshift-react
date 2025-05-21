@@ -57,7 +57,6 @@ test.describe('Custom Views', () => {
     helper,
     page,
   }) => {
-    // TODO: After implementing
     await helper.navigation.goToDetailSubList(
       'all-projects',
       CON.project.values.websiteRedesign,

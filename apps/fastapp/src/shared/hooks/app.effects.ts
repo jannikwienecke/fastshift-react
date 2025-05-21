@@ -1,6 +1,6 @@
 import { api, views } from '@apps-next/convex';
 import { GetTableName, slugHelper } from '@apps-next/core';
-import { globalStore, store$ } from '@apps-next/react';
+import { viewActionStore, store$ } from '@apps-next/react';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useRouter } from '@tanstack/react-router';
@@ -55,8 +55,14 @@ export const useAppEffects = (viewName: string) => {
 
   const [_, i18n] = useTranslationReact();
 
+  const ignoreFirstRef = React.useRef(true);
   React.useEffect(() => {
-    globalStore.setViews(views);
+    if (ignoreFirstRef.current) {
+      ignoreFirstRef.current = false;
+      return;
+    }
+
+    viewActionStore.setViews(views);
   }, [i18n.language]);
 
   React.useEffect(() => {
@@ -104,7 +110,7 @@ export const useAppEffects = (viewName: string) => {
 
       const view = store$.viewConfigManager.getViewName();
       const userViewData = store$.userViewData.get();
-      const slug = userViewData?.slug ?? view;
+      const slug = userViewData?.slug || view;
       const viewsNotPreload: GetTableName[] = ['history'];
 
       const isInNotPreload = viewsNotPreload.find((v) =>

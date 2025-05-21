@@ -32,13 +32,19 @@ export const viewLoaderHandler = async (
     };
   }
 
-  // console.warn('____'VIEW LOADER START', {
-  //   ...args,
-  //   modelConfig: undefined,
-  //   viewConfigManager: undefined,
-  //   registeredViews: undefined,
-  //   viewConfig: undefined,
-  // });
+  if (args.onlyRelationalData) {
+    //
+  } else {
+    if (args.viewId) {
+      console.debug(`Loader:Detail:${args.viewName}`);
+    } else if (args.parentViewName) {
+      console.debug(
+        `Loader:SubView:${args.viewName}:Of:${args.parentViewName}`
+      );
+    } else if (args.viewName) {
+      console.debug(`Loder:View:${args.viewName}`);
+    }
+  }
 
   const viewConfigManager = args.viewConfigManager;
   if (!viewConfigManager) throw new Error('viewConfigManager is not defined');

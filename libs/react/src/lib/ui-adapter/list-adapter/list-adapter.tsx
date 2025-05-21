@@ -335,8 +335,9 @@ export const makeListProps = <T extends RecordType = RecordType>(
       store$.navigation.state.set({
         type: 'navigate',
         view:
-          store$.userViewData.name.get() ??
-          store$.viewConfigManager.getViewName(),
+          store$.detail.viewType.get() || !store$.userViewData.name.get()
+            ? store$.viewConfigManager.getViewName()
+            : store$.userViewData.name.get() ?? '',
         id: item.id.toString(),
       });
     },

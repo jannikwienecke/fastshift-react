@@ -54,6 +54,7 @@ test.describe('Detail Page Form Test', () => {
 
     await mainPage.comboboxPopover
       .getByText(CON.dueDate.values.tomorrow)
+      .first()
       .click();
 
     await isClosed();
@@ -96,7 +97,10 @@ test.describe('Detail Page Form Test', () => {
     await searchInCombobox('tags', CON.tag.values.creative);
 
     // we select a tag.
-    await mainPage.comboboxPopover.getByText(CON.tag.values.creative).click();
+    await mainPage.comboboxPopover
+      .getByText(CON.tag.values.creative)
+      .first()
+      .click();
 
     await waitFor(mainPage.page, 500);
 

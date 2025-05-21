@@ -31,12 +31,6 @@ export const mapWithInclude = async (
         return acc;
       }
 
-      if (!recordWithoutRelations) {
-        // console.trace();
-        // console.log(rows);
-        // console.log('NO RECORDS', recordWithoutRelations);
-      }
-
       const accResolved = await acc;
 
       const props = {

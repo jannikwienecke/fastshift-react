@@ -16,6 +16,7 @@ import { viewRegistry } from './legend.app.registry';
 import { detailFormHelper } from './legend.detailpage.helper';
 import { store$ } from './legend.store';
 import { copyRow } from './legend.utils';
+import { perstistedStore$ } from './legend.store.persisted';
 
 const getDetailTabsFields = () => {
   const row = store$.detail.row.raw.get();
@@ -41,14 +42,48 @@ const getDetailTabsFields = () => {
 export const detailTabsHelper = () => {
   const detailTabsFields = getDetailTabsFields();
 
+  const activeTabFieldName = perstistedStore$.activeTabFieldName.get();
+
   if (!store$.detail.activeTabField.get()) {
-    store$.detail.activeTabField.set(detailTabsFields[0]);
-    store$.detail.isActivityTab.set(true);
+    let defaultField = detailTabsFields?.[0];
+
+    if (activeTabFieldName) {
+      const field = detailTabsFields.find(
+        (f) => f.field.name === activeTabFieldName
+      );
+      if (field) {
+        defaultField = field;
+        store$.detail.activeTabField.set(defaultField);
+      } else {
+        perstistedStore$.activeTabFieldName.set(undefined);
+        perstistedStore$.isActivityTab.set(true);
+      }
+    } else {
+      store$.detail.activeTabField.set(defaultField);
+    }
   }
 
   const activeTabField = store$.detail.activeTabField.get();
 
-  if (!activeTabField) return null;
+  if (!activeTabField) {
+    return {
+      updateRow: () => null,
+      saveIfDirty: () => null,
+      activeTabField: null,
+      detailTabsFields: [] as CommandformItem[],
+      activeTabPrimitiveFields: [] as CommandformItem[],
+      activeTabComplexFields: [] as CommandformItem[],
+      row: null,
+    } satisfies {
+      row: Row | null;
+      updateRow: (field: FieldConfig, value: unknown) => void;
+      saveIfDirty: (field: FieldConfig) => void;
+      activeTabField: CommandformItem | null;
+      detailTabsFields: CommandformItem[];
+      activeTabPrimitiveFields: CommandformItem[];
+      activeTabComplexFields: CommandformItem[];
+    };
+  }
 
   const activeTabViewConfig = getViewByName(
     store$.views.get(),
@@ -198,7 +233,7 @@ export const detailTabsHelper = () => {
     const errors = viewConfigManager.validateRecord(row?.raw);
 
     if (errors) {
-      _log.debug('Form State Errors: ', errors);
+      console.debug('Form State Errors: ', errors);
     }
 
     return {
