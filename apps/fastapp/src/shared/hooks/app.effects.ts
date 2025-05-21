@@ -160,7 +160,12 @@ export const useAppEffects = (viewName: string) => {
                 )}/${id}/overview`,
               });
             } else {
-              // router.invalidate();
+              //important dont delete.
+              // when we are on tasks -> sub todos list
+              // and we click on the parent tasks view
+              // without this, we would see the todos list for a moment and then the tasks list
+              // with the invalidate, we will force the loader of the view to be called
+              router.invalidate();
               navigateRef.current({
                 to: `/fastApp/${slugHelper().slugify(
                   state.slug ?? state.view

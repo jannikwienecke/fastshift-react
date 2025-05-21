@@ -1,5 +1,4 @@
-import { getViewByName, RecordType } from '@apps-next/core';
-import { store$ } from '@apps-next/react';
+import { RecordType } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import {
   createFileRoute,
@@ -13,10 +12,9 @@ import {
   dispatchLoadDetailOverviewView,
   dispatchLoadDetailSubView,
   dispatchLoadView,
-  getViewData,
 } from '../application-store/app.store.utils';
 import { getUserViewsQuery, queryClient } from '../query-client';
-import { getView, getViewParms } from '../shared/utils/app.helper';
+import { getView } from '../shared/utils/app.helper';
 import { DefaultViewTemplate } from '../views/default-view-template';
 
 export const Route = createFileRoute('/fastApp/$view')({
@@ -25,39 +23,14 @@ export const Route = createFileRoute('/fastApp/$view')({
 
     await queryClient.ensureQueryData(getUserViewsQuery());
 
-    const { viewData, userViewData, viewName } = getView(props);
-
     const { id, view, model } = props.params as RecordType;
 
     if (id && view && model) {
-      const { viewName: parentViewName } = getViewParms(props.params);
-      if (!parentViewName) throw new Error('NOT VALID VIEW');
-      const view = getViewByName(store$.views.get(), model);
-
-      if (!view) throw new Error('NOT VALID MODEL VIEW');
-
-      const { viewData } = getViewData(view.viewName);
-
-      await props.context.preloadQuery(
-        viewData.viewConfig,
-        view.viewName,
-        null,
-        parentViewName,
-        id
-      );
       dispatchLoadDetailSubView(props, true);
       loading$.set(false);
     }
 
     if (id && view) {
-      await props.context.preloadQuery(
-        viewData.viewConfig,
-        userViewData?.name ?? viewName,
-        id,
-        null,
-        null
-      );
-
       dispatchLoadDetailOverviewView(props, true);
       loading$.set(false);
     } else if (view) {
@@ -81,12 +54,12 @@ const ViewMainComponent = observer(() => {
   );
 
   if (params.model) {
-    dispatchLoadDetailSubView({ params, cause: '' });
+    dispatchLoadDetailSubView({ params, cause: '', context });
     prevViewRef.current =
       params.view + (params.id ?? '') + (params.model ?? '');
   }
   if (params.id) {
-    dispatchLoadDetailOverviewView({ params, cause: '' });
+    dispatchLoadDetailOverviewView({ params, cause: '', context });
     prevViewRef.current =
       params.view + (params.id ?? '') + (params.model ?? '');
   } else if (

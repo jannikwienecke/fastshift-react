@@ -96,28 +96,45 @@ export const dispatchLoadView = async (
   return { viewData, userViewData, viewName };
 };
 
-export const dispatchLoadDetailOverviewView = (
+export const dispatchLoadDetailOverviewView = async (
   props: {
     params: RecordType;
     cause: string;
+    context: {
+      preloadQuery?: ConvexPreloadQuery<QueryReturnOrUndefined>;
+    };
   },
   isLoader?: boolean
 ) => {
   const id = props.params.id as string;
   const model = props.params.model as string | undefined;
-  if (props.cause === 'preload') return {};
 
   const { viewData, userViewData, viewName } = getView(props);
 
-  const data = queryClient.getQueryData(
-    getQueryKey(
+  setTimeout(() => {
+    // also preload the parent view
+    props.context.preloadQuery?.(
       viewData.viewConfig,
       userViewData?.name ?? viewName,
-      id,
+      null,
       null,
       null
-    )
-  ) as QueryReturnOrUndefined;
+    );
+  }, 500);
+
+  const data = await props.context.preloadQuery?.(
+    viewData.viewConfig,
+    userViewData?.name ?? viewName,
+    id,
+    null,
+    null
+  );
+
+  if (props.cause === 'preload') {
+    return {};
+  }
+
+  if (!data) throw new Error('NOT VALID PRELOAD QUERY');
 
   viewActionStore.dispatchViewAction({
     type: 'LOAD_DETAIL_OVERVIEW',
@@ -132,16 +149,18 @@ export const dispatchLoadDetailOverviewView = (
   return { viewData, userViewData, viewName };
 };
 
-export const dispatchLoadDetailSubView = (
+export const dispatchLoadDetailSubView = async (
   props: {
     params: RecordType;
     cause: string;
+    context: {
+      preloadQuery?: ConvexPreloadQuery<QueryReturnOrUndefined>;
+    };
   },
   isLoader?: boolean
 ) => {
   const id = props.params.id as string;
   const model = props.params.model as string;
-  if (props.cause === 'preload') return {};
 
   const { viewData: parentViewData, viewName: parentViewName } = getView(props);
 
@@ -161,15 +180,28 @@ export const dispatchLoadDetailSubView = (
   const name = `${parentViewData.viewConfig.tableName}|${modelView.tableName}`;
   const userViewData = userViews.find((u) => u.name === name);
 
-  const data = queryClient.getQueryData(
-    getQueryKey(
-      modelViewData.viewConfig,
-      modelView.viewName,
+  setTimeout(() => {
+    // also preload the parent view
+    props.context.preloadQuery?.(
+      parentViewData.viewConfig,
+      parentViewData.viewConfig.viewName,
       null,
-      parentViewName ?? null,
-      id ?? null
-    )
-  ) as QueryReturnOrUndefined;
+      null,
+      null
+    );
+  }, 500);
+
+  const data = await props.context.preloadQuery?.(
+    modelView,
+    modelView.viewName,
+    null,
+    parentViewName,
+    id
+  );
+
+  if (props.cause === 'preload') return {};
+
+  if (!data) throw new Error('NOT VALID PRELOAD QUERY');
 
   viewActionStore.dispatchViewAction({
     type: 'LOAD_DETAIL_SUB_VIEW',
