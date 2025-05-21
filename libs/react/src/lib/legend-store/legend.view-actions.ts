@@ -186,7 +186,6 @@ const handleLoadView = (action: Action) => {
 
   console.log('handleLoadView: viewData', viewConfigManager);
 
-  store$.detail.set(undefined);
   resetStore();
 
   setStore({
@@ -194,6 +193,9 @@ const handleLoadView = (action: Action) => {
     parentViewName: undefined,
     userViewData,
   });
+
+  // must be resetted after setStore and reset
+  store$.detail.set(undefined);
 
   handleQueryData(data);
 
