@@ -194,7 +194,11 @@ const handleLoadView = (action: Action) => {
     store$.detail.set(undefined);
   }
 
-  console.debug('ACTION: LOAD_VIEW:: ', action.viewName);
+  console.debug(
+    'ACTION: LOAD_VIEW:: ',
+    action.viewName,
+    action.data?.data?.length
+  );
 
   resetStore();
 

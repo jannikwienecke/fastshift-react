@@ -1,12 +1,20 @@
 import { api, views } from '@apps-next/convex';
-import { GetTableName, slugHelper } from '@apps-next/core';
-import { viewActionStore, store$ } from '@apps-next/react';
+import {
+  GetTableName,
+  QueryReturnOrUndefined,
+  slugHelper,
+} from '@apps-next/core';
+import { getView, store$, viewActionStore } from '@apps-next/react';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation, useRouter } from '@tanstack/react-router';
+import {
+  useLocation,
+  useRouteContext,
+  useRouter,
+} from '@tanstack/react-router';
 import React from 'react';
 import { useTranslation as useTranslationReact } from 'react-i18next';
-import { getUserViews } from '../../query-client';
+import { getQueryKey, getUserViews, queryClient } from '../../query-client';
 import { useViewParams } from './useViewParams';
 
 export const useAppEffects = (viewName: string) => {
@@ -14,6 +22,7 @@ export const useAppEffects = (viewName: string) => {
 
   const navigateRef = React.useRef(router.navigate);
   const realPreloadRoute = router.preloadRoute;
+  const context = useRouteContext({ strict: false });
 
   const realPreloadRouteRef = React.useRef(realPreloadRoute);
 
@@ -149,8 +158,9 @@ export const useAppEffects = (viewName: string) => {
           break;
 
         case 'navigate':
-          (() => {
+          (async () => {
             const id = state.id;
+
             if (id) {
               navigateRef.current({
                 to: `/fastApp/${slugHelper().slugify(
@@ -158,6 +168,32 @@ export const useAppEffects = (viewName: string) => {
                 )}/${id}/overview`,
               });
             } else {
+              const userView = store$.userViews
+                .get()
+                .find((v) => v.name === state.view);
+
+              const view =
+                getView(state.view) ?? userView
+                  ? getView(userView?.baseView ?? '')
+                  : null;
+
+              if (!view) return;
+
+              const data = queryClient.getQueryData(
+                getQueryKey(view, state.view, null, null, null)
+              ) as QueryReturnOrUndefined;
+
+              if (!data) {
+                console.debug(`Preload view: "${state.view}". No data found.`);
+                await context.preloadQuery?.(
+                  view,
+                  state.view,
+                  null,
+                  null,
+                  null
+                );
+              }
+
               navigateRef.current({
                 to: `/fastApp/${slugHelper().slugify(
                   state.slug ?? state.view

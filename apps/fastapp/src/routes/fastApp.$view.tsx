@@ -9,7 +9,7 @@ import {
   dispatchLoadView,
   getViewData,
 } from '../application-store/app.store.utils';
-import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
+import { getUserViewsQuery, queryClient } from '../query-client';
 import { getView, getViewParms } from '../shared/utils/app.helper';
 import { DefaultViewTemplate } from '../views/default-view-template';
 
@@ -77,6 +77,8 @@ const ViewMainComponent = observer(() => {
   if (params.id) {
     dispatchLoadDetailOverviewView({ params, cause: '' });
   } else {
+    // TODO HIER WEITER MACHEN
+    // check if preloaded should habben in the dispatch fn itself and not in the effect
     dispatchLoadView({ params, cause: '' });
   }
 
