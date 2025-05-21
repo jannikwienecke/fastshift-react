@@ -6,7 +6,12 @@ import {
   UserViewData,
   ViewRegistryEntry,
 } from '@apps-next/core';
-import { globalStore, viewRegistry } from '@apps-next/react';
+import {
+  viewActionStore,
+  viewRegistry,
+  getSubUserView,
+  store$,
+} from '@apps-next/react';
 import { getQueryKey, getUserViews, queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
 
@@ -25,13 +30,14 @@ export const wait = () => {
 };
 
 export const getViewData = (
-  viewName: string,
-  userViews: UserViewData[] = []
+  viewName: string
 ): {
   userViewData: UserViewData | null | undefined;
   viewData: ViewRegistryEntry;
 } => {
-  const userViewData = userViews.find((view) => view.name === viewName);
+  const userViewData = store$.userViews
+    .get()
+    .find((view) => view.name === viewName);
 
   const viewData = viewRegistry.getView(userViewData?.baseView ?? viewName);
 
@@ -44,12 +50,9 @@ export const getSubModelViewData = (model: string, parentModel: string) => {
 
   if (!modelView) throw new Error('NOT VALID MODEL');
 
-  const userViews = getUserViews();
+  const { viewData } = getViewData(modelView.viewName);
 
-  const { viewData } = getViewData(modelView.viewName, userViews);
-
-  const name = `${parentModel}|${modelView.tableName}`;
-  const userViewData = userViews.find((u) => u.name === name);
+  const userViewData = getSubUserView(modelView);
 
   return { viewData, userViewData };
 };
@@ -75,7 +78,7 @@ export const dispatchLoadView = (
     )
   ) as QueryReturnOrUndefined;
 
-  globalStore.dispatchViewAction({
+  viewActionStore.dispatchViewAction({
     type: 'LOAD_VIEW',
     viewName,
     data,
@@ -109,7 +112,7 @@ export const dispatchLoadDetailOverviewView = (
     )
   ) as QueryReturnOrUndefined;
 
-  globalStore.dispatchViewAction({
+  viewActionStore.dispatchViewAction({
     type: 'LOAD_DETAIL_OVERVIEW',
     viewName,
     data,
@@ -146,10 +149,7 @@ export const dispatchLoadDetailSubView = (
 
   const userViews = getUserViews();
 
-  const { viewData: modelViewData } = getViewData(
-    modelView.viewName,
-    userViews
-  );
+  const { viewData: modelViewData } = getViewData(modelView.viewName);
 
   const name = `${parentViewData.viewConfig.tableName}|${modelView.tableName}`;
   const userViewData = userViews.find((u) => u.name === name);
@@ -164,7 +164,7 @@ export const dispatchLoadDetailSubView = (
     )
   ) as QueryReturnOrUndefined;
 
-  globalStore.dispatchViewAction({
+  viewActionStore.dispatchViewAction({
     type: 'LOAD_DETAIL_SUB_VIEW',
     viewName: modelView.viewName,
     parentViewName: parentViewName,

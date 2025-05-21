@@ -88,7 +88,7 @@ export const configManager = (viewConfig: ViewConfigType) => {
     } satisfies DisplayOptionsUiType;
   };
 
-  const mergeAndCreate = (userViewData?: UserViewData) => {
+  const mergeAndCreate = (userViewData?: UserViewData | null) => {
     const displayOptionsUser = userViewData?.displayOptions
       ? parseDisplayOptionsStringForServer(
           userViewData.displayOptions,

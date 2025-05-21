@@ -179,7 +179,7 @@ export type LegendStore = {
   views: RegisteredViews;
   userViews: UserViewData[];
   commands: UserStoreCommand[];
-  userViewData: UserViewData | undefined;
+  userViewData: UserViewData | undefined | null;
 
   viewId: string | null;
 

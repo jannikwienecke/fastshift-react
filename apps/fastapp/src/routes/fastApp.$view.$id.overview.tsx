@@ -1,4 +1,8 @@
-import { FormField, globalStore, RenderActivityList } from '@apps-next/react';
+import {
+  FormField,
+  viewActionStore,
+  RenderActivityList,
+} from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
@@ -34,8 +38,7 @@ const DetaiViewPage = observer(() => {
   let { viewName } = useViewParams();
   viewName = viewName as string;
 
-  const userViews = getUserViews();
-  const { viewData } = getViewData(viewName, userViews);
+  const { viewData } = getViewData(viewName);
 
   if (viewData.overView) {
     return <viewData.overView />;

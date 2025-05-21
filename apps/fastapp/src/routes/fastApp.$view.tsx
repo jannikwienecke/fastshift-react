@@ -27,10 +27,10 @@ export const Route = createFileRoute('/fastApp/$view')({
       const { viewName: parentViewName } = getViewParms(props.params);
       if (!parentViewName) throw new Error('NOT VALID VIEW');
       const view = getViewByName(store$.views.get(), model);
-      const userViews = getUserViews();
+
       if (!view) throw new Error('NOT VALID MODEL VIEW');
 
-      const { viewData } = getViewData(view.viewName, userViews);
+      const { viewData } = getViewData(view.viewName);
 
       await props.context.preloadQuery(
         viewData.viewConfig,

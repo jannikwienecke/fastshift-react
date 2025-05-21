@@ -77,7 +77,7 @@ const makeSelectModelAttributeCommand = (
     handler: ({ row }) => {
       console.debug('makeSelectModelAttributeCommand - handler');
 
-      // TODO DETAIL BRANCHING
+      //  DETAIL BRANCHING
       const field = getViewConfigManager().getFieldBy(item.id.toString());
 
       if (!row) return;

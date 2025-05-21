@@ -43,7 +43,7 @@ export const useComboboxQuery = () => {
     (store$.filter.open.get() && !store.field);
 
   const formViewName = store$.commandform.view.get()?.viewName;
-  const viewName = // TODO DETAIL BRANCHING
+  const viewName = //  DETAIL BRANCHING
     activeTabViewName
       ? activeTabViewName
       : formViewName

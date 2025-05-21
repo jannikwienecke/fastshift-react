@@ -1,6 +1,6 @@
 import { api, views } from '@apps-next/convex';
 import { GetTableName, slugHelper } from '@apps-next/core';
-import { globalStore, store$ } from '@apps-next/react';
+import { viewActionStore, store$ } from '@apps-next/react';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useRouter } from '@tanstack/react-router';
@@ -62,7 +62,7 @@ export const useAppEffects = (viewName: string) => {
       return;
     }
 
-    globalStore.setViews(views);
+    viewActionStore.setViews(views);
   }, [i18n.language]);
 
   React.useEffect(() => {

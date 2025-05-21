@@ -4,6 +4,7 @@ import {
   getViewByName,
   makeData,
   Row,
+  ViewConfigType,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { derviedDetailPage$ } from './legend.detailpage.derived';
@@ -104,4 +105,24 @@ export const getIsManyRelationView = (tableOrFieldName: string) => {
   );
 
   return viewThatHasAManyRelation;
+};
+
+export const getSubUserView = (subConfig: ViewConfigType) => {
+  const viewConfigParent = store$.detail.viewConfigManager.viewConfig.get();
+  if (!viewConfigParent) return null;
+
+  const userViews = store$.userViews.get();
+
+  const name = `${viewConfigParent.tableName}|${subConfig.tableName}`;
+
+  return userViews.find((v) => v.name === name);
+};
+
+export const createSubViewName = (
+  parentView: ViewConfigType,
+  subView: ViewConfigType
+) => {
+  const name = `${parentView.tableName}|${subView.tableName}`;
+
+  return name;
 };

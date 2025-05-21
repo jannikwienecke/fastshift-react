@@ -32,6 +32,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     cwd: workspaceRoot,
   },
+
   reportSlowTests: {
     threshold: 40,
     max: 10,

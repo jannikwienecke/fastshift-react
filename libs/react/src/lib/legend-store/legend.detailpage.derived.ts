@@ -46,6 +46,7 @@ export const derviedDetailPage$ = observable(() => {
           onSelectTab(field) {
             perstistedStore$.isActivityTab.set(false);
             store$.detail.activeTabField.set(field);
+            perstistedStore$.activeTabFieldName.set(field.field?.name);
           },
           onClickGoToRelation: () => {
             const tab = store$.detail.activeTabField.get();

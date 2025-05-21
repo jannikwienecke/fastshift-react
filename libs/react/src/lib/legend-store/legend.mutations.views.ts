@@ -9,6 +9,7 @@ import {
 } from './legend.shared.derived';
 import { StoreFn } from './legend.store.types';
 import { getParsedViewSettings } from './legend.utils.helper';
+import { createSubViewName } from './legend.utils';
 
 export const createViewMutation: StoreFn<'createViewMutation'> =
   (store$) => async (form, onSuccess) => {
@@ -96,19 +97,19 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
 
 export const saveSubUserView: StoreFn<'saveSubUserView'> =
   (store$) => async () => {
-    const parentTablename = parentView$.get()?.tableName;
+    const parentView = parentView$.get();
     const view = currentView$.get();
 
-    console.log('save sub', { view, parentTablename });
-    if (!parentTablename) return;
+    if (!parentView) return;
 
-    const name = `${parentTablename}|${view.tableName}`;
+    const name = createSubViewName(parentView, view);
 
     const existingSubView = store$.userViews
       .find((v) => v.name.get() === name)
       ?.get();
 
     if (!existingSubView) {
+      console.debug('saveSubUserView::CREATE_SUB_VIEW: ', name);
       await store$.api.mutateAsync({
         query: '',
         viewName: currentView$.viewName.get(),
@@ -127,6 +128,8 @@ export const saveSubUserView: StoreFn<'saveSubUserView'> =
         },
       });
     } else {
+      console.debug('saveSubUserView::UPDATE_SUB_VIEW: ', name);
+
       await store$.api.mutateAsync({
         query: '',
         viewName: currentView$.viewName.get(),
@@ -151,7 +154,7 @@ export const updateDetailViewMutation: StoreFn<'updateDetailViewMutation'> =
     const view = detailUserView$.get();
 
     if (view) {
-      const result = await store$.api.mutateAsync({
+      await store$.api.mutateAsync({
         query: '',
         viewName: currentView$.viewName.get(),
         mutation: {

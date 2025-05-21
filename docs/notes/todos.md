@@ -152,10 +152,6 @@ created: 1723444498044
 - [x] test: in detail task view -> try to add or remove tags
 - [x] test: in detail task view -> have 3 tags, remove one, add a different one, add back the first thta were removed
 
-Next Bigger Feature
-
-- [ ] add -> user can comment on an model, inside the acitivty list
-
 Small Bugs to fix
 
 - [x] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
@@ -172,10 +168,17 @@ Small Features to add
 - [x] in tab header -> show icon
 - [x] in tab content. show the display field more prominent and add a go to button
 - [x] in combobox popover, if not found -> show create
-- [ ] create sepearte store for values that should be persisted on local storage and the synced
+- [x] create sepearte store for values that should be persisted on local storage and the synced
+
+### Next Feature to add:
+
+- [ ] add -> user can comment on an model, inside the acitivty list
+
+### Small Feature:
+
 - [ ] color picker and color indicator for fields with type "color" or something like this
 
-Add tests
+### Add tests
 
 - [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
 - [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task

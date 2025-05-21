@@ -2,7 +2,7 @@ import { perstistedStore$ } from '@apps-next/react';
 import { observable } from '@legendapp/state';
 import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/local-storage';
 import { syncObservable } from '@legendapp/state/sync';
-import { isDev } from '../../application-store/app.store.utils';
+
 export const localStore$ = observable<{
   activeTabFieldName?: string;
   isActivityTab?: boolean;
@@ -13,20 +13,24 @@ export const localStore$ = observable<{
 
 export const hydradatedStore$ = observable(false);
 
-if (!isDev) {
+if (localStorage.getItem('test') !== 'true') {
+  console.debug('Persisting State to Local Storage');
   syncObservable(localStore$, {
     persist: {
-      name: 'local-store',
+      name: 'local-store-state',
       plugin: ObservablePersistLocalStorage,
     },
   });
+} else {
+  console.warn('Not Persisting State to Local Storage in Test Mode...');
 }
 
-perstistedStore$.onChange((value) => {
+perstistedStore$.onChange((changes) => {
+  const value = changes.value;
   if (!hydradatedStore$.get()) return;
 
   localStore$.set({
-    ...value.value,
+    ...value,
     updatedAt: Date.now(),
   });
 });

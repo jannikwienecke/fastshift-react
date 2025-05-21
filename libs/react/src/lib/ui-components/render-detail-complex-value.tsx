@@ -79,7 +79,7 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
   const Component = getComponent({
     fieldName: fieldConfig.name,
     componentType: 'detailValue',
-    // TODO DETAIL BRANCHING
+    //  DETAIL BRANCHING
     isDetail: true,
   });
 

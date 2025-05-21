@@ -4,8 +4,9 @@ import { views } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
   ErrorDetailsDialog,
-  globalStore,
+  viewActionStore,
   store$,
+  perstistedStore$,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import {
@@ -18,10 +19,15 @@ import { Toaster } from 'sonner';
 import { resettingDb$ } from '../application-store/app.store';
 import { AppSidebar } from '../components/sidebar/app-sidebar';
 import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
-import { useCommands, useViewParams } from '../shared/hooks';
+import {
+  hydradatedStore$,
+  localStore$,
+  useCommands,
+  useViewParams,
+} from '../shared/hooks';
 import { useAppEffects } from '../shared/hooks/app.effects';
 
-globalStore.setViews(views);
+viewActionStore.setViews(views);
 
 export const Route = createFileRoute('/fastApp')({
   loader: async (props) => {
@@ -35,66 +41,11 @@ export const Route = createFileRoute('/fastApp')({
 
     store$.api.getUserViewQueryKey.set(userViewsQuery.queryKey);
     store$.userViews.set(userViews);
+
+    console.log(localStore$.get());
+    hydradatedStore$.set(true);
+    perstistedStore$.set(localStore$.get());
   },
-
-  //   const { viewName, slug, id, model } = getViewParms(props.params);
-
-  //   store$.api.getUserViewQueryKey.set(userViewsQuery.queryKey);
-
-  //   if (!viewName) {
-  //     return redirect({ to: '/fastApp/task' });
-  //   }
-
-  //   if (store$.viewConfigManager.viewConfig.get()) {
-  //     return;
-  //   }
-
-  //   _log.debug(`Loader for view: ${viewName} - slug: ${slug}`);
-
-  //   const { viewData, userViewData } = getViewData(viewName, userViews);
-
-  //   if (!viewData) {
-  //     _log.warn(`View ${viewName} not found, redirecting to /fastApp`);
-  //     return redirect({ to: '/fastApp' });
-  //   }
-
-  //   let data: QueryReturnOrUndefined | null = null;
-
-  //   await props.context.preloadQuery(
-  //     viewData.viewConfig,
-  //     userViewData?.name ?? viewName,
-  //     null,
-  //     null,
-  //     null
-  //   );
-
-  //   data = queryClient.getQueryData(
-  //     getQueryKey(
-  //       viewData.viewConfig,
-  //       userViewData?.name ?? viewName,
-  //       null,
-  //       null,
-  //       null
-  //     )
-  //   ) as QueryReturnOrUndefined;
-
-  //   globalStore.dispatch({
-  //     type: 'INIT_LOAD_STORE',
-  //     payload: {
-  //       viewName,
-  //       data,
-  //       userViews,
-  //       views,
-  //       id: id ?? null,
-  //       model: model ?? null,
-  //       userView: userViewData,
-  //     },
-  //   });
-
-  //   const persistedState = localStore$.get();
-  //   perstistedStore$.set(persistedState);
-  //   hydradatedStore$.set(true);
-  // },
 
   component: () => <FastAppLayoutComponent />,
   errorComponent: (props) => {

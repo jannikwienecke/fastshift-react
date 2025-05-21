@@ -8,7 +8,7 @@ export const getComponent = ({
 }: {
   fieldName: string;
   componentType: ComponentType;
-  // TODO DETAIL BRANCHING
+  //  DETAIL BRANCHING
   isDetail?: boolean;
 }) => {
   const tableNameDetail = store$.detail.viewConfigManager.get()

@@ -82,8 +82,6 @@ export const getView = (props: { params: RecordType }) => {
 
   if (!viewName) throw new Error('View name is required');
 
-  const userViews = getUserViews();
-
-  const { viewData, userViewData } = getViewData(viewName, userViews);
+  const { viewData, userViewData } = getViewData(viewName);
   return { viewData, userViewData, viewName };
 };

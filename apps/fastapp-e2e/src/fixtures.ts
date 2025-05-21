@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { test as base, Browser } from '@playwright/test';
 import { seedDatabase } from './helpers/db-seed';
 import { MainViewPage } from './view-pom';
 import { _log } from '@apps-next/core';
@@ -63,6 +63,12 @@ export const test = base.extend<Fixtures>({
     const navigationHelper = makeNavigationHelper(mainPage);
     await use({ list: listHelper, navigation: navigationHelper } as const);
   },
+});
+
+test.beforeEach(async ({ context }) => {
+  await context.addInitScript(() => {
+    localStorage.setItem('test', 'true');
+  });
 });
 
 export { expect } from '@playwright/test';

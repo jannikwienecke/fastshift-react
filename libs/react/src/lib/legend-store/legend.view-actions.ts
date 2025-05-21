@@ -18,6 +18,8 @@ import {
   createRelationalDataModel,
   handleIncomingDetailData,
 } from './legend.store.fn.global';
+import { getSubUserView } from './legend.utils';
+import { perstistedStore$ } from './legend.store.persisted';
 
 type Action =
   | {
@@ -158,10 +160,10 @@ const handleLoadDetailOverview = (action: Action) => {
 
     setStore({
       viewConfigManager: viewConfigManagerRelation,
-      // TODO: Use the userViewData of the sub model e.g.tasks|projects
-      userViewData: undefined,
+      userViewData: getSubUserView(viewConfigManagerRelation.viewConfig),
       parentViewName: action.viewName,
     });
+
     loadDetailSubViewKey$.set('');
   }
 
@@ -180,9 +182,6 @@ const handleLoadView = (action: Action) => {
     view,
     action.viewData.uiViewConfig
   );
-
-  //   perstistedStore$.activeTabFieldName.set(undefined);
-  // perstistedStore$.isActivityTab.set(true);
 
   if (loadViewKey$.get() === key && !action.isLoader) return;
 
@@ -231,6 +230,9 @@ const resetStore = () => {
 
   store$.detail.activeTabField.set(null);
 
+  perstistedStore$.activeTabFieldName.set(undefined);
+  perstistedStore$.isActivityTab.set(true);
+
   store$.fetchMore.assign({
     isDone: false,
     currentCursor: {
@@ -259,7 +261,7 @@ const setStore = ({
   parentViewName,
 }: {
   viewConfigManager: BaseViewConfigManager;
-  userViewData: UserViewData | undefined;
+  userViewData: UserViewData | undefined | null;
   parentViewName: string | undefined;
 }) => {
   batch(() => {
@@ -310,7 +312,7 @@ const setStore = ({
   });
 };
 
-export const globalStore = {
+export const viewActionStore = {
   dispatchViewAction,
   setViews: (views: RegisteredViews) => {
     store$.views.set(patchAllViews(views));

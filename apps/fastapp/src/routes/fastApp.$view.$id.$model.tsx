@@ -47,9 +47,7 @@ const DetailModelListViewPage = observer(() => {
 
   const view = getViewByName(views, model);
 
-  const userViews = getUserViews();
-
-  const { viewData } = getViewData(view?.viewName ?? '', userViews);
+  const { viewData } = getViewData(view?.viewName ?? '');
 
   if (viewData.main) {
     return <viewData.main isSubView={true} />;

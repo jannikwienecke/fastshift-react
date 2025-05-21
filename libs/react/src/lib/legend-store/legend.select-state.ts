@@ -25,7 +25,7 @@ export const selectState$ = observable({
 const getParentRow = () => {
   const detailRow = store$.detail.row.get();
 
-  // TODO DETAIL BRANCHING
+  //  DETAIL BRANCHING
   if (detailRow && selectState$.isDetail.get()) {
     return detailRow as Row;
   }
