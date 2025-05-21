@@ -70,16 +70,6 @@ created: 1723444498044
 - [x] add tests for validation rules frontend and backend
 - [x] in combobox render field names, label should be aligned (with or without icon), maybe default icon
 
-<!-- FEATURE -->
-
-- [ ] Commandform -> extract field input components into own components
-- [ ] when created a new task -> click on notifiaction -> open task
-- [ ] open after creation, in config
-- [ ] update design / message / icon of success notification
-- [ ] way to show what fields are missing / errors in form
-- [ ] add tipTap
-- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
-
 ## How we handle Deletes with soft delete
 
 - project has many tasks, task has one project
@@ -177,6 +167,10 @@ Small Features to add
 ### Small Feature:
 
 - [ ] color picker and color indicator for fields with type "color" or something like this
+- [ ] when created a new task -> click on notifiaction -> open task
+- [ ] open after creation, in config
+- [ ] add tipTap
+- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
 
 ### Add tests
 
