@@ -1,6 +1,6 @@
 import { SidebarInset, SidebarProvider } from '@apps-next/ui';
 
-import { views } from '@apps-next/convex';
+import { api, views } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
   ErrorDetailsDialog,
@@ -26,6 +26,10 @@ import {
   useViewParams,
 } from '../shared/hooks';
 import { useAppEffects } from '../shared/hooks/app.effects';
+import {
+  ConvexPreloadQuery,
+  preloadQuery,
+} from '@apps-next/convex-adapter-app';
 
 viewActionStore.setViews(views);
 

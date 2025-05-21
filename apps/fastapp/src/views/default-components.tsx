@@ -11,6 +11,7 @@ import {
   MakeComboboxPropsOptions,
   makeHooks,
   MakeInputDialogPropsOptions,
+  store$,
   useComboboxQuery,
 } from '@apps-next/react';
 import {

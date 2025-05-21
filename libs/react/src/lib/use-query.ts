@@ -22,6 +22,7 @@ import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
 import { derviedDetailPage$ } from './legend-store/legend.detailpage.derived';
+import { parentView$ } from './legend-store';
 
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const viewName = args.viewName ?? args.viewConfig?.viewName ?? '';
@@ -261,6 +262,13 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       queryReturn?.data?.data?.[0]
     );
   }, [queryReturn?.data?.data, queryReturn?.data?.relationalData]);
+
+  // if (
+  //   queryReturn.fetchStatus === 'fetching' ||
+  //   queryReturn.status === 'pending'
+  // ) {
+  //   console.log('Query is pending or fetching');
+  // }
 
   return {
     ...queryReturn,

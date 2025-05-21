@@ -1,12 +1,17 @@
 import { views } from '@apps-next/convex';
-import { getViewByName } from '@apps-next/core';
+import { getViewByName, QueryReturnOrUndefined } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import {
   getSubModelViewData,
   getViewData,
 } from '../application-store/app.store.utils';
-import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
+import {
+  getQueryKey,
+  getUserViews,
+  getUserViewsQuery,
+  queryClient,
+} from '../query-client';
 import { getView } from '../shared/utils/app.helper';
 import {
   RenderDisplayOptions,
@@ -15,10 +20,42 @@ import {
   RenderList,
 } from '../views/default-components';
 import React from 'react';
+import { viewActionStore } from '@apps-next/react';
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
+  onEnter: async (props) => {
+    await props.loaderPromise;
+    await props.loadPromise;
+
+    console.debug('onEnter:Sub Model Page');
+
+    const model = props.params.model;
+
+    const { viewData: parentViewData, viewName: parentViewName } =
+      getView(props);
+
+    const { viewData: viewDataModel, userViewData } = getSubModelViewData(
+      model,
+      parentViewData.viewConfig.tableName
+    );
+
+    const id = props.params.id as string;
+    const data = queryClient.getQueryData(
+      getQueryKey(viewDataModel.viewConfig, model, null, parentViewName, id)
+    ) as QueryReturnOrUndefined;
+
+    viewActionStore.dispatchViewAction({
+      type: 'LOAD_DETAIL_SUB_VIEW',
+      userViewData,
+      viewData: viewDataModel,
+      data,
+      id,
+      parentViewName,
+    });
+  },
+
   async loader(ctx) {
-    await queryClient.ensureQueryData(getUserViewsQuery());
+    await ctx.parentMatchPromise;
 
     const model = ctx.params.model;
     const { viewData: parentViewData, viewName: parentViewName } = getView(ctx);

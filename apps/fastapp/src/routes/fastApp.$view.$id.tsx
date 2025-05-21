@@ -1,14 +1,69 @@
-import { _log, Row } from '@apps-next/core';
-import { FormField, RenderDetailComplexValue, store$ } from '@apps-next/react';
+import { _log, QueryReturnOrUndefined, Row } from '@apps-next/core';
+import {
+  FormField,
+  RenderDetailComplexValue,
+  store$,
+  viewActionStore,
+} from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
+import { getQueryKey, getUserViewsQuery, queryClient } from '../query-client';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
+  onLeave: (props) => {
+    console.debug('onLeave:DetailPage');
+    const { viewData, userViewData, viewName } = getView(props);
+
+    const data = queryClient.getQueryData(
+      getQueryKey(viewData.viewConfig, viewName, null, null, null)
+    ) as QueryReturnOrUndefined;
+
+    viewActionStore.dispatchViewAction({
+      type: 'LOAD_VIEW',
+      viewData,
+      userViewData,
+      data,
+    });
+  },
+  onEnter: async (props) => {
+    await props.loaderPromise;
+    await props.loadPromise;
+
+    console.debug('onEnter:Overview Page');
+    const { viewData, userViewData, viewName } = getView(props);
+
+    const id = props.params.id as string;
+    const data = queryClient.getQueryData(
+      getQueryKey(viewData.viewConfig, viewName, id, null, null)
+    ) as QueryReturnOrUndefined;
+
+    viewActionStore.dispatchViewAction({
+      type: 'LOAD_DETAIL_OVERVIEW',
+      viewData,
+      userViewData,
+      data,
+      id,
+    });
+  },
   loader: async (props) => {
+    console.debug('loader:Overview Page');
     await props.parentMatchPromise;
+    await queryClient.ensureQueryData(getUserViewsQuery());
+
+    const id = props.params.id as string;
+
+    const { viewData, userViewData, viewName } = getView(props);
+
+    await props.context.preloadQuery?.(
+      viewData.viewConfig,
+      userViewData?.name ?? viewName,
+      id,
+      null,
+      null
+    );
   },
   component: () => <DetaiViewPage />,
 });

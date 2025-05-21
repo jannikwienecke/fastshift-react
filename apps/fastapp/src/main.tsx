@@ -33,6 +33,7 @@ const router = createRouter({
 
   context: {
     queryClient,
+
     preloadQuery: async (
       viewConfig,
       viewName,

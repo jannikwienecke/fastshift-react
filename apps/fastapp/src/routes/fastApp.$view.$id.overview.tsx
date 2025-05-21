@@ -2,9 +2,10 @@ import {
   FormField,
   viewActionStore,
   RenderActivityList,
+  makeHooks,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { getViewData } from '../application-store/app.store.utils';
 import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
@@ -33,10 +34,32 @@ export const Route = createFileRoute('/fastApp/$view/$id/overview')({
 });
 
 const DetaiViewPage = observer(() => {
+  const { makeDetailPageProps } = makeHooks();
+  const { relationalListFields } = makeDetailPageProps();
   React.useEffect(() => console.debug('Render:DetailOverView'));
 
-  let { viewName } = useViewParams();
-  viewName = viewName as string;
+  const params = useViewParams();
+  const viewName = params.viewName as string;
+
+  const router = useRouter();
+  const preloadRoute = router.preloadRoute;
+  const preloadRef = React.useRef(preloadRoute);
+
+  React.useEffect(() => {
+    const firstRelationalListField = relationalListFields?.[0];
+    if (!firstRelationalListField?.field?.name) return;
+    console.debug('PRELOAD:SUB MODEL', firstRelationalListField.field?.name);
+
+    preloadRef.current({
+      from: '/fastApp/$view/$id/overview',
+      to: '/fastApp/$view/$id/$model',
+      params: {
+        view: params.viewName,
+        id: params.id,
+        model: firstRelationalListField.field?.name,
+      },
+    });
+  }, [params, relationalListFields]);
 
   const { viewData } = getViewData(viewName);
 
