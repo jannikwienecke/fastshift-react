@@ -322,11 +322,15 @@ export const makeListProps = <T extends RecordType = RecordType>(
   listItems$.set(items);
 
   if (!store$.list.rowInFocus.get()) {
-    store$.list.rowInFocus.set({
-      row: dataModel.rows?.[0] ? copyRow(dataModel.rows?.[0] as Row) : null,
-      hover: false,
-      focus: false,
-    });
+    setTimeout(() => {
+      if (store$.list.rowInFocus.get()) return;
+
+      store$.list.rowInFocus.set({
+        row: dataModel.rows?.[0] ? copyRow(dataModel.rows?.[0] as Row) : null,
+        hover: false,
+        focus: false,
+      });
+    }, 500);
   }
 
   return {

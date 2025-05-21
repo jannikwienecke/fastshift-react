@@ -172,6 +172,7 @@ Small Features to add
 - [ ] add tipTap
 - [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
 - [ ] chat in activity
+- [ ] chat activity (optimistic update)
 
 ### Add tests
 

@@ -14,6 +14,7 @@ import {
 } from '@apps-next/react';
 import { getQueryKey, getUserViews, queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
+import { ConvexPreloadQuery } from '@apps-next/convex-adapter-app';
 
 export const isDev = import.meta.env.MODE === 'development';
 export const wait = () => {
@@ -57,26 +58,32 @@ export const getSubModelViewData = (model: string, parentModel: string) => {
   return { viewData, userViewData };
 };
 
-export const dispatchLoadView = (
+export const dispatchLoadView = async (
   props: {
     params: RecordType;
     cause: string;
+    context: {
+      preloadQuery?: ConvexPreloadQuery<QueryReturnOrUndefined>;
+    };
   },
+
   isLoader?: boolean
 ) => {
-  if (props.cause === 'preload' || props.params?.id) return {};
-
   const { viewData, userViewData, viewName } = getView(props);
 
-  const data = queryClient.getQueryData(
-    getQueryKey(
-      viewData.viewConfig,
-      userViewData?.name ?? viewName,
-      null,
-      null,
-      null
-    )
-  ) as QueryReturnOrUndefined;
+  const data = await props.context.preloadQuery?.(
+    viewData.viewConfig,
+    viewName,
+    null,
+    null,
+    null
+  );
+
+  if (props.cause === 'preload' || props.params?.id) {
+    return {};
+  }
+
+  if (!data) throw new Error('NOT VALID PRELOAD QUERY');
 
   viewActionStore.dispatchViewAction({
     type: 'LOAD_VIEW',

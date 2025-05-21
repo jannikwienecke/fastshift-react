@@ -7,7 +7,7 @@ import {
   preloadQuery,
 } from '@apps-next/convex-adapter-app';
 
-import { logger, UserViewData } from '@apps-next/core';
+import { logger, QueryReturnOrUndefined, UserViewData } from '@apps-next/core';
 import './i18n';
 import { convex, getUserViews, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
@@ -48,7 +48,7 @@ const router = createRouter({
         userViewData = userViews.find((u) => u.name === viewName);
       }
 
-      return await queryClient.ensureQueryData(
+      const res = (await queryClient.ensureQueryData(
         preloadQuery(
           api.query.viewLoader,
           viewConfig,
@@ -57,7 +57,11 @@ const router = createRouter({
           parentViewName ?? null,
           parentId ?? null
         )
-      );
+      )) as QueryReturnOrUndefined;
+
+      if (!res) throw new Error('NOT VALID PRELOAD QUERY');
+
+      return res;
     },
   },
 });

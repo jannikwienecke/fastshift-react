@@ -1,8 +1,14 @@
 import { getViewByName, RecordType } from '@apps-next/core';
 import { store$ } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
-import { createFileRoute, Outlet, useParams } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Outlet,
+  useParams,
+  useRouteContext,
+} from '@tanstack/react-router';
 import React from 'react';
+import { loading$ } from '../application-store/app.store';
 import {
   dispatchLoadDetailOverviewView,
   dispatchLoadDetailSubView,
@@ -40,6 +46,7 @@ export const Route = createFileRoute('/fastApp/$view')({
         id
       );
       dispatchLoadDetailSubView(props, true);
+      loading$.set(false);
     }
 
     if (id && view) {
@@ -52,15 +59,11 @@ export const Route = createFileRoute('/fastApp/$view')({
       );
 
       dispatchLoadDetailOverviewView(props, true);
+      loading$.set(false);
     } else if (view) {
-      await props.context.preloadQuery(
-        viewData.viewConfig,
-        userViewData?.name ?? viewName,
-        null,
-        null,
-        null
-      );
-      dispatchLoadView(props, true);
+      props.cause !== 'preload' && loading$.set(true);
+      await dispatchLoadView(props, true);
+      loading$.set(false);
     }
   },
 
@@ -69,23 +72,41 @@ export const Route = createFileRoute('/fastApp/$view')({
 
 const ViewMainComponent = observer(() => {
   React.useEffect(() => console.debug('Render:ListPage'), []);
+
   const params = useParams({ strict: false });
+  const context = useRouteContext({ strict: false });
+
+  const prevViewRef = React.useRef<string | null>(
+    (params.view as string) + (params.id ?? '') + (params.model ?? '')
+  );
 
   if (params.model) {
     dispatchLoadDetailSubView({ params, cause: '' });
+    prevViewRef.current =
+      params.view + (params.id ?? '') + (params.model ?? '');
   }
   if (params.id) {
     dispatchLoadDetailOverviewView({ params, cause: '' });
-  } else {
-    // TODO HIER WEITER MACHEN
-    // check if preloaded should habben in the dispatch fn itself and not in the effect
-    dispatchLoadView({ params, cause: '' });
+    prevViewRef.current =
+      params.view + (params.id ?? '') + (params.model ?? '');
+  } else if (
+    !loading$.get() &&
+    params.view + (params.id ?? '') + (params.model ?? '')
+  ) {
+    prevViewRef.current =
+      params.view + (params.id ?? '') + (params.model ?? '');
+
+    dispatchLoadView({
+      params,
+      cause: '',
+      context,
+    });
   }
 
   const { viewData } = getView({ params });
   const ViewComponent = viewData?.main;
 
-  if (!viewData) return null;
+  if (!viewData || loading$.get()) return null;
   return (
     <>
       {ViewComponent ? <ViewComponent /> : <DefaultViewTemplate />}

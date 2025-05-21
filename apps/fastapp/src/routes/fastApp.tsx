@@ -42,7 +42,7 @@ export const Route = createFileRoute('/fastApp')({
     store$.api.getUserViewQueryKey.set(userViewsQuery.queryKey);
     store$.userViews.set(userViews);
 
-    console.log(localStore$.get());
+    console.debug('Persisted Storage: ', localStore$.get());
     hydradatedStore$.set(true);
     perstistedStore$.set(localStore$.get());
   },

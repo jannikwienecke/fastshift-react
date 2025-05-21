@@ -322,8 +322,6 @@ export const viewActionStore = {
     store$.views.set(patchAllViews(views));
     if (!store$.viewConfigManager.viewConfig.get()) return;
 
-    console.log('HIER');
-
     const current = store$.viewConfigManager.get();
     const viewConfig = getView(current.getViewName());
     if (!viewConfig) return;
