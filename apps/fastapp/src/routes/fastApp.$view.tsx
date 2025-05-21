@@ -26,12 +26,12 @@ export const Route = createFileRoute('/fastApp/$view')({
     const { id, view, model } = props.params as RecordType;
 
     if (id && view && model) {
-      dispatchLoadDetailSubView(props, true);
+      await dispatchLoadDetailSubView(props, true);
       loading$.set(false);
     }
 
     if (id && view) {
-      dispatchLoadDetailOverviewView(props, true);
+      await dispatchLoadDetailOverviewView(props, true);
       loading$.set(false);
     } else if (view) {
       props.cause !== 'preload' && loading$.set(true);
