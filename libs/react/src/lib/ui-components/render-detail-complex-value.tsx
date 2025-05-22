@@ -34,7 +34,6 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
 
         <div
           onClick={(e) => {
-            e.stopPropagation();
             props.onClickGoToRelation(field, value);
           }}
           className="group-hover:opacity-100 opacity-0 transition-opacity hover:bg-foreground/5"
@@ -164,9 +163,9 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
         <FieldLabel />
 
         <button
-          onClick={(e) =>
-            props.onClick(field, e.currentTarget.getBoundingClientRect())
-          }
+          onClick={(e) => {
+            props.onClick(field, e.currentTarget.getBoundingClientRect());
+          }}
           className="cursor-pointer"
         >
           {Component ? (

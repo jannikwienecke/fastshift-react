@@ -10,6 +10,14 @@ import { getQueryKey, getUserViewsQuery, queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultViewTemplate } from '../views/default-view-template';
 import { isInDetailView$ } from '../application-store/app.store.utils';
+import {
+  RenderComboboxPopover,
+  RenderCommandbar,
+  RenderCommandform,
+  RenderConfirmationAlert,
+  RenderContextmenu,
+  RenderDatePickerDialog,
+} from '../views/default-components';
 
 const loading$ = observable(false);
 const loadingEnter$ = observable(false);
@@ -47,7 +55,7 @@ export const Route = createFileRoute('/fastApp/$view')({
     loadingEnter$.set(false);
   },
   loader: async (props) => {
-    console.debug(':::onLoad:ListPage', props.params.view);
+    console.debug(':::onLoad:ListPage', props.params.view, props.cause);
     if (props.cause === 'enter') {
       loading$.set(true);
     }
@@ -73,7 +81,7 @@ export const Route = createFileRoute('/fastApp/$view')({
 
 const ViewMainComponent = observer(() => {
   const params = useParams({ strict: false });
-  const { viewData, userViewData, viewName } = getView({ params });
+  const { viewData } = getView({ params });
 
   React.useEffect(() => console.debug('Render:ListPage'), []);
 
@@ -81,15 +89,28 @@ const ViewMainComponent = observer(() => {
 
   if (loading$.get() || loadingEnter$.get()) return null;
 
+  console.debug(store$.viewConfigManager.get());
+
   if (!viewData) return null;
-  if (isInDetailView$.get()) {
-    return <Outlet />;
-  }
 
   return (
     <>
-      {ViewComponent ? <ViewComponent /> : <DefaultViewTemplate />}
       <DispatchComponent />
+
+      <RenderContextmenu />
+      <RenderConfirmationAlert />
+      <RenderCommandbar />
+      <RenderCommandform />
+      <RenderDatePickerDialog />
+      <RenderComboboxPopover />
+
+      {isInDetailView$.get() ? (
+        <>
+          <Outlet />;
+        </>
+      ) : (
+        <>{ViewComponent ? <ViewComponent /> : <DefaultViewTemplate />}</>
+      )}
     </>
   );
 });

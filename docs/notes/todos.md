@@ -179,3 +179,6 @@ Small Features to add
 - [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
 - [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task
 - [ ] history in detail view (activity list)
+- [ ] be on owner page -> navigate to history page
+- [ ] be on detail page of tasks -> navigate to list page of tasks
+- [ ] be on tasks all -> navigate to tasks urgent

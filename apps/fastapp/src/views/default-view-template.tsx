@@ -114,13 +114,6 @@ export const DefaultViewTemplate = observer(
             <Outlet />
           </div>
         ) : null}
-
-        <RenderContextmenu />
-        <RenderConfirmationAlert options={props.confirmationAlertOptions} />
-        <RenderCommandbar />
-        <RenderCommandform />
-        <RenderDatePickerDialog />
-        <RenderComboboxPopover options={props.comboboOptions} />
       </>
     );
   }

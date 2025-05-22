@@ -49,7 +49,6 @@ export const useMutation = () => {
       }
 
       const cache = queryClient?.getQueryCache?.();
-      console.log(cache?.getAll());
 
       try {
         cache?.clear();

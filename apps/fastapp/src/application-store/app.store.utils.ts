@@ -6,6 +6,7 @@ import {
 } from '@apps-next/core';
 import { getSubUserView, store$, viewRegistry } from '@apps-next/react';
 import { observable } from '@legendapp/state';
+import { getUserViews } from '../query-client';
 
 export const isDev = import.meta.env.MODE === 'development';
 export const wait = () => {
@@ -27,9 +28,15 @@ export const getViewData = (
   userViewData: UserViewData | null | undefined;
   viewData: ViewRegistryEntry;
 } => {
-  const userViewData = store$.userViews
+  let userViewData = store$.userViews
     .get()
-    .find((view) => view.name.toLowerCase() === viewName.toLowerCase());
+    ?.find((view) => view.name.toLowerCase() === viewName.toLowerCase());
+
+  userViewData = !userViewData
+    ? getUserViews()?.find(
+        (view) => view.name.toLowerCase() === viewName.toLowerCase()
+      )
+    : userViewData;
 
   const viewData = viewRegistry.getView(userViewData?.baseView || viewName);
 

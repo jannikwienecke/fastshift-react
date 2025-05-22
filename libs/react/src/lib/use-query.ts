@@ -285,13 +285,6 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     );
   }, [queryReturn?.data?.data, queryReturn?.data?.relationalData]);
 
-  // if (
-  //   queryReturn.fetchStatus === 'fetching' ||
-  //   queryReturn.status === 'pending'
-  // ) {
-  //   console.log('Query is pending or fetching');
-  // }
-
   return {
     ...queryReturn,
     allIds: queryReturn.data?.allIds ?? [],

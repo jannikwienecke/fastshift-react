@@ -86,8 +86,6 @@ const handleLoadDetailSubView = (action: Action) => {
 
   resetStore();
 
-  console.debug({ action, viewConfigManager });
-
   const detailViewConfigManager = new BaseViewConfigManager(
     detailView,
     action.detailViewData.uiViewConfig
@@ -132,6 +130,11 @@ const handleLoadDetailOverview = (action: Action) => {
 
   batch(() => {
     resetStore();
+    setStore({
+      viewConfigManager,
+      parentViewName: undefined,
+      userViewData: action.userViewData ?? undefined,
+    });
 
     store$.detail.viewConfigManager.set(viewConfigManager);
     store$.detail.historyDataOfRow.set(action.data?.historyData ?? []);

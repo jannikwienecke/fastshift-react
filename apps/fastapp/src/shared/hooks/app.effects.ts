@@ -6,7 +6,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { useTranslation as useTranslationReact } from 'react-i18next';
-import { getUserViews } from '../../query-client';
+import {
+  getUserViews,
+  getUserViewsQuery,
+  queryClient,
+} from '../../query-client';
 import { useViewParams } from './useViewParams';
 // import { invalidateRouteData } from '@tanstack/react-router'
 
@@ -91,6 +95,7 @@ export const useAppEffects = (viewName: string) => {
     doOnceRef.current = true;
 
     store$.userViewSettings.viewCreated.slug.onChange(async (v) => {
+      await queryClient.ensureQueryData(getUserViewsQuery());
       const views = getUserViews();
 
       store$.userViews.set(views);
