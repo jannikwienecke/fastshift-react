@@ -1,6 +1,6 @@
 import { api } from '@apps-next/convex';
 import { preloadQuery } from '@apps-next/convex-adapter-app';
-import { QueryReturnOrUndefined } from '@apps-next/core';
+import { QueryReturnOrUndefined, RecordType } from '@apps-next/core';
 import { store$, viewActionStore } from '@apps-next/react';
 import { observable } from '@legendapp/state';
 import { observer } from '@legendapp/state/react';
@@ -25,7 +25,7 @@ export const Route = createFileRoute('/fastApp/$view')({
   onEnter: async (props) => {
     if ((props.params as any)?.id) return;
 
-    console.debug(':::onEnter:ListPage:', props.params.view);
+    console.debug('::::onEnter:ListPage:', props.params.view);
 
     loadingEnter$.set(true);
     store$.detail.set(undefined);
@@ -55,15 +55,15 @@ export const Route = createFileRoute('/fastApp/$view')({
     loadingEnter$.set(false);
   },
   loader: async (props) => {
-    console.debug(':::onLoad:ListPage', props.params.view, props.cause);
+    console.debug('::::onLoad:ListPage', props.params.view, props.cause);
     if (props.cause === 'enter') {
       loading$.set(true);
     }
     await queryClient.ensureQueryData(getUserViewsQuery());
 
-    const { viewData, viewName } = getView(props);
+    const { viewData, viewName, userViewData } = getView(props);
 
-    await props.context.preloadQuery?.(
+    const data = await props.context.preloadQuery?.(
       viewData.viewConfig,
       viewName,
       null,
@@ -73,7 +73,18 @@ export const Route = createFileRoute('/fastApp/$view')({
 
     if (props.cause === 'enter') {
       loading$.set(false);
+
+      if (!(props.params as RecordType).id) {
+        viewActionStore.dispatchViewAction({
+          type: 'LOAD_VIEW',
+          viewData,
+          userViewData,
+          data,
+        });
+      }
     }
+
+    console.debug('::::onLoad:ListPage:done', props.params.view);
   },
 
   component: () => <ViewMainComponent />,
@@ -83,13 +94,13 @@ const ViewMainComponent = observer(() => {
   const params = useParams({ strict: false });
   const { viewData } = getView({ params });
 
-  React.useEffect(() => console.debug('Render:ListPage'), []);
+  React.useEffect(() => console.debug(':Render:ListPage'), []);
+  console.debug(':Render:ListPage', params);
 
   const ViewComponent = viewData?.main;
 
   if (loading$.get() || loadingEnter$.get()) return null;
-
-  console.debug(store$.viewConfigManager.get());
+  if (!store$.viewConfigManager.viewConfig.get()) return null;
 
   if (!viewData) return null;
 
@@ -106,7 +117,7 @@ const ViewMainComponent = observer(() => {
 
       {isInDetailView$.get() ? (
         <>
-          <Outlet />;
+          <Outlet />
         </>
       ) : (
         <>{ViewComponent ? <ViewComponent /> : <DefaultViewTemplate />}</>

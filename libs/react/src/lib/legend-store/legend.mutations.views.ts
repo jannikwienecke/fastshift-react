@@ -154,6 +154,8 @@ export const updateDetailViewMutation: StoreFn<'updateDetailViewMutation'> =
     const view = detailUserView$.get();
 
     if (view) {
+      console.log('UPDATE DETAIL VIEW', view);
+
       await store$.api.mutateAsync({
         query: '',
         viewName: currentView$.viewName.get(),

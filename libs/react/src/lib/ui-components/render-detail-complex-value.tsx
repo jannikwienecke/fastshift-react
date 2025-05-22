@@ -34,6 +34,7 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
 
         <div
           onClick={(e) => {
+            e.stopPropagation();
             props.onClickGoToRelation(field, value);
           }}
           className="group-hover:opacity-100 opacity-0 transition-opacity hover:bg-foreground/5"

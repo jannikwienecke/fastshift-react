@@ -1,12 +1,12 @@
 import { SidebarInset, SidebarProvider } from '@apps-next/ui';
 
-import { api, views } from '@apps-next/convex';
+import { views } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
   ErrorDetailsDialog,
-  viewActionStore,
-  store$,
   perstistedStore$,
+  store$,
+  viewActionStore,
 } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import {
@@ -26,10 +26,6 @@ import {
   useViewParams,
 } from '../shared/hooks';
 import { useAppEffects } from '../shared/hooks/app.effects';
-import {
-  ConvexPreloadQuery,
-  preloadQuery,
-} from '@apps-next/convex-adapter-app';
 
 viewActionStore.setViews(views);
 

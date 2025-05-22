@@ -10,6 +10,7 @@ import { getUserViewsQuery, queryClient } from '../query-client';
 import { preloadQuery } from '@apps-next/convex-adapter-app';
 import { api } from '@apps-next/convex';
 import { isInDetailView$ } from '../application-store/app.store.utils';
+import { CircleIcon } from 'lucide-react';
 
 const loading$ = observable(false);
 const loadingEnter$ = observable(false);
@@ -86,7 +87,12 @@ const DetaiViewPage = observer(() => {
   const row = store$.detail.row.get() as Row | undefined;
   const viewConfigManager = store$.detail.viewConfigManager.get();
 
-  if (loading$.get() || loadingEnter$.get()) return null;
+  if (loading$.get() || loadingEnter$.get())
+    return (
+      <>
+        <CircleIcon />
+      </>
+    );
   if (!store$.detail) return <>NO DETAIL</>;
   if (!row || !viewConfigManager) return <>NO ROW OR NO VIEW</>;
 
