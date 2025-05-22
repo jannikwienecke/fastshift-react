@@ -38,7 +38,6 @@ export const useAppEffects = (viewName: string) => {
   const view = store$.viewConfigManager.viewConfig.viewName.get();
 
   const { data: userViews } = useQuery(convexQuery(api.query.getUserViews, {}));
-  console.log('userViews', userViews);
 
   React.useEffect(() => {
     if (!userViews) return;

@@ -87,12 +87,6 @@ const DetaiViewPage = observer(() => {
   const row = store$.detail.row.get() as Row | undefined;
   const viewConfigManager = store$.detail.viewConfigManager.get();
 
-  if (loading$.get() || loadingEnter$.get())
-    return (
-      <>
-        <CircleIcon />
-      </>
-    );
   if (!store$.detail) return <>NO DETAIL</>;
   if (!row || !viewConfigManager) return <>NO ROW OR NO VIEW</>;
 

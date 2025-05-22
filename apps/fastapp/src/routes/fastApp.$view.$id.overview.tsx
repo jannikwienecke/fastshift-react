@@ -67,10 +67,6 @@ const DetaiViewPage = observer(() => {
 
   const { viewData } = getViewData(viewName);
 
-  if (loadingEnter$.get()) {
-    return null;
-  }
-
   if (viewData.overView) {
     return <viewData.overView />;
   }

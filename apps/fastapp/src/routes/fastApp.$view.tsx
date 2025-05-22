@@ -99,7 +99,7 @@ const ViewMainComponent = observer(() => {
 
   const ViewComponent = viewData?.main;
 
-  if (loading$.get() || loadingEnter$.get()) return null;
+  // if (loading$.get() || loadingEnter$.get()) return null;
   if (!store$.viewConfigManager.viewConfig.get()) return null;
 
   if (!viewData) return null;
