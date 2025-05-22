@@ -6,22 +6,25 @@ import { observable } from '@legendapp/state';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet, useParams } from '@tanstack/react-router';
 import React from 'react';
-import { getUserViewsQuery, queryClient } from '../query-client';
+import { getQueryKey, getUserViewsQuery, queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultViewTemplate } from '../views/default-view-template';
-
-// const getQueryKey =
+import { isInDetailView$ } from '../application-store/app.store.utils';
 
 const loading$ = observable(false);
+const loadingEnter$ = observable(false);
 export const Route = createFileRoute('/fastApp/$view')({
-  // gcTime: 0,
-  // preloadGcTime: 1000 * 60 * 5, // 10 minutes
   onEnter: async (props) => {
+    if ((props.params as any)?.id) return;
+
+    console.debug(':::onEnter:ListPage:', props.params.view);
+
+    loadingEnter$.set(true);
+    store$.detail.set(undefined);
+
     await props.loaderPromise;
     await props.loadPromise;
 
-    store$.detail.set(undefined);
-    console.debug('onEnter:ListPage:', props.params.view);
     const { viewData, userViewData } = getView(props);
 
     const data = (await queryClient.ensureQueryData(
@@ -35,17 +38,16 @@ export const Route = createFileRoute('/fastApp/$view')({
       )
     )) as QueryReturnOrUndefined;
 
-    if ((props.params as any)?.id) return;
-
     viewActionStore.dispatchViewAction({
       type: 'LOAD_VIEW',
       viewData,
       userViewData,
       data,
     });
+    loadingEnter$.set(false);
   },
   loader: async (props) => {
-    console.debug('onLoad:ListPage', props.params.view);
+    console.debug(':::onLoad:ListPage', props.params.view);
     if (props.cause === 'enter') {
       loading$.set(true);
     }
@@ -53,7 +55,7 @@ export const Route = createFileRoute('/fastApp/$view')({
 
     const { viewData, viewName } = getView(props);
 
-    const dataLoader = await props.context.preloadQuery?.(
+    await props.context.preloadQuery?.(
       viewData.viewConfig,
       viewName,
       null,
@@ -64,26 +66,53 @@ export const Route = createFileRoute('/fastApp/$view')({
     if (props.cause === 'enter') {
       loading$.set(false);
     }
-    console.debug('onLoad:ListPage:Data', props.params.view, dataLoader);
   },
 
   component: () => <ViewMainComponent />,
 });
 
 const ViewMainComponent = observer(() => {
+  const params = useParams({ strict: false });
+  const { viewData, userViewData, viewName } = getView({ params });
+
   React.useEffect(() => console.debug('Render:ListPage'), []);
 
-  const params = useParams({ strict: false });
-
-  const { viewData } = getView({ params });
   const ViewComponent = viewData?.main;
 
-  if (loading$.get()) return null;
-  if (!viewData || loading$.get()) return null;
+  if (loading$.get() || loadingEnter$.get()) return null;
+
+  if (!viewData) return null;
+  if (isInDetailView$.get()) {
+    return <Outlet />;
+  }
+
   return (
     <>
       {ViewComponent ? <ViewComponent /> : <DefaultViewTemplate />}
-      <Outlet />
+      <DispatchComponent />
     </>
   );
+});
+
+const DispatchComponent = observer(() => {
+  const params = useParams({ strict: false });
+  const { viewData, userViewData, viewName } = getView({ params });
+
+  React.useEffect(() => {
+    if (isInDetailView$.get()) return;
+
+    if (!params.model && !params.id) {
+      const data = queryClient.getQueryData(
+        getQueryKey(viewData.viewConfig, viewName, null, null, null)
+      ) as QueryReturnOrUndefined;
+
+      viewActionStore.dispatchViewAction({
+        type: 'LOAD_VIEW',
+        viewData,
+        userViewData,
+        data,
+      });
+    }
+  }, [params.id, params.model, userViewData, viewData, viewName]);
+  return <></>;
 });

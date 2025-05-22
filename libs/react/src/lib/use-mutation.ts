@@ -30,6 +30,34 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
+      const queryClient = store$.api.queryClient.get();
+
+      queryClient?.cancelQueries?.();
+      try {
+        (queryClient as any)?.clear?.();
+        console.debug('Cleared cache...');
+      } catch (error) {
+        console.debug('Error in clear: ', error);
+      }
+
+      try {
+        console.debug('Mutate and Reset Queries...');
+        (queryClient as any)?.removeQueries?.({});
+        console.debug('Removed queries...');
+      } catch (error) {
+        console.debug('Error in removeQueries: ', error);
+      }
+
+      const cache = queryClient?.getQueryCache?.();
+      console.log(cache?.getAll());
+
+      try {
+        cache?.clear();
+        console.debug('Cleared cache2...');
+      } catch (error) {
+        console.debug('Error in clear: ', error);
+      }
+
       store$.state.set('mutating');
 
       if (

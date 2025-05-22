@@ -37,11 +37,15 @@ type Action =
       userViewData: UserViewData | undefined | null;
       viewData: ViewRegistryEntry;
       id: string;
+      model?: string | null;
     }
   | {
       type: 'LOAD_DETAIL_SUB_VIEW';
       parentViewName: string;
       data: QueryReturnOrUndefined;
+      detailData: QueryReturnOrUndefined;
+      detailUserViewData: UserViewData | undefined | null;
+      detailViewData: ViewRegistryEntry;
       userViewData: UserViewData | undefined | null;
       viewData: ViewRegistryEntry;
       id: string;
@@ -66,29 +70,40 @@ export const dispatchViewAction = (action: Action) => {
 const handleLoadDetailSubView = (action: Action) => {
   if (action.type !== 'LOAD_DETAIL_SUB_VIEW') return;
 
-  console.debug('ACTION: LOAD_DETAIL_SUB_VIEW:: ', action);
+  console.debug(':::ACTION: LOAD_DETAIL_SUB_VIEW:: ', action);
 
   store$.state.set('pending');
 
   const view = getView(action.viewData.viewConfig.viewName);
-
+  const detailView = getView(action.detailViewData.viewConfig.viewName);
   if (!view) throw new Error('NO VIEW !!');
+  if (!detailView) throw new Error('NO DETAIL VIEW !!');
 
   const viewConfigManager = new BaseViewConfigManager(
     view,
     action.viewData.uiViewConfig
   );
 
-  const parentUserViewData = getUserView(action.parentViewName);
-  const parentView = parentUserViewData
-    ? getView(parentUserViewData.baseView)
-    : getView(action.parentViewName);
-
-  if (!parentView) throw new Error('NO PARENT VIEW !!');
-
   resetStore();
 
-  console.debug({ action });
+  console.debug({ action, viewConfigManager });
+
+  const detailViewConfigManager = new BaseViewConfigManager(
+    detailView,
+    action.detailViewData.uiViewConfig
+  );
+
+  batch(() => {
+    store$.detail.viewConfigManager.set(detailViewConfigManager);
+    store$.detail.historyDataOfRow.set(action.detailData?.historyData ?? []);
+    store$.detail.viewType.set({
+      type: 'model',
+      model: view.tableName,
+    });
+    store$.detail.parentViewName.set(action.parentViewName);
+    createRelationalDataModel(store$)(action.detailData.relationalData ?? {});
+    handleIncomingDetailData(store$)(action.detailData);
+  });
 
   setStore({
     viewConfigManager,
@@ -98,11 +113,6 @@ const handleLoadDetailSubView = (action: Action) => {
 
   handleQueryData(action.data);
 
-  store$.detail.viewType.set({
-    type: 'model',
-    model: action.viewData.viewConfig.tableName,
-  });
-
   store$.state.set('initialized');
 };
 
@@ -110,7 +120,7 @@ const handleLoadDetailOverview = (action: Action) => {
   if (action.type !== 'LOAD_DETAIL_OVERVIEW') return;
 
   store$.state.set('pending');
-  console.debug('ACTION: LOAD_DETAIL_OVERVIEW:: ', action);
+  console.debug(':::ACTION: LOAD_DETAIL_OVERVIEW:: ', action);
 
   const view = getView(action.viewData.viewConfig.viewName);
   if (!view) throw new Error('handleLoadDetailOverview: View not found.');
@@ -121,12 +131,11 @@ const handleLoadDetailOverview = (action: Action) => {
   );
 
   batch(() => {
-    //   !action.model &&
     resetStore();
 
     store$.detail.viewConfigManager.set(viewConfigManager);
     store$.detail.historyDataOfRow.set(action.data?.historyData ?? []);
-    store$.detail.viewType.set({ type: 'overview' });
+    !action.model && store$.detail.viewType.set({ type: 'overview' });
     store$.detail.parentViewName.set(
       action.userViewData?.name ?? action.viewData.viewConfig.viewName
     );
@@ -139,7 +148,7 @@ const handleLoadDetailOverview = (action: Action) => {
 
 const handleLoadView = (action: Action) => {
   if (action.type !== 'LOAD_VIEW') return;
-  console.debug('ACTION: LOAD_VIEW:: ', action.viewData.viewConfig.viewName);
+  console.debug(':::ACTION: LOAD_VIEW:: ', action.viewData.viewConfig.viewName);
 
   store$.state.set('pending');
 

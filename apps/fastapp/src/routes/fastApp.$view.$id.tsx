@@ -1,79 +1,57 @@
 import { _log, QueryReturnOrUndefined, Row } from '@apps-next/core';
-import {
-  FormField,
-  RenderDetailComplexValue,
-  store$,
-  viewActionStore,
-} from '@apps-next/react';
+import { FormField, RenderDetailComplexValue, store$ } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
-import { getUserViewsQuery, queryClient } from '../query-client';
-import { api } from '@apps-next/convex';
-import { preloadQuery } from '@apps-next/convex-adapter-app';
 import { observable } from '@legendapp/state';
+import { getUserViewsQuery, queryClient } from '../query-client';
+import { preloadQuery } from '@apps-next/convex-adapter-app';
+import { api } from '@apps-next/convex';
+import { isInDetailView$ } from '../application-store/app.store.utils';
 
 const loading$ = observable(false);
+const loadingEnter$ = observable(false);
+
 export const Route = createFileRoute('/fastApp/$view/$id')({
-  onLeave: async (props) => {
-    console.debug('::onLeave:DetailPage');
-    const { viewData, userViewData } = getView(props);
-
-    const data = (await queryClient.ensureQueryData(
-      preloadQuery(
-        api.query.viewLoader,
-        viewData.viewConfig,
-        userViewData ?? null,
-        null,
-        null,
-        null
-      )
-    )) as QueryReturnOrUndefined;
-
-    viewActionStore.dispatchViewAction({
-      type: 'LOAD_VIEW',
-      viewData,
-      userViewData,
-      data,
-    });
+  onLeave: () => {
+    isInDetailView$.set(false);
   },
   onEnter: async (props) => {
+    isInDetailView$.set(true);
+    if ((props.params as any)?.model) return;
+    loadingEnter$.set(true);
+
     await props.loaderPromise;
     await props.loadPromise;
+    await queryClient.ensureQueryData(getUserViewsQuery());
 
-    console.debug('::onEnter:Overview Page');
+    console.debug(':::onEnter:ID Page');
     const { viewData, userViewData } = getView(props);
 
-    const id = props.params.id as string;
-
-    const data = (await queryClient.ensureQueryData(
+    (await queryClient.ensureQueryData(
       preloadQuery(
         api.query.viewLoader,
         viewData.viewConfig,
         userViewData ?? null,
-        id,
+        props.params.id as string,
         null,
         null
       )
     )) as QueryReturnOrUndefined;
-
-    viewActionStore.dispatchViewAction({
-      type: 'LOAD_DETAIL_OVERVIEW',
-      viewData,
-      userViewData,
-      data,
-      id,
-    });
+    loadingEnter$.set(false);
   },
   loader: async (props) => {
-    console.debug('::ONLOAD:Overview Page');
+    props.cause !== 'preload' && isInDetailView$.set(true);
+
+    console.debug(':::ONLOAD:ID Page', props.cause);
     if (props.cause === 'enter') {
       loading$.set(true);
     }
-    await props.parentMatchPromise;
     await queryClient.ensureQueryData(getUserViewsQuery());
+
+    await props.parentMatchPromise;
 
     const id = props.params.id as string;
 
@@ -90,8 +68,6 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
     if (props.cause === 'enter') {
       loading$.set(false);
     }
-
-    console.debug('::onLOAD:DONE:Overview Page');
   },
   component: () => <DetaiViewPage />,
 });
@@ -102,8 +78,6 @@ const DetaiViewPage = observer(() => {
   const params = useParams({ strict: false });
   const { viewData, viewName } = getView({ params });
 
-  if (loading$.get()) return null;
-
   if (!viewData.viewConfig) {
     _log.info(`View ${viewName} not found, redirecting to /fastApp`);
     return null;
@@ -112,7 +86,9 @@ const DetaiViewPage = observer(() => {
   const row = store$.detail.row.get() as Row | undefined;
   const viewConfigManager = store$.detail.viewConfigManager.get();
 
-  if (!row || !viewConfigManager) return <>NULL</>;
+  if (loading$.get() || loadingEnter$.get()) return null;
+  if (!store$.detail) return <>NO DETAIL</>;
+  if (!row || !viewConfigManager) return <>NO ROW OR NO VIEW</>;
 
   if (viewData.detail) {
     return <viewData.detail />;

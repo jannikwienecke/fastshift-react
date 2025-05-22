@@ -1,6 +1,7 @@
 import { api } from '@apps-next/convex';
 import { preloadQuery } from '@apps-next/convex-adapter-app';
 import { _log, UserViewData, ViewConfigType } from '@apps-next/core';
+import { store$ } from '@apps-next/react';
 
 import { convexQuery, ConvexQueryClient } from '@convex-dev/react-query';
 import { QueryClient } from '@tanstack/react-query';
@@ -41,7 +42,7 @@ export const getQueryKey = (
     userViewData = null;
   } else {
     // TODO REFACTOR AND USE SAME AS IN MAIN
-    const userViews = getUserViews();
+    const userViews = store$.userViews.get();
     userViewData = userViews.find((u) => u.name === viewName);
   }
 

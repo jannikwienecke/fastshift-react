@@ -1,17 +1,16 @@
-import { views } from '@apps-next/convex';
+import { api, views } from '@apps-next/convex';
+import { preloadQuery } from '@apps-next/convex-adapter-app';
 import { getViewByName, QueryReturnOrUndefined } from '@apps-next/core';
+import { store$, viewActionStore } from '@apps-next/react';
+import { observable } from '@legendapp/state';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';
+import React from 'react';
 import {
   getSubModelViewData,
   getViewData,
 } from '../application-store/app.store.utils';
-import {
-  getQueryKey,
-  getUserViews,
-  getUserViewsQuery,
-  queryClient,
-} from '../query-client';
+import { queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
 import {
   RenderDisplayOptions,
@@ -19,20 +18,25 @@ import {
   RenderInputDialog,
   RenderList,
 } from '../views/default-components';
-import React from 'react';
-import { viewActionStore } from '@apps-next/react';
 
+const loading$ = observable(false);
+const loadingEnter$ = observable(false);
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   onEnter: async (props) => {
+    loadingEnter$.set(true);
+
     await props.loaderPromise;
     await props.loadPromise;
 
-    console.debug('onEnter:Sub Model Page');
+    console.debug(':::onEnter:Sub Model Page');
 
     const model = props.params.model;
 
-    const { viewData: parentViewData, viewName: parentViewName } =
-      getView(props);
+    const {
+      viewData: parentViewData,
+      viewName: parentViewName,
+      userViewData: userViewDataDetail,
+    } = getView(props);
 
     const { viewData: viewDataModel, userViewData } = getSubModelViewData(
       model,
@@ -40,22 +44,48 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
     );
 
     const id = props.params.id as string;
-    const data = queryClient.getQueryData(
-      getQueryKey(viewDataModel.viewConfig, model, null, parentViewName, id)
-    ) as QueryReturnOrUndefined;
+
+    const data = (await queryClient.ensureQueryData(
+      preloadQuery(
+        api.query.viewLoader,
+        viewDataModel.viewConfig,
+        userViewData ?? null,
+        null,
+        parentViewName,
+        id
+      )
+    )) as QueryReturnOrUndefined;
+
+    const dataDetail = (await queryClient.ensureQueryData(
+      preloadQuery(
+        api.query.viewLoader,
+        parentViewData.viewConfig,
+        userViewDataDetail ?? null,
+        id,
+        null,
+        null
+      )
+    )) as QueryReturnOrUndefined;
 
     viewActionStore.dispatchViewAction({
       type: 'LOAD_DETAIL_SUB_VIEW',
       userViewData,
       viewData: viewDataModel,
       data,
+      detailData: dataDetail,
+      detailUserViewData: userViewDataDetail,
+      detailViewData: parentViewData,
       id,
       parentViewName,
     });
+    loadingEnter$.set(false);
   },
 
   async loader(ctx) {
-    console.debug('LOADER:SubModelPage', ctx.params.view);
+    if (ctx.cause === 'enter') {
+      loading$.set(true);
+    }
+    console.debug(':::LOADER:SubModelPage', ctx.params.model);
 
     await ctx.parentMatchPromise;
 
@@ -74,6 +104,10 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
       parentViewName,
       ctx.params.id
     );
+
+    if (ctx.cause === 'enter') {
+      loading$.set(false);
+    }
   },
 
   component: () => <DetailModelListViewPage />,
@@ -88,9 +122,12 @@ const DetailModelListViewPage = observer(() => {
 
   const { viewData } = getViewData(view?.viewName ?? '');
 
+  if (loading$.get() || loadingEnter$.get()) return null;
+
   if (viewData.main) {
     return <viewData.main isSubView={true} />;
   }
+  if (!store$.viewConfigManager.viewConfig.get()) return;
 
   return (
     <>
