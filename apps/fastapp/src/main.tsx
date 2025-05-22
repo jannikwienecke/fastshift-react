@@ -12,8 +12,8 @@ import './i18n';
 import { convex, getUserViews, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
 
-import './views';
 import './shared/hooks/app.persist';
+import './views';
 
 // syncObservable(store$, {
 //   persist: {
@@ -29,7 +29,6 @@ logger.setLevel(isDev ? 'info' : 'warn');
 const router = createRouter({
   routeTree,
   defaultPreload: 'viewport',
-  defaultStaleTime: 5000,
 
   context: {
     queryClient,

@@ -189,6 +189,7 @@ export type LegendStore = {
     queryClient?: QueryClient;
     makeQueryOptions: MakeQueryOptions;
     getUserViewQueryKey?: any[];
+    loader?: { fn: () => any };
   };
 
   globalQuery: string;

@@ -55,6 +55,8 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   },
 
   async loader(ctx) {
+    console.debug('LOADER:SubModelPage', ctx.params.view);
+
     await ctx.parentMatchPromise;
 
     const model = ctx.params.model;

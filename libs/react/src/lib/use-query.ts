@@ -13,6 +13,7 @@ import {
   useQuery as useTanstackQuery,
 } from '@tanstack/react-query';
 import React from 'react';
+import { derviedDetailPage$ } from './legend-store/legend.detailpage.derived';
 import { store$ } from './legend-store/legend.store';
 import {
   getParsedViewSettings,
@@ -21,11 +22,9 @@ import {
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
-import { derviedDetailPage$ } from './legend-store/legend.detailpage.derived';
-import { parentView$ } from './legend-store';
 
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
-  const viewName = args.viewName ?? args.viewConfig?.viewName ?? '';
+  const viewName = args.viewName || args.viewConfig?.viewName || '';
 
   const queryOptions = api.makeQueryOptions
     ? api.makeQueryOptions({
@@ -37,7 +36,8 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         disabled: undefined as any,
         viewConfigManager: undefined,
-        viewName,
+        parentViewName: args.parentViewName?.toLowerCase() ?? null,
+        viewName: viewName.toLowerCase(),
         relationQuery: args.relationQuery,
         filters: args.relationQuery?.tableName ? '' : args.filters ?? '',
       })
@@ -53,6 +53,24 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
           return api.prisma?.viewLoader(args);
         },
       };
+
+  // console.log(args.handleIncomingDataviewConfig?.viewName, 'VIEW NAME');
+  // const result = useQ(store$.api.loader.get()?.fn, {
+  //   ...args,
+  //   viewConfig: undefined,
+  //   viewName: viewName.toLowerCase(),
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   registeredViews: undefined as any,
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   modelConfig: undefined as any,
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   disabled: undefined as any,
+  //   viewConfigManager: undefined,
+  //   parentViewName: args.parentViewName?.toLowerCase() ?? null,
+  //   relationQuery: args.relationQuery,
+  //   filters: args.relationQuery?.tableName ? '' : args.filters ?? '',
+  // });
+  // console.log('RESULT2', result);
 
   const result = useTanstackQuery({
     ...(queryOptions ?? {}),
@@ -71,14 +89,14 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
     retry: import.meta.env.DEV ? 0 : 3,
   } as any);
 
-  if (result.error) {
+  if (result?.error) {
     console.error('USE QUERY', args.viewName);
     console.error('ERROR', result.error);
   }
 
   const stored = React.useRef(result as any);
 
-  if (result.data !== undefined) {
+  if (result?.data !== undefined) {
     stored.current = result;
   } else {
     stored.current = {
@@ -88,6 +106,10 @@ export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   }
 
   return stored.current;
+
+  // return {
+  //   data: stored.current,
+  // };
 };
 
 export const useRelationalQuery = <QueryReturnType extends RecordType[]>(

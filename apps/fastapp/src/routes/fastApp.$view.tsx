@@ -1,31 +1,42 @@
+import { api } from '@apps-next/convex';
+import { preloadQuery } from '@apps-next/convex-adapter-app';
 import { QueryReturnOrUndefined } from '@apps-next/core';
-import { viewActionStore } from '@apps-next/react';
+import { store$, viewActionStore } from '@apps-next/react';
+import { observable } from '@legendapp/state';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, Outlet, useParams } from '@tanstack/react-router';
 import React from 'react';
-import { loading$ } from '../application-store/app.store';
-import { getQueryKey, getUserViewsQuery, queryClient } from '../query-client';
+import { getUserViewsQuery, queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultViewTemplate } from '../views/default-view-template';
 
 // const getQueryKey =
 
+const loading$ = observable(false);
 export const Route = createFileRoute('/fastApp/$view')({
+  // gcTime: 0,
+  // preloadGcTime: 1000 * 60 * 5, // 10 minutes
   onEnter: async (props) => {
     await props.loaderPromise;
     await props.loadPromise;
 
-    console.debug('onEnter:ListPage');
-    const { viewData, userViewData, viewName } = getView(props);
+    store$.detail.set(undefined);
+    console.debug('onEnter:ListPage:', props.params.view);
+    const { viewData, userViewData } = getView(props);
 
-    const data = queryClient.getQueryData(
-      getQueryKey(viewData.viewConfig, viewName, null, null, null)
-    ) as QueryReturnOrUndefined;
+    const data = (await queryClient.ensureQueryData(
+      preloadQuery(
+        api.query.viewLoader,
+        viewData.viewConfig,
+        userViewData ?? null,
+        null,
+        null,
+        null
+      )
+    )) as QueryReturnOrUndefined;
 
-    console.log('onEnter:ListPage', props.params);
     if ((props.params as any)?.id) return;
 
-    console.log('DISPATCH ACTION');
     viewActionStore.dispatchViewAction({
       type: 'LOAD_VIEW',
       viewData,
@@ -34,18 +45,26 @@ export const Route = createFileRoute('/fastApp/$view')({
     });
   },
   loader: async (props) => {
+    console.debug('onLoad:ListPage', props.params.view);
+    if (props.cause === 'enter') {
+      loading$.set(true);
+    }
     await queryClient.ensureQueryData(getUserViewsQuery());
 
-    console.debug('loader:ListPage');
     const { viewData, viewName } = getView(props);
 
-    await props.context.preloadQuery?.(
+    const dataLoader = await props.context.preloadQuery?.(
       viewData.viewConfig,
       viewName,
       null,
       null,
       null
     );
+
+    if (props.cause === 'enter') {
+      loading$.set(false);
+    }
+    console.debug('onLoad:ListPage:Data', props.params.view, dataLoader);
   },
 
   component: () => <ViewMainComponent />,
@@ -59,6 +78,7 @@ const ViewMainComponent = observer(() => {
   const { viewData } = getView({ params });
   const ViewComponent = viewData?.main;
 
+  if (loading$.get()) return null;
   if (!viewData || loading$.get()) return null;
   return (
     <>

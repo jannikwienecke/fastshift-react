@@ -1,34 +1,27 @@
-import {
-  FormField,
-  viewActionStore,
-  RenderActivityList,
-  makeHooks,
-} from '@apps-next/react';
+import { FormField, RenderActivityList, makeHooks } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { getViewData } from '../application-store/app.store.utils';
-import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
 import { useViewParams } from '../shared/hooks';
-import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailOverviewTemplate } from '../views/default-detail-view-template';
 
 export const Route = createFileRoute('/fastApp/$view/$id/overview')({
-  loader: async (props) => {
-    await queryClient.ensureQueryData(getUserViewsQuery());
+  // loader: async (props) => {
+  //   await queryClient.ensureQueryData(getUserViewsQuery());
 
-    await props.parentMatchPromise;
+  //   await props.parentMatchPromise;
 
-    const { viewData, userViewData, viewName } = getView(props);
+  //   const { viewData, userViewData, viewName } = getView(props);
 
-    await props.context.preloadQuery(
-      viewData.viewConfig,
-      userViewData?.name ?? viewName,
-      props.params.id,
-      null,
-      null
-    );
-  },
+  //   await props.context.preloadQuery(
+  //     viewData.viewConfig,
+  //     userViewData?.name ?? viewName,
+  //     props.params.id,
+  //     null,
+  //     null
+  //   );
+  // },
 
   component: () => <DetaiViewPage />,
 });

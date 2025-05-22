@@ -12,7 +12,7 @@ import {
   UserViewData,
   ViewConfigType,
 } from '@apps-next/core';
-import { QueryContext } from '@apps-next/react';
+import { QueryContext, store$ } from '@apps-next/react';
 import React from 'react';
 
 export const ConvexQueryProvider = (props: ConvexQueryProviderProps) => {
@@ -44,6 +44,7 @@ const ProviderContent = (props: ConvexQueryProviderProps) => {
     [props.viewLoader]
   );
 
+  // store$.api.loader.set({ fn: props.viewLoader });
   return (
     <QueryContext.Provider
       value={{
@@ -78,7 +79,7 @@ const makeQuery = (
 
   if (viewId) {
     return convexQuery(viewLoader, {
-      viewName: viewConfig.viewName,
+      viewName: viewConfig.viewName.toLowerCase(),
       query: '',
       filters: '',
       displayOptions: '',
@@ -87,7 +88,7 @@ const makeQuery = (
   }
 
   const query = convexQuery(viewLoader, {
-    viewName: viewConfig.viewName,
+    viewName: viewConfig.viewName.toLowerCase(),
     query: '',
     filters: viewId ? '' : convertFiltersForBackend(mergedConfig.filters),
     displayOptions: viewId
@@ -95,7 +96,7 @@ const makeQuery = (
       : convertDisplayOptionsForBackend(mergedConfig.displayOptions),
     viewId: viewId ?? null,
     parentId: parentId ?? null,
-    parentViewName: parentViewName ?? null,
+    parentViewName: parentViewName?.toLowerCase() ?? null,
     paginateOptions: viewId
       ? undefined
       : {

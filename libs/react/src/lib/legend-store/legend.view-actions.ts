@@ -98,7 +98,6 @@ const handleLoadDetailSubView = (action: Action) => {
 
   handleQueryData(action.data);
 
-  console.log(action);
   store$.detail.viewType.set({
     type: 'model',
     model: action.viewData.viewConfig.tableName,
@@ -125,18 +124,9 @@ const handleLoadDetailOverview = (action: Action) => {
     //   !action.model &&
     resetStore();
 
-    console.log('set....', viewConfigManager.viewConfig.viewName);
     store$.detail.viewConfigManager.set(viewConfigManager);
-    store$.detail.historyDataOfRow.set(action.data.historyData ?? []);
-    store$.detail.viewType.set(
-      { type: 'overview' }
-      // action.model
-      //   ? {
-      //       type: action.model ? 'model' : 'overview',
-      //       model: action.model,
-      //     }
-      //   : { type: 'overview' }
-    );
+    store$.detail.historyDataOfRow.set(action.data?.historyData ?? []);
+    store$.detail.viewType.set({ type: 'overview' });
     store$.detail.parentViewName.set(
       action.userViewData?.name ?? action.viewData.viewConfig.viewName
     );
@@ -144,26 +134,6 @@ const handleLoadDetailOverview = (action: Action) => {
     handleIncomingDetailData(store$)(action.data);
   });
 
-  // if (!action.model) {
-  // console.debug('handleLoadDetailOverview: Pre setup model sub view.');
-  // const helper = detailFormHelper();
-  // const firstRelationalListField = helper.getRelationalFields()?.[0];
-  // if (!firstRelationalListField) return;
-  // const viewConfigOfFirstRelationalListField = getView(
-  //   firstRelationalListField?.field.name ?? ''
-  // );
-  // if (!viewConfigOfFirstRelationalListField) return;
-  // const viewConfigManagerRelation = new BaseViewConfigManager(
-  //   viewConfigOfFirstRelationalListField
-  // );
-  // setStore({
-  //   viewConfigManager: viewConfigManagerRelation,
-  //   userViewData: getSubUserView(viewConfigManagerRelation.viewConfig),
-  //   parentViewName: action.viewName,
-  // });
-  // }
-
-  console.log(store$.get());
   store$.state.set('initialized');
 };
 
@@ -183,8 +153,6 @@ const handleLoadView = (action: Action) => {
     view,
     action.viewData.uiViewConfig
   );
-
-  console.log('handleLoadView: viewData', viewConfigManager);
 
   resetStore();
 
@@ -332,7 +300,6 @@ export const viewActionStore = {
         viewConfig,
         current.uiViewConfig
       );
-      console.log('SET.....');
       store$.detail.viewConfigManager.set(updatedViewConfigManager);
     }
   },

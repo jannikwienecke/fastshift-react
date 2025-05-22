@@ -10,16 +10,27 @@ import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
-import { getQueryKey, getUserViewsQuery, queryClient } from '../query-client';
+import { getUserViewsQuery, queryClient } from '../query-client';
+import { api } from '@apps-next/convex';
+import { preloadQuery } from '@apps-next/convex-adapter-app';
+import { observable } from '@legendapp/state';
 
+const loading$ = observable(false);
 export const Route = createFileRoute('/fastApp/$view/$id')({
-  onLeave: (props) => {
-    console.debug('onLeave:DetailPage');
-    const { viewData, userViewData, viewName } = getView(props);
+  onLeave: async (props) => {
+    console.debug('::onLeave:DetailPage');
+    const { viewData, userViewData } = getView(props);
 
-    const data = queryClient.getQueryData(
-      getQueryKey(viewData.viewConfig, viewName, null, null, null)
-    ) as QueryReturnOrUndefined;
+    const data = (await queryClient.ensureQueryData(
+      preloadQuery(
+        api.query.viewLoader,
+        viewData.viewConfig,
+        userViewData ?? null,
+        null,
+        null,
+        null
+      )
+    )) as QueryReturnOrUndefined;
 
     viewActionStore.dispatchViewAction({
       type: 'LOAD_VIEW',
@@ -32,13 +43,21 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
     await props.loaderPromise;
     await props.loadPromise;
 
-    console.debug('onEnter:Overview Page');
-    const { viewData, userViewData, viewName } = getView(props);
+    console.debug('::onEnter:Overview Page');
+    const { viewData, userViewData } = getView(props);
 
     const id = props.params.id as string;
-    const data = queryClient.getQueryData(
-      getQueryKey(viewData.viewConfig, viewName, id, null, null)
-    ) as QueryReturnOrUndefined;
+
+    const data = (await queryClient.ensureQueryData(
+      preloadQuery(
+        api.query.viewLoader,
+        viewData.viewConfig,
+        userViewData ?? null,
+        id,
+        null,
+        null
+      )
+    )) as QueryReturnOrUndefined;
 
     viewActionStore.dispatchViewAction({
       type: 'LOAD_DETAIL_OVERVIEW',
@@ -49,7 +68,10 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
     });
   },
   loader: async (props) => {
-    console.debug('loader:Overview Page');
+    console.debug('::ONLOAD:Overview Page');
+    if (props.cause === 'enter') {
+      loading$.set(true);
+    }
     await props.parentMatchPromise;
     await queryClient.ensureQueryData(getUserViewsQuery());
 
@@ -64,15 +86,23 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
       null,
       null
     );
+
+    if (props.cause === 'enter') {
+      loading$.set(false);
+    }
+
+    console.debug('::onLOAD:DONE:Overview Page');
   },
   component: () => <DetaiViewPage />,
 });
 
 const DetaiViewPage = observer(() => {
-  React.useEffect(() => console.debug('Render:DetaiViewPage'), []);
+  React.useEffect(() => console.debug('::Render:DetaiViewPage'), []);
 
   const params = useParams({ strict: false });
   const { viewData, viewName } = getView({ params });
+
+  if (loading$.get()) return null;
 
   if (!viewData.viewConfig) {
     _log.info(`View ${viewName} not found, redirecting to /fastApp`);

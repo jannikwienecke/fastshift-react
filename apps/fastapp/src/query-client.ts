@@ -59,7 +59,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryKeyHashFn: convexQueryClient.hashFn(),
-      gcTime: 1000 * 10,
+      gcTime: 1000 * 30,
       staleTime: Infinity,
 
       queryFn: convexQueryClient.queryFn(),
