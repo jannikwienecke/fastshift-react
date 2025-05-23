@@ -1,13 +1,9 @@
-import {
-  FormField,
-  viewActionStore,
-  RenderActivityList,
-} from '@apps-next/react';
+import { FormField, RenderActivityList } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import { getViewData } from '../application-store/app.store.utils';
-import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
+import { getUserViewsQuery, queryClient } from '../query-client';
 import { useViewParams } from '../shared/hooks';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailOverviewTemplate } from '../views/default-detail-view-template';

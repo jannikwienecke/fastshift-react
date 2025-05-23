@@ -131,10 +131,10 @@ export type ConvexContext = {
   viewLoader: ViewLoader;
 };
 
-export type ConvexPreloadQuery = (
+export type ConvexPreloadQuery<T = unknown> = (
   viewConfig: ViewConfigType,
   viewName: string,
   viewId: string | null,
   parentViewName: string | null,
   parentId: string | null
-) => void;
+) => Promise<T>;

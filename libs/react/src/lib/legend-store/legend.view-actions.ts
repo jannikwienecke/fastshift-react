@@ -194,7 +194,11 @@ const handleLoadView = (action: Action) => {
     store$.detail.set(undefined);
   }
 
-  console.debug('ACTION: LOAD_VIEW:: ', action.viewName);
+  console.debug(
+    'ACTION: LOAD_VIEW:: ',
+    action.viewName,
+    action.data?.data?.length
+  );
 
   resetStore();
 
@@ -317,8 +321,6 @@ export const viewActionStore = {
   setViews: (views: RegisteredViews) => {
     store$.views.set(patchAllViews(views));
     if (!store$.viewConfigManager.viewConfig.get()) return;
-
-    console.log('HIER');
 
     const current = store$.viewConfigManager.get();
     const viewConfig = getView(current.getViewName());

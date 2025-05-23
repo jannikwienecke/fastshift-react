@@ -42,7 +42,7 @@ export const viewLoaderHandler = async (
         `Loader:SubView:${args.viewName}:Of:${args.parentViewName}`
       );
     } else if (args.viewName) {
-      console.debug(`Loder:View:${args.viewName}`);
+      console.debug(`Loader:View:${args.viewName}`);
     }
   }
 

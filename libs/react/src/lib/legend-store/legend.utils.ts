@@ -15,6 +15,7 @@ export const copyRow = (
   row: Row,
   viewConfigManager?: BaseViewConfigManagerInterface
 ): Row => {
+  if (!viewConfigManager?.viewConfig) return row;
   return makeData(
     store$.views.get(),
     viewConfigManager?.getViewName() ?? store$.viewConfigManager.getViewName()

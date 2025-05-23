@@ -171,8 +171,11 @@ Small Features to add
 - [ ] open after creation, in config
 - [ ] add tipTap
 - [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
+- [ ] chat in activity
+- [ ] chat activity (optimistic update)
 
 ### Add tests
 
 - [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
 - [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task
+- [ ] history in detail view (activity list)

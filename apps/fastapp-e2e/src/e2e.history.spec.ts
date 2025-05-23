@@ -25,14 +25,20 @@ test.describe('history view tests', () => {
     const url = page.url();
     expect(url).toContain('/owner');
 
+    await waitFor(page, 300);
+
     // go back
     await page.goBack();
 
     await firstListItem.getByText(CON.task.values.designMockups).click();
     await expect(page.url()).toContain('/tasks');
 
+    await waitFor(page, 300);
+
     // go back
     await page.goBack();
+
+    await waitFor(page, 300);
 
     // can see the workd update and the word insert
     await expect(page.getByText(/update/i).first()).toBeVisible();

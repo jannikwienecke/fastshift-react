@@ -27,7 +27,7 @@ import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/
 import { observer } from '@legendapp/state/react';
 import { syncObservable } from '@legendapp/state/sync';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
+import { Link, useRouter } from '@tanstack/react-router';
 import {
   ArrowUpRight,
   ChevronDownIcon,
@@ -173,6 +173,8 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
   const { t } = useTranslation();
   const { isMobile } = useSidebar();
 
+  const router = useRouter();
+
   const hasSubItems = item.items && item.items.length > 0;
 
   if (!hasSubItems) {
@@ -216,6 +218,9 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
                     to={subItem.url}
                     preload="intent"
                     className="flex-grow"
+                    onClick={() => {
+                      router.invalidate();
+                    }}
                   >
                     <span className="">{subItem.title}</span>
                     {subItem.emoji ? (
