@@ -10,6 +10,7 @@ import { observable } from '@legendapp/state';
 import { derviedDetailPage$ } from './legend.detailpage.derived';
 import { selectState$ } from './legend.select-state';
 import { store$ } from './legend.store';
+import { isOnDetailPage$ } from './legend.view-actions';
 
 export const copyRow = (
   row: Row,
@@ -56,7 +57,8 @@ export const isDetail = () => {
   return !!(
     (detailForm || selectStateIsDetail || isDetailOverview) &&
     viewConfigDetail &&
-    commandViewIsDetail
+    commandViewIsDetail &&
+    isOnDetailPage$.get()
   );
 };
 

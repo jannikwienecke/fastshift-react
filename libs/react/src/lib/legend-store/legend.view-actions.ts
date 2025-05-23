@@ -129,12 +129,15 @@ const handleLoadDetailOverview = (action: Action) => {
   );
 
   batch(() => {
-    resetStore();
-    setStore({
-      viewConfigManager,
-      parentViewName: undefined,
-      userViewData: action.userViewData ?? undefined,
-    });
+    if (!store$.viewConfigManager.viewConfig.get()) {
+      console.debug('":::RESET STORE');
+      resetStore();
+      setStore({
+        viewConfigManager,
+        parentViewName: undefined,
+        userViewData: action.userViewData ?? undefined,
+      });
+    }
 
     store$.detail.viewConfigManager.set(viewConfigManager);
     store$.detail.historyDataOfRow.set(action.data?.historyData ?? []);
@@ -166,20 +169,23 @@ const handleLoadView = (action: Action) => {
     action.viewData.uiViewConfig
   );
 
-  resetStore();
+  batch(() => {
+    resetStore();
 
-  setStore({
-    viewConfigManager,
-    parentViewName: undefined,
-    userViewData,
+    console.debug('SET STORE', { action, viewConfigManager });
+
+    setStore({
+      viewConfigManager,
+      parentViewName: undefined,
+      userViewData,
+    });
+
+    handleQueryData(data);
+
+    store$.detail.set(undefined);
+
+    store$.state.set('initialized');
   });
-
-  // must be resetted after setStore and reset
-  store$.detail.set(undefined);
-
-  handleQueryData(data);
-
-  store$.state.set('initialized');
 };
 
 const resetStore = () => {
@@ -316,3 +322,5 @@ export const viewActionStore = {
     }
   },
 };
+
+export const isOnDetailPage$ = observable(false);

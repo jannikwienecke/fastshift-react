@@ -32,7 +32,6 @@ export const useMutation = () => {
     onMutate: async (vars) => {
       const queryClient = store$.api.queryClient.get();
 
-      console.log(vars);
       const viewMutation = vars.mutation.type === 'NEW_USER_VIEW_MUTATION';
 
       if (!viewMutation) {

@@ -12,9 +12,14 @@ import {
 import { observable } from '@legendapp/state';
 import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
 import { store$ } from '../../legend-store/legend.store.js';
-import { copyRow, hasOpenDialog$ } from '../../legend-store/legend.utils.js';
+import {
+  copyRow,
+  hasOpenDialog$,
+  isDetail,
+} from '../../legend-store/legend.utils.js';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
+import { isOnDetailPage$ } from '../../legend-store/legend.view-actions.js';
 
 export const listItems$ = observable<ListProps['items']>([]);
 
@@ -339,7 +344,8 @@ export const makeListProps = <T extends RecordType = RecordType>(
       store$.navigation.state.set({
         type: 'navigate',
         view:
-          store$.detail.viewType.get() || !store$.userViewData.name.get()
+          (store$.detail.viewType.get() && isOnDetailPage$.get()) ||
+          !store$.userViewData.name.get()
             ? store$.viewConfigManager.getViewName()
             : store$.userViewData.name.get() ?? '',
         id: item.id.toString(),

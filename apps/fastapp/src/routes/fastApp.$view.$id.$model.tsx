@@ -25,6 +25,8 @@ export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   onEnter: async (props) => {
     loadingEnter$.set(true);
 
+    store$.detail.viewType.set({ type: 'model', model: props.params.model });
+
     await props.loaderPromise;
     await props.loadPromise;
 
@@ -122,12 +124,21 @@ const DetailModelListViewPage = observer(() => {
 
   const { viewData } = getViewData(view?.viewName ?? '');
 
-  if (loading$.get() || loadingEnter$.get()) return null;
+  console.debug(':: ', store$.viewConfigManager.viewConfig.get());
+  console.debug('::', store$.dataModel.rows.get());
+  // if (loading$.get() || loadingEnter$.get()) return <></>;
+
+  if (store$.viewConfigManager.viewConfig.get()?.viewName !== view?.viewName) {
+    return <></>;
+  }
 
   if (viewData.main) {
-    return <viewData.main isSubView={true} />;
+    return (
+      <>
+        <viewData.main isSubView={true} />
+      </>
+    );
   }
-  if (!store$.viewConfigManager.viewConfig.get()) return;
 
   return (
     <>

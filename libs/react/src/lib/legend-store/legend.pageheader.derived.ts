@@ -12,6 +12,7 @@ import {
   userView$,
 } from './legend.shared.derived';
 import { store$ } from './legend.store';
+import { isOnDetailPage$ } from './legend.view-actions';
 
 export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
   {}
@@ -19,7 +20,8 @@ export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
 
 export const derivedPageHeaderProps$ = observable(() => {
   const detailProps = derviedDetailPage$.get();
-  if (store$.detail.row.get()) {
+
+  if (store$.detail.row.get() && isOnDetailPage$.get()) {
     return {
       options: [],
       starred: detailUserView$.get()?.starred ?? false,

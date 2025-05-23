@@ -210,8 +210,12 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const cursor = store$.fetchMore.currentCursor.get();
 
+  const viewName =
+    store$.userViewData.name.get() ||
+    store$.viewConfigManager.get().viewConfig?.viewName;
   const parentId = store$.detail.row.get()?.id ?? null;
   const parentViewName = store$.detail.parentViewName.get() ?? null;
+  const viewIsSameAsParent = parentViewName === viewName;
 
   const localMode = localModeEnabled$.get();
 
@@ -245,8 +249,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       },
       viewId: null,
       // disabled: localMode ? true : false,
-      parentViewName,
-      parentId,
+      parentViewName: viewIsSameAsParent ? null : parentViewName,
+      parentId: viewIsSameAsParent ? null : parentId,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -264,6 +268,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     cursor,
     parentViewName,
     parentId,
+    viewIsSameAsParent,
   ]);
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =

@@ -1,25 +1,33 @@
+import { api } from '@apps-next/convex';
+import { preloadQuery } from '@apps-next/convex-adapter-app';
 import { _log, QueryReturnOrUndefined, Row } from '@apps-next/core';
-import { FormField, RenderDetailComplexValue, store$ } from '@apps-next/react';
+import {
+  FormField,
+  isOnDetailPage$,
+  RenderDetailComplexValue,
+  store$,
+} from '@apps-next/react';
+import { observable } from '@legendapp/state';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
+import { isInDetailView$ } from '../application-store/app.store.utils';
+import { getUserViewsQuery, queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
-import { observable } from '@legendapp/state';
-import { getUserViewsQuery, queryClient } from '../query-client';
-import { preloadQuery } from '@apps-next/convex-adapter-app';
-import { api } from '@apps-next/convex';
-import { isInDetailView$ } from '../application-store/app.store.utils';
-import { CircleIcon } from 'lucide-react';
 
 const loading$ = observable(false);
 const loadingEnter$ = observable(false);
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   onLeave: () => {
+    console.debug('::::::LEAVE');
     isInDetailView$.set(false);
+    isOnDetailPage$.set(false);
   },
   onEnter: async (props) => {
+    console.debug('::::::ENTER');
+    isOnDetailPage$.set(true);
     isInDetailView$.set(true);
     if ((props.params as any)?.model) return;
     loadingEnter$.set(true);
@@ -81,14 +89,16 @@ const DetaiViewPage = observer(() => {
 
   if (!viewData.viewConfig) {
     _log.info(`View ${viewName} not found, redirecting to /fastApp`);
-    return null;
+    return <>NO VIEW DATA...</>;
   }
 
   const row = store$.detail.row.get() as Row | undefined;
   const viewConfigManager = store$.detail.viewConfigManager.get();
 
-  if (!store$.detail) return <>NO DETAIL</>;
-  if (!row || !viewConfigManager) return <>NO ROW OR NO VIEW</>;
+  if (!store$.detail) return <div aria-label="Detail not found"></div>;
+  if (!row || !viewConfigManager) {
+    return <div aria-label="Row or ViewConfigManager not found"></div>;
+  }
 
   if (viewData.detail) {
     return <viewData.detail />;

@@ -1,10 +1,11 @@
 import { api } from '@apps-next/convex';
 import { preloadQuery } from '@apps-next/convex-adapter-app';
-import { QueryReturnOrUndefined, RecordType } from '@apps-next/core';
+import { QueryReturnOrUndefined, RecordType, Row } from '@apps-next/core';
 import {
   FormField,
   RenderActivityList,
   makeHooks,
+  store$,
   viewActionStore,
 } from '@apps-next/react';
 import { observable } from '@legendapp/state';
@@ -21,6 +22,8 @@ const loadingEnter$ = observable(false);
 export const Route = createFileRoute('/fastApp/$view/$id/overview')({
   onEnter: async (props) => {
     if ((props.params as any)?.model) return;
+    if (!props.id) return;
+    store$.detail.viewType.set({ type: 'overview' });
 
     loadingEnter$.set(true);
     console.debug(':::onEnter:Overview Page');
@@ -66,6 +69,23 @@ const DetaiViewPage = observer(() => {
   const viewName = params.viewName as string;
 
   const { viewData } = getViewData(viewName);
+
+  const row = store$.detail.row.get() as Row | undefined;
+  const viewConfigManager = store$.detail.viewConfigManager.get();
+
+  if (!store$.detail) return <div aria-label="Detail not found">no detail</div>;
+  if (!row || !viewConfigManager)
+    return (
+      <div aria-label="Row or ViewConfigManager not found">
+        no row or view config
+      </div>
+    );
+
+  if (
+    viewData.viewConfig.viewName !==
+    store$.detail.viewConfigManager.get()?.viewConfig.viewName
+  )
+    return;
 
   if (viewData.overView) {
     return <viewData.overView />;
