@@ -5,9 +5,19 @@ import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
+import { getUserViewsQuery, queryClient } from '../query-client';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   loader: async (props) => {
+    await queryClient.ensureQueryData(getUserViewsQuery());
+    const { viewData, userViewData, viewName } = getView(props);
+    await props.context.preloadQuery(
+      viewData.viewConfig,
+      userViewData?.name ?? viewName,
+      props.params.id,
+      null,
+      null
+    );
     await props.parentMatchPromise;
   },
   component: () => <DetaiViewPage />,
@@ -27,7 +37,7 @@ const DetaiViewPage = observer(() => {
   const row = store$.detail.row.get() as Row | undefined;
   const viewConfigManager = store$.detail.viewConfigManager.get();
 
-  if (!row || !viewConfigManager) return <>NULL</>;
+  if (!row || !viewConfigManager) return <></>;
 
   if (viewData.detail) {
     return <viewData.detail />;

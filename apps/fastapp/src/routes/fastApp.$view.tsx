@@ -19,23 +19,38 @@ import { DefaultViewTemplate } from '../views/default-view-template';
 
 export const Route = createFileRoute('/fastApp/$view')({
   loader: async (props) => {
-    console.debug('/fastApp/view::loader');
+    console.debug('/fastApp/view::loader', props.params, props.cause);
 
     await queryClient.ensureQueryData(getUserViewsQuery());
 
     const { id, view, model } = props.params as RecordType;
 
     if (id && view && model) {
-      await dispatchLoadDetailSubView(props, true);
+      console.log('dispatchLoadDetailSubView2');
+
+      if (props.cause === 'preload') {
+        dispatchLoadDetailSubView(props, true);
+        dispatchLoadDetailOverviewView(props, true);
+      } else {
+        await dispatchLoadDetailSubView(props, true);
+        await dispatchLoadDetailOverviewView(props, true);
+      }
+
       loading$.set(false);
     }
 
-    if (id && view) {
-      await dispatchLoadDetailOverviewView(props, true);
+    if (id && view && !model) {
+      console.debug('dispatchLoadDetailOverviewView1');
+      if (props.cause === 'preload') {
+        dispatchLoadDetailOverviewView(props, true);
+      } else {
+        await dispatchLoadDetailOverviewView(props);
+      }
       loading$.set(false);
     } else if (view) {
       props.cause !== 'preload' && loading$.set(true);
       await dispatchLoadView(props, true);
+
       loading$.set(false);
     }
   },
@@ -53,12 +68,13 @@ const ViewMainComponent = observer(() => {
     (params.view as string) + (params.id ?? '') + (params.model ?? '')
   );
 
-  if (params.model) {
+  const viewKey = params.view + (params.id ?? '') + (params.model ?? '');
+  if (params.model && viewKey !== prevViewRef.current) {
     dispatchLoadDetailSubView({ params, cause: '', context });
     prevViewRef.current =
       params.view + (params.id ?? '') + (params.model ?? '');
   }
-  if (params.id) {
+  if (params.id && viewKey !== prevViewRef.current) {
     dispatchLoadDetailOverviewView({ params, cause: '', context });
     prevViewRef.current =
       params.view + (params.id ?? '') + (params.model ?? '');

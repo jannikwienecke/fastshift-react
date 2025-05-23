@@ -91,7 +91,7 @@ export const dispatchLoadView = async (
     data,
     userViewData,
     viewData,
-    isLoader,
+    isLoader: props.cause === 'enter' || props.cause === 'stay',
   });
   return { viewData, userViewData, viewName };
 };
