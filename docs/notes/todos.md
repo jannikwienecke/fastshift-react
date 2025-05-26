@@ -166,6 +166,7 @@ Small Features to add
 
 ### Small Feature:
 
+- [ ] if i query the commandbar, and the edit view fields are in the list, sort them to the top
 - [ ] color picker and color indicator for fields with type "color" or something like this
 - [ ] when created a new task -> click on notifiaction -> open task
 - [ ] open after creation, in config

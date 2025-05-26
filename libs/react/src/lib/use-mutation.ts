@@ -40,26 +40,28 @@ export const useMutation = () => {
       const queryClient = store$.api.queryClient.get();
 
       if (!viewMutation) {
-        queryClient?.cancelQueries?.();
-        try {
-          (queryClient as any)?.clear?.();
-        } catch (error) {
-          console.debug('Error in clear: ', error);
-        }
+        setTimeout(() => {
+          queryClient?.cancelQueries?.();
+          try {
+            (queryClient as any)?.clear?.();
+          } catch (error) {
+            console.debug('Error in clear: ', error);
+          }
 
-        try {
-          (queryClient as any)?.removeQueries?.({});
-        } catch (error) {
-          console.debug('Error in removeQueries: ', error);
-        }
+          try {
+            (queryClient as any)?.removeQueries?.({});
+          } catch (error) {
+            console.debug('Error in removeQueries: ', error);
+          }
 
-        const cache = queryClient?.getQueryCache?.();
+          const cache = queryClient?.getQueryCache?.();
 
-        try {
-          cache?.clear();
-        } catch (error) {
-          console.debug('Error in clear: ', error);
-        }
+          try {
+            cache?.clear();
+          } catch (error) {
+            console.debug('Error in clear: ', error);
+          }
+        }, 50);
       }
 
       if (

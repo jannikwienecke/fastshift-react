@@ -118,6 +118,9 @@ export const useAppEffects = (viewName: string) => {
       const isInNotPreload = viewsNotPreload.find((v) =>
         v.includes(store$.viewConfigManager.getTableName())
       );
+
+      if (store$.detail.viewType.type.get() === 'overview') return;
+
       if (isInNotPreload) return;
 
       if (row?.row?.id) {
@@ -216,6 +219,10 @@ export const useAppEffects = (viewName: string) => {
         router.cleanCache();
       }
 
+      if (store$.detail.viewType.type.get() === 'overview') {
+        router.invalidate();
+      }
+
       isMutation$.set(true);
     });
 
@@ -227,10 +234,6 @@ export const useAppEffects = (viewName: string) => {
           console.debug('Mutation detected, refetching user views...');
           refetch();
           isMutation$.set(false);
-
-          if (store$.detail.viewType.type.get() === 'overview') {
-            router.invalidate();
-          }
         }
       }
     });

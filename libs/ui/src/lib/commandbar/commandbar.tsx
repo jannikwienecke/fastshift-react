@@ -34,6 +34,7 @@ export const CommandDialogList = (props: {
   onSelect: CommandbarProps['onSelect'];
   onValueChange: CommandbarProps['onValueChange'];
   row?: CommandbarProps['row'];
+  query?: CommandbarProps['query'];
 }) => {
   const value: string | undefined = useCommandState((state) => state.value);
   const listRef = React.useRef<HTMLDivElement>(null);
@@ -52,8 +53,12 @@ export const CommandDialogList = (props: {
   }, [props, props.groups, value]);
 
   React.useLayoutEffect(() => {
-    listRef.current?.scrollTo({ top: 0 });
-  }, [value]);
+    if (props.query === '') {
+      setTimeout(() => {
+        listRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+      }, 10);
+    }
+  }, [props.query]);
 
   return (
     <CommandList ref={listRef} className="px-3 pb-3 flex flex-col pt-2">
