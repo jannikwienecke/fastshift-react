@@ -39,7 +39,6 @@ export const Route = createFileRoute('/fastApp/$view')({
     }
 
     if (id && view && !model) {
-      console.debug('dispatchLoadDetailOverviewView1');
       if (props.cause === 'preload') {
         // dispatchLoadDetailOverviewView(props, true);
       } else {
@@ -47,7 +46,10 @@ export const Route = createFileRoute('/fastApp/$view')({
       }
       loading$.set(false);
     } else if (view) {
-      props.cause !== 'preload' && loading$.set(true);
+      if (props.cause !== 'preload') {
+        loading$.set(true);
+      }
+
       await dispatchLoadView(props, true);
 
       loading$.set(false);
@@ -70,20 +72,13 @@ const ViewMainComponent = observer(() => {
   const viewKey = params.view + (params.id ?? '') + (params.model ?? '');
   if (params.model && viewKey !== prevViewRef.current) {
     dispatchLoadDetailSubView({ params, cause: '', context });
-    prevViewRef.current =
-      params.view + (params.id ?? '') + (params.model ?? '');
+    prevViewRef.current = viewKey;
   }
   if (params.id && viewKey !== prevViewRef.current) {
     dispatchLoadDetailOverviewView({ params, cause: '', context });
-    prevViewRef.current =
-      params.view + (params.id ?? '') + (params.model ?? '');
-  } else if (
-    !loading$.get() &&
-    params.view + (params.id ?? '') + (params.model ?? '') &&
-    !params.id
-  ) {
-    prevViewRef.current =
-      params.view + (params.id ?? '') + (params.model ?? '');
+    prevViewRef.current = viewKey;
+  } else if (!loading$.get() && viewKey && !params.id) {
+    prevViewRef.current = viewKey;
 
     dispatchLoadView({
       params,

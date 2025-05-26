@@ -1,20 +1,13 @@
-import { api, views } from '@apps-next/convex';
+import { views } from '@apps-next/convex';
 import { GetTableName, slugHelper } from '@apps-next/core';
 import { store$, viewActionStore } from '@apps-next/react';
-import { convexQuery } from '@convex-dev/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { observable } from '@legendapp/state';
 import { useLocation, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { useTranslation as useTranslationReact } from 'react-i18next';
-import {
-  getUserViews,
-  getUserViewsQuery,
-  queryClient,
-} from '../../query-client';
-import { useViewParams } from './useViewParams';
+import { getUserViews } from '../../query-client';
 import { useUserViews } from './use-user-views';
-import { observable } from '@legendapp/state';
-// import { invalidateRouteData } from '@tanstack/react-router'
+import { useViewParams } from './useViewParams';
 
 export const useAppEffects = (viewName: string) => {
   const router = useRouter();
@@ -173,7 +166,7 @@ export const useAppEffects = (viewName: string) => {
               // and we click on the parent tasks view
               // without this, we would see the todos list for a moment and then the tasks list
               // with the invalidate, we will force the loader of the view to be called
-              router.invalidate();
+              // router.invalidate();
               navigateRef.current({
                 to: `/fastApp/${slugHelper().slugify(
                   state.slug ?? state.view
@@ -234,6 +227,10 @@ export const useAppEffects = (viewName: string) => {
           console.debug('Mutation detected, refetching user views...');
           refetch();
           isMutation$.set(false);
+
+          if (store$.detail.viewType.type.get() === 'overview') {
+            router.invalidate();
+          }
         }
       }
     });

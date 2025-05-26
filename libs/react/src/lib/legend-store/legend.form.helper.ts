@@ -57,10 +57,6 @@ export const getFormState = () => {
 
   const errors = viewConfigManager.validateRecord(row?.raw);
 
-  if (errors) {
-    console.debug('Form State Errors: ', errors);
-  }
-
   return {
     isReady: !errors,
     errors: errors ?? {},
@@ -197,10 +193,6 @@ export const formHelper = (
   const getFormState = () => {
     if (!row?.id) return null;
     const errors = viewConfigManager.validateRecord(row?.raw);
-
-    if (errors) {
-      console.debug('Form State Errors: ', errors);
-    }
 
     return {
       isReady: !errors,

@@ -98,13 +98,6 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
 
   const parsedViewSettings = getParsedViewSettings();
 
-  const staticViewConfig = React.useRef(viewConfig ?? null);
-
-  React.useEffect(() => {
-    if (staticViewConfig.current) return;
-    staticViewConfig.current = viewConfig;
-  }, [viewConfig]);
-
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
     useStableQuery(prisma, {
       registeredViews: queryProps?.registeredViews ?? registeredViews,
@@ -114,7 +107,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
       displayOptions: parsedViewSettings?.displayOptions,
       // displayOptions: '',
       modelConfig: undefined,
-      viewConfig: staticViewConfig.current,
+      viewConfig: viewConfig,
       paginateOptions: undefined,
       disabled: viewConfig ? false : true,
       viewId: null,

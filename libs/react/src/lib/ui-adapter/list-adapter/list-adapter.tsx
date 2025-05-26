@@ -189,8 +189,6 @@ export const makeListProps = <T extends RecordType = RecordType>(
     listGrouping.groupLabel =
       grouping.field?.relation?.tableName.firstUpper().slice(0, -1) ?? '';
 
-    console.log(store$.relationalDataModel.get());
-
     listGrouping.groups =
       store$.relationalDataModel[grouping.field.name]
         ?.get()

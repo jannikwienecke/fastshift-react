@@ -219,7 +219,7 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
                     preload="intent"
                     className="flex-grow"
                     onClick={() => {
-                      router.invalidate();
+                      // router.invalidate();
                     }}
                   >
                     <span className="">{subItem.title}</span>
