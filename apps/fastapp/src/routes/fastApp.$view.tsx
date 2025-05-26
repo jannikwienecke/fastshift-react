@@ -26,8 +26,6 @@ export const Route = createFileRoute('/fastApp/$view')({
     const { id, view, model } = props.params as RecordType;
 
     if (id && view && model) {
-      console.log('dispatchLoadDetailSubView2');
-
       if (props.cause === 'preload') {
         dispatchLoadDetailSubView(props, true);
         dispatchLoadDetailOverviewView(props, true);
@@ -42,7 +40,7 @@ export const Route = createFileRoute('/fastApp/$view')({
     if (id && view && !model) {
       console.debug('dispatchLoadDetailOverviewView1');
       if (props.cause === 'preload') {
-        dispatchLoadDetailOverviewView(props, true);
+        // dispatchLoadDetailOverviewView(props, true);
       } else {
         await dispatchLoadDetailOverviewView(props);
       }
@@ -80,7 +78,8 @@ const ViewMainComponent = observer(() => {
       params.view + (params.id ?? '') + (params.model ?? '');
   } else if (
     !loading$.get() &&
-    params.view + (params.id ?? '') + (params.model ?? '')
+    params.view + (params.id ?? '') + (params.model ?? '') &&
+    !params.id
   ) {
     prevViewRef.current =
       params.view + (params.id ?? '') + (params.model ?? '');

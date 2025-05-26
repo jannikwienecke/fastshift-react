@@ -14,6 +14,7 @@ import { routeTree } from './routeTree.gen';
 
 import './views';
 import './shared/hooks/app.persist';
+import { store$ } from '@apps-next/react';
 
 // syncObservable(store$, {
 //   persist: {
@@ -44,7 +45,7 @@ const router = createRouter({
       if (parentViewName) {
         userViewData = null;
       } else {
-        const userViews = getUserViews();
+        const userViews = store$.userViews.get() ?? getUserViews();
         userViewData = userViews.find((u) => u.name === viewName);
       }
 

@@ -123,6 +123,7 @@ const handleLoadDetailOverview = (action: Action) => {
 
   batch(() => {
     !action.model && resetStore();
+    store$.detail.set(undefined);
 
     store$.detail.viewConfigManager.set(viewConfigManager);
     store$.detail.historyDataOfRow.set(action.data.historyData ?? []);
@@ -183,10 +184,11 @@ const handleLoadView = (action: Action) => {
     action.viewData.uiViewConfig
   );
 
+  // && !action.isLoader
+  const isOtherKey = loadViewKey$.get() !== key;
   if (loadViewKey$.get() === key && !action.isLoader) return;
 
-  loadViewKey$.set(key);
-  store$.state.set('pending');
+  isOtherKey && store$.state.set('pending');
 
   if (!action.id) {
     loadDetailOverviewKey$.set('');
@@ -194,13 +196,19 @@ const handleLoadView = (action: Action) => {
     store$.detail.set(undefined);
   }
 
+  if (isOtherKey) {
+    resetStore();
+  }
+
+  loadViewKey$.set(key);
+
   console.debug(
     'ACTION: LOAD_VIEW:: ',
     action.viewName,
-    action.data?.data?.length
+    action.data?.data?.length,
+    key,
+    loadViewKey$.get()
   );
-
-  resetStore();
 
   setStore({
     viewConfigManager,
@@ -210,7 +218,7 @@ const handleLoadView = (action: Action) => {
 
   handleQueryData(action.data);
 
-  store$.state.set('initialized');
+  isOtherKey && store$.state.set('initialized');
 };
 
 const resetStore = () => {
@@ -256,7 +264,7 @@ const handleQueryData = (data: QueryReturnOrUndefined) => {
   store$.fetchMore.isDone.set(isDone);
 
   createDataModel(store$)(data.data ?? []);
-  createRelationalDataModel(store$)(data.relationalData ?? {});
+  // createRelationalDataModel(store$)(data.relationalData ?? {});
 };
 
 const setStore = ({

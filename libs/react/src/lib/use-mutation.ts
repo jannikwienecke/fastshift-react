@@ -30,11 +30,18 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
+      console.log('MUTATE!!!');
+      store$.state.set('invalidated');
+
+      store$.mutating.mutation.set(vars.mutation);
+
       const viewMutation = vars.mutation.type === 'NEW_USER_VIEW_MUTATION';
 
       const queryClient = store$.api.queryClient.get();
 
       if (!viewMutation) {
+        console.debug('HANDLE Mutation: Reset Queries...');
+
         queryClient?.cancelQueries?.();
         try {
           (queryClient as any)?.clear?.();
@@ -60,8 +67,6 @@ export const useMutation = () => {
           console.debug('Error in clear: ', error);
         }
       }
-
-      store$.state.set('mutating');
 
       if (
         vars.mutation.type !== 'UPDATE_RECORD' &&

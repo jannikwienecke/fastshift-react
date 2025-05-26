@@ -114,7 +114,9 @@ export const createDataModel: StoreFn<'createDataModel'> =
       tableName ?? store$.viewConfigManager.get().getTableName?.()
     )(sorted);
 
-    setGlobalDataModel(dataModel.rows);
+    if (store$.state.get() !== 'invalidated') {
+      setGlobalDataModel(dataModel.rows);
+    }
   };
 
 const handlingFetchMoreState = async (
@@ -189,6 +191,7 @@ const handleFilterChangedState = async (
   });
 
   store$.createDataModel(all);
+
   store$.state.set('initialized');
 
   store$.fetchMore.assign({
@@ -243,22 +246,30 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
     const state = store$.state.get();
 
     if (data.isPending) return;
+
     _log.debug(
       `____handleIncomingData`,
       state,
       data.data?.slice(0, 3).map((d) => d?.['name'])
     );
 
-    if (localModeEnabled$.get()) {
+    if (
+      localModeEnabled$.get() &&
+      store$.detail.viewType.type.get() === 'model'
+    ) {
       _log.debug(`handleIncomingData:debugMode-> Update Data Model`);
       store$.createDataModel(data.data ?? []);
-
       return;
     }
 
-    store$.createRelationalDataModel(data.relationalData ?? {});
+    // store$.createRelationalDataModel(data.relationalData ?? {});
 
     switch (state) {
+      case 'invalidated':
+        _log.debug('RECEIVING DATA AFTER INVALIDATED');
+        setTimeout(() => store$.state.set('mutating'), 10);
+        break;
+
       case 'fetching-more':
         _log.debug('RECEIVING DATA AFTER FETCHING MORE', data);
         await handlingFetchMoreState(store$, data);

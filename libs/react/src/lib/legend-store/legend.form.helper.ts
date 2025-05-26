@@ -230,7 +230,7 @@ export const formHelper = (
       console.error('___GET VALUE OF ROW ERROR', error);
       console.debug(row);
       console.debug(fieldName);
-      throw new Error('HIER!!!!');
+      throw new Error('Error getting value of row: ' + error);
     }
   };
 

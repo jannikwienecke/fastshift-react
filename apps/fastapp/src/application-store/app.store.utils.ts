@@ -38,7 +38,7 @@ export const getViewData = (
 } => {
   const userViewData = store$.userViews
     .get()
-    .find((view) => view.name === viewName);
+    .find((view) => view.name.toLowerCase() === viewName.toLowerCase());
 
   const viewData = viewRegistry.getView(userViewData?.baseView ?? viewName);
 
@@ -173,7 +173,7 @@ export const dispatchLoadDetailSubView = async (
 
   if (!modelView) throw new Error('NOT VALID MODEL VIEW');
 
-  const userViews = getUserViews();
+  const userViews = store$.userViews.get();
 
   const { viewData: modelViewData } = getViewData(modelView.viewName);
 

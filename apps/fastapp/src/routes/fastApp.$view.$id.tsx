@@ -18,6 +18,7 @@ export const Route = createFileRoute('/fastApp/$view/$id')({
       null,
       null
     );
+
     await props.parentMatchPromise;
   },
   component: () => <DetaiViewPage />,

@@ -33,7 +33,7 @@ export const viewLoaderHandler = async (
   }
 
   if (args.onlyRelationalData) {
-    //
+    console.debug(`Loader:OnlyRelationalData:${args.viewName}`);
   } else {
     if (args.viewId) {
       console.debug(`Loader:Detail:${args.viewName}`);
@@ -120,7 +120,9 @@ export const viewLoaderHandler = async (
 
   const { data, continueCursor, isDone, allIds } = getDataRes;
 
-  const relationalData = await getRelationalData(ctx, serverProps);
+  const relationalData = args.onlyRelationalData
+    ? await getRelationalData(ctx, serverProps)
+    : {};
 
   return {
     allIds: allIds?.map((id) => id.toString()) ?? [],

@@ -26,12 +26,12 @@ export function ComboboxPopover<T extends ComboxboxItem = ComboxboxItem>(
 ) {
   const { input, rect, ...comboboxProps } = props || {};
   const { t } = useTranslation();
+
   if (!props) return null;
 
   if (props.datePickerProps?.open) {
     return <DatePicker {...props.datePickerProps} />;
   }
-
   return (
     <Popover
       modal={true}

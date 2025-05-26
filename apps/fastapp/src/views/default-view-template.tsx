@@ -5,11 +5,7 @@ import {
   MakeListPropsOptions,
   RecordType,
 } from '@apps-next/core';
-import {
-  MakeComboboxPropsOptions,
-  store$,
-  viewRegistry,
-} from '@apps-next/react';
+import { MakeComboboxPropsOptions, store$ } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { Outlet, useParams } from '@tanstack/react-router';
 import React from 'react';

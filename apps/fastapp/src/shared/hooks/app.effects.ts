@@ -6,8 +6,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { useTranslation as useTranslationReact } from 'react-i18next';
-import { getUserViews } from '../../query-client';
+import {
+  getUserViews,
+  getUserViewsQuery,
+  queryClient,
+} from '../../query-client';
 import { useViewParams } from './useViewParams';
+import { useUserViews } from './use-user-views';
+import { observable } from '@legendapp/state';
 // import { invalidateRouteData } from '@tanstack/react-router'
 
 export const useAppEffects = (viewName: string) => {
@@ -33,7 +39,7 @@ export const useAppEffects = (viewName: string) => {
 
   const view = store$.viewConfigManager.viewConfig.viewName.get();
 
-  const { data: userViews } = useQuery(convexQuery(api.query.getUserViews, {}));
+  const { allViews: userViews, refetch } = useUserViews();
 
   React.useEffect(() => {
     if (!userViews) return;
@@ -71,18 +77,20 @@ export const useAppEffects = (viewName: string) => {
     if (!isOverview) return;
 
     const config = store$.viewConfigManager.viewConfig.get();
-    const parentViewName = store$.detail.parentViewName.get();
     const parentId = store$.detail.row.get()?.id ?? null;
 
-    if (!config || !parentViewName || !parentId) return;
-    if (view.toLowerCase() === parentViewName.toLowerCase()) return;
+    setTimeout(() => {
+      const parentViewName = store$.detail.parentViewName.get();
+      if (!config || !parentViewName || !parentId) return;
+      if (view.toLowerCase() === parentViewName.toLowerCase()) return;
 
-    realPreloadRouteRef.current({
-      from: '/fastApp/$view/$id/overview',
-      to: `/fastApp/${slugHelper().slugify(
-        parentViewName
-      )}/${parentId}/${view}`,
-    });
+      realPreloadRouteRef.current({
+        from: '/fastApp/$view/$id/overview',
+        to: `/fastApp/${slugHelper().slugify(parentViewName)}/${parentId}/${
+          viewNameRef.current
+        }`,
+      });
+    }, 50);
   }, [pathname, realPreloadRoute, view]);
 
   const doOnceRef = React.useRef(false);
@@ -204,5 +212,32 @@ export const useAppEffects = (viewName: string) => {
           break;
       }
     });
+
+    store$.mutating.mutation.onChange((changes) => {
+      const mutation = changes.value;
+      if (!mutation) return;
+
+      const viewMutation = mutation.type === 'NEW_USER_VIEW_MUTATION';
+
+      if (!viewMutation) {
+        router.cleanCache();
+      }
+
+      isMutation$.set(true);
+    });
+
+    store$.state.onChange((changes) => {
+      const state = changes.value;
+
+      if (state === 'initialized') {
+        if (isMutation$.get()) {
+          console.debug('Mutation detected, refetching user views...');
+          refetch();
+          isMutation$.set(false);
+        }
+      }
+    });
   }, []);
 };
+
+const isMutation$ = observable(false);

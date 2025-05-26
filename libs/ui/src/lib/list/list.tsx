@@ -5,7 +5,7 @@ import {
   useTranslation,
 } from '@apps-next/core';
 import { PlusIcon } from 'lucide-react';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Checkbox } from '../components/checkbox';
 import { cn } from '../utils';
 // import { store$ } from '@apps-next/react';
@@ -22,14 +22,28 @@ export function ListDefault<TItem extends ListItem = ListItem>({
 }: ListProps<TItem>) {
   const { t } = useTranslation();
   const observerTarget = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  // Add scroll event listener to detect when user has scrolled
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (!hasScrolled) {
+        setHasScrolled(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasScrolled]);
 
   const addObserver = React.useCallback(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries?.[0]?.isIntersecting) {
-          // console.info(
-          //   'Observer triggered - loading more items - not implemented right now'
-          // );
+        if (entries?.[0]?.isIntersecting && hasScrolled) {
+          // Only call onReachEnd if the user has scrolled
           onReachEnd?.();
         }
       },
@@ -39,10 +53,17 @@ export function ListDefault<TItem extends ListItem = ListItem>({
     if (observerTarget.current) {
       observer.observe(observerTarget.current);
     }
-  }, [onReachEnd]);
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [hasScrolled, onReachEnd]);
 
   React.useEffect(() => {
-    addObserver();
+    const cleanup = addObserver();
+    return cleanup;
   }, [addObserver]);
 
   const renderList = (items: TItem[]) => {

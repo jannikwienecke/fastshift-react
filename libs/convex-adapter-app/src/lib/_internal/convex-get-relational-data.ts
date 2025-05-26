@@ -1,17 +1,14 @@
 import {
   DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY,
-  getRelationTableName,
   getViewByName,
   NONE_OPTION,
   QueryRelationalData,
   QueryServerProps,
-  relationalViewHelper,
 } from '@apps-next/core';
 import { filterByNotDeleted, queryClient } from './convex-client';
 import { queryHelper } from './convex-query-helper';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
-import { mapWithInclude } from './convex-map-with-include';
 
 export const getRelationalData = async (
   ctx: GenericQueryCtx,
@@ -19,49 +16,58 @@ export const getRelationalData = async (
 ) => {
   const { viewConfigManager } = args;
 
-  const displayField = viewConfigManager.getDisplayFieldLabel();
+  const tables = Object.values(args.registeredViews)
+    .map((v) => v?.tableName)
+    .filter((t) => !getViewByName(args.registeredViews, t)?.isManyToMany);
 
-  const { getInclude } = queryHelper({ displayField, query: args.query });
+  const relationalDataPromises = tables.map((key) => {
+    const view = getViewByName(args.registeredViews, key);
 
-  const include = getInclude(viewConfigManager.getIncludeFields());
+    if (view?.isManyToMany) return null;
 
-  const fields = Object.keys({
-    ...include,
-  });
-
-  const relationalDataPromises = fields.map((key) => {
-    const manyToManyField = viewConfigManager.getManyToManyField(key);
-
-    const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
-
-    const view = getViewByName(args.registeredViews, field.name);
     const viewHasSoftDelete = view?.mutation?.softDelete;
     const deletedIndexField = viewHasSoftDelete
       ? viewConfigManager.getSoftDeleteIndexField()
       : undefined;
 
-    let dbQuery = queryClient(ctx, key);
-    if (field.relation) {
-      dbQuery = queryClient(
-        ctx,
-        field.relation.manyToManyRelation || field.relation.tableName
-      );
-    }
+    const dbQuery = queryClient(ctx, key);
 
     const groupingField = args.displayOptions?.grouping?.field.name;
 
-    const isGroupByField = groupingField === field.name;
+    const isGroupByField = groupingField === key;
 
-    // if its the group by field, we need to query the complete table
-    return isGroupByField && deletedIndexField
-      ? filterByNotDeleted(dbQuery, deletedIndexField).collect()
-      : isGroupByField
-      ? dbQuery.collect()
-      : deletedIndexField
-      ? filterByNotDeleted(dbQuery, deletedIndexField).take(
-          DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY
-        )
-      : dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+    const x =
+      isGroupByField && deletedIndexField
+        ? filterByNotDeleted(dbQuery, deletedIndexField).collect()
+        : deletedIndexField
+        ? filterByNotDeleted(dbQuery, deletedIndexField).take(
+            DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY
+          )
+        : dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
+
+    return x;
+    //       DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY
+    //     )
+
+    // if (view.relation) {
+    //   dbQuery = queryClient(
+    //     ctx,
+    //     field.relation.manyToManyRelation || field.relation.tableName
+    //   );
+    // }
+
+    // const groupingField = args.displayOptions?.grouping?.field.name;
+
+    // // if its the group by field, we need to query the complete table
+    // return isGroupByField && deletedIndexField
+    //   ? filterByNotDeleted(dbQuery, deletedIndexField).collect()
+    //   : isGroupByField
+    //   ? dbQuery.collect()
+    //   : deletedIndexField
+    //   ? filterByNotDeleted(dbQuery, deletedIndexField).take(
+    //       DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY
+    //     )
+    //   : dbQuery.take(DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY);
   });
 
   const filtersWithRelationalValues =
@@ -73,53 +79,55 @@ export const getRelationalData = async (
 
   const dict: { [key: string]: ConvexRecord[] } = {};
 
-  for (const filter of filtersWithRelationalValues) {
-    const fieldName = filter.field.relation?.fieldName;
-
-    const indexField = indexFields.find((f) => f.fields?.[0] === fieldName);
-    if (!indexField) {
-      continue;
-    }
-
-    const values: ConvexRecord[] = [];
-    for (const value of filter.values) {
-      if (value.id === NONE_OPTION) continue;
-
-      const res = await ctx.db.get(value.id);
-
-      if (!res) continue;
-
-      values.push(res);
-    }
-
-    dict[filter.field.name] = values;
-  }
-
   const resultList = await Promise.all(relationalDataPromises);
 
-  Object.entries(dict).forEach(([key, value]) => {
-    const indexOfFields = fields.findIndex((f) => f === key);
-    if (indexOfFields !== -1) {
-      const prevValues = resultList[indexOfFields];
-      const prevIds = prevValues?.map((r) => r._id);
-      const notInPrev = value.filter((r) => !prevIds?.includes(r._id));
+  if (filtersWithRelationalValues.length) {
+    // if we have filters, we need to add these values to the result list
+    // e.g. we have 10 values for projects
+    // but we also have a filter for projects, and this values is not under the
+    // 10 items of the result list. So we need to fetch it by id and add it
+    for (const filter of filtersWithRelationalValues) {
+      const fieldName = filter.field.relation?.fieldName;
 
-      resultList[indexOfFields] = [
-        ...(prevValues ?? []),
-        ...notInPrev,
-      ] as ConvexRecord[];
+      const indexField = indexFields.find((f) => f.fields?.[0] === fieldName);
+      if (!indexField) {
+        continue;
+      }
+
+      const values: ConvexRecord[] = [];
+      for (const value of filter.values) {
+        if (value.id === NONE_OPTION) continue;
+
+        const res = await ctx.db.get(value.id);
+
+        if (!res) continue;
+
+        values.push(res);
+      }
+
+      dict[filter.field.name] = values;
     }
-  });
 
-  const relationalData = Object.keys(include).reduce((acc, key, index) => {
-    const manyToManyField = viewConfigManager.getManyToManyField(key);
-    const field = manyToManyField ?? viewConfigManager.getFieldBy(key);
+    Object.entries(dict).forEach(([key, value]) => {
+      const indexOfFields = tables.findIndex((f) => f === key);
 
-    const _key = getRelationTableName(field);
+      if (indexOfFields !== -1) {
+        const prevValues = resultList[indexOfFields];
+        const prevIds = prevValues?.map((r) => r._id);
+        const notInPrev = value.filter((r) => !prevIds?.includes(r._id));
 
+        resultList[indexOfFields] = [
+          ...(prevValues ?? []),
+          ...notInPrev,
+        ] as ConvexRecord[];
+      }
+    });
+  }
+
+  const relationalData = tables.reduce((acc, key, index) => {
     const rows = resultList[index];
 
-    acc[_key] =
+    acc[key] =
       rows?.map((row) => ({
         ...row,
         id: row._id,
@@ -127,22 +135,22 @@ export const getRelationalData = async (
     return acc;
   }, {} as QueryRelationalData);
 
-  for (const [tableName, rows] of Object.entries(relationalData)) {
-    const { relationalViewManager } = relationalViewHelper(
-      tableName,
-      args.registeredViews
-    );
+  // for (const [tableName, rows] of Object.entries(relationalData)) {
+  //   const { relationalViewManager } = relationalViewHelper(
+  //     tableName,
+  //     args.registeredViews
+  //   );
 
-    args.viewConfigManager = relationalViewManager;
+  //   args.viewConfigManager = relationalViewManager;
 
-    const rowsWithInclude = await mapWithInclude(
-      rows as ConvexRecord[],
-      ctx,
-      args
-    );
+  //   const rowsWithInclude = await mapWithInclude(
+  //     rows as ConvexRecord[],
+  //     ctx,
+  //     args
+  //   );
 
-    relationalData[tableName] = rowsWithInclude;
-  }
+  //   relationalData[tableName] = rowsWithInclude;
+  // }
 
   return relationalData;
 };

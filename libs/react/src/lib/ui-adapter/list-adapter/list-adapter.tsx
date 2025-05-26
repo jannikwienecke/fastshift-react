@@ -189,10 +189,12 @@ export const makeListProps = <T extends RecordType = RecordType>(
     listGrouping.groupLabel =
       grouping.field?.relation?.tableName.firstUpper().slice(0, -1) ?? '';
 
+    console.log(store$.relationalDataModel.get());
+
     listGrouping.groups =
       store$.relationalDataModel[grouping.field.name]
         ?.get()
-        .rows.filter((row) => {
+        ?.rows.filter((row) => {
           if (showEmptyGroups) return true;
 
           const has = dataModel.rows.find((r) => {
@@ -346,7 +348,11 @@ export const makeListProps = <T extends RecordType = RecordType>(
       });
     },
     selected,
-    items,
+    items:
+      grouping.field?.relation &&
+      !store$.relationalDataModel[grouping.field.name].get()
+        ? []
+        : items,
     onReachEnd: store$.globalFetchMore,
     grouping: listGrouping,
     onContextMenu: store$.onContextMenuListItem,

@@ -31,6 +31,7 @@ import {
   UserViewData,
   UserViewForm,
   ViewConfigType,
+  Mutation,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { QueryClient } from '@tanstack/react-query';
@@ -143,7 +144,8 @@ export type LegendStore = {
     | 'fetching-more'
     | 'updating-display-options'
     | 'filter-changed'
-    | 'mutating';
+    | 'mutating'
+    | 'invalidated';
 
   // MAIN DATA MODEL
   dataModel: DataModelNew;
@@ -151,6 +153,11 @@ export type LegendStore = {
   relationalDataModel: RelationalDataModel;
   uiViewConfig: UiViewConfig;
 
+  mutating:
+    | {
+        mutation: Mutation;
+      }
+    | undefined;
   navigation?: {
     state:
       | { type: 'ready' }
