@@ -179,3 +179,4 @@ Small Features to add
 - [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
 - [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task
 - [ ] history in detail view (activity list)
+- [ ] in combobox: deselect tag, select, deselect, select. Not Updating in ui anymore

@@ -123,10 +123,10 @@ export const select = (row: Row) => {
   if (isInRemovedRows) {
     console.debug('___ADD BACK');
     selectState$.removedRows.set((prev) => prev.filter((r) => r.id !== row.id));
-    selectState$.newRows.set((prev) => [...prev, row]);
+    !isInInitialRows && selectState$.newRows.set((prev) => [...prev, row]);
+
     selectState$.toInsertRow.set(row);
   } else if (isInInitialRows) {
-    console.debug('___REMOVE');
     selectState$.toRemoveRow.set(row);
     selectState$.removedRows.set((prev) => [...prev, row]);
   } else if (isInNewRows) {
