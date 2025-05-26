@@ -70,18 +70,27 @@ export const dispatchViewAction = (action: Action) => {
 
 const loadDetailSubViewKey$ = observable('');
 const handleLoadDetailSubView = (action: Action) => {
-  if (action.type !== 'LOAD_DETAIL_SUB_VIEW') return;
+  if (action.type !== 'LOAD_DETAIL_SUB_VIEW') {
+    return;
+  }
   const key = `load-view-${action.parentViewName}-${action.id}-model-${action.viewName}`;
 
-  if (loadDetailSubViewKey$.get() === key) return;
+  const view = getView(action.viewData.viewConfig.viewName);
+  const viewDetail = getView(action.parentViewName);
+
+  if (!view) throw new Error('NO VIEW !!');
+
+  store$.detail.viewType.set({ model: view.tableName, type: 'model' });
+
+  if (loadDetailSubViewKey$.get() === key) {
+    return;
+  }
+
+  console.debug('ACTION: LOAD_DETAIL_SUB_VIEW:: ');
 
   loadDetailSubViewKey$.set(key);
+  loadDetailOverviewKey$.set('');
   store$.state.set('pending');
-
-  console.debug('ACTION: LOAD_DETAIL_SUB_VIEW:: ', action);
-
-  const view = getView(action.viewData.viewConfig.viewName);
-  if (!view) throw new Error('NO VIEW !!');
 
   const viewConfigManager = new BaseViewConfigManager(
     view,
@@ -89,6 +98,11 @@ const handleLoadDetailSubView = (action: Action) => {
   );
 
   resetStore();
+
+  if (viewDetail) {
+    const detailViewConfigManager = new BaseViewConfigManager(viewDetail);
+    store$.detail.viewConfigManager.set(detailViewConfigManager);
+  }
 
   setStore({
     viewConfigManager,
@@ -104,10 +118,18 @@ const handleLoadDetailSubView = (action: Action) => {
 const loadDetailOverviewKey$ = observable('');
 const handleLoadDetailOverview = (action: Action) => {
   if (action.type !== 'LOAD_DETAIL_OVERVIEW') return;
-  const key = `load-view-${action.viewName}-${action.id}-overview`;
-  if (loadDetailOverviewKey$.get() === key) return;
 
-  loadDetailOverviewKey$.set(key);
+  const key = `load-view-${action.viewName}-${action.id}-overview`;
+
+  if (loadDetailOverviewKey$.get() === key) {
+    return;
+  }
+
+  if (!action.model) {
+    loadDetailOverviewKey$.set(key);
+    loadDetailSubViewKey$.set('');
+  }
+
   loadViewKey$.set('');
   store$.state.set('pending');
 

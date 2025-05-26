@@ -72,6 +72,8 @@ const ViewMainComponent = observer(() => {
   const viewKey = params.view + (params.id ?? '') + (params.model ?? '');
   if (params.model && viewKey !== prevViewRef.current) {
     dispatchLoadDetailSubView({ params, cause: '', context });
+    dispatchLoadDetailOverviewView({ params, cause: '', context });
+
     prevViewRef.current = viewKey;
   }
   if (params.id && viewKey !== prevViewRef.current) {
