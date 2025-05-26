@@ -1,4 +1,4 @@
-import { FormField, RenderActivityList } from '@apps-next/react';
+import { FormField, RenderActivityList, store$ } from '@apps-next/react';
 import { observer } from '@legendapp/state/react';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
@@ -35,6 +35,12 @@ const DetaiViewPage = observer(() => {
   viewName = viewName as string;
 
   const { viewData } = getViewData(viewName);
+
+  if (
+    viewData.viewConfig.viewName !==
+    store$.detail.viewConfigManager?.viewConfig.viewName.get()
+  )
+    return null;
 
   if (viewData.overView) {
     return <viewData.overView />;
