@@ -30,7 +30,7 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      console.log('MUTATE!!!');
+      console.debug('onMutate: ', vars.mutation);
       store$.state.set('invalidated');
 
       store$.mutating.mutation.set(vars.mutation);
@@ -40,20 +40,15 @@ export const useMutation = () => {
       const queryClient = store$.api.queryClient.get();
 
       if (!viewMutation) {
-        console.debug('HANDLE Mutation: Reset Queries...');
-
         queryClient?.cancelQueries?.();
         try {
           (queryClient as any)?.clear?.();
-          console.debug('Cleared cache...');
         } catch (error) {
           console.debug('Error in clear: ', error);
         }
 
         try {
-          console.debug('Mutate and Reset Queries...');
           (queryClient as any)?.removeQueries?.({});
-          console.debug('Removed queries...');
         } catch (error) {
           console.debug('Error in removeQueries: ', error);
         }
@@ -62,7 +57,6 @@ export const useMutation = () => {
 
         try {
           cache?.clear();
-          console.debug('Cleared cache2...');
         } catch (error) {
           console.debug('Error in clear: ', error);
         }

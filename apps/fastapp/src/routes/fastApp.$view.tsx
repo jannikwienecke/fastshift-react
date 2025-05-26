@@ -27,14 +27,15 @@ export const Route = createFileRoute('/fastApp/$view')({
 
     if (id && view && model) {
       if (props.cause === 'preload') {
-        dispatchLoadDetailSubView(props, true);
-        dispatchLoadDetailOverviewView(props, true);
+        // dispatchLoadDetailSubView(props, true);
+        // dispatchLoadDetailOverviewView(props, true);
       } else {
         await dispatchLoadDetailSubView(props, true);
         await dispatchLoadDetailOverviewView(props, true);
       }
 
       loading$.set(false);
+      return;
     }
 
     if (id && view && !model) {
@@ -94,7 +95,10 @@ const ViewMainComponent = observer(() => {
   const { viewData } = getView({ params });
   const ViewComponent = viewData?.main;
 
-  if (!viewData || loading$.get()) return null;
+  if (!viewData || loading$.get()) {
+    return null;
+  }
+
   return (
     <>
       {ViewComponent ? <ViewComponent /> : <DefaultViewTemplate />}

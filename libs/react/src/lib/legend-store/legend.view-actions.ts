@@ -74,6 +74,7 @@ const handleLoadDetailSubView = (action: Action) => {
   const key = `load-view-${action.parentViewName}-${action.id}-model-${action.viewName}`;
 
   if (loadDetailSubViewKey$.get() === key) return;
+
   loadDetailSubViewKey$.set(key);
   store$.state.set('pending');
 

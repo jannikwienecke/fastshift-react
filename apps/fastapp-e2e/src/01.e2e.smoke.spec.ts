@@ -49,7 +49,10 @@ test.describe('Smoke Test', () => {
 
     await taskPage.sidebar.getByText(/this week/i).click();
 
+    await waitFor(page, 200);
+
     await (await helper.list.getListItem(1)).hasText('develop frontend');
+
     await helper.list.hasListSizeOf(3);
 
     await taskPage.sidebar
@@ -182,9 +185,15 @@ test.describe('Smoke Test', () => {
       .getByPlaceholder(/change tasks/i)
       .fill('organize desk space');
 
+    await waitFor(page, 50);
+
     await taskPage.comboboxPopover.getByText(/organize desk space/i).click();
 
+    await waitFor(page, 50);
+
     await listItem.click({ force: true });
+
+    await waitFor(page, 50);
 
     await expect(listItem.getByText(/4/i)).toBeVisible();
     await listItem.getByText(/4/i).click();
