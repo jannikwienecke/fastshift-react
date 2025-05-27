@@ -9,8 +9,21 @@ export const addKeyEvents = (store$: Observable<LegendStore>) => {
       store$.datePickerDialogClose();
     };
 
+    const handleCommandF = () => {
+      console.debug('Command + F pressed, toggling search input...');
+      store$.pageHeader.showSearchInput.set(
+        !store$.pageHeader.showSearchInput.get()
+      );
+    };
+
     if (event.key === 'Escape') {
       handleEscape();
+    }
+
+    // if we click command and f
+    if ((event.metaKey || event.ctrlKey) && event.key === 'f') {
+      event.preventDefault(); // Prevent default browser search
+      handleCommandF();
     }
   };
 
