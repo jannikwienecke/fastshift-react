@@ -114,6 +114,9 @@ export const en = {
     saveTo: 'Save to',
     more: 'More',
     overview: 'Overview',
+    to: 'to',
+    from: 'from',
+    this: 'this',
   },
 
   datePicker: {

@@ -94,6 +94,9 @@ export const de = {
     more: 'Mehr',
     overview: 'Übersicht',
     saveTo: 'Speichern in',
+    to: 'zu',
+    from: 'von',
+    this: 'das',
   },
 
   userViewForm: {

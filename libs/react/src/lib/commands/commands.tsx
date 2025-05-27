@@ -6,7 +6,6 @@ import {
   DELETE_OPTION,
   FieldConfig,
   getFieldLabel,
-  getViewByName,
   getViewLabel,
   makeRowFromValue,
   NONE_OPTION,
@@ -16,21 +15,15 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import { Layers3Icon, PlusIcon } from 'lucide-react';
-import {
-  comboboxStore$,
-  getView,
-  parentView$,
-  parentViewName$,
-  store$,
-} from '../legend-store';
+import { comboboxStore$, parentView$, store$ } from '../legend-store';
 import { xSelect } from '../legend-store/legend.select-state';
-import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
-import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
 import {
   getIsManyRelationView,
   getViewConfigManager,
   isDetailOverview,
 } from '../legend-store/legend.utils';
+import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
+import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
 
 const getViewName = () => store$.viewConfigManager.getViewName();
 
