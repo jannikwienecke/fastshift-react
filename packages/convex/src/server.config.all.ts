@@ -29,6 +29,10 @@ export const tasksConfig = createViewConfig(
     },
 
     fields: {
+      projectId: {
+        useAsSidebarFilter: true,
+      },
+
       dueDate: {
         isDateField: true,
         defaultValue: () => {
@@ -70,6 +74,7 @@ export const tasksConfig = createViewConfig(
       },
       tags: {
         showInProperties: true,
+        useAsSidebarFilter: true,
       },
     },
 
@@ -134,7 +139,7 @@ export const tasksConfig = createViewConfig(
   config.config
 );
 
-export const projectsConfig = createViewConfig(
+export const projectsConfig = createViewConfig<'projects'>(
   'projects',
   {
     viewName: 'projects',
@@ -143,7 +148,14 @@ export const projectsConfig = createViewConfig(
     displayField: {
       field: 'label',
     },
+
     fields: {
+      categoryId: {
+        useAsSidebarFilter: true,
+      },
+      ownerId: {
+        useAsSidebarFilter: true,
+      },
       dueDate: {
         isDateField: true,
         dateFormatter: (date) =>

@@ -45,7 +45,7 @@ export const listFilter = ({ mainPage }: PartialFixtures) => {
     await pressEscape(mainPage.page);
 
     if (notVisibleName) {
-      await expect(mainPage.page.getByText(notVisibleName)).toBeHidden();
+      await expect(mainPage.list.getByText(notVisibleName)).toBeHidden();
     }
   };
 

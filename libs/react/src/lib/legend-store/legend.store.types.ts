@@ -469,6 +469,14 @@ export type LegendStore = {
     showSearchInput: boolean;
   };
 
+  rightSidebar: {
+    open: boolean;
+    filter?: {
+      tableName?: string | null;
+      id?: string | null;
+    };
+  };
+
   viewQuery: string;
   debouncedViewQuery: string;
 

@@ -182,6 +182,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const localMode = localModeEnabled$.get();
 
+  const righSidebarFilter = store$.rightSidebar.filter.get();
+
   const queryPropsMerged = React.useMemo(() => {
     return {
       ...queryProps,
@@ -214,6 +216,9 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       // disabled: localMode ? true : false,
       parentViewName,
       parentId,
+      tempFilter: righSidebarFilter
+        ? `${righSidebarFilter?.tableName}:${righSidebarFilter?.id}`
+        : undefined,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -231,6 +236,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     cursor,
     parentViewName,
     parentId,
+    righSidebarFilter,
   ]);
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =

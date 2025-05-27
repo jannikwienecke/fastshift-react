@@ -81,6 +81,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'pageHeader'
   | 'viewQuery'
   | 'debouncedViewQuery'
+  | 'rightSidebar'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
@@ -112,6 +113,11 @@ export const DEFAULT_LEGEND_STORE: Pick<
     // isFetched: false,
     isDone: false,
   },
+
+  rightSidebar: {
+    open: false,
+  },
+
   globalQueryDebounced: '',
   combobox: {
     values: null,

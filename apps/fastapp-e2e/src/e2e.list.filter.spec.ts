@@ -39,8 +39,7 @@ test.describe('List Filter Tests', () => {
     await filterByWithOptions(
       props,
       CON.filter.options.project,
-      CON.project.values.fitnessPlan,
-      CON.project.values.websiteRedesign
+      CON.project.values.fitnessPlan
     );
     await removeFilter(CON.filter.options.project + 's');
 

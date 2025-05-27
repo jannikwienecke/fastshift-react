@@ -163,7 +163,9 @@ const _schema = defineSchema({
     .searchIndex('label', {
       searchField: 'label',
     })
-    .index('deleted', ['deleted_']),
+    .index('deleted', ['deleted_'])
+    .index('categoryId', ['categoryId'])
+    .index('ownerId', ['ownerId']),
 
   categories: defineTable({
     ...tableMetaFields,

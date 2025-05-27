@@ -268,14 +268,26 @@ export const parseDisplayOptionsStringForServer = (
   return options;
 };
 
-export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] | null {
+export function arrayIntersection(
+  ...arrays: (ID[] | null | ID[][])[]
+): ID[] | null {
   if (arrays.filter((a) => a != null).length === 0) return null;
-  // if (arrays.length)
 
-  const allIds = [...new Set(arrays.filter((a) => a != null).flat())];
+  const allIds = [...new Set(arrays.filter((a) => a != null).flat())].flat();
 
-  const result = allIds.filter((value) => {
-    return arrays
+  const arrays_ = [] as ID[][];
+  arrays.forEach((array) => {
+    if (Array.isArray(array?.[0])) {
+      for (const subArray of array) {
+        arrays_.push(subArray as ID[]);
+      }
+    } else {
+      arrays_.push(array as ID[]);
+    }
+  });
+
+  const result = [...new Set(allIds)].filter((value) => {
+    return arrays_
       .filter((a) => a != null)
       .every((array) => array?.includes(value));
   });

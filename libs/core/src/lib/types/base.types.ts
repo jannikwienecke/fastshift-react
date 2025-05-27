@@ -60,6 +60,7 @@ export type FieldConfigOptions<
   showInProperties?: boolean;
   validator?: () => any;
   validationErrorMessage?: (t: any) => string;
+  useAsSidebarFilter?: boolean;
 };
 
 export type FieldConfig<TName = string> = {

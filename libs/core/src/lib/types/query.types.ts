@@ -14,6 +14,7 @@ export type QueryProps = {
   query?: string;
   viewId: string | null;
   filters?: string;
+  tempFilter?: string | undefined;
   displayOptions?: string;
   paginateOptions?: {
     cursor: ContinueCursor;
@@ -40,6 +41,7 @@ export type QueryDto = {
   parentViewName?: string | null;
   parentId?: string | null;
   filters?: string;
+  tempFilter?: string | undefined;
   displayOptions?: string;
   onlyRelationalData?: boolean;
 } & Omit<QueryProps, 'viewConfigManager'>;

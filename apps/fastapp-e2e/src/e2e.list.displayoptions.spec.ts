@@ -91,7 +91,7 @@ test.describe('List Display Options', () => {
 
     await groupByField(taskPage, /project/i);
 
-    await expect(page.getByText(/Website redesign/i)).toHaveCount(4);
+    await expect(taskPage.list.getByText(/Website redesign/i)).toHaveCount(3);
 
     await expect(firstListItem.getByText(/design mockups/i)).toBeVisible();
 

@@ -6,6 +6,7 @@ import {
 import {
   Layers3Icon,
   MoreHorizontal,
+  PanelRightIcon,
   SearchIcon,
   StarIcon,
 } from 'lucide-react';
@@ -118,7 +119,7 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
             onBlur={props.query.onBlur}
           />
         ) : (
-          <>
+          <div className="flex flex-row gap-0 items-center">
             <Button
               variant={'ghost'}
               size="icon"
@@ -126,7 +127,15 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
             >
               <SearchIcon className="h-4 w-4" />
             </Button>
-          </>
+
+            <Button
+              variant={'ghost'}
+              size="icon"
+              onClick={props.query?.onToggleRightSidebar}
+            >
+              <PanelRightIcon className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </div>
     </div>

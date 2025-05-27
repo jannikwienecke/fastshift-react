@@ -472,4 +472,8 @@ export const addEffects = (store$: Observable<LegendStore>) => {
       store$.debouncedViewQuery.set(query);
     }, 200);
   });
+
+  store$.filter.filters.onChange((changes) => {
+    store$.rightSidebar.filter.set(undefined);
+  });
 };

@@ -206,7 +206,10 @@ export function List<TItem extends ListItem = ListItem>({
 
   return (
     <ListProvider value={{ onSelect, selected, onContextMenu }}>
-      <div className="flex flex-col w-full border-collapse overflow-scroll grow ">
+      <div
+        data-testid="list"
+        className="flex flex-col w-full border-collapse overflow-scroll grow "
+      >
         {children}
       </div>
     </ListProvider>

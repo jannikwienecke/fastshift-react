@@ -81,6 +81,9 @@ export const derivedPageHeaderProps$ = observable(() => {
           store$.pageHeader.showSearchInput.set(false);
         }
       },
+      onToggleRightSidebar: () => {
+        store$.rightSidebar.open.set((prev) => !prev);
+      },
       showInput: store$.pageHeader.showSearchInput.get(),
       query: store$.viewQuery.get(),
     },
