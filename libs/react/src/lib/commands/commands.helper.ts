@@ -113,8 +113,6 @@ const filterCommandGroups = (groups: CommandbarProps['groups']) => {
     })
     .filter((g) => g.items.length > 0) satisfies CommandbarProps['groups'];
 
-  // sort the groups based on the score
-
   const options = {
     keys: ['label'],
     threshold: 0.3,
@@ -126,6 +124,9 @@ const filterCommandGroups = (groups: CommandbarProps['groups']) => {
 
   filteredGroups.sort((a, b) => {
     if (!query) return 0;
+
+    if (a.header === '') return -1;
+    if (b.header === '') return 1;
 
     const aHasCurrentTableName = a.items.some(
       (item) => item.tablename === currentTableName

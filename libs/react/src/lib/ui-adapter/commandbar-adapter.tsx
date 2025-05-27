@@ -9,6 +9,7 @@ import {
   NONE_OPTION,
   RecordType,
   Row,
+  ViewConfigType,
 } from '@apps-next/core';
 
 import { Checkbox, cn } from '@apps-next/ui';
@@ -18,7 +19,7 @@ import {
   PencilLineIcon,
   PlusIcon,
 } from 'lucide-react';
-import { comboboxStore$, store$ } from '../legend-store';
+import { comboboxStore$, getView, store$ } from '../legend-store';
 import {
   commandbarProps$,
   derivedCommandbarState$,
@@ -43,14 +44,21 @@ export const makeCommandbarProps = <T extends RecordType>(
     ...state,
     renderItem(item, active, index, activeRow) {
       const viewField = store$.commandbar.selectedViewField.get();
+      let viewOfField: ViewConfigType | undefined;
+      try {
+        viewOfField = getView(item.id.toString());
+      } catch (e) {
+        //
+      }
 
       if (!activeRow) return null;
 
       if (viewField && viewField.type === 'String') {
-        const IconOf = getComponent({
-          fieldName: viewField?.name,
-          componentType: 'icon',
-        });
+        const IconOf =
+          getComponent({
+            fieldName: viewField?.name,
+            componentType: 'icon',
+          }) || viewOfField?.icon;
 
         return (
           <div className="flex flex-row gap-4 items-center">
@@ -213,10 +221,11 @@ export const makeCommandbarProps = <T extends RecordType>(
         });
 
         if (!Component) {
-          const IconOf = getComponent({
-            fieldName: field?.name,
-            componentType: 'icon',
-          });
+          const IconOf =
+            getComponent({
+              fieldName: field?.name,
+              componentType: 'icon',
+            }) ?? viewOfField?.icon;
 
           const label = item.label ?? '';
 

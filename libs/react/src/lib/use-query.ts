@@ -1,6 +1,5 @@
 import {
   DEFAULT_FETCH_LIMIT_QUERY,
-  getViewByName,
   makeQueryKey,
   QueryDto,
   QueryProps,
@@ -21,7 +20,6 @@ import {
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
-import { derviedDetailPage$ } from './legend-store/legend.detailpage.derived';
 
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const viewName = args.viewName ?? args.viewConfig?.viewName ?? '';
@@ -94,32 +92,24 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
 ): QueryReturnOrUndefined<QueryReturnType[0]> => {
   const prisma = useApi();
 
-  const { registeredViews, viewConfigManager } = useView();
+  const { registeredViews } = useView();
 
-  const activeTabField = derviedDetailPage$.tabs.activeTabField.get();
-  const useTabsForComboboxQuery = store$.detail.useTabsForComboboxQuery.get();
-  const activeTabView = useTabsForComboboxQuery
-    ? getViewByName(store$.views.get(), activeTabField?.field?.name ?? '')
-    : null;
+  const viewConfig = store$.viewConfigManager?.viewConfig.get() ?? null;
 
-  const view = store$.commandform.view.get() ?? activeTabView;
+  const parsedViewSettings = getParsedViewSettings();
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
     useStableQuery(prisma, {
       registeredViews: queryProps?.registeredViews ?? registeredViews,
       query: '',
+      filters: parsedViewSettings?.filters,
+      // filters: '',
+      displayOptions: parsedViewSettings?.displayOptions,
+      // displayOptions: '',
       modelConfig: undefined,
-      viewConfig: getViewByName(
-        registeredViews,
-        view?.viewName ?? viewConfigManager?.viewConfig?.viewName ?? ''
-      ),
-
-      displayOptions: '',
+      viewConfig: viewConfig,
       paginateOptions: undefined,
-      disabled:
-        view?.viewName && view.viewName !== viewConfigManager?.getViewName()
-          ? false
-          : true,
+      disabled: viewConfig ? false : true,
       viewId: null,
       onlyRelationalData: true,
       parentViewName: null,

@@ -30,7 +30,7 @@ const uiViewConfig = makeViewFieldsConfig<HistoryViewDataType>('history', {
     entityId: {
       component: {
         comboboxListValue: ({ data }) => {
-          return <>hier</>;
+          return <></>;
         },
       },
     },

@@ -1,7 +1,7 @@
 import { FieldConfig } from './types';
 
-export const DEFAULT_FETCH_LIMIT_QUERY = 50;
-export const DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY = 10;
+export const DEFAULT_FETCH_LIMIT_QUERY = 30;
+export const DEFAULT_FETCH_LIMIT_RELATIONAL_QUERY = 12;
 export const DEFAULT_LOCAL_MODE_LIMIT = 500;
 
 export const NONE_OPTION = 'none-option';

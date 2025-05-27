@@ -55,6 +55,7 @@ export type FieldConfigOptions<
   isDisplayField?: true;
   richEditor?: boolean;
   isDateField?: boolean;
+  dateFormatter?: (date: Date) => string;
   showCheckboxInList?: boolean;
   showInProperties?: boolean;
   validator?: () => any;

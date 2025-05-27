@@ -7,13 +7,14 @@ import {
   preloadQuery,
 } from '@apps-next/convex-adapter-app';
 
-import { logger, UserViewData } from '@apps-next/core';
+import { logger, QueryReturnOrUndefined, UserViewData } from '@apps-next/core';
 import './i18n';
 import { convex, getUserViews, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
 
 import './views';
 import './shared/hooks/app.persist';
+import { store$ } from '@apps-next/react';
 
 // syncObservable(store$, {
 //   persist: {
@@ -44,11 +45,11 @@ const router = createRouter({
       if (parentViewName) {
         userViewData = null;
       } else {
-        const userViews = getUserViews();
+        const userViews = store$.userViews.get() ?? getUserViews();
         userViewData = userViews.find((u) => u.name === viewName);
       }
 
-      return await queryClient.ensureQueryData(
+      const res = (await queryClient.ensureQueryData(
         preloadQuery(
           api.query.viewLoader,
           viewConfig,
@@ -57,7 +58,11 @@ const router = createRouter({
           parentViewName ?? null,
           parentId ?? null
         )
-      );
+      )) as QueryReturnOrUndefined;
+
+      if (!res) throw new Error('NOT VALID PRELOAD QUERY');
+
+      return res;
     },
   },
 });

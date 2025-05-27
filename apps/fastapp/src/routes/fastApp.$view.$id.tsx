@@ -5,10 +5,20 @@ import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
+import { getUserViewsQuery, queryClient } from '../query-client';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   loader: async (props) => {
     await props.parentMatchPromise;
+    await queryClient.ensureQueryData(getUserViewsQuery());
+    const { viewData, userViewData, viewName } = getView(props);
+    await props.context.preloadQuery(
+      viewData.viewConfig,
+      userViewData?.name ?? viewName,
+      props.params.id,
+      null,
+      null
+    );
   },
   component: () => <DetaiViewPage />,
 });
@@ -21,13 +31,15 @@ const DetaiViewPage = observer(() => {
 
   if (!viewData.viewConfig) {
     _log.info(`View ${viewName} not found, redirecting to /fastApp`);
-    return null;
+    return <div aria-label="no view config"></div>;
   }
 
   const row = store$.detail.row.get() as Row | undefined;
   const viewConfigManager = store$.detail.viewConfigManager.get();
 
-  if (!row || !viewConfigManager) return <>NULL</>;
+  if (!row || !viewConfigManager) {
+    return <div aria-label="no data or viewconfigmanager"></div>;
+  }
 
   if (viewData.detail) {
     return <viewData.detail />;

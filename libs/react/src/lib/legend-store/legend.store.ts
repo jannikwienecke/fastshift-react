@@ -108,6 +108,7 @@ import {
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
   state: 'pending',
+  mutating: undefined,
 
   handleIncomingData: (...props) => handleIncomingData(store$)(...props),
   handleIncomingRelationalData: (...props) =>

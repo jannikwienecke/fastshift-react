@@ -232,10 +232,6 @@ export const detailTabsHelper = () => {
     if (!row?.raw) return null;
     const errors = viewConfigManager.validateRecord(row?.raw);
 
-    if (errors) {
-      console.debug('Form State Errors: ', errors);
-    }
-
     return {
       isReady: !errors,
       isFieldReady: (field: FieldConfig) => {

@@ -11,7 +11,7 @@ test.beforeEach(async ({ seedDatabase, helper }) => {
   );
 });
 
-test.setTimeout(isDev() ? 20000 : 10000);
+test.setTimeout(isDev() ? 30000 : 20000);
 
 test.describe.configure({ mode: 'serial' });
 

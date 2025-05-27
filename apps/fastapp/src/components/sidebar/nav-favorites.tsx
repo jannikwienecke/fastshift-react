@@ -1,4 +1,3 @@
-import { api } from '@apps-next/convex';
 import { getView, store$ } from '@apps-next/react';
 import {
   Collapsible,
@@ -17,9 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@apps-next/ui';
-import { convexQuery } from '@convex-dev/react-query';
 import { observer } from '@legendapp/state/react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import {
   ArrowUpRight,
@@ -33,10 +30,9 @@ import {
 
 export const NavFavorites = observer(() => {
   const { isMobile } = useSidebar();
-  const { data: allViews } = useQuery(convexQuery(api.query.getUserViews, {}));
-  const starredViews = allViews?.filter(
-    (view) => view.starred && !view._deleted
-  );
+  const starredViews = store$.userViews
+    .get()
+    ?.filter((view) => view.starred && !view._deleted);
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">

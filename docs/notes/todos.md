@@ -166,13 +166,22 @@ Small Features to add
 
 ### Small Feature:
 
+- [ ] if i query the commandbar, and the edit view fields are in the list, sort them to the top
 - [ ] color picker and color indicator for fields with type "color" or something like this
 - [ ] when created a new task -> click on notifiaction -> open task
 - [ ] open after creation, in config
 - [ ] add tipTap
 - [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
+- [ ] chat in activity
+- [ ] chat activity (optimistic update)
 
 ### Add tests
 
 - [ ] in tasks detail, todos list. Open commandbar -> shows wrong options (Rename Task. Should be Name of todo)
 - [ ] when we create a tag inside a task detail view, we need to directly add this tag to this task
+- [x] history in detail view (activity list)
+- [ ] in combobox: deselect tag, select, deselect, select. Not Updating in ui anymore
+- [x] extend smoke test and make sure it runs first
+- [x] be on owner page -> navigate to history page
+- [x] be on detail page of tasks -> navigate to list page of tasks
+- [x] be on tasks all -> navigate to tasks urgent

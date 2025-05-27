@@ -10,6 +10,7 @@ import {
 } from '@apps-next/core';
 import { getUserViews } from '../../query-client';
 import { getViewData } from '../../application-store/app.store.utils';
+import { store$ } from '@apps-next/react';
 
 export const getViewParms = (params: {
   id?: string;
@@ -25,7 +26,7 @@ export const getViewParms = (params: {
     };
   }
 
-  const userViews = getUserViews();
+  const userViews = store$.userViews.get() ?? getUserViews();
 
   const userViewData = userViews?.find((v) => v.slug === params.view);
 

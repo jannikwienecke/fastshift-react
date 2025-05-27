@@ -40,18 +40,20 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   }, [detailQueryReturn]);
 
   React.useEffect(() => {
-    if (!queryReturn.data || queryReturn.isPending) return;
+    if (!queryReturn.data || queryReturn.isPending) {
+      if (store$.state.get() === 'invalidated') {
+        setTimeout(() => {
+          store$.state.set('mutating');
+        }, 10);
+      }
+      return;
+    }
 
     store$.handleIncomingData(queryReturnRef.current);
   }, [queryReturn.data, queryReturn.isPending]);
 
   React.useEffect(() => {
     if (!relationalQueryReturn.relationalData) return;
-    if (
-      !store$.commandform.view.get() &&
-      !store$.detail.useTabsForComboboxQuery.get()
-    )
-      return;
 
     store$.handleIncomingRelationalData(relationalQueryReturnRef.current);
   }, [relationalQueryReturn.relationalData]);

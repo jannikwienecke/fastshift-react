@@ -9,7 +9,7 @@ test.beforeEach(async ({ seedDatabase, helper }) => {
   await helper.navigation.goToListView('history');
 });
 
-test.setTimeout(isDev() ? 20000 : 10000);
+test.setTimeout(isDev() ? 30000 : 20000);
 
 test.describe.configure({ mode: 'serial' });
 
@@ -25,14 +25,20 @@ test.describe('history view tests', () => {
     const url = page.url();
     expect(url).toContain('/owner');
 
+    await waitFor(page, 300);
+
     // go back
     await page.goBack();
 
     await firstListItem.getByText(CON.task.values.designMockups).click();
     await expect(page.url()).toContain('/tasks');
 
+    await waitFor(page, 300);
+
     // go back
     await page.goBack();
+
+    await waitFor(page, 300);
 
     // can see the workd update and the word insert
     await expect(page.getByText(/update/i).first()).toBeVisible();

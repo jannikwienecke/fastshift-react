@@ -143,7 +143,17 @@ export const projectsConfig = createViewConfig(
     displayField: {
       field: 'label',
     },
-    fields: { dueDate: { isDateField: true } },
+    fields: {
+      dueDate: {
+        isDateField: true,
+        dateFormatter: (date) =>
+          date.toLocaleDateString('de-DE', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }),
+      },
+    },
     query: {
       showDeleted: false,
     },

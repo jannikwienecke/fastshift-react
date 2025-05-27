@@ -335,6 +335,26 @@ export const makeDayMonthStringWithTime = (date: Date | undefined) => {
   return formatter.format(date);
 };
 
+export const toLocaleString = (
+  field: FieldConfig,
+  value?: string | number | null
+) => {
+  if (!value) return '';
+  if (!field.isDateField) throw new Error('Field is not a date field');
+  const date = new Date(+value);
+
+  return field.dateFormatter
+    ? field.dateFormatter(date)
+    : date.toLocaleDateString('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+};
+
 export const renderModelName = (
   modelName: string,
   t: (key: any, options?: Record<string, unknown>) => string,

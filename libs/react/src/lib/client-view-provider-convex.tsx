@@ -46,5 +46,5 @@ const Content = observer((props: { children: React.ReactNode }) => {
     });
   }, [makeQueryOptions, queryClient, runMutate, runMutateAsync]);
 
-  return <> {props.children}</>;
+  return <>{props.children}</>;
 });

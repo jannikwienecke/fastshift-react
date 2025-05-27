@@ -30,7 +30,39 @@ export const useMutation = () => {
     },
 
     onMutate: async (vars) => {
-      store$.state.set('mutating');
+      console.debug('onMutate: ', vars.mutation);
+      store$.state.set('invalidated');
+
+      store$.mutating.mutation.set(vars.mutation);
+
+      const viewMutation = vars.mutation.type === 'NEW_USER_VIEW_MUTATION';
+
+      const queryClient = store$.api.queryClient.get();
+
+      if (!viewMutation) {
+        setTimeout(() => {
+          queryClient?.cancelQueries?.();
+          try {
+            (queryClient as any)?.clear?.();
+          } catch (error) {
+            console.debug('Error in clear: ', error);
+          }
+
+          try {
+            (queryClient as any)?.removeQueries?.({});
+          } catch (error) {
+            console.debug('Error in removeQueries: ', error);
+          }
+
+          const cache = queryClient?.getQueryCache?.();
+
+          try {
+            cache?.clear();
+          } catch (error) {
+            console.debug('Error in clear: ', error);
+          }
+        }, 50);
+      }
 
       if (
         vars.mutation.type !== 'UPDATE_RECORD' &&

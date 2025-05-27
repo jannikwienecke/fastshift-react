@@ -287,11 +287,9 @@ const DetailTabs = (
               {activeTabPrimitiveFields.map((field) => {
                 if (field.field?.isDisplayField) {
                   return (
-                    <>
-                      <div key={field.field?.name + 'primitive'}>
-                        <props.FormField {...props} field={field} />
-                      </div>
-                    </>
+                    <div key={field.field?.name + 'primitive'}>
+                      <props.FormField {...props} field={field} />
+                    </div>
                   );
                 }
 

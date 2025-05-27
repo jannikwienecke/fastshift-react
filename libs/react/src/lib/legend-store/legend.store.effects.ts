@@ -336,6 +336,12 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     }, 10);
   });
 
+  store$.mutating.mutation.onChange((changes) => {
+    setTimeout(() => {
+      store$.mutating.set(undefined);
+    }, 10);
+  });
+
   store$.dataModel.rows.forEach((row) => {
     row.updated.onChange((changes) => {
       if (changes.isFromSync) return;

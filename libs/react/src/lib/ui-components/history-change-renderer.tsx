@@ -1,5 +1,9 @@
-import { HistoryType } from '@apps-next/core';
-import { useTranslation } from 'react-i18next';
+import {
+  HistoryType,
+  t,
+  toLocaleString,
+  useTranslation,
+} from '@apps-next/core';
 import { store$ } from '../legend-store';
 
 type ChangeTypeRenderer = (
@@ -38,12 +42,21 @@ const ChangeCreated: ChangeTypeRenderer = (history: HistoryType) => {
 };
 
 const ChangeField: ChangeTypeRenderer = (history: HistoryType) => {
+  const field = store$.detail.viewConfigManager.getFieldBy(
+    history.changed.fieldName
+  );
+
   const renderActivityItem = () => {
+    let value = history.changed.newValue?.toString() ?? '';
+    if (field.isDateField && history.changed.newValue) {
+      value = toLocaleString(field, value);
+    }
+
     return (
       <div className="flex flex-row gap-1">
         <RenderFieldName name={history.changed.fieldName} />
-        <div>to</div>
-        <RenderLabel>{history.changed.newValue?.toString() ?? ''}</RenderLabel>
+        <div>{t('common.to')}</div>
+        <RenderLabel>{value}</RenderLabel>
       </div>
     );
   };
@@ -126,7 +139,7 @@ const ChangeAddedTo: ChangeTypeRenderer = (history: HistoryType) => {
     return (
       <div className="flex flex-row gap-1">
         <RenderTableName name={history.tableName} />
-        <div>to</div>
+        <div>{t('common.to')}</div>
         <RenderFieldName name={history.changed.fieldName} />
         <RenderLabel onClick={() => handleClickOnLabel(history)}>
           {history.changed.label?.toString() ?? ''}
@@ -145,7 +158,7 @@ const ChangeRemovedFrom: ChangeTypeRenderer = (history: HistoryType) => {
     return (
       <div className="flex flex-row gap-1">
         <RenderTableName name={history.tableName} />
-        <div>from</div>
+        <div>{t('common.from')}</div>
         <RenderFieldName name={history.changed.fieldName} />
         <RenderLabel onClick={() => handleClickOnLabel(history)}>
           {history.changed.label?.toString() ?? ''}
@@ -163,10 +176,11 @@ const RenderFieldName = ({
 }: {
   name: HistoryType['changed']['fieldName'];
 }) => {
-  const { t } = useTranslation();
+  console.log('RenderFieldName', name);
+
   return (
     <div className="border-[.5px] px-2 rounded-sm border-foreground/20">
-      {t(`${name}.one` as any).toLowerCase()}
+      {t(`${name}.one` as any)}
     </div>
   );
 };
@@ -214,8 +228,8 @@ const RenderTableName = (props: { name: HistoryType['tableName'] }) => {
   const { t } = useTranslation();
   return (
     <div className="flex flex-row gap-1">
-      <div>this</div>
-      <div>{t(`${props.name}.one`)}</div>
+      <div>{t('common.this')}</div>
+      <div>{t(`${props.name}.one` as any)}</div>
     </div>
   );
 };
