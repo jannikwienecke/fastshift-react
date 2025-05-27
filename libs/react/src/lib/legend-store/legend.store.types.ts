@@ -465,6 +465,13 @@ export type LegendStore = {
     };
   };
 
+  pageHeader: {
+    showSearchInput: boolean;
+  };
+
+  viewQuery: string;
+  debouncedViewQuery: string;
+
   detailpageChangeInput: (
     field: CommandformItem,
     value: string | boolean,

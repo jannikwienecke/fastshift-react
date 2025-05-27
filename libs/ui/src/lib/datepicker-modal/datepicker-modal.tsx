@@ -22,21 +22,6 @@ function Default({ open, ...props }: DatePickerDialogProps) {
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
-  const onCloseRef = React.useRef(props.onClose);
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-        onCloseRef.current?.();
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [open]);
-
   const dateToShow = props.selectedDate ?? props.defaultDate ?? tomorrow;
 
   return (

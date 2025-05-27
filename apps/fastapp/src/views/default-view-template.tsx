@@ -79,7 +79,7 @@ export const DefaultViewTemplate = observer(
             ) : null}
 
             <div className="flex flex-row w-full justify-between border-gray-100 border-t-[1px] border-b-[1px] text-sm py-2 items-center">
-              <div className="pl-8">
+              <div className="pl-8 w-full">
                 <RenderPageHeader />
               </div>
             </div>

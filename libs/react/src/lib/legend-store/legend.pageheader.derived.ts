@@ -69,6 +69,16 @@ export const derivedPageHeaderProps$ = observable(() => {
   }
 
   return {
+    query: {
+      onChange: (query) => {
+        store$.viewQuery.set(query);
+      },
+      toggleShowInput: () => {
+        store$.pageHeader.showSearchInput.set((prev) => !prev);
+      },
+      showInput: store$.pageHeader.showSearchInput.get(),
+      query: store$.viewQuery.get(),
+    },
     viewName:
       store$.userViewData.name.get() ??
       currentView$.viewName.get().firstUpper() ??

@@ -8,11 +8,11 @@ import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { querySubListViewOptions$ } from './legend.queryProps.derived';
 import { selectState$, xSelect } from './legend.select-state';
+import { parentView$ } from './legend.shared.derived';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
 import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
 import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
-import { parentView$ } from './legend.shared.derived';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -459,5 +459,17 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     if (!changes.value) {
       store$.detail.useTabsForComboboxQuery.set(false);
     }
+  });
+
+  // handle debounced query changes
+  let timeout: NodeJS.Timeout;
+  store$.viewQuery.onChange((changes) => {
+    const query = changes.value;
+
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      store$.debouncedViewQuery.set(query);
+    }, 200);
   });
 };

@@ -1,29 +1,28 @@
-import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import {
+  getFieldLabel,
+  PageHeaderProps,
+  useTranslation,
+} from '@apps-next/core';
 import {
   Layers3Icon,
   MoreHorizontal,
-  PencilIcon,
+  SearchIcon,
   StarIcon,
 } from 'lucide-react';
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
+  BreadcrumbList,
   BreadcrumbPage,
-  DropdownMenuItem,
+  BreadcrumbSeparator,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-  Button,
+  Input,
 } from './components';
-import {
-  getFieldLabel,
-  PageHeaderProps,
-  t,
-  useTranslation,
-} from '@apps-next/core';
 import { cn } from './utils';
 
 const DefaultPageHeaderMain = (props: PageHeaderProps) => {
@@ -32,7 +31,7 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
   return (
     <div
       data-testid="main-page-header"
-      className="flex flex-row items-center justify-between"
+      className="flex flex-row items-center justify-between w-full"
     >
       <Breadcrumb>
         <BreadcrumbList>
@@ -107,6 +106,28 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <div data-testid="right-header-actions" className="pr-4">
+        {props.query?.showInput ? (
+          <Input
+            onChange={(e) => {
+              props.query?.onChange(e.target.value);
+            }}
+            autoFocus
+            placeholder="Find in view..."
+          />
+        ) : (
+          <>
+            <Button
+              variant={'ghost'}
+              size="icon"
+              onClick={props.query?.toggleShowInput}
+            >
+              <SearchIcon className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

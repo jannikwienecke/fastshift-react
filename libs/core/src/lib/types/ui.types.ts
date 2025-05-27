@@ -249,6 +249,14 @@ export type PageHeaderProps = {
     items: (CommandbarItem & ComboxboxItem)[];
   }[];
   onSelectOption: (item: CommandbarItem) => void;
+
+  query?: {
+    showInput: boolean;
+    query: string;
+
+    toggleShowInput: () => void;
+    onChange: (query: string) => void;
+  };
 };
 
 export type ConfirmationDialogProps = {

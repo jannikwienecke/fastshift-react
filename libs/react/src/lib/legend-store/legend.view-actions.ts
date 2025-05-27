@@ -250,6 +250,10 @@ const resetStore = () => {
   store$.userViewSettings.initialSettings.set(null);
   store$.userViewSettings.hasChanged.set(false);
 
+  store$.viewQuery.set('');
+  store$.debouncedViewQuery.set('');
+  store$.pageHeader.set({ showSearchInput: false });
+
   store$.contextMenuState.row.set(null);
 
   store$.filter.filters.set([]);

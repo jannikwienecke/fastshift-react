@@ -171,7 +171,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const viewConfigManager = store$.viewConfigManager.get();
 
-  const query = store$.globalQueryDebounced.get();
+  const query = store$.debouncedViewQuery.get();
 
   const parsedViewSettings = getParsedViewSettings();
 

@@ -78,6 +78,9 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'viewId'
   | 'userViews'
   | 'ignoreNextQueryDict'
+  | 'pageHeader'
+  | 'viewQuery'
+  | 'debouncedViewQuery'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
@@ -109,7 +112,6 @@ export const DEFAULT_LEGEND_STORE: Pick<
     // isFetched: false,
     isDone: false,
   },
-  globalQuery: '',
   globalQueryDebounced: '',
   combobox: {
     values: null,
@@ -126,6 +128,15 @@ export const DEFAULT_LEGEND_STORE: Pick<
   inputDialog: {
     valueDict: {},
   },
+
+  pageHeader: {
+    showSearchInput: false,
+  },
+
+  viewQuery: '',
+  debouncedViewQuery: '',
+  globalQuery: '',
+
   commands: [],
   displayOptions: {
     // showEmptyGroups?,
