@@ -76,6 +76,11 @@ export const derivedPageHeaderProps$ = observable(() => {
       toggleShowInput: () => {
         store$.pageHeader.showSearchInput.set((prev) => !prev);
       },
+      onBlur: () => {
+        if (store$.viewQuery.get() === '') {
+          store$.pageHeader.showSearchInput.set(false);
+        }
+      },
       showInput: store$.pageHeader.showSearchInput.get(),
       query: store$.viewQuery.get(),
     },

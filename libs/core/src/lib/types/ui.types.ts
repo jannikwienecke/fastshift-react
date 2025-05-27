@@ -254,6 +254,7 @@ export type PageHeaderProps = {
     showInput: boolean;
     query: string;
 
+    onBlur: () => void;
     toggleShowInput: () => void;
     onChange: (query: string) => void;
   };

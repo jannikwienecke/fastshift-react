@@ -21,7 +21,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
+  SearchInput,
 } from './components';
 import { cn } from './utils';
 
@@ -109,12 +109,13 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
 
       <div data-testid="right-header-actions" className="pr-4">
         {props.query?.showInput ? (
-          <Input
+          <SearchInput
             onChange={(e) => {
               props.query?.onChange(e.target.value);
             }}
             autoFocus
             placeholder="Find in view..."
+            onBlur={props.query.onBlur}
           />
         ) : (
           <>
