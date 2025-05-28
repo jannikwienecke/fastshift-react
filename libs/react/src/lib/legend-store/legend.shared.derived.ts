@@ -7,7 +7,7 @@ import {
 } from '@apps-next/core';
 
 export const currentView$ = observable(() => {
-  return store$.viewConfigManager.viewConfig.get();
+  return store$.viewConfigManager.viewConfig.get() as ViewConfigType;
 });
 
 export const detailView$ = observable(() => {

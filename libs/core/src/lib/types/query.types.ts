@@ -34,6 +34,12 @@ export type QueryProps = {
   disabled?: boolean;
 };
 
+export type RelationalFilterQueryProps = {
+  tableName: string;
+  withCount: boolean;
+  ids: string[] | undefined;
+};
+
 export type QueryDto = {
   viewConfig?: ViewConfigType;
   viewConfigManager?: BaseViewConfigManagerInterface;
@@ -101,6 +107,13 @@ export type QueryReturnDto<T extends RecordType = RecordType> = {
   isDone: boolean;
   allIds: string[];
   view?: UserViewData;
+};
+
+export type RelationalFilterQueryDto = {
+  [table: string]: {
+    record: RecordType;
+    count: number | null;
+  }[];
 };
 
 export type QueryError = {

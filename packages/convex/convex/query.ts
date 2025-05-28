@@ -9,6 +9,7 @@ import {
   BaseViewConfigManager,
   GetTableName,
   RecordType,
+  RelationalFilterQueryDto,
   UserViewData,
   _log,
   getViewByName,
@@ -64,21 +65,23 @@ export const getViewRelationalFilterOptions = server.query({
   args: {
     tableName: v.string(),
     withCount: v.boolean(),
+    ids: v.optional(v.array(v.string())),
   },
-  handler: async (
-    ctx,
-    args
-  ): Promise<{
-    [table: string]: {
-      record: RecordType;
-      count: number | null;
-    }[];
-  }> => {
-    const { tableName } = args;
+  handler: async (ctx, args): Promise<RelationalFilterQueryDto> => {
+    const { tableName, ids } = args;
 
-    // make this work based on the config
+    if (!ids || ids.length === 0) return {};
+
     // add no project to the tabs resullt list
     // add translations..
+    // parse the config in the beginning
+    // from categoriesId -> categories
+    // in query of tabs -> if no result -> add label below Like Nothing Found
+    // handle case 0 rows in list.
+    // No Labels used -> No {tableName} found
+    // use correct label above of tabs (All Tasks)
+    // handle what should happen if we have no (or 1) filter relation
+    // extract this into the convex lib
     const view = getViewByName(views, tableName);
 
     if (!view) throw new Error(`View not found for table: ${tableName}`);
@@ -155,12 +158,16 @@ export const getViewRelationalFilterOptions = server.query({
           );
         }
 
-        const recordsOf = await ctx.db
+        let recordsOf = await ctx.db
           .query(view.tableName)
           .withIndex(index.name, (q) =>
             q.eq(index.fields?.[0].toString() ?? '', record._id)
           )
           .collect();
+
+        recordsOf = recordsOf.filter((record) => {
+          return ids?.includes(record._id as string);
+        });
 
         return {
           record: {

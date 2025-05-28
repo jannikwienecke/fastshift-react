@@ -28,3 +28,4 @@ export * from './lib/user-view-form/user-view-form';
 export * from './lib/detailpage';
 export * from './lib/page-header';
 export * from './lib/emoji-picker-dialog';
+export * from './lib/right-sidebar';

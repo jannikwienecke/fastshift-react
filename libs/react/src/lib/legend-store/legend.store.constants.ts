@@ -53,6 +53,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   LegendStore,
   | 'dataModel'
   | 'dataModelBackup'
+  | 'relationalFilterData'
   | 'views'
   | 'uiViewConfig'
   | 'viewConfigManager'
@@ -86,6 +87,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   state: 'pending',
   dataModel: {} as DataModelNew,
   dataModelBackup: { rows: [] } as DataModelNew,
+  relationalFilterData: {},
   views: {} as RegisteredViews,
   userViews: [],
   viewConfigManager: {} as BaseViewConfigManagerInterface,

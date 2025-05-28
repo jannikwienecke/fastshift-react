@@ -1,15 +1,14 @@
 import {
   _log,
-  configManager,
   getViewByName,
   makeData,
   QueryReturnType,
   RelationalDataModel,
+  RelationalFilterDataModel,
   sortRows,
 } from '@apps-next/core';
 import { batch, Observable } from '@legendapp/state';
 import { ignoreNewData$ } from './legend.mutationts';
-import { xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
 
@@ -247,6 +246,8 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
 
     if (data.isPending) return;
 
+    store$.allIds.set(data.allIds ?? []);
+
     _log.debug(
       `____handleIncomingData`,
       state,
@@ -366,3 +367,24 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
       }
     }
   };
+
+export const handleIncomingRelationalFilterData: StoreFn<
+  'handleIncomingRelationalFilterData'
+> = (store$) => async (data) => {
+  const hasNoKeys = Object.keys(data).length === 0;
+  if (hasNoKeys) return;
+
+  const parsedData = Object.entries(data).reduce((acc, [tableName, data]) => {
+    return {
+      ...acc,
+      [tableName]: data.map((item) => {
+        const row = makeData(store$.views.get(), tableName)([item.record])
+          .rows?.[0];
+        row.raw = { ...row.raw, count: item.count };
+        return row;
+      }),
+    };
+  }, {} satisfies RelationalFilterDataModel);
+
+  store$.relationalFilterData.set(parsedData);
+};

@@ -6,6 +6,7 @@ import {
   IndexField,
   MutationReturnDto,
   QueryReturnDto,
+  RelationalFilterQueryDto,
 } from '@apps-next/core';
 import {
   DefaultFunctionArgs,
@@ -37,6 +38,13 @@ export type ViewLoader = FunctionReference<
   QueryReturnDto | null
 >;
 
+export type RelationalFilterQuery = FunctionReference<
+  'query',
+  'public',
+  DefaultFunctionArgs,
+  RelationalFilterQueryDto | null
+>;
+
 export type ViewMutation = FunctionReference<
   'mutation',
   'public',
@@ -51,6 +59,7 @@ export type ConvexApiType = {
 
 export type ConvexQueryProviderProps = React.PropsWithChildren<{
   viewLoader: ViewLoader;
+  relationalFilterQuery: RelationalFilterQuery;
   viewMutation: ViewMutation;
   globalConfig: Omit<GlobalConfig, 'provider'>;
   queryClient: QueryClient;

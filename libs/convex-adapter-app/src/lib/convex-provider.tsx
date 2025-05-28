@@ -9,6 +9,7 @@ import {
   convertFiltersForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
   QueryProps,
+  RelationalFilterQueryProps,
   UserViewData,
   ViewConfigType,
 } from '@apps-next/core';
@@ -44,12 +45,24 @@ const ProviderContent = (props: ConvexQueryProviderProps) => {
     [props.viewLoader]
   );
 
+  const makeRelationalFilterOptions = React.useCallback(
+    (args: RelationalFilterQueryProps) => {
+      const return_ = convexQuery(props.relationalFilterQuery, {
+        ...args,
+      });
+
+      return return_ as QueryOptions;
+    },
+    [props.relationalFilterQuery]
+  );
+
   return (
     <QueryContext.Provider
       value={{
         mutationFn,
 
         makeQueryOptions,
+        makeRelationalFilterOptions,
 
         config: props.globalConfig.config,
         provider: 'default',

@@ -1,4 +1,4 @@
-import { Row } from '../data-model';
+import { RelationalFilterDataModel, Row } from '../data-model';
 import { TranslationKeys } from '../translations';
 import { FieldConfig, RecordType } from './base.types';
 import { CommandHeader, CommandName } from './commands';
@@ -8,6 +8,8 @@ import {
   UserViewForm,
 } from './filter.types';
 import { HistoryType } from './history.types';
+import { UserViewData } from './query.types';
+import { ViewConfigType } from './view-config.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
@@ -168,6 +170,10 @@ export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
   //
 };
 
+export type MakeRightSidebarOption<T extends RecordType = RecordType> = {
+  //
+};
+
 export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
   onClickRelation?: (field: FieldConfig, row: Row, cb: () => void) => void;
 };
@@ -258,6 +264,34 @@ export type PageHeaderProps = {
     onToggleRightSidebar: () => void;
     toggleShowInput: () => void;
     onChange: (query: string) => void;
+  };
+};
+
+export type RightSidebarProps = {
+  isOpen: boolean;
+  viewName: string;
+  viewIcon: React.FC<any>;
+  tableName: string;
+  onClose: () => void;
+
+  tabs: {
+    listRows: Row[];
+    relationalFilterData: RelationalFilterDataModel;
+    query: string;
+    activeTab: string;
+    currentFilter?: { id?: string | null; tableName?: string | null } | null;
+    userViews: UserViewData[];
+
+    onTabChange: (tab: string) => void;
+    onQueryChange: (query: string) => void;
+    setFilter: (filter?: { id: string; tableName: string }) => void;
+    getView: (tableName: string) => ViewConfigType | undefined;
+    getTabProps: (tab: string) => {
+      icon: React.FC<any> | undefined;
+      ids: string[];
+      getCountForRow: (row: Row) => number;
+      shouldNotRender: (row: Row) => boolean;
+    };
   };
 };
 

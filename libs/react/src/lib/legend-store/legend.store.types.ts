@@ -32,6 +32,8 @@ import {
   UserViewForm,
   ViewConfigType,
   Mutation,
+  RelationalFilterQueryDto,
+  RelationalFilterDataModel,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { QueryClient } from '@tanstack/react-query';
@@ -137,6 +139,7 @@ export type LegendStore = {
   handleIncomingData: (props: QueryReturnOrUndefined) => void;
   handleIncomingRelationalData: (props: QueryReturnOrUndefined) => void;
   handleIncomingDetailData: (props: QueryReturnOrUndefined) => void;
+  handleIncomingRelationalFilterData: (data: RelationalFilterQueryDto) => void;
 
   state:
     | 'pending'
@@ -149,8 +152,10 @@ export type LegendStore = {
 
   // MAIN DATA MODEL
   dataModel: DataModelNew;
+  allIds?: string[];
   dataModelBackup: DataModelNew;
   relationalDataModel: RelationalDataModel;
+  relationalFilterData: RelationalFilterDataModel;
   uiViewConfig: UiViewConfig;
 
   mutating:

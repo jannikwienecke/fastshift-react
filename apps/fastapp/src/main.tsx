@@ -86,6 +86,7 @@ ReactDOM.createRoot(root).render(
     globalConfig={config}
     viewLoader={api.query.viewLoader}
     viewMutation={api.query.viewMutation}
+    relationalFilterQuery={api.query.getViewRelationalFilterOptions}
   >
     <RouterProvider router={router} />
   </ConvexQueryProvider>

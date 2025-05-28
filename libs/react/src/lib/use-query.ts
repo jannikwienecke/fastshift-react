@@ -6,6 +6,8 @@ import {
   QueryReturnDto,
   QueryReturnOrUndefined,
   RecordType,
+  RelationalFilterQueryDto,
+  RelationalFilterQueryProps,
 } from '@apps-next/core';
 import {
   DefinedUseQueryResult,
@@ -20,7 +22,10 @@ import {
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
-
+import {} from 'convex-helpers/react';
+import { currentView$ } from './legend-store';
+import { rightSidebarProps$ } from './legend-store/legend.rightsidebar.derived';
+import { listRowIds$ } from './legend-store/legend.rightsidebar.state';
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const viewName = args.viewName ?? args.viewConfig?.viewName ?? '';
 
@@ -266,4 +271,34 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     continueCursor: queryReturn.data?.continueCursor,
     isDone: queryReturn.data?.isDone,
   };
+};
+
+export const useRelationalFilterQuery = () => {
+  const listRows = listRowIds$.get();
+
+  const prisma = useApi();
+
+  const result = useTanstackQuery({
+    ...prisma.makeRelationalFilterOptions({
+      ids: rightSidebarProps$.isOpen ? listRows : [],
+      tableName: currentView$.tableName.get() || '',
+      withCount: true,
+    }),
+    enabled: rightSidebarProps$.isOpen.get(),
+  } as any);
+
+  const stored = React.useRef(result as any);
+
+  if (result.data !== undefined) {
+    stored.current = result;
+  } else {
+    stored.current = {
+      ...result,
+      data: stored.current?.data,
+    };
+  }
+
+  return stored.current as {
+    data: RelationalFilterQueryDto;
+  } & DefinedUseQueryResult<RelationalFilterQueryDto>;
 };

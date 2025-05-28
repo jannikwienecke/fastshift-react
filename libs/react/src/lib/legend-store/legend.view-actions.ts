@@ -254,6 +254,10 @@ const resetStore = () => {
   store$.debouncedViewQuery.set('');
   store$.pageHeader.set({ showSearchInput: false });
 
+  store$.rightSidebar.filter.set(undefined);
+  store$.relationalFilterData.set({});
+  store$.rightSidebar.open.set(false);
+
   store$.contextMenuState.row.set(null);
 
   store$.filter.filters.set([]);
