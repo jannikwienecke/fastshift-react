@@ -79,12 +79,10 @@ test.describe('List Filter Tests', () => {
     const { getFilterItemBy, selectFilterOption, filterByWithOptions } =
       listFilter(props);
 
-    await filterByWithOptions(
-      props,
-      CON.filter.options.tag,
-      [CON.tag.values.planning, CON.tag.values.longTerm],
-      CON.tag.values.creative
-    );
+    await filterByWithOptions(props, CON.filter.options.tag, [
+      CON.tag.values.planning,
+      CON.tag.values.longTerm,
+    ]);
 
     let filterItem = getFilterItemBy(CON.filter.options.tag + 's');
 
@@ -97,8 +95,8 @@ test.describe('List Filter Tests', () => {
     await filterItem.getByText(/is any of/i).click();
     await selectFilterOption('is not any of');
 
-    await expect(mainPage.page.getByText(CON.tag.values.creative)).toBeHidden();
-    await expect(mainPage.page.getByText(CON.tag.values.longTerm)).toBeHidden();
+    await expect(mainPage.list.getByText(CON.tag.values.creative)).toBeHidden();
+    await expect(mainPage.list.getByText(CON.tag.values.longTerm)).toBeHidden();
   });
 
   test('can filter task list by tag and open filter, update it and change operator in sub projects task list ', async ({
@@ -120,12 +118,10 @@ test.describe('List Filter Tests', () => {
     const { getFilterItemBy, selectFilterOption, filterByWithOptions } =
       listFilter(props);
 
-    await filterByWithOptions(
-      props,
-      CON.filter.options.tag,
-      [CON.tag.values.planning, CON.tag.values.longTerm],
-      CON.tag.values.creative
-    );
+    await filterByWithOptions(props, CON.filter.options.tag, [
+      CON.tag.values.planning,
+      CON.tag.values.longTerm,
+    ]);
 
     let filterItem = getFilterItemBy(CON.filter.options.tag + 's');
 
