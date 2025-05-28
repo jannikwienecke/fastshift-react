@@ -166,8 +166,9 @@ Small Features to add
 
 ### Small Feature:
 
-- [ ] find in view
+- [x] find in view
 - [ ] sidebar list view, filter on the relational and enum values
+- [ ] group by enum
 - [ ] action buttons in views
 - [ ] if i query the commandbar, and the edit view fields are in the list, sort them to the top
 - [ ] color picker and color indicator for fields with type "color" or something like this

@@ -46,12 +46,10 @@ test.describe('List Filter Tests', () => {
     await filterByName(props, CON.task.values.designMockups);
     await removeFilter(CON.filter.options.name);
 
-    await filterByWithOptions(
-      props,
-      CON.filter.options.tag,
-      [CON.tag.values.planning, CON.tag.values.longTerm],
-      CON.tag.values.creative
-    );
+    await filterByWithOptions(props, CON.filter.options.tag, [
+      CON.tag.values.planning,
+      CON.tag.values.longTerm,
+    ]);
     await removeFilter(CON.filter.options.tag + 's');
 
     await filterByWithOptions(
