@@ -110,6 +110,13 @@ export const de = {
   richEditor: {
     placeholder: '{{name}} hinzufügen...',
   },
+
+  rightSidebar: {
+    noModelUser: '{{model}} nicht verwendet',
+    see: '{{model}} ansehen',
+    noResults: 'Keine Ergebnisse gefunden',
+  },
+
   error: {
     title: '⚠️ ️️Oops! Etwas ist schiefgelaufen',
     showDetails: 'Details anzeigen',

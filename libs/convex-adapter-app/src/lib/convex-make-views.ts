@@ -1,5 +1,6 @@
 import {
   BaseConfigInterface,
+  patchAllViews,
   RegisteredViews,
   ViewConfigType,
 } from '@apps-next/core';
@@ -24,8 +25,10 @@ export const makeViews = (
     };
   }, {} as RegisteredViews);
 
+  const patchedViews = patchAllViews(userDefinedViews);
+
   return {
     ...defaultViewConfigs,
-    ...userDefinedViews,
+    ...patchedViews,
   };
 };

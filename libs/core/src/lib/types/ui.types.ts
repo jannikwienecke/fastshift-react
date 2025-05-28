@@ -261,7 +261,7 @@ export type PageHeaderProps = {
     query: string;
 
     onBlur: () => void;
-    onToggleRightSidebar: () => void;
+    onToggleRightSidebar?: () => void;
     toggleShowInput: () => void;
     onChange: (query: string) => void;
   };
@@ -276,16 +276,17 @@ export type RightSidebarProps = {
 
   tabs: {
     listRows: Row[];
+    listQueryIsDone: boolean;
     relationalFilterData: RelationalFilterDataModel;
     query: string;
     activeTab: string;
     currentFilter?: { id?: string | null; tableName?: string | null } | null;
-    userViews: UserViewData[];
 
     onTabChange: (tab: string) => void;
     onQueryChange: (query: string) => void;
     setFilter: (filter?: { id: string; tableName: string }) => void;
     getView: (tableName: string) => ViewConfigType | undefined;
+    getUserView: (name: string) => UserViewData | undefined;
     getTabProps: (tab: string) => {
       icon: React.FC<any> | undefined;
       ids: string[];

@@ -1,19 +1,23 @@
 import {
   DEFAULT_FETCH_LIMIT_QUERY,
   makeQueryKey,
+  NONE_OPTION,
   QueryDto,
   QueryProps,
   QueryReturnDto,
   QueryReturnOrUndefined,
   RecordType,
   RelationalFilterQueryDto,
-  RelationalFilterQueryProps,
 } from '@apps-next/core';
 import {
   DefinedUseQueryResult,
   useQuery as useTanstackQuery,
 } from '@tanstack/react-query';
+import {} from 'convex-helpers/react';
 import React from 'react';
+import { currentView$ } from './legend-store';
+import { rightSidebarProps$ } from './legend-store/legend.rightsidebar.derived';
+import { listRowIds$ } from './legend-store/legend.rightsidebar.state';
 import { store$ } from './legend-store/legend.store';
 import {
   getParsedViewSettings,
@@ -22,10 +26,6 @@ import {
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
-import {} from 'convex-helpers/react';
-import { currentView$ } from './legend-store';
-import { rightSidebarProps$ } from './legend-store/legend.rightsidebar.derived';
-import { listRowIds$ } from './legend-store/legend.rightsidebar.state';
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const viewName = args.viewName ?? args.viewConfig?.viewName ?? '';
 
@@ -221,9 +221,12 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       // disabled: localMode ? true : false,
       parentViewName,
       parentId,
-      tempFilter: righSidebarFilter
-        ? `${righSidebarFilter?.tableName}:${righSidebarFilter?.id}`
-        : undefined,
+      tempFilter:
+        righSidebarFilter?.id === NONE_OPTION
+          ? `${righSidebarFilter?.tableName}:${righSidebarFilter?.id}`
+          : righSidebarFilter?.id
+          ? `${righSidebarFilter?.tableName}:${righSidebarFilter?.id}`
+          : undefined,
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -274,13 +277,13 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 };
 
 export const useRelationalFilterQuery = () => {
-  const listRows = listRowIds$.get();
+  const listRowIds = listRowIds$.get();
 
   const prisma = useApi();
 
   const result = useTanstackQuery({
     ...prisma.makeRelationalFilterOptions({
-      ids: rightSidebarProps$.isOpen ? listRows : [],
+      ids: rightSidebarProps$.isOpen ? listRowIds : [],
       tableName: currentView$.tableName.get() || '',
       withCount: true,
     }),

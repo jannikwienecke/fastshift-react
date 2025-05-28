@@ -12,6 +12,10 @@ import {
   userView$,
 } from './legend.shared.derived';
 import { store$ } from './legend.store';
+import {
+  getRightSidebarFilterFields,
+  hasRightSidebarFiltering,
+} from './legend.rightsidebar.state';
 
 export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
   {}
@@ -81,9 +85,11 @@ export const derivedPageHeaderProps$ = observable(() => {
           store$.pageHeader.showSearchInput.set(false);
         }
       },
-      onToggleRightSidebar: () => {
-        store$.rightSidebar.open.set((prev) => !prev);
-      },
+      onToggleRightSidebar: hasRightSidebarFiltering()
+        ? () => {
+            store$.rightSidebar.open.set((prev) => !prev);
+          }
+        : undefined,
       showInput: store$.pageHeader.showSearchInput.get(),
       query: store$.viewQuery.get(),
     },

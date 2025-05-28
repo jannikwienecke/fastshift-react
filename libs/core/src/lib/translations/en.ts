@@ -127,6 +127,12 @@ export const en = {
     placeholder: 'Add {{name}}...',
   },
 
+  rightSidebar: {
+    noModelUser: 'No {{model}} used',
+    see: 'See {{model}}',
+    noResults: 'Nothing found',
+  },
+
   error: {
     title: '⚠️ ️️Oops! Something went wrong',
     showDetails: 'Show details',

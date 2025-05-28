@@ -2,12 +2,14 @@ import {
   handleTriggerChanges,
   makeViewLoaderHandler,
   makeViewMutationHandler,
+  relationalFilterQuery,
 } from '@apps-next/convex-adapter-app';
 import * as server from './_generated/server';
 
 import {
   BaseViewConfigManager,
   GetTableName,
+  IndexField,
   RecordType,
   RelationalFilterQueryDto,
   UserViewData,
@@ -67,132 +69,7 @@ export const getViewRelationalFilterOptions = server.query({
     withCount: v.boolean(),
     ids: v.optional(v.array(v.string())),
   },
-  handler: async (ctx, args): Promise<RelationalFilterQueryDto> => {
-    const { tableName, ids } = args;
-
-    if (!ids || ids.length === 0) return {};
-
-    // add no project to the tabs resullt list
-    // add translations..
-    // parse the config in the beginning
-    // from categoriesId -> categories
-    // in query of tabs -> if no result -> add label below Like Nothing Found
-    // handle case 0 rows in list.
-    // No Labels used -> No {tableName} found
-    // use correct label above of tabs (All Tasks)
-    // handle what should happen if we have no (or 1) filter relation
-    // extract this into the convex lib
-    const view = getViewByName(views, tableName);
-
-    if (!view) throw new Error(`View not found for table: ${tableName}`);
-
-    const vi = Object.entries(view?.fields ?? {})
-      .filter(([, v]) => v?.useAsSidebarFilter)
-      .map(
-        ([k]) =>
-          Object.values(view.viewFields).find(
-            (v) => v.relation?.fieldName === k
-          )?.name
-      )
-      .filter(Boolean);
-
-    const tables = vi as GetTableName[];
-
-    const viewConfigManager = new BaseViewConfigManager(view);
-
-    const result = await asyncMap(tables, async (table) => {
-      const allProjects = ctx.db.query(table).collect();
-
-      const config = Object.values(view.viewFields).find(
-        (f) => f.name === table
-      );
-      const fieldName = config?.relation?.fieldName;
-
-      const indexFields = viewConfigManager.getIndexFields();
-      const index = indexFields.find(
-        (f) => f.fields?.[0].toString() === fieldName
-      );
-
-      // TODO Refactor and remove duplicated code todoId:1
-      const manyToMany = Object.values(views).find(
-        (v) =>
-          v?.isManyToMany &&
-          [tableName, table].every((t) => Object.keys(v.viewFields).includes(t))
-      );
-
-      return asyncMap(allProjects, async (record) => {
-        if (!args.withCount) return { [table]: record, count: null };
-
-        if (manyToMany) {
-          const fieldName = manyToMany.viewFields[table]?.relation?.fieldName;
-          const indexFields = manyToMany.query?.indexFields || [];
-          const index = indexFields.find(
-            (f) => f.fields?.[0].toString() === fieldName
-          );
-
-          if (!index) {
-            throw new Error(
-              `Index not found for table: ${table} with field: ${fieldName}`
-            );
-          }
-
-          const manyToManyRecordsOf = await ctx.db
-            .query(manyToMany.tableName)
-            .withIndex(index?.name, (q) =>
-              q.eq(index?.fields?.[0], record._id as any)
-            )
-            .collect();
-
-          return {
-            record: {
-              id: record._id,
-              ...record,
-            },
-            count: manyToManyRecordsOf.length,
-          };
-        }
-
-        if (!index) {
-          throw new Error(
-            `Index not found for table: ${table} with field: ${fieldName}`
-          );
-        }
-
-        let recordsOf = await ctx.db
-          .query(view.tableName)
-          .withIndex(index.name, (q) =>
-            q.eq(index.fields?.[0].toString() ?? '', record._id)
-          )
-          .collect();
-
-        recordsOf = recordsOf.filter((record) => {
-          return ids?.includes(record._id as string);
-        });
-
-        return {
-          record: {
-            id: record._id,
-            ...record,
-          },
-          count: recordsOf.length,
-        };
-      });
-    });
-
-    return tables.reduce(
-      (acc, table, index) => ({
-        ...acc,
-        [table]: result[index],
-      }),
-      {} satisfies Record<
-        string,
-        {
-          record: RecordType;
-          count: number | null;
-        }
-      >
-    );
-  },
+  handler: relationalFilterQuery(views),
 });
 
 export const testQuery = server.mutation({

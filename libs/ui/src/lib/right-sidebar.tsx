@@ -1,7 +1,6 @@
-import { _filter, RightSidebarProps } from '@apps-next/core';
+import { _filter, RightSidebarProps, useTranslation } from '@apps-next/core';
 import { StarIcon, XIcon } from 'lucide-react';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Input, Tabs, TabsContent, TabsList, TabsTrigger } from './components';
 import { cn } from './utils';
 
@@ -27,7 +26,8 @@ export const RightSidebar = (props: RightSidebarProps) => {
             </>
 
             <div className="text-foreground/90">
-              All {t(`${props.tableName}.other` as any)}
+              {/* All {t(`${props.tableName}.other` as any)} */}
+              {props.viewName}
             </div>
           </div>
 
@@ -37,25 +37,25 @@ export const RightSidebar = (props: RightSidebarProps) => {
         </div>
 
         <div className="py-6 px-4">
-          <TabsDemo {...props.tabs} tableName={props.tableName} />
+          <SidebarTabs {...props.tabs} tableName={props.tableName} />
         </div>
       </div>
     </div>
   );
 };
 
-export const TabsDemo = ({
+export const SidebarTabs = ({
   relationalFilterData,
   query,
   onQueryChange,
   currentFilter,
-  userViews,
   setFilter,
   getView,
   activeTab,
   onTabChange,
   tableName,
   getTabProps,
+  getUserView,
 }: RightSidebarProps['tabs'] & {
   tableName: RightSidebarProps['tableName'];
 }) => {
@@ -68,6 +68,8 @@ export const TabsDemo = ({
   }
 
   const allowed = Object.keys(data);
+  const hasMultipleTabs = allowed.length > 1;
+
   return (
     <Tabs
       value={activeTab || allowed[0]}
@@ -75,24 +77,34 @@ export const TabsDemo = ({
         onTabChange(value);
       }}
     >
-      <TabsList
-        className={cn(
-          'grid w-full text-foreground/70 font-normal bg-foreground/5 rounded-sm text-xs h-[1.6rem] p-0 py-0',
-          `grid-cols-${allowed.length}`
-        )}
-      >
-        {allowed.map((item) => {
-          return (
-            <TabsTrigger
-              key={item}
-              value={item}
-              className="text-xs h-6 font-normal"
-            >
-              {item.charAt(0).toUpperCase() + item.slice(1)}
-            </TabsTrigger>
-          );
-        })}
-      </TabsList>
+      {hasMultipleTabs && (
+        <TabsList
+          className={cn(
+            'grid w-full text-foreground/70 font-normal bg-foreground/5 rounded-sm text-xs h-[1.6rem] p-0 py-0',
+            `grid-cols-${allowed.length}`
+          )}
+        >
+          {allowed.map((item) => {
+            return (
+              <TabsTrigger
+                key={item}
+                value={item}
+                className="text-xs h-6 font-normal"
+              >
+                {item.charAt(0).toUpperCase() + item.slice(1)}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+      )}
+
+      {!hasMultipleTabs && allowed.length && (
+        <div className="mb-3">
+          <h3 className="text-sm font-medium text-foreground/90">
+            {allowed[0]?.charAt(0).toUpperCase() + allowed[0]?.slice(1)}
+          </h3>
+        </div>
+      )}
 
       {allowed.map((item) => {
         let rowList = data?.[item] || [];
@@ -106,8 +118,6 @@ export const TabsDemo = ({
           return count > 0 ? acc + 1 : acc;
         }, 0);
 
-        // const view = getView(item);
-
         if (query) {
           rowList = _filter(rowList, ['label']).withQuery(query);
         }
@@ -117,9 +127,9 @@ export const TabsDemo = ({
             key={item}
             value={item}
             className={cn(
-              'flex flex-col',
+              'flex flex-col mt-0',
               activeTab === item
-                ? 'max-h-[50vh] overflow-y-scroll'
+                ? 'max-h-[75vh] overflow-y-scroll'
                 : 'max-h-[70vh] overflow-scroll'
             )}
           >
@@ -150,14 +160,18 @@ export const TabsDemo = ({
               </div>
               <>
                 {rowsWithCountGreaterThanZero === 0 ? (
-                  <div className="text-foreground/70 text-sm grid place-items-center">
-                    <div>No Labels used</div>
+                  <div className="text-foreground/70 pt-4 text-sm grid place-items-center">
+                    <div>
+                      {t('rightSidebar.noModelUser', {
+                        model: t(`${item}.one` as any),
+                      })}
+                    </div>
                   </div>
                 ) : null}
 
                 {rowList?.map((row) => {
                   const isActiveFilter = currentFilter?.id === row.id;
-                  const userView = userViews.find((v) => v.name === row.label);
+                  const userView = getUserView?.(row.label);
                   const count = getCountForRow(row);
 
                   if (shouldNotRender(row)) return null;
@@ -196,7 +210,9 @@ export const TabsDemo = ({
                           <span className="w-4 h-4">{/*  */}</span>
                         )}
                       </div>
-                      <div className="text-[13px]">{row.label}</div>
+                      <div className="text-[13px]">
+                        {row.label || 'No Project.'}
+                      </div>
 
                       <div className="flex-grow" />
 
@@ -206,7 +222,12 @@ export const TabsDemo = ({
                             <>Clear Filter</>
                           ) : (
                             <>
-                              <div>See {t(`${tableName}.other` as any)}</div>
+                              {/* <div>See {t(`${tableName}.other` as any)}</div> */}
+                              <div>
+                                {t('rightSidebar.see', {
+                                  model: t(`${tableName}.other` as any),
+                                })}
+                              </div>
                             </>
                           )}
                         </div>
@@ -215,6 +236,17 @@ export const TabsDemo = ({
                     </button>
                   );
                 })}
+
+                {query.length && rowList.length === 0 ? (
+                  <div className="text-foreground/70 pt-4 text-sm grid place-items-center">
+                    <div>
+                      {t('rightSidebar.noResults', {
+                        query: query,
+                        model: t(`${item}.one` as any),
+                      })}
+                    </div>
+                  </div>
+                ) : null}
               </>
             </>
           </TabsContent>

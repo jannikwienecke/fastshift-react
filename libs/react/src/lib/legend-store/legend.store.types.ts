@@ -148,7 +148,8 @@ export type LegendStore = {
     | 'updating-display-options'
     | 'filter-changed'
     | 'mutating'
-    | 'invalidated';
+    | 'invalidated'
+    | 'temp-filter-changed';
 
   // MAIN DATA MODEL
   dataModel: DataModelNew;

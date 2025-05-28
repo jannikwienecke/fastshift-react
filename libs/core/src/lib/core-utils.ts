@@ -5,6 +5,7 @@ import { makeRow, Row } from './data-model';
 import { t, TranslationKeys } from './translations';
 import {
   FieldConfig,
+  FieldConfigOptions,
   ID,
   QUERY_KEY_PREFIX,
   RecordType,
@@ -620,7 +621,16 @@ export const patchAllViews = (views: RegisteredViews) => {
     return {
       ...view,
       viewFields: patchDict(view.viewFields, (f) => {
-        const userFieldConfig = view.fields?.[f.name];
+        let relationalFieldConfig: FieldConfigOptions = {};
+        if (f.relation?.fieldName) {
+          relationalFieldConfig = view.fields?.[f.relation.fieldName] || {};
+        }
+
+        const fieldConfig = view.fields?.[f.name];
+        const userFieldConfig = {
+          ...relationalFieldConfig,
+          ...fieldConfig,
+        };
         const displayFIeld = view.displayField.field;
         const softDeleteField = view.mutation?.softDeleteField;
 

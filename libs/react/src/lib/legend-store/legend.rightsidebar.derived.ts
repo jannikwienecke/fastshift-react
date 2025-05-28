@@ -1,24 +1,27 @@
 import { RightSidebarProps, Row } from '@apps-next/core';
 import { observable } from '@legendapp/state';
+import {
+  getIdsOfTable,
+  hasRightSidebarFiltering,
+  isDone$,
+  listRows$,
+  query$,
+  tab$,
+} from './legend.rightsidebar.state';
 import { currentView$, getView, userView$ } from './legend.shared.derived';
 import { store$ } from './legend.store';
-import {
-  query$,
-  listRows$,
-  tab$,
-  getIdsOfTable,
-} from './legend.rightsidebar.state';
 
 export const rightSidebarProps$ = observable(() => {
   const relationalFilterData = store$.relationalFilterData.get();
 
-  const queryIsDone = store$.fetchMore.isDone.get();
+  const queryIsDone = isDone$.get();
   const stateIsFilterChanged = store$.state.get() === 'filter-changed';
 
   if (!currentView$.get()) return {} as RightSidebarProps;
 
   return {
-    isOpen: store$.rightSidebar.open.get(),
+    isOpen: hasRightSidebarFiltering() && store$.rightSidebar.open.get(),
+
     onClose: () => {
       store$.rightSidebar.open.set(false);
     },
@@ -26,14 +29,16 @@ export const rightSidebarProps$ = observable(() => {
     tableName: currentView$.get().tableName,
     viewIcon: currentView$.get().icon,
     tabs: {
+      listQueryIsDone: queryIsDone,
       listRows: listRows$.get(),
       relationalFilterData: relationalFilterData,
       currentFilter: store$.rightSidebar.filter.get(),
       getView: getView,
-      userViews: store$.userViews.get(),
       query: query$.get(),
       activeTab: tab$.get(),
 
+      getUserView: (viewName) =>
+        store$.userViews.get().find((v) => v.name === viewName),
       getTabProps: (tabName) => {
         const ids = getIdsOfTable(tabName);
         const getCount = (row: Row) =>
@@ -52,7 +57,10 @@ export const rightSidebarProps$ = observable(() => {
       },
       onQueryChange: (q) => query$.set(q),
       onTabChange: (tab) => tab$.set(tab),
-      setFilter: (filter) => store$.rightSidebar.filter.set(filter),
+      setFilter: (filter) => {
+        store$.rightSidebar.filter.set(filter);
+        store$.state.set('temp-filter-changed');
+      },
     },
   } satisfies RightSidebarProps;
 });

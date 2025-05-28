@@ -2,10 +2,12 @@ import {
   _log,
   getViewByName,
   makeData,
+  NONE_OPTION,
   QueryReturnType,
   RelationalDataModel,
   RelationalFilterDataModel,
   sortRows,
+  t,
 } from '@apps-next/core';
 import { batch, Observable } from '@legendapp/state';
 import { ignoreNewData$ } from './legend.mutationts';
@@ -189,8 +191,6 @@ const handleFilterChangedState = async (
     return allIds?.some((id) => id === row['id']);
   });
 
-  store$.createDataModel(all);
-
   store$.state.set('initialized');
 
   store$.fetchMore.assign({
@@ -198,6 +198,8 @@ const handleFilterChangedState = async (
     nextCursor: queryReturn.continueCursor,
     isDone: queryReturn.isDone ?? false,
   });
+
+  store$.createDataModel(all);
 };
 
 const handleMutatingState = async (
@@ -283,6 +285,11 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
 
       case 'filter-changed':
         _log.debug('RECEIVING DATA AFTER FILTER CHANGED');
+        await handleFilterChangedState(store$, data);
+        break;
+
+      case 'temp-filter-changed':
+        _log.debug('RECEIVING DATA AFTER TEMP FILTER CHANGED');
         await handleFilterChangedState(store$, data);
         break;
 
@@ -381,6 +388,12 @@ export const handleIncomingRelationalFilterData: StoreFn<
         const row = makeData(store$.views.get(), tableName)([item.record])
           .rows?.[0];
         row.raw = { ...row.raw, count: item.count };
+
+        if (!row.label && !item.record) {
+          row.label = `No ${t(`${tableName}.one`)}`;
+          row.id = NONE_OPTION;
+        }
+
         return row;
       }),
     };

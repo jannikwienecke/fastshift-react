@@ -7,6 +7,7 @@ import {
   useRelationalFilterQuery,
   useRelationalQuery,
 } from './use-query';
+import { currentView$ } from './legend-store';
 
 export type QueryStore<T extends RecordType> = {
   dataModel: DataModelNew<T>;
@@ -79,13 +80,14 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
     store$.handleIncomingDetailData(detailQueryReturnRef.current);
   }, [detailQueryReturn.data]);
 
+  const viewName = currentView$.get()?.viewName;
   React.useEffect(() => {
     if (!relationalFilterQueryReturn.data) return;
 
     store$.handleIncomingRelationalFilterData(
       relationalFilterQueryReturnRef.current.data
     );
-  }, [relationalFilterQueryReturn.data]);
+  }, [relationalFilterQueryReturn.data, viewName]);
 
   return {
     dataModel,

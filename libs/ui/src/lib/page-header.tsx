@@ -128,13 +128,15 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
               <SearchIcon className="h-4 w-4" />
             </Button>
 
-            <Button
-              variant={'ghost'}
-              size="icon"
-              onClick={props.query?.onToggleRightSidebar}
-            >
-              <PanelRightIcon className="h-4 w-4" />
-            </Button>
+            {props.query?.onToggleRightSidebar ? (
+              <Button
+                variant={'ghost'}
+                size="icon"
+                onClick={props.query?.onToggleRightSidebar}
+              >
+                <PanelRightIcon className="h-4 w-4" />
+              </Button>
+            ) : null}
           </div>
         )}
       </div>
