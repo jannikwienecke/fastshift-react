@@ -18,6 +18,7 @@ export class MainViewPage {
   readonly detailTabs: Locator;
   readonly detailProperties: Locator;
   readonly list: Locator;
+  readonly emojiPickerContent: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -36,6 +37,7 @@ export class MainViewPage {
     this.detailTabs = page.getByTestId('detail-tabs');
     this.detailProperties = page.getByTestId('detail-properties');
     this.list = page.getByTestId('list');
+    this.emojiPickerContent = page.getByTestId('emoji-picker-content');
   }
 
   async goto() {

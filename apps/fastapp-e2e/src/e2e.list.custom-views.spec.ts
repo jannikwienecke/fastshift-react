@@ -309,7 +309,10 @@ test.describe('Custom Views', () => {
 
     await page.getByRole('button', { name: 'emoji-picker-button' }).click();
 
-    await page.getByPlaceholder(/search/i).fill('laugh');
+    await mainPage.emojiPickerContent
+      .getByPlaceholder(/search/i)
+      .first()
+      .fill('laugh');
 
     await waitFor(page, 300);
 

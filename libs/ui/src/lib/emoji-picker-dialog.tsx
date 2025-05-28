@@ -35,6 +35,7 @@ export const EmojiPickerDialog = (props: {
       </PopoverTrigger>
 
       <PopoverContent
+        data-testid="emoji-picker-content"
         onClick={(e) => e.stopPropagation()}
         className="w-fit p-0"
       >
