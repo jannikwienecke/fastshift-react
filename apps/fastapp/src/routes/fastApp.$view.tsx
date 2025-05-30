@@ -14,6 +14,7 @@ import {
   dispatchLoadView,
 } from '../application-store/app.store.utils';
 import { getUserViewsQuery, queryClient } from '../query-client';
+import { useGlobalSearch } from '../shared/hooks/use-global-search';
 import { getView } from '../shared/utils/app.helper';
 import { DefaultViewTemplate } from '../views/default-view-template';
 
@@ -64,6 +65,8 @@ const ViewMainComponent = observer(() => {
 
   const params = useParams({ strict: false });
   const context = useRouteContext({ strict: false });
+
+  useGlobalSearch();
 
   const prevViewRef = React.useRef<string | null>(
     (params.view as string) + (params.id ?? '') + (params.model ?? '')

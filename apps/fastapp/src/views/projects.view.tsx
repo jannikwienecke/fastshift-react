@@ -17,6 +17,17 @@ type ProjectViewDataType = DataType<
 >;
 
 const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
+  renderCommandbarRow(props) {
+    return (
+      <div className="flex flex-row items-center gap-3">
+        <div>{props.row.label}</div>
+
+        <div className="text-xs text-foreground/70 truncate w-56">
+          {props.row.raw.description}
+        </div>
+      </div>
+    );
+  },
   fields: {
     categories: {
       component: {

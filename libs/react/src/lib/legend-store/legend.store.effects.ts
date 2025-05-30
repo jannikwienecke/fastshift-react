@@ -74,8 +74,18 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     });
   }).onChange(() => null);
 
+  let timeoutGlobalQuery: NodeJS.Timeout;
   observable(function handleQueryCommandbarChange() {
     const query = store$.commandbar.query.get();
+
+    if (store$.combobox.query.get() === '') {
+      store$.globalQueryDebounced.set('');
+    } else {
+      clearTimeout(timeoutGlobalQuery);
+      timeoutGlobalQuery = setTimeout(() => {
+        store$.globalQueryDebounced.set(store$.combobox.query.get());
+      }, 200);
+    }
 
     const fieldCommandbar = store$.commandbar.selectedViewField.get();
     const openModelCommandbar = store$.commandbar.activeOpen.tableName.get();

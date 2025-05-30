@@ -64,6 +64,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'inputDialog'
   | 'globalQuery'
   | 'globalQueryDebounced'
+  | 'globalQueryData'
   | 'paginateOptions'
   | 'fetchMore'
   | 'displayOptions'
@@ -144,6 +145,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   viewQuery: '',
   debouncedViewQuery: '',
   globalQuery: '',
+  globalQueryData: {},
 
   commands: [],
   displayOptions: {

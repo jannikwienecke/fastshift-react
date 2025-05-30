@@ -72,6 +72,62 @@ export const getViewRelationalFilterOptions = server.query({
   handler: relationalFilterQuery(views),
 });
 
+export const globalQuery = server.query({
+  args: {
+    query: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (args.query.length < 3) {
+      return [];
+    }
+
+    const allViews = Object.entries(views);
+    const resultsPromises = allViews.map(async ([viewName, view]) => {
+      if (!view) return null;
+      const searchableFields = new BaseViewConfigManager(
+        view
+      ).getSearchableFields();
+
+      const promises =
+        searchableFields?.map(async (field) => {
+          return await ctx.db
+            .query(view.tableName)
+            .withSearchIndex(field.name, (q) =>
+              q.search(field.field.toString(), args.query)
+            )
+            .collect();
+        }) ?? [];
+
+      const responses = await Promise.all(promises);
+      const ids = responses.flatMap((r) => r.map((d) => d._id));
+      const uniqueIds = [...new Set(ids)];
+      return uniqueIds.map((id) => {
+        const record = responses.flatMap((r) => r).find((d) => d._id === id);
+        return record;
+      });
+    });
+
+    const results = await Promise.all(resultsPromises);
+
+    const dict = allViews.reduce((acc, [viewName], index) => {
+      const records = results[index];
+      if (!records || records.length === 0) return acc;
+
+      return {
+        ...acc,
+        [viewName]: records.map((record) => {
+          return {
+            ...record,
+            id: record._id,
+          };
+        }),
+      };
+    }, {} as Record<string, Doc<any>[] | null>);
+
+    return dict;
+  },
+});
+
 export const testQuery = server.mutation({
   async handler(ctx, args_0) {
     try {

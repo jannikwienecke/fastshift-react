@@ -207,6 +207,9 @@ export type LegendStore = {
 
   globalQuery: string;
   globalQueryDebounced: string;
+  globalQueryData: {
+    [key: string]: Row[] | null;
+  };
 
   errorDialog: {
     error: MutationHandlerErrorType | null;

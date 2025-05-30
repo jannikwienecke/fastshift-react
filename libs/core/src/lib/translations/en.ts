@@ -8,6 +8,7 @@ export const headers: {
   view: 'View',
   admin: 'Admin',
   navigation: 'Navigation',
+  'global-query': 'Search for "{{query}}"',
 };
 
 export const historyChangedTypes: {

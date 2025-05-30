@@ -1,9 +1,5 @@
 import { tasksConfig } from '@apps-next/convex';
-import {
-  MakeDetailPropsOption,
-  ViewConfig,
-  ViewConfigType,
-} from '@apps-next/core';
+import { MakeDetailPropsOption, ViewConfigType } from '@apps-next/core';
 import { makeHooks, viewRegistry } from '@apps-next/react';
 import { InputDialog } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';

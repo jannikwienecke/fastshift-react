@@ -5,11 +5,13 @@ export const getComponent = ({
   fieldName,
   componentType,
   isDetail,
+  ...props
 }: {
   fieldName: string;
   componentType: ComponentType;
   //  DETAIL BRANCHING
   isDetail?: boolean;
+  tableName?: string;
 }) => {
   const tableNameDetail = store$.detail.viewConfigManager.get()
     ? store$.detail?.viewConfigManager?.getTableName?.()
@@ -20,7 +22,9 @@ export const getComponent = ({
   const tableNameConfig = viewConfigManger?.getTableName?.();
   const commanformTablename = store$.commandform.view.tableName.get();
 
-  const tableName = isDetail
+  const tableName = props.tableName
+    ? props.tableName
+    : isDetail
     ? tableNameDetail
     : commanformTablename ?? tableNameConfig ?? '';
 

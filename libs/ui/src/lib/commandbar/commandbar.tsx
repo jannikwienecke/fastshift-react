@@ -38,6 +38,10 @@ export const CommandDialogList = (props: {
   activeItem?: CommandbarProps['activeItem'];
 }) => {
   const [hoveredItem, setHoveredItem] = React.useState<string>('');
+  const lastMousePosition = React.useRef<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
 
   // const state = useCommandState((state) => state.value);
 
@@ -53,11 +57,9 @@ export const CommandDialogList = (props: {
     const handleKeyDown = (e: KeyboardEvent) => {
       // if is down arrow, focus next item
       const activeId = props.activeItem?.id;
-      const index = groupsRef.current
-        .flat()
-        .map((g) => g.items)
-        .flat()
-        .findIndex((i) => i.id === activeId);
+      const allItems = groupsRef.current.map((g) => g.items).flat();
+
+      const index = allItems.flat().findIndex((i) => i.id === activeId);
 
       let newIndex = index;
 
@@ -73,10 +75,15 @@ export const CommandDialogList = (props: {
       }
 
       const item = groupsRef.current.map((g) => g.items).flat()?.[
-        Number(newIndex)
+        Number(newIndex + 1 > allItems.length ? 0 : newIndex)
       ];
 
-      item && onValueChangeRef.current(item);
+      if (item) {
+        onValueChangeRef.current(item);
+        setHoveredItem(item.label.toString());
+      } else {
+        //
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -113,6 +120,7 @@ export const CommandDialogList = (props: {
     prevIdKey.current = newKey;
 
     onValueChangeRef.current(groupsRef.current[0]?.items[0]);
+    setHoveredItem(groupsRef.current[0]?.items[0]?.label.toString() ?? '');
   }, [props.groups]);
 
   React.useLayoutEffect(() => {
@@ -122,6 +130,8 @@ export const CommandDialogList = (props: {
       }, 10);
     }
   }, [props.query]);
+
+  if (!props.groups || props.groups.length === 0) return null;
 
   return (
     <CommandList ref={listRef} className="px-3 pb-3 flex flex-col pt-2">
@@ -142,7 +152,9 @@ export const CommandDialogList = (props: {
             {group.items.map((item, index) => {
               // const active = props.activeItem?.id === item.id;
 
-              const active = !!hoveredItem?.includes(item.label.toString());
+              const active = hoveredItem
+                ? !!hoveredItem?.includes(item.label.toString())
+                : index === 0;
 
               if (!item) return null;
               return (
@@ -156,12 +168,23 @@ export const CommandDialogList = (props: {
                 >
                   <div
                     className="p-0 m-0 h-full w-full px-1 py-3"
-                    onMouseOver={() => {
-                      setHoveredItem(item.label.toString());
+                    onMouseMove={(e) => {
+                      const currentX = e.clientX;
+                      const currentY = e.clientY;
+                      const lastPos = lastMousePosition.current;
 
-                      debounce(() => {
-                        props.onValueChange?.(item);
-                      }, 75);
+                      // Only update if mouse actually moved
+                      if (currentX !== lastPos.x || currentY !== lastPos.y) {
+                        lastMousePosition.current = {
+                          x: currentX,
+                          y: currentY,
+                        };
+                        setHoveredItem(item.label.toString());
+
+                        debounce(() => {
+                          props.onValueChange?.(item);
+                        }, 75);
+                      }
                     }}
                     onClick={() => {
                       props.onSelect?.(item);
@@ -180,8 +203,6 @@ export const CommandDialogList = (props: {
           </div>
         );
       })}
-
-      <CommandEmpty>No results found.</CommandEmpty>
     </CommandList>
   );
 };
@@ -266,12 +287,14 @@ export function CommandDialogDefault(props: CommandbarProps | undefined) {
 
           <CommandDialogList {...props} />
 
-          <div className="px-4 pb-2">
-            <CommandRenderErrors
-              errors={[props.error?.message ?? '']}
-              showError={props.error?.showError ?? false}
-            />
-          </div>
+          {props.error?.showError ? (
+            <div className="px-4 pb-2">
+              <CommandRenderErrors
+                errors={[props.error?.message ?? '']}
+                showError={props.error?.showError ?? false}
+              />
+            </div>
+          ) : null}
         </Command>
       </CommandbarContainer>
     </>

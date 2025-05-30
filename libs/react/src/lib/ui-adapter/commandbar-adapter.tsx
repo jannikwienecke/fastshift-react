@@ -48,6 +48,10 @@ export const makeCommandbarProps = <T extends RecordType>(
   return {
     ...state,
     renderItem(item, active, index, activeRow) {
+      if (item.render) {
+        return item.render(active, index);
+      }
+
       const viewField = store$.commandbar.selectedViewField.get();
       let viewOfField: ViewConfigType | undefined;
       try {
@@ -258,15 +262,16 @@ export const makeCommandbarProps = <T extends RecordType>(
           />
         );
       } catch (e) {
-        return (
-          <div className="flex flex-row gap-4 items-center">
-            <div className=" text-foreground/50">
-              {item.icon ? <Icon icon={item.icon} /> : <div />}
-            </div>
+        if (item)
+          return (
+            <div className="flex flex-row gap-4 items-center">
+              <div className=" text-foreground/50">
+                {item.icon ? <Icon icon={item.icon} /> : <div />}
+              </div>
 
-            <div>{item.label}</div>
-          </div>
-        );
+              <div>{item.label}</div>
+            </div>
+          );
       }
     },
   };

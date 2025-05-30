@@ -21,6 +21,7 @@ export type ComboxboxItem = {
   value?: unknown;
   rowValue?: Row;
   rowValues?: Row[];
+  render?: (active: boolean, index: number) => React.ReactNode;
 };
 
 export type DisplayOptionsViewField = {
