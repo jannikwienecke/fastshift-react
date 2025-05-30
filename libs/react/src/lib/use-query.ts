@@ -15,7 +15,7 @@ import {
 } from '@tanstack/react-query';
 import {} from 'convex-helpers/react';
 import React from 'react';
-import { currentView$ } from './legend-store';
+import { currentView$, getViewConfigManager } from './legend-store';
 import { rightSidebarProps$ } from './legend-store/legend.rightsidebar.derived';
 import { listRowIds$ } from './legend-store/legend.rightsidebar.state';
 import { store$ } from './legend-store/legend.store';
@@ -99,7 +99,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
 
   const { registeredViews } = useView();
 
-  const viewConfig = store$.viewConfigManager?.viewConfig.get() ?? null;
+  const viewConfig = getViewConfigManager()?.viewConfig;
 
   const parsedViewSettings = getParsedViewSettings();
 

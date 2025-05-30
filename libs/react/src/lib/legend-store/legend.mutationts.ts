@@ -221,6 +221,15 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
       } else {
         console.debug('Record deleted successfully');
         onSuccess?.();
+        if (isDetail()) {
+          // TODO: add abstraction for this
+          // also fix flashing when navigating back to list view (see in 3g network)
+          store$.navigation.state.set({
+            type: 'navigate',
+            view: store$.detail.viewConfigManager.getViewName(),
+          });
+        }
+        store$.commandbarClose();
       }
     };
 

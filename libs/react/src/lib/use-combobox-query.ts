@@ -1,5 +1,5 @@
 import React from 'react';
-import { comboboxStore$, store$ } from './legend-store';
+import { comboboxStore$, getView, store$ } from './legend-store';
 import { useQuery } from './use-query';
 import {
   BaseViewConfigManager,
@@ -12,6 +12,17 @@ import { isDetail } from './legend-store/legend.utils';
 import { derviedDetailPage$ } from './legend-store/legend.detailpage.derived';
 
 const viewConfigManager$ = observable(() => {
+  const commandbarTableName = store$.commandbar.activeOpen.tableName.get();
+  if (commandbarTableName) {
+    const view = getView(commandbarTableName);
+    if (view) {
+      return new BaseViewConfigManager(
+        view as ViewConfigType,
+        {}
+      ) as BaseViewConfigManagerInterface;
+    }
+  }
+
   const view = store$.commandform.view.get();
   if (!view) return null;
 
@@ -34,17 +45,20 @@ export const useComboboxQuery = () => {
         ?.viewName
     : null;
 
-  const disabled =
-    !store.field ||
-    !store.query ||
-    !!store.field.enum ||
-    store.field.type === 'Date' ||
-    store.field.type === 'Boolean' ||
-    (store$.filter.open.get() && !store.field);
+  const disabled = store$.commandbar.activeOpen.tableName.get()
+    ? false
+    : !store.field ||
+      !store.query ||
+      !!store.field.enum ||
+      store.field.type === 'Date' ||
+      store.field.type === 'Boolean' ||
+      (store$.filter.open.get() && !store.field);
 
   const formViewName = store$.commandform.view.get()?.viewName;
   const viewName = //  DETAIL BRANCHING
-    activeTabViewName
+    store$.commandbar.activeOpen.tableName.get()
+      ? store.tableName
+      : activeTabViewName
       ? activeTabViewName
       : formViewName
       ? formViewName

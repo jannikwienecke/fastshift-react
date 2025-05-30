@@ -5,10 +5,14 @@ import {
   t,
   TranslationKeys,
 } from '@apps-next/core';
-import { store$ } from '../legend-store';
+import { getViewConfigManager, store$ } from '../legend-store';
 import { getViewFieldsOptions } from '../legend-store/legend.combobox.helper';
 import { commands } from './commands';
 import { commandsHelper } from './commands.helper';
+import { makeCopyCommands } from './commands.copy';
+import { makeModelCommands } from './commands.model';
+import { makeGoToCommands } from './commands.goTo';
+import { makeOpenCommands } from './commands.open';
 
 export const getOpenCreateModelFormCommands = () => {
   const views = store$.views.get();
@@ -32,7 +36,7 @@ export const getOpenCreateModelFormCommands = () => {
     return true;
   });
 
-  const currentTableName = store$.viewConfigManager.getTableName();
+  const currentTableName = getViewConfigManager()?.getTableName();
   return viewsToUse
     .filter(Boolean)
     .map((view) => {
@@ -80,6 +84,10 @@ export const getCommandsList = (): CommandbarItem[] => {
   const openCreateModelFormCommands = getOpenCreateModelFormCommands();
   return [
     ...currentViewCommands,
+    ...makeCopyCommands(),
+    ...makeModelCommands(),
+    ...makeOpenCommands(),
+    ...makeGoToCommands(),
     commands.viewCommand,
     commands.viewSaveCommand,
     ...openCreateModelFormCommands,

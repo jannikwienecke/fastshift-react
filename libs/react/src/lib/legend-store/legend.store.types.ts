@@ -34,6 +34,7 @@ import {
   Mutation,
   RelationalFilterQueryDto,
   RelationalFilterDataModel,
+  CommandbarItem,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { QueryClient } from '@tanstack/react-query';
@@ -238,6 +239,9 @@ export type LegendStore = {
     selectedViewField?: FieldConfig;
     activeItem: ComboxboxItem | null;
     activeRow: Row | null;
+    activeOpen?: {
+      tableName: string;
+    } | null;
   } & Omit<
     CommandbarProps,
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'

@@ -25,7 +25,7 @@ import {
 import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
 import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
 
-const getViewName = () => store$.viewConfigManager.getViewName();
+const getViewName = () => getViewConfigManager()?.getViewName();
 
 const viewCommand: CommandbarItem = {
   id: 'create-new-view',

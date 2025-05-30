@@ -167,17 +167,20 @@ Small Features to add
 ### Small Feature:
 
 - [x] find in view
-- [ ] sidebar list view, filter on the relational and enum values
-- [ ] group by enum
+- [x] sidebar list view, filter on the relational and enum values
+- [x] group by enum
+- [ ] star/unstar from the right sidebar
+- [ ] menu dropdown in the right sidebar
+- [ ] select one or more rows -> show correct action commands, show action popover like linear
 - [ ] action buttons in views
 - [ ] if i query the commandbar, and the edit view fields are in the list, sort them to the top
-- [ ] color picker and color indicator for fields with type "color" or something like this
 - [ ] when created a new task -> click on notifiaction -> open task
 - [ ] open after creation, in config
-- [ ] add tipTap
-- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
+- [ ] color picker and color indicator for fields with type "color" or something like this
 - [ ] chat in activity
 - [ ] chat activity (optimistic update)
+- [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
+- [ ] add tipTap
 
 ### Add tests
 

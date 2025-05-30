@@ -19,7 +19,12 @@ import {
   PencilLineIcon,
   PlusIcon,
 } from 'lucide-react';
-import { comboboxStore$, getView, store$ } from '../legend-store';
+import {
+  comboboxStore$,
+  getView,
+  getViewConfigManager,
+  store$,
+} from '../legend-store';
 import {
   commandbarProps$,
   derivedCommandbarState$,
@@ -212,9 +217,10 @@ export const makeCommandbarProps = <T extends RecordType>(
       }
 
       try {
-        const field = store$.viewConfigManager.getFieldBy(item.id.toString());
-
+        const viewConfigManager = getViewConfigManager();
+        const field = viewConfigManager.getFieldBy(item.id.toString());
         const row = makeRow(item.id.toString(), item.label, item, field);
+
         const Component = getComponent({
           fieldName: field?.name,
           componentType: 'commandbarFieldItem',

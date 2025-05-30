@@ -16,6 +16,8 @@ export const relationalFilterQuery =
   async (ctx: GenericQueryCtx, args: RelationalFilterQueryProps) => {
     const { tableName, ids } = args;
 
+    if (!tableName) return null;
+
     const view = getViewByName(views, tableName);
 
     if (!view) throw new Error(`View not found for table: ${tableName}`);

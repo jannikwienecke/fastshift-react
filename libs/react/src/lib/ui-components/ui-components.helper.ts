@@ -24,6 +24,8 @@ export const getComponent = ({
     ? tableNameDetail
     : commanformTablename ?? tableNameConfig ?? '';
 
+  if (!tableName) return null;
+
   const uiConfigActiveTable = viewRegistry.getView(tableName) ?? {};
 
   const uiViewConfig = {

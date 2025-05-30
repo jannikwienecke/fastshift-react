@@ -98,7 +98,8 @@ test.describe('Custom Views', () => {
     await filterByProject(mainPage, 'fitness plan');
     await firstListItem.click({ force: true });
 
-    await expect(mainPage.list.getByText(/fitness plan/i)).toHaveCount(3);
+    await expect(mainPage.page.getByTestId('list-item')).toHaveCount(3);
+
     await expect(page.getByText(/design mockups/i)).toBeHidden();
 
     await page.getByText(/reset/i).click();
@@ -113,7 +114,7 @@ test.describe('Custom Views', () => {
     await waitFor(page, 500);
     await page.reload();
 
-    await expect(mainPage.list.getByText(/fitness plan/i)).toHaveCount(3);
+    await expect(mainPage.page.getByTestId('list-item')).toHaveCount(3);
     await expect(page.getByText(/design mockups/i)).toBeHidden();
 
     await mainPage.sidebar
@@ -139,9 +140,8 @@ test.describe('Custom Views', () => {
       .first()
       .click();
 
-    await expect(
-      mainPage.list.getByText(CON.project.values.fitnessPlan)
-    ).toHaveCount(3);
+    await expect(mainPage.page.getByTestId('list-item')).toHaveCount(3);
+
     await expect(
       page.getByText(CON.project.values.websiteRedesign)
     ).toHaveCount(0);

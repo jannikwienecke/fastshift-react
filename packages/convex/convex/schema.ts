@@ -16,6 +16,8 @@ const _schema = defineSchema({
     ...tableMetaFields,
     email: v.string(),
     password: v.string(),
+  }).searchIndex('email', {
+    searchField: 'email',
   }),
 
   history: defineTable({

@@ -1,10 +1,12 @@
 import { observable } from '@legendapp/state';
 import { store$ } from './legend.store';
 import {
+  ComponentType,
   getUserViewByName,
   getViewByName,
   ViewConfigType,
 } from '@apps-next/core';
+import { viewRegistry } from './legend.app.registry';
 
 export const currentView$ = observable(() => {
   return store$.viewConfigManager.viewConfig.get() as ViewConfigType;
@@ -81,4 +83,44 @@ export const detailUserView$ = observable(() => {
     ?.get();
 
   return currentView;
+});
+
+export const uiViewConfigDict$ = observable(() => {
+  store$.views.get();
+
+  const getUiViewConfig = () => {
+    return Object.entries(viewRegistry.getViews())
+      .map(([key, v]) => v.uiViewConfig?.[key]['fields'])
+      .reduce((acc, fields) => {
+        const innerDict = Object.entries(fields ?? {}).reduce(
+          (acc, [fieldName, field]) => {
+            if (!field) return acc;
+            if (!fieldName) return acc;
+
+            if (acc[fieldName]) {
+              acc[fieldName] = {
+                ...acc[fieldName],
+                ...field?.component,
+              };
+            } else if (field.component && fieldName) {
+              acc[fieldName] = {
+                ...field.component,
+              };
+            }
+
+            return { ...acc };
+          },
+          {} as Record<
+            string,
+            Partial<Record<ComponentType, React.FC<any> | undefined>>
+          >
+        );
+
+        return {
+          ...acc,
+          ...innerDict,
+        };
+      }, {} as Record<string, Partial<Record<ComponentType, React.FC<any> | undefined>>>);
+  };
+  return getUiViewConfig();
 });

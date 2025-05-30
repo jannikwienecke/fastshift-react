@@ -8,6 +8,7 @@ import {
   Row,
   _log,
   makeRowFromValue,
+  t,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
@@ -15,6 +16,8 @@ import { store$ } from '../../legend-store/legend.store.js';
 import { copyRow, hasOpenDialog$ } from '../../legend-store/legend.utils.js';
 import { Icon } from '../../ui-components/render-icon';
 import { ListFieldValue } from '../../ui-components/render-list-field-value';
+import { getComponent } from '../../ui-components/ui-components.helper.js';
+import { getView } from '../../legend-store/legend.shared.derived.js';
 
 export const listItems$ = observable<ListProps['items']>([]);
 
@@ -188,7 +191,9 @@ export const makeListProps = <T extends RecordType = RecordType>(
     listGrouping.groupByField = grouping.field?.relation?.fieldName ?? '';
     listGrouping.groupLabel =
       grouping.field?.relation?.tableName.firstUpper().slice(0, -1) ?? '';
-
+    listGrouping.groupIcon = getView(
+      grouping.field.relation?.tableName ?? ''
+    )?.icon;
     listGrouping.groups =
       store$.relationalDataModel[grouping.field.name]
         ?.get()
@@ -234,9 +239,24 @@ export const makeListProps = <T extends RecordType = RecordType>(
               : `Not ${grouping.field?.name.firstUpper()}`,
         })) ?? [];
   } else if (grouping.field?.enum) {
-    // IMPROVEMENT: [LATER] Implement grouping by enum
-    console.debug('Grouping by enum is not implemented yet');
-    alert('Grouping by enum is not implemented yet');
+    listGrouping.groupByTableName = grouping.field.name ?? '';
+    listGrouping.groupIcon = getComponent({
+      fieldName: grouping.field.name,
+      componentType: 'icon',
+    });
+    listGrouping.groupByField = grouping.field?.name ?? '';
+    listGrouping.groupLabel =
+      grouping.field?.name.firstUpper().slice(0, -1) ?? '';
+
+    listGrouping.groups =
+      grouping.field.enum.values.map((value) => {
+        const row = makeRowFromValue(value.name, grouping.field as FieldConfig);
+
+        return {
+          groupById: row.label,
+          groupByLabel: grouping.field?.getEnumLabel?.(t, value.name) ?? row.id,
+        };
+      }) ?? [];
   }
 
   // if we are grouped by a relation field like "projects", when sorting, we want to sort the groups

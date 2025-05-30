@@ -63,6 +63,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
     groupByField: string;
     groupByTableName: string;
     groupLabel: string;
+    groupIcon?: React.FC<any>;
     groups: {
       groupById: string | number | undefined;
       groupByLabel: string;
@@ -432,6 +433,7 @@ export type CommandbarProps = {
     header: string;
     items: (CommandbarItem & ComboxboxItem)[];
   }[];
+  activeItem?: ComboxboxItem | null;
   headerLabel: string;
   inputPlaceholder: string;
   query?: string;

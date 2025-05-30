@@ -59,6 +59,20 @@ export const tasksConfig = createViewConfig(
       },
       priority: {
         defaultValue: 1,
+        getEnumLabel(t, value) {
+          switch (value) {
+            case 1:
+              return t('priority.none');
+            case 2:
+              return t('priority.low');
+            case 3:
+              return t('priority.medium');
+            case 4:
+              return t('priority.high');
+            case 5:
+              return t('priority.urgent');
+          }
+        },
       },
       description: {
         richEditor: true,

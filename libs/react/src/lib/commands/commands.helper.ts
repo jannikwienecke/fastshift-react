@@ -3,11 +3,19 @@ import {
   CommandbarItem,
   CommandbarItemHandler,
   CommandbarProps,
+  getViewLabel,
   makeRowFromValue,
   Row,
+  t,
+  ViewConfigType,
 } from '@apps-next/core';
 import { dateUtils, operatorMap } from '../ui-adapter/filter-adapter';
-import { store$ } from '../legend-store';
+import {
+  currentView$,
+  getViewConfigManager,
+  isDetail,
+  store$,
+} from '../legend-store';
 import { xSelect } from '../legend-store/legend.select-state';
 import Fuse from 'fuse.js';
 import { comboboxDebouncedQuery$ } from '../legend-store/legend.combobox.helper';
@@ -120,7 +128,7 @@ const filterCommandGroups = (groups: CommandbarProps['groups']) => {
     includeScore: true,
   };
 
-  const currentTableName = store$.viewConfigManager.getTableName();
+  const currentTableName = getViewConfigManager()?.getTableName();
 
   filteredGroups.sort((a, b) => {
     if (!query) return 0;
@@ -154,6 +162,19 @@ const filterCommandGroups = (groups: CommandbarProps['groups']) => {
   return filteredGroups;
 };
 
+export const getViewName = () => getViewConfigManager()?.getViewName();
+
+export const getViewLabelOf = (translationString: string) => {
+  const view = isDetail()
+    ? store$.detail.viewConfigManager.viewConfig.get()
+    : currentView$.get();
+  if (!view) return translationString;
+
+  return t(translationString, {
+    name: getViewLabel(view as ViewConfigType, true),
+  });
+};
+
 export const commandsHelper = {
   openCommandbarDatePicker,
   getParsedDateRowForMutation,
@@ -161,4 +182,5 @@ export const commandsHelper = {
   isInternalView,
   getUserStoreCommands,
   filterCommandGroups,
+  getViewName,
 };

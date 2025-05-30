@@ -5,10 +5,11 @@ import {
   Tasks,
   tasksConfig,
 } from '@apps-next/convex';
-import { DataType, makeDayMonthString } from '@apps-next/core';
+import { DataType, makeDayMonthString, ViewConfigType } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { DefaultViewTemplate } from './default-view-template';
 import { makeViewFieldsConfig, viewRegistry } from '@apps-next/react';
+import { CalendarIcon, ComponentIcon } from 'lucide-react';
 
 type ProjectViewDataType = DataType<
   'projects',
@@ -19,6 +20,7 @@ const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
   fields: {
     categories: {
       component: {
+        icon: ComponentIcon,
         list: ({ data }) => {
           return <>{data.categories?.label ?? 'Set Category'}</>;
         },
@@ -56,6 +58,7 @@ const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
     },
     dueDate: {
       component: {
+        icon: CalendarIcon,
         list: ({ data }) => {
           const date = new Date(data.dueDate);
 
@@ -84,6 +87,6 @@ const ProjectsMainPage = observer(() => {
 });
 
 viewRegistry
-  .addView(projectsConfig)
+  .addView(projectsConfig as ViewConfigType)
   .addComponents({ main: ProjectsMainPage })
   .addUiConfig(uiViewConfig);

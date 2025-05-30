@@ -53,6 +53,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     ) {
       store$.combobox.selected.set([]);
       store$.combobox.values.set(null);
+
       store$.combobox.query.set('');
       store$.combobox.multiple.set(false);
       store$.combobox.datePicker.set(null);
@@ -77,10 +78,12 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     const query = store$.commandbar.query.get();
 
     const fieldCommandbar = store$.commandbar.selectedViewField.get();
+    const openModelCommandbar = store$.commandbar.activeOpen.tableName.get();
 
-    if (!fieldCommandbar?.name) return;
+    if (!fieldCommandbar?.name && !openModelCommandbar) return;
 
     comboboxStore$.query.set(query ?? '');
+
     store$.combobox.query.set(query ?? '');
   }).onChange(() => null);
 

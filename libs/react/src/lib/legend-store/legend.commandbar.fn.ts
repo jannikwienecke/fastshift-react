@@ -21,6 +21,7 @@ export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
   store$.combobox.query.set('');
   store$.commandbar.error.set(undefined);
   store$.commandbar.selectedViewField.set(undefined);
+  store$.commandbar.activeOpen.set(undefined);
   // store$.list.selectedRelationField.set()
   comboboxDebouncedQuery$.set('');
 };
@@ -63,6 +64,7 @@ export const commandbarUpdateQuery: StoreFn<'commandbarUpdateQuery'> =
     }
 
     store$.commandbar.query.set(query);
+
     store$.combobox.query.set(query);
   };
 

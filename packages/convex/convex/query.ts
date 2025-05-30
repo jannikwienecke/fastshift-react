@@ -156,3 +156,19 @@ export const deleteMutesttation = server.query({
     return {};
   },
 });
+
+export const getLastEditedTask = server.query({
+  handler: async (ctx) => {
+    // Find the most recent update to a task in the history table
+    const lastEdit = await ctx.db
+      .query('history')
+      .withIndex('by_table', (q) => q.eq('tableName', 'tasks'))
+      .order('desc')
+      .take(1);
+    if (lastEdit.length === 0) return null;
+    // Get the corresponding task document
+    const taskId = lastEdit[0].entityId as Id<'tasks'>;
+    const task = await ctx.db.get(taskId);
+    return { lastEdit: lastEdit[0], task };
+  },
+});

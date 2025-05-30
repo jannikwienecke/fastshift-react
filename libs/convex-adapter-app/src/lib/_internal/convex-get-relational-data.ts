@@ -6,7 +6,6 @@ import {
   QueryServerProps,
 } from '@apps-next/core';
 import { filterByNotDeleted, queryClient } from './convex-client';
-import { queryHelper } from './convex-query-helper';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
 

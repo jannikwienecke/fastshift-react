@@ -137,6 +137,11 @@ export function ListDefault<TItem extends ListItem = ListItem>({
                 <div className="bg-muted/70 border-foreground/5 text-sm pr-6">
                   <div className="py-[8px] pl-9 flex justify-between items-center">
                     <div className="flex gap-2 items-center">
+                      {grouping.groupIcon ? (
+                        <div>
+                          <grouping.groupIcon className="h-4 w-4 " />
+                        </div>
+                      ) : null}
                       <div>{group.groupByLabel}</div>
 
                       <div>{itemsOfGroup.length}</div>

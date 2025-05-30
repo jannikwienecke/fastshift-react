@@ -7,6 +7,7 @@ export const headers: {
 } = {
   view: 'View',
   admin: 'Admin',
+  navigation: 'Navigation',
 };
 
 export const historyChangedTypes: {
@@ -53,6 +54,14 @@ export const en = {
     createNewView: 'Create new view',
     saveView: 'Save view',
     headers: headers,
+    copyId: 'Copy {{name}} ID',
+    copyUrl: 'Copy {{name}} URL',
+    favoriteModel: 'Favorite {{name}}',
+    unfavoriteModel: 'Unfavorite {{name}}',
+    deleteModel: 'Delete {{name}}',
+    remindMeLater: 'Remind me about this {{name}}...',
+    goTo: 'Go to {{name}}',
+    open: 'Open {{name}}',
   },
 
   displayOptions: {
