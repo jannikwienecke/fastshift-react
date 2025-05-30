@@ -61,10 +61,7 @@ export type FieldConfigOptions<
   validator?: () => any;
   validationErrorMessage?: (t: any) => string;
   useAsSidebarFilter?: boolean;
-  getEnumLabel?: (
-    t: (label: string) => string,
-    value: GetTableDataType<T>[F]
-  ) => string;
+  getEnumLabel?: (t: (label: string) => string, value: string) => string;
 };
 
 export type FieldConfig<TName = string> = {

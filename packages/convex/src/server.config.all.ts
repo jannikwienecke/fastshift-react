@@ -6,6 +6,7 @@ import { CheckCheckIcon, TagIcon } from 'lucide-react';
 import { z } from 'zod';
 import { Projects, Tags, Tasks, Todos } from '../convex/schema';
 import { config } from './server.config';
+import { Doc } from '../convex/_generated/dataModel';
 
 // FIXME -> Defined in one place
 
@@ -60,7 +61,7 @@ export const tasksConfig = createViewConfig(
       priority: {
         defaultValue: 1,
         getEnumLabel(t, value) {
-          switch (value) {
+          switch (value as unknown as Doc<'tasks'>['priority']) {
             case 1:
               return t('priority.none');
             case 2:
@@ -153,7 +154,7 @@ export const tasksConfig = createViewConfig(
   config.config
 );
 
-export const projectsConfig = createViewConfig<'projects'>(
+export const projectsConfig = createViewConfig(
   'projects',
   {
     viewName: 'projects',
