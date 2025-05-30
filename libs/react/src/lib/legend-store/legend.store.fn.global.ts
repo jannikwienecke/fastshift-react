@@ -1,15 +1,16 @@
 import {
   _log,
-  configManager,
   getViewByName,
   makeData,
+  NONE_OPTION,
   QueryReturnType,
   RelationalDataModel,
+  RelationalFilterDataModel,
   sortRows,
+  t,
 } from '@apps-next/core';
 import { batch, Observable } from '@legendapp/state';
 import { ignoreNewData$ } from './legend.mutationts';
-import { xSelect } from './legend.select-state';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
 
@@ -190,8 +191,6 @@ const handleFilterChangedState = async (
     return allIds?.some((id) => id === row['id']);
   });
 
-  store$.createDataModel(all);
-
   store$.state.set('initialized');
 
   store$.fetchMore.assign({
@@ -199,6 +198,8 @@ const handleFilterChangedState = async (
     nextCursor: queryReturn.continueCursor,
     isDone: queryReturn.isDone ?? false,
   });
+
+  store$.createDataModel(all);
 };
 
 const handleMutatingState = async (
@@ -247,6 +248,8 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
 
     if (data.isPending) return;
 
+    store$.allIds.set(data.allIds ?? []);
+
     _log.debug(
       `____handleIncomingData`,
       state,
@@ -282,6 +285,11 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
 
       case 'filter-changed':
         _log.debug('RECEIVING DATA AFTER FILTER CHANGED');
+        await handleFilterChangedState(store$, data);
+        break;
+
+      case 'temp-filter-changed':
+        _log.debug('RECEIVING DATA AFTER TEMP FILTER CHANGED');
         await handleFilterChangedState(store$, data);
         break;
 
@@ -366,3 +374,30 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
       }
     }
   };
+
+export const handleIncomingRelationalFilterData: StoreFn<
+  'handleIncomingRelationalFilterData'
+> = (store$) => async (data) => {
+  const hasNoKeys = Object.keys(data).length === 0;
+  if (hasNoKeys) return;
+
+  const parsedData = Object.entries(data).reduce((acc, [tableName, data]) => {
+    return {
+      ...acc,
+      [tableName]: data.map((item) => {
+        const row = makeData(store$.views.get(), tableName)([item.record])
+          .rows?.[0];
+        row.raw = { ...row.raw, count: item.count };
+
+        if (!row.label && !item.record) {
+          row.label = `No ${t(`${tableName}.one`)}`;
+          row.id = NONE_OPTION;
+        }
+
+        return row;
+      }),
+    };
+  }, {} satisfies RelationalFilterDataModel);
+
+  store$.relationalFilterData.set(parsedData);
+};

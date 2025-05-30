@@ -48,9 +48,35 @@ export const viewLoaderHandler = async (
 
   const viewConfigManager = args.viewConfigManager;
   if (!viewConfigManager) throw new Error('viewConfigManager is not defined');
-
   // console.info(args.parentId);
   // "filters": "filter[]=projects:is:j978hgpasa3s6pzej5j22abh2x7e86mf||Learn%20Spanish:relation;false",
+
+  // 'filter[]=projects:is:j970tn6yxftgmjj1et2zxfwa0d7gmchk||Learn%20Spanish:relation;false&filter[]=tags:is:jd73axh3m5h8npp060fmqe1q017gne6p||Quick:relation;false'
+
+  // 'filter[]=projects:is%20any%20of:j9709cr389477jayjet0nmwqhet0nmwqnh7gmzgk||Home%20Renovation,j970tn6yxftgmjj1et2zxfwa0d7gmchk||Learn%20Spanish:relation;false'
+
+  if (args.tempFilter) {
+    // tempFilter example: "projects:1231312312"
+    const [tableName, recordId] = args.tempFilter.split(':');
+    if (args.filters) {
+      // Check if the tableName already exists in filters
+      const filterRegex = new RegExp(`filter\\[\\]=${tableName}:[^&]*`, 'g');
+      const existingFilter = args.filters.match(filterRegex);
+
+      if (existingFilter) {
+        // Replace existing filter for the same table
+        args.filters = args.filters.replace(
+          filterRegex,
+          `filter[]=${tableName}:is:${recordId}||nolabel:relation;false`
+        );
+      } else {
+        // Add new filter
+        args.filters = `${args.filters}&filter[]=${tableName}:is:${recordId}||nolabel:relation;false`;
+      }
+    } else {
+      args.filters = `filter[]=${tableName}:is:${recordId}||nolabel:relation;false`;
+    }
+  }
 
   const parsedFilters = parseFilterStringForServer(
     args.filters ?? '',

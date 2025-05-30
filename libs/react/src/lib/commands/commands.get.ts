@@ -5,10 +5,15 @@ import {
   t,
   TranslationKeys,
 } from '@apps-next/core';
-import { store$ } from '../legend-store';
+import { getViewConfigManager, store$ } from '../legend-store';
 import { getViewFieldsOptions } from '../legend-store/legend.combobox.helper';
 import { commands } from './commands';
 import { commandsHelper } from './commands.helper';
+import { makeCopyCommands } from './commands.copy';
+import { makeModelCommands } from './commands.model';
+import { makeGoToCommands } from './commands.goTo';
+import { makeOpenCommands } from './commands.open';
+import { makeGlobalQueryCommands } from './commands.globalQuery';
 
 export const getOpenCreateModelFormCommands = () => {
   const views = store$.views.get();
@@ -32,7 +37,7 @@ export const getOpenCreateModelFormCommands = () => {
     return true;
   });
 
-  const currentTableName = store$.viewConfigManager.getTableName();
+  const currentTableName = getViewConfigManager()?.getTableName();
   return viewsToUse
     .filter(Boolean)
     .map((view) => {
@@ -73,6 +78,11 @@ const getCommandsForCurrentView = (): CommandbarItem[] => {
 };
 
 export const getCommandsList = (): CommandbarItem[] => {
+  if (store$.commandbar.selectedViewField.get()) {
+    // if a view field is selected, we only show the commands for that field
+    return [];
+  }
+
   const currentViewCommands = getCommandsForCurrentView();
 
   const userStoreCommands = commandsHelper.getUserStoreCommands();
@@ -80,6 +90,11 @@ export const getCommandsList = (): CommandbarItem[] => {
   const openCreateModelFormCommands = getOpenCreateModelFormCommands();
   return [
     ...currentViewCommands,
+    ...makeCopyCommands(),
+    ...makeModelCommands(),
+    ...makeOpenCommands(),
+    ...makeGoToCommands(),
+    ...makeGlobalQueryCommands(),
     commands.viewCommand,
     commands.viewSaveCommand,
     ...openCreateModelFormCommands,

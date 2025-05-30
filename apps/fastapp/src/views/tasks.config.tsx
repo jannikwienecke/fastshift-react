@@ -9,6 +9,7 @@ import {
   PriorityListItemComponent as PriorityComponent,
   PriorityComponentCombobox,
   PriorityDetailtemComponent,
+  PriorityListItemComponent,
   ProjectComponent,
   ProjectComponentCombobox,
   TagsComponent,
@@ -24,6 +25,16 @@ export const tasksUiViewConfig = makeViewFieldsConfig<TaskViewDataType>(
   {
     onDelete: {
       showConfirmation: true,
+    },
+    renderCommandbarRow(props) {
+      return (
+        <div className="flex flex-row items-center gap-3">
+          <CompletedComponent data={props.row.raw} />
+          <PriorityListItemComponent data={props.row.raw} />
+
+          <div>{props.row.label}</div>
+        </div>
+      );
     },
     fields: {
       tasks: {
@@ -129,6 +140,7 @@ export const tasksUiViewConfig = makeViewFieldsConfig<TaskViewDataType>(
           contextmenuFieldOption: ProjectComponentCombobox,
         },
       },
+
       dueDate: {
         component: {
           icon: CalendarIcon,

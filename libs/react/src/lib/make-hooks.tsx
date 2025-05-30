@@ -14,6 +14,7 @@ import { makeCommandformProps } from './ui-adapter/commandform-adapter';
 import { makeDetailPageProps } from './legend-store/legend.detail.adapter';
 import { makePageHeaderProps } from './legend-store/legend.pageheader.adapter';
 import { makeSaveViewDropdownProps } from './legend-store/legend.saveViewDropdown.adapter';
+import { makeRightSidebarProps } from './legend-store/legend.rightsidebar.adapter';
 
 export const makeHooks = <T extends DataType | ViewConfigType>(
   viewConfig?: T
@@ -34,5 +35,6 @@ export const makeHooks = <T extends DataType | ViewConfigType>(
     makeSaveViewDropdownProps: makeSaveViewDropdownProps<DataTypeToUse<T>>,
     makeDetailPageProps: makeDetailPageProps<DataTypeToUse<T>>,
     makePageHeaderProps: makePageHeaderProps<DataTypeToUse<T>>,
+    makeRightSidebarProps: makeRightSidebarProps<DataTypeToUse<T>>,
   };
 };

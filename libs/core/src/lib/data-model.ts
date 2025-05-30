@@ -32,6 +32,10 @@ export type RelationalDataModel<T extends RecordType = RecordType> = {
   [key: string]: DataModelNew<T>;
 };
 
+export type RelationalFilterDataModel<T extends RecordType = RecordType> = {
+  [key: string]: Row<T & { count: number | null }>[];
+};
+
 export const makeData = (registeredViews: RegisteredViews, name: string) => {
   if (Object.keys(registeredViews).length === 0) {
     throw new Error('Registered views not found');

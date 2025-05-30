@@ -12,3 +12,4 @@ export * from './legend.store.persisted';
 export * from './legend.view-actions';
 export * from './legend.utils';
 export * from './legend.utils.helper';
+export * from './legend.key-events';

@@ -5,6 +5,7 @@ import {
   MakeDisplayOptionsPropsOptions,
   MakeFilterPropsOptions,
   MakeListPropsOptions,
+  MakeRightSidebarOption,
   RecordType,
 } from '@apps-next/core';
 import {
@@ -28,6 +29,7 @@ import {
   SaveViewDropdown,
   UserViewForm,
   pageHeader,
+  rightSidebar,
 } from '@apps-next/ui';
 import { Memo, observer } from '@legendapp/state/react';
 import { TaskViewDataType } from '../views/tasks.components';
@@ -101,6 +103,22 @@ export const RenderList = observer(
       <Memo>
         {() => {
           return <List.Default {...makeListProps(props.options)} />;
+        }}
+      </Memo>
+    );
+  }
+);
+
+export const RenderRightSidebar = observer(
+  (props: { options?: MakeRightSidebarOption }) => {
+    const { makeRightSidebarProps } = makeHooks<TaskViewDataType>();
+
+    return (
+      <Memo>
+        {() => {
+          return (
+            <rightSidebar.default {...makeRightSidebarProps(props.options)} />
+          );
         }}
       </Memo>
     );

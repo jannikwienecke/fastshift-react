@@ -5,6 +5,7 @@ import { makeRow, Row } from './data-model';
 import { t, TranslationKeys } from './translations';
 import {
   FieldConfig,
+  FieldConfigOptions,
   ID,
   QUERY_KEY_PREFIX,
   RecordType,
@@ -268,14 +269,26 @@ export const parseDisplayOptionsStringForServer = (
   return options;
 };
 
-export function arrayIntersection(...arrays: (ID[] | null)[]): ID[] | null {
+export function arrayIntersection(
+  ...arrays: (ID[] | null | ID[][])[]
+): ID[] | null {
   if (arrays.filter((a) => a != null).length === 0) return null;
-  // if (arrays.length)
 
-  const allIds = [...new Set(arrays.filter((a) => a != null).flat())];
+  const allIds = [...new Set(arrays.filter((a) => a != null).flat())].flat();
 
-  const result = allIds.filter((value) => {
-    return arrays
+  const arrays_ = [] as ID[][];
+  arrays.forEach((array) => {
+    if (Array.isArray(array?.[0])) {
+      for (const subArray of array) {
+        arrays_.push(subArray as ID[]);
+      }
+    } else {
+      arrays_.push(array as ID[]);
+    }
+  });
+
+  const result = [...new Set(allIds)].filter((value) => {
+    return arrays_
       .filter((a) => a != null)
       .every((array) => array?.includes(value));
   });
@@ -608,7 +621,16 @@ export const patchAllViews = (views: RegisteredViews) => {
     return {
       ...view,
       viewFields: patchDict(view.viewFields, (f) => {
-        const userFieldConfig = view.fields?.[f.name];
+        let relationalFieldConfig: FieldConfigOptions = {};
+        if (f.relation?.fieldName) {
+          relationalFieldConfig = view.fields?.[f.relation.fieldName] || {};
+        }
+
+        const fieldConfig = view.fields?.[f.name];
+        const userFieldConfig = {
+          ...relationalFieldConfig,
+          ...fieldConfig,
+        };
         const displayFIeld = view.displayField.field;
         const softDeleteField = view.mutation?.softDeleteField;
 

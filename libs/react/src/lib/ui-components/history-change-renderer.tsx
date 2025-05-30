@@ -176,8 +176,6 @@ const RenderFieldName = ({
 }: {
   name: HistoryType['changed']['fieldName'];
 }) => {
-  console.log('RenderFieldName', name);
-
   return (
     <div className="border-[.5px] px-2 rounded-sm border-foreground/20">
       {t(`${name}.one` as any)}

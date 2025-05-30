@@ -7,6 +7,8 @@ export const headers: {
 } = {
   view: 'View',
   admin: 'Admin',
+  navigation: 'Navigation',
+  'global-query': 'Search for "{{query}}"',
 };
 
 export const historyChangedTypes: {
@@ -53,6 +55,14 @@ export const en = {
     createNewView: 'Create new view',
     saveView: 'Save view',
     headers: headers,
+    copyId: 'Copy {{name}} ID',
+    copyUrl: 'Copy {{name}} URL',
+    favoriteModel: 'Favorite {{name}}',
+    unfavoriteModel: 'Unfavorite {{name}}',
+    deleteModel: 'Delete {{name}}',
+    remindMeLater: 'Remind me about this {{name}}...',
+    goTo: 'Go to {{name}}',
+    open: 'Open {{name}}',
   },
 
   displayOptions: {
@@ -125,6 +135,12 @@ export const en = {
 
   richEditor: {
     placeholder: 'Add {{name}}...',
+  },
+
+  rightSidebar: {
+    noModelUser: 'No {{model}} used',
+    see: 'See {{model}}',
+    noResults: 'Nothing found',
   },
 
   error: {

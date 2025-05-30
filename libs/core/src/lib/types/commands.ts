@@ -7,11 +7,18 @@ export type CommandName =
   | 'update-model-attribute'
   | 'select-model-attribute'
   | 'select-model-relational-option'
-  | 'user-store-command';
+  | 'user-store-command'
+  | 'copy-model'
+  | 'model-commands'
+  | 'goTo-commands'
+  | 'open-commands'
+  | 'global-query-commands'
+  | 'navigation-commands';
 
 export type CommandHeader =
   | 'view'
   | 'admin'
+  | 'navigation'
   | (string & {
       //
     });

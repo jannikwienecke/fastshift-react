@@ -1,5 +1,6 @@
 import {
   _log,
+  ComponentType,
   getViewByName,
   MakeDetailPropsOption,
   UiViewConfig,
@@ -15,7 +16,7 @@ const viewsConfigStore = observable<{
   [key: string]: ViewRegistryEntry;
 }>({});
 
-const addView = (config: ViewConfigType) => {
+const addView = <T extends ViewConfigType>(config: T) => {
   _log.debug('viewsConfigStore:addView', config.viewName);
 
   viewsConfigStore.set({

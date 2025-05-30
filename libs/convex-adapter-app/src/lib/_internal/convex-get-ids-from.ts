@@ -186,7 +186,7 @@ export const getIdsFromManyToManyFilters = async (
   });
 
   return {
-    ids: [...new Set(idsLists.flat())],
+    ids: idsLists.filter((v) => v !== null).filter((v) => v !== undefined),
     idsToRemove: [...new Set(idsToRemove)],
   };
 };
@@ -245,7 +245,7 @@ export const getIdsFromOneToManyFilters = async (
   });
 
   return {
-    ids: [...new Set(listOfIds.flat())],
+    ids: listOfIds,
     idsToRemove: [...new Set(idsToRemove)],
   };
 };
@@ -255,7 +255,7 @@ export const getIdsFromIndexFilters = async (
   indexFields: SearchField[] | undefined,
   ctx: GenericQueryCtx,
   viewConfigManager: BaseViewConfigManagerInterface
-): Promise<{ ids: ID[]; idsToRemove: ID[] }> => {
+): Promise<{ ids: ID[][]; idsToRemove: ID[] }> => {
   if (!indexFields) return { ids: [], idsToRemove: [] };
   if (!filtersWithIndexField) return { ids: [], idsToRemove: [] };
   if (!filtersWithIndexField.length) return { ids: [], idsToRemove: [] };
@@ -351,7 +351,7 @@ export const getIdsFromIndexFilters = async (
   );
 
   return {
-    ids: [...new Set(idsIndexField.flat())],
+    ids: idsIndexField,
     idsToRemove: [...new Set(idsIndexFieldToRemove)],
   };
 };

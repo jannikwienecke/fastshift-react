@@ -1,5 +1,15 @@
 import { operatorLabels } from '../filters';
-import { headers, en } from './en';
+import { en } from './en';
+import { CommandHeader as commandHeaders } from '../types/commands';
+
+const headers: {
+  [key in commandHeaders]: string;
+} = {
+  view: 'Ansicht',
+  admin: 'Admin',
+  navigation: 'Navigation',
+  'global-query': 'Suche nach "{{query}}"',
+};
 
 export const de = {
   filter: {
@@ -110,6 +120,13 @@ export const de = {
   richEditor: {
     placeholder: '{{name}} hinzufügen...',
   },
+
+  rightSidebar: {
+    noModelUser: '{{model}} nicht verwendet',
+    see: '{{model}} ansehen',
+    noResults: 'Keine Ergebnisse gefunden',
+  },
+
   error: {
     title: '⚠️ ️️Oops! Etwas ist schiefgelaufen',
     showDetails: 'Details anzeigen',
@@ -153,8 +170,16 @@ export const de = {
   },
 
   __commands: {
-    createNewView: 'Create new view',
-    saveView: 'Save view',
+    createNewView: 'Neue Ansicht erstellen',
+    saveView: 'Ansicht speichern',
     headers: headers,
+    copyId: 'ID kopieren',
+    copyUrl: 'URL kopieren',
+    deleteModel: '{{name}} löschen',
+    favoriteModel: '{{name}} favorisieren',
+    unfavoriteModel: '{{name}} nicht mehr favorisieren',
+    open: '{{name}} öffnen',
+    goTo: 'Gehe zu {{name}}',
+    remindMeLater: 'Erinnere mich später',
   },
 } satisfies typeof en;

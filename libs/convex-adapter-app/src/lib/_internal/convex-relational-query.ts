@@ -5,7 +5,6 @@ import {
 } from '@apps-next/core';
 import { filterByNotDeleted, queryClient } from './convex-client';
 import { filterResults } from './convex-filter-results';
-import { mapWithInclude } from './convex-map-with-include';
 import { withSearch } from './convex-searching';
 import { GenericQueryCtx } from './convex.server.types';
 
@@ -16,18 +15,15 @@ export const handleRelationalTableQuery = async ({
   ctx: GenericQueryCtx;
   args: QueryServerProps;
 }) => {
-  const { viewConfigManager } = args;
-
   const relationQuery = args.relationQuery;
+
   if (!relationQuery?.tableName) throw new Error('No table name provided');
 
-  const field = viewConfigManager.getRelationFieldByTableName(
-    relationQuery.tableName
-  );
+  const tableName = relationQuery.tableName;
 
-  const dbQuery = queryClient(ctx, field.name);
+  const dbQuery = queryClient(ctx, tableName);
   const { relationalViewManager } = relationalViewHelper(
-    field.name,
+    tableName,
     args.registeredViews
   );
 
@@ -35,7 +31,7 @@ export const handleRelationalTableQuery = async ({
 
   const searchFields = relationalViewManager.getSearchableFields() || [];
 
-  const query = queryClient(ctx, field.name);
+  const query = queryClient(ctx, tableName);
 
   const rowsNotDeleted = indexFieldDeleted
     ? await filterByNotDeleted(query, indexFieldDeleted).collect()

@@ -10,6 +10,7 @@ import {
   getSharedStateList,
   getSharedStateSelectState,
   getSharedStateSorting,
+  getStateSelectOpenCommand,
   handleRelationalField,
   makeComboboxStateFilterOptions,
   makeComboboxStateFilterValuesBoolean,
@@ -19,6 +20,7 @@ import {
   makeComboboxStateFilterValuesNumber,
   makeComboboxStateFilterValuesOperator,
   makeComboboxStateGroupingOptions,
+  makeComboboxStateOpenCommandbar,
   makeComboboxStateSortingOptions,
 } from './legend.combobox.helper';
 import { selectState$ } from './legend.select-state';
@@ -50,6 +52,10 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     ? store$.commandform.field.get()
     : null;
 
+  const selectedCommandbarTableName = commandbarIsOpen
+    ? store$.commandbar.activeOpen.tableName.get()
+    : null;
+
   const selectedListField = store$.list.selectedRelationField.get()?.field;
 
   const isList = !!store$.list.selectedRelationField.get();
@@ -64,7 +70,8 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     !displayOptionsGroupingIsOpen &&
     !isCommandbar &&
     !isCommandform &&
-    !isSelectState
+    !isSelectState &&
+    !selectedCommandbarTableName
   )
     return DEFAULT_COMBOBOX_STATE;
 
@@ -101,20 +108,21 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
     ? true
     : false;
 
-  const stateShared =
-    isSelectState && !isList
-      ? getSharedStateSelectState()
-      : isCommandform
-      ? stateSharedCommandform
-      : isCommandbar
-      ? getSharedStateCommandbar()
-      : isList
-      ? stateSharedList
-      : displayOptionsSortingIsOpen
-      ? stateSharedSorting
-      : displayOptionsGroupingIsOpen
-      ? stateSharedGrouping
-      : stateSharedFilter;
+  const stateShared = selectedCommandbarTableName
+    ? getStateSelectOpenCommand()
+    : isSelectState && !isList
+    ? getSharedStateSelectState()
+    : isCommandform
+    ? stateSharedCommandform
+    : isCommandbar
+    ? getSharedStateCommandbar()
+    : isList
+    ? stateSharedList
+    : displayOptionsSortingIsOpen
+    ? stateSharedSorting
+    : displayOptionsGroupingIsOpen
+    ? stateSharedGrouping
+    : stateSharedFilter;
 
   const selected = isList ? selectedOfList : selectedOfFilter;
 
@@ -128,7 +136,9 @@ export const comboboxStore$ = observable<ComboboxState>(() => {
 
   let options: MakeComboboxStateProps | null = null;
 
-  if (operatorField) {
+  if (selectedCommandbarTableName) {
+    options = makeComboboxStateOpenCommandbar();
+  } else if (operatorField) {
     options = makeComboboxStateFilterValuesOperator(operatorField);
   } else if (field && store$.combobox.datePicker.open.get()) {
     options = makeComboboxStateFilterValuesDatePicker(field);

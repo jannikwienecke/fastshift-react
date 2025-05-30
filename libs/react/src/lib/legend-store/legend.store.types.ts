@@ -32,6 +32,9 @@ import {
   UserViewForm,
   ViewConfigType,
   Mutation,
+  RelationalFilterQueryDto,
+  RelationalFilterDataModel,
+  CommandbarItem,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { QueryClient } from '@tanstack/react-query';
@@ -137,6 +140,7 @@ export type LegendStore = {
   handleIncomingData: (props: QueryReturnOrUndefined) => void;
   handleIncomingRelationalData: (props: QueryReturnOrUndefined) => void;
   handleIncomingDetailData: (props: QueryReturnOrUndefined) => void;
+  handleIncomingRelationalFilterData: (data: RelationalFilterQueryDto) => void;
 
   state:
     | 'pending'
@@ -145,12 +149,15 @@ export type LegendStore = {
     | 'updating-display-options'
     | 'filter-changed'
     | 'mutating'
-    | 'invalidated';
+    | 'invalidated'
+    | 'temp-filter-changed';
 
   // MAIN DATA MODEL
   dataModel: DataModelNew;
+  allIds?: string[];
   dataModelBackup: DataModelNew;
   relationalDataModel: RelationalDataModel;
+  relationalFilterData: RelationalFilterDataModel;
   uiViewConfig: UiViewConfig;
 
   mutating:
@@ -200,6 +207,9 @@ export type LegendStore = {
 
   globalQuery: string;
   globalQueryDebounced: string;
+  globalQueryData: {
+    [key: string]: Row[] | null;
+  };
 
   errorDialog: {
     error: MutationHandlerErrorType | null;
@@ -232,6 +242,9 @@ export type LegendStore = {
     selectedViewField?: FieldConfig;
     activeItem: ComboxboxItem | null;
     activeRow: Row | null;
+    activeOpen?: {
+      tableName: string;
+    } | null;
   } & Omit<
     CommandbarProps,
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'
@@ -464,6 +477,21 @@ export type LegendStore = {
       fn: (field: FieldConfig, row: Row, cb: () => void) => void;
     };
   };
+
+  pageHeader: {
+    showSearchInput: boolean;
+  };
+
+  rightSidebar: {
+    open: boolean;
+    filter?: {
+      tableName?: string | null;
+      id?: string | null;
+    };
+  };
+
+  viewQuery: string;
+  debouncedViewQuery: string;
 
   detailpageChangeInput: (
     field: CommandformItem,

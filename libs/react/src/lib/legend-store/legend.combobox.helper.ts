@@ -61,6 +61,25 @@ export const getViewFieldsOptions = (options?: {
     multiple: false,
   };
 };
+export const makeComboboxStateOpenCommandbar =
+  (): MakeComboboxStateProps | null => {
+    const tableName = store$.commandbar.activeOpen.tableName.get();
+    if (!tableName) return null;
+
+    const debouncedQuery = comboboxDebouncedQuery$.get();
+    const defaultData = store$.relationalDataModel[tableName]?.get() ?? {
+      rows: [],
+    };
+
+    const valuesQuery = store$.combobox.values.get();
+
+    return {
+      values: debouncedQuery.length ? valuesQuery : defaultData.rows ?? [],
+      tableName,
+      multiple: false,
+      selected: [],
+    } as MakeComboboxStateProps;
+  };
 
 export const makeComboboxStateSortingOptions =
   (): MakeComboboxStateProps | null => {
@@ -565,6 +584,25 @@ export const getSharedStateSelectState = (): ComboboxStateCommonType => {
     field: field,
     selected: getDefaultSelectedList(),
     row: row as Row,
+  };
+
+  return stateShared;
+};
+
+export const getStateSelectOpenCommand = (): ComboboxStateCommonType => {
+  const activeOpen = store$.commandbar.activeOpen.get();
+  if (!activeOpen?.tableName) return DEFAULT_COMBOBOX_STATE;
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: selectState$.rect.get() ?? null,
+    searchable: true,
+    name: 'select-open-command_' + activeOpen.tableName,
+    isNewState: true,
+    open: false,
+    query: store$.combobox.query.get(),
+    field: null,
+    selected: getDefaultSelectedList(),
+    row: null,
   };
 
   return stateShared;

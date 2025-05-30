@@ -1,29 +1,29 @@
-import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import {
+  getFieldLabel,
+  PageHeaderProps,
+  useTranslation,
+} from '@apps-next/core';
 import {
   Layers3Icon,
   MoreHorizontal,
-  PencilIcon,
+  PanelRightIcon,
+  SearchIcon,
   StarIcon,
 } from 'lucide-react';
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
+  BreadcrumbList,
   BreadcrumbPage,
-  DropdownMenuItem,
+  BreadcrumbSeparator,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-  Button,
+  SearchInput,
 } from './components';
-import {
-  getFieldLabel,
-  PageHeaderProps,
-  t,
-  useTranslation,
-} from '@apps-next/core';
 import { cn } from './utils';
 
 const DefaultPageHeaderMain = (props: PageHeaderProps) => {
@@ -32,7 +32,7 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
   return (
     <div
       data-testid="main-page-header"
-      className="flex flex-row items-center justify-between"
+      className="flex flex-row items-center justify-between w-full"
     >
       <Breadcrumb>
         <BreadcrumbList>
@@ -107,6 +107,39 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <div data-testid="right-header-actions" className="pr-4">
+        {props.query?.showInput ? (
+          <SearchInput
+            onChange={(e) => {
+              props.query?.onChange(e.target.value);
+            }}
+            autoFocus
+            placeholder="Find in view..."
+            onBlur={props.query.onBlur}
+          />
+        ) : (
+          <div className="flex flex-row gap-0 items-center">
+            <Button
+              variant={'ghost'}
+              size="icon"
+              onClick={props.query?.toggleShowInput}
+            >
+              <SearchIcon className="h-4 w-4" />
+            </Button>
+
+            {props.query?.onToggleRightSidebar ? (
+              <Button
+                variant={'ghost'}
+                size="icon"
+                onClick={props.query?.onToggleRightSidebar}
+              >
+                <PanelRightIcon className="h-4 w-4" />
+              </Button>
+            ) : null}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

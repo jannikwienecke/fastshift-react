@@ -29,6 +29,10 @@ export const tasksConfig = createViewConfig(
     },
 
     fields: {
+      projectId: {
+        useAsSidebarFilter: true,
+      },
+
       dueDate: {
         isDateField: true,
         defaultValue: () => {
@@ -55,6 +59,20 @@ export const tasksConfig = createViewConfig(
       },
       priority: {
         defaultValue: 1,
+        getEnumLabel(t, value) {
+          switch (value) {
+            case 1:
+              return t('priority.none');
+            case 2:
+              return t('priority.low');
+            case 3:
+              return t('priority.medium');
+            case 4:
+              return t('priority.high');
+            case 5:
+              return t('priority.urgent');
+          }
+        },
       },
       description: {
         richEditor: true,
@@ -70,6 +88,7 @@ export const tasksConfig = createViewConfig(
       },
       tags: {
         showInProperties: true,
+        useAsSidebarFilter: true,
       },
     },
 
@@ -134,7 +153,7 @@ export const tasksConfig = createViewConfig(
   config.config
 );
 
-export const projectsConfig = createViewConfig(
+export const projectsConfig = createViewConfig<'projects'>(
   'projects',
   {
     viewName: 'projects',
@@ -143,7 +162,14 @@ export const projectsConfig = createViewConfig(
     displayField: {
       field: 'label',
     },
+
     fields: {
+      categoryId: {
+        useAsSidebarFilter: true,
+      },
+      ownerId: {
+        useAsSidebarFilter: true,
+      },
       dueDate: {
         isDateField: true,
         dateFormatter: (date) =>

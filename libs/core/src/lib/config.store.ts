@@ -21,6 +21,9 @@ export type UiViewConfig<
     onDelete?: {
       showConfirmation: boolean;
     };
+
+    renderCommandbarRow?: (props: { row: Row<U> }) => React.ReactNode;
+
     fields: Partial<{
       [key in keyof U]: {
         fieldLabel?: () => string | React.ReactNode;

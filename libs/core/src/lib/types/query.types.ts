@@ -14,6 +14,7 @@ export type QueryProps = {
   query?: string;
   viewId: string | null;
   filters?: string;
+  tempFilter?: string | undefined;
   displayOptions?: string;
   paginateOptions?: {
     cursor: ContinueCursor;
@@ -33,6 +34,12 @@ export type QueryProps = {
   disabled?: boolean;
 };
 
+export type RelationalFilterQueryProps = {
+  tableName: string;
+  withCount: boolean;
+  ids: string[] | undefined;
+};
+
 export type QueryDto = {
   viewConfig?: ViewConfigType;
   viewConfigManager?: BaseViewConfigManagerInterface;
@@ -40,6 +47,7 @@ export type QueryDto = {
   parentViewName?: string | null;
   parentId?: string | null;
   filters?: string;
+  tempFilter?: string | undefined;
   displayOptions?: string;
   onlyRelationalData?: boolean;
 } & Omit<QueryProps, 'viewConfigManager'>;
@@ -99,6 +107,13 @@ export type QueryReturnDto<T extends RecordType = RecordType> = {
   isDone: boolean;
   allIds: string[];
   view?: UserViewData;
+};
+
+export type RelationalFilterQueryDto = {
+  [table: string]: {
+    record: RecordType;
+    count: number | null;
+  }[];
 };
 
 export type QueryError = {

@@ -1,4 +1,4 @@
-import { Row } from '../data-model';
+import { RelationalFilterDataModel, Row } from '../data-model';
 import { TranslationKeys } from '../translations';
 import { FieldConfig, RecordType } from './base.types';
 import { CommandHeader, CommandName } from './commands';
@@ -8,6 +8,8 @@ import {
   UserViewForm,
 } from './filter.types';
 import { HistoryType } from './history.types';
+import { UserViewData } from './query.types';
+import { ViewConfigType } from './view-config.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
@@ -19,6 +21,7 @@ export type ComboxboxItem = {
   value?: unknown;
   rowValue?: Row;
   rowValues?: Row[];
+  render?: (active: boolean, index: number) => React.ReactNode;
 };
 
 export type DisplayOptionsViewField = {
@@ -61,6 +64,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
     groupByField: string;
     groupByTableName: string;
     groupLabel: string;
+    groupIcon?: React.FC<any>;
     groups: {
       groupById: string | number | undefined;
       groupByLabel: string;
@@ -168,6 +172,10 @@ export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
   //
 };
 
+export type MakeRightSidebarOption<T extends RecordType = RecordType> = {
+  //
+};
+
 export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
   onClickRelation?: (field: FieldConfig, row: Row, cb: () => void) => void;
 };
@@ -249,6 +257,45 @@ export type PageHeaderProps = {
     items: (CommandbarItem & ComboxboxItem)[];
   }[];
   onSelectOption: (item: CommandbarItem) => void;
+
+  query?: {
+    showInput: boolean;
+    query: string;
+
+    onBlur: () => void;
+    onToggleRightSidebar?: () => void;
+    toggleShowInput: () => void;
+    onChange: (query: string) => void;
+  };
+};
+
+export type RightSidebarProps = {
+  isOpen: boolean;
+  viewName: string;
+  viewIcon: React.FC<any>;
+  tableName: string;
+  onClose: () => void;
+
+  tabs: {
+    listRows: Row[];
+    listQueryIsDone: boolean;
+    relationalFilterData: RelationalFilterDataModel;
+    query: string;
+    activeTab: string;
+    currentFilter?: { id?: string | null; tableName?: string | null } | null;
+
+    onTabChange: (tab: string) => void;
+    onQueryChange: (query: string) => void;
+    setFilter: (filter?: { id: string; tableName: string }) => void;
+    getView: (tableName: string) => ViewConfigType | undefined;
+    getUserView: (name: string) => UserViewData | undefined;
+    getTabProps: (tab: string) => {
+      icon: React.FC<any> | undefined;
+      ids: string[];
+      getCountForRow: (row: Row) => number;
+      shouldNotRender: (row: Row) => boolean;
+    };
+  };
 };
 
 export type ConfirmationDialogProps = {
@@ -387,6 +434,7 @@ export type CommandbarProps = {
     header: string;
     items: (CommandbarItem & ComboxboxItem)[];
   }[];
+  activeItem?: ComboxboxItem | null;
   headerLabel: string;
   inputPlaceholder: string;
   query?: string;

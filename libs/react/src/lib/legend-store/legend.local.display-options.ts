@@ -59,8 +59,6 @@ export const addLocalDisplayOptionsHandling = (
 
     if (!changes.value) return;
 
-    // const prevAtPath = changes.changes[0].prevAtPath;
-
     applyDisplayOptions(store$, store$.displayOptions.get());
   });
   store$.displayOptions.sorting.order.onChange((changes) => {

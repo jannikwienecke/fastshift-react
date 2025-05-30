@@ -1,8 +1,6 @@
 import {
-  BaseViewConfigManager,
   ERROR_STATUS,
   FieldConfig,
-  getViewByName,
   INTERNAL_FIELDS,
   MutationHandlerReturnType,
   MutationPropsServer,
@@ -283,6 +281,8 @@ export const userViewMutation = async (
     throw new Error('INVALID MUTATION-5');
 
   const dbMutation = mutationClient(ctx);
+
+  console.log(mutation.payload);
 
   if (mutation.payload.type === 'CREATE_NEW_VIEW') {
     try {

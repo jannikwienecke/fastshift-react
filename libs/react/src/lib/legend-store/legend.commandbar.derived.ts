@@ -9,6 +9,7 @@ import { getCommandGroups } from '../commands';
 import { getCommandbarPropsForFieldType } from '../commands/commands-field-type';
 import { store$ } from './legend.store';
 import { copyRow, isDetailOverview } from './legend.utils';
+import { getCommandsOpenModelList } from '../commands/commands.open.list';
 export const commandbarProps$ = observable<
   Partial<MakeConfirmationAlertPropsOption>
 >({});
@@ -34,6 +35,7 @@ export const derivedCommandbarState$ = observable(() => {
   }
 
   const fieldTypeCommandbarProps = getCommandbarPropsForFieldType();
+  const openModelListProps = getCommandsOpenModelList();
 
   const props = store$.commandbar.get();
   return {
@@ -43,6 +45,7 @@ export const derivedCommandbarState$ = observable(() => {
     onSelect: (...props) => store$.commandbarSelectItem(...props),
     onValueChange: (...props) => store$.commandbarSetValue(...props),
 
+    activeItem: store$.commandbar.activeItem.get(),
     open: props?.open ?? false,
     row: (store$.commandbar.activeRow.get() as Row) || undefined,
     headerLabel:
@@ -53,5 +56,6 @@ export const derivedCommandbarState$ = observable(() => {
     groups: getCommandGroups(),
 
     ...(fieldTypeCommandbarProps ?? {}),
+    ...(openModelListProps ?? {}),
   } satisfies Omit<CommandbarProps, 'renderItem'>;
 });

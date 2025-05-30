@@ -16,6 +16,8 @@ const _schema = defineSchema({
     ...tableMetaFields,
     email: v.string(),
     password: v.string(),
+  }).searchIndex('email', {
+    searchField: 'email',
   }),
 
   history: defineTable({
@@ -163,7 +165,9 @@ const _schema = defineSchema({
     .searchIndex('label', {
       searchField: 'label',
     })
-    .index('deleted', ['deleted_']),
+    .index('deleted', ['deleted_'])
+    .index('categoryId', ['categoryId'])
+    .index('ownerId', ['ownerId']),
 
   categories: defineTable({
     ...tableMetaFields,
