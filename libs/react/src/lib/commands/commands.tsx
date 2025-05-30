@@ -24,6 +24,7 @@ import {
 } from '../legend-store/legend.utils';
 import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
 import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
+import { setCommandbarQuery } from '../legend-store/legend.commandbar.fn';
 
 const getViewName = () => getViewConfigManager()?.getViewName();
 
@@ -68,7 +69,7 @@ const makeSelectModelAttributeCommand = (
     tablename: item.tablename,
     icon: item.icon,
     handler: ({ row }) => {
-      console.debug('makeSelectModelAttributeCommand - handler');
+      console.debug('makeSelectModelAttributeCommand called');
 
       //  DETAIL BRANCHING
       const field = getViewConfigManager().getFieldBy(item.id.toString());
@@ -94,7 +95,7 @@ const makeSelectModelAttributeCommand = (
         store$.commandbar.selectedViewField.set(field);
       }
 
-      store$.commandbar.query.set(query);
+      setCommandbarQuery(store$, query);
     },
   } satisfies CommandbarItem;
 

@@ -6,6 +6,7 @@ import {
 } from '@apps-next/core';
 import { store$, uiViewConfigDict$ } from '../legend-store';
 import { getViewName } from './commands.helper';
+import { setCommandbarQuery } from '../legend-store/legend.commandbar.fn';
 
 // open like -> open task -> then select which task to open
 // HIER WEITER MACHEN
@@ -37,7 +38,7 @@ export const makeOpenCommands = () => {
         icon: v._generated ? uiViewConfig?.icon || v.icon : v.icon,
         handler: () => {
           store$.commandbar.activeOpen.tableName.set(v.tableName);
-          store$.commandbar.query.set('');
+          setCommandbarQuery(store$, '');
         },
       };
 

@@ -1,6 +1,5 @@
 import { CommandbarProps } from '@apps-next/core';
 import { DialogTitle } from '@radix-ui/react-dialog';
-import { useCommandState } from 'cmdk';
 import React from 'react';
 import { Dialog, DialogContent } from '../components';
 import {
@@ -38,6 +37,8 @@ export const CommandDialogList = (props: {
   query?: CommandbarProps['query'];
   activeItem?: CommandbarProps['activeItem'];
 }) => {
+  const [hoveredItem, setHoveredItem] = React.useState<string>('');
+
   // const state = useCommandState((state) => state.value);
 
   const listRef = React.useRef<HTMLDivElement>(null);
@@ -75,8 +76,6 @@ export const CommandDialogList = (props: {
         Number(newIndex)
       ];
 
-      // console.log('item', item, newIndex);
-
       item && onValueChangeRef.current(item);
     };
 
@@ -84,7 +83,7 @@ export const CommandDialogList = (props: {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [props.activeItem?.id]);
+  }, [props.activeItem]);
 
   const prevIdKey = React.useRef<string | null>(null);
 
@@ -142,9 +141,8 @@ export const CommandDialogList = (props: {
 
             {group.items.map((item, index) => {
               // const active = props.activeItem?.id === item.id;
-              const active = !!props.activeItem?.label?.includes(
-                item.label.toString()
-              );
+
+              const active = !!hoveredItem?.includes(item.label.toString());
 
               if (!item) return null;
               return (
@@ -159,10 +157,13 @@ export const CommandDialogList = (props: {
                   <div
                     className="p-0 m-0 h-full w-full px-1 py-3"
                     onMouseOver={() => {
-                      props.onValueChange?.(item);
+                      setHoveredItem(item.label.toString());
+
+                      debounce(() => {
+                        props.onValueChange?.(item);
+                      }, 75);
                     }}
                     onClick={() => {
-                      console.log('onClick item', item);
                       props.onSelect?.(item);
                     }}
                   >
@@ -279,4 +280,13 @@ export function CommandDialogDefault(props: CommandbarProps | undefined) {
 
 export const commandbar = {
   default: CommandDialogDefault,
+};
+
+let timeoutId: ReturnType<typeof setTimeout>;
+const debounce = (func: () => void, delay: number) => {
+  clearTimeout(timeoutId);
+  timeoutId = setTimeout(() => {
+    console.log('debounced function called with args:');
+    func();
+  }, delay);
 };

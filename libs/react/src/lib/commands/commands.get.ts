@@ -77,6 +77,11 @@ const getCommandsForCurrentView = (): CommandbarItem[] => {
 };
 
 export const getCommandsList = (): CommandbarItem[] => {
+  if (store$.commandbar.selectedViewField.get()) {
+    // if a view field is selected, we only show the commands for that field
+    return [];
+  }
+
   const currentViewCommands = getCommandsForCurrentView();
 
   const userStoreCommands = commandsHelper.getUserStoreCommands();

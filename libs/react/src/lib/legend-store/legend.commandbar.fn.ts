@@ -3,7 +3,20 @@ import { handleCommand } from '../commands';
 import { commands } from '../commands/commands';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { xSelect } from './legend.select-state';
-import { StoreFn } from './legend.store.types';
+import { LegendStore, StoreFn } from './legend.store.types';
+import { Observable } from '@legendapp/state';
+
+export const setCommandbarQuery = (
+  store$: Observable<LegendStore>,
+  query?: string
+) => {
+  if (!query) {
+    store$.commandbar.query.set('');
+    return;
+  }
+
+  store$.commandbar.query.set(query.trim());
+};
 
 export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
   store$.openSpecificModal('commandbar', () => {
@@ -15,14 +28,13 @@ export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
 
 export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
   store$.commandbar.open.set(false);
-  store$.commandbar.query.set('');
+  setCommandbarQuery(store$, '');
   store$.commandbar.groups.set([]);
   store$.commandbar.selectedViewField.set(undefined);
   store$.combobox.query.set('');
   store$.commandbar.error.set(undefined);
   store$.commandbar.selectedViewField.set(undefined);
   store$.commandbar.activeOpen.set(undefined);
-  // store$.list.selectedRelationField.set()
   comboboxDebouncedQuery$.set('');
 };
 
@@ -33,12 +45,12 @@ export const commandbarOpenWithFieldValue: StoreFn<
   store$.commandbarOpen(row);
 
   if ((value as Row | undefined)?.id) {
-    store$.commandbar.query.set('');
+    setCommandbarQuery(store$);
     store$.commandbar.activeItem.set(row);
   } else if (field.type === 'Enum') {
     store$.commandbar.activeItem.set(row);
   } else if (typeof value !== 'object') {
-    store$.commandbar.query.set(value);
+    setCommandbarQuery(store$, value);
     store$.commandbar.activeItem.set(row);
   } else {
     //
@@ -63,7 +75,7 @@ export const commandbarUpdateQuery: StoreFn<'commandbarUpdateQuery'> =
       return;
     }
 
-    store$.commandbar.query.set(query);
+    setCommandbarQuery(store$, query);
 
     store$.combobox.query.set(query);
   };
