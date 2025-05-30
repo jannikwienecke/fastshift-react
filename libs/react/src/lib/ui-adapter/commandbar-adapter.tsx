@@ -272,6 +272,8 @@ export const makeCommandbarProps = <T extends RecordType>(
               <div>{item.label}</div>
             </div>
           );
+
+        return null;
       }
     },
   };

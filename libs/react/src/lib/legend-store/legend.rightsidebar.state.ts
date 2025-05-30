@@ -40,6 +40,7 @@ store$.dataModel.rows.onChange((changes) => {
   }, 0);
 
   listRows$.set(rows);
+  return;
 });
 
 store$.allIds.onChange((changes) => {
@@ -51,6 +52,7 @@ store$.allIds.onChange((changes) => {
   }
 
   listRowIds$.set(allIds);
+  return;
 });
 
 export const getIdsOfTable = (table: string) => {

@@ -244,6 +244,7 @@ export const makeListProps = <T extends RecordType = RecordType>(
       fieldName: grouping.field.name,
       componentType: 'icon',
     });
+
     listGrouping.groupByField = grouping.field?.name ?? '';
     listGrouping.groupLabel =
       grouping.field?.name.firstUpper().slice(0, -1) ?? '';
