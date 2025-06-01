@@ -309,7 +309,6 @@ let timeoutId: ReturnType<typeof setTimeout>;
 const debounce = (func: () => void, delay: number) => {
   clearTimeout(timeoutId);
   timeoutId = setTimeout(() => {
-    console.log('debounced function called with args:');
     func();
   }, delay);
 };

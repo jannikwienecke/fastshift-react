@@ -24,8 +24,6 @@ export const makeGlobalQueryCommands = () => {
               }),
             getViewName,
             handler: () => {
-              console.log('goToCommands handler');
-
               store$.navigation.state.set({
                 view: table,
                 id: record.id,

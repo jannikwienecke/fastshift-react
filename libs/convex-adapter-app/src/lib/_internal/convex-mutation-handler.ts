@@ -282,8 +282,6 @@ export const userViewMutation = async (
 
   const dbMutation = mutationClient(ctx);
 
-  console.log(mutation.payload);
-
   if (mutation.payload.type === 'CREATE_NEW_VIEW') {
     try {
       await dbMutation.insert('views', {

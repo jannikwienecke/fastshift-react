@@ -110,9 +110,6 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
                                     <DropdownMenuSubContent>
                                       {item.subCommands.map(
                                         (subItem, index) => {
-                                          console.log(
-                                            subItem.id.toString() + index
-                                          );
                                           return (
                                             <DropdownMenuItem
                                               key={

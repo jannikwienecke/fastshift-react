@@ -68,7 +68,6 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
 
     store$.userViewData.set((prev) => (prev ? { ...prev, ...record } : prev));
 
-    console.log('UPDATE....', record);
     const result = await store$.api.mutateAsync({
       query: '',
       viewName: currentView$.viewName.get(),

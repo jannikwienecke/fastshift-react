@@ -182,7 +182,6 @@ export const makeViewCommands = () => {
     getIsVisible: () => isViewCommands() && !!userView$.get(),
     icon: PencilIcon,
     handler: () => {
-      console.log('UPDATE..');
       console.debug('viewCommand - handler');
 
       const userView = userView$.get();
@@ -206,7 +205,6 @@ export const makeViewCommands = () => {
     icon: TrashIcon,
     dropdownOptions: { showDivider: true },
     handler: () => {
-      console.log('DELETE..');
       console.debug('viewCommand - delete view');
 
       const userView = userView$.get();
@@ -302,7 +300,7 @@ export const makeViewCommands = () => {
         icon: ClockIcon,
         // TODO NOT IMPLEMENTED YET
         onCheckedChange: (checked: boolean) => {
-          console.log('subscribeToViewCommand - onCheckedChange', checked);
+          console.debug('subscribeToViewCommand - onCheckedChange', checked);
         },
       },
     ],
