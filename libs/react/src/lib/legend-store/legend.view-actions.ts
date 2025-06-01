@@ -260,6 +260,8 @@ const resetStore = () => {
 
   store$.contextMenuState.row.set(null);
 
+  store$.isFetchAll.set(false);
+
   store$.list.rowInFocus.set(undefined);
 
   store$.filter.filters.set([]);

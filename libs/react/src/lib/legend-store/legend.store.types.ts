@@ -197,6 +197,10 @@ export type LegendStore = {
 
   viewId: string | null;
 
+  commandsDialog?: {
+    type: 'view' | 'view-sidebar' | 'detail-row';
+  };
+
   api?: {
     mutate?: (args: MutationDto) => void;
     mutateAsync?: (args: MutationDto) => Promise<MutationReturnDto>;
@@ -492,6 +496,10 @@ export type LegendStore = {
 
   viewQuery: string;
   debouncedViewQuery: string;
+
+  // when we are on a view with more than MAX_FETCH_LIMIT_QUERY items
+  // we can set this to true to fetch all items at once
+  isFetchAll?: boolean;
 
   detailpageChangeInput: (
     field: CommandformItem,

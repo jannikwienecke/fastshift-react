@@ -1,7 +1,6 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { Doc, TableNames } from './_generated/dataModel';
-import { table } from 'console';
 
 const tableMetaFields = {
   updatedAt_: v.optional(v.number()),

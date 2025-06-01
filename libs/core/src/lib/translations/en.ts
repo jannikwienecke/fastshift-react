@@ -63,6 +63,8 @@ export const en = {
     remindMeLater: 'Remind me about this {{name}}...',
     goTo: 'Go to {{name}}',
     open: 'Open {{name}}',
+    delete: 'Delete...',
+    exportAsCsv: 'Export as CSV',
   },
 
   displayOptions: {
@@ -173,6 +175,11 @@ export const en = {
       title: 'Are you sure you want to delete this record?',
       description:
         'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
+    },
+    deleteView: {
+      title: 'Are you sure you want to delete this view?',
+      description:
+        'If you want to undo this action, you can restore the view from the settings.',
     },
   },
 

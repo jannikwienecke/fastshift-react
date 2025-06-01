@@ -147,7 +147,10 @@ export const testQuery = server.mutation({
 
 export const getUserViews = server.query({
   handler: async (ctx, args): Promise<Partial<UserViewData>[]> => {
-    const views = await ctx.db.query('views').collect();
+    const allViews = await ctx.db.query('views').collect();
+    const views = allViews.filter((view) => {
+      return view.deleted_ === false || view.deleted_ === undefined;
+    });
 
     return asyncMap(views, async (view) => {
       if (!view.rowId || !view.rowLabelFieldName)

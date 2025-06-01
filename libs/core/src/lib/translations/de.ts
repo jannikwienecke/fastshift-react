@@ -159,6 +159,11 @@ export const de = {
       description:
         'Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihr Konto dauerhaft löschen und Ihre Daten von unseren Servern entfernen.',
     },
+    deleteView: {
+      title: 'Sind Sie sicher, dass Sie diese Ansicht löschen möchten?',
+      description:
+        'Wenn Sie diese Aktion rückgängig machen möchten, können Sie die Ansicht aus den Einstellungen wiederherstellen.',
+    },
   },
   saveViewDropdown: {
     saveToThisView: 'In diese Ansicht speichern',
@@ -181,5 +186,7 @@ export const de = {
     open: '{{name}} öffnen',
     goTo: 'Gehe zu {{name}}',
     remindMeLater: 'Erinnere mich später',
+    delete: 'Löschen...',
+    exportAsCsv: 'Als CSV exportieren',
   },
 } satisfies typeof en;

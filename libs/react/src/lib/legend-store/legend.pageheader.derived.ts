@@ -1,7 +1,8 @@
-import { MakePageHeaderPropsOption, PageHeaderProps, t } from '@apps-next/core';
+import { MakePageHeaderPropsOption, PageHeaderProps } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { PencilIcon } from 'lucide-react';
+import { getCommandGroups } from '../commands/commands.get';
 import { derviedDetailPage$ } from './legend.detailpage.derived';
+import { hasRightSidebarFiltering } from './legend.rightsidebar.state';
 import {
   currentView$,
   detailLabel$,
@@ -12,10 +13,6 @@ import {
   userView$,
 } from './legend.shared.derived';
 import { store$ } from './legend.store';
-import {
-  getRightSidebarFilterFields,
-  hasRightSidebarFiltering,
-} from './legend.rightsidebar.state';
 
 export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
   {}
@@ -30,6 +27,9 @@ export const derivedPageHeaderProps$ = observable(() => {
       icon: parentView$.get()?.icon,
       emoji: parentUserView$.get()?.emoji,
       viewName: parentViewName$.get() ?? '',
+      onOpenCommands: () => {
+        store$.commandsDialog.type.set('detail-row');
+      },
       detail: {
         label: detailLabel$.get(),
         onClickParentView: () => {
@@ -60,7 +60,7 @@ export const derivedPageHeaderProps$ = observable(() => {
       },
 
       onSelectOption: (option) => {
-        if (option.command === 'create-new-view') {
+        if (option.command === 'view-commands') {
           store$.userViewSettings.form.set({
             type: 'edit',
             viewName: userView$.get()?.name ?? '',
@@ -102,19 +102,10 @@ export const derivedPageHeaderProps$ = observable(() => {
     starred: store$.userViewData.starred.get() ?? false,
 
     // TODO: MAKE THIS GENEERIC AND REUSABLE -> Like commands
-    options: [
-      {
-        header: '',
-        items: [
-          {
-            id: 'edit',
-            label: t('common.edit') + '...',
-            icon: PencilIcon,
-            command: 'create-new-view',
-          },
-        ],
-      },
-    ],
+
+    options: getCommandGroups().filter((g) =>
+      g.items.find((i) => i.command === 'view-commands')
+    ),
 
     onToggleFavorite: async () => {
       const userViewData = store$.userViewData.get();
@@ -126,16 +117,12 @@ export const derivedPageHeaderProps$ = observable(() => {
       });
     },
 
+    onOpenCommands: () => {
+      store$.commandsDialog.type.set('view');
+    },
+
     onSelectOption: (option) => {
-      if (option.command === 'create-new-view') {
-        store$.userViewSettings.form.set({
-          type: 'edit',
-          viewName: userView$.get()?.name ?? currentView$.viewName.get(),
-          viewDescription: userView$.get()?.description ?? '',
-          emoji: userView$.get()?.emoji,
-          iconName: undefined,
-        });
-      }
+      option.handler?.({ row: undefined, field: undefined, value: option });
     },
   } satisfies PageHeaderProps;
 });

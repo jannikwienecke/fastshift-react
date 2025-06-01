@@ -14,6 +14,7 @@ import { makeModelCommands } from './commands.model';
 import { makeGoToCommands } from './commands.goTo';
 import { makeOpenCommands } from './commands.open';
 import { makeGlobalQueryCommands } from './commands.globalQuery';
+import { makeViewCommands } from './commands.view';
 
 export const getOpenCreateModelFormCommands = () => {
   const views = store$.views.get();
@@ -92,10 +93,10 @@ export const getCommandsList = (): CommandbarItem[] => {
     ...currentViewCommands,
     ...makeCopyCommands(),
     ...makeModelCommands(),
+    ...makeViewCommands(),
     ...makeOpenCommands(),
     ...makeGoToCommands(),
     ...makeGlobalQueryCommands(),
-    commands.viewCommand,
     commands.viewSaveCommand,
     ...openCreateModelFormCommands,
     ...userStoreCommands,

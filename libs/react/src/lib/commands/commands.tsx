@@ -28,19 +28,6 @@ import { setCommandbarQuery } from '../legend-store/legend.commandbar.fn';
 
 const getViewName = () => getViewConfigManager()?.getViewName();
 
-const viewCommand: CommandbarItem = {
-  id: 'create-new-view',
-  label: '__commands.createNewView',
-  header: 'view',
-  command: 'create-new-view',
-  getViewName,
-  icon: Layers3Icon,
-  handler: () => {
-    _log.info('viewCommand - handler');
-    alert('HANDLE...viewCommand NOT IMPLEMENTED');
-  },
-};
-
 const viewSaveCommand: CommandbarItem = {
   id: 'save-view',
   command: 'save-view',
@@ -251,7 +238,7 @@ const makeRemoveAttributeCommand = (field: FieldConfig): CommandbarItem => {
 };
 
 export const commands = {
-  viewCommand,
+  // viewCommand,
   viewSaveCommand,
   makeSelectModelAttributeCommand,
   makeSelectRelationalOptionCommand,

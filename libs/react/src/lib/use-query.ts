@@ -189,10 +189,13 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const righSidebarFilter = store$.rightSidebar.filter.get();
 
+  const isFetchAll = store$.isFetchAll.get();
+
   const queryPropsMerged = React.useMemo(() => {
     return {
       ...queryProps,
       query: queryProps?.query || query,
+      isFetchAll,
       registeredViews: queryProps?.registeredViews ?? registeredViews,
       modelConfig:
         queryProps?.viewConfigManager?.modelConfig ||
@@ -221,6 +224,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       // disabled: localMode ? true : false,
       parentViewName,
       parentId,
+
       tempFilter:
         righSidebarFilter?.id === NONE_OPTION
           ? `${righSidebarFilter?.tableName}:${righSidebarFilter?.id}`
@@ -245,6 +249,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     parentViewName,
     parentId,
     righSidebarFilter,
+    isFetchAll,
   ]);
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =

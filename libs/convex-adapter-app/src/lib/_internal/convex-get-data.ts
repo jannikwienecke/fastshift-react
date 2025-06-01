@@ -41,7 +41,7 @@ export const getData = async (ctx: GenericQueryCtx, args: QueryServerProps) => {
   const displayOptionsInfo = getDisplayOptionsInfo(args);
 
   const localModeEnabled =
-    viewConfigManager.viewConfig.localMode?.enabled &&
+    (viewConfigManager.viewConfig.localMode?.enabled || args.isFetchAll) &&
     !args.viewId &&
     !args.parentId;
 

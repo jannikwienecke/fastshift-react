@@ -13,6 +13,7 @@ import { RegisteredViews, ViewConfigType } from './view-config.types';
 export type QueryProps = {
   query?: string;
   viewId: string | null;
+  isFetchAll?: boolean;
   filters?: string;
   tempFilter?: string | undefined;
   displayOptions?: string;
@@ -82,7 +83,9 @@ export type UserViewData = {
   rowId?: string;
   rowLabelFieldName?: string;
   starred?: boolean;
+  // FIXME _deleted AND  deleted_ -> remove "_deleted"
   _deleted?: boolean;
+  deleted_?: boolean;
   emoji?: Emoji;
 };
 

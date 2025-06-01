@@ -244,6 +244,7 @@ export type SaveViewDropdownProps = {
 
 export type PageHeaderProps = {
   onToggleFavorite: () => void;
+  onOpenCommands: () => void;
   starred: boolean;
   viewName: string;
   icon?: React.FC<any>;

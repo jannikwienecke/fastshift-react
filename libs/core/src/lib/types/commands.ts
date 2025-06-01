@@ -1,5 +1,5 @@
 export type CommandName =
-  | 'create-new-view'
+  | 'view-commands'
   | 'save-view'
   | 'open-view-form'
   | 'update-model-record'

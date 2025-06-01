@@ -56,10 +56,11 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
                 {props.viewName}
               </div>
 
-              <DropdownMenu>
+              <DropdownMenu onOpenChange={props.onOpenCommands}>
                 <DropdownMenuTrigger asChild>
                   <div>
                     <MoreHorizontal className="text-foreground/50" />
+
                     <span className="sr-only">{t('common.more')}</span>
                   </div>
                 </DropdownMenuTrigger>
@@ -78,10 +79,10 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
                               }}
                             >
                               {item.icon ? (
-                                <item.icon className="text-muted-foreground" />
+                                <item.icon className="text-foreground" />
                               ) : null}
 
-                              <span className="text-muted-foreground">
+                              <span className="text-foreground text-[13px]">
                                 {item.label}
                               </span>
                             </DropdownMenuItem>
