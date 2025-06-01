@@ -163,6 +163,7 @@ const filterCommandGroups = (groups: CommandbarProps['groups']) => {
 };
 
 export const getViewName = () => getViewConfigManager()?.getViewName();
+export const getTableName = () => getViewConfigManager()?.getTableName();
 
 export const getViewLabelOf = (translationString: string) => {
   const view = isDetail()

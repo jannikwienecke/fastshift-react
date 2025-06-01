@@ -420,12 +420,19 @@ export type CommandbarItem = Omit<ComboxboxItem, 'label' | 'viewName'> & {
     | (string & {
         //
       });
+
+  getLabel?: () => string;
   command: CommandName;
   getViewName?: () => string;
   getIsVisible?: () => boolean;
   handler?: CommandbarItemHandler;
   options?: {
     keepCommandbarOpen?: boolean;
+  };
+  onCheckedChange?: (checked: boolean) => void;
+  subCommands?: CommandbarItem[];
+  dropdownOptions?: {
+    showDivider?: boolean;
   };
 };
 

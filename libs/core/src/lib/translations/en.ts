@@ -65,6 +65,9 @@ export const en = {
     open: 'Open {{name}}',
     delete: 'Delete...',
     exportAsCsv: 'Export as CSV',
+    subscribeToView: 'Subscribe',
+    unsubscribeFromView: 'Unsubscribe',
+    subscribeToItemAdded: 'An {{name}} was added to this view',
   },
 
   displayOptions: {

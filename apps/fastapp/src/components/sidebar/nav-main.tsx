@@ -1,5 +1,6 @@
 import { api, views } from '@apps-next/convex';
 import { Emoji, GetTableName } from '@apps-next/core';
+import { currentView$ } from '@apps-next/react';
 import {
   cn,
   Collapsible,
@@ -8,7 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   SidebarGroup,
   SidebarGroupLabel,
@@ -27,15 +27,14 @@ import { ObservablePersistLocalStorage } from '@legendapp/state/persist-plugins/
 import { observer } from '@legendapp/state/react';
 import { syncObservable } from '@legendapp/state/sync';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useRouter } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import {
   ArrowUpRight,
   ChevronDownIcon,
   ChevronRight,
   ChevronRightIcon,
+  LinkIcon,
   MoreHorizontal,
-  PencilIcon,
-  Trash2,
 } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -168,12 +167,12 @@ export const NavMain = observer(() => {
   );
 });
 
-export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
+export const NavItem = observer(({ item }: { item: Nav['items'][number] }) => {
   const [hover, setHover] = React.useState('');
   const { t } = useTranslation();
   const { isMobile } = useSidebar();
 
-  const router = useRouter();
+  if (!currentView$.get()) return null;
 
   const hasSubItems = item.items && item.items.length > 0;
 
@@ -250,22 +249,23 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
                       side={isMobile ? 'bottom' : 'right'}
                       align={isMobile ? 'end' : 'start'}
                     >
-                      <DropdownMenuItem>
-                        <PencilIcon className="text-muted-foreground" />
-                        <span>{t('common.edit')}</span>
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem>
-                        <Trash2 className="text-muted-foreground" />
-                        <span>{t('common.delete', { name: '' })}</span>
-                      </DropdownMenuItem>
-
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <Link className="text-muted-foreground" />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const baseUrl = window.location.origin;
+                          const fullUrl = `${baseUrl}${subItem.url}`;
+                          const url = new URL(fullUrl);
+                          navigator.clipboard.writeText(url.toString());
+                        }}
+                      >
+                        <LinkIcon className="text-muted-foreground" />
                         <span>{t('copy.url')}</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={() => {
+                          window.open(subItem.url, '_blank');
+                        }}
+                      >
                         <ArrowUpRight className="text-muted-foreground" />
                         <span>{t('common.openInNewTab')}</span>
                       </DropdownMenuItem>
@@ -279,4 +279,4 @@ export const NavItem = ({ item }: { item: Nav['items'][number] }) => {
       </SidebarMenuItem>
     </Collapsible>
   );
-};
+});

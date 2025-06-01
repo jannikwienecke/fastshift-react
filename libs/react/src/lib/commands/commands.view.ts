@@ -1,8 +1,15 @@
-import { CommandbarItem, Row } from '@apps-next/core';
-import { DownloadIcon, Layers3Icon, PencilIcon, TrashIcon } from 'lucide-react';
+import { CommandbarItem, getViewLabel, Row } from '@apps-next/core';
+import { observable } from '@legendapp/state';
+import { t } from 'i18next';
+import {
+  ClockIcon,
+  DownloadIcon,
+  Layers3Icon,
+  PencilIcon,
+  TrashIcon,
+} from 'lucide-react';
 import { currentView$, store$, userView$ } from '../legend-store';
 import { getViewName } from './commands.helper';
-import { observable } from '@legendapp/state';
 
 const isViewCommands = () => store$.commandsDialog.type.get() === 'view';
 
@@ -197,6 +204,7 @@ export const makeViewCommands = () => {
     getViewName,
     getIsVisible: () => isViewCommands() && !!userView$.get(),
     icon: TrashIcon,
+    dropdownOptions: { showDivider: true },
     handler: () => {
       console.log('DELETE..');
       console.debug('viewCommand - delete view');
@@ -228,7 +236,7 @@ export const makeViewCommands = () => {
     },
   };
 
-  const viewCommand: CommandbarItem = {
+  const createViewCommand: CommandbarItem = {
     id: 'create-new-view',
     label: '__commands.createNewView',
     header: 'view',
@@ -247,7 +255,7 @@ export const makeViewCommands = () => {
     },
   };
 
-  const exportAsCsv: CommandbarItem = {
+  const exportAsCsvCommand: CommandbarItem = {
     id: 'export-as-csv',
     label: '__commands.exportAsCsv',
     header: 'view',
@@ -268,10 +276,44 @@ export const makeViewCommands = () => {
     },
   };
 
+  const subscribeToViewCommand: CommandbarItem = {
+    id: 'subscribe-to-view',
+    label: '__commands.subscribeToView',
+    header: 'view',
+    command: 'view-commands',
+    getViewName,
+    getIsVisible: isViewCommands,
+    icon: ClockIcon,
+    handler: () => {
+      console.debug('viewCommand - handler - subscribe to view');
+    },
+    subCommands: [
+      {
+        id: 'subscribe-to-view-item-added',
+        label: '',
+        getLabel: () =>
+          t('__commands.subscribeToItemAdded', {
+            name: getViewLabel(currentView$.get(), true),
+          }),
+        header: '',
+        command: 'view-commands',
+        getViewName,
+        getIsVisible: isViewCommands,
+        icon: ClockIcon,
+        // TODO NOT IMPLEMENTED YET
+        onCheckedChange: (checked: boolean) => {
+          console.log('subscribeToViewCommand - onCheckedChange', checked);
+        },
+      },
+    ],
+  };
+
   return [
     editViewCommand,
     deleteViewCommand,
-    viewCommand,
-    exportAsCsv,
+    //
+    createViewCommand,
+    exportAsCsvCommand,
+    subscribeToViewCommand,
   ] satisfies CommandbarItem[];
 };

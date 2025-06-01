@@ -20,6 +20,7 @@ export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
 
 export const derivedPageHeaderProps$ = observable(() => {
   const detailProps = derviedDetailPage$.get();
+
   if (store$.detail.row.get()) {
     return {
       options: [],
@@ -100,8 +101,6 @@ export const derivedPageHeaderProps$ = observable(() => {
     icon: currentView$.get().icon,
     emoji: userView$.get()?.emoji,
     starred: store$.userViewData.starred.get() ?? false,
-
-    // TODO: MAKE THIS GENEERIC AND REUSABLE -> Like commands
 
     options: getCommandGroups().filter((g) =>
       g.items.find((i) => i.command === 'view-commands')

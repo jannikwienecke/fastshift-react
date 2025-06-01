@@ -108,7 +108,11 @@ export const getAllCommandGroups = () => {
     const _current = {
       ...current,
       viewName: current.getViewName?.(),
-      label: t(current.label as TranslationKeys),
+      label: current.getLabel?.() || t(current.label as TranslationKeys),
+      subCommands: current.subCommands?.map((c) => ({
+        ...c,
+        label: c.getLabel?.() || t(c.label as TranslationKeys),
+      })),
     } satisfies CommandbarProps['groups'][number]['items'][0];
 
     const headerLabel =

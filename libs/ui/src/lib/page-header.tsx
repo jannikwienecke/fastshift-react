@@ -21,9 +21,15 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   SearchInput,
 } from './components';
+import { Checkbox } from './components/checkbox';
 import { cn } from './utils';
 
 const DefaultPageHeaderMain = (props: PageHeaderProps) => {
@@ -71,21 +77,91 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
                       <div key={index}>
                         {option.items.map((item) => {
                           return (
-                            <DropdownMenuItem
-                              key={item.label}
-                              onClick={() => {
-                                // item.onClick();
-                                props.onSelectOption?.(item);
-                              }}
-                            >
-                              {item.icon ? (
-                                <item.icon className="text-foreground" />
-                              ) : null}
+                            <div key={item.id.toString()}>
+                              {!item.subCommands ? (
+                                <DropdownMenuItem
+                                  key={item.label}
+                                  onClick={() => {
+                                    // item.onClick();
+                                    props.onSelectOption?.(item);
+                                  }}
+                                >
+                                  {item.icon ? (
+                                    <item.icon className="text-foreground" />
+                                  ) : null}
 
-                              <span className="text-foreground text-[13px]">
-                                {item.label}
-                              </span>
-                            </DropdownMenuItem>
+                                  <span className="text-foreground text-[13px]">
+                                    {item.label}
+                                  </span>
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuSub>
+                                  <DropdownMenuSubTrigger>
+                                    {item.icon ? (
+                                      <item.icon className="text-foreground" />
+                                    ) : null}
+
+                                    <span className="text-foreground text-[13px]">
+                                      {item.label}
+                                    </span>
+                                  </DropdownMenuSubTrigger>
+
+                                  <DropdownMenuPortal>
+                                    <DropdownMenuSubContent>
+                                      {item.subCommands.map(
+                                        (subItem, index) => {
+                                          console.log(
+                                            subItem.id.toString() + index
+                                          );
+                                          return (
+                                            <DropdownMenuItem
+                                              key={
+                                                subItem.id.toString() + index
+                                              }
+                                              onClick={(e) => {
+                                                if (subItem.onCheckedChange) {
+                                                  e.preventDefault();
+                                                  e.stopPropagation();
+                                                } else {
+                                                  props.onSelectOption?.(
+                                                    subItem
+                                                  );
+                                                }
+                                              }}
+                                            >
+                                              {subItem.icon &&
+                                              !subItem.onCheckedChange ? (
+                                                <subItem.icon className="text-foreground" />
+                                              ) : (
+                                                <>
+                                                  <Checkbox
+                                                    onCheckedChange={(
+                                                      checked
+                                                    ) => {
+                                                      subItem.onCheckedChange?.(
+                                                        checked as boolean
+                                                      );
+                                                    }}
+                                                  />
+                                                </>
+                                              )}
+
+                                              <span className="text-foreground text-[13px]">
+                                                {subItem.label.toString()}
+                                              </span>
+                                            </DropdownMenuItem>
+                                          );
+                                        }
+                                      )}
+                                    </DropdownMenuSubContent>
+                                  </DropdownMenuPortal>
+                                </DropdownMenuSub>
+                              )}
+
+                              {item.dropdownOptions?.showDivider ? (
+                                <DropdownMenuSeparator />
+                              ) : null}
+                            </div>
                           );
                         })}
                       </div>

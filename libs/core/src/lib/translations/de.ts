@@ -188,5 +188,8 @@ export const de = {
     remindMeLater: 'Erinnere mich später',
     delete: 'Löschen...',
     exportAsCsv: 'Als CSV exportieren',
+    subscribeToView: 'Abonnieren',
+    unsubscribeFromView: 'Abonnement beenden',
+    subscribeToItemAdded: 'Wenn {{name}} zu dieser Ansicht hinzugefügt wurde',
   },
 } satisfies typeof en;
