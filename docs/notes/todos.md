@@ -171,6 +171,7 @@ Small Features to add
 - [x] group by enum
 - [ ] star/unstar from the right sidebar
 - [ ] menu dropdown in the right sidebar
+- [ ] check how options in right click contextmenu are implemented
 - [ ] select one or more rows -> show correct action commands, show action popover like linear
 - [ ] action buttons in views
 - [ ] if i query the commandbar, and the edit view fields are in the list, sort them to the top
