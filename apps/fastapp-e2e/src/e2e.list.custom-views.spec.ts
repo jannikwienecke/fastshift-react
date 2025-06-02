@@ -331,11 +331,11 @@ test.describe('Custom Views', () => {
   test('can star and unstar a view', async ({ mainPage }) => {
     const page = mainPage.page;
 
-    await page.getByTestId('unstarred').click({ force: true });
+    await page.getByTestId('unstarred').first().click({ force: true });
     await expect(mainPage.sidebar.getByText(/all tasks/i)).toHaveCount(2);
-    await page.getByTestId('starred').click({ force: true });
+    await page.getByTestId('starred').first().click({ force: true });
     await expect(mainPage.sidebar.getByText(/all tasks/i)).toHaveCount(0);
-    await page.getByTestId('unstarred').click({ force: true });
+    await page.getByTestId('unstarred').first().click({ force: true });
 
     await mainPage.sidebar.getByText(/all tasks more/i).click();
 

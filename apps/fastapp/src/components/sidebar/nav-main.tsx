@@ -1,6 +1,6 @@
 import { api, views } from '@apps-next/convex';
 import { Emoji, GetTableName } from '@apps-next/core';
-import { currentView$ } from '@apps-next/react';
+import { currentView$, detailView$ } from '@apps-next/react';
 import {
   cn,
   Collapsible,
@@ -131,7 +131,7 @@ export const NavMain = observer(() => {
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Views</SidebarGroupLabel>
+        <SidebarGroupLabel>{t('common.views')}</SidebarGroupLabel>
 
         <SidebarMenu>
           {mainViews.map((view) => (
@@ -172,7 +172,7 @@ export const NavItem = observer(({ item }: { item: Nav['items'][number] }) => {
   const { t } = useTranslation();
   const { isMobile } = useSidebar();
 
-  if (!currentView$.get()) return null;
+  if (!currentView$.get() && !detailView$.get()) return null;
 
   const hasSubItems = item.items && item.items.length > 0;
 

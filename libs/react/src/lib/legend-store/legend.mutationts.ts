@@ -21,7 +21,10 @@ import {
   isDetail,
   isTabs,
 } from './legend.utils';
-import { setGlobalDataModel } from './legend.utils.helper';
+import {
+  dispatchDeleteMutation,
+  setGlobalDataModel,
+} from './legend.utils.helper';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
@@ -233,19 +236,7 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
       }
     };
 
-    if (viewConfigManager.getUiViewConfig().onDelete?.showConfirmation) {
-      store$.confirmationAlert.open.set(true);
-      store$.confirmationAlert.title.set('confirmationAlert.delete.title');
-      store$.confirmationAlert.description.set(
-        'confirmationAlert.delete.description'
-      );
-
-      store$.confirmationAlert.onConfirm.set({
-        cb: runMutation,
-      });
-    } else {
-      runMutation();
-    }
+    dispatchDeleteMutation(runMutation);
   };
 
 export const createRecordMutation: StoreFn<'createRecordMutation'> =
@@ -255,8 +246,6 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
     onSuccess,
     onError
   ) => {
-    const viewConfigManager = getViewConfigManager();
-
     const row = createRow({
       ...record,
       id: '_tempId' + Math.random().toString(36).substring(2, 9),

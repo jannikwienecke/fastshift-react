@@ -62,6 +62,10 @@ export type FieldConfigOptions<
   validationErrorMessage?: (t: any) => string;
   useAsSidebarFilter?: boolean;
   getEnumLabel?: (t: (label: string) => string, value: string) => string;
+  // projects -> relations are e.g. tasks|owner... -> if we set this to true, not just the
+  // id will be returned, but the whole object
+  includeInRelationalDataQuery?: boolean;
+  showFieldActionInDetailCommands?: boolean;
 };
 
 export type FieldConfig<TName = string> = {

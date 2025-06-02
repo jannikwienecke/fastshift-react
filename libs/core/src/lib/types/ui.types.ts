@@ -417,8 +417,8 @@ export type DetailPageProps = {
 } & FormFieldMethod;
 
 export type CommandbarItemHandler = (options: {
-  row: Row | undefined | null;
-  field: FieldConfig | undefined;
+  row?: Row | undefined | null;
+  field?: FieldConfig | undefined;
   value: ComboxboxItem | undefined;
 }) => void;
 

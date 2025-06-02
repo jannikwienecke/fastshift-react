@@ -11,7 +11,7 @@ import {
   displayOptionsToggleShowDeleted,
   displayOptionsToggleShowEmptyGroups,
   displayOptionsToggleSorting,
-} from './legend-store.fn.displayOptions';
+} from './legend.displayOptions.fn';
 import {
   commandbarClose,
   commandbarOpen,

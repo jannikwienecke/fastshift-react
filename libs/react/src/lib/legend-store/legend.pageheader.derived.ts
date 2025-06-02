@@ -1,4 +1,8 @@
-import { MakePageHeaderPropsOption, PageHeaderProps } from '@apps-next/core';
+import {
+  CommandName,
+  MakePageHeaderPropsOption,
+  PageHeaderProps,
+} from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { getCommandGroups } from '../commands/commands.get';
 import { derviedDetailPage$ } from './legend.detailpage.derived';
@@ -23,6 +27,11 @@ export const derivedPageHeaderProps$ = observable(() => {
   const detailProps = derviedDetailPage$.get();
 
   if (store$.detail.row.get()) {
+    const allowedCommands: CommandName[] = [
+      'model-commands',
+      'model-attribute-commands',
+    ];
+    //
     return {
       options: [],
       starred: detailUserView$.get()?.starred ?? false,
@@ -51,27 +60,24 @@ export const derivedPageHeaderProps$ = observable(() => {
       },
 
       onToggleFavorite: async () => {
-        const userViewData = detailUserView$.get();
-
-        store$.updateDetailViewMutation({
-          starred: !userViewData ? true : !userViewData.starred,
-        });
+        viewActions().toggleFavorite();
       },
 
       commandsDropdownProps: {
         onOpenCommands: () => {
           store$.commandsDialog.type.set('view');
         },
-        onSelectCommand: (command) => {
-          command.handler?.({
-            row: undefined,
-            field: undefined,
-            value: command,
-          });
-        },
-        commands: getCommandGroups().filter((g) =>
-          g.items.find((i) => i.command === 'view-commands')
-        ),
+        onSelectCommand: (c) => c.handler?.({ value: c }),
+        commands: getCommandGroups().map((g) => ({
+          items: g.items
+            .filter((i) => allowedCommands.includes(i.command))
+            .filter((i) =>
+              i.command !== 'model-attribute-commands'
+                ? true
+                : i.field?.showFieldActionInDetailCommands
+            ),
+          header: g.header,
+        })),
       },
     } as PageHeaderProps;
   }
@@ -109,9 +115,7 @@ export const derivedPageHeaderProps$ = observable(() => {
       onOpenCommands: () => {
         store$.commandsDialog.type.set('view');
       },
-      onSelectCommand: (command) => {
-        command.handler?.({ row: undefined, field: undefined, value: command });
-      },
+      onSelectCommand: (c) => c.handler?.({ value: c }),
       commands: getCommandGroups().filter((g) =>
         g.items.find((i) => i.command === 'view-commands')
       ),

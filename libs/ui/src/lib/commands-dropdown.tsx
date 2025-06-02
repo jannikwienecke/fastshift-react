@@ -18,6 +18,7 @@ export const CommandsDropdown = ({
   onOpenCommands,
   onSelectCommand,
 }: CommandsDropdownProps) => {
+  const groupsWithItems = commands?.filter((c) => c.items.length > 0);
   return (
     <DropdownMenu onOpenChange={onOpenCommands}>
       <DropdownMenuTrigger asChild>
@@ -28,11 +29,17 @@ export const CommandsDropdown = ({
         </div>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-56 rounded-lg text-sm">
-        {commands?.map((option, index) => {
+      <DropdownMenuContent className="rounded-lg text-sm px-2">
+        {groupsWithItems.map((option, index) => {
+          let lastCommandType = '';
+
+          const isLast = index === groupsWithItems.length - 1;
           return (
             <div key={index}>
               {option.items.map((item) => {
+                const isDifferentCommandType =
+                  lastCommandType && item.command !== lastCommandType;
+                lastCommandType = item.command;
                 return (
                   <div key={item.id.toString()}>
                     {!item.subCommands ? (
@@ -102,12 +109,20 @@ export const CommandsDropdown = ({
                       </DropdownMenuSub>
                     )}
 
-                    {item.dropdownOptions?.showDivider ? (
+                    {item.dropdownOptions?.showDivider ||
+                    isDifferentCommandType ? (
                       <DropdownMenuSeparator />
                     ) : null}
                   </div>
                 );
               })}
+
+              {!isLast ? (
+                <>
+                  <DropdownMenuSeparator />
+                  helo
+                </>
+              ) : null}
             </div>
           );
         })}

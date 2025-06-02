@@ -146,41 +146,7 @@ const DefaultPageHeaderDetail = (props: PageHeaderProps) => {
                 {props.detail?.label ?? ''}
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div>
-                    <MoreHorizontal className="text-foreground/50" />
-                    <span className="sr-only">{t('common.more')}</span>
-                  </div>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent className="w-56 rounded-lg text-sm">
-                  {/* {props.options.map((option, index) => {
-                    return (
-                      <div key={index}>
-                        {option.items.map((item) => {
-                          return (
-                            <DropdownMenuItem
-                              key={item.label}
-                              onClick={() => {
-                                props.onSelectOption?.(item);
-                              }}
-                            >
-                              {item.icon ? (
-                                <item.icon className="text-muted-foreground" />
-                              ) : null}
-
-                              <span className="text-muted-foreground">
-                                {item.label}
-                              </span>
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </div>
-                    );
-                  })} */}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <CommandsDropdown {...props.commandsDropdownProps} />
 
               <StarIcon
                 data-testid={props.starred ? 'starred' : 'unstarred'}

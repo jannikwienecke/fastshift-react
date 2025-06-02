@@ -92,9 +92,9 @@ export const en = {
     placeholder: 'Search',
   },
   viewFields: {
-    _creationTime: {
-      label: 'Created At',
-    },
+    // _creationTime: {
+    //   label: 'Created At..',
+    // },
   },
   common: {
     save: 'Save',
@@ -132,6 +132,7 @@ export const en = {
     to: 'to',
     from: 'from',
     this: 'this',
+    views: 'Views',
   },
 
   datePicker: {
@@ -190,6 +191,12 @@ export const en = {
     changed: historyChangedTypes,
   },
 
+  detailView: {
+    activity: {
+      goTo: 'Go to {{name}}',
+    },
+  },
+
   saveViewDropdown: {
     saveToThisView: 'Save to this view',
     createNewView: 'Create new view...',
@@ -197,5 +204,25 @@ export const en = {
   _creationTime: {
     one: 'Created at',
     other: 'Created at',
+  },
+  updatedAt_: {
+    one: 'Updated at',
+    other: 'Updated at',
+  },
+  updatedBy_: {
+    one: 'Updated by',
+    other: 'Updated by',
+  },
+  deletedAt_: {
+    one: 'Deleted at',
+    other: 'Deleted at',
+  },
+  deleted: {
+    one: 'Deleted',
+    other: 'Deleted',
+  },
+  createdBy_: {
+    one: 'Created by',
+    other: 'Created by',
   },
 };

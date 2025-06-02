@@ -9,11 +9,13 @@ import {
 import { viewRegistry } from './legend.app.registry';
 
 export const currentView$ = observable(() => {
-  return store$.viewConfigManager.viewConfig.get() as ViewConfigType;
+  return store$.viewConfigManager?.viewConfig?.get() as ViewConfigType;
 });
 
 export const detailView$ = observable(() => {
-  return store$.detail.viewConfigManager.viewConfig.get();
+  return store$.detail?.viewConfigManager?.viewConfig.get() as
+    | ViewConfigType
+    | undefined;
 });
 
 export const userViews$ = observable(() => store$.userViews.get());

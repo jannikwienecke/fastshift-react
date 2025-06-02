@@ -2,6 +2,7 @@ import {
   ComboxboxItem,
   FieldConfig,
   getViewByName,
+  isSystemField,
   makeRow,
   makeRowFromValue,
   useTranslation,
@@ -9,6 +10,8 @@ import {
 } from '@apps-next/core';
 import { useView } from '../use-view';
 import { ComboboxFieldValue } from './render-combobox-field-value';
+import { getComponent } from './ui-components.helper';
+import { ClockIcon } from 'lucide-react';
 
 export const FilterValue = (props: {
   value: ComboxboxItem;
@@ -48,8 +51,21 @@ export const FilterValue = (props: {
       ? getViewByName(registeredViews, field.name)
       : undefined;
 
+    const IconComponent = field
+      ? getComponent({
+          fieldName: field.name,
+          componentType: 'icon',
+          isDetail: false,
+        })
+      : undefined;
+
     name = field.label ?? field.name;
-    Icon = view?.icon;
+    Icon = IconComponent ?? view?.icon;
+
+    if (isSystemField(field.name)) {
+      Icon = ClockIcon;
+    }
+
     fallback = field.name.firstUpper();
   } catch (error) {
     name = props.value.label;
@@ -66,7 +82,9 @@ export const FilterValue = (props: {
 
   return (
     <div className="flex flex-row gap-2 items-center">
-      <span>{Icon && <Icon className="w-4 h-4" />}</span>
+      <span className="h-3 w-3">
+        {Icon && <Icon style={{ height: '12px', width: '12px' }} />}
+      </span>
       <span>{toDisplay}</span>
     </div>
   );

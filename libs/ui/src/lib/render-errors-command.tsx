@@ -11,7 +11,7 @@ export const CommandRenderErrors = (props: {
           return (
             <div
               key={`error-${index}`}
-              className="text-sm text-red-400 flex items-center"
+              className="text-xs text-red-400 flex items-center"
             >
               <div>
                 <MessageCircleWarning className="inline h-4 w-4 mr-1" />

@@ -170,8 +170,8 @@ Small Features to add
 - [x] sidebar list view, filter on the relational and enum values
 - [x] group by enum
 - [x] if we are doing a search/filtering and we are fetchMore.isDone -> local search...
-- [ ] star/unstar from the right sidebar
-- [ ] menu dropdown in the right sidebar
+- [x] star/unstar from the right sidebar
+- [x] menu dropdown in the right sidebar
 - [ ] check how options in right click contextmenu are implemented
 - [ ] select one or more rows -> show correct action commands, show action popover like linear
 - [ ] action buttons in views

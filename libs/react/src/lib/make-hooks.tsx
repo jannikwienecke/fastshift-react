@@ -5,7 +5,7 @@ import { useQuery } from './use-query';
 import { useQueryData } from './use-query-data';
 import { makeFilterProps } from './ui-adapter/filter-adapter';
 import { makeInputDialogProps } from './ui-adapter/input-dialog';
-import { makeDisplayOptionsProps } from './ui-adapter/filter-adapter/displayOptions-adapter';
+import { makeDisplayOptionsProps } from './legend-store/legend.displayOptions.adapter';
 import { makeContextMenuProps } from './ui-adapter/filter-adapter/contextmenu-adapter';
 import { makeConfirmationAlertProps } from './ui-adapter/confirmation-alert-adapter/confirmation-alert-adapter';
 import { makeCommandbarProps } from './ui-adapter/commandbar-adapter';

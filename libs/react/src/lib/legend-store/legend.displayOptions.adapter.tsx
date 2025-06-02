@@ -6,7 +6,7 @@ import {
 import {
   derviedDisplayOptions,
   displayOptionsProps,
-} from '../../legend-store/legend.store.derived.displayOptions';
+} from './legend.displayOptions.derived.js';
 
 export const makeDisplayOptionsProps = <T extends RecordType>(
   options?: MakeDisplayOptionsPropsOptions<T>

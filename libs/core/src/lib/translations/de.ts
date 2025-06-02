@@ -107,6 +107,7 @@ export const de = {
     to: 'zu',
     from: 'von',
     this: 'das',
+    views: 'Ansichten',
   },
 
   userViewForm: {
@@ -169,9 +170,36 @@ export const de = {
     saveToThisView: 'In diese Ansicht speichern',
     createNewView: 'Neue Ansicht erstellen...',
   },
+
+  detailView: {
+    activity: {
+      goTo: 'Gehe zu {{name}}',
+    },
+  },
+
   _creationTime: {
-    one: 'Created at',
-    other: 'Created at',
+    one: 'Erstellt am',
+    other: 'Erstellt am',
+  },
+  updatedAt_: {
+    one: 'Aktualisiert am',
+    other: 'Aktualisiert am',
+  },
+  updatedBy_: {
+    one: 'Aktualisiert von',
+    other: 'Aktualisiert von',
+  },
+  deletedAt_: {
+    one: 'Gelöscht am',
+    other: 'Gelöscht am',
+  },
+  deleted: {
+    one: 'Gelöscht',
+    other: 'Gelöscht',
+  },
+  createdBy_: {
+    one: 'Erstellt von',
+    other: 'Erstellt von',
   },
 
   __commands: {

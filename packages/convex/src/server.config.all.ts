@@ -32,6 +32,7 @@ export const tasksConfig = createViewConfig(
     fields: {
       projectId: {
         useAsSidebarFilter: true,
+        includeInRelationalDataQuery: true,
       },
 
       dueDate: {
@@ -165,14 +166,17 @@ export const projectsConfig = createViewConfig(
     },
 
     fields: {
+      tasks: { includeInRelationalDataQuery: true },
       categoryId: {
         useAsSidebarFilter: true,
       },
       ownerId: {
         useAsSidebarFilter: true,
+        showFieldActionInDetailCommands: true,
       },
       dueDate: {
         isDateField: true,
+        showFieldActionInDetailCommands: true,
         dateFormatter: (date) =>
           date.toLocaleDateString('de-DE', {
             year: 'numeric',

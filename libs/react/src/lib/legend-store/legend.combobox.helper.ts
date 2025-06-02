@@ -1,6 +1,7 @@
 import {
   ComboxboxItem,
   FieldConfig,
+  INTERNAL_FIELDS,
   NO_GROUPING_FIELD,
   NO_SORTING_FIELD,
   RecordType,
@@ -45,6 +46,10 @@ export const getViewFieldsOptions = (options?: {
     includeSystemFields: options?.includeSystemFields,
   });
 
+  console.log(viewFields.map((f) => f.name));
+  console.log(getViewConfigManager().viewConfig.viewName);
+  console.log(options?.row?.label);
+
   filterOptions = viewFields.map((field) => {
     const label = options?.useEditLabel
       ? getEditLabel(field, getViewConfigManager().viewConfig, options.row)
@@ -87,19 +92,61 @@ export const makeComboboxStateSortingOptions =
     if (!props) return null;
 
     let values = [...(props.values || [])];
-    values = [...values, makeRowFromField(NO_SORTING_FIELD)];
+    values = [...values];
 
     const showDeleted = store$.displayOptions.showDeleted.get();
 
     const softDeleteField =
       store$.viewConfigManager.viewConfig.mutation.softDeleteField.get();
 
-    values = values.filter((v) => {
-      if (showDeleted) return true;
-      if (v.id === softDeleteField) return false;
+    values = values
+      .filter((v) => {
+        if (showDeleted) return true;
+        if (v.id === softDeleteField) return false;
 
-      return true;
-    });
+        return true;
+      })
+      .filter((v) => {
+        const systemFieldsToInclude = [
+          INTERNAL_FIELDS.updatedAt.fieldName,
+          INTERNAL_FIELDS.creationTime.fieldName,
+        ];
+        return systemFieldsToInclude.includes(v.id) || !v.raw.isSystemField;
+      })
+      .sort((a, b) => {
+        // first the display fields
+        // second: Non-relational fields & non system fields
+        // third relational fields  & non system fields
+        // last: System fields
+
+        const isDisplayFieldA = a.raw.isDisplayField;
+        const isDisplayFieldB = b.raw.isDisplayField;
+
+        const isSystemFieldA = a.raw.isSystemField;
+        const isSystemFieldB = b.raw.isSystemField;
+
+        const isNonRelationalA = !a.raw.relation;
+        const isNonRelationalB = !b.raw.relation;
+
+        if (isDisplayFieldA && !isDisplayFieldB) return -1;
+        if (!isDisplayFieldA && isDisplayFieldB) return 1;
+
+        // System fields always go last
+        if (isSystemFieldA && !isSystemFieldB) return 1;
+        if (!isSystemFieldA && isSystemFieldB) return -1;
+
+        // Both are system fields, sort alphabetically
+        if (isSystemFieldA && isSystemFieldB) {
+          return a.label.localeCompare(b.label);
+        }
+
+        // Non-relational fields come before relational fields
+        if (isNonRelationalA && !isNonRelationalB) return -1;
+        if (!isNonRelationalA && isNonRelationalB) return 1;
+
+        // Same type (both relational or both non-relational), sort alphabetically
+        return a.label.localeCompare(b.label);
+      });
 
     return {
       ...props,

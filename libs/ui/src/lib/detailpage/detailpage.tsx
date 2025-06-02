@@ -3,6 +3,7 @@ import {
   FormFieldProps,
   getFieldLabel,
   HistoryType,
+  useTranslation,
 } from '@apps-next/core';
 import { CubeIcon, DotsHorizontalIcon } from '@radix-ui/react-icons';
 import {
@@ -197,6 +198,7 @@ const DetailTabs = (
     RenderActivityList: React.FC<{ historyData: HistoryType[] }>;
   }
 ) => {
+  const { t } = useTranslation();
   if (!props.tabs) return null;
 
   const {
@@ -267,11 +269,15 @@ const DetailTabs = (
                 <div className="flex group flex-row items-center rounded-sm italic">
                   <div className="flex flex-row items-center">
                     <div className="flex flex-row gap-1 items-center">
-                      <div className="text-foreground/70">Go to</div>
+                      <div className="text-foreground/70">
+                        {t('detailView.activity.goTo', {
+                          name: '',
+                        })}
+                      </div>
                       <div className="pl-1">
                         {props.tabs?.activeTabField?.icon ? (
                           <>
-                            <props.tabs.activeTabField.icon />
+                            <props.tabs.activeTabField.icon className="h-4 w-4" />
                           </>
                         ) : null}
                       </div>

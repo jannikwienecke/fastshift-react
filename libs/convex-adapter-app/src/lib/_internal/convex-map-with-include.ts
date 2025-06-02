@@ -15,10 +15,10 @@ import { ConvexRecord } from './types.convex';
 export const mapWithInclude = async (
   rows: ConvexRecord[],
   ctx: GenericQueryCtx,
-  args: QueryServerProps
+  args: QueryServerProps & { includeFields?: string[] }
 ) => {
   const { viewConfigManager, registeredViews } = args;
-  const include = viewConfigManager.getIncludeFields();
+  const include = args.includeFields ?? viewConfigManager.getIncludeFields();
 
   if (!rows) return [];
   const result = await asyncMap(rows, async (recordWithoutRelations) => {

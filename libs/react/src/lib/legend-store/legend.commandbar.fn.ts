@@ -36,6 +36,7 @@ export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
   store$.commandbar.selectedViewField.set(undefined);
   store$.commandbar.activeOpen.set(undefined);
   comboboxDebouncedQuery$.set('');
+  store$.commandbar.activeRow.set(undefined);
 };
 
 export const commandbarOpenWithFieldValue: StoreFn<

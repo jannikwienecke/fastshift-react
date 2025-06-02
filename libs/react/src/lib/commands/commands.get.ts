@@ -85,6 +85,7 @@ export const getCommandsList = (): CommandbarItem[] => {
   }
 
   const currentViewCommands = getCommandsForCurrentView();
+  // console.log('currentViewCommands')
 
   const userStoreCommands = commandsHelper.getUserStoreCommands();
 

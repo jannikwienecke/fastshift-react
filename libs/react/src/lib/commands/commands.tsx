@@ -15,16 +15,19 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import { Layers3Icon, PlusIcon } from 'lucide-react';
-import { comboboxStore$, parentView$, store$ } from '../legend-store';
+import { comboboxStore$, getView, parentView$, store$ } from '../legend-store';
 import { xSelect } from '../legend-store/legend.select-state';
 import {
+  copyRow,
   getIsManyRelationView,
   getViewConfigManager,
+  isDetail,
   isDetailOverview,
 } from '../legend-store/legend.utils';
 import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
 import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
 import { setCommandbarQuery } from '../legend-store/legend.commandbar.fn';
+import { getComponent } from '../ui-components/ui-components.helper';
 
 const getViewName = () => getViewConfigManager()?.getViewName();
 
@@ -47,21 +50,37 @@ const viewSaveCommand: CommandbarItem = {
 const makeSelectModelAttributeCommand = (
   item: ComboxboxItem
 ): CommandbarItem => {
+  const field = getViewConfigManager().getFieldBy(item.id.toString());
+  const icon =
+    item.icon ||
+    getComponent({
+      fieldName: field.name,
+      componentType: 'icon',
+      isDetail: isDetail(),
+    }) ||
+    getView(field.name)?.icon;
+
   const command = {
     id: item.id,
     label: item.label,
     header: '',
-    command: 'select-model-attribute',
+    command: 'model-attribute-commands',
     getViewName,
     tablename: item.tablename,
-    icon: item.icon,
-    handler: ({ row }) => {
+    field,
+    icon,
+    handler: ({ row: commandbarRow, value: command }) => {
       console.debug('makeSelectModelAttributeCommand called');
 
-      //  DETAIL BRANCHING
-      const field = getViewConfigManager().getFieldBy(item.id.toString());
+      const row = commandbarRow || store$.detail.row.get();
+      const field = command?.field;
 
-      if (!row) return;
+      if (!field) return;
+      if (!commandbarRow) {
+        store$.commandbarOpen(row as Row);
+        store$.commandbar.selectedViewField.set(field);
+        return;
+      }
 
       const value = row?.getValue?.(field.name);
       let query = '';

@@ -1,10 +1,11 @@
 import { CommandbarItem, Row } from '@apps-next/core';
 import { AlarmCheckIcon, StarIcon, StarOffIcon, TrashIcon } from 'lucide-react';
-import { store$ } from '../legend-store';
+import { store$, viewActions } from '../legend-store';
 import { getViewLabelOf, getViewName } from './commands.helper';
 
 export const makeModelCommands = () => {
-  const activeRow = store$.commandbar.activeRow.get();
+  const activeRow =
+    store$.commandbar.activeRow.get() || store$.detail.row.get();
   const userViews = store$.userViews.get();
 
   const userView = userViews.find((v) => v.name === activeRow?.label);
@@ -23,7 +24,8 @@ export const makeModelCommands = () => {
     getViewName,
     icon: isStarred ? StarOffIcon : StarIcon,
     handler: () => {
-      store$.updateViewMutation({ id: userView?.id, starred: !isStarred });
+      console.log('toggleFavoriteModel - handler');
+      viewActions().toggleFavorite();
     },
   };
 

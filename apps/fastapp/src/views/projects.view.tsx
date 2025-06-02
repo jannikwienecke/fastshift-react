@@ -1,6 +1,7 @@
 import {
   Categories,
   Owner,
+  Projects,
   projectsConfig,
   Tasks,
   tasksConfig,
@@ -9,11 +10,16 @@ import { DataType, makeDayMonthString, ViewConfigType } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { DefaultViewTemplate } from './default-view-template';
 import { makeViewFieldsConfig, viewRegistry } from '@apps-next/react';
-import { CalendarIcon, ComponentIcon } from 'lucide-react';
+import { CalendarIcon, ComponentIcon, PencilIcon } from 'lucide-react';
+import { BubbleItem } from '@apps-next/ui';
 
 type ProjectViewDataType = DataType<
   'projects',
-  { categories: Categories; owner: Owner; tasks?: Tasks }
+  {
+    categories: Categories;
+    owner: Owner;
+    tasks?: (Tasks & { projects?: Projects })[];
+  }
 >;
 
 const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
@@ -48,6 +54,18 @@ const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
             </div>
           );
         },
+        comboboxListValue: (props) => {
+          const task = props.data;
+
+          return (
+            <div className="flex flex-row items-center gap-3">
+              <div>{task.name}</div>
+              {props.data.projects?.label ? (
+                <BubbleItem label={props.data.projects.label ?? ''} />
+              ) : null}
+            </div>
+          );
+        },
       },
     },
     owner: {
@@ -60,8 +78,14 @@ const uiViewConfig = makeViewFieldsConfig<ProjectViewDataType>('projects', {
         },
       },
     },
+    description: {
+      component: {
+        icon: PencilIcon,
+      },
+    },
     label: {
       component: {
+        icon: PencilIcon,
         list: ({ data }) => {
           return <>{data.label}</>;
         },

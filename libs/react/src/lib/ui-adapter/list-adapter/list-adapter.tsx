@@ -11,7 +11,7 @@ import {
   t,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { derviedDisplayOptions } from '../../legend-store/legend.store.derived.displayOptions.js';
+import { derviedDisplayOptions } from '../../legend-store/legend.displayOptions.derived.js';
 import { store$ } from '../../legend-store/legend.store.js';
 import { copyRow, hasOpenDialog$ } from '../../legend-store/legend.utils.js';
 import { Icon } from '../../ui-components/render-icon';

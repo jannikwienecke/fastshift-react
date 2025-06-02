@@ -5,12 +5,15 @@ import {
   DEFAULT_FETCH_LIMIT_QUERY,
   getViewByName,
   Row,
+  UserViewData,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
 import { renderErrorToast } from '../toast';
 import { applyDisplayOptions } from './legend.local.display-options';
 import { applyFilter } from './legend.local.filtering';
 import { store$ } from './legend.store';
+import { getViewConfigManager, isDetail } from './legend.utils';
+import { detailUserView$, userView$ } from './legend.shared.derived';
 
 export const filterRowsByShowDeleted = (rows: Row[]) => {
   const showDeleted = store$.displayOptions.showDeleted.get();
@@ -107,8 +110,10 @@ export const localModeEnabled$ = observable(() => {
 });
 
 export const viewActions = () => {
-  const userViewData = store$.userViewData.get();
+  const userViewData = isDetail() ? detailUserView$.get() : userView$.get();
+
   const toggleFavorite = () => {
+    console.log(userViewData);
     store$.ignoreNextUserViewData.set((prev) => prev + 1);
 
     store$.userViews.set((prev) => {
@@ -127,14 +132,39 @@ export const viewActions = () => {
       return updatedViews;
     });
 
-    store$.updateViewMutation({
-      id: userViewData?.id,
-      starred:
-        userViewData?.starred !== undefined ? !userViewData.starred : true,
-    });
+    if (isDetail()) {
+      store$.updateDetailViewMutation({
+        id: userViewData?.id,
+        starred: !userViewData?.starred,
+      });
+    } else {
+      store$.updateViewMutation({
+        id: userViewData?.id,
+        starred:
+          userViewData?.starred !== undefined ? !userViewData.starred : true,
+      });
+    }
   };
 
   return {
     toggleFavorite,
   };
+};
+
+export const dispatchDeleteMutation = (runMutation: () => void) => {
+  const viewConfigManager = getViewConfigManager();
+
+  if (viewConfigManager.getUiViewConfig().onDelete?.showConfirmation) {
+    store$.confirmationAlert.open.set(true);
+    store$.confirmationAlert.title.set('confirmationAlert.delete.title');
+    store$.confirmationAlert.description.set(
+      'confirmationAlert.delete.description'
+    );
+
+    store$.confirmationAlert.onConfirm.set({
+      cb: runMutation,
+    });
+  } else {
+    runMutation();
+  }
 };

@@ -48,7 +48,7 @@ export const tasksUiViewConfig = makeViewFieldsConfig<TaskViewDataType>(
             }
             return (
               <div className="flex flex-row items-center gap-3">
-                <div>{task.name} </div>
+                <div>{task.name}</div>
                 <BubbleItem label={task.projects?.label ?? ''} />
               </div>
             );
