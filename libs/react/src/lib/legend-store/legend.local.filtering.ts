@@ -85,7 +85,7 @@ const handleBooleanFilter = (
   return rows.filter((row) => row.getValue(filter.field.name) === filterValue);
 };
 
-const getRows = (store$: Observable<LegendStore>) => {
+export const getRows = (store$: Observable<LegendStore>) => {
   const backup = store$.dataModelBackup.get();
 
   const rows: Row<RecordType>[] = backup
@@ -162,6 +162,7 @@ export const applyFilter = (
 export const addLocalFiltering = (store$: Observable<LegendStore>) => {
   store$.filter.filters.onChange((changes) => {
     if (store$.state.get() === 'pending') return;
+
     if (!localModeEnabled$.get() && !store$.fetchMore.isDone.get()) return;
 
     applyFilter(store$, changes.value);

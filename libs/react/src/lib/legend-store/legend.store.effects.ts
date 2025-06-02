@@ -1,4 +1,5 @@
 import {
+  _filter,
   _log,
   FilterType,
   makeData,
@@ -11,8 +12,13 @@ import { selectState$, xSelect } from './legend.select-state';
 import { parentView$ } from './legend.shared.derived';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
-import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
+import {
+  _hasOpenDialog$,
+  getViewConfigManager,
+  hasOpenDialog$,
+} from './legend.utils';
 import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
+import { getRows } from './legend.local.filtering';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -107,9 +113,27 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     const filters = changes.value;
 
+    const prevLength = changes?.changes?.[0].prevAtPath?.length ?? 0;
+    const newLength = changes?.changes?.[0].valueAtPath?.length ?? 0;
+    const newFilterAdded = newLength > prevLength;
+    const filterRemoved = newLength < prevLength;
+
     _log.debug('handleFilterChange: ', filters);
 
-    if (localModeEnabled$.get()) {
+    const queryIsDone = store$.fetchMore.isDone.get();
+    if (queryIsDone && filterRemoved) {
+      store$.debouncedViewQuery.set(store$.viewQuery.get());
+    }
+
+    if (queryIsDone && newFilterAdded) {
+      console.debug(
+        'handleFilterChange: fetchMore is done. Resetting fetchMore state'
+      );
+
+      if (parentView$.get()) {
+        store$.saveSubUserView();
+      }
+    } else if (localModeEnabled$.get()) {
       _log.debug('handleFilterChange: local mode. No fetchMore');
 
       if (parentView$.get()) {
@@ -476,14 +500,48 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
   // handle debounced query changes
   let timeout: NodeJS.Timeout;
+  let wasDoneOnStart = false;
+
+  store$.fetchMore.isDone.onChange((changes) => {
+    const isDone = changes.value;
+    if (!isDone) {
+      wasDoneOnStart = false;
+    }
+  });
+
   store$.viewQuery.onChange((changes) => {
     const query = changes.value;
 
-    clearTimeout(timeout);
+    const prevQuery = changes.changes?.[0].prevAtPath?.[0];
 
-    timeout = setTimeout(() => {
-      store$.debouncedViewQuery.set(query);
-    }, 200);
+    if (!prevQuery && query.length) {
+      wasDoneOnStart = store$.fetchMore.isDone.get();
+    }
+
+    if (store$.fetchMore.isDone.get() && wasDoneOnStart) {
+      const rows = getRows(store$);
+
+      const fields = getViewConfigManager()
+        .getSearchableFields()
+        ?.map((f) => f.field.toString());
+
+      const res = _filter(
+        rows.map((r) => r.raw),
+        fields ?? []
+      )
+        .withQuery(query)
+        .map((r) => r.id) as string[];
+
+      const filteredRows = rows.filter((row) => res.includes(row.id));
+
+      store$.dataModel.rows.set(filteredRows);
+    } else {
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        store$.debouncedViewQuery.set(query);
+      }, 200);
+    }
   });
 
   store$.filter.filters.onChange((changes) => {
