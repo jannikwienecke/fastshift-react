@@ -46,10 +46,6 @@ export const getViewFieldsOptions = (options?: {
     includeSystemFields: options?.includeSystemFields,
   });
 
-  console.log(viewFields.map((f) => f.name));
-  console.log(getViewConfigManager().viewConfig.viewName);
-  console.log(options?.row?.label);
-
   filterOptions = viewFields.map((field) => {
     const label = options?.useEditLabel
       ? getEditLabel(field, getViewConfigManager().viewConfig, options.row)

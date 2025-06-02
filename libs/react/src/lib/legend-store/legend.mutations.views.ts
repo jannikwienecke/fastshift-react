@@ -170,7 +170,6 @@ export const updateDetailViewMutation: StoreFn<'updateDetailViewMutation'> =
 
       return;
     }
-    console.log('updateDetailViewMutation - record', record);
     await store$.api.mutateAsync({
       query: '',
       viewName: currentView$.viewName.get(),

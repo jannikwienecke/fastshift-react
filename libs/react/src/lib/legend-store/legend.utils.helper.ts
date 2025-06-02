@@ -113,7 +113,6 @@ export const viewActions = () => {
   const userViewData = isDetail() ? detailUserView$.get() : userView$.get();
 
   const toggleFavorite = () => {
-    console.log(userViewData);
     store$.ignoreNextUserViewData.set((prev) => prev + 1);
 
     store$.userViews.set((prev) => {

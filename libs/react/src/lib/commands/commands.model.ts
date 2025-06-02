@@ -24,7 +24,6 @@ export const makeModelCommands = () => {
     getViewName,
     icon: isStarred ? StarOffIcon : StarIcon,
     handler: () => {
-      console.log('toggleFavoriteModel - handler');
       viewActions().toggleFavorite();
     },
   };

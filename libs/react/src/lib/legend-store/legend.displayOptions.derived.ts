@@ -20,7 +20,6 @@ export const derviedDisplayOptions = observable(() => {
   const options = displayOptionsProps.get();
 
   const { sorting, grouping, ...props } = store$.displayOptions.get();
-  console.log('=sorting', sorting);
 
   const sortingDefaultField: FieldConfig = NO_SORTING_FIELD;
   const groupingDefaultField: FieldConfig = NO_GROUPING_FIELD;
