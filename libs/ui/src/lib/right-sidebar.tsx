@@ -1,7 +1,8 @@
 import { _filter, RightSidebarProps, useTranslation } from '@apps-next/core';
-import { StarIcon, XIcon } from 'lucide-react';
-import React from 'react';
+import { XIcon } from 'lucide-react';
+import { CommandsDropdown } from './commands-dropdown';
 import { Input, Tabs, TabsContent, TabsList, TabsTrigger } from './components';
+import { StarredIcon } from './starred-icon';
 import { cn } from './utils';
 
 export const RightSidebar = (props: RightSidebarProps) => {
@@ -31,8 +32,10 @@ export const RightSidebar = (props: RightSidebarProps) => {
             </div>
           </div>
 
-          <div>
-            <StarIcon className="w-4 h-4 text-yellow-500" />
+          <div className="flex flex-row gap-2 items-center">
+            <CommandsDropdown {...props.commandsDropdownProps} />
+
+            <StarredIcon {...props} />
           </div>
         </div>
 
@@ -50,7 +53,6 @@ export const SidebarTabs = ({
   onQueryChange,
   currentFilter,
   setFilter,
-  getView,
   activeTab,
   onTabChange,
   tableName,

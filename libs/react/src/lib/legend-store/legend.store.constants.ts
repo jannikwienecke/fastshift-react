@@ -84,6 +84,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'viewQuery'
   | 'debouncedViewQuery'
   | 'rightSidebar'
+  | 'ignoreNextUserViewData'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
@@ -189,4 +190,5 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
 
   userViewData: undefined,
+  ignoreNextUserViewData: 0,
 };

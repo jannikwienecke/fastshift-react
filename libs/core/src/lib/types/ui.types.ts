@@ -242,9 +242,18 @@ export type SaveViewDropdownProps = {
   };
 };
 
+export type CommandsDropdownProps = {
+  onOpenCommands: () => void;
+  onSelectCommand: (command: CommandbarItem) => void;
+  commands: {
+    header?: string;
+    items: (CommandbarItem & ComboxboxItem)[];
+  }[];
+};
+
 export type PageHeaderProps = {
   onToggleFavorite: () => void;
-  onOpenCommands: () => void;
+  commandsDropdownProps: CommandsDropdownProps;
   starred: boolean;
   viewName: string;
   icon?: React.FC<any>;
@@ -253,11 +262,6 @@ export type PageHeaderProps = {
     label: string;
     onClickParentView: () => void;
   } & DetailPageProps;
-  options: {
-    header?: string;
-    items: (CommandbarItem & ComboxboxItem)[];
-  }[];
-  onSelectOption: (item: CommandbarItem) => void;
 
   query?: {
     showInput: boolean;
@@ -275,7 +279,12 @@ export type RightSidebarProps = {
   viewName: string;
   viewIcon: React.FC<any>;
   tableName: string;
+
+  commandsDropdownProps: CommandsDropdownProps;
+  starred: boolean;
+
   onClose: () => void;
+  onToggleFavorite: () => void;
 
   tabs: {
     listRows: Row[];

@@ -12,7 +12,7 @@ import { getParsedViewSettings } from './legend.utils.helper';
 import { createSubViewName } from './legend.utils';
 
 export const createViewMutation: StoreFn<'createViewMutation'> =
-  (store$) => async (form, onSuccess) => {
+  (store$) => async (form, record, onSuccess) => {
     if (!form) {
       throw new Error('Form is required');
     }
@@ -30,7 +30,7 @@ export const createViewMutation: StoreFn<'createViewMutation'> =
             description: form.viewDescription,
             name: form.viewName,
             slug: slugHelper().slugify(form.viewName),
-            starred: false,
+            ...(record || {}),
           },
         },
       },
@@ -58,6 +58,7 @@ export const updateViewMutation: StoreFn<'updateViewMutation'> =
           viewDescription: '',
           type: 'create',
         },
+        { ...record },
         onSuccess
       );
     }

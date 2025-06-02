@@ -13,6 +13,7 @@ import {
   userView$,
 } from './legend.shared.derived';
 import { store$ } from './legend.store';
+import { viewActions } from './legend.utils.helper';
 
 export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
   {}
@@ -28,9 +29,6 @@ export const derivedPageHeaderProps$ = observable(() => {
       icon: parentView$.get()?.icon,
       emoji: parentUserView$.get()?.emoji,
       viewName: parentViewName$.get() ?? '',
-      onOpenCommands: () => {
-        store$.commandsDialog.type.set('detail-row');
-      },
       detail: {
         label: detailLabel$.get(),
         onClickParentView: () => {
@@ -60,15 +58,20 @@ export const derivedPageHeaderProps$ = observable(() => {
         });
       },
 
-      onSelectOption: (option) => {
-        if (option.command === 'view-commands') {
-          store$.userViewSettings.form.set({
-            type: 'edit',
-            viewName: userView$.get()?.name ?? '',
-            viewDescription: userView$.get()?.description ?? '',
-            iconName: undefined,
+      commandsDropdownProps: {
+        onOpenCommands: () => {
+          store$.commandsDialog.type.set('view');
+        },
+        onSelectCommand: (command) => {
+          command.handler?.({
+            row: undefined,
+            field: undefined,
+            value: command,
           });
-        }
+        },
+        commands: getCommandGroups().filter((g) =>
+          g.items.find((i) => i.command === 'view-commands')
+        ),
       },
     } as PageHeaderProps;
   }
@@ -102,26 +105,20 @@ export const derivedPageHeaderProps$ = observable(() => {
     emoji: userView$.get()?.emoji,
     starred: store$.userViewData.starred.get() ?? false,
 
-    options: getCommandGroups().filter((g) =>
-      g.items.find((i) => i.command === 'view-commands')
-    ),
+    commandsDropdownProps: {
+      onOpenCommands: () => {
+        store$.commandsDialog.type.set('view');
+      },
+      onSelectCommand: (command) => {
+        command.handler?.({ row: undefined, field: undefined, value: command });
+      },
+      commands: getCommandGroups().filter((g) =>
+        g.items.find((i) => i.command === 'view-commands')
+      ),
+    },
 
     onToggleFavorite: async () => {
-      const userViewData = store$.userViewData.get();
-      if (!userViewData) return;
-
-      store$.updateViewMutation({
-        id: userViewData.id,
-        starred: !userViewData.starred,
-      });
-    },
-
-    onOpenCommands: () => {
-      store$.commandsDialog.type.set('view');
-    },
-
-    onSelectOption: (option) => {
-      option.handler?.({ row: undefined, field: undefined, value: option });
+      viewActions().toggleFavorite();
     },
   } satisfies PageHeaderProps;
 });

@@ -73,12 +73,12 @@ export type ContinueCursor = {
 
 export type UserViewData = {
   id: string;
-  baseView: string;
-  displayOptions: string;
-  filters: string;
-  name: string;
-  slug: string;
-  description: string | null;
+  baseView?: string;
+  displayOptions?: string;
+  filters?: string;
+  name?: string;
+  slug?: string;
+  description?: string | null;
   parentModel?: string;
   rowId?: string;
   rowLabelFieldName?: string;

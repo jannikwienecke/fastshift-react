@@ -146,7 +146,10 @@ export const testQuery = server.mutation({
 });
 
 export const getUserViews = server.query({
-  handler: async (ctx, args): Promise<Partial<UserViewData>[]> => {
+  handler: async (
+    ctx,
+    args
+  ): Promise<(Partial<UserViewData> & { id: string })[]> => {
     const allViews = await ctx.db.query('views').collect();
     const views = allViews.filter((view) => {
       return view.deleted_ === false || view.deleted_ === undefined;
@@ -162,7 +165,10 @@ export const getUserViews = server.query({
       const row = await ctx.db.get(view.rowId as Id<any>);
 
       if (!row) {
-        return view;
+        return {
+          ...view,
+          id: view._id,
+        };
       }
 
       const label = row[view.rowLabelFieldName as keyof Doc<any>];

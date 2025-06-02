@@ -105,6 +105,7 @@ import {
   updateDetailViewMutation,
   updateViewMutation,
 } from './legend.mutations.views';
+import { updateUserViews } from './legend.views.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
@@ -228,4 +229,6 @@ export const store$ = observable<LegendStore>({
     updateDetailViewMutation(store$)(...props),
   createViewMutation: (...props) => createViewMutation(store$)(...props),
   saveSubUserView: (...props) => saveSubUserView(store$)(...props),
+
+  updateUserViews: (...props) => updateUserViews(store$)(...props),
 });

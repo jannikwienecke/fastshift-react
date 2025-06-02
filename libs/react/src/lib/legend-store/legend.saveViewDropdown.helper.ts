@@ -21,7 +21,7 @@ export const updateExisitingView = () => {
           return [
             {
               ...view,
-              id: view.id + '-deleted',
+              id: view.id,
               _deleted: true,
             },
             {

@@ -197,7 +197,7 @@ const handleLoadDetailOverview = (action: Action) => {
 const loadViewKey$ = observable('');
 const handleLoadView = (action: Action) => {
   if (action.type !== 'LOAD_VIEW') return;
-  const key = `load-view-${action.viewName}`;
+  const key = `load-view-${action.userViewData?.id || action.viewName}`;
 
   const view = getView(action.viewData.viewConfig.viewName);
   if (!view) throw new Error('ERROR NO VIEW');
@@ -207,7 +207,6 @@ const handleLoadView = (action: Action) => {
     action.viewData.uiViewConfig
   );
 
-  // && !action.isLoader
   const isOtherKey = loadViewKey$.get() !== key;
   if (loadViewKey$.get() === key && !action.isLoader) return;
 

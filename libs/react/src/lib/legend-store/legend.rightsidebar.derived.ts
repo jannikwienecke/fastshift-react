@@ -10,6 +10,8 @@ import {
 } from './legend.rightsidebar.state';
 import { currentView$, getView, userView$ } from './legend.shared.derived';
 import { store$ } from './legend.store';
+import { viewActions } from './legend.utils.helper';
+import { getCommandGroups } from '../commands/commands.get';
 
 export const rightSidebarProps$ = observable(() => {
   const relationalFilterData = store$.relationalFilterData.get();
@@ -25,6 +27,24 @@ export const rightSidebarProps$ = observable(() => {
     onClose: () => {
       store$.rightSidebar.open.set(false);
     },
+    onToggleFavorite: () => {
+      viewActions().toggleFavorite();
+    },
+
+    commandsDropdownProps: {
+      onOpenCommands: () => {
+        store$.commandsDialog.type.set('view');
+      },
+      onSelectCommand: (command) => {
+        command.handler?.({ row: undefined, field: undefined, value: command });
+      },
+      commands: getCommandGroups().filter((g) =>
+        g.items.find((i) => i.command === 'view-commands')
+      ),
+    },
+
+    starred: store$.userViewData.starred.get() ?? false,
+
     viewName: (userView$.get()?.name || currentView$.get()?.viewName) ?? '',
     tableName: currentView$.get().tableName,
     viewIcon: currentView$.get().icon,

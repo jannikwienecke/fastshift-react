@@ -192,8 +192,11 @@ export type LegendStore = {
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
   userViews: UserViewData[];
+  updateUserViews: (views: UserViewData[]) => void;
+
   commands: UserStoreCommand[];
   userViewData: UserViewData | undefined | null;
+  ignoreNextUserViewData: number;
 
   viewId: string | null;
 
@@ -380,7 +383,11 @@ export type LegendStore = {
     onSuccess?: () => void
   ) => void;
   updateDetailViewMutation: (props: Partial<UserViewData>) => void;
-  createViewMutation: (form: UserViewForm, onSuccess?: () => void) => void;
+  createViewMutation: (
+    form: UserViewForm,
+    props: Partial<UserViewData>,
+    onSuccess?: () => void
+  ) => void;
   saveSubUserView: () => void;
 
   // commandbar

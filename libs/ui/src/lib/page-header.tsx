@@ -10,6 +10,7 @@ import {
   SearchIcon,
   StarIcon,
 } from 'lucide-react';
+import { CommandsDropdown } from './commands-dropdown';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,16 +21,10 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   SearchInput,
 } from './components';
-import { Checkbox } from './components/checkbox';
+import { StarredIcon } from './starred-icon';
 import { cn } from './utils';
 
 const DefaultPageHeaderMain = (props: PageHeaderProps) => {
@@ -62,121 +57,9 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
                 {props.viewName}
               </div>
 
-              <DropdownMenu onOpenChange={props.onOpenCommands}>
-                <DropdownMenuTrigger asChild>
-                  <div>
-                    <MoreHorizontal className="text-foreground/50" />
+              <CommandsDropdown {...props.commandsDropdownProps} />
 
-                    <span className="sr-only">{t('common.more')}</span>
-                  </div>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent className="w-56 rounded-lg text-sm">
-                  {props.options?.map((option, index) => {
-                    return (
-                      <div key={index}>
-                        {option.items.map((item) => {
-                          return (
-                            <div key={item.id.toString()}>
-                              {!item.subCommands ? (
-                                <DropdownMenuItem
-                                  key={item.label}
-                                  onClick={() => {
-                                    // item.onClick();
-                                    props.onSelectOption?.(item);
-                                  }}
-                                >
-                                  {item.icon ? (
-                                    <item.icon className="text-foreground" />
-                                  ) : null}
-
-                                  <span className="text-foreground text-[13px]">
-                                    {item.label}
-                                  </span>
-                                </DropdownMenuItem>
-                              ) : (
-                                <DropdownMenuSub>
-                                  <DropdownMenuSubTrigger>
-                                    {item.icon ? (
-                                      <item.icon className="text-foreground" />
-                                    ) : null}
-
-                                    <span className="text-foreground text-[13px]">
-                                      {item.label}
-                                    </span>
-                                  </DropdownMenuSubTrigger>
-
-                                  <DropdownMenuPortal>
-                                    <DropdownMenuSubContent>
-                                      {item.subCommands.map(
-                                        (subItem, index) => {
-                                          return (
-                                            <DropdownMenuItem
-                                              key={
-                                                subItem.id.toString() + index
-                                              }
-                                              onClick={(e) => {
-                                                if (subItem.onCheckedChange) {
-                                                  e.preventDefault();
-                                                  e.stopPropagation();
-                                                } else {
-                                                  props.onSelectOption?.(
-                                                    subItem
-                                                  );
-                                                }
-                                              }}
-                                            >
-                                              {subItem.icon &&
-                                              !subItem.onCheckedChange ? (
-                                                <subItem.icon className="text-foreground" />
-                                              ) : (
-                                                <>
-                                                  <Checkbox
-                                                    onCheckedChange={(
-                                                      checked
-                                                    ) => {
-                                                      subItem.onCheckedChange?.(
-                                                        checked as boolean
-                                                      );
-                                                    }}
-                                                  />
-                                                </>
-                                              )}
-
-                                              <span className="text-foreground text-[13px]">
-                                                {subItem.label.toString()}
-                                              </span>
-                                            </DropdownMenuItem>
-                                          );
-                                        }
-                                      )}
-                                    </DropdownMenuSubContent>
-                                  </DropdownMenuPortal>
-                                </DropdownMenuSub>
-                              )}
-
-                              {item.dropdownOptions?.showDivider ? (
-                                <DropdownMenuSeparator />
-                              ) : null}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <StarIcon
-                data-testid={props.starred ? 'starred' : 'unstarred'}
-                className={cn(
-                  'h-4 w-4 cursor-pointer',
-                  props.starred ? 'text-yellow-500' : 'text-foreground'
-                )}
-                onClick={() => {
-                  props.onToggleFavorite?.();
-                }}
-              />
+              <StarredIcon {...props} />
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
@@ -272,7 +155,7 @@ const DefaultPageHeaderDetail = (props: PageHeaderProps) => {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="w-56 rounded-lg text-sm">
-                  {props.options.map((option, index) => {
+                  {/* {props.options.map((option, index) => {
                     return (
                       <div key={index}>
                         {option.items.map((item) => {
@@ -280,7 +163,6 @@ const DefaultPageHeaderDetail = (props: PageHeaderProps) => {
                             <DropdownMenuItem
                               key={item.label}
                               onClick={() => {
-                                // item.onClick();
                                 props.onSelectOption?.(item);
                               }}
                             >
@@ -296,7 +178,7 @@ const DefaultPageHeaderDetail = (props: PageHeaderProps) => {
                         })}
                       </div>
                     );
-                  })}
+                  })} */}
                 </DropdownMenuContent>
               </DropdownMenu>
 

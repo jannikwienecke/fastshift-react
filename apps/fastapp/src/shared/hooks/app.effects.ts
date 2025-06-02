@@ -36,21 +36,8 @@ export const useAppEffects = (viewName: string) => {
 
   React.useEffect(() => {
     if (!userViews) return;
-    store$.userViews.set(
-      userViews.map((v) => {
-        // Fixme -> combine both types from db and ui to one in core
-        return {
-          ...v,
-          id: v.id ?? '',
-          baseView: v.baseView ?? '',
-          displayOptions: v.displayOptions ?? '',
-          filters: v.filters ?? '',
-          name: v.name ?? '',
-          slug: v.slug ?? '',
-          description: v.description ?? '',
-        };
-      })
-    );
+
+    store$.updateUserViews(userViews);
   }, [userViews]);
 
   const [_, i18n] = useTranslationReact();

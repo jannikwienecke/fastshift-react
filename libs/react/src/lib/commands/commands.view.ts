@@ -12,6 +12,8 @@ import { currentView$, store$, userView$ } from '../legend-store';
 import { getViewName } from './commands.helper';
 
 const isViewCommands = () => store$.commandsDialog.type.get() === 'view';
+const isBaseView = () =>
+  !userView$.get() || userView$.get()?.baseView === userView$.get()?.name;
 
 const downloadingCSVInProgress = observable(false);
 
@@ -179,7 +181,7 @@ export const makeViewCommands = () => {
     header: 'view',
     command: 'view-commands',
     getViewName,
-    getIsVisible: () => isViewCommands() && !!userView$.get(),
+    getIsVisible: () => isViewCommands() && !isBaseView(),
     icon: PencilIcon,
     handler: () => {
       console.debug('viewCommand - handler');
@@ -201,7 +203,7 @@ export const makeViewCommands = () => {
     header: 'view',
     command: 'view-commands',
     getViewName,
-    getIsVisible: () => isViewCommands() && !!userView$.get(),
+    getIsVisible: () => isViewCommands() && !isBaseView(),
     icon: TrashIcon,
     dropdownOptions: { showDivider: true },
     handler: () => {

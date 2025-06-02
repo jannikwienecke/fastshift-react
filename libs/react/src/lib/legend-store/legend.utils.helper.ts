@@ -105,3 +105,36 @@ export const localModeEnabled$ = observable(() => {
     parentViewName
   );
 });
+
+export const viewActions = () => {
+  const userViewData = store$.userViewData.get();
+  const toggleFavorite = () => {
+    store$.ignoreNextUserViewData.set((prev) => prev + 1);
+
+    store$.userViews.set((prev) => {
+      const updatedViews = prev.map((view) => {
+        if (view.id === userViewData?.id) {
+          return {
+            ...view,
+            starred:
+              userViewData?.starred !== undefined
+                ? !userViewData.starred
+                : true,
+          };
+        }
+        return view;
+      });
+      return updatedViews;
+    });
+
+    store$.updateViewMutation({
+      id: userViewData?.id,
+      starred:
+        userViewData?.starred !== undefined ? !userViewData.starred : true,
+    });
+  };
+
+  return {
+    toggleFavorite,
+  };
+};
