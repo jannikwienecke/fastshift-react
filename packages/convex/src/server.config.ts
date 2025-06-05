@@ -6,5 +6,6 @@ export const config = createConfigFromConvexSchema(schema);
 declare module '@apps-next/core' {
   interface Register {
     config: typeof config;
+    viewNames: ['convex'];
   }
 }

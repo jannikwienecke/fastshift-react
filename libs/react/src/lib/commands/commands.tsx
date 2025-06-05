@@ -25,7 +25,11 @@ import {
   isDetailOverview,
 } from '../legend-store/legend.utils';
 import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
-import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
+import {
+  commandsHelper,
+  getCommandsType,
+  getParsedDateRowForMutation,
+} from './commands.helper';
 import { setCommandbarQuery } from '../legend-store/legend.commandbar.fn';
 import { getComponent } from '../ui-components/ui-components.helper';
 
@@ -68,6 +72,8 @@ const makeSelectModelAttributeCommand = (
     getViewName,
     tablename: item.tablename,
     field,
+    getIsVisible: () =>
+      getCommandsType() !== 'detail-row' && getCommandsType() !== 'closed',
     icon,
     handler: ({ row: commandbarRow, value: command }) => {
       console.debug('makeSelectModelAttributeCommand called');
@@ -118,6 +124,8 @@ const makeSelectRelationalOptionCommand = (
     header: '',
     command: 'select-model-relational-option',
     getViewName,
+    getIsVisible: () => store$.commandsDisplay.type.get() === 'view',
+
     handler: ({ row, field, value }) => {
       if (!row || !field) return;
       _log.debug('makeSelectRelationalOptionCommand - handler');
@@ -222,6 +230,11 @@ const makeOpenCreateFormCommand = (view: ViewConfigType): CommandbarItem => {
     id: ADD_NEW_OPTION,
     label: labelToUse,
     icon: PlusIcon,
+    getIsVisible: () =>
+      store$.commandsDisplay.type.get() === 'view' ||
+      store$.commandsDisplay.type.get() === 'list-actions' ||
+      store$.commandsDisplay.type.get() === 'commandbar',
+
     tablename: view.tableName,
     header: () => getViewLabel(view, true),
     command: 'open-view-form',

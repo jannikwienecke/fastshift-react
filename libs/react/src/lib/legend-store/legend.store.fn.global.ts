@@ -10,7 +10,11 @@ import {
   t,
 } from '@apps-next/core';
 import { batch, Observable } from '@legendapp/state';
-import { ignoreNewData$ } from './legend.mutationts';
+import {
+  ignoreNewData$,
+  ignoreNewDetailData$,
+  isRunning$,
+} from './legend.mutationts';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
 
@@ -250,7 +254,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
 
     store$.allIds.set(data.allIds ?? []);
 
-    _log.debug(
+    console.debug(
       `____handleIncomingData`,
       state,
       data.data?.slice(0, 3).map((d) => d?.['name'])
@@ -260,7 +264,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
       localModeEnabled$.get() &&
       store$.detail.viewType.type.get() === 'model'
     ) {
-      _log.debug(`handleIncomingData:debugMode-> Update Data Model`);
+      console.debug(`handleIncomingData:debugMode-> Update Data Model`);
       store$.createDataModel(data.data ?? []);
       return;
     }
@@ -269,37 +273,37 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
 
     switch (state) {
       case 'invalidated':
-        _log.debug('RECEIVING DATA AFTER INVALIDATED');
+        console.debug('RECEIVING DATA AFTER INVALIDATED');
         setTimeout(() => store$.state.set('mutating'), 10);
         break;
 
       case 'fetching-more':
-        _log.debug('RECEIVING DATA AFTER FETCHING MORE', data);
+        console.debug('RECEIVING DATA AFTER FETCHING MORE', data);
         await handlingFetchMoreState(store$, data);
         break;
 
       case 'updating-display-options':
-        _log.debug('RECEIVING DATA AFTER UPDATING DISPLAY OPTIONS');
+        console.debug('RECEIVING DATA AFTER UPDATING DISPLAY OPTIONS');
         await handlingDisplayOptionsChangeState(store$, data);
         break;
 
       case 'filter-changed':
-        _log.debug('RECEIVING DATA AFTER FILTER CHANGED');
+        console.debug('RECEIVING DATA AFTER FILTER CHANGED');
         await handleFilterChangedState(store$, data);
         break;
 
       case 'temp-filter-changed':
-        _log.debug('RECEIVING DATA AFTER TEMP FILTER CHANGED');
+        console.debug('RECEIVING DATA AFTER TEMP FILTER CHANGED');
         await handleFilterChangedState(store$, data);
         break;
 
       case 'mutating':
-        _log.debug('====RECEIVING DATA AFTER MUTATION');
+        console.debug('====RECEIVING DATA AFTER MUTATION');
         handleMutatingState(store$, data);
         break;
 
       case 'initialized':
-        _log.debug('RECEIVING DATA AFTER INITIALIZED -> Do NOTHING');
+        console.debug('RECEIVING DATA AFTER INITIALIZED -> Do NOTHING');
         handleMutatingState(store$, data);
         break;
 
@@ -333,19 +337,22 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
     const rows = data.data;
 
     const viewName = store$.detail.viewConfigManager.getViewName();
-    _log.debug('____handleIncomingDetailData: ', rows?.length, viewName);
+    console.debug('____handleIncomingDetailData: ', rows?.length, viewName);
 
     const key = `detail-${store$.detail.row.get()?.id}`;
     const ignoreNext = store$.ignoreNextQueryDict?.[key].get();
     const dirtyField = store$.detail.form.dirtyField.get();
     const diryValue = store$.detail.form.dirtyValue.get();
 
-    if (ignoreNewData$.get() > 0) {
-      ignoreNewData$.set((prev) => prev - 1);
-      return;
-    }
-
     store$.detail.historyDataOfRow.set(data.historyData);
+
+    if (ignoreNewDetailData$.get() > 0) {
+      ignoreNewDetailData$.set((prev) => prev - 1);
+      return;
+    } else if (ignoreNewDetailData$.get() === 0) {
+      ignoreNewDetailData$.set(0);
+      isRunning$.set(false);
+    }
 
     if (rows?.length === 1) {
       if (ignoreNext > 1) {

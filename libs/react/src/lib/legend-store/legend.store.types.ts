@@ -35,6 +35,7 @@ import {
   RelationalFilterQueryDto,
   RelationalFilterDataModel,
   CommandbarItem,
+  MakeUserStoreCommand,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { QueryClient } from '@tanstack/react-query';
@@ -194,14 +195,20 @@ export type LegendStore = {
   userViews: UserViewData[];
   updateUserViews: (views: UserViewData[]) => void;
 
-  commands: UserStoreCommand[];
+  commands: MakeUserStoreCommand[];
   userViewData: UserViewData | undefined | null;
   ignoreNextUserViewData: number;
 
   viewId: string | null;
 
-  commandsDialog?: {
-    type: 'view' | 'view-sidebar' | 'detail-row';
+  commandsDisplay: {
+    type:
+      | 'view'
+      | 'view-sidebar'
+      | 'detail-row'
+      | 'closed'
+      | 'commandbar'
+      | 'list-actions';
   };
 
   api?: {
@@ -230,7 +237,7 @@ export type LegendStore = {
       focus: boolean;
     };
     onClickRelation?: { fn: MakeListPropsOptions['onClickRelation'] };
-    selected: RecordType[];
+    selected: Row[];
     selectedRelationField?: {
       field: FieldConfig;
       row?: Row | null;

@@ -48,15 +48,23 @@ export const CommandDialogList = (props: {
   const listRef = React.useRef<HTMLDivElement>(null);
 
   const onValueChangeRef = React.useRef(props.onValueChange);
+  const onSelectRef = React.useRef(props.onSelect);
   const groupsRef = React.useRef(props.groups);
   React.useEffect(() => {
     groupsRef.current = props.groups;
   }, [props.groups]);
 
+  const activeItemRef = React.useRef(props.activeItem);
+  React.useEffect(() => {
+    activeItemRef.current = props.activeItem;
+  }, [props.activeItem]);
+
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // if is down arrow, focus next item
-      const activeId = props.activeItem?.id;
+      const activeItem = activeItemRef.current;
+
+      const activeId = activeItem?.id;
       const allItems = groupsRef.current.map((g) => g.items).flat();
 
       const index = allItems.flat().findIndex((i) => i.id === activeId);
@@ -69,9 +77,9 @@ export const CommandDialogList = (props: {
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         newIndex = index - 1;
-      } else if (e.key === 'Enter' && props.activeItem) {
+      } else if (e.key === 'Enter' && activeItem) {
         e.preventDefault();
-        props.onSelect?.(props.activeItem);
+        onSelectRef.current?.(activeItem);
       }
 
       const item = groupsRef.current.map((g) => g.items).flat()?.[
@@ -90,7 +98,7 @@ export const CommandDialogList = (props: {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [props.activeItem]);
+  }, []);
 
   const prevIdKey = React.useRef<string | null>(null);
 

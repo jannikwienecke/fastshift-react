@@ -149,7 +149,8 @@ export const saveSubUserView: StoreFn<'saveSubUserView'> =
   };
 
 export const updateDetailViewMutation: StoreFn<'updateDetailViewMutation'> =
-  (store$) => async (record) => {
+  (store$) =>
+  async ({ id, ...record }) => {
     const baseView = parentView$.get()?.viewName;
 
     const view = detailUserView$.get();
@@ -170,6 +171,7 @@ export const updateDetailViewMutation: StoreFn<'updateDetailViewMutation'> =
 
       return;
     }
+
     await store$.api.mutateAsync({
       query: '',
       viewName: currentView$.viewName.get(),

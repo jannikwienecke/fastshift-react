@@ -1,6 +1,13 @@
 import { CommandbarItem } from '@apps-next/core';
 import { CopyIcon, LinkIcon } from 'lucide-react';
-import { getViewLabelOf, getViewName } from './commands.helper';
+import {
+  getCommandsType,
+  getViewLabelOf,
+  getViewName,
+} from './commands.helper';
+
+const getIsVisible = () =>
+  getCommandsType() !== 'detail-row' && getCommandsType() !== 'closed';
 
 export const makeCopyCommands = () => {
   const copyIdCommand: CommandbarItem = {
@@ -10,9 +17,7 @@ export const makeCopyCommands = () => {
     header: '',
     getViewName: getViewName,
     icon: CopyIcon,
-    getIsVisible: () => {
-      return true;
-    },
+    getIsVisible,
     handler: () => {
       console.debug('copyIssueIdCommand - handler');
       alert('HANDLE...copyIssueIdCommand NOT IMPLEMENTED');
@@ -25,6 +30,7 @@ export const makeCopyCommands = () => {
     label: getViewLabelOf('__commands.copyUrl'),
     header: '',
     getViewName: getViewName,
+    getIsVisible,
     icon: LinkIcon,
     handler: () => {
       console.debug('copyUrlCommand - handler');

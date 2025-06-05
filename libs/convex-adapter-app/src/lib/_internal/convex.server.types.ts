@@ -1,3 +1,5 @@
+import { GetTableName } from '@apps-next/core';
+
 /**
  * The arguments array for a function that takes arguments.
  *

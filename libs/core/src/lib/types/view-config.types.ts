@@ -5,7 +5,6 @@ import {
   GetTableName,
   ID,
   IndexField,
-  RecordType,
   SearchableField,
 } from './base.types';
 import { IncludeConfig } from './config.types';
@@ -13,7 +12,7 @@ import { DisplayOptionsUiType } from './filter.types';
 import { QueryServerProps } from './query.types';
 export type ViewFieldConfig = Record<string, FieldConfig>;
 
-export type ViewConfigBaseInfo<T extends GetTableName> = {
+export type ViewConfigBaseInfo<T extends GetTableName = any> = {
   viewName: string;
   tableName: T;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

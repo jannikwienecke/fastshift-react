@@ -323,7 +323,9 @@ export const getUserViewByName = (
   userViewsList: UserViewData[],
   name: string
 ) => {
-  return userViewsList.find((u) => u.name.toLowerCase() === name.toLowerCase());
+  return userViewsList.find(
+    (u) => u.name?.toLowerCase() === name.toLowerCase()
+  );
 };
 
 export const makeDayMonthString = (date: Date | undefined) => {

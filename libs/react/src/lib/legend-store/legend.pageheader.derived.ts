@@ -14,10 +14,13 @@ import {
   parentUserView$,
   parentView$,
   parentViewName$,
+  tablename$,
   userView$,
+  view$,
 } from './legend.shared.derived';
 import { store$ } from './legend.store';
-import { viewActions } from './legend.utils.helper';
+import { getCommandsDropdownProps, viewActions } from './legend.utils.helper';
+import { commands } from '../commands/commands';
 
 export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
   {}
@@ -31,15 +34,14 @@ export const derivedPageHeaderProps$ = observable(() => {
       'model-commands',
       'model-attribute-commands',
     ];
-    //
+
     return {
-      options: [],
       starred: detailUserView$.get()?.starred ?? false,
       icon: parentView$.get()?.icon,
       emoji: parentUserView$.get()?.emoji,
       viewName: parentViewName$.get() ?? '',
       detail: {
-        label: detailLabel$.get(),
+        label: detailLabel$.get() ?? '',
         onClickParentView: () => {
           store$.navigation.set({
             state: {
@@ -63,11 +65,10 @@ export const derivedPageHeaderProps$ = observable(() => {
         viewActions().toggleFavorite();
       },
 
-      commandsDropdownProps: {
-        onOpenCommands: () => {
-          store$.commandsDialog.type.set('view');
-        },
-        onSelectCommand: (c) => c.handler?.({ value: c }),
+      commands: {},
+
+      commandsDropdownProps: getCommandsDropdownProps({
+        view: 'view',
         commands: getCommandGroups().map((g) => ({
           items: g.items
             .filter((i) => allowedCommands.includes(i.command))
@@ -78,8 +79,34 @@ export const derivedPageHeaderProps$ = observable(() => {
             ),
           header: g.header,
         })),
-      },
-    } as PageHeaderProps;
+      }),
+    } satisfies PageHeaderProps;
+  }
+
+  const view = view$.get();
+  if (!view) throw new Error('View is not defined');
+
+  const primaryCommand = commands.makeOpenCreateFormCommand(view);
+
+  const commandsGroupsForLustActions = getCommandGroups().filter((g) =>
+    g.items.find(
+      (i) => i.command === 'open-view-form' && i.tablename === tablename$.get()
+    )
+  );
+
+  let commandsDropdownProps = getCommandsDropdownProps({
+    view: 'list-actions',
+    commands:
+      commandsGroupsForLustActions.length === 1
+        ? []
+        : commandsGroupsForLustActions,
+  });
+
+  if (store$.list.selected.get()?.length) {
+    commandsDropdownProps = getCommandsDropdownProps({
+      view: 'detail-row',
+      commands: getCommandGroups(),
+    });
   }
 
   return {
@@ -111,14 +138,16 @@ export const derivedPageHeaderProps$ = observable(() => {
     emoji: userView$.get()?.emoji,
     starred: store$.userViewData.starred.get() ?? false,
 
-    commandsDropdownProps: {
-      onOpenCommands: () => {
-        store$.commandsDialog.type.set('view');
-      },
-      onSelectCommand: (c) => c.handler?.({ value: c }),
+    commandsDropdownProps: getCommandsDropdownProps({
+      view: 'view',
       commands: getCommandGroups().filter((g) =>
         g.items.find((i) => i.command === 'view-commands')
       ),
+    }),
+
+    commands: {
+      primaryCommand: primaryCommand,
+      commandsDropdownProps,
     },
 
     onToggleFavorite: async () => {

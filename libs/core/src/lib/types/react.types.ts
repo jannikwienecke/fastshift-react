@@ -1,4 +1,4 @@
-import { GetTableDataType, GetTableName, RegisteredRouter } from './base.types';
+import { GetTableDataType, GetTableName } from './base.types';
 import { ViewConfigType } from './view-config.types';
 
 export type DataType<
@@ -7,8 +7,8 @@ export type DataType<
     | Partial<Record<GetTableName, any>>
     | undefined = undefined
 > = TCustomDataType extends undefined
-  ? GetTableDataType<T> & { id: string }
-  : TCustomDataType & GetTableDataType<T> & { id: string };
+  ? GetTableDataType<T> & { id: string; _id: string }
+  : TCustomDataType & GetTableDataType<T> & { id: string; _id: string };
 // : TCustomDataType & GetTableDataType<T> & { id: string };
 
 // export type GetViewProps<

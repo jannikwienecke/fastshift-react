@@ -1,16 +1,15 @@
 import {
-  ModelSchema,
   BaseConfigInterface,
-  ModelField,
-  schemaHelper,
   getPrefferedDisplayField,
   GetTableName,
+  ModelField,
+  ModelSchema,
   RegisteredViews,
+  schemaHelper,
   ViewConfigType,
-  _log,
 } from '@apps-next/core';
-import { createViewConfig } from './create-view-config';
 import { CubeIcon } from '@radix-ui/react-icons';
+import { createViewConfig } from './create-view-config';
 
 export const generateDefaultViewConfigs = ({
   tableNames,
@@ -23,7 +22,7 @@ export const generateDefaultViewConfigs = ({
   dataModel: ModelSchema;
   config: BaseConfigInterface;
   guessDisplayFieldIfNotProvided?: boolean;
-  userDefinedViews: ViewConfigType[];
+  userDefinedViews: ViewConfigType<any>[];
 }) => {
   const tablesWithView = userDefinedViews.map((v) => v.tableName);
 
@@ -77,7 +76,7 @@ export const generateDefaultViewConfigs = ({
 
       return {
         ...acc,
-        [tableName]: _config,
+        [tableName]: _config as ViewConfigType,
       };
     }, {} as RegisteredViews);
 };

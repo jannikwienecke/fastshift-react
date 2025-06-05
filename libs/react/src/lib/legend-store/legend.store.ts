@@ -111,7 +111,7 @@ export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
   state: 'pending',
   mutating: undefined,
-
+  commandsDisplay: { type: 'closed' },
   handleIncomingData: (...props) => handleIncomingData(store$)(...props),
   handleIncomingRelationalData: (...props) =>
     handleIncomingRelationalData(store$)(...props),

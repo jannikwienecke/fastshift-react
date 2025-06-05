@@ -1,7 +1,14 @@
 import { CommandbarItem, Row } from '@apps-next/core';
 import { AlarmCheckIcon, StarIcon, StarOffIcon, TrashIcon } from 'lucide-react';
 import { store$, viewActions } from '../legend-store';
-import { getViewLabelOf, getViewName } from './commands.helper';
+import {
+  getCommandsType,
+  getViewLabelOf,
+  getViewName,
+} from './commands.helper';
+
+const isNotShowingDetailCommands = () =>
+  getCommandsType() !== 'detail-row' && getCommandsType() !== 'closed';
 
 export const makeModelCommands = () => {
   const activeRow =
@@ -10,8 +17,6 @@ export const makeModelCommands = () => {
 
   const userView = userViews.find((v) => v.name === activeRow?.label);
   const isStarred = userView?.starred ?? false;
-
-  if (!activeRow) return [];
 
   const toggleFavoriteModel: CommandbarItem = {
     id: 'toggle-favorite-model',
@@ -22,6 +27,7 @@ export const makeModelCommands = () => {
 
     header: '',
     getViewName,
+    getIsVisible: isNotShowingDetailCommands,
     icon: isStarred ? StarOffIcon : StarIcon,
     handler: () => {
       viewActions().toggleFavorite();
@@ -34,6 +40,7 @@ export const makeModelCommands = () => {
     label: getViewLabelOf('__commands.deleteModel'),
     header: '',
     getViewName,
+    getIsVisible: isNotShowingDetailCommands,
     icon: TrashIcon,
     handler: () => {
       store$.deleteRecordMutation({ row: activeRow as Row });
@@ -45,6 +52,7 @@ export const makeModelCommands = () => {
     command: 'model-commands',
     label: getViewLabelOf('__commands.remindMeLater'),
     header: '',
+    getIsVisible: isNotShowingDetailCommands,
     getViewName,
     icon: AlarmCheckIcon,
     handler: () => {

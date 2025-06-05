@@ -1,10 +1,19 @@
 {
   "root": true,
-  "ignorePatterns": ["**/*"],
-  "plugins": ["@nx"],
+  "ignorePatterns": [
+    "**/*"
+  ],
+  "plugins": [
+    "@nx"
+  ],
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "files": [
+        "*.ts",
+        "*.tsx",
+        "*.js",
+        "*.jsx"
+      ],
       "rules": {
         "react/jsx-no-useless-fragment": "off",
         "@nx/enforce-module-boundaries": [
@@ -19,36 +28,55 @@
               },
               {
                 "sourceTag": "scope:react",
-                "onlyDependOnLibsWithTags": ["scope:shared", "scope:ui"]
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared",
+                  "scope:ui"
+                ]
               },
               {
                 "sourceTag": "scope:convex-app",
                 "onlyDependOnLibsWithTags": [
-                  "scope:convex-adapter",
+                  "*"
+                ]
+              },
+              {
+                "sourceTag": "scope:model",
+                "onlyDependOnLibsWithTags": [
                   "scope:shared",
-                  "scope:react",
-                  "scope:convex-adapter"
+                  "scope:react"
                 ]
               },
               {
                 "sourceTag": "scope:application",
-                "onlyDependOnLibsWithTags": ["*"]
+                "onlyDependOnLibsWithTags": [
+                  "*"
+                ]
               },
               {
                 "sourceTag": "scope:convex-adapter",
-                "onlyDependOnLibsWithTags": ["scope:shared", "scope:react"]
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared",
+                  "scope:react"
+                ]
               },
               {
                 "sourceTag": "scope:ui",
-                "onlyDependOnLibsWithTags": ["scope:shared"]
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared"
+                ]
               },
               {
                 "sourceTag": "scope:query",
-                "onlyDependOnLibsWithTags": ["scope:shared", "scope:react"]
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared",
+                  "scope:react"
+                ]
               },
               {
                 "sourceTag": "scope:server-adapter",
-                "onlyDependOnLibsWithTags": ["scope:shared"]
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared"
+                ]
               }
             ]
           }
@@ -56,17 +84,32 @@
       }
     },
     {
-      "files": ["*.ts", "*.tsx"],
-      "extends": ["plugin:@nx/typescript"],
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
+      "extends": [
+        "plugin:@nx/typescript"
+      ],
       "rules": {}
     },
     {
-      "files": ["*.js", "*.jsx"],
-      "extends": ["plugin:@nx/javascript"],
+      "files": [
+        "*.js",
+        "*.jsx"
+      ],
+      "extends": [
+        "plugin:@nx/javascript"
+      ],
       "rules": {}
     },
     {
-      "files": ["*.spec.ts", "*.spec.tsx", "*.spec.js", "*.spec.jsx"],
+      "files": [
+        "*.spec.ts",
+        "*.spec.tsx",
+        "*.spec.js",
+        "*.spec.jsx"
+      ],
       "env": {
         "jest": true
       },

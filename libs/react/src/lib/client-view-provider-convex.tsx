@@ -1,4 +1,4 @@
-import { UserStoreCommand } from '@apps-next/core';
+import { MakeUserStoreCommand } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
@@ -10,7 +10,7 @@ import { useMutation } from './use-mutation';
 import { useQueryData } from './use-query-data';
 
 export type QueryProviderConvexProps = {
-  commands: UserStoreCommand[];
+  commands: MakeUserStoreCommand[];
 } & { children: React.ReactNode };
 
 export const ClientViewProviderConvex = (props: QueryProviderConvexProps) => {

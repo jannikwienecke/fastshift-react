@@ -16,28 +16,35 @@ export const RightSidebar = (props: RightSidebarProps) => {
         props.isOpen ? 'w-[26rem] opacity-100' : 'w-0 opacity-0'
       )}
     >
-      <div className="w-[26rem] overflow-y-scroll h-full">
-        <div className="flex w-full flex-row items-center px-6 justify-between py-6 border-b-[1px] border-gray-100">
-          <div className="flex flex-row gap-2 items-center">
-            <>
-              {/* <currentView$.icon className="w-4 h-4 text-foreground/70" /> */}
-              {props.viewIcon && (
-                <props.viewIcon className="w-4 h-4 text-foreground/70" />
-              )}
-            </>
+      <div
+        className={cn(
+          'overflow-y-scroll h-full',
+          props.isOpen ? 'w-[26rem] opacity-100' : 'w-0 opacity-0'
+        )}
+      >
+        {props.isOpen ? (
+          <div className="flex w-full flex-row items-center px-6 justify-between py-6 border-b-[1px] border-gray-100">
+            <div className="flex flex-row gap-2 items-center">
+              <>
+                {/* <currentView$.icon className="w-4 h-4 text-foreground/70" /> */}
+                {props.viewIcon && (
+                  <props.viewIcon className="w-4 h-4 text-foreground/70" />
+                )}
+              </>
 
-            <div className="text-foreground/90">
-              {/* All {t(`${props.tableName}.other` as any)} */}
-              {props.viewName}
+              <div className="text-foreground/90">
+                {/* All {t(`${props.tableName}.other` as any)} */}
+                {props.viewName}
+              </div>
+            </div>
+
+            <div className="flex flex-row gap-2 items-center">
+              <CommandsDropdown {...props.commandsDropdownProps} />
+
+              <StarredIcon {...props} />
             </div>
           </div>
-
-          <div className="flex flex-row gap-2 items-center">
-            <CommandsDropdown {...props.commandsDropdownProps} />
-
-            <StarredIcon {...props} />
-          </div>
-        </div>
+        ) : null}
 
         <div className="py-6 px-4">
           <SidebarTabs {...props.tabs} tableName={props.tableName} />

@@ -15,7 +15,7 @@ export const setCommandbarQuery = (
     return;
   }
 
-  store$.commandbar.query.set(query.trim());
+  store$.commandbar.query.set(query);
 };
 
 export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
@@ -23,6 +23,7 @@ export const commandbarOpen: StoreFn<'commandbarOpen'> = (store$) => (row) => {
     // first set row -> then open | important!
     row && store$.commandbar.activeRow.set(row);
     store$.commandbar.open.set(true);
+    store$.commandsDisplay.type.set('commandbar');
   });
 };
 
@@ -37,6 +38,7 @@ export const commandbarClose: StoreFn<'commandbarClose'> = (store$) => () => {
   store$.commandbar.activeOpen.set(undefined);
   comboboxDebouncedQuery$.set('');
   store$.commandbar.activeRow.set(undefined);
+  store$.commandsDisplay.type.set('closed');
 };
 
 export const commandbarOpenWithFieldValue: StoreFn<

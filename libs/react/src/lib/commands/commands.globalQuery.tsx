@@ -7,6 +7,8 @@ import { getViewName } from './commands.helper';
 export const makeGlobalQueryCommands = () => {
   const result = store$.globalQueryData.get();
 
+  if (store$.commandsDisplay.type.get()) return [];
+
   const commands = Object.entries(result ?? {})
     .map(([table, records]) => {
       if (!records) return null;

@@ -21,7 +21,7 @@ export const RenderDetailComplexValue = (props: FormFieldProps) => {
 
   const FieldLabel = () => {
     return (
-      <div className="text-foreground/70 pb-2">
+      <div className="text-foreground/70 pb-2 text-xs">
         {getFieldLabel(fieldConfig)}
       </div>
     );

@@ -143,8 +143,12 @@ export type MutationContext = {
   table: string;
   view: string;
   displayField: string;
-  type: Mutation['type'];
-  payload: MutationPayload;
+  type:
+    | Mutation['type']
+    | ({
+        //
+      } & string);
+  payload: MutationPayload | Record<string, unknown>;
 };
 
 export type MutationHandlerErrorType = {
@@ -154,9 +158,9 @@ export type MutationHandlerErrorType = {
   context: MutationContext;
 };
 
-export type MutationReturnDtoSuccess = {
+export type MutationReturnDtoSuccess<T> = {
   error?: never;
-  success: MutationHandlerSuccessType;
+  success: MutationHandlerSuccessType & T;
 };
 
 export type MutationReturnDtoError = {
@@ -164,8 +168,8 @@ export type MutationReturnDtoError = {
   error: MutationHandlerErrorType;
 };
 
-export type MutationReturnDto =
-  | MutationReturnDtoSuccess
+export type MutationReturnDto<T = RecordType> =
+  | MutationReturnDtoSuccess<T>
   | MutationReturnDtoError;
 
 export type ManyToManyMutationProps = {

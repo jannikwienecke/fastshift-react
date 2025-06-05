@@ -8,22 +8,23 @@ import * as server from './_generated/server';
 
 import {
   BaseViewConfigManager,
+  coreQuery,
   GetTableName,
-  IndexField,
-  RecordType,
-  RelationalFilterQueryDto,
-  UserViewData,
-  _log,
-  getViewByName,
+  MutationReturnDto,
   slugHelper,
+  UserViewData,
 } from '@apps-next/core';
+import { IUsers } from '@apps-next/shared';
+import { copyTaskFn } from '@apps-next/tasks';
 import { asyncMap } from 'convex-helpers';
 import {
   customCtx,
   customMutation,
 } from 'convex-helpers/server/customFunctions';
 import { Triggers } from 'convex-helpers/server/triggers';
+import { GenericMutationCtx, GenericQueryCtx } from 'convex/server';
 import { v } from 'convex/values';
+import schema from '../convex/schema';
 import { views } from '../src/index';
 import { DataModel, Doc, Id } from './_generated/dataModel';
 import { mutation as rawMutation } from './_generated/server';
@@ -54,6 +55,100 @@ tables.forEach((tableName) => {
 });
 
 export const mutation = customMutation(rawMutation, customCtx(triggers.wrapDB));
+
+// Use `apiMutation` instead of `mutation` to apply this behavior.
+const apiMutation = customMutation(mutation, {
+  // This is the expanded customization simplified by `customCtx` above
+  // You can specify arguments that the customization logic consumes
+  args: { apiKey: v.string(), viewName: v.string(), name: v.string() },
+  // Similar to the `args` and `handler` for a normal function, the
+  // args validated above define the shape of `args` below.
+
+  input: async (ctx, { apiKey, viewName, name, ...args }) => {
+    if (apiKey !== process.env.API_KEY) throw new Error('Invalid API key');
+
+    const userRes = await getUser(ctx);
+
+    if (!userRes) throw new Error('User not found');
+    const user: IUsers = { ...userRes, id: userRes._id };
+
+    const queryHandler = coreQuery({
+      viewName,
+      views,
+      user: { ...user, id: user._id },
+      queryName: name,
+      type: 'mutation',
+      args,
+    });
+    // We return what parameters to ADD to the modified function parameters.
+    // In this case, we aren't modifying ctx or args
+    return {
+      ctx: { user, queryHandler },
+      args: {},
+    };
+  },
+});
+
+const makeHandler = <
+  T extends Record<string, unknown>,
+  TData extends Record<string, unknown> | undefined = undefined
+>(
+  handler: (
+    ctx: GenericMutationCtx<DataModel> & {
+      queryHandler: ReturnType<typeof coreQuery>;
+      user: IUsers;
+    },
+    args: T
+  ) => Promise<MutationReturnDto<{ data?: TData }>>
+) => {
+  return async (
+    ctx: GenericMutationCtx<DataModel> & {
+      queryHandler: ReturnType<typeof coreQuery>;
+      user: IUsers;
+    },
+    args: T
+  ) => {
+    ctx.queryHandler.setArgs(args);
+    try {
+      return await handler(ctx, args as any);
+    } catch (error) {
+      return ctx.queryHandler.makeError('error.unexpectedError', { error });
+    }
+  };
+};
+
+export const doSomething = apiMutation({
+  args: { taskId: v.id('tasks') },
+
+  handler: makeHandler<{ taskId: Id<'tasks'> }, { newTaskId: Id<'tasks'> }>(
+    async (ctx, args) => {
+      return copyTaskFn(ctx, args);
+    }
+  ),
+});
+
+export const toggleComplete = apiMutation({
+  args: { taskId: v.id('tasks'), completed: v.boolean() },
+
+  handler: makeHandler<{ taskId: Id<'tasks'>; completed: boolean }>(
+    async (ctx, args) => {
+      await ctx.db.patch(args.taskId, {
+        completed: args.completed,
+      });
+
+      return {
+        success: {
+          message: 'ok',
+          status: 200 as const,
+        },
+      };
+    }
+  ),
+});
+
+export const getUser = async (ctx: GenericQueryCtx<DataModel>) => {
+  return await ctx.db.query('users').first();
+};
 
 export const viewLoader = server.query({
   handler: makeViewLoaderHandler(views),
@@ -91,7 +186,7 @@ export const globalQuery = server.query({
       const promises =
         searchableFields?.map(async (field) => {
           return await ctx.db
-            .query(view.tableName)
+            .query(view.tableName as any)
             .withSearchIndex(field.name, (q) =>
               q.search(field.field.toString(), args.query)
             )

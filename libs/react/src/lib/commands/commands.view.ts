@@ -11,7 +11,7 @@ import {
 import { currentView$, store$, userView$ } from '../legend-store';
 import { getViewName } from './commands.helper';
 
-const isViewCommands = () => store$.commandsDialog.type.get() === 'view';
+const isViewCommands = () => store$.commandsDisplay.type.get() === 'view';
 const isBaseView = () =>
   !userView$.get() || userView$.get()?.baseView === userView$.get()?.name;
 
@@ -205,7 +205,7 @@ export const makeViewCommands = () => {
     getViewName,
     getIsVisible: () => isViewCommands() && !isBaseView(),
     icon: TrashIcon,
-    dropdownOptions: { showDivider: true },
+    // dropdownOptions: { showDivider: true },
     handler: () => {
       console.debug('viewCommand - delete view');
 

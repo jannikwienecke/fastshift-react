@@ -110,9 +110,14 @@ export const en = {
     unauthorized: 'Unauthorized',
     minCharacters: 'Minimum {{count}} characters',
     invalidEmail: 'Invalid email address',
+    unknownError: 'An unknown error occurred',
   },
   commands: {
     resetDb: 'Reset database',
+    makeACopy: 'Make a copy...',
+    makeACopyOf: 'Make a copy as new {{model}}...',
+    toggleCompleteTask: 'Mark Task as Complete',
+    untoggleCompleteTask: 'Mark Task as Incomplete',
   },
 
   history: {

@@ -8,6 +8,7 @@ import {
 } from '@apps-next/ui';
 import { observer } from '@legendapp/state/react';
 import { store$ } from '../legend-store';
+import { RecordType } from '@apps-next/core';
 
 export const ErrorDetailsDialog = observer(() => {
   const error = store$.errorDialog.error.get();
@@ -16,6 +17,7 @@ export const ErrorDetailsDialog = observer(() => {
 
   const { message, status, context, error: errorMessage } = error;
 
+  const x = context.payload;
   const formattedError = () => {
     try {
       // If the error is a JSON string, parse it for better display
@@ -98,8 +100,9 @@ export const ErrorDetailsDialog = observer(() => {
         <DialogFooter>
           <div className="w-full text-xs text-muted-foreground text-right">
             Error ID:{' '}
-            {typeof context.payload === 'object' && 'id' in context.payload
-              ? context.payload.id
+            {typeof context.payload === 'object' &&
+            'id' in (context.payload as RecordType)
+              ? (context.payload as RecordType).id
               : 'N/A'}
           </div>
         </DialogFooter>

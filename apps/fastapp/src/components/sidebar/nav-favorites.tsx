@@ -34,6 +34,8 @@ export const NavFavorites = observer(() => {
     .get()
     ?.filter((view) => view.starred && !view._deleted);
 
+  console.log('starredViews', starredViews);
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <Collapsible

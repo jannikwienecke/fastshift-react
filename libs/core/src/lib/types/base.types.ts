@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
 import { object, z } from 'zod';
+import { Row } from '../data-model';
 import { BaseConfigInterface } from './config.types';
 import { CommandbarItem } from './ui.types';
 
@@ -12,6 +12,7 @@ const documentBaseSchema = object({
 export interface Register {}
 
 export type RegisteredRouter = Register extends { config: infer T } ? T : any;
+export type ViewNames = Register extends { viewNames: infer T } ? T : any;
 
 export type FieldType =
   | 'String'
@@ -91,9 +92,6 @@ export type FieldConfig<TName = string> = {
 
 export type GetTableName = keyof RegisteredRouter['config']['_datamodel'];
 
-// export type GetTableNameSecond =
-//   RegisteredRouter['config']['tableNames'][number];
-
 export type GetTableDataType<T extends GetTableName> =
   RegisteredRouter['config']['_datamodel'][T];
 
@@ -132,4 +130,12 @@ export type ID = string | number;
 
 export type UserStoreCommand = {
   command: string;
-} & Omit<CommandbarItem, 'command'>;
+} & Omit<CommandbarItem, 'command'> & {
+    tableCommand: GetTableName | false;
+  };
+
+export type MakeUserStoreCommand<T extends RecordType = RecordType> = (args: {
+  rows?: Row<T>[] | undefined;
+
+  optimisticUpdateStore: (props: { updatedRecord?: T }) => void;
+}) => UserStoreCommand;

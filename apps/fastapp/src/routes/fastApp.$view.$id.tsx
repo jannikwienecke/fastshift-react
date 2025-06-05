@@ -4,8 +4,8 @@ import { observer } from '@legendapp/state/react';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import React from 'react';
 import { getView } from '../shared/utils/app.helper';
-import { DefaultDetailViewTemplate } from '../views/default-detail-view-template';
 import { getUserViewsQuery, queryClient } from '../query-client';
+import { DefaultDetailViewTemplate } from '@apps-next/shared';
 
 export const Route = createFileRoute('/fastApp/$view/$id')({
   loader: async (props) => {

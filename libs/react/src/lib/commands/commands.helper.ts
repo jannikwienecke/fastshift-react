@@ -1,6 +1,5 @@
 import {
   _filter,
-  CommandbarItem,
   CommandbarItemHandler,
   CommandbarProps,
   getViewLabel,
@@ -9,16 +8,16 @@ import {
   t,
   ViewConfigType,
 } from '@apps-next/core';
-import { dateUtils, operatorMap } from '../ui-adapter/filter-adapter';
+import Fuse from 'fuse.js';
 import {
   currentView$,
   getViewConfigManager,
   isDetail,
   store$,
 } from '../legend-store';
-import { xSelect } from '../legend-store/legend.select-state';
-import Fuse from 'fuse.js';
 import { comboboxDebouncedQuery$ } from '../legend-store/legend.combobox.helper';
+import { xSelect } from '../legend-store/legend.select-state';
+import { dateUtils, operatorMap } from '../ui-adapter/filter-adapter';
 
 type FnArgsOfCommand = Parameters<CommandbarItemHandler>[0];
 
@@ -82,17 +81,6 @@ const isInternalView = (viewName: string) => {
   const internalViewNames = ['views'];
 
   return internalViewNames.includes(viewName);
-};
-
-const getUserStoreCommands = (): CommandbarItem[] => {
-  const storeCommands = store$.commands.get();
-
-  return storeCommands.map((command) => {
-    return {
-      ...command,
-      command: 'user-store-command',
-    } satisfies CommandbarItem;
-  });
 };
 
 const filterCommandGroups = (groups: CommandbarProps['groups']) => {
@@ -176,12 +164,13 @@ export const getViewLabelOf = (translationString: string) => {
   });
 };
 
+export const getCommandsType = () => store$.commandsDisplay.type.get();
+
 export const commandsHelper = {
   openCommandbarDatePicker,
   getParsedDateRowForMutation,
   onError,
   isInternalView,
-  getUserStoreCommands,
   filterCommandGroups,
   getViewName,
 };

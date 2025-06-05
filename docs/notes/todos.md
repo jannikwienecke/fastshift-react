@@ -172,7 +172,7 @@ Small Features to add
 - [x] if we are doing a search/filtering and we are fetchMore.isDone -> local search...
 - [x] star/unstar from the right sidebar
 - [x] menu dropdown in the right sidebar
-- [ ] check how options in right click contextmenu are implemented
+- [x] check how options in right click contextmenu are implemented
 - [ ] select one or more rows -> show correct action commands, show action popover like linear
 - [ ] action buttons in views
 - [ ] if i query the commandbar, and the edit view fields are in the list, sort them to the top
@@ -182,6 +182,7 @@ Small Features to add
 - [ ] chat in activity
 - [ ] chat activity (optimistic update)
 - [ ] implement custom behaviour for combobox. E.g. Task -> Todos. Show only todos of that task. Updating the state of the task (completed / not completed)
+- [ ] in detail activity list -> combine activies based on the type and the date
 - [ ] add tipTap
 
 ### Add tests

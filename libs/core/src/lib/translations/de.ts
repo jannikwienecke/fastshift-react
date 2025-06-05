@@ -108,6 +108,7 @@ export const de = {
     from: 'von',
     this: 'das',
     views: 'Ansichten',
+    ok: 'OK',
   },
 
   userViewForm: {
@@ -135,6 +136,7 @@ export const de = {
       'Eintrag konnte nicht gelöscht werden. Bitte versuchen Sie es erneut',
     updateRecord:
       'Eintrag konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut',
+    unexpectedError: 'Ein unerwarteter Fehler ist aufgetreten',
   },
   success: {
     createRecord: {

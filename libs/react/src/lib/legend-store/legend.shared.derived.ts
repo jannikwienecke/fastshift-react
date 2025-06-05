@@ -4,9 +4,11 @@ import {
   ComponentType,
   getUserViewByName,
   getViewByName,
+  getViewLabel,
   ViewConfigType,
 } from '@apps-next/core';
 import { viewRegistry } from './legend.app.registry';
+import { isDetail } from './legend.utils';
 
 export const currentView$ = observable(() => {
   return store$.viewConfigManager?.viewConfig?.get() as ViewConfigType;
@@ -21,6 +23,27 @@ export const detailView$ = observable(() => {
 export const userViews$ = observable(() => store$.userViews.get());
 
 export const userView$ = observable(() => store$.userViewData.get());
+
+export const view$ = observable(() => {
+  if (isDetail()) return detailView$.get();
+  return currentView$.get();
+});
+
+export const tablename$ = observable(() => {
+  return view$.get()?.tableName;
+});
+
+export const viewName$ = observable(() => {
+  const view = view$.get();
+  if (!view) return '';
+  return view.viewName;
+});
+
+export const tablenameLabel$ = observable(() => {
+  const view = view$.get();
+  if (!view) return '';
+  return getViewLabel(view ?? '', true);
+});
 
 export const getUserView = (viewName: string) => {
   return getUserViewByName(userViews$.get(), viewName);
@@ -67,7 +90,7 @@ export const parentUserView$ = observable(() => {
 export const parentViewName$ = observable(() => {
   return (
     parentUserView$.get()?.name ??
-    parentView$.get()?.viewName.firstUpper() ??
+    parentView$.get()?.viewName.toString().firstUpper() ??
     ''
   );
 });

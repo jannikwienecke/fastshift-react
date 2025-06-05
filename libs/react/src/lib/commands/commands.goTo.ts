@@ -10,10 +10,6 @@ import { getViewName } from './commands.helper';
 
 export const makeGoToCommands = () => {
   const activeRow = store$.commandbar.activeRow.get();
-  const userViews = store$.userViews.get();
-
-  const userView = userViews.find((v) => v.name === activeRow?.label);
-  const isStarred = userView?.starred ?? false;
 
   if (!activeRow) return [];
 

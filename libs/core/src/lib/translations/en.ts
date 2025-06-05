@@ -133,6 +133,7 @@ export const en = {
     from: 'from',
     this: 'this',
     views: 'Views',
+    ok: 'OK',
   },
 
   datePicker: {
@@ -154,6 +155,7 @@ export const en = {
     showDetails: 'Show details',
     deleteRecord: 'Could not delete record. Please try again',
     updateRecord: 'Could not update record. Please try again',
+    unexpectedError: 'An unexpected error occurred',
   },
   success: {
     createRecord: {

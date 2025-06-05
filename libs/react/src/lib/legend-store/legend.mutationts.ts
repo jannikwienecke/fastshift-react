@@ -29,8 +29,9 @@ import {
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
 const idsToDelete$ = observable<string[]>([]);
-const isRunning$ = observable(false);
+export const isRunning$ = observable(false);
 export const ignoreNewData$ = observable(0);
+export const ignoreNewDetailData$ = observable(0);
 
 export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   (store$) =>
@@ -45,7 +46,7 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   }) => {
     const viewConfigManager = getViewConfigManager();
 
-    _log.debug('___RUN Mutation', { newRows, idsToDelete, newIds });
+    console.debug('___RUN Mutation', { newRows, idsToDelete, newIds });
 
     // Perform optimistic update
     const rollback = optimisticUpdateStore({
@@ -352,6 +353,7 @@ export const optimisticUpdateStore = ({
   )(updatedRawRows).rows;
 
   // Update context menu
+  // TODO DUPLICATE CODE
   const updatedRow = makeData(store$.views.get(), viewName)([updatedRowData])
     .rows?.[0];
 

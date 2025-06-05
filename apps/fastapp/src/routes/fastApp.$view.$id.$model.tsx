@@ -6,15 +6,16 @@ import {
   getSubModelViewData,
   getViewData,
 } from '../application-store/app.store.utils';
-import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
+import { getUserViewsQuery, queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
+
+import React from 'react';
 import {
   RenderDisplayOptions,
   RenderFilter,
   RenderInputDialog,
   RenderList,
-} from '../views/default-components';
-import React from 'react';
+} from '@apps-next/shared';
 
 export const Route = createFileRoute('/fastApp/$view/$id/$model')({
   async loader(ctx) {
@@ -68,10 +69,11 @@ const DetailModelListViewPage = observer(() => {
 
         <RenderInputDialog />
 
-        <div className="flex flex-col w-full ">
-          <RenderList options={undefined} />
+        <div className="flex flex-row w-full  flex-grow overflow-scroll">
+          <div className="overflow-y-scroll flex-grow h-full">
+            <RenderList />
+          </div>
         </div>
-        <hr />
       </div>
     </>
   );

@@ -4,8 +4,8 @@ import {
   useTranslation,
 } from '@apps-next/core';
 import {
+  ChevronsUpDown,
   Layers3Icon,
-  MoreHorizontal,
   PanelRightIcon,
   SearchIcon,
   StarIcon,
@@ -19,9 +19,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
   SearchInput,
 } from './components';
 import { StarredIcon } from './starred-icon';
@@ -37,12 +34,13 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
     >
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem className="text-sm">
+          <BreadcrumbItem className="text-[13px]">
+            {/* FIXME translation */}
             <BreadcrumbLink href="/components">Views</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
 
-          <BreadcrumbItem className="text-sm">
+          <BreadcrumbItem className="text-[13px]">
             <BreadcrumbPage className="flex flex-row gap-4 items-center">
               <div className="flex flex-row gap-2 items-center">
                 <div>
@@ -77,6 +75,43 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
           />
         ) : (
           <div className="flex flex-row gap-0 items-center">
+            <div className="pr-4 flex flex-row gap-2 items-center">
+              {props.commands?.primaryCommand ? (
+                <Button
+                  variant={'ghost'}
+                  className="text-xs flex flex-row items-center gap-1"
+                  size={'sm'}
+                  onClick={() =>
+                    props.commands.primaryCommand &&
+                    props.commands.commandsDropdownProps?.onSelectCommand?.(
+                      props.commands.primaryCommand
+                    )
+                  }
+                >
+                  {props.commands.primaryCommand.icon ? (
+                    <props.commands.primaryCommand.icon className="h-4 w-4" />
+                  ) : null}
+                  <div>{props.commands.primaryCommand.label}</div>
+                </Button>
+              ) : null}
+
+              {props.commands?.commandsDropdownProps?.commands.length ? (
+                <CommandsDropdown {...props.commands.commandsDropdownProps}>
+                  <div
+                    className="flex flex-row items-center gap-1"
+                    onClick={(e) => {
+                      props.commands.commandsDropdownProps?.onOpenCommands?.(
+                        true
+                      );
+                    }}
+                  >
+                    <div className="text-xs">Commands</div>
+                    <ChevronsUpDown className="size-4" />
+                  </div>
+                </CommandsDropdown>
+              ) : null}
+            </div>
+
             <Button
               variant={'ghost'}
               size="icon"

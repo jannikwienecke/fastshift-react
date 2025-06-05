@@ -12,9 +12,9 @@ import './i18n';
 import { convex, getUserViews, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
 
-import './views';
 import './shared/hooks/app.persist';
-import { store$ } from '@apps-next/react';
+import { store$, viewRegistry } from '@apps-next/react';
+import registerAppViews from './register-app-views';
 
 // syncObservable(store$, {
 //   persist: {
@@ -26,6 +26,11 @@ import { store$ } from '@apps-next/react';
 const isDev = import.meta.env.MODE === 'development';
 
 logger.setLevel(isDev ? 'info' : 'warn');
+
+console.debug('FastApp main.tsx loaded');
+console.debug('Registering app views...');
+registerAppViews(viewRegistry);
+console.debug('App views registered');
 
 const router = createRouter({
   routeTree,

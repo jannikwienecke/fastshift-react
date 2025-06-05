@@ -10,8 +10,9 @@ import {
 } from './legend.rightsidebar.state';
 import { currentView$, getView, userView$ } from './legend.shared.derived';
 import { store$ } from './legend.store';
-import { viewActions } from './legend.utils.helper';
+import { getCommandsDropdownProps, viewActions } from './legend.utils.helper';
 import { getCommandGroups } from '../commands/commands.get';
+import { isDetail } from './legend.utils';
 
 export const rightSidebarProps$ = observable(() => {
   const relationalFilterData = store$.relationalFilterData.get();
@@ -20,6 +21,7 @@ export const rightSidebarProps$ = observable(() => {
   const stateIsFilterChanged = store$.state.get() === 'filter-changed';
 
   if (!currentView$.get()) return {} as RightSidebarProps;
+  if (isDetail()) return {} as RightSidebarProps;
 
   return {
     isOpen: hasRightSidebarFiltering() && store$.rightSidebar.open.get(),
@@ -31,17 +33,12 @@ export const rightSidebarProps$ = observable(() => {
       viewActions().toggleFavorite();
     },
 
-    commandsDropdownProps: {
-      onOpenCommands: () => {
-        store$.commandsDialog.type.set('view');
-      },
-      onSelectCommand: (command) => {
-        command.handler?.({ row: undefined, field: undefined, value: command });
-      },
+    commandsDropdownProps: getCommandsDropdownProps({
+      view: 'view-sidebar',
       commands: getCommandGroups().filter((g) =>
         g.items.find((i) => i.command === 'view-commands')
       ),
-    },
+    }),
 
     starred: store$.userViewData.starred.get() ?? false,
 

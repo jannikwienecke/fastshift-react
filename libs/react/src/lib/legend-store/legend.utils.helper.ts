@@ -1,19 +1,19 @@
 import {
   _log,
+  CommandsDropdownProps,
   convertDisplayOptionsForBackend,
   convertFiltersForBackend,
   DEFAULT_FETCH_LIMIT_QUERY,
   getViewByName,
   Row,
-  UserViewData,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { renderErrorToast } from '../toast';
 import { applyDisplayOptions } from './legend.local.display-options';
-import { applyFilter } from './legend.local.filtering';
-import { store$ } from './legend.store';
-import { getViewConfigManager, isDetail } from './legend.utils';
 import { detailUserView$, userView$ } from './legend.shared.derived';
+import { store$ } from './legend.store';
+import { LegendStore } from './legend.store.types';
+import { getViewConfigManager, isDetail } from './legend.utils';
+import { viewRegistry } from './legend.app.registry';
 
 export const filterRowsByShowDeleted = (rows: Row[]) => {
   const showDeleted = store$.displayOptions.showDeleted.get();
@@ -112,6 +112,12 @@ export const localModeEnabled$ = observable(() => {
 export const viewActions = () => {
   const userViewData = isDetail() ? detailUserView$.get() : userView$.get();
 
+  const starred = isDetail()
+    ? !detailUserView$.get()?.starred
+    : userViewData?.starred !== undefined
+    ? !userViewData.starred
+    : true;
+
   const toggleFavorite = () => {
     store$.ignoreNextUserViewData.set((prev) => prev + 1);
 
@@ -134,13 +140,12 @@ export const viewActions = () => {
     if (isDetail()) {
       store$.updateDetailViewMutation({
         id: userViewData?.id,
-        starred: !userViewData?.starred,
+        starred,
       });
     } else {
       store$.updateViewMutation({
         id: userViewData?.id,
-        starred:
-          userViewData?.starred !== undefined ? !userViewData.starred : true,
+        starred,
       });
     }
   };
@@ -153,7 +158,7 @@ export const viewActions = () => {
 export const dispatchDeleteMutation = (runMutation: () => void) => {
   const viewConfigManager = getViewConfigManager();
 
-  if (viewConfigManager.getUiViewConfig().onDelete?.showConfirmation) {
+  if (viewConfigManager.getUiViewConfig()?.onDelete?.showConfirmation) {
     store$.confirmationAlert.open.set(true);
     store$.confirmationAlert.title.set('confirmationAlert.delete.title');
     store$.confirmationAlert.description.set(
@@ -166,4 +171,39 @@ export const dispatchDeleteMutation = (runMutation: () => void) => {
   } else {
     runMutation();
   }
+};
+
+const timeoutRef$ = observable<number | null>(null);
+export const getCommandsDropdownProps = ({
+  commands,
+  view,
+}: Pick<CommandsDropdownProps, 'commands'> & {
+  view: Exclude<LegendStore['commandsDisplay']['type'], 'closed'>;
+}) => {
+  const commandbarRow = store$.commandbar.activeRow.get() as Row | undefined;
+  const detailRow = store$.detail.row.get() as Row | undefined;
+  const row = commandbarRow || detailRow;
+
+  return {
+    onOpenCommands: (open) => {
+      const prevRef = timeoutRef$.get();
+      if (prevRef && open) {
+        clearTimeout(prevRef);
+        timeoutRef$.set(null);
+      }
+
+      const timeout = window.setTimeout(
+        () => {
+          store$.commandsDisplay.type.set(open ? view : 'closed');
+        },
+        open ? 0 : 500
+      );
+
+      timeoutRef$.set(timeout);
+    },
+    onSelectCommand: (command) => {
+      command.handler?.({ row: row, field: undefined, value: command });
+    },
+    commands,
+  } satisfies CommandsDropdownProps;
 };

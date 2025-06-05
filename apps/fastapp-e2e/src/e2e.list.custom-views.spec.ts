@@ -314,13 +314,13 @@ test.describe('Custom Views', () => {
       .first()
       .fill('laugh');
 
-    await waitFor(page, 300);
+    await waitFor(page, 200);
 
     await pressEnter(page);
 
     await page.getByRole('button', { name: 'save' }).click();
 
-    await waitFor(page, 300);
+    await waitFor(page, 500);
 
     await expect(page.getByText('🤣')).toBeVisible();
 

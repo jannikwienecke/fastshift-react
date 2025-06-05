@@ -23,6 +23,21 @@
       "@apps-next/convex": [
         "packages/convex/src/index.ts"
       ],
+      "@apps-next/tasks": [
+        "packages/tasks/src/index.ts"
+      ],
+      "@apps-next/projects": [
+        "packages/projects/src/index.ts"
+      ],
+      "@apps-next/history": [
+        "packages/history/src/index.ts"
+      ],
+      "@apps-next/users": [
+        "packages/users/src/index.ts"
+      ],
+      "@apps-next/shared": [
+        "packages/shared/src/index.ts"
+      ],
       "@apps-next/convex-adapter-app": [
         "libs/convex-adapter-app/src/index.ts"
       ],

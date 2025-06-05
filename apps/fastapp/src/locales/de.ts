@@ -31,6 +31,8 @@ export const de = {
   },
   name: {
     edit: 'Aufgabe umbenennen',
+    one: 'Name',
+    other: 'Namen',
   },
 
   owner: {
@@ -89,9 +91,14 @@ export const de = {
     unauthorized: 'Nicht autorisiert',
     minCharacters: 'Mindestens {{count}} Zeichen',
     invalidEmail: 'Ungültige E-Mail-Adresse',
+    unknownError: 'Unbekannter Fehler',
   },
   commands: {
     resetDb: 'Datenbank zurücksetzen',
+    makeACopy: 'Eine Kopie erstellen...',
+    makeACopyOf: 'Eine Kopie als neues {{model}} erstellen...',
+    toggleCompleteTask: 'Aufgabe als erledigt markieren',
+    untoggleCompleteTask: 'Aufgabe als nicht erledigt markieren',
   },
   entityId: { one: 'ID', other: 'IDs' },
   tableName: { one: 'Tabelle', other: 'Tabellen' },
@@ -102,6 +109,9 @@ export const de = {
     delete: 'Löschen',
     detail: { headerInsert: '', headerUpdate: '' },
   },
+  users: { one: 'Benutzer', other: 'Benutzer' },
+  color: { one: 'Farbe', other: 'Farben' },
+  label: { one: 'Label', other: 'Labels' },
 } satisfies typeof en;
 
 export default de;

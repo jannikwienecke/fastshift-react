@@ -235,7 +235,10 @@ export function ListControl() {
     >
       <Checkbox
         checked={isSelected}
-        onCheckedChange={() => {
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        onCheckedChange={(e) => {
           onSelect?.(item);
         }}
       />

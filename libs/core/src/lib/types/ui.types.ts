@@ -243,12 +243,13 @@ export type SaveViewDropdownProps = {
 };
 
 export type CommandsDropdownProps = {
-  onOpenCommands: () => void;
+  onOpenCommands: (open: boolean) => void;
   onSelectCommand: (command: CommandbarItem) => void;
   commands: {
     header?: string;
     items: (CommandbarItem & ComboxboxItem)[];
   }[];
+  children?: React.ReactNode;
 };
 
 export type PageHeaderProps = {
@@ -262,6 +263,11 @@ export type PageHeaderProps = {
     label: string;
     onClickParentView: () => void;
   } & DetailPageProps;
+
+  commands: {
+    commandsDropdownProps?: CommandsDropdownProps;
+    primaryCommand?: CommandbarItem | null;
+  };
 
   query?: {
     showInput: boolean;
@@ -399,6 +405,11 @@ export type DetailPageProps = {
   viewTypeState: DetailViewTypeState;
   emoji: Emoji | null;
 
+  commands: {
+    commandsDropdownProps: CommandsDropdownProps;
+    primaryCommand?: CommandbarItem | null;
+  };
+
   tabs: {
     detailTabsFields: CommandformItem[];
     activeTabField: CommandformItem | null | undefined;
@@ -438,11 +449,22 @@ export type CommandbarItem = Omit<ComboxboxItem, 'label' | 'viewName'> & {
   options?: {
     keepCommandbarOpen?: boolean;
   };
+
   onCheckedChange?: (checked: boolean) => void;
   subCommands?: CommandbarItem[];
   dropdownOptions?: {
     showDivider?: boolean;
   };
+  primaryCommand?: boolean;
+  primaryCommandOptions?: {
+    style?: {
+      type?: 'success' | 'danger';
+    };
+  };
+  requiredRow?: boolean;
+  allowMultiple?: boolean;
+  rows?: Row[];
+  priority?: number;
 };
 
 export type CommandbarProps = {

@@ -154,7 +154,7 @@ const DetailPageIcon = (props: DetailPageProps) => {
 
 const DetailPagePropertiesHeader = (props: DetailPageProps) => {
   return (
-    <div className="py-3 text-sm flex flex-row justify-between items-center text-xs">
+    <div className="py-3 flex flex-row justify-between items-center text-sm">
       <div className="text-foreground/70">Properties</div>
 
       <div className="flex flex-row gap-3 items-center">

@@ -4,19 +4,23 @@ import { views } from '@apps-next/convex';
 import {
   ClientViewProviderConvex,
   ErrorDetailsDialog,
-  viewActionStore,
-  store$,
   perstistedStore$,
+  store$,
+  viewActionStore,
 } from '@apps-next/react';
-import { observer } from '@legendapp/state/react';
+import { Memo, observer } from '@legendapp/state/react';
 import {
   createFileRoute,
   ErrorComponent,
   Outlet,
 } from '@tanstack/react-router';
 import { LoaderIcon } from 'lucide-react';
+import React from 'react';
 import { Toaster } from 'sonner';
-import { resettingDb$ } from '../application-store/app.store';
+import {
+  pageLoaderIsLoading,
+  resettingDb$,
+} from '../application-store/app.store';
 import { AppSidebar } from '../components/sidebar/app-sidebar';
 import { getUserViews, getUserViewsQuery, queryClient } from '../query-client';
 import {
@@ -26,7 +30,6 @@ import {
   useViewParams,
 } from '../shared/hooks';
 import { useAppEffects } from '../shared/hooks/app.effects';
-
 viewActionStore.setViews(views);
 
 export const Route = createFileRoute('/fastApp')({
@@ -54,15 +57,13 @@ export const Route = createFileRoute('/fastApp')({
 });
 
 const FastAppLayoutComponent = observer(() => {
-  const { commands } = useCommands();
-
   let { viewName } = useViewParams();
   viewName = viewName as string;
 
   useAppEffects(viewName);
 
   return (
-    <ClientViewProviderConvex commands={commands}>
+    <ClientViewProviderConvex commands={[]}>
       <SidebarProvider>
         <AppSidebar />
 
@@ -79,8 +80,34 @@ const FastAppLayoutComponent = observer(() => {
         <></>
       )}
 
+      <Memo>{() => <RenderCommandsHook />}</Memo>
+
       <ErrorDetailsDialog />
       <Toaster richColors duration={2000} />
+
+      {pageLoaderIsLoading.get() ? (
+        <div className="fixed right-4 bottom-4 z-40">
+          <div className="animate-spin">
+            <LoaderIcon className="h-7 w-7 text-muted-foreground" />
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
     </ClientViewProviderConvex>
   );
+});
+
+const RenderCommandsHook = observer(() => {
+  const { makeCommands } = useCommands();
+
+  if (store$.commands.get().length === 0 && makeCommands.length) {
+    store$.commands.set(makeCommands);
+  }
+
+  React.useEffect(() => {
+    store$.commands.set(makeCommands);
+  }, [makeCommands]);
+
+  return null;
 });
