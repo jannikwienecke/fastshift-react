@@ -5,12 +5,12 @@ import {
   tablenameLabel$,
   viewName$,
 } from '@apps-next/react';
-import { Id, MakeServerFnRef } from '@apps-next/shared';
+import { getDefaultMutationArgs, Id, MakeServerFnRef } from '@apps-next/shared';
 import { useConvexMutation } from '@convex-dev/react-query';
 import { useMutation } from '@tanstack/react-query';
 import { PlusSquareIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { MakeTaskCommand } from '../../tasks.types';
+import { MakeTaskCommand, TaskCommandHandler } from '../../tasks.types';
 
 import {
   CopyTaskArgs,
@@ -26,10 +26,25 @@ export const useCopyTask = (
     mutationFn: useConvexMutation(mutationFn),
   });
 
-  // TODO -> THIS MUST BE CHANGED
-  const defaultArgs = {
-    apiKey: 'API_KEY_LOCAL',
-    viewName: viewName$.get(),
+  const makeCopyHandler: TaskCommandHandler = async (options) => {
+    const row = options?.rows?.[0];
+    if (!row) throw new Error('No row provided for copy task command');
+
+    const res = await copyTask({
+      taskId: row?.id as Id<'tasks'>,
+      name: options.value?.label ?? '',
+      ...getDefaultMutationArgs(),
+    });
+
+    if (res.error) {
+      renderError(res.error);
+    } else {
+      store$.navigation.state.set({
+        type: 'navigate',
+        view: viewName$.get() ?? '',
+        id: res.success.data?.newTaskId,
+      });
+    }
   };
 
   const makeCopyCommand: MakeTaskCommand = ({ rows }) => {
@@ -48,29 +63,7 @@ export const useCopyTask = (
       allowMultiple: false,
       rows,
 
-      handler: async (options) => {
-        const row = rows?.[0];
-        if (!row) {
-          console.warn('No row provided for copy command');
-          return;
-        }
-
-        const res = await copyTask({
-          taskId: row?.id as Id<'tasks'>,
-          name: options.value?.label ?? '',
-          ...defaultArgs,
-        });
-
-        if (res.error) {
-          renderError(res.error);
-        } else {
-          store$.navigation.state.set({
-            type: 'navigate',
-            view: viewName$.get() ?? '',
-            id: res.success.data?.newTaskId,
-          });
-        }
-      },
+      handler: (args) => makeCopyHandler({ rows, ...args }),
     };
 
     return command;

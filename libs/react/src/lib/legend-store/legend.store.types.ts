@@ -212,6 +212,7 @@ export type LegendStore = {
   };
 
   api?: {
+    apiKey?: string;
     mutate?: (args: MutationDto) => void;
     mutateAsync?: (args: MutationDto) => Promise<MutationReturnDto>;
     queryClient?: QueryClient;

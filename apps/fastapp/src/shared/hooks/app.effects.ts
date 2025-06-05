@@ -42,13 +42,7 @@ export const useAppEffects = (viewName: string) => {
 
   const [_, i18n] = useTranslationReact();
 
-  const ignoreFirstRef = React.useRef(true);
   React.useEffect(() => {
-    if (ignoreFirstRef.current) {
-      ignoreFirstRef.current = false;
-      return;
-    }
-
     viewActionStore.setViews(views);
   }, [i18n.language]);
 

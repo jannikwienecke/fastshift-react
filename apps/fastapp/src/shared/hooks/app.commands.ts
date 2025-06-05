@@ -1,6 +1,6 @@
 import { api } from '@apps-next/convex';
 import { MakeUserStoreCommand, UserStoreCommand } from '@apps-next/core';
-import { renderError, store$, viewName$ } from '@apps-next/react';
+import { renderError, viewName$ } from '@apps-next/react';
 import { TaskViewDataType, useCopyTask } from '@apps-next/tasks';
 import { useConvexMutation } from '@convex-dev/react-query';
 import { observable } from '@legendapp/state';
@@ -25,18 +25,12 @@ export type MakeTaskCommand = MakeUserStoreCommand<TaskViewDataType>;
 export const useCommands = () => {
   const router = useRouter();
 
-  const isCommandbar = store$.commandsDisplay.type.get() === 'commandbar';
-
   const { t } = useTranslation();
   const { mutateAsync } = useMutation({
     mutationFn: useConvexMutation(api.init.default),
   });
 
   const { makeCommand } = useCopyTask(api.query.doSomething);
-
-  const { mutateAsync: copyTask } = useMutation({
-    mutationFn: useConvexMutation(api.query.doSomething),
-  });
 
   const { mutateAsync: toggleComplete } = useMutation({
     mutationFn: useConvexMutation(api.query.toggleComplete),

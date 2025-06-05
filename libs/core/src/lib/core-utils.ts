@@ -640,11 +640,13 @@ export const patchAllViews = (views: RegisteredViews) => {
         const isDisplayField =
           displayFIeld && f.name === displayFIeld ? true : undefined;
 
+        const label = f.label || getFieldLabel(f);
+
         return {
           ...f,
           ...userFieldConfig,
           isDisplayField,
-          label: f.label || getFieldLabel(f),
+          label,
           editLabel: `${f.name}.edit`,
           hideFromForm: hideFieldFromForm || userFieldConfig?.hideFromForm,
         } satisfies FieldConfig;

@@ -122,8 +122,8 @@ export const en = {
     description: 'Manage your tasks and projects efficiently',
   },
 
-  ...modelTranslations,
   ...fieldTranslations,
+  ...modelTranslations,
 
   shared: {
     rename: 'Rename {{model}}',

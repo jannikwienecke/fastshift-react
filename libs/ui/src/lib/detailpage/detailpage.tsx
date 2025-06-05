@@ -18,7 +18,6 @@ import { Button } from '../components';
 import { Checkbox } from '../components/checkbox';
 import { EmojiPickerDialog } from '../emoji-picker-dialog';
 import { cn } from '../utils';
-import { BubbleItem } from '../standard-components';
 
 const DetailPageHeader = (props: DetailPageProps) => {
   return (

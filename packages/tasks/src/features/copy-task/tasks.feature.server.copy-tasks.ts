@@ -15,16 +15,18 @@ export const copyTaskFn: MakeServerFn<CopyTaskArgs, CopyTaskReturn> = async (
   const task = await ctx.db.get(args.taskId);
 
   if (!task) throw new Error(`Task with ID ${args.taskId} not found`);
+  const { _id, _creationTime, ...taskData } = task;
 
-  await ctx.db.patch(args.taskId, {
-    name: `${task.name} (Copy)`,
+  const newTaskId = await ctx.db.insert('tasks', {
+    ...taskData,
+    name: taskData.name + ' (Copy)',
   });
 
   return {
     success: {
       message: 'ok',
       status: 200 as const,
-      data: { newTaskId: args.taskId },
+      data: { newTaskId },
     },
   };
 };
