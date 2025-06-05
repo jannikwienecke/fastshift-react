@@ -94,7 +94,7 @@ export const NavMain = observer(() => {
     );
 
     return {
-      title: t(`navigation.${key}` as any),
+      title: t(`${key}.other` as any),
       url: `/fastApp/${key}`,
       isActive: false,
       icon: view?.icon,
@@ -115,7 +115,7 @@ export const NavMain = observer(() => {
     );
 
     return {
-      title: t(`navigation.${key}` as any),
+      title: t(`${key}.one` as any),
       url: `/fastApp/${key}`,
       isActive: false,
       icon: view?.icon,

@@ -6,6 +6,7 @@ export * from './default-list-view';
 export * from './render-components';
 export * from './views';
 export * from './model-types';
+export * from './internationalization';
 
 export const config = createConfigFromConvexSchema(schema);
 

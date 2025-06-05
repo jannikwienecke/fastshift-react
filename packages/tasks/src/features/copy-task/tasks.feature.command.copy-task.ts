@@ -20,7 +20,6 @@ import {
 export const useCopyTask = (
   mutationFn: MakeServerFnRef<CopyTaskArgs, CopyTaskReturn>
 ) => {
-  // TODO -> THIS MUST BE CHANGED -> USE THE ONE FROM THE APPS -> MOVE INTO LIB (SHARED)
   const { t } = useTranslation();
 
   const { mutateAsync: copyTask } = useMutation({

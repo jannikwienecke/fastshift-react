@@ -11,9 +11,6 @@ const tableMetaFields = {
 };
 
 const _schema = defineSchema({
-  app_config: defineTable({
-    json: v.string(),
-  }),
   users: defineTable({
     ...tableMetaFields,
     email: v.string(),

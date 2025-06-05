@@ -1,45 +1,42 @@
+import { AllFieldsType, AllModelsType } from '@apps-next/core';
 import en from './en';
 
-export const de = {
-  welcome: {
-    title: 'Willkommen bei FastApp',
-    description: 'Verwalten Sie Ihre Aufgaben und Projekte effizient',
+const fieldTranslations: Partial<AllFieldsType> = {
+  tableName: {
+    one: 'Tabelle',
+    other: 'Tabellen',
   },
-  navigation: {
-    projects: 'Projekte',
-    tasks: 'Aufgaben',
-    owner: 'Besitzer',
-    logout: 'Abmelden',
-    categories: 'Kategorien',
-    tags: 'Tags',
-    users: 'Benutzer',
-    history: 'Verlauf',
+
+  entityId: {
+    one: 'Entity ID',
+    other: 'Entity IDs',
   },
-  projects: {
-    one: 'Projekt',
-    other: 'Projekte',
+
+  dueDate: {
+    one: 'Fälligkeitsdatum',
+    other: 'Fälligkeitsdaten',
   },
-  tags: {
-    one: 'Tag',
-    other: 'Tags',
+
+  age: {
+    one: 'Alter',
+    other: 'Alter',
+    edit: 'Alter bearbeiten',
+    changeField: 'Alter aktualisieren',
   },
-  tasks: {
-    one: 'Aufgabe',
-    other: 'Aufgaben',
-    create: 'Aufgabe erstellen',
-    delete: 'Aufgabe löschen',
+  color: {
+    one: 'Farbe',
+    other: 'Farben',
+  },
+  label: {
+    one: 'Label',
+    other: 'Labels',
   },
   name: {
-    edit: 'Aufgabe umbenennen',
     one: 'Name',
     other: 'Namen',
+    edit: '{{model}} umbenennen',
+    // changeField: 'Update description',
   },
-
-  owner: {
-    one: 'Besitzer',
-    other: 'Besitzer',
-  },
-
   firstname: {
     one: 'Vorname',
     other: 'Vorname',
@@ -58,12 +55,6 @@ export const de = {
     high: 'Hoch',
     urgent: 'Dringend',
   },
-
-  categories: {
-    one: 'Kategorie',
-    other: 'Kategorien',
-  },
-
   description: {
     one: 'Beschreibung',
     other: 'Beschreibungen',
@@ -75,14 +66,65 @@ export const de = {
     markAs: 'Als erledigt markieren ✅',
     unMarkAs: 'Als nicht erledigt markieren',
   },
-  dueDate: {
-    one: 'Fälligkeitsdatum',
-    other: 'Fälligkeitsdaten',
+};
+
+const modelTranslations: AllModelsType = {
+  views: {
+    one: 'Ansicht',
+    other: 'Ansichten',
+  },
+  history: {
+    one: 'Verlauf',
+    other: 'Verlauf',
+  },
+  tasks_tags: {
+    one: 'Aufgaben-Tag',
+    other: 'Aufgaben-Tags',
+  },
+  users: {
+    one: 'Benutzer',
+    other: 'Benutzer',
+    // edit: 'Edit User',
+    // changeField: 'Update user',
+  },
+  projects: {
+    one: 'Projekt',
+    other: 'Projekte',
+  },
+
+  tags: {
+    one: 'Tag',
+    other: 'Tags',
+  },
+  categories: {
+    one: 'Kategorie',
+    other: 'Kategorien',
+  },
+  tasks: {
+    one: 'Aufgabe',
+    other: 'Aufgaben',
+    create: 'Aufgabe erstellen',
+    delete: 'Aufgabe löschen',
   },
   todos: {
     one: 'Todo',
     other: 'Todos',
   },
+
+  owner: {
+    one: 'Besitzer',
+    other: 'Besitzer',
+  },
+};
+
+export const de = {
+  ...fieldTranslations,
+  ...modelTranslations,
+  welcome: {
+    title: 'Willkommen bei FastApp',
+    description: 'Verwalten Sie Ihre Aufgaben und Projekte effizient',
+  },
+
   shared: {
     rename: '{{model}} umbenennen',
   },
@@ -109,6 +151,7 @@ export const de = {
     delete: 'Löschen',
     detail: { headerInsert: '', headerUpdate: '' },
   },
+
   users: { one: 'Benutzer', other: 'Benutzer' },
   color: { one: 'Farbe', other: 'Farben' },
   label: { one: 'Label', other: 'Labels' },

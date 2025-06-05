@@ -1,15 +1,8 @@
-import i18n, { t } from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import { i18nextPlugin } from 'translation-check';
+import { t } from 'i18next';
 
-import enTranslations from './locales/en';
+import { baseResources, InferTranslationKeys } from '@apps-next/core';
 import deTranslations from './locales/de';
-import {
-  makeResources,
-  baseResources,
-  InferTranslationKeys,
-} from '@apps-next/core';
+import enTranslations from './locales/en';
 
 export const resources = {
   en: {
@@ -20,28 +13,6 @@ export const resources = {
   },
 } as const;
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .use(i18nextPlugin)
-  .init({
-    fallbackLng: 'en',
-    resources: makeResources(resources, {
-      'filter.button.label': {
-        en: 'Filter',
-        de: 'Filter.',
-      },
-    }),
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
-    interpolation: {
-      escapeValue: false,
-    },
-    debug: false,
-  });
-
 declare module 'i18next' {
   interface CustomTypeOptions {
     resources: {
@@ -49,7 +20,6 @@ declare module 'i18next' {
     };
   }
 }
-export default i18n;
 
 export type TranslationType = InferTranslationKeys<typeof enTranslations>;
 

@@ -92,6 +92,28 @@ export type FieldConfig<TName = string> = {
 
 export type GetTableName = keyof RegisteredRouter['config']['_datamodel'];
 
+export type AllModelsType = {
+  [key in GetTableName]: {
+    one?: string;
+    other?: string;
+    edit?: string;
+    changeField?: string;
+  } & Record<string, string>;
+};
+
+export type AllFieldsType = {
+  [key in GetTableName]: {
+    [key2 in keyof GetTableDataType<key>]: {
+      one?: string;
+      other?: string;
+      edit?: string;
+      changeField?: string;
+      markAs?: string;
+      unMarkAs?: string;
+    } & Record<string, string>;
+  };
+}[GetTableName];
+
 export type GetTableDataType<T extends GetTableName> =
   RegisteredRouter['config']['_datamodel'][T];
 

@@ -8,13 +8,13 @@ import {
 } from '@apps-next/convex-adapter-app';
 
 import { logger, QueryReturnOrUndefined, UserViewData } from '@apps-next/core';
-import './i18n';
 import { convex, getUserViews, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
 
-import './shared/hooks/app.persist';
 import { store$, viewRegistry } from '@apps-next/react';
 import registerAppViews from './register-app-views';
+import './shared/hooks/app.persist';
+import { initI18n } from './initialize-i18n';
 
 // syncObservable(store$, {
 //   persist: {
@@ -22,6 +22,8 @@ import registerAppViews from './register-app-views';
 //     plugin: ObservablePersistLocalStorage,
 //   },
 // });
+
+initI18n();
 
 const isDev = import.meta.env.MODE === 'development';
 
