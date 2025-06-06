@@ -4,11 +4,12 @@ import {
   NONE_OPTION,
   QueryRelationalData,
   QueryServerProps,
+  relationalViewHelper,
 } from '@apps-next/core';
 import { filterByNotDeleted, queryClient } from './convex-client';
-import { queryHelper } from './convex-query-helper';
 import { GenericQueryCtx } from './convex.server.types';
 import { ConvexRecord } from './types.convex';
+import { mapWithInclude } from './convex-map-with-include';
 
 export const getRelationalData = async (
   ctx: GenericQueryCtx,
@@ -135,22 +136,27 @@ export const getRelationalData = async (
     return acc;
   }, {} as QueryRelationalData);
 
-  // for (const [tableName, rows] of Object.entries(relationalData)) {
-  //   const { relationalViewManager } = relationalViewHelper(
-  //     tableName,
-  //     args.registeredViews
-  //   );
+  for (const [tableName, rows] of Object.entries(relationalData)) {
+    const { relationalViewManager } = relationalViewHelper(
+      tableName,
+      args.registeredViews
+    );
 
-  //   args.viewConfigManager = relationalViewManager;
+    const includeFields = relationalViewManager.viewConfig.includeFields
+      .map((f) => f.toString())
+      .filter(
+        (f) => relationalViewManager.getFieldBy(f).includeInRelationalDataQuery
+      );
 
-  //   const rowsWithInclude = await mapWithInclude(
-  //     rows as ConvexRecord[],
-  //     ctx,
-  //     args
-  //   );
+    args.viewConfigManager = relationalViewManager;
 
-  //   relationalData[tableName] = rowsWithInclude;
-  // }
+    const rowsWithInclude = await mapWithInclude(rows as ConvexRecord[], ctx, {
+      ...args,
+      includeFields,
+    });
+
+    relationalData[tableName] = rowsWithInclude;
+  }
 
   return relationalData;
 };

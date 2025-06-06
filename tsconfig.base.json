@@ -10,19 +10,50 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@apps-next/convex": ["packages/convex/src/index.ts"],
-      "@apps-next/convex-adapter-app": ["libs/convex-adapter-app/src/index.ts"],
-      "@apps-next/core": ["libs/core/src/index.ts"],
-      "@apps-next/react": ["libs/react/src/index.ts"],
-      "@apps-next/ui": ["libs/ui/src/index.ts"],
+      "@apps-next/convex": [
+        "packages/convex/src/index.ts"
+      ],
+      "@apps-next/tasks": [
+        "packages/tasks/src/index.ts"
+      ],
+      "@apps-next/projects": [
+        "packages/projects/src/index.ts"
+      ],
+      "@apps-next/history": [
+        "packages/history/src/index.ts"
+      ],
+      "@apps-next/users": [
+        "packages/users/src/index.ts"
+      ],
+      "@apps-next/shared": [
+        "packages/shared/src/index.ts"
+      ],
+      "@apps-next/convex-adapter-app": [
+        "libs/convex-adapter-app/src/index.ts"
+      ],
+      "@apps-next/core": [
+        "libs/core/src/index.ts"
+      ],
+      "@apps-next/react": [
+        "libs/react/src/index.ts"
+      ],
+      "@apps-next/ui": [
+        "libs/ui/src/index.ts"
+      ],
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }

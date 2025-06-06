@@ -1,4 +1,5 @@
 import { views } from '@apps-next/convex';
+import { ConvexPreloadQuery } from '@apps-next/convex-adapter-app';
 import {
   getViewByName,
   QueryReturnOrUndefined,
@@ -7,16 +8,18 @@ import {
   ViewRegistryEntry,
 } from '@apps-next/core';
 import {
-  viewActionStore,
-  viewRegistry,
   getSubUserView,
   store$,
+  viewActionStore,
+  viewRegistry,
 } from '@apps-next/react';
-import { getQueryKey, getUserViews, queryClient } from '../query-client';
 import { getView } from '../shared/utils/app.helper';
-import { ConvexPreloadQuery } from '@apps-next/convex-adapter-app';
 
 export const isDev = import.meta.env.MODE === 'development';
+export const apiKey = import.meta.env.VITE_CONVEX_API_KEY;
+
+store$.api.apiKey.set(apiKey);
+
 export const wait = () => {
   if (!isDev) {
     console.warn('wait() is only for development purposes');
@@ -38,7 +41,7 @@ export const getViewData = (
 } => {
   const userViewData = store$.userViews
     .get()
-    .find((view) => view.name.toLowerCase() === viewName.toLowerCase());
+    .find((view) => view.name?.toLowerCase() === viewName.toLowerCase());
 
   const viewData = viewRegistry.getView(userViewData?.baseView ?? viewName);
 

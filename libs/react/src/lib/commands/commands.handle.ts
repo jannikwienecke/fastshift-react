@@ -17,6 +17,7 @@ export const handleCommand = (_command: ComboxboxItem) => {
     if (!keepOpen) {
       store$.commandbarClose();
     }
+    return;
   }
 
   if (command?.handler) {

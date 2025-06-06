@@ -19,7 +19,12 @@ import {
   PencilLineIcon,
   PlusIcon,
 } from 'lucide-react';
-import { comboboxStore$, getView, store$ } from '../legend-store';
+import {
+  comboboxStore$,
+  getView,
+  getViewConfigManager,
+  store$,
+} from '../legend-store';
 import {
   commandbarProps$,
   derivedCommandbarState$,
@@ -43,6 +48,10 @@ export const makeCommandbarProps = <T extends RecordType>(
   return {
     ...state,
     renderItem(item, active, index, activeRow) {
+      if (item.render) {
+        return item.render(active, index);
+      }
+
       const viewField = store$.commandbar.selectedViewField.get();
       let viewOfField: ViewConfigType | undefined;
       try {
@@ -212,9 +221,10 @@ export const makeCommandbarProps = <T extends RecordType>(
       }
 
       try {
-        const field = store$.viewConfigManager.getFieldBy(item.id.toString());
-
+        const viewConfigManager = getViewConfigManager();
+        const field = viewConfigManager.getFieldBy(item.id.toString());
         const row = makeRow(item.id.toString(), item.label, item, field);
+
         const Component = getComponent({
           fieldName: field?.name,
           componentType: 'commandbarFieldItem',
@@ -252,15 +262,18 @@ export const makeCommandbarProps = <T extends RecordType>(
           />
         );
       } catch (e) {
-        return (
-          <div className="flex flex-row gap-4 items-center">
-            <div className=" text-foreground/50">
-              {item.icon ? <Icon icon={item.icon} /> : <div />}
-            </div>
+        if (item)
+          return (
+            <div className="flex flex-row gap-4 items-center">
+              <div className=" text-foreground/50">
+                {item.icon ? <Icon icon={item.icon} /> : <div />}
+              </div>
 
-            <div>{item.label}</div>
-          </div>
-        );
+              <div>{item.label}</div>
+            </div>
+          );
+
+        return null;
       }
     },
   };

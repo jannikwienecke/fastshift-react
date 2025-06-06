@@ -103,6 +103,7 @@ const StringFormField = (props: FormFieldProps) => {
         </>
 
         <input
+          tabIndex={0}
           autoFocus={props.field.field?.isDisplayField}
           placeholder={props.field.label}
           value={(props.field.value as string) || ''}

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
 import { object, z } from 'zod';
+import { Row } from '../data-model';
 import { BaseConfigInterface } from './config.types';
 import { CommandbarItem } from './ui.types';
 
@@ -12,6 +12,7 @@ const documentBaseSchema = object({
 export interface Register {}
 
 export type RegisteredRouter = Register extends { config: infer T } ? T : any;
+export type ViewNames = Register extends { viewNames: infer T } ? T : any;
 
 export type FieldType =
   | 'String'
@@ -60,6 +61,12 @@ export type FieldConfigOptions<
   showInProperties?: boolean;
   validator?: () => any;
   validationErrorMessage?: (t: any) => string;
+  useAsSidebarFilter?: boolean;
+  getEnumLabel?: (t: (label: string) => string, value: string) => string;
+  // projects -> relations are e.g. tasks|owner... -> if we set this to true, not just the
+  // id will be returned, but the whole object
+  includeInRelationalDataQuery?: boolean;
+  showFieldActionInDetailCommands?: boolean;
 };
 
 export type FieldConfig<TName = string> = {
@@ -85,8 +92,27 @@ export type FieldConfig<TName = string> = {
 
 export type GetTableName = keyof RegisteredRouter['config']['_datamodel'];
 
-// export type GetTableNameSecond =
-//   RegisteredRouter['config']['tableNames'][number];
+export type AllModelsType = {
+  [key in GetTableName]: {
+    one?: string;
+    other?: string;
+    edit?: string;
+    changeField?: string;
+  } & Record<string, string>;
+};
+
+export type AllFieldsType = {
+  [key in GetTableName]: {
+    [key2 in keyof GetTableDataType<key>]: {
+      one?: string;
+      other?: string;
+      edit?: string;
+      changeField?: string;
+      markAs?: string;
+      unMarkAs?: string;
+    } & Record<string, string>;
+  };
+}[GetTableName];
 
 export type GetTableDataType<T extends GetTableName> =
   RegisteredRouter['config']['_datamodel'][T];
@@ -126,4 +152,12 @@ export type ID = string | number;
 
 export type UserStoreCommand = {
   command: string;
-} & Omit<CommandbarItem, 'command'>;
+} & Omit<CommandbarItem, 'command'> & {
+    tableCommand: GetTableName | false;
+  };
+
+export type MakeUserStoreCommand<T extends RecordType = RecordType> = (args: {
+  rows?: Row<T>[] | undefined;
+
+  optimisticUpdateStore: (props: { updatedRecord?: T }) => void;
+}) => UserStoreCommand;

@@ -4,6 +4,7 @@ import { t } from './translations';
 
 import {
   FieldConfig,
+  GetTableName,
   IncludeConfig,
   IndexField,
   RecordErrors,

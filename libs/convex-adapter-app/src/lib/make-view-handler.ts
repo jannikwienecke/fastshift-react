@@ -16,6 +16,10 @@ import { viewMutationHandler } from './view-mutation';
 
 export const makeViewLoaderHandler =
   (views: RegisteredViews) => async (ctx: GenericQueryCtx, args: any) => {
+    // const appConfig = await ctx.db.query('app_config').first();
+
+    // const views = JSON.parse(appConfig.json) as RegisteredViews;
+
     let viewConfig = getViewByName(views, args.viewName);
 
     if (!args.viewName) return null;
@@ -27,7 +31,7 @@ export const makeViewLoaderHandler =
 
       // TODO REFACTOR AND USE SAME IN ALL PLACES
       const userView = allUserViews.find(
-        (v) => v.name.toLowerCase() === args.viewName.toLowerCase()
+        (v) => v.name?.toLowerCase() === args.viewName.toLowerCase()
       );
 
       viewConfig = getViewByName(views, userView?.baseView ?? '');

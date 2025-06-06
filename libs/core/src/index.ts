@@ -14,3 +14,4 @@ export * from './lib/translations';
 export * from './lib/filters';
 export * from './lib/core-config-manager';
 export * from './lib/core-filter';
+export * from './lib/core-query';

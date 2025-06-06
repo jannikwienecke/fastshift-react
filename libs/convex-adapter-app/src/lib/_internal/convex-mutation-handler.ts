@@ -1,8 +1,6 @@
 import {
-  BaseViewConfigManager,
   ERROR_STATUS,
   FieldConfig,
-  getViewByName,
   INTERNAL_FIELDS,
   MutationHandlerReturnType,
   MutationPropsServer,

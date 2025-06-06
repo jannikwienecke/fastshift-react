@@ -15,30 +15,25 @@ import {
   ViewConfigType,
 } from '@apps-next/core';
 import { Layers3Icon, PlusIcon } from 'lucide-react';
-import { comboboxStore$, parentView$, store$ } from '../legend-store';
+import { comboboxStore$, getView, parentView$, store$ } from '../legend-store';
 import { xSelect } from '../legend-store/legend.select-state';
 import {
+  copyRow,
   getIsManyRelationView,
   getViewConfigManager,
+  isDetail,
   isDetailOverview,
 } from '../legend-store/legend.utils';
 import { SELECT_FILTER_DATE } from '../ui-adapter/filter-adapter';
-import { commandsHelper, getParsedDateRowForMutation } from './commands.helper';
+import {
+  commandsHelper,
+  getCommandsType,
+  getParsedDateRowForMutation,
+} from './commands.helper';
+import { setCommandbarQuery } from '../legend-store/legend.commandbar.fn';
+import { getComponent } from '../ui-components/ui-components.helper';
 
-const getViewName = () => store$.viewConfigManager.getViewName();
-
-const viewCommand: CommandbarItem = {
-  id: 'create-new-view',
-  label: '__commands.createNewView',
-  header: 'view',
-  command: 'create-new-view',
-  getViewName,
-  icon: Layers3Icon,
-  handler: () => {
-    _log.info('viewCommand - handler');
-    alert('HANDLE...viewCommand NOT IMPLEMENTED');
-  },
-};
+const getViewName = () => getViewConfigManager()?.getViewName();
 
 const viewSaveCommand: CommandbarItem = {
   id: 'save-view',
@@ -59,21 +54,39 @@ const viewSaveCommand: CommandbarItem = {
 const makeSelectModelAttributeCommand = (
   item: ComboxboxItem
 ): CommandbarItem => {
+  const field = getViewConfigManager().getFieldBy(item.id.toString());
+  const icon =
+    item.icon ||
+    getComponent({
+      fieldName: field.name,
+      componentType: 'icon',
+      isDetail: isDetail(),
+    }) ||
+    getView(field.name)?.icon;
+
   const command = {
     id: item.id,
     label: item.label,
     header: '',
-    command: 'select-model-attribute',
+    command: 'model-attribute-commands',
     getViewName,
     tablename: item.tablename,
-    icon: item.icon,
-    handler: ({ row }) => {
-      console.debug('makeSelectModelAttributeCommand - handler');
+    field,
+    getIsVisible: () =>
+      getCommandsType() !== 'detail-row' && getCommandsType() !== 'closed',
+    icon,
+    handler: ({ row: commandbarRow, value: command }) => {
+      console.debug('makeSelectModelAttributeCommand called');
 
-      //  DETAIL BRANCHING
-      const field = getViewConfigManager().getFieldBy(item.id.toString());
+      const row = commandbarRow || store$.detail.row.get();
+      const field = command?.field;
 
-      if (!row) return;
+      if (!field) return;
+      if (!commandbarRow) {
+        store$.commandbarOpen(row as Row);
+        store$.commandbar.selectedViewField.set(field);
+        return;
+      }
 
       const value = row?.getValue?.(field.name);
       let query = '';
@@ -94,7 +107,7 @@ const makeSelectModelAttributeCommand = (
         store$.commandbar.selectedViewField.set(field);
       }
 
-      store$.commandbar.query.set(query);
+      setCommandbarQuery(store$, query);
     },
   } satisfies CommandbarItem;
 
@@ -111,6 +124,8 @@ const makeSelectRelationalOptionCommand = (
     header: '',
     command: 'select-model-relational-option',
     getViewName,
+    getIsVisible: () => store$.commandsDisplay.type.get() === 'view',
+
     handler: ({ row, field, value }) => {
       if (!row || !field) return;
       _log.debug('makeSelectRelationalOptionCommand - handler');
@@ -215,6 +230,11 @@ const makeOpenCreateFormCommand = (view: ViewConfigType): CommandbarItem => {
     id: ADD_NEW_OPTION,
     label: labelToUse,
     icon: PlusIcon,
+    getIsVisible: () =>
+      store$.commandsDisplay.type.get() === 'view' ||
+      store$.commandsDisplay.type.get() === 'list-actions' ||
+      store$.commandsDisplay.type.get() === 'commandbar',
+
     tablename: view.tableName,
     header: () => getViewLabel(view, true),
     command: 'open-view-form',
@@ -250,7 +270,7 @@ const makeRemoveAttributeCommand = (field: FieldConfig): CommandbarItem => {
 };
 
 export const commands = {
-  viewCommand,
+  // viewCommand,
   viewSaveCommand,
   makeSelectModelAttributeCommand,
   makeSelectRelationalOptionCommand,

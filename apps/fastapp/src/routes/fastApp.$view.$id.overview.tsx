@@ -6,7 +6,7 @@ import { getViewData } from '../application-store/app.store.utils';
 import { getUserViewsQuery, queryClient } from '../query-client';
 import { useViewParams } from '../shared/hooks';
 import { getView } from '../shared/utils/app.helper';
-import { DefaultDetailOverviewTemplate } from '../views/default-detail-view-template';
+import { DefaultDetailOverviewTemplate } from '@apps-next/shared';
 
 export const Route = createFileRoute('/fastApp/$view/$id/overview')({
   loader: async (props) => {

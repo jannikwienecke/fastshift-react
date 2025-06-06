@@ -21,6 +21,9 @@ export type UiViewConfig<
     onDelete?: {
       showConfirmation: boolean;
     };
+
+    renderCommandbarRow?: (props: { row: Row<U> }) => React.ReactNode;
+
     fields: Partial<{
       [key in keyof U]: {
         fieldLabel?: () => string | React.ReactNode;
@@ -35,7 +38,7 @@ export type UiViewConfig<
           comboboxListValue: (props: {
             data: NonNullable<U[key]> extends Array<unknown>
               ? NonNullable<U[key]>[0]
-              : U[key] extends RecordType
+              : U[key] extends RecordType | undefined
               ? U[key]
               : U[key] extends boolean
               ? boolean
@@ -62,7 +65,7 @@ export type UiViewConfig<
             // data: U[key] extends Array<unknown> ? U[key][0] : U[key];
             data: NonNullable<U[key]> extends Array<any>
               ? NonNullable<U[key]>[0]
-              : U[key] extends RecordType
+              : U[key] extends RecordType | undefined
               ? U[key]
               : U[key] extends boolean
               ? boolean
@@ -77,7 +80,7 @@ export type UiViewConfig<
           default: (props: {
             data: NonNullable<U[key]> extends Array<any>
               ? NonNullable<U[key]>[0]
-              : U[key] extends RecordType
+              : U[key] extends RecordType | undefined
               ? U[key]
               : U[key] extends boolean
               ? boolean

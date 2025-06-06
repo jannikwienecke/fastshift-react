@@ -1,15 +1,20 @@
 import {
   _log,
-  configManager,
   getViewByName,
   makeData,
+  NONE_OPTION,
   QueryReturnType,
   RelationalDataModel,
+  RelationalFilterDataModel,
   sortRows,
+  t,
 } from '@apps-next/core';
 import { batch, Observable } from '@legendapp/state';
-import { ignoreNewData$ } from './legend.mutationts';
-import { xSelect } from './legend.select-state';
+import {
+  ignoreNewData$,
+  ignoreNewDetailData$,
+  isRunning$,
+} from './legend.mutationts';
 import { LegendStore, StoreFn } from './legend.store.types';
 import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
 
@@ -114,9 +119,9 @@ export const createDataModel: StoreFn<'createDataModel'> =
       tableName ?? store$.viewConfigManager.get().getTableName?.()
     )(sorted);
 
-    if (store$.state.get() !== 'invalidated') {
-      setGlobalDataModel(dataModel.rows);
-    }
+    // if (store$.state.get() !== 'invalidated') {
+    setGlobalDataModel(dataModel.rows);
+    // }
   };
 
 const handlingFetchMoreState = async (
@@ -190,8 +195,6 @@ const handleFilterChangedState = async (
     return allIds?.some((id) => id === row['id']);
   });
 
-  store$.createDataModel(all);
-
   store$.state.set('initialized');
 
   store$.fetchMore.assign({
@@ -199,6 +202,8 @@ const handleFilterChangedState = async (
     nextCursor: queryReturn.continueCursor,
     isDone: queryReturn.isDone ?? false,
   });
+
+  store$.createDataModel(all);
 };
 
 const handleMutatingState = async (
@@ -247,7 +252,9 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
 
     if (data.isPending) return;
 
-    _log.debug(
+    store$.allIds.set(data.allIds ?? []);
+
+    console.debug(
       `____handleIncomingData`,
       state,
       data.data?.slice(0, 3).map((d) => d?.['name'])
@@ -257,7 +264,7 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
       localModeEnabled$.get() &&
       store$.detail.viewType.type.get() === 'model'
     ) {
-      _log.debug(`handleIncomingData:debugMode-> Update Data Model`);
+      console.debug(`handleIncomingData:debugMode-> Update Data Model`);
       store$.createDataModel(data.data ?? []);
       return;
     }
@@ -265,33 +272,38 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
     // store$.createRelationalDataModel(data.relationalData ?? {});
 
     switch (state) {
-      case 'invalidated':
-        _log.debug('RECEIVING DATA AFTER INVALIDATED');
-        setTimeout(() => store$.state.set('mutating'), 10);
-        break;
+      // case 'invalidated':
+      //   console.debug('RECEIVING DATA AFTER INVALIDATED');
+      //   setTimeout(() => store$.state.set('mutating'), 10);
+      //   break;
 
       case 'fetching-more':
-        _log.debug('RECEIVING DATA AFTER FETCHING MORE', data);
+        console.debug('RECEIVING DATA AFTER FETCHING MORE', data);
         await handlingFetchMoreState(store$, data);
         break;
 
       case 'updating-display-options':
-        _log.debug('RECEIVING DATA AFTER UPDATING DISPLAY OPTIONS');
+        console.debug('RECEIVING DATA AFTER UPDATING DISPLAY OPTIONS');
         await handlingDisplayOptionsChangeState(store$, data);
         break;
 
       case 'filter-changed':
-        _log.debug('RECEIVING DATA AFTER FILTER CHANGED');
+        console.debug('RECEIVING DATA AFTER FILTER CHANGED');
+        await handleFilterChangedState(store$, data);
+        break;
+
+      case 'temp-filter-changed':
+        console.debug('RECEIVING DATA AFTER TEMP FILTER CHANGED');
         await handleFilterChangedState(store$, data);
         break;
 
       case 'mutating':
-        _log.debug('====RECEIVING DATA AFTER MUTATION');
+        console.debug('====RECEIVING DATA AFTER MUTATION');
         handleMutatingState(store$, data);
         break;
 
       case 'initialized':
-        _log.debug('RECEIVING DATA AFTER INITIALIZED -> Do NOTHING');
+        console.debug('RECEIVING DATA AFTER INITIALIZED -> Do NOTHING');
         handleMutatingState(store$, data);
         break;
 
@@ -325,19 +337,22 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
     const rows = data.data;
 
     const viewName = store$.detail.viewConfigManager.getViewName();
-    _log.debug('____handleIncomingDetailData: ', rows?.length, viewName);
+    console.debug('____handleIncomingDetailData: ', rows?.length, viewName);
 
     const key = `detail-${store$.detail.row.get()?.id}`;
     const ignoreNext = store$.ignoreNextQueryDict?.[key].get();
     const dirtyField = store$.detail.form.dirtyField.get();
     const diryValue = store$.detail.form.dirtyValue.get();
 
-    if (ignoreNewData$.get() > 0) {
-      ignoreNewData$.set((prev) => prev - 1);
-      return;
-    }
-
     store$.detail.historyDataOfRow.set(data.historyData);
+
+    if (ignoreNewDetailData$.get() > 0) {
+      ignoreNewDetailData$.set((prev) => prev - 1);
+      return;
+    } else if (ignoreNewDetailData$.get() === 0) {
+      ignoreNewDetailData$.set(0);
+      isRunning$.set(false);
+    }
 
     if (rows?.length === 1) {
       if (ignoreNext > 1) {
@@ -366,3 +381,30 @@ export const handleIncomingDetailData: StoreFn<'handleIncomingDetailData'> =
       }
     }
   };
+
+export const handleIncomingRelationalFilterData: StoreFn<
+  'handleIncomingRelationalFilterData'
+> = (store$) => async (data) => {
+  const hasNoKeys = Object.keys(data).length === 0;
+  if (hasNoKeys) return;
+
+  const parsedData = Object.entries(data).reduce((acc, [tableName, data]) => {
+    return {
+      ...acc,
+      [tableName]: data.map((item) => {
+        const row = makeData(store$.views.get(), tableName)([item.record])
+          .rows?.[0];
+        row.raw = { ...row.raw, count: item.count };
+
+        if (!row.label && !item.record) {
+          row.label = `No ${t(`${tableName}.one`)}`;
+          row.id = NONE_OPTION;
+        }
+
+        return row;
+      }),
+    };
+  }, {} satisfies RelationalFilterDataModel);
+
+  store$.relationalFilterData.set(parsedData);
+};

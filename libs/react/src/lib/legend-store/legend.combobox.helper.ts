@@ -1,6 +1,7 @@
 import {
   ComboxboxItem,
   FieldConfig,
+  INTERNAL_FIELDS,
   NO_GROUPING_FIELD,
   NO_SORTING_FIELD,
   RecordType,
@@ -61,6 +62,25 @@ export const getViewFieldsOptions = (options?: {
     multiple: false,
   };
 };
+export const makeComboboxStateOpenCommandbar =
+  (): MakeComboboxStateProps | null => {
+    const tableName = store$.commandbar.activeOpen.tableName.get();
+    if (!tableName) return null;
+
+    const debouncedQuery = comboboxDebouncedQuery$.get();
+    const defaultData = store$.relationalDataModel[tableName]?.get() ?? {
+      rows: [],
+    };
+
+    const valuesQuery = store$.combobox.values.get();
+
+    return {
+      values: debouncedQuery.length ? valuesQuery : defaultData.rows ?? [],
+      tableName,
+      multiple: false,
+      selected: [],
+    } as MakeComboboxStateProps;
+  };
 
 export const makeComboboxStateSortingOptions =
   (): MakeComboboxStateProps | null => {
@@ -68,19 +88,61 @@ export const makeComboboxStateSortingOptions =
     if (!props) return null;
 
     let values = [...(props.values || [])];
-    values = [...values, makeRowFromField(NO_SORTING_FIELD)];
+    values = [...values];
 
     const showDeleted = store$.displayOptions.showDeleted.get();
 
     const softDeleteField =
       store$.viewConfigManager.viewConfig.mutation.softDeleteField.get();
 
-    values = values.filter((v) => {
-      if (showDeleted) return true;
-      if (v.id === softDeleteField) return false;
+    values = values
+      .filter((v) => {
+        if (showDeleted) return true;
+        if (v.id === softDeleteField) return false;
 
-      return true;
-    });
+        return true;
+      })
+      .filter((v) => {
+        const systemFieldsToInclude = [
+          INTERNAL_FIELDS.updatedAt.fieldName,
+          INTERNAL_FIELDS.creationTime.fieldName,
+        ];
+        return systemFieldsToInclude.includes(v.id) || !v.raw.isSystemField;
+      })
+      .sort((a, b) => {
+        // first the display fields
+        // second: Non-relational fields & non system fields
+        // third relational fields  & non system fields
+        // last: System fields
+
+        const isDisplayFieldA = a.raw.isDisplayField;
+        const isDisplayFieldB = b.raw.isDisplayField;
+
+        const isSystemFieldA = a.raw.isSystemField;
+        const isSystemFieldB = b.raw.isSystemField;
+
+        const isNonRelationalA = !a.raw.relation;
+        const isNonRelationalB = !b.raw.relation;
+
+        if (isDisplayFieldA && !isDisplayFieldB) return -1;
+        if (!isDisplayFieldA && isDisplayFieldB) return 1;
+
+        // System fields always go last
+        if (isSystemFieldA && !isSystemFieldB) return 1;
+        if (!isSystemFieldA && isSystemFieldB) return -1;
+
+        // Both are system fields, sort alphabetically
+        if (isSystemFieldA && isSystemFieldB) {
+          return a.label.localeCompare(b.label);
+        }
+
+        // Non-relational fields come before relational fields
+        if (isNonRelationalA && !isNonRelationalB) return -1;
+        if (!isNonRelationalA && isNonRelationalB) return 1;
+
+        // Same type (both relational or both non-relational), sort alphabetically
+        return a.label.localeCompare(b.label);
+      });
 
     return {
       ...props,
@@ -565,6 +627,25 @@ export const getSharedStateSelectState = (): ComboboxStateCommonType => {
     field: field,
     selected: getDefaultSelectedList(),
     row: row as Row,
+  };
+
+  return stateShared;
+};
+
+export const getStateSelectOpenCommand = (): ComboboxStateCommonType => {
+  const activeOpen = store$.commandbar.activeOpen.get();
+  if (!activeOpen?.tableName) return DEFAULT_COMBOBOX_STATE;
+
+  const stateShared: ComboboxStateCommonType = {
+    rect: selectState$.rect.get() ?? null,
+    searchable: true,
+    name: 'select-open-command_' + activeOpen.tableName,
+    isNewState: true,
+    open: false,
+    query: store$.combobox.query.get(),
+    field: null,
+    selected: getDefaultSelectedList(),
+    row: null,
   };
 
   return stateShared;

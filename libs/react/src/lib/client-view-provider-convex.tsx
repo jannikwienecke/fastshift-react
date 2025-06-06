@@ -1,8 +1,8 @@
-import { UserStoreCommand } from '@apps-next/core';
+import { MakeUserStoreCommand } from '@apps-next/core';
 import { observer } from '@legendapp/state/react';
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
-import { addEffects, addLocalFiltering } from './legend-store';
+import { addEffects, addKeyEvents, addLocalFiltering } from './legend-store';
 import { addLocalDisplayOptionsHandling } from './legend-store/legend.local.display-options';
 import { store$ } from './legend-store/legend.store';
 import { useApi } from './use-api';
@@ -10,7 +10,7 @@ import { useMutation } from './use-mutation';
 import { useQueryData } from './use-query-data';
 
 export type QueryProviderConvexProps = {
-  commands: UserStoreCommand[];
+  commands: MakeUserStoreCommand[];
 } & { children: React.ReactNode };
 
 export const ClientViewProviderConvex = (props: QueryProviderConvexProps) => {
@@ -37,6 +37,7 @@ const Content = observer((props: { children: React.ReactNode }) => {
     addEffects(store$);
     addLocalFiltering(store$);
     addLocalDisplayOptionsHandling(store$);
+    addKeyEvents(store$);
 
     store$.api.assign({
       mutate: runMutate,

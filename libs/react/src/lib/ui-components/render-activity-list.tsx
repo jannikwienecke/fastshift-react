@@ -19,11 +19,11 @@ const groupSimilarActivities = (
     // Check if the current activity belongs to the same group as the last one
     const isSameGroup =
       last &&
-      current.creator.id === last.creator.id &&
-      current.changed.type === last.changed.type &&
-      current.changed.fieldName === last.changed.fieldName &&
-      (last.changed.type === 'added' || last?.changed.type === 'removed') &&
-      Math.abs(current.timestamp - last.timestamp) < 60000;
+      current.creator?.id === last.creator?.id &&
+      current.changed.type === last.changed?.type &&
+      current.changed.fieldName === last.changed?.fieldName &&
+      (last.changed.type === 'added' || last?.changed?.type === 'removed') &&
+      Math.abs(current.timestamp - last?.timestamp) < 60000;
 
     if (isSameGroup) {
       currentGroup.push(current);

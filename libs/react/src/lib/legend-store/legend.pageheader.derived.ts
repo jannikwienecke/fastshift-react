@@ -1,7 +1,12 @@
-import { MakePageHeaderPropsOption, PageHeaderProps, t } from '@apps-next/core';
+import {
+  CommandName,
+  MakePageHeaderPropsOption,
+  PageHeaderProps,
+} from '@apps-next/core';
 import { observable } from '@legendapp/state';
-import { PencilIcon } from 'lucide-react';
+import { getCommandGroups } from '../commands/commands.get';
 import { derviedDetailPage$ } from './legend.detailpage.derived';
+import { hasRightSidebarFiltering } from './legend.rightsidebar.state';
 import {
   currentView$,
   detailLabel$,
@@ -9,9 +14,13 @@ import {
   parentUserView$,
   parentView$,
   parentViewName$,
+  tablename$,
   userView$,
+  view$,
 } from './legend.shared.derived';
 import { store$ } from './legend.store';
+import { getCommandsDropdownProps, viewActions } from './legend.utils.helper';
+import { commands } from '../commands/commands';
 
 export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
   {}
@@ -19,15 +28,20 @@ export const pageHeaderProps$ = observable<Partial<MakePageHeaderPropsOption>>(
 
 export const derivedPageHeaderProps$ = observable(() => {
   const detailProps = derviedDetailPage$.get();
+
   if (store$.detail.row.get()) {
+    const allowedCommands: CommandName[] = [
+      'model-commands',
+      'model-attribute-commands',
+    ];
+
     return {
-      options: [],
       starred: detailUserView$.get()?.starred ?? false,
       icon: parentView$.get()?.icon,
       emoji: parentUserView$.get()?.emoji,
       viewName: parentViewName$.get() ?? '',
       detail: {
-        label: detailLabel$.get(),
+        label: detailLabel$.get() ?? '',
         onClickParentView: () => {
           store$.navigation.set({
             state: {
@@ -48,27 +62,74 @@ export const derivedPageHeaderProps$ = observable(() => {
       },
 
       onToggleFavorite: async () => {
-        const userViewData = detailUserView$.get();
-
-        store$.updateDetailViewMutation({
-          starred: !userViewData ? true : !userViewData.starred,
-        });
+        viewActions().toggleFavorite();
       },
 
-      onSelectOption: (option) => {
-        if (option.command === 'create-new-view') {
-          store$.userViewSettings.form.set({
-            type: 'edit',
-            viewName: userView$.get()?.name ?? '',
-            viewDescription: userView$.get()?.description ?? '',
-            iconName: undefined,
-          });
-        }
-      },
-    } as PageHeaderProps;
+      commands: {},
+
+      commandsDropdownProps: getCommandsDropdownProps({
+        view: 'view',
+        commands: getCommandGroups().map((g) => ({
+          items: g.items
+            .filter((i) => allowedCommands.includes(i.command))
+            .filter((i) =>
+              i.command !== 'model-attribute-commands'
+                ? true
+                : i.field?.showFieldActionInDetailCommands
+            ),
+          header: g.header,
+        })),
+      }),
+    } satisfies PageHeaderProps;
+  }
+
+  const view = view$.get();
+  if (!view) throw new Error('View is not defined');
+
+  const primaryCommand = commands.makeOpenCreateFormCommand(view);
+
+  const commandsGroupsForLustActions = getCommandGroups().filter((g) =>
+    g.items.find(
+      (i) => i.command === 'open-view-form' && i.tablename === tablename$.get()
+    )
+  );
+
+  let commandsDropdownProps = getCommandsDropdownProps({
+    view: 'list-actions',
+    commands:
+      commandsGroupsForLustActions.length === 1
+        ? []
+        : commandsGroupsForLustActions,
+  });
+
+  if (store$.list.selected.get()?.length) {
+    commandsDropdownProps = getCommandsDropdownProps({
+      view: 'detail-row',
+      commands: getCommandGroups(),
+    });
   }
 
   return {
+    query: {
+      onChange: (query) => {
+        store$.viewQuery.set(query);
+      },
+      toggleShowInput: () => {
+        store$.pageHeader.showSearchInput.set((prev) => !prev);
+      },
+      onBlur: () => {
+        if (store$.viewQuery.get() === '') {
+          store$.pageHeader.showSearchInput.set(false);
+        }
+      },
+      onToggleRightSidebar: hasRightSidebarFiltering()
+        ? () => {
+            store$.rightSidebar.open.set((prev) => !prev);
+          }
+        : undefined,
+      showInput: store$.pageHeader.showSearchInput.get(),
+      query: store$.viewQuery.get(),
+    },
     viewName:
       store$.userViewData.name.get() ??
       currentView$.viewName.get().firstUpper() ??
@@ -77,41 +138,20 @@ export const derivedPageHeaderProps$ = observable(() => {
     emoji: userView$.get()?.emoji,
     starred: store$.userViewData.starred.get() ?? false,
 
-    // TODO: MAKE THIS GENEERIC AND REUSABLE -> Like commands
-    options: [
-      {
-        header: '',
-        items: [
-          {
-            id: 'edit',
-            label: t('common.edit') + '...',
-            icon: PencilIcon,
-            command: 'create-new-view',
-          },
-        ],
-      },
-    ],
+    commandsDropdownProps: getCommandsDropdownProps({
+      view: 'view',
+      commands: getCommandGroups().filter((g) =>
+        g.items.find((i) => i.command === 'view-commands')
+      ),
+    }),
 
-    onToggleFavorite: async () => {
-      const userViewData = store$.userViewData.get();
-      if (!userViewData) return;
-
-      store$.updateViewMutation({
-        id: userViewData.id,
-        starred: !userViewData.starred,
-      });
+    commands: {
+      primaryCommand: primaryCommand,
+      commandsDropdownProps,
     },
 
-    onSelectOption: (option) => {
-      if (option.command === 'create-new-view') {
-        store$.userViewSettings.form.set({
-          type: 'edit',
-          viewName: userView$.get()?.name ?? currentView$.viewName.get(),
-          viewDescription: userView$.get()?.description ?? '',
-          emoji: userView$.get()?.emoji,
-          iconName: undefined,
-        });
-      }
+    onToggleFavorite: async () => {
+      viewActions().toggleFavorite();
     },
   } satisfies PageHeaderProps;
 });

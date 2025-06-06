@@ -197,7 +197,7 @@ const handleLoadDetailOverview = (action: Action) => {
 const loadViewKey$ = observable('');
 const handleLoadView = (action: Action) => {
   if (action.type !== 'LOAD_VIEW') return;
-  const key = `load-view-${action.viewName}`;
+  const key = `load-view-${action.userViewData?.id || action.viewName}`;
 
   const view = getView(action.viewData.viewConfig.viewName);
   if (!view) throw new Error('ERROR NO VIEW');
@@ -207,7 +207,6 @@ const handleLoadView = (action: Action) => {
     action.viewData.uiViewConfig
   );
 
-  // && !action.isLoader
   const isOtherKey = loadViewKey$.get() !== key;
   if (loadViewKey$.get() === key && !action.isLoader) return;
 
@@ -250,7 +249,19 @@ const resetStore = () => {
   store$.userViewSettings.initialSettings.set(null);
   store$.userViewSettings.hasChanged.set(false);
 
+  store$.viewQuery.set('');
+  store$.debouncedViewQuery.set('');
+  store$.pageHeader.set({ showSearchInput: false });
+
+  store$.rightSidebar.filter.set(undefined);
+  store$.relationalFilterData.set({});
+  store$.rightSidebar.open.set(false);
+
   store$.contextMenuState.row.set(null);
+
+  store$.isFetchAll.set(false);
+
+  store$.list.rowInFocus.set(undefined);
 
   store$.filter.filters.set([]);
 

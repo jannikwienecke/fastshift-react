@@ -1,7 +1,6 @@
 import { views } from '@apps-next/convex';
 import { GetTableName, slugHelper } from '@apps-next/core';
 import { store$, viewActionStore } from '@apps-next/react';
-import { observable } from '@legendapp/state';
 import { useLocation, useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { useTranslation as useTranslationReact } from 'react-i18next';
@@ -11,7 +10,6 @@ import { useViewParams } from './useViewParams';
 
 export const useAppEffects = (viewName: string) => {
   const router = useRouter();
-
   const navigateRef = React.useRef(router.navigate);
   const realPreloadRoute = router.preloadRoute;
 
@@ -36,32 +34,13 @@ export const useAppEffects = (viewName: string) => {
 
   React.useEffect(() => {
     if (!userViews) return;
-    store$.userViews.set(
-      userViews.map((v) => {
-        // Fixme -> combine both types from db and ui to one in core
-        return {
-          ...v,
-          id: v.id ?? '',
-          baseView: v.baseView ?? '',
-          displayOptions: v.displayOptions ?? '',
-          filters: v.filters ?? '',
-          name: v.name ?? '',
-          slug: v.slug ?? '',
-          description: v.description ?? '',
-        };
-      })
-    );
+
+    store$.updateUserViews(userViews);
   }, [userViews]);
 
   const [_, i18n] = useTranslationReact();
 
-  const ignoreFirstRef = React.useRef(true);
   React.useEffect(() => {
-    if (ignoreFirstRef.current) {
-      ignoreFirstRef.current = false;
-      return;
-    }
-
     viewActionStore.setViews(views);
   }, [i18n.language]);
 
@@ -209,35 +188,38 @@ export const useAppEffects = (viewName: string) => {
       }
     });
 
-    store$.mutating.mutation.onChange((changes) => {
-      const mutation = changes.value;
-      if (!mutation) return;
+    // store$.mutating.mutation.onChange((changes) => {
+    //   const mutation = changes.value;
+    //   if (!mutation) return;
 
-      const viewMutation = mutation.type === 'NEW_USER_VIEW_MUTATION';
+    // const viewMutation = mutation.type === 'NEW_USER_VIEW_MUTATION';
 
-      if (!viewMutation) {
-        router.cleanCache();
-      }
+    // if (!viewMutation) {
+    //   router.clearCache();
+    // }
 
-      if (store$.detail.viewType.type.get() === 'overview') {
-        router.invalidate();
-      }
+    // if (store$.detail.viewType.type.get() === 'overview') {
+    //   // setTimeout(() => {
+    //   //   console.debug('INVALIDATE.......');
+    //   //   router.invalidate();
+    //   // }, 50);
+    // }
 
-      isMutation$.set(true);
-    });
+    // isMutation$.set(true);
+    // });
 
-    store$.state.onChange((changes) => {
-      const state = changes.value;
+    // store$.state.onChange((changes) => {
+    //   const state = changes.value;
 
-      if (state === 'initialized') {
-        if (isMutation$.get()) {
-          console.debug('Mutation detected, refetching user views...');
-          refetch();
-          isMutation$.set(false);
-        }
-      }
-    });
+    //   // if (state === 'initialized') {
+    //   //   if (isMutation$.get()) {
+    //   //     console.debug('Mutation detected, refetching user views...');
+    //   //     refetch();
+    //   //     isMutation$.set(false);
+    //   //   }
+    //   // }
+    // });
   }, []);
 };
 
-const isMutation$ = observable(false);
+// const isMutation$ = observable(false);

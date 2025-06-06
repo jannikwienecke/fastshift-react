@@ -7,6 +7,8 @@ export const headers: {
 } = {
   view: 'View',
   admin: 'Admin',
+  navigation: 'Navigation',
+  'global-query': 'Search for "{{query}}"',
 };
 
 export const historyChangedTypes: {
@@ -53,6 +55,19 @@ export const en = {
     createNewView: 'Create new view',
     saveView: 'Save view',
     headers: headers,
+    copyId: 'Copy {{name}} ID',
+    copyUrl: 'Copy {{name}} URL',
+    favoriteModel: 'Favorite {{name}}',
+    unfavoriteModel: 'Unfavorite {{name}}',
+    deleteModel: 'Delete {{name}}',
+    remindMeLater: 'Remind me about this {{name}}...',
+    goTo: 'Go to {{name}}',
+    open: 'Open {{name}}',
+    delete: 'Delete...',
+    exportAsCsv: 'Export as CSV',
+    subscribeToView: 'Subscribe',
+    unsubscribeFromView: 'Unsubscribe',
+    subscribeToItemAdded: 'An {{name}} was added to this view',
   },
 
   displayOptions: {
@@ -77,9 +92,9 @@ export const en = {
     placeholder: 'Search',
   },
   viewFields: {
-    _creationTime: {
-      label: 'Created At',
-    },
+    // _creationTime: {
+    //   label: 'Created At..',
+    // },
   },
   common: {
     save: 'Save',
@@ -117,6 +132,8 @@ export const en = {
     to: 'to',
     from: 'from',
     this: 'this',
+    views: 'Views',
+    ok: 'OK',
   },
 
   datePicker: {
@@ -127,11 +144,18 @@ export const en = {
     placeholder: 'Add {{name}}...',
   },
 
+  rightSidebar: {
+    noModelUser: 'No {{model}} used',
+    see: 'See {{model}}',
+    noResults: 'Nothing found',
+  },
+
   error: {
     title: '⚠️ ️️Oops! Something went wrong',
     showDetails: 'Show details',
     deleteRecord: 'Could not delete record. Please try again',
     updateRecord: 'Could not update record. Please try again',
+    unexpectedError: 'An unexpected error occurred',
   },
   success: {
     createRecord: {
@@ -158,10 +182,21 @@ export const en = {
       description:
         'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
     },
+    deleteView: {
+      title: 'Are you sure you want to delete this view?',
+      description:
+        'If you want to undo this action, you can restore the view from the settings.',
+    },
   },
 
   __history: {
     changed: historyChangedTypes,
+  },
+
+  detailView: {
+    activity: {
+      goTo: 'Go to {{name}}',
+    },
   },
 
   saveViewDropdown: {
@@ -171,5 +206,25 @@ export const en = {
   _creationTime: {
     one: 'Created at',
     other: 'Created at',
+  },
+  updatedAt_: {
+    one: 'Updated at',
+    other: 'Updated at',
+  },
+  updatedBy_: {
+    one: 'Updated by',
+    other: 'Updated by',
+  },
+  deletedAt_: {
+    one: 'Deleted at',
+    other: 'Deleted at',
+  },
+  deleted: {
+    one: 'Deleted',
+    other: 'Deleted',
+  },
+  createdBy_: {
+    one: 'Created by',
+    other: 'Created by',
   },
 };

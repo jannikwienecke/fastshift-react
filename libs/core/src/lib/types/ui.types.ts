@@ -1,4 +1,4 @@
-import { Row } from '../data-model';
+import { RelationalFilterDataModel, Row } from '../data-model';
 import { TranslationKeys } from '../translations';
 import { FieldConfig, RecordType } from './base.types';
 import { CommandHeader, CommandName } from './commands';
@@ -8,6 +8,8 @@ import {
   UserViewForm,
 } from './filter.types';
 import { HistoryType } from './history.types';
+import { UserViewData } from './query.types';
+import { ViewConfigType } from './view-config.types';
 
 export type ComboxboxItem = {
   id: string | number | (string | number)[];
@@ -19,6 +21,7 @@ export type ComboxboxItem = {
   value?: unknown;
   rowValue?: Row;
   rowValues?: Row[];
+  render?: (active: boolean, index: number) => React.ReactNode;
 };
 
 export type DisplayOptionsViewField = {
@@ -61,6 +64,7 @@ export type ListProps<TItem extends ListItem = ListItem> = {
     groupByField: string;
     groupByTableName: string;
     groupLabel: string;
+    groupIcon?: React.FC<any>;
     groups: {
       groupById: string | number | undefined;
       groupByLabel: string;
@@ -168,6 +172,10 @@ export type MakeCommandformPropsOption<T extends RecordType = RecordType> = {
   //
 };
 
+export type MakeRightSidebarOption<T extends RecordType = RecordType> = {
+  //
+};
+
 export type MakeDetailPropsOption<T extends RecordType = RecordType> = {
   onClickRelation?: (field: FieldConfig, row: Row, cb: () => void) => void;
 };
@@ -234,8 +242,19 @@ export type SaveViewDropdownProps = {
   };
 };
 
+export type CommandsDropdownProps = {
+  onOpenCommands: (open: boolean) => void;
+  onSelectCommand: (command: CommandbarItem) => void;
+  commands: {
+    header?: string;
+    items: (CommandbarItem & ComboxboxItem)[];
+  }[];
+  children?: React.ReactNode;
+};
+
 export type PageHeaderProps = {
   onToggleFavorite: () => void;
+  commandsDropdownProps: CommandsDropdownProps;
   starred: boolean;
   viewName: string;
   icon?: React.FC<any>;
@@ -244,11 +263,55 @@ export type PageHeaderProps = {
     label: string;
     onClickParentView: () => void;
   } & DetailPageProps;
-  options: {
-    header?: string;
-    items: (CommandbarItem & ComboxboxItem)[];
-  }[];
-  onSelectOption: (item: CommandbarItem) => void;
+
+  commands: {
+    commandsDropdownProps?: CommandsDropdownProps;
+    primaryCommand?: CommandbarItem | null;
+  };
+
+  query?: {
+    showInput: boolean;
+    query: string;
+
+    onBlur: () => void;
+    onToggleRightSidebar?: () => void;
+    toggleShowInput: () => void;
+    onChange: (query: string) => void;
+  };
+};
+
+export type RightSidebarProps = {
+  isOpen: boolean;
+  viewName: string;
+  viewIcon: React.FC<any>;
+  tableName: string;
+
+  commandsDropdownProps: CommandsDropdownProps;
+  starred: boolean;
+
+  onClose: () => void;
+  onToggleFavorite: () => void;
+
+  tabs: {
+    listRows: Row[];
+    listQueryIsDone: boolean;
+    relationalFilterData: RelationalFilterDataModel;
+    query: string;
+    activeTab: string;
+    currentFilter?: { id?: string | null; tableName?: string | null } | null;
+
+    onTabChange: (tab: string) => void;
+    onQueryChange: (query: string) => void;
+    setFilter: (filter?: { id: string; tableName: string }) => void;
+    getView: (tableName: string) => ViewConfigType | undefined;
+    getUserView: (name: string) => UserViewData | undefined;
+    getTabProps: (tab: string) => {
+      icon: React.FC<any> | undefined;
+      ids: string[];
+      getCountForRow: (row: Row) => number;
+      shouldNotRender: (row: Row) => boolean;
+    };
+  };
 };
 
 export type ConfirmationDialogProps = {
@@ -342,6 +405,11 @@ export type DetailPageProps = {
   viewTypeState: DetailViewTypeState;
   emoji: Emoji | null;
 
+  commands: {
+    commandsDropdownProps: CommandsDropdownProps;
+    primaryCommand?: CommandbarItem | null;
+  };
+
   tabs: {
     detailTabsFields: CommandformItem[];
     activeTabField: CommandformItem | null | undefined;
@@ -360,8 +428,8 @@ export type DetailPageProps = {
 } & FormFieldMethod;
 
 export type CommandbarItemHandler = (options: {
-  row: Row | undefined | null;
-  field: FieldConfig | undefined;
+  row?: Row | undefined | null;
+  field?: FieldConfig | undefined;
   value: ComboxboxItem | undefined;
 }) => void;
 
@@ -372,6 +440,8 @@ export type CommandbarItem = Omit<ComboxboxItem, 'label' | 'viewName'> & {
     | (string & {
         //
       });
+
+  getLabel?: () => string;
   command: CommandName;
   getViewName?: () => string;
   getIsVisible?: () => boolean;
@@ -379,6 +449,22 @@ export type CommandbarItem = Omit<ComboxboxItem, 'label' | 'viewName'> & {
   options?: {
     keepCommandbarOpen?: boolean;
   };
+
+  onCheckedChange?: (checked: boolean) => void;
+  subCommands?: CommandbarItem[];
+  dropdownOptions?: {
+    showDivider?: boolean;
+  };
+  primaryCommand?: boolean;
+  primaryCommandOptions?: {
+    style?: {
+      type?: 'success' | 'danger';
+    };
+  };
+  requiredRow?: boolean;
+  allowMultiple?: boolean;
+  rows?: Row[];
+  priority?: number;
 };
 
 export type CommandbarProps = {
@@ -387,6 +473,7 @@ export type CommandbarProps = {
     header: string;
     items: (CommandbarItem & ComboxboxItem)[];
   }[];
+  activeItem?: ComboxboxItem | null;
   headerLabel: string;
   inputPlaceholder: string;
   query?: string;

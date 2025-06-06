@@ -1,29 +1,27 @@
-import { DotsHorizontalIcon } from '@radix-ui/react-icons';
-import {
-  Layers3Icon,
-  MoreHorizontal,
-  PencilIcon,
-  StarIcon,
-} from 'lucide-react';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-  DropdownMenuItem,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  Button,
-} from './components';
 import {
   getFieldLabel,
   PageHeaderProps,
-  t,
   useTranslation,
 } from '@apps-next/core';
+import {
+  ChevronsUpDown,
+  Layers3Icon,
+  PanelRightIcon,
+  SearchIcon,
+  StarIcon,
+} from 'lucide-react';
+import { CommandsDropdown } from './commands-dropdown';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+  SearchInput,
+} from './components';
+import { StarredIcon } from './starred-icon';
 import { cn } from './utils';
 
 const DefaultPageHeaderMain = (props: PageHeaderProps) => {
@@ -32,16 +30,17 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
   return (
     <div
       data-testid="main-page-header"
-      className="flex flex-row items-center justify-between"
+      className="flex flex-row items-center justify-between w-full"
     >
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem className="text-sm">
+          <BreadcrumbItem className="text-[13px]">
+            {/* FIXME translation */}
             <BreadcrumbLink href="/components">Views</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
 
-          <BreadcrumbItem className="text-sm">
+          <BreadcrumbItem className="text-[13px]">
             <BreadcrumbPage className="flex flex-row gap-4 items-center">
               <div className="flex flex-row gap-2 items-center">
                 <div>
@@ -56,57 +55,83 @@ const DefaultPageHeaderMain = (props: PageHeaderProps) => {
                 {props.viewName}
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div>
-                    <MoreHorizontal className="text-foreground/50" />
-                    <span className="sr-only">{t('common.more')}</span>
-                  </div>
-                </DropdownMenuTrigger>
+              <CommandsDropdown {...props.commandsDropdownProps} />
 
-                <DropdownMenuContent className="w-56 rounded-lg text-sm">
-                  {props.options?.map((option, index) => {
-                    return (
-                      <div key={index}>
-                        {option.items.map((item) => {
-                          return (
-                            <DropdownMenuItem
-                              key={item.label}
-                              onClick={() => {
-                                // item.onClick();
-                                props.onSelectOption?.(item);
-                              }}
-                            >
-                              {item.icon ? (
-                                <item.icon className="text-muted-foreground" />
-                              ) : null}
-
-                              <span className="text-muted-foreground">
-                                {item.label}
-                              </span>
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <StarIcon
-                data-testid={props.starred ? 'starred' : 'unstarred'}
-                className={cn(
-                  'h-4 w-4 cursor-pointer',
-                  props.starred ? 'text-yellow-500' : 'text-foreground'
-                )}
-                onClick={() => {
-                  props.onToggleFavorite?.();
-                }}
-              />
+              <StarredIcon {...props} />
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <div data-testid="right-header-actions" className="pr-4">
+        {props.query?.showInput ? (
+          <SearchInput
+            onChange={(e) => {
+              props.query?.onChange(e.target.value);
+            }}
+            autoFocus
+            placeholder="Find in view..."
+            onBlur={props.query.onBlur}
+          />
+        ) : (
+          <div className="flex flex-row gap-0 items-center">
+            <div className="pr-4 flex flex-row gap-2 items-center">
+              {props.commands?.primaryCommand ? (
+                <Button
+                  variant={'ghost'}
+                  className="text-xs flex flex-row items-center gap-1"
+                  size={'sm'}
+                  onClick={() =>
+                    props.commands.primaryCommand &&
+                    props.commands.commandsDropdownProps?.onSelectCommand?.(
+                      props.commands.primaryCommand
+                    )
+                  }
+                >
+                  {props.commands.primaryCommand.icon ? (
+                    <props.commands.primaryCommand.icon className="h-4 w-4" />
+                  ) : null}
+                  <div>{props.commands.primaryCommand.label}</div>
+                </Button>
+              ) : null}
+
+              {props.commands?.commandsDropdownProps?.commands.length ? (
+                <CommandsDropdown {...props.commands.commandsDropdownProps}>
+                  <div
+                    className="flex flex-row items-center gap-1"
+                    onClick={(e) => {
+                      props.commands.commandsDropdownProps?.onOpenCommands?.(
+                        true
+                      );
+                    }}
+                  >
+                    <div className="text-xs">Commands</div>
+                    <ChevronsUpDown className="size-4" />
+                  </div>
+                </CommandsDropdown>
+              ) : null}
+            </div>
+
+            <Button
+              variant={'ghost'}
+              size="icon"
+              onClick={props.query?.toggleShowInput}
+            >
+              <SearchIcon className="h-4 w-4" />
+            </Button>
+
+            {props.query?.onToggleRightSidebar ? (
+              <Button
+                variant={'ghost'}
+                size="icon"
+                onClick={props.query?.onToggleRightSidebar}
+              >
+                <PanelRightIcon className="h-4 w-4" />
+              </Button>
+            ) : null}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -156,42 +181,7 @@ const DefaultPageHeaderDetail = (props: PageHeaderProps) => {
                 {props.detail?.label ?? ''}
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div>
-                    <MoreHorizontal className="text-foreground/50" />
-                    <span className="sr-only">{t('common.more')}</span>
-                  </div>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent className="w-56 rounded-lg text-sm">
-                  {props.options.map((option, index) => {
-                    return (
-                      <div key={index}>
-                        {option.items.map((item) => {
-                          return (
-                            <DropdownMenuItem
-                              key={item.label}
-                              onClick={() => {
-                                // item.onClick();
-                                props.onSelectOption?.(item);
-                              }}
-                            >
-                              {item.icon ? (
-                                <item.icon className="text-muted-foreground" />
-                              ) : null}
-
-                              <span className="text-muted-foreground">
-                                {item.label}
-                              </span>
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <CommandsDropdown {...props.commandsDropdownProps} />
 
               <StarIcon
                 data-testid={props.starred ? 'starred' : 'unstarred'}

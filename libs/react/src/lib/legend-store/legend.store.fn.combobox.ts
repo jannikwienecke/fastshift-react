@@ -112,7 +112,8 @@ export const comboboxHandleQueryData: StoreFn<'comboboxHandleQueryData'> =
   (store$) => (data) => {
     const prevSelected = comboboxStore$.selected.get();
     const field = comboboxStore$.field.get();
-    const tableName = getRelationTableName(field);
+    const tableName =
+      comboboxStore$.tableName.get() || getRelationTableName(field);
 
     const dataModel = makeData(store$.views.get(), tableName)(data);
 

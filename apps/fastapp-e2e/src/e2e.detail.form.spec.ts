@@ -74,7 +74,12 @@ test.describe('Detail Page Form Test', () => {
 
     // getby label "label"
     await updateDetailFormValue(props, 'label', newLabel);
+
+    await waitFor(mainPage.page, 300);
+
     await updateDetailFormValue(props, 'description', newDescription);
+
+    await waitFor(mainPage.page, 100);
 
     await mainPage.sidebar
       .getByText(/projects/i)

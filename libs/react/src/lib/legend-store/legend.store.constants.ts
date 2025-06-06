@@ -53,6 +53,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   LegendStore,
   | 'dataModel'
   | 'dataModelBackup'
+  | 'relationalFilterData'
   | 'views'
   | 'uiViewConfig'
   | 'viewConfigManager'
@@ -63,6 +64,7 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'inputDialog'
   | 'globalQuery'
   | 'globalQueryDebounced'
+  | 'globalQueryData'
   | 'paginateOptions'
   | 'fetchMore'
   | 'displayOptions'
@@ -78,10 +80,16 @@ export const DEFAULT_LEGEND_STORE: Pick<
   | 'viewId'
   | 'userViews'
   | 'ignoreNextQueryDict'
+  | 'pageHeader'
+  | 'viewQuery'
+  | 'debouncedViewQuery'
+  | 'rightSidebar'
+  | 'ignoreNextUserViewData'
 > = {
   state: 'pending',
   dataModel: {} as DataModelNew,
   dataModelBackup: { rows: [] } as DataModelNew,
+  relationalFilterData: {},
   views: {} as RegisteredViews,
   userViews: [],
   viewConfigManager: {} as BaseViewConfigManagerInterface,
@@ -109,7 +117,11 @@ export const DEFAULT_LEGEND_STORE: Pick<
     // isFetched: false,
     isDone: false,
   },
-  globalQuery: '',
+
+  rightSidebar: {
+    open: false,
+  },
+
   globalQueryDebounced: '',
   combobox: {
     values: null,
@@ -126,6 +138,16 @@ export const DEFAULT_LEGEND_STORE: Pick<
   inputDialog: {
     valueDict: {},
   },
+
+  pageHeader: {
+    showSearchInput: false,
+  },
+
+  viewQuery: '',
+  debouncedViewQuery: '',
+  globalQuery: '',
+  globalQueryData: {},
+
   commands: [],
   displayOptions: {
     // showEmptyGroups?,
@@ -168,4 +190,5 @@ export const DEFAULT_LEGEND_STORE: Pick<
   },
 
   userViewData: undefined,
+  ignoreNextUserViewData: 0,
 };

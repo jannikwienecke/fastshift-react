@@ -3,6 +3,7 @@ import {
   FormFieldProps,
   getFieldLabel,
   HistoryType,
+  useTranslation,
 } from '@apps-next/core';
 import { CubeIcon, DotsHorizontalIcon } from '@radix-ui/react-icons';
 import {
@@ -17,7 +18,6 @@ import { Button } from '../components';
 import { Checkbox } from '../components/checkbox';
 import { EmojiPickerDialog } from '../emoji-picker-dialog';
 import { cn } from '../utils';
-import { BubbleItem } from '../standard-components';
 
 const DetailPageHeader = (props: DetailPageProps) => {
   return (
@@ -153,7 +153,7 @@ const DetailPageIcon = (props: DetailPageProps) => {
 
 const DetailPagePropertiesHeader = (props: DetailPageProps) => {
   return (
-    <div className="py-3 text-sm flex flex-row justify-between items-center text-xs">
+    <div className="py-3 flex flex-row justify-between items-center text-sm">
       <div className="text-foreground/70">Properties</div>
 
       <div className="flex flex-row gap-3 items-center">
@@ -197,6 +197,7 @@ const DetailTabs = (
     RenderActivityList: React.FC<{ historyData: HistoryType[] }>;
   }
 ) => {
+  const { t } = useTranslation();
   if (!props.tabs) return null;
 
   const {
@@ -267,11 +268,15 @@ const DetailTabs = (
                 <div className="flex group flex-row items-center rounded-sm italic">
                   <div className="flex flex-row items-center">
                     <div className="flex flex-row gap-1 items-center">
-                      <div className="text-foreground/70">Go to</div>
+                      <div className="text-foreground/70">
+                        {t('detailView.activity.goTo', {
+                          name: '',
+                        })}
+                      </div>
                       <div className="pl-1">
                         {props.tabs?.activeTabField?.icon ? (
                           <>
-                            <props.tabs.activeTabField.icon />
+                            <props.tabs.activeTabField.icon className="h-4 w-4" />
                           </>
                         ) : null}
                       </div>

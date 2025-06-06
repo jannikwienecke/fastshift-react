@@ -11,7 +11,7 @@ import {
   displayOptionsToggleShowDeleted,
   displayOptionsToggleShowEmptyGroups,
   displayOptionsToggleSorting,
-} from './legend-store.fn.displayOptions';
+} from './legend.displayOptions.fn';
 import {
   commandbarClose,
   commandbarOpen,
@@ -75,6 +75,7 @@ import {
   handleIncomingData,
   handleIncomingDetailData,
   handleIncomingRelationalData,
+  handleIncomingRelationalFilterData,
   openSpecificModal,
 } from './legend.store.fn.global';
 import {
@@ -104,17 +105,20 @@ import {
   updateDetailViewMutation,
   updateViewMutation,
 } from './legend.mutations.views';
+import { updateUserViews } from './legend.views.fn';
 
 export const store$ = observable<LegendStore>({
   ...DEFAULT_LEGEND_STORE,
   state: 'pending',
   mutating: undefined,
-
+  commandsDisplay: { type: 'closed' },
   handleIncomingData: (...props) => handleIncomingData(store$)(...props),
   handleIncomingRelationalData: (...props) =>
     handleIncomingRelationalData(store$)(...props),
   handleIncomingDetailData: (...props) =>
     handleIncomingDetailData(store$)(...props),
+  handleIncomingRelationalFilterData: (...props) =>
+    handleIncomingRelationalFilterData(store$)(...props),
   createDataModel: (...props) => createDataModel(store$)(...props),
   createRelationalDataModel: (...props) =>
     createRelationalDataModel(store$)(...props),
@@ -225,4 +229,6 @@ export const store$ = observable<LegendStore>({
     updateDetailViewMutation(store$)(...props),
   createViewMutation: (...props) => createViewMutation(store$)(...props),
   saveSubUserView: (...props) => saveSubUserView(store$)(...props),
+
+  updateUserViews: (...props) => updateUserViews(store$)(...props),
 });

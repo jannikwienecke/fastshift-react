@@ -1,4 +1,5 @@
 import {
+  _filter,
   _log,
   FilterType,
   makeData,
@@ -8,11 +9,16 @@ import { Observable, observable } from '@legendapp/state';
 import { comboboxDebouncedQuery$ } from './legend.combobox.helper';
 import { querySubListViewOptions$ } from './legend.queryProps.derived';
 import { selectState$, xSelect } from './legend.select-state';
+import { parentView$ } from './legend.shared.derived';
 import { comboboxStore$ } from './legend.store.derived.combobox';
 import { LegendStore } from './legend.store.types';
-import { _hasOpenDialog$, hasOpenDialog$ } from './legend.utils';
+import {
+  _hasOpenDialog$,
+  getViewConfigManager,
+  hasOpenDialog$,
+} from './legend.utils';
 import { localModeEnabled$, setGlobalDataModel } from './legend.utils.helper';
-import { parentView$ } from './legend.shared.derived';
+import { getRows } from './legend.local.filtering';
 
 export const addEffects = (store$: Observable<LegendStore>) => {
   const timeout$ = observable<number | null>(null);
@@ -53,6 +59,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     ) {
       store$.combobox.selected.set([]);
       store$.combobox.values.set(null);
+
       store$.combobox.query.set('');
       store$.combobox.multiple.set(false);
       store$.combobox.datePicker.set(null);
@@ -73,14 +80,26 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     });
   }).onChange(() => null);
 
+  let timeoutGlobalQuery: NodeJS.Timeout;
   observable(function handleQueryCommandbarChange() {
     const query = store$.commandbar.query.get();
 
-    const fieldCommandbar = store$.commandbar.selectedViewField.get();
+    if (store$.combobox.query.get() === '') {
+      store$.globalQueryDebounced.set('');
+    } else {
+      clearTimeout(timeoutGlobalQuery);
+      timeoutGlobalQuery = setTimeout(() => {
+        store$.globalQueryDebounced.set(store$.combobox.query.get());
+      }, 200);
+    }
 
-    if (!fieldCommandbar?.name) return;
+    const fieldCommandbar = store$.commandbar.selectedViewField.get();
+    const openModelCommandbar = store$.commandbar.activeOpen.tableName.get();
+
+    if (!fieldCommandbar?.name && !openModelCommandbar) return;
 
     comboboxStore$.query.set(query ?? '');
+
     store$.combobox.query.set(query ?? '');
   }).onChange(() => null);
 
@@ -94,9 +113,27 @@ export const addEffects = (store$: Observable<LegendStore>) => {
 
     const filters = changes.value;
 
+    const prevLength = changes?.changes?.[0].prevAtPath?.length ?? 0;
+    const newLength = changes?.changes?.[0].valueAtPath?.length ?? 0;
+    const newFilterAdded = newLength > prevLength;
+    const filterRemoved = newLength < prevLength;
+
     _log.debug('handleFilterChange: ', filters);
 
-    if (localModeEnabled$.get()) {
+    const queryIsDone = store$.fetchMore.isDone.get();
+    if (queryIsDone && filterRemoved) {
+      store$.debouncedViewQuery.set(store$.viewQuery.get());
+    }
+
+    if (queryIsDone && newFilterAdded) {
+      console.debug(
+        'handleFilterChange: fetchMore is done. Resetting fetchMore state'
+      );
+
+      if (parentView$.get()) {
+        store$.saveSubUserView();
+      }
+    } else if (localModeEnabled$.get()) {
       _log.debug('handleFilterChange: local mode. No fetchMore');
 
       if (parentView$.get()) {
@@ -342,12 +379,16 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     }, 10);
   });
 
+  let lastupdated = 0;
   store$.dataModel.rows.forEach((row) => {
     row.updated.onChange((changes) => {
       if (changes.isFromSync) return;
       const prevAtPath = changes.changes?.[0].prevAtPath;
       const valueAtPath = changes.changes?.[0].valueAtPath;
-      if (!prevAtPath && valueAtPath) {
+
+      if (!prevAtPath && valueAtPath && valueAtPath !== lastupdated) {
+        lastupdated = valueAtPath;
+
         const queryKey = querySubListViewOptions$.get()?.queryKey;
         const rows = store$.dataModel.rows.get();
 
@@ -425,6 +466,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         return false;
       if ('relationQuery' in key) return false;
       if (key?.['viewId'] !== null) return false;
+      if (key?.['parentViewName'] !== null) return false;
 
       const data = store$.api.queryClient.getQueryData(q[0]);
       return !!data;
@@ -459,5 +501,55 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     if (!changes.value) {
       store$.detail.useTabsForComboboxQuery.set(false);
     }
+  });
+
+  // handle debounced query changes
+  let timeout: NodeJS.Timeout;
+  let wasDoneOnStart = false;
+
+  store$.fetchMore.isDone.onChange((changes) => {
+    const isDone = changes.value;
+    if (!isDone) {
+      wasDoneOnStart = false;
+    }
+  });
+
+  store$.viewQuery.onChange((changes) => {
+    const query = changes.value;
+
+    const prevQuery = changes.changes?.[0].prevAtPath?.[0];
+
+    if (!prevQuery && query.length) {
+      wasDoneOnStart = store$.fetchMore.isDone.get();
+    }
+
+    if (store$.fetchMore.isDone.get() && wasDoneOnStart) {
+      const rows = getRows(store$);
+
+      const fields = getViewConfigManager()
+        .getSearchableFields()
+        ?.map((f) => f.field.toString());
+
+      const res = _filter(
+        rows.map((r) => r.raw),
+        fields ?? []
+      )
+        .withQuery(query)
+        .map((r) => r.id) as string[];
+
+      const filteredRows = rows.filter((row) => res.includes(row.id));
+
+      store$.dataModel.rows.set(filteredRows);
+    } else {
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        store$.debouncedViewQuery.set(query);
+      }, 200);
+    }
+  });
+
+  store$.filter.filters.onChange((changes) => {
+    store$.rightSidebar.filter.set(undefined);
   });
 };

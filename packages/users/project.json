@@ -1,0 +1,8 @@
+{
+  "name": "users-module",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/users/src",
+  "projectType": "library",
+  "tags": ["scope:convex-app"],
+  "targets": {}
+}

@@ -87,3 +87,19 @@ export function createViewConfig<T extends GetTableName>(
 
   return viewConfig;
 }
+
+export function _createViewConfig<T extends GetTableName>(
+  tableName: T,
+  config: Partial<
+    Omit<ViewConfigType<T>, 'viewFields' | 'tableName' | 'viewName'>
+  > &
+    Pick<ViewConfigBaseInfo<T>, 'icon'>
+) {
+  return {
+    tableName,
+    configOptions: {
+      viewName: tableName as string,
+      ...config,
+    },
+  };
+}

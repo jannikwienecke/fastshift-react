@@ -21,13 +21,17 @@ import {
   isDetail,
   isTabs,
 } from './legend.utils';
-import { setGlobalDataModel } from './legend.utils.helper';
+import {
+  dispatchDeleteMutation,
+  setGlobalDataModel,
+} from './legend.utils.helper';
 
 // Temporary states
 const checkedRows$ = observable<Row[]>([]);
 const idsToDelete$ = observable<string[]>([]);
-const isRunning$ = observable(false);
+export const isRunning$ = observable(false);
 export const ignoreNewData$ = observable(0);
+export const ignoreNewDetailData$ = observable(0);
 
 export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   (store$) =>
@@ -42,7 +46,7 @@ export const selectRowsMutation: StoreFn<'selectRowsMutation'> =
   }) => {
     const viewConfigManager = getViewConfigManager();
 
-    _log.debug('___RUN Mutation', { newRows, idsToDelete, newIds });
+    console.debug('___RUN Mutation', { newRows, idsToDelete, newIds });
 
     // Perform optimistic update
     const rollback = optimisticUpdateStore({
@@ -221,22 +225,19 @@ export const deleteRecordMutation: StoreFn<'deleteRecordMutation'> =
       } else {
         console.debug('Record deleted successfully');
         onSuccess?.();
+        if (isDetail()) {
+          // TODO: add abstraction for this
+          // also fix flashing when navigating back to list view (see in 3g network)
+          store$.navigation.state.set({
+            type: 'navigate',
+            view: store$.detail.viewConfigManager.getViewName(),
+          });
+        }
+        store$.commandbarClose();
       }
     };
 
-    if (viewConfigManager.getUiViewConfig().onDelete?.showConfirmation) {
-      store$.confirmationAlert.open.set(true);
-      store$.confirmationAlert.title.set('confirmationAlert.delete.title');
-      store$.confirmationAlert.description.set(
-        'confirmationAlert.delete.description'
-      );
-
-      store$.confirmationAlert.onConfirm.set({
-        cb: runMutation,
-      });
-    } else {
-      runMutation();
-    }
+    dispatchDeleteMutation(runMutation);
   };
 
 export const createRecordMutation: StoreFn<'createRecordMutation'> =
@@ -246,8 +247,6 @@ export const createRecordMutation: StoreFn<'createRecordMutation'> =
     onSuccess,
     onError
   ) => {
-    const viewConfigManager = getViewConfigManager();
-
     const row = createRow({
       ...record,
       id: '_tempId' + Math.random().toString(36).substring(2, 9),
@@ -354,6 +353,7 @@ export const optimisticUpdateStore = ({
   )(updatedRawRows).rows;
 
   // Update context menu
+  // TODO DUPLICATE CODE
   const updatedRow = makeData(store$.views.get(), viewName)([updatedRowData])
     .rows?.[0];
 
@@ -401,8 +401,6 @@ export const optimisticUpdateStore = ({
     }
 
     if (updateGlobalDataModel && !isDetail()) {
-      console.debug('____UPDATE GLOBAL DATA MODEL');
-
       updatedRows.map((r) => {
         const hasRow = r.id === updatedRow.id;
         if (hasRow) {

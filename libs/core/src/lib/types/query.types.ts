@@ -13,7 +13,9 @@ import { RegisteredViews, ViewConfigType } from './view-config.types';
 export type QueryProps = {
   query?: string;
   viewId: string | null;
+  isFetchAll?: boolean;
   filters?: string;
+  tempFilter?: string | undefined;
   displayOptions?: string;
   paginateOptions?: {
     cursor: ContinueCursor;
@@ -33,6 +35,12 @@ export type QueryProps = {
   disabled?: boolean;
 };
 
+export type RelationalFilterQueryProps = {
+  tableName: string;
+  withCount: boolean;
+  ids: string[] | undefined;
+};
+
 export type QueryDto = {
   viewConfig?: ViewConfigType;
   viewConfigManager?: BaseViewConfigManagerInterface;
@@ -40,6 +48,7 @@ export type QueryDto = {
   parentViewName?: string | null;
   parentId?: string | null;
   filters?: string;
+  tempFilter?: string | undefined;
   displayOptions?: string;
   onlyRelationalData?: boolean;
 } & Omit<QueryProps, 'viewConfigManager'>;
@@ -64,17 +73,19 @@ export type ContinueCursor = {
 
 export type UserViewData = {
   id: string;
-  baseView: string;
-  displayOptions: string;
-  filters: string;
-  name: string;
-  slug: string;
-  description: string | null;
+  baseView?: string;
+  displayOptions?: string;
+  filters?: string;
+  name?: string;
+  slug?: string;
+  description?: string | null;
   parentModel?: string;
   rowId?: string;
   rowLabelFieldName?: string;
   starred?: boolean;
+  // FIXME _deleted AND  deleted_ -> remove "_deleted"
   _deleted?: boolean;
+  deleted_?: boolean;
   emoji?: Emoji;
 };
 
@@ -99,6 +110,13 @@ export type QueryReturnDto<T extends RecordType = RecordType> = {
   isDone: boolean;
   allIds: string[];
   view?: UserViewData;
+};
+
+export type RelationalFilterQueryDto = {
+  [table: string]: {
+    record: RecordType;
+    count: number | null;
+  }[];
 };
 
 export type QueryError = {

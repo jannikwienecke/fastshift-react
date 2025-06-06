@@ -14,24 +14,26 @@ import {
   DisplayOptionsViewField,
   FieldConfig,
   FilterType,
+  HistoryType,
   MakeListPropsOptions,
+  MakeUserStoreCommand,
+  Mutation,
   MutationDto,
   MutationHandlerErrorType,
   MutationReturnDto,
-  HistoryType,
   QueryRelationalData,
   QueryReturnOrUndefined,
   RecordType,
   RegisteredViews,
   RelationalDataModel,
+  RelationalFilterDataModel,
+  RelationalFilterQueryDto,
   Row,
   TranslationKeys,
   UiViewConfig,
-  UserStoreCommand,
   UserViewData,
   UserViewForm,
   ViewConfigType,
-  Mutation,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { QueryClient } from '@tanstack/react-query';
@@ -137,6 +139,7 @@ export type LegendStore = {
   handleIncomingData: (props: QueryReturnOrUndefined) => void;
   handleIncomingRelationalData: (props: QueryReturnOrUndefined) => void;
   handleIncomingDetailData: (props: QueryReturnOrUndefined) => void;
+  handleIncomingRelationalFilterData: (data: RelationalFilterQueryDto) => void;
 
   state:
     | 'pending'
@@ -145,12 +148,15 @@ export type LegendStore = {
     | 'updating-display-options'
     | 'filter-changed'
     | 'mutating'
-    | 'invalidated';
+    // | 'invalidated'
+    | 'temp-filter-changed';
 
   // MAIN DATA MODEL
   dataModel: DataModelNew;
+  allIds?: string[];
   dataModelBackup: DataModelNew;
   relationalDataModel: RelationalDataModel;
+  relationalFilterData: RelationalFilterDataModel;
   uiViewConfig: UiViewConfig;
 
   mutating:
@@ -185,12 +191,26 @@ export type LegendStore = {
   viewConfigManager: BaseViewConfigManagerInterface;
   views: RegisteredViews;
   userViews: UserViewData[];
-  commands: UserStoreCommand[];
+  updateUserViews: (views: UserViewData[]) => void;
+
+  commands: MakeUserStoreCommand[];
   userViewData: UserViewData | undefined | null;
+  ignoreNextUserViewData: number;
 
   viewId: string | null;
 
+  commandsDisplay: {
+    type:
+      | 'view'
+      | 'view-sidebar'
+      | 'detail-row'
+      | 'closed'
+      | 'commandbar'
+      | 'list-actions';
+  };
+
   api?: {
+    apiKey?: string;
     mutate?: (args: MutationDto) => void;
     mutateAsync?: (args: MutationDto) => Promise<MutationReturnDto>;
     queryClient?: QueryClient;
@@ -200,6 +220,9 @@ export type LegendStore = {
 
   globalQuery: string;
   globalQueryDebounced: string;
+  globalQueryData: {
+    [key: string]: Row[] | null;
+  };
 
   errorDialog: {
     error: MutationHandlerErrorType | null;
@@ -213,7 +236,7 @@ export type LegendStore = {
       focus: boolean;
     };
     onClickRelation?: { fn: MakeListPropsOptions['onClickRelation'] };
-    selected: RecordType[];
+    selected: Row[];
     selectedRelationField?: {
       field: FieldConfig;
       row?: Row | null;
@@ -232,6 +255,9 @@ export type LegendStore = {
     selectedViewField?: FieldConfig;
     activeItem: ComboxboxItem | null;
     activeRow: Row | null;
+    activeOpen?: {
+      tableName: string;
+    } | null;
   } & Omit<
     CommandbarProps,
     'onClose' | 'onSelect' | 'onClose' | 'onInputChange'
@@ -363,7 +389,11 @@ export type LegendStore = {
     onSuccess?: () => void
   ) => void;
   updateDetailViewMutation: (props: Partial<UserViewData>) => void;
-  createViewMutation: (form: UserViewForm, onSuccess?: () => void) => void;
+  createViewMutation: (
+    form: UserViewForm,
+    props: Partial<UserViewData>,
+    onSuccess?: () => void
+  ) => void;
   saveSubUserView: () => void;
 
   // commandbar
@@ -464,6 +494,25 @@ export type LegendStore = {
       fn: (field: FieldConfig, row: Row, cb: () => void) => void;
     };
   };
+
+  pageHeader: {
+    showSearchInput: boolean;
+  };
+
+  rightSidebar: {
+    open: boolean;
+    filter?: {
+      tableName?: string | null;
+      id?: string | null;
+    };
+  };
+
+  viewQuery: string;
+  debouncedViewQuery: string;
+
+  // when we are on a view with more than MAX_FETCH_LIMIT_QUERY items
+  // we can set this to true to fetch all items at once
+  isFetchAll?: boolean;
 
   detailpageChangeInput: (
     field: CommandformItem,

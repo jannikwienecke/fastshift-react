@@ -27,7 +27,7 @@ export const getIdsFromParentView = async (
           .collect()) as UserViewData[];
 
         const parentViewName = allUserViews.find(
-          (v) => v.name.toLowerCase() === args.parentViewName?.toLowerCase()
+          (v) => v.name?.toLowerCase() === args.parentViewName?.toLowerCase()
         )?.baseView;
 
         parentView = getViewByName(args.registeredViews, parentViewName ?? '');

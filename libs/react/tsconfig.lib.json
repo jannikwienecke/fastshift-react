@@ -24,6 +24,7 @@
     "src/**/*.jsx",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/lib/legend-store/legend.saveViewDropdown.adapter.tsx"
+    "src/lib/legend-store/legend.saveViewDropdown.adapter.tsx",
+    "src/lib/legend-store/legend.displayOptions.derived.ts"
   ]
 }

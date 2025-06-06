@@ -16,11 +16,10 @@ import {
 } from '../ui-adapter/filter-adapter';
 import { LegendStore } from './legend.store.types';
 import { copyRow } from './legend.utils';
-import { filterRowsByShowDeleted } from './legend.utils.helper';
-
-const getFilteredRowsByIds = (rows: Row<RecordType>[], ids: string[]) => {
-  return ids.map((id) => rows.find((row) => row.id === id) as Row);
-};
+import {
+  filterRowsByShowDeleted,
+  localModeEnabled$,
+} from './legend.utils.helper';
 
 const handleDateFilter = (
   rows: Row<RecordType>[],
@@ -86,7 +85,7 @@ const handleBooleanFilter = (
   return rows.filter((row) => row.getValue(filter.field.name) === filterValue);
 };
 
-const getRows = (store$: Observable<LegendStore>) => {
+export const getRows = (store$: Observable<LegendStore>) => {
   const backup = store$.dataModelBackup.get();
 
   const rows: Row<RecordType>[] = backup
@@ -163,6 +162,8 @@ export const applyFilter = (
 export const addLocalFiltering = (store$: Observable<LegendStore>) => {
   store$.filter.filters.onChange((changes) => {
     if (store$.state.get() === 'pending') return;
+
+    if (!localModeEnabled$.get() && !store$.fetchMore.isDone.get()) return;
 
     applyFilter(store$, changes.value);
   });

@@ -4,6 +4,7 @@ import {
   MakeDetailPropsOption,
   UiViewConfig,
   ViewConfigType,
+  ViewRegistry,
   ViewRegistryEntry,
 } from '@apps-next/core';
 import { observable } from '@legendapp/state';
@@ -15,7 +16,7 @@ const viewsConfigStore = observable<{
   [key: string]: ViewRegistryEntry;
 }>({});
 
-const addView = (config: ViewConfigType) => {
+const addView = <T extends ViewConfigType<any>>(config: T) => {
   _log.debug('viewsConfigStore:addView', config.viewName);
 
   viewsConfigStore.set({
@@ -88,7 +89,7 @@ const getViews = () => {
   return viewsConfigStore.get();
 };
 
-export const viewRegistry = {
+export const viewRegistry: ViewRegistry = {
   addView,
   getView,
   getViews,

@@ -7,15 +7,16 @@ import {
   useRouteContext,
 } from '@tanstack/react-router';
 import React from 'react';
-import { loading$ } from '../application-store/app.store';
+import { pageLoaderIsLoading } from '../application-store/app.store';
 import {
   dispatchLoadDetailOverviewView,
   dispatchLoadDetailSubView,
   dispatchLoadView,
 } from '../application-store/app.store.utils';
 import { getUserViewsQuery, queryClient } from '../query-client';
+import { useGlobalSearch } from '../shared/hooks/use-global-search';
 import { getView } from '../shared/utils/app.helper';
-import { DefaultViewTemplate } from '../views/default-view-template';
+import { DefaultViewTemplate } from '@apps-next/shared';
 
 export const Route = createFileRoute('/fastApp/$view')({
   loader: async (props) => {
@@ -34,7 +35,7 @@ export const Route = createFileRoute('/fastApp/$view')({
         await dispatchLoadDetailOverviewView(props, true);
       }
 
-      loading$.set(false);
+      pageLoaderIsLoading.set(false);
       return;
     }
 
@@ -44,15 +45,15 @@ export const Route = createFileRoute('/fastApp/$view')({
       } else {
         await dispatchLoadDetailOverviewView(props);
       }
-      loading$.set(false);
+      pageLoaderIsLoading.set(false);
     } else if (view) {
       if (props.cause !== 'preload') {
-        loading$.set(true);
+        pageLoaderIsLoading.set(true);
       }
 
       await dispatchLoadView(props, true);
 
-      loading$.set(false);
+      pageLoaderIsLoading.set(false);
     }
   },
 
@@ -64,6 +65,8 @@ const ViewMainComponent = observer(() => {
 
   const params = useParams({ strict: false });
   const context = useRouteContext({ strict: false });
+
+  useGlobalSearch();
 
   const prevViewRef = React.useRef<string | null>(
     (params.view as string) + (params.id ?? '') + (params.model ?? '')
@@ -79,7 +82,7 @@ const ViewMainComponent = observer(() => {
   if (params.id && viewKey !== prevViewRef.current) {
     dispatchLoadDetailOverviewView({ params, cause: '', context });
     prevViewRef.current = viewKey;
-  } else if (!loading$.get() && viewKey && !params.id) {
+  } else if (!pageLoaderIsLoading.get() && viewKey && !params.id) {
     prevViewRef.current = viewKey;
 
     dispatchLoadView({
@@ -92,7 +95,7 @@ const ViewMainComponent = observer(() => {
   const { viewData } = getView({ params });
   const ViewComponent = viewData?.main;
 
-  if (!viewData || loading$.get()) {
+  if (!viewData || pageLoaderIsLoading.get()) {
     return null;
   }
 

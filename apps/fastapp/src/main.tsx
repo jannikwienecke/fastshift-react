@@ -8,13 +8,13 @@ import {
 } from '@apps-next/convex-adapter-app';
 
 import { logger, QueryReturnOrUndefined, UserViewData } from '@apps-next/core';
-import './i18n';
 import { convex, getUserViews, queryClient } from './query-client';
 import { routeTree } from './routeTree.gen';
 
-import './views';
+import { store$, viewRegistry } from '@apps-next/react';
+import registerAppViews from './register-app-views';
 import './shared/hooks/app.persist';
-import { store$ } from '@apps-next/react';
+import { initI18n } from './initialize-i18n';
 
 // syncObservable(store$, {
 //   persist: {
@@ -23,9 +23,16 @@ import { store$ } from '@apps-next/react';
 //   },
 // });
 
+initI18n();
+
 const isDev = import.meta.env.MODE === 'development';
 
 logger.setLevel(isDev ? 'info' : 'warn');
+
+console.debug('FastApp main.tsx loaded');
+console.debug('Registering app views...');
+registerAppViews(viewRegistry);
+console.debug('App views registered');
 
 const router = createRouter({
   routeTree,
@@ -86,6 +93,7 @@ ReactDOM.createRoot(root).render(
     globalConfig={config}
     viewLoader={api.query.viewLoader}
     viewMutation={api.query.viewMutation}
+    relationalFilterQuery={api.query.getViewRelationalFilterOptions}
   >
     <RouterProvider router={router} />
   </ConvexQueryProvider>

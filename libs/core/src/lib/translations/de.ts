@@ -1,5 +1,15 @@
 import { operatorLabels } from '../filters';
-import { headers, en } from './en';
+import { en } from './en';
+import { CommandHeader as commandHeaders } from '../types/commands';
+
+const headers: {
+  [key in commandHeaders]: string;
+} = {
+  view: 'Ansicht',
+  admin: 'Admin',
+  navigation: 'Navigation',
+  'global-query': 'Suche nach "{{query}}"',
+};
 
 export const de = {
   filter: {
@@ -97,6 +107,8 @@ export const de = {
     to: 'zu',
     from: 'von',
     this: 'das',
+    views: 'Ansichten',
+    ok: 'OK',
   },
 
   userViewForm: {
@@ -110,6 +122,13 @@ export const de = {
   richEditor: {
     placeholder: '{{name}} hinzufügen...',
   },
+
+  rightSidebar: {
+    noModelUser: '{{model}} nicht verwendet',
+    see: '{{model}} ansehen',
+    noResults: 'Keine Ergebnisse gefunden',
+  },
+
   error: {
     title: '⚠️ ️️Oops! Etwas ist schiefgelaufen',
     showDetails: 'Details anzeigen',
@@ -117,6 +136,7 @@ export const de = {
       'Eintrag konnte nicht gelöscht werden. Bitte versuchen Sie es erneut',
     updateRecord:
       'Eintrag konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut',
+    unexpectedError: 'Ein unerwarteter Fehler ist aufgetreten',
   },
   success: {
     createRecord: {
@@ -142,19 +162,64 @@ export const de = {
       description:
         'Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihr Konto dauerhaft löschen und Ihre Daten von unseren Servern entfernen.',
     },
+    deleteView: {
+      title: 'Sind Sie sicher, dass Sie diese Ansicht löschen möchten?',
+      description:
+        'Wenn Sie diese Aktion rückgängig machen möchten, können Sie die Ansicht aus den Einstellungen wiederherstellen.',
+    },
   },
   saveViewDropdown: {
     saveToThisView: 'In diese Ansicht speichern',
     createNewView: 'Neue Ansicht erstellen...',
   },
+
+  detailView: {
+    activity: {
+      goTo: 'Gehe zu {{name}}',
+    },
+  },
+
   _creationTime: {
-    one: 'Created at',
-    other: 'Created at',
+    one: 'Erstellt am',
+    other: 'Erstellt am',
+  },
+  updatedAt_: {
+    one: 'Aktualisiert am',
+    other: 'Aktualisiert am',
+  },
+  updatedBy_: {
+    one: 'Aktualisiert von',
+    other: 'Aktualisiert von',
+  },
+  deletedAt_: {
+    one: 'Gelöscht am',
+    other: 'Gelöscht am',
+  },
+  deleted: {
+    one: 'Gelöscht',
+    other: 'Gelöscht',
+  },
+  createdBy_: {
+    one: 'Erstellt von',
+    other: 'Erstellt von',
   },
 
   __commands: {
-    createNewView: 'Create new view',
-    saveView: 'Save view',
+    createNewView: 'Neue Ansicht erstellen',
+    saveView: 'Ansicht speichern',
     headers: headers,
+    copyId: 'ID kopieren',
+    copyUrl: 'URL kopieren',
+    deleteModel: '{{name}} löschen',
+    favoriteModel: '{{name}} favorisieren',
+    unfavoriteModel: '{{name}} nicht mehr favorisieren',
+    open: '{{name}} öffnen',
+    goTo: 'Gehe zu {{name}}',
+    remindMeLater: 'Erinnere mich später',
+    delete: 'Löschen...',
+    exportAsCsv: 'Als CSV exportieren',
+    subscribeToView: 'Abonnieren',
+    unsubscribeFromView: 'Abonnement beenden',
+    subscribeToItemAdded: 'Wenn {{name}} zu dieser Ansicht hinzugefügt wurde',
   },
 } satisfies typeof en;

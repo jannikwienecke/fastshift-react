@@ -251,7 +251,6 @@ export const formHelper = (
 
       const value = getValueOfRow(field.name);
       const label = Array.isArray(value) ? '' : value?.id ? value.label : value;
-
       return {
         id: field.name,
         label,

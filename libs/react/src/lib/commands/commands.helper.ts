@@ -1,16 +1,23 @@
 import {
   _filter,
-  CommandbarItem,
   CommandbarItemHandler,
   CommandbarProps,
+  getViewLabel,
   makeRowFromValue,
   Row,
+  t,
+  ViewConfigType,
 } from '@apps-next/core';
-import { dateUtils, operatorMap } from '../ui-adapter/filter-adapter';
-import { store$ } from '../legend-store';
-import { xSelect } from '../legend-store/legend.select-state';
 import Fuse from 'fuse.js';
+import {
+  currentView$,
+  getViewConfigManager,
+  isDetail,
+  store$,
+} from '../legend-store';
 import { comboboxDebouncedQuery$ } from '../legend-store/legend.combobox.helper';
+import { xSelect } from '../legend-store/legend.select-state';
+import { dateUtils, operatorMap } from '../ui-adapter/filter-adapter';
 
 type FnArgsOfCommand = Parameters<CommandbarItemHandler>[0];
 
@@ -76,17 +83,6 @@ const isInternalView = (viewName: string) => {
   return internalViewNames.includes(viewName);
 };
 
-const getUserStoreCommands = (): CommandbarItem[] => {
-  const storeCommands = store$.commands.get();
-
-  return storeCommands.map((command) => {
-    return {
-      ...command,
-      command: 'user-store-command',
-    } satisfies CommandbarItem;
-  });
-};
-
 const filterCommandGroups = (groups: CommandbarProps['groups']) => {
   const viewFieldOrUndefined = store$.commandbar.selectedViewField.get();
   const standardQuery = store$.commandbar.query.get() ?? '';
@@ -120,7 +116,7 @@ const filterCommandGroups = (groups: CommandbarProps['groups']) => {
     includeScore: true,
   };
 
-  const currentTableName = store$.viewConfigManager.getTableName();
+  const currentTableName = getViewConfigManager()?.getTableName();
 
   filteredGroups.sort((a, b) => {
     if (!query) return 0;
@@ -154,11 +150,27 @@ const filterCommandGroups = (groups: CommandbarProps['groups']) => {
   return filteredGroups;
 };
 
+export const getViewName = () => getViewConfigManager()?.getViewName();
+export const getTableName = () => getViewConfigManager()?.getTableName();
+
+export const getViewLabelOf = (translationString: string) => {
+  const view = isDetail()
+    ? store$.detail.viewConfigManager.viewConfig.get()
+    : currentView$.get();
+  if (!view) return translationString;
+
+  return t(translationString, {
+    name: getViewLabel(view as ViewConfigType, true),
+  });
+};
+
+export const getCommandsType = () => store$.commandsDisplay.type.get();
+
 export const commandsHelper = {
   openCommandbarDatePicker,
   getParsedDateRowForMutation,
   onError,
   isInternalView,
-  getUserStoreCommands,
   filterCommandGroups,
+  getViewName,
 };

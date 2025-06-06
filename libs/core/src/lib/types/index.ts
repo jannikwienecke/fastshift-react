@@ -9,3 +9,4 @@ export * from './react.types';
 export * from './displayOptions.types';
 export * from './commands';
 export * from './history.types';
+export * from './viewregistry.types';

@@ -1,17 +1,23 @@
 import {
   DEFAULT_FETCH_LIMIT_QUERY,
   makeQueryKey,
+  NONE_OPTION,
   QueryDto,
   QueryProps,
   QueryReturnDto,
   QueryReturnOrUndefined,
   RecordType,
+  RelationalFilterQueryDto,
 } from '@apps-next/core';
 import {
   DefinedUseQueryResult,
   useQuery as useTanstackQuery,
 } from '@tanstack/react-query';
+import {} from 'convex-helpers/react';
 import React from 'react';
+import { currentView$, getViewConfigManager } from './legend-store';
+import { rightSidebarProps$ } from './legend-store/legend.rightsidebar.derived';
+import { listRowIds$ } from './legend-store/legend.rightsidebar.state';
 import { store$ } from './legend-store/legend.store';
 import {
   getParsedViewSettings,
@@ -20,7 +26,6 @@ import {
 import { PrismaContextType } from './query-context';
 import { useApi } from './use-api';
 import { useView } from './use-view';
-
 export const useStableQuery = (api: PrismaContextType, args: QueryDto) => {
   const viewName = args.viewName ?? args.viewConfig?.viewName ?? '';
 
@@ -94,7 +99,7 @@ export const useRelationalQuery = <QueryReturnType extends RecordType[]>(
 
   const { registeredViews } = useView();
 
-  const viewConfig = store$.viewConfigManager?.viewConfig.get() ?? null;
+  const viewConfig = getViewConfigManager()?.viewConfig;
 
   const parsedViewSettings = getParsedViewSettings();
 
@@ -171,7 +176,7 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const viewConfigManager = store$.viewConfigManager.get();
 
-  const query = store$.globalQueryDebounced.get();
+  const query = store$.debouncedViewQuery.get();
 
   const parsedViewSettings = getParsedViewSettings();
 
@@ -182,10 +187,15 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
 
   const localMode = localModeEnabled$.get();
 
+  const righSidebarFilter = store$.rightSidebar.filter.get();
+
+  const isFetchAll = store$.isFetchAll.get();
+
   const queryPropsMerged = React.useMemo(() => {
     return {
       ...queryProps,
       query: queryProps?.query || query,
+      isFetchAll,
       registeredViews: queryProps?.registeredViews ?? registeredViews,
       modelConfig:
         queryProps?.viewConfigManager?.modelConfig ||
@@ -215,6 +225,13 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
       parentViewName,
       parentId,
 
+      tempFilter:
+        righSidebarFilter?.id === NONE_OPTION
+          ? `${righSidebarFilter?.tableName}:${righSidebarFilter?.id}`
+          : righSidebarFilter?.id
+          ? `${righSidebarFilter?.tableName}:${righSidebarFilter?.id}`
+          : undefined,
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       viewConfigManager: undefined,
@@ -231,6 +248,8 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     cursor,
     parentViewName,
     parentId,
+    righSidebarFilter,
+    isFetchAll,
   ]);
 
   const queryReturn: { data: QueryReturnDto } & DefinedUseQueryResult =
@@ -260,4 +279,34 @@ export const useQuery = <QueryReturnType extends RecordType[]>(
     continueCursor: queryReturn.data?.continueCursor,
     isDone: queryReturn.data?.isDone,
   };
+};
+
+export const useRelationalFilterQuery = () => {
+  const listRowIds = listRowIds$.get();
+
+  const prisma = useApi();
+
+  const result = useTanstackQuery({
+    ...prisma.makeRelationalFilterOptions({
+      ids: rightSidebarProps$.isOpen ? listRowIds : [],
+      tableName: currentView$.tableName.get() || '',
+      withCount: true,
+    }),
+    enabled: rightSidebarProps$.isOpen.get(),
+  } as any);
+
+  const stored = React.useRef(result as any);
+
+  if (result.data !== undefined) {
+    stored.current = result;
+  } else {
+    stored.current = {
+      ...result,
+      data: stored.current?.data,
+    };
+  }
+
+  return stored.current as {
+    data: RelationalFilterQueryDto;
+  } & DefinedUseQueryResult<RelationalFilterQueryDto>;
 };

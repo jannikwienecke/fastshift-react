@@ -85,7 +85,7 @@ export const makeSaveViewDropdownProps = <T extends RecordType>(
             } else {
               const form = store$.userViewSettings.form.get();
               if (!form) return;
-              store$.createViewMutation(form, onSuccess);
+              store$.createViewMutation(form, {}, onSuccess);
             }
           },
         }

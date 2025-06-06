@@ -98,7 +98,8 @@ test.describe('Custom Views', () => {
     await filterByProject(mainPage, 'fitness plan');
     await firstListItem.click({ force: true });
 
-    await expect(page.getByText(/fitness plan/i)).toHaveCount(4);
+    await expect(mainPage.page.getByTestId('list-item')).toHaveCount(3);
+
     await expect(page.getByText(/design mockups/i)).toBeHidden();
 
     await page.getByText(/reset/i).click();
@@ -113,7 +114,7 @@ test.describe('Custom Views', () => {
     await waitFor(page, 500);
     await page.reload();
 
-    await expect(page.getByText(/fitness plan/i)).toHaveCount(4);
+    await expect(mainPage.page.getByTestId('list-item')).toHaveCount(3);
     await expect(page.getByText(/design mockups/i)).toBeHidden();
 
     await mainPage.sidebar
@@ -139,7 +140,8 @@ test.describe('Custom Views', () => {
       .first()
       .click();
 
-    await expect(page.getByText(CON.project.values.fitnessPlan)).toHaveCount(4);
+    await expect(mainPage.page.getByTestId('list-item')).toHaveCount(3);
+
     await expect(
       page.getByText(CON.project.values.websiteRedesign)
     ).toHaveCount(0);
@@ -307,15 +309,18 @@ test.describe('Custom Views', () => {
 
     await page.getByRole('button', { name: 'emoji-picker-button' }).click();
 
-    await page.getByPlaceholder(/search/i).fill('laugh');
+    await mainPage.emojiPickerContent
+      .getByPlaceholder(/search/i)
+      .first()
+      .fill('laugh');
 
-    await waitFor(page, 300);
+    await waitFor(page, 200);
 
     await pressEnter(page);
 
     await page.getByRole('button', { name: 'save' }).click();
 
-    await waitFor(page, 300);
+    await waitFor(page, 500);
 
     await expect(page.getByText('🤣')).toBeVisible();
 
@@ -326,11 +331,11 @@ test.describe('Custom Views', () => {
   test('can star and unstar a view', async ({ mainPage }) => {
     const page = mainPage.page;
 
-    await page.getByTestId('unstarred').click({ force: true });
+    await page.getByTestId('unstarred').first().click({ force: true });
     await expect(mainPage.sidebar.getByText(/all tasks/i)).toHaveCount(2);
-    await page.getByTestId('starred').click({ force: true });
+    await page.getByTestId('starred').first().click({ force: true });
     await expect(mainPage.sidebar.getByText(/all tasks/i)).toHaveCount(0);
-    await page.getByTestId('unstarred').click({ force: true });
+    await page.getByTestId('unstarred').first().click({ force: true });
 
     await mainPage.sidebar.getByText(/all tasks more/i).click();
 

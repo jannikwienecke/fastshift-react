@@ -1,7 +1,13 @@
 import { DataModelNew, RecordType } from '@apps-next/core';
 import React from 'react';
 import { store$ } from './legend-store/legend.store';
-import { useDetailQuery, useQuery, useRelationalQuery } from './use-query';
+import {
+  useDetailQuery,
+  useQuery,
+  useRelationalFilterQuery,
+  useRelationalQuery,
+} from './use-query';
+import { currentView$ } from './legend-store';
 
 export type QueryStore<T extends RecordType> = {
   dataModel: DataModelNew<T>;
@@ -20,12 +26,17 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
 
   const detailQueryReturn = useDetailQuery();
 
+  const relationalFilterQueryReturn = useRelationalFilterQuery();
+
   const dataModel = store$.dataModel.get() as DataModelNew<QueryReturnType[0]>;
   const relationalDataModel = store$.relationalDataModel.get();
 
   const queryReturnRef = React.useRef(queryReturn);
   const relationalQueryReturnRef = React.useRef(relationalQueryReturn);
   const detailQueryReturnRef = React.useRef(detailQueryReturn);
+  const relationalFilterQueryReturnRef = React.useRef(
+    relationalFilterQueryReturn
+  );
 
   React.useEffect(() => {
     queryReturnRef.current = queryReturn;
@@ -40,12 +51,16 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
   }, [detailQueryReturn]);
 
   React.useEffect(() => {
+    relationalFilterQueryReturnRef.current = relationalFilterQueryReturn;
+  }, [relationalFilterQueryReturn]);
+
+  React.useEffect(() => {
     if (!queryReturn.data || queryReturn.isPending) {
-      if (store$.state.get() === 'invalidated') {
-        setTimeout(() => {
-          store$.state.set('mutating');
-        }, 10);
-      }
+      // if (store$.state.get() === 'invalidated') {
+      //   setTimeout(() => {
+      //     store$.state.set('mutating');
+      //   }, 10);
+      // }
       return;
     }
 
@@ -64,6 +79,15 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
 
     store$.handleIncomingDetailData(detailQueryReturnRef.current);
   }, [detailQueryReturn.data]);
+
+  const viewName = currentView$.get()?.viewName;
+  React.useEffect(() => {
+    if (!relationalFilterQueryReturn.data) return;
+
+    store$.handleIncomingRelationalFilterData(
+      relationalFilterQueryReturnRef.current.data
+    );
+  }, [relationalFilterQueryReturn.data, viewName]);
 
   return {
     dataModel,

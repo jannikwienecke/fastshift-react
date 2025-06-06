@@ -253,15 +253,17 @@ test.describe('List Combobox', () => {
 
     await firstListItem.hasText(oneOfOne);
 
+    await waitFor(mainPage.page, 200);
+
     await firstListItem.locator.getByText(oneOfOne).click({ force: true });
 
     await mainPage.page.reload();
 
-    await waitFor(mainPage.page, 300);
+    await waitFor(mainPage.page, 200);
 
     firstListItem = await helper.list.getFirstListItem();
 
-    await waitFor(mainPage.page, 100);
+    await waitFor(mainPage.page, 300);
 
     await firstListItem.hasText(oneOfOne);
 

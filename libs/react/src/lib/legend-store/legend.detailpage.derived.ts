@@ -6,6 +6,8 @@ import { selectState$, xSelect } from './legend.select-state';
 import { detailUserView$ } from './legend.shared.derived';
 import { store$ } from './legend.store';
 import { perstistedStore$ } from './legend.store.persisted';
+import { getCommandGroups, getPrimaryCommand } from '../commands';
+import { getCommandsDropdownProps } from './legend.utils.helper';
 
 export const detailPageProps$ = observable<Partial<MakeDetailPropsOption>>({});
 
@@ -60,6 +62,15 @@ export const derviedDetailPage$ = observable(() => {
           },
         }
       : null,
+
+    commands: {
+      primaryCommand: getPrimaryCommand(),
+      commandsDropdownProps: getCommandsDropdownProps({
+        view: 'detail-row',
+        commands: getCommandGroups(),
+      }),
+    },
+
     onClick: (field, rect, tabFormField) => {
       if (store$.detail.onClickRelation.get() && field.field) {
         store$.detail.onClickRelation
