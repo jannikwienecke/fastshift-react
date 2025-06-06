@@ -379,12 +379,16 @@ export const addEffects = (store$: Observable<LegendStore>) => {
     }, 10);
   });
 
+  let lastupdated = 0;
   store$.dataModel.rows.forEach((row) => {
     row.updated.onChange((changes) => {
       if (changes.isFromSync) return;
       const prevAtPath = changes.changes?.[0].prevAtPath;
       const valueAtPath = changes.changes?.[0].valueAtPath;
-      if (!prevAtPath && valueAtPath) {
+
+      if (!prevAtPath && valueAtPath && valueAtPath !== lastupdated) {
+        lastupdated = valueAtPath;
+
         const queryKey = querySubListViewOptions$.get()?.queryKey;
         const rows = store$.dataModel.rows.get();
 
@@ -462,6 +466,7 @@ export const addEffects = (store$: Observable<LegendStore>) => {
         return false;
       if ('relationQuery' in key) return false;
       if (key?.['viewId'] !== null) return false;
+      if (key?.['parentViewName'] !== null) return false;
 
       const data = store$.api.queryClient.getQueryData(q[0]);
       return !!data;

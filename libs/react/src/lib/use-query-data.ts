@@ -56,11 +56,11 @@ export const useQueryData = <QueryReturnType extends RecordType[]>(): Pick<
 
   React.useEffect(() => {
     if (!queryReturn.data || queryReturn.isPending) {
-      if (store$.state.get() === 'invalidated') {
-        setTimeout(() => {
-          store$.state.set('mutating');
-        }, 10);
-      }
+      // if (store$.state.get() === 'invalidated') {
+      //   setTimeout(() => {
+      //     store$.state.set('mutating');
+      //   }, 10);
+      // }
       return;
     }
 

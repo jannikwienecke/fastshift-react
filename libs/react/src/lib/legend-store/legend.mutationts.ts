@@ -401,8 +401,6 @@ export const optimisticUpdateStore = ({
     }
 
     if (updateGlobalDataModel && !isDetail()) {
-      console.debug('____UPDATE GLOBAL DATA MODEL');
-
       updatedRows.map((r) => {
         const hasRow = r.id === updatedRow.id;
         if (hasRow) {

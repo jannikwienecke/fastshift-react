@@ -14,28 +14,26 @@ import {
   DisplayOptionsViewField,
   FieldConfig,
   FilterType,
+  HistoryType,
   MakeListPropsOptions,
+  MakeUserStoreCommand,
+  Mutation,
   MutationDto,
   MutationHandlerErrorType,
   MutationReturnDto,
-  HistoryType,
   QueryRelationalData,
   QueryReturnOrUndefined,
   RecordType,
   RegisteredViews,
   RelationalDataModel,
+  RelationalFilterDataModel,
+  RelationalFilterQueryDto,
   Row,
   TranslationKeys,
   UiViewConfig,
-  UserStoreCommand,
   UserViewData,
   UserViewForm,
   ViewConfigType,
-  Mutation,
-  RelationalFilterQueryDto,
-  RelationalFilterDataModel,
-  CommandbarItem,
-  MakeUserStoreCommand,
 } from '@apps-next/core';
 import { Observable } from '@legendapp/state';
 import { QueryClient } from '@tanstack/react-query';
@@ -150,7 +148,7 @@ export type LegendStore = {
     | 'updating-display-options'
     | 'filter-changed'
     | 'mutating'
-    | 'invalidated'
+    // | 'invalidated'
     | 'temp-filter-changed';
 
   // MAIN DATA MODEL

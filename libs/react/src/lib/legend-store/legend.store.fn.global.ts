@@ -119,9 +119,9 @@ export const createDataModel: StoreFn<'createDataModel'> =
       tableName ?? store$.viewConfigManager.get().getTableName?.()
     )(sorted);
 
-    if (store$.state.get() !== 'invalidated') {
-      setGlobalDataModel(dataModel.rows);
-    }
+    // if (store$.state.get() !== 'invalidated') {
+    setGlobalDataModel(dataModel.rows);
+    // }
   };
 
 const handlingFetchMoreState = async (
@@ -272,10 +272,10 @@ export const handleIncomingData: StoreFn<'handleIncomingData'> =
     // store$.createRelationalDataModel(data.relationalData ?? {});
 
     switch (state) {
-      case 'invalidated':
-        console.debug('RECEIVING DATA AFTER INVALIDATED');
-        setTimeout(() => store$.state.set('mutating'), 10);
-        break;
+      // case 'invalidated':
+      //   console.debug('RECEIVING DATA AFTER INVALIDATED');
+      //   setTimeout(() => store$.state.set('mutating'), 10);
+      //   break;
 
       case 'fetching-more':
         console.debug('RECEIVING DATA AFTER FETCHING MORE', data);

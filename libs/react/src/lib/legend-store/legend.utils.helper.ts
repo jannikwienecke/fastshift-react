@@ -80,7 +80,6 @@ export const setGlobalDataModel = (rows: Row[]) => {
     DEFAULT_FETCH_LIMIT_QUERY > store$.dataModel.rows.get().length;
 
   if (localModeEnabled$.get() || isDone_) {
-    _log.debug('setGlobalDataModel: APPLY FILTER! AND SORT');
     applyDisplayOptions(store$, store$.displayOptions.get());
   }
 };

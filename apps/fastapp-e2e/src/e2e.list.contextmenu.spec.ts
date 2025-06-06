@@ -31,6 +31,7 @@ test.describe('List Contextmenu', () => {
     await mainPage.contextmenu.getByText(/Project/i).hover();
     await expect(mainPage.contextmenu.getByText(/no project/i)).toBeVisible();
 
+    await waitFor(mainPage.page, 500);
     await firstListItem
       .locator('div')
       .first()
@@ -72,6 +73,7 @@ test.describe('List Contextmenu', () => {
     await mainPage.contextmenu.getByText(/Project/i).hover();
     await expect(mainPage.contextmenu.getByText(/no project/i)).toBeVisible();
 
+    await waitFor(mainPage.page, 500);
     await firstListItem
       .locator('div')
       .first()

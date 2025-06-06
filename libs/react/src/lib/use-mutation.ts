@@ -1,12 +1,19 @@
-import { _log, lldebug, MutationDto, MutationReturnDto } from '@apps-next/core';
-import { useMutation as useMutationTanstack } from '@tanstack/react-query';
+import {
+  _log,
+  lldebug,
+  MutationDto,
+  MutationReturnDto,
+  RecordType,
+} from '@apps-next/core';
+import {
+  QueryClient,
+  useMutation as useMutationTanstack,
+} from '@tanstack/react-query';
 import React from 'react';
 import { toast } from 'sonner';
-import { store$ } from '..';
+import { store$, viewName$ } from '..';
 import { useApi } from './use-api';
 import { isDetail } from './legend-store/legend.utils';
-
-// const isDev = import.meta.env.MODE === 'development';
 
 export const useMutation = () => {
   const api = useApi();
@@ -31,35 +38,45 @@ export const useMutation = () => {
 
     onMutate: async (vars) => {
       console.debug('onMutate: ', vars.mutation);
-      store$.state.set('invalidated');
+      store$.state.set('mutating');
 
-      store$.mutating.mutation.set(vars.mutation);
+      // store$.mutating.mutation.set(vars.mutation);
 
       const viewMutation = vars.mutation.type === 'NEW_USER_VIEW_MUTATION';
 
-      const queryClient = store$.api.queryClient.get();
+      const queryClient =
+        store$.api.queryClient.get() as unknown as QueryClient;
 
       if (!viewMutation) {
+        let removedQueries = 0;
         setTimeout(() => {
-          queryClient?.cancelQueries?.();
           try {
-            (queryClient as any)?.clear?.();
-          } catch (error) {
-            console.debug('Error in clear: ', error);
-          }
+            const allQuerys = queryClient?.getQueriesData?.({});
 
-          try {
-            (queryClient as any)?.removeQueries?.({});
+            allQuerys?.forEach((query) => {
+              const [queryKey] = query as unknown as [
+                [string, string, RecordType]
+              ];
+              const nameOfFn = queryKey?.[1] as string;
+
+              if (!nameOfFn.toLowerCase().includes('viewloader')) return;
+
+              const viewName = queryKey?.[2]?.viewName as string;
+              const current = viewName$.get();
+
+              if (viewName === current) {
+                return;
+              } else {
+                removedQueries++;
+                queryClient?.removeQueries?.({
+                  queryKey,
+                });
+              }
+            });
+
+            console.debug(`Removed ${removedQueries} queries`);
           } catch (error) {
             console.debug('Error in removeQueries: ', error);
-          }
-
-          const cache = queryClient?.getQueryCache?.();
-
-          try {
-            cache?.clear();
-          } catch (error) {
-            console.debug('Error in clear: ', error);
           }
         }, 50);
       }
